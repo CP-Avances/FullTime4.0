@@ -14,18 +14,8 @@ class ReportesAsistenciasRutas {
         // LISTA DEPARTAMENTOS CON EMPLEADOS ACTIVOS O INACTIVOS
         this.router.get('/datos_generales/:estado', TokenValidation, REPORTE_A_CONTROLADOR.DatosGeneralesUsuarios);
 
-         // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR CARGOS
-         this.router.get(`/informacion-general-cargo/:estado`, TokenValidation, REPORTE_A_CONTROLADOR.DatosGeneralesCargo);
-
-        // REPORTES DE FALTAS
-        this.router.put('/faltas-empleados/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteFaltasMultiple);
-        this.router.put('/faltas-tabulado/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteFaltasMultipleTabulado);
-
-        // Reportes de Horas Trabajadas
-        this.router.put('/horas-trabaja/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteHorasTrabajaMultiple);
-
-        // REPORTES DE PUNTUALIDAD
-        this.router.put('/puntualidad/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReportePuntualidad);
+        // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR CARGOS
+        this.router.get(`/informacion-general-cargo/:estado`, TokenValidation, REPORTE_A_CONTROLADOR.DatosGeneralesCargo);
 
         // REPORTES DE TIMBRES MULTIPLE
         this.router.put('/timbres/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresMultiple);
@@ -47,14 +37,8 @@ class ReportesAsistenciasRutas {
         this.router.get('/timbres-abiertos', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresAbiertos);
 
         // REPORTES DE TIMBRES INCOMPLETOS
-        this.router.put('/timbres-incompletos/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresIncompletos);        
+        this.router.put('/timbres-incompletos/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresIncompletos);
         this.router.put('/timbres-incompletos-regimen-cargo/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresIncompletosRegimenCargo);
-        
-        // REPORTES DE TIMBRES TABULADO
-        this.router.put('/timbres-tabulados/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresTabulado);
-        
-        // REPORTES DE TIMBRES TABULADO INCOMPLETOS
-        this.router.put('/timbres-tabulados-incompletos/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresTabuladosIncompletos);
     }
 }
 

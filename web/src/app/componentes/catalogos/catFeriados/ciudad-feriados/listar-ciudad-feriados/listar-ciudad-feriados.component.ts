@@ -95,8 +95,8 @@ export class ListarCiudadFeriadosComponent implements OnInit {
       this.datosFeriado = data;
       this.datosFeriado.forEach(data => {
         data.fecha_ = this.validar.FormatearFecha(data.fecha, formato_fecha, this.validar.dia_abreviado);
-        if (data.fec_recuperacion != null) {
-          data.fec_recuperacion_ = this.validar.FormatearFecha(data.fec_recuperacion, formato_fecha, this.validar.dia_abreviado);
+        if (data.fecha_recuperacion != null) {
+          data.fec_recuperacion_ = this.validar.FormatearFecha(data.fecha_recuperacion, formato_fecha, this.validar.dia_abreviado);
         }
       })
     })

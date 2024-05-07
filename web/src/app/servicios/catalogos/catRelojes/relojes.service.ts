@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment'
+import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -17,8 +18,8 @@ export class RelojesService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/relojes/eliminar/${id}`);
+  EliminarRegistro(id: any) {
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/relojes/eliminar/${id}`).pipe(catchError(id));
   }
 
   // METODO PARA CREAR ARCHIVO XML

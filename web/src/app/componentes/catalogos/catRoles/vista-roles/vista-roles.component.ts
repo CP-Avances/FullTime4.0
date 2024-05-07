@@ -347,7 +347,7 @@ export class VistaRolesComponent implements OnInit {
       }
       return encontrado;
     } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+      if (parseInt(localStorage.getItem('rol') as string) != 1) {
         return false;
       } else {
         return true;
@@ -360,7 +360,7 @@ export class VistaRolesComponent implements OnInit {
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes' && item.id_funcion === 4));
+      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes Roles' && item.id_funcion === 4));
       if (index !== -1) {
         encontrado = true;
       }
@@ -380,13 +380,13 @@ export class VistaRolesComponent implements OnInit {
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Funciones Rol');
+      const index = datos.findIndex(item => item.accion === 'Ver Funciones Rol');
       if (index !== -1) {
         encontrado = true;
       }
       return encontrado;
     } else {
-      if (rolEmpl != 3) {
+      if (rolEmpl != 1) {
         return false;
       } else {
         return true;

@@ -51,7 +51,7 @@
                         <td class="d-flex justify-content-center">
                             <i matSuffix matTooltipPosition="right" matTooltip="Agregar funciones a este Rol."
                                 class="fas fa-grip-horizontal" id="funtion"
-                                [routerLink]="['/seleccionarPermisos/', rol.id]" *ngIf="getFuncionesRol() && rol.id != 3">
+                                [routerLink]="['/seleccionarPermisos/', rol.id]" *ngIf="getFuncionesRol()">
                                 <p>Funciones</p>
                             </i>
                             <i *ngIf="getEditarRol()" matSuffix (click)="AbrirVentanaEditar(rol)"

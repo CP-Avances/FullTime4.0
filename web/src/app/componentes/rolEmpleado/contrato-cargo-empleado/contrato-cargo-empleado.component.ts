@@ -103,8 +103,8 @@ export class ContratoCargoEmpleadoComponent implements OnInit {
     this.restEmpleado.BuscarDatosContrato(id_contrato).subscribe(res => {
       this.contratoEmpleado = res;
       this.contratoEmpleado.forEach((data: any) => {
-        data.fec_ingreso_ = this.validar.FormatearFecha(data.fec_ingreso, formato_fecha, this.validar.dia_abreviado);
-        data.fec_salida_ = this.validar.FormatearFecha(data.fec_salida, formato_fecha, this.validar.dia_abreviado);
+        data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, formato_fecha, this.validar.dia_abreviado);
+        data.fec_salida_ = this.validar.FormatearFecha(data.fecha_salida, formato_fecha, this.validar.dia_abreviado);
       })
     });
   }
@@ -116,7 +116,7 @@ export class ContratoCargoEmpleadoComponent implements OnInit {
     this.restEmpleado.BuscarContratosEmpleado(parseInt(this.idEmpleado)).subscribe(res => {
       this.contratoBuscado = res;
       this.contratoBuscado.forEach((data: any) => {
-        data.fec_ingreso_ = this.validar.FormatearFecha(data.fec_ingreso, formato_fecha, this.validar.dia_abreviado);
+        data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, formato_fecha, this.validar.dia_abreviado);
       })
     });
   }
@@ -134,14 +134,14 @@ export class ContratoCargoEmpleadoComponent implements OnInit {
     this.restEmpleado.BuscarDatosContrato(form.fechaContratoForm).subscribe(res => {
       this.contratoSeleccionado = res;
       this.contratoSeleccionado.forEach((data: any) => {
-        data.fec_ingreso_ = this.validar.FormatearFecha(data.fec_ingreso, this.formato_fecha, this.validar.dia_abreviado);
-        data.fec_salida_ = this.validar.FormatearFecha(data.fec_salida, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_salida_ = this.validar.FormatearFecha(data.fecha_salida, this.formato_fecha, this.validar.dia_abreviado);
       })
     });
     this.restCargo.BuscarCargoIDContrato(form.fechaContratoForm).subscribe(datos => {
       this.listaCargos = datos;
       this.listaCargos.forEach((data: any) => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
       })
     }, error => {
       this.toastr.info('El contrato seleccionado no registra ningún cargo', 'VERIFICAR', {
@@ -171,8 +171,8 @@ export class ContratoCargoEmpleadoComponent implements OnInit {
     this.restCargo.BuscarCargoID(id_cargo).subscribe(datos => {
       this.cargoEmpleado = datos;
       this.cargoEmpleado.forEach((data: any) => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
-        data.fec_final_ = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
+        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado);
+        data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, formato_fecha, this.validar.dia_abreviado);
       })
     });
   }
@@ -195,8 +195,8 @@ export class ContratoCargoEmpleadoComponent implements OnInit {
     this.restCargo.BuscarCargoID(form.fechaICargoForm).subscribe(datos => {
       this.cargoSeleccionado = datos;
       this.cargoSeleccionado.forEach((data: any) => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, this.formato_fecha, this.validar.dia_abreviado);
-        data.fec_final_ = this.validar.FormatearFecha(data.fec_final, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, this.formato_fecha, this.validar.dia_abreviado);
       })
     });
   }

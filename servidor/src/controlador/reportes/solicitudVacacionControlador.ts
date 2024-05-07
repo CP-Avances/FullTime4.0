@@ -36,7 +36,7 @@ class SolicitudVacacionesControlador {
 
         }).filter(obj => { return obj.departamentos.length > 0 })
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registro de vacaciones.' })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registros.' })
 
         return res.status(200).jsonp(nuevo)
 
@@ -45,19 +45,22 @@ class SolicitudVacacionesControlador {
 }
 
 const VACACIONES_REPORTE_CONTROLADOR = new SolicitudVacacionesControlador();
+
 export default VACACIONES_REPORTE_CONTROLADOR;
 
 const BuscarVacaciones = async function (id: string | number, desde: string, hasta: string) {
-    return await pool.query('SELECT v.fec_inicio, v.fec_final, v.fec_ingreso,v.id AS id_vacacion, ' +
-        'a.id_documento, a.estado ' +
-        'FROM vacaciones AS v, autorizaciones AS a ' +
-        'WHERE v.id = a.id_vacacion AND v.codigo = $1 AND fec_inicio BETWEEN $2 AND $3',
-        [id, desde, hasta])
+    return await pool.query(
+        `
+        SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso,v.id AS id_vacacion, a.id_autoriza_estado, a.estado 
+        FROM mv_solicitud_vacacion AS v, ecm_autorizaciones AS a 
+        WHERE v.id = a.id_vacacion AND v.codigo = $1 AND fecha_inicio BETWEEN $2 AND $3
+        `
+        , [id, desde, hasta])
         .then((res: any) => {
             if (res.rowCount > 0) {
                 res.rows.map((obj: any) => {
-                    if (obj.id_documento != null && obj.id_documento != '' && obj.estado != 1) {
-                        var autorizaciones = obj.id_documento.split(',');
+                    if (obj.id_autoriza_estado != null && obj.id_autoriza_estado != '' && obj.estado != 1) {
+                        var autorizaciones = obj.id_autoriza_estado.split(',');
                         let empleado_id = autorizaciones[autorizaciones.length - 2].split('_')[0];
                         obj.autoriza = parseInt(empleado_id);
                     }
@@ -76,13 +79,5 @@ const BuscarVacaciones = async function (id: string | number, desde: string, has
                 });
             }
             return res.rows
-        });
-}
-
-const BuscarAprobacion = async function (id: number) {
-    return await pool.query('SELECT e.nombre, e.apellido FROM empleados AS e WHERE e.id = $1 ',
-        [id])
-        .then((res: any) => {
-            return res.rows[0].nombre + ' ' + res.rows[0].apellido
         });
 }

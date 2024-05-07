@@ -23,6 +23,11 @@ import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla
 import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
 import { RegimenService } from "src/app/servicios/catalogos/catRegimen/regimen.service";
 
+
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableRegimen } from 'src/app/model/reportes.model';
+
+
 @Component({
   selector: "app-listar-regimen",
   templateUrl: "./listar-regimen.component.html",
@@ -30,6 +35,10 @@ import { RegimenService } from "src/app/servicios/catalogos/catRegimen/regimen.s
 })
 
 export class ListarRegimenComponent implements OnInit {
+
+  regimenesEliminar: any = [];
+
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   descripcionF = new FormControl("");
 
@@ -128,29 +137,7 @@ export class ListarRegimenComponent implements OnInit {
    ** **          VENTANAS PARA REGISTRAR Y EDITAR DATOS DE UN REGIMEN LABORAL       ** **
    ** ********************************************************************************* **/
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
-  Eliminar(id_regimen: number) {
-    this.rest.EliminarRegistro(id_regimen).subscribe((res) => {
-      this.toastr.error("Registro eliminado.", "", {
-        timeOut: 6000,
-      });
-      this.ObtenerRegimen();
-    });
-  }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
-    this.ventana
-      .open(MetodosComponent, { width: "450px" })
-      .afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id);
-        } else {
-          this.router.navigate(["/listarRegimen"]);
-        }
-      });
-  }
 
   // METODO PARA ABRIR FORMULARIO REGISTRAR
   ver_lista: boolean = true;
@@ -158,6 +145,15 @@ export class ListarRegimenComponent implements OnInit {
   AbrirRegistrar() {
     this.ver_lista = false;
     this.ver_registrar = true;
+
+
+
+    this.ObtenerRegimen();
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionRegimen.clear();
+    this.regimenesEliminar = [];
+
   }
 
   // METODO PARA VER DATOS DE REGIMEN LABORAL
@@ -321,7 +317,7 @@ export class ListarRegimenComponent implements OnInit {
                   { text: obj.vacacion_dias_laboral, style: "itemsTable" },
                   { text: obj.vacacion_dias_libre, style: "itemsTable" },
                   { text: obj.vacacion_dias_calendario, style: "itemsTable" },
-                  { text: obj.dias_max_acumulacion, style: "itemsTable" },
+                  { text: obj.dias_maximo_acumulacion, style: "itemsTable" },
                   { text: obj.anio_antiguedad, style: "itemsTable" },
                   { text: obj.dias_antiguedad, style: "itemsTable" },
                 ];
@@ -359,7 +355,7 @@ export class ListarRegimenComponent implements OnInit {
           DIAS_ANIO_VACACION: obj.vacacion_dias_laboral,
           DIAS_LIBRES: obj.vacacion_dias_libre,
           DIAS_CALENDARIO_VACACION: obj.vacacion_dias_calendario,
-          MAX_DIAS_ACUMULABLES: obj.dias_max_acumulacion,
+          MAX_DIAS_ACUMULABLES: obj.dias_maximo_acumulacion,
           DIAS_LABORALES_GANADOS_MES: obj.vacacion_dias_laboral_mes,
           DIAS_CALENDARIO_GANADOS_MES: obj.vacacion_dias_calendario_mes,
           DIAS_LABORALES_GANADOS_DIA: obj.laboral_dias,
@@ -406,7 +402,7 @@ export class ListarRegimenComponent implements OnInit {
           dias_anio_vacacion: obj.vacacion_dias_laboral,
           dias_libres: obj.vacacion_dias_libre,
           dias_calendario_vacacion: obj.vacacion_dias_calendario,
-          max_dias_acumulables: obj.dias_max_acumulacion,
+          max_dias_acumulables: obj.dias_maximo_acumulacion,
           dias_laborales_ganados_mes: obj.vacacion_dias_laboral_mes,
           dias_calendario_ganados_mes: obj.vacacion_dias_calendario_mes,
           dias_laborales_ganados_dia: obj.laboral_dias,
@@ -557,4 +553,180 @@ export class ListarRegimenComponent implements OnInit {
     }
   }
 
+  //HABILITAR LOS CHECKS
+
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionRegimen = new SelectionModel<ITableRegimen>(true, []);
+
+
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionRegimen.selected.length;
+    return numSelected === this.regimen.length
+  }
+
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionRegimen.clear() :
+      this.regimen.forEach((row: any) => this.selectionRegimen.select(row));
+  }
+
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableRegimen): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.regimenesEliminar = this.selectionRegimen.selected;
+    //console.log('paginas para Eliminar',this.paginasEliminar);
+
+    //console.log(this.selectionPaginas.selected)
+    return `${this.selectionRegimen.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+
+  }
+  contador: number = 0;
+  ingresar: boolean = false;
+
+
+  EliminarMultiple() {
+
+    this.ingresar = false;
+    this.contador = 0;
+    this.regimenesEliminar = this.selectionRegimen.selected;
+    this.regimenesEliminar.forEach((datos: any) => {
+
+      this.regimen = this.regimen.filter(item => item.id !== datos.id);
+
+      this.contador = this.contador + 1;
+
+      //AQUI MODIFICAR EL METODO 
+      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+
+        if (res.message === 'error') {
+          this.toastr.error('No se puede eliminar.', '', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+
+
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ObtenerRegimen();
+        }
+      });
+
+    }
+    )
+  }
+
+
+
+
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+
+          if (this.regimenesEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+            this.regimenesEliminar = [];
+            this.selectionRegimen.clear();
+
+            this.ObtenerRegimen();
+
+
+          } else {
+            this.toastr.warning('No ha seleccionado REGÍMENES.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+
+          }
+
+
+        } else {
+          this.router.navigate(['/listarRegimen']);
+
+        }
+      });
+  }
+
+
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
+  Eliminar(id_regimen: number) {
+    this.rest.EliminarRegistro(id_regimen).subscribe((res) => {
+
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerRegimen();
+      }
+    });
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana
+      .open(MetodosComponent, { width: "450px" })
+      .afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.regimenesEliminar = [];
+          this.selectionRegimen.clear();
+
+          this.ObtenerRegimen();
+
+
+        } else {
+          this.router.navigate(["/listarRegimen"]);
+        }
+      });
+  }
+
+
+
+
+
 }
+
+
+
+
+

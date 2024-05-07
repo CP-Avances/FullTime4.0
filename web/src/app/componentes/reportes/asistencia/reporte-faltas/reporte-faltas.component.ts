@@ -622,8 +622,8 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }

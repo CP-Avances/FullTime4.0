@@ -14,20 +14,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VACUNAS_CONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const moment_1 = __importDefault(require("moment"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const moment_1 = __importDefault(require("moment"));
 class VacunasControlador {
     // LISTAR REGISTROS DE VACUNACIÓN DEL EMPLEADO POR SU ID
     ListarUnRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             const VACUNA = yield database_1.default.query(`
-            SELECT ev.id, ev.id_empleado, ev.id_tipo_vacuna, ev.carnet, ev.fecha, 
-            tv.nombre, ev.descripcion
-            FROM empl_vacunas AS ev, tipo_vacuna AS tv 
-            WHERE ev.id_tipo_vacuna = tv.id AND ev.id_empleado = $1
+            SELECT ev.id, ev.id_empleado, ev.id_vacuna, ev.carnet, ev.fecha, tv.nombre, ev.descripcion
+            FROM eu_empleado_vacunas AS ev, e_cat_vacuna AS tv 
+            WHERE ev.id_vacuna = tv.id AND ev.id_empleado = $1
             ORDER BY ev.id DESC
             `, [id_empleado]);
             if (VACUNA.rowCount > 0) {
@@ -42,7 +41,7 @@ class VacunasControlador {
     ListarTipoVacuna(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const VACUNA = yield database_1.default.query(`
-            SELECT * FROM tipo_vacuna
+            SELECT * FROM e_cat_vacuna
             `);
             if (VACUNA.rowCount > 0) {
                 return res.jsonp(VACUNA.rows);
@@ -57,7 +56,7 @@ class VacunasControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, descripcion, fecha, id_tipo_vacuna } = req.body;
             const response = yield database_1.default.query(`
-            INSERT INTO empl_vacunas (id_empleado, descripcion, fecha, id_tipo_vacuna) 
+            INSERT INTO eu_empleado_vacunas (id_empleado, descripcion, fecha, id_vacuna) 
             VALUES ($1, $2, $3, $4) RETURNING *
             `, [id_empleado, descripcion, fecha, id_tipo_vacuna]);
             const [vacuna] = response.rows;
@@ -81,12 +80,12 @@ class VacunasControlador {
             let id = req.params.id;
             let id_empleado = req.params.id_empleado;
             const response = yield database_1.default.query(`
-            SELECT codigo FROM empleados WHERE id = $1
+            SELECT codigo FROM eu_empleados WHERE id = $1
             `, [id_empleado]);
             const [vacuna] = response.rows;
             let documento = vacuna.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
             yield database_1.default.query(`
-            UPDATE empl_vacunas SET carnet = $2 WHERE id = $1
+            UPDATE eu_empleado_vacunas SET carnet = $2 WHERE id = $1
             `, [id, documento]);
             res.jsonp({ message: 'Registro guardado.' });
         });
@@ -97,8 +96,8 @@ class VacunasControlador {
             const { id } = req.params;
             const { id_empleado, descripcion, fecha, id_tipo_vacuna } = req.body;
             yield database_1.default.query(`
-            UPDATE empl_vacunas SET id_empleado = $1, descripcion = $2, fecha = $3, 
-            id_tipo_vacuna = $4 WHERE id = $5
+            UPDATE eu_empleado_vacunas SET id_empleado = $1, descripcion = $2, fecha = $3, id_vacuna = $4 
+            WHERE id = $5
             `, [id_empleado, descripcion, fecha, id_tipo_vacuna, id]);
             res.jsonp({ message: 'Registro actualizado.' });
         });
@@ -129,7 +128,7 @@ class VacunasControlador {
             let separador = path_1.default.sep;
             let { documento, id } = req.body;
             const response = yield database_1.default.query(`
-            UPDATE empl_vacunas SET carnet = null WHERE id = $1 RETURNING *
+            UPDATE eu_empleado_vacunas SET carnet = null WHERE id = $1 RETURNING *
             `, [id]);
             const [vacuna] = response.rows;
             if (documento != 'null' && documento != '' && documento != null) {
@@ -153,7 +152,7 @@ class VacunasControlador {
             let separador = path_1.default.sep;
             const { id, documento } = req.params;
             const response = yield database_1.default.query(`
-            DELETE FROM empl_vacunas WHERE id = $1 RETURNING *
+            DELETE FROM eu_empleado_vacunas WHERE id = $1 RETURNING *
             `, [id]);
             const [vacuna] = response.rows;
             if (documento != 'null' && documento != '' && documento != null) {
@@ -177,7 +176,7 @@ class VacunasControlador {
             try {
                 const { nombre } = req.body;
                 const response = yield database_1.default.query(`
-                INSERT INTO tipo_vacuna (nombre) VALUES ($1) RETURNING *
+                INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
                 `, [nombre]);
                 const [vacunas] = response.rows;
                 if (vacunas) {
@@ -213,10 +212,9 @@ class VacunasControlador {
     ListarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const VACUNA = yield database_1.default.query(`
-            SELECT ev.id, ev.id_empleado, ev.id_tipo_vacuna, ev.carnet, ev.fecha, 
-            tv.nombre, ev.descripcion
-            FROM empl_vacunas AS ev, tipo_vacuna AS tv 
-            WHERE ev.id_tipo_vacuna = tv.id
+            SELECT ev.id, ev.id_empleado, ev.id_vacuna, ev.carnet, ev.fecha, tv.nombre, ev.descripcion
+            FROM eu_empleado_vacunas AS ev, e_cat_vacuna AS tv 
+            WHERE ev.id_vacuna = tv.id
             ORDER BY ev.id DESC
             `);
             if (VACUNA.rowCount > 0) {

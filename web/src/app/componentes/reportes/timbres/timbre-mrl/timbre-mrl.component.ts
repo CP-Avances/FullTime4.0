@@ -490,8 +490,8 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -510,11 +510,11 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
           obj3.timbres.forEach((obj4: any) => {
             n = n + 1;
             const servidor_fecha = this.validacionService.FormatearFecha(
-              obj4.fec_hora_timbre_servidor.split(' ')[0],
+              obj4.fecha_hora_timbre_servidor.split(' ')[0],
               this.formato_fecha,
               'no');
             const servidor_hora = this.validacionService.FormatearHora(
-              obj4.fec_hora_timbre_servidor.split(' ')[1],
+              obj4.fecha_hora_timbre_servidor.split(' ')[1],
               this.formato_hora);
 
             switch (obj4.accion) {
@@ -554,11 +554,11 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
         obj2.timbres.forEach((obj3: any) => {
           n = n + 1;
           const servidor_fecha = this.validacionService.FormatearFecha(
-            obj3.fec_hora_timbre_servidor.split(' ')[0],
+            obj3.fecha_hora_timbre_servidor.split(' ')[0],
             this.formato_fecha,
             this.validacionService.dia_abreviado);
           const servidor_hora = this.validacionService.FormatearHora(
-            obj3.fec_hora_timbre_servidor.split(' ')[1],
+            obj3.fecha_hora_timbre_servidor.split(' ')[1],
             this.formato_hora);
 
           switch (obj3.accion) {

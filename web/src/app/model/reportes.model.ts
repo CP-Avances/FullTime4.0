@@ -457,3 +457,88 @@ export interface ITableFuncionesRoles {
     funcion: string,
     
 }
+
+//CREAR AQUI LAS NUEVAS INTERFACES
+
+//SUCURSALES
+
+export interface ITableSucursales {
+    nombre: string,
+    
+}
+
+
+export interface ITableDepartamentos {
+    nombre: string,
+    
+}
+
+
+export interface ITableRegimen {
+    nombre: string,
+    
+}
+
+
+export interface ITableProvincias {
+    nombre: string,
+    
+}
+
+
+export interface ITableCiudades {
+    nombre: string,
+    
+}
+
+export interface ITableSucursales {
+    nombre: string,
+    
+}
+
+export interface ITableDepartamentos {
+    nombre: string,
+    
+}
+
+
+
+export interface ITableNivelesEducacion {
+    nombre: string,
+    
+}
+
+export interface ITableTitulos {
+    nombre: string,
+    
+}
+
+export interface ITableFeriados {
+    
+    descripcion: string,
+    
+}
+
+
+export interface ITableHorarios {
+    
+    descripcion: string,
+    
+}
+
+export interface ITableDispositivos {
+    
+    codigo: string,
+    
+}
+
+export interface ITableArchivos{
+
+    nombre: string,
+}
+
+
+export interface ITableNivel {
+    nivel: string,
+    
+}

@@ -83,14 +83,14 @@ class ReportesAtrasosControlador {
 const BuscarAtrasos = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
-        SELECT CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR),
-            EXTRACT(epoch FROM (fec_hora_timbre - fec_hora_horario)) AS diferencia, 
-            codigo, estado_timbre, tipo_entr_salida AS accion, tolerancia, tipo_dia 
-        FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' 
+        SELECT CAST(fecha_hora_horario AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR),
+            EXTRACT(epoch FROM (fecha_hora_timbre - fecha_hora_horario)) AS diferencia, 
+            codigo, estado_timbre, tipo_accion AS accion, tolerancia, tipo_dia 
+        FROM eu_asistencia_general WHERE CAST(fecha_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' 
             AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 
-            AND fec_hora_timbre > fec_hora_horario AND tipo_dia NOT IN (\'L\', \'FD\') 
-            AND tipo_entr_salida = \'E\' 
-        ORDER BY fec_hora_horario ASC
+            AND fecha_hora_timbre > fecha_hora_horario AND tipo_dia NOT IN (\'L\', \'FD\') 
+            AND tipo_accion = \'E\' 
+        ORDER BY fecha_hora_horario ASC
         `, [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;

@@ -246,7 +246,7 @@ export class CrearPedidoAccionComponent implements OnInit {
       .subscribe((data) => {
         this.empresa = data;
         this.secondFormGroup.patchValue({
-          numPartidaForm: this.empresa[0].num_partida,
+          numPartidaForm: this.empresa[0].numero_partida,
         });
       });
   }

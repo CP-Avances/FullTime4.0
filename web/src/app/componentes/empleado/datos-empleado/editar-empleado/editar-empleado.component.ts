@@ -111,7 +111,7 @@ export class EditarEmpleadoComponent implements OnInit {
 
   // CARGAR DATOS DE EMPLEADO Y USUARIO
   ObtenerEmpleado() {
-    const { apellido, cedula, codigo, correo, domicilio, esta_civil, estado, fec_nacimiento, genero,
+    const { apellido, cedula, codigo, correo, domicilio, estado_civil, estado, fecha_nacimiento, genero,
       id, id_nacionalidad, nombre, telefono } = this.empleado;
 
     this.primeroFormGroup.setValue({
@@ -120,12 +120,12 @@ export class EditarEmpleadoComponent implements OnInit {
       nombreForm: nombre,
       cedulaForm: cedula,
       emailForm: correo,
-      fechaForm: fec_nacimiento,
+      fechaForm: fecha_nacimiento,
     });
 
     this.segundoFormGroup.setValue({
       nacionalidadForm: this.nacionalidades.filter(o => { return id_nacionalidad === o.id }).map(o => { return o.nombre }),
-      estadoCivilForm: esta_civil,
+      estadoCivilForm: estado_civil,
       domicilioForm: domicilio,
       telefonoForm: telefono,
       generoForm: genero,

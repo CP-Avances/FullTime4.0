@@ -19,12 +19,28 @@ const storage = multer.diskStorage({
         //var mes = fecha.format('MM');
         //var dia = fecha.format('DD');
         let documento = file.originalname;
+        cb(null, documento);
+    }
+})
 
+const storage1 = multer.diskStorage({
+
+    destination: function (req, file, cb) {
+        cb(null, ObtenerRutaLeerPlantillas())
+    },
+    filename: function (req, file, cb) {
+        // FECHA DEL SISTEMA
+        //var fecha = moment();
+        //var anio = fecha.format('YYYY');
+        //var mes = fecha.format('MM');
+        //var dia = fecha.format('DD');
+        let documento = file.originalname;
         cb(null, documento);
     }
 })
 
 const upload = multer({ storage: storage });
+const upload1 = multer({ storage: storage1});
 
 class FeriadosRuta {
     public router: Router = Router();
@@ -53,13 +69,11 @@ class FeriadosRuta {
         this.router.post('/listar-feriados-recuperar/ciudad', TokenValidation, FERIADOS_CONTROLADOR.FeriadosRecuperacionCiudad);
 
 
-
-
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], FERIADOS_CONTROLADOR.RevisarDatos);
         this.router.post('/upload/revision_data', [TokenValidation, upload.single('uploads')], FERIADOS_CONTROLADOR.RevisarDatos_Duplicados);
         this.router.post('/upload', [TokenValidation, upload.single('uploads')], FERIADOS_CONTROLADOR.CrearFeriadoPlantilla);
 
-
+        this.router.post('/upload/crearFeriadoCiudad',[TokenValidation, upload1.single('uploads')], FERIADOS_CONTROLADOR.RegistrarFeriado_Ciudad);
 
     }
 }

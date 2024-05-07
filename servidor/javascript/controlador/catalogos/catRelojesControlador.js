@@ -15,17 +15,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
 const fs_1 = __importDefault(require("fs"));
-const builder = require('xmlbuilder');
 class RelojesControlador {
     // METODO PARA BUSCAR DISPOSITIVOS
     ListarRelojes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const RELOJES = yield database_1.default.query(`
             SELECT cr.id, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
-                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tien_funciones, cr.id_sucursal, 
+                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tiene_funciones, cr.id_sucursal, 
                 cr.id_departamento, cr.numero_accion, cd.nombre AS nomdepar, s.nombre AS nomsucursal, 
                 e.nombre AS nomempresa, c.descripcion AS nomciudad
-            FROM cg_relojes cr, cg_departamentos cd, sucursales s, ciudades c, cg_empresa e
+            FROM ed_relojes cr, ed_departamentos cd, e_sucursales s, e_ciudades c, e_empresa e
             WHERE cr.id_departamento = cd.id AND cd.id_sucursal = cr.id_sucursal AND 
                 cr.id_sucursal = s.id AND s.id_empresa = e.id AND s.id_ciudad = c.id;
             `);
@@ -40,11 +39,16 @@ class RelojesControlador {
     // METODO PARA ELIMINAR REGISTROS
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-            DELETE FROM cg_relojes WHERE id = $1
-            `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                const id = req.params.id;
+                yield database_1.default.query(`
+                DELETE FROM ed_relojes WHERE id = $1
+                `, [id]);
+                res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
         });
     }
     // METODO PARA REGISTRAR DISPOSITIVO
@@ -53,8 +57,8 @@ class RelojesControlador {
             try {
                 const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, id, numero_accion } = req.body;
                 const response = yield database_1.default.query(`
-                INSERT INTO cg_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                    id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, id, 
+                INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
+                    id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, id, 
                     numero_accion )
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
                 `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
@@ -77,7 +81,7 @@ class RelojesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const RELOJES = yield database_1.default.query(`
-            SELECT * FROM cg_relojes WHERE id = $1
+            SELECT * FROM ed_relojes WHERE id = $1
             `, [id]);
             if (RELOJES.rowCount > 0) {
                 return res.jsonp(RELOJES.rows);
@@ -93,9 +97,9 @@ class RelojesControlador {
             try {
                 const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, id, numero_accion, id_real } = req.body;
                 yield database_1.default.query(`
-                UPDATE cg_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
+                UPDATE ed_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
                     modelo = $6, serie = $7, id_fabricacion = $8, fabricante = $9, mac = $10, 
-                    tien_funciones = $11, id_sucursal = $12, id_departamento = $13, id = $14, 
+                    tiene_funciones = $11, id_sucursal = $12, id_departamento = $13, id = $14, 
                     numero_accion = $15 
                 WHERE id = $16
                 `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
@@ -113,10 +117,10 @@ class RelojesControlador {
             const { id } = req.params;
             const RELOJES = yield database_1.default.query(`
             SELECT cr.id, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
-                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tien_funciones, cr.id_sucursal, 
+                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tiene_funciones, cr.id_sucursal, 
                 cr.id_departamento, cr.numero_accion, cd.nombre AS nomdepar, s.nombre AS nomsucursal,
                 e.nombre AS nomempresa, c.descripcion AS nomciudad
-            FROM cg_relojes cr, cg_departamentos cd, sucursales s, ciudades c, cg_empresa e
+            FROM ed_relojes cr, ed_departamentos cd, e_sucursales s, e_ciudades c, e_empresa e
             WHERE cr.id_departamento = cd.id AND cd.id_sucursal = cr.id_sucursal AND cr.id_sucursal = s.id 
                 AND s.id_empresa = e.id AND s.id_ciudad = c.id AND cr.id = $1
             `, [id]);
@@ -141,9 +145,13 @@ class RelojesControlador {
                 // Dtaos de la plantilla ingresada
                 const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tiene_funciones, sucursal, departamento, codigo_reloj, numero_accion } = data;
                 // Buscar id de la sucursal ingresada
-                const id_sucursal = yield database_1.default.query('SELECT id FROM sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
-                const id_departamento = yield database_1.default.query('SELECT id FROM cg_departamentos WHERE UPPER(nombre) = $1 AND ' +
-                    'id_sucursal = $2', [departamento.toUpperCase(), id_sucursal.rows[0]['id']]);
+                const id_sucursal = yield database_1.default.query(`
+                SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+                `, [sucursal.toUpperCase()]);
+                const id_departamento = yield database_1.default.query(`
+                SELECT id FROM ed_departamentos 
+                WHERE UPPER(nombre) = $1 AND id_sucursal = $2
+                `, [departamento.toUpperCase(), id_sucursal.rows[0]['id']]);
                 // Verificar que se haya ingresado número de acciones si el dispositivo las tiene
                 if (tiene_funciones === true) {
                     var accion = numero_accion;
@@ -151,9 +159,11 @@ class RelojesControlador {
                 else {
                     accion = 0;
                 }
-                yield database_1.default.query('INSERT INTO cg_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, ' +
-                    'id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, id, numero_accion) ' +
-                    'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)', [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                yield database_1.default.query(`
+                INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
+                    id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, id, numero_accion) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+                `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
                     tiene_funciones, id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], codigo_reloj, accion]);
                 res.jsonp({ message: 'correcto' });
             }));
@@ -194,26 +204,36 @@ class RelojesControlador {
                     contarLlenos = contarLlenos + 1;
                 }
                 //Verificar que el codigo no se encuentre registrado
-                const VERIFICAR_CODIGO = yield database_1.default.query('SELECT * FROM cg_relojes WHERE id = $1', [codigo_reloj]);
+                const VERIFICAR_CODIGO = yield database_1.default.query(`
+                SELECT * FROM ed_relojes WHERE id = $1
+                `, [codigo_reloj]);
                 if (VERIFICAR_CODIGO.rowCount === 0) {
                     contarCodigo = contarCodigo + 1;
                 }
                 //Verificar que el nombre del equipo no se encuentre registrado
-                const VERIFICAR_NOMBRE = yield database_1.default.query('SELECT * FROM cg_relojes WHERE UPPER(nombre) = $1', [nombre.toUpperCase()]);
+                const VERIFICAR_NOMBRE = yield database_1.default.query(`
+                SELECT * FROM ed_relojes WHERE UPPER(nombre) = $1
+                `, [nombre.toUpperCase()]);
                 if (VERIFICAR_NOMBRE.rowCount === 0) {
                     contarNombre = contarNombre + 1;
                 }
                 //Verificar que la IP del dispositivo no se encuentre registrado
-                const VERIFICAR_IP = yield database_1.default.query('SELECT * FROM cg_relojes WHERE ip = $1', [ip]);
+                const VERIFICAR_IP = yield database_1.default.query(`
+                SELECT * FROM ed_relojes WHERE ip = $1
+                `, [ip]);
                 if (VERIFICAR_IP.rowCount === 0) {
                     contarIP = contarIP + 1;
                 }
                 //Verificar que la sucursal exista dentro del sistema
-                const VERIFICAR_SUCURSAL = yield database_1.default.query('SELECT id FROM sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
+                const VERIFICAR_SUCURSAL = yield database_1.default.query(`
+                SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+                `, [sucursal.toUpperCase()]);
                 if (VERIFICAR_SUCURSAL.rowCount > 0) {
                     contarSucursal = contarSucursal + 1;
                     // Verificar que el departamento exista dentro del sistema
-                    const VERIFICAR_DEPARTAMENTO = yield database_1.default.query('SELECT id FROM cg_departamentos WHERE UPPER(nombre) = $1 AND id_sucursal = $2', [departamento.toUpperCase(), VERIFICAR_SUCURSAL.rows[0]['id']]);
+                    const VERIFICAR_DEPARTAMENTO = yield database_1.default.query(`
+                    SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND id_sucursal = $2
+                    `, [departamento.toUpperCase(), VERIFICAR_SUCURSAL.rows[0]['id']]);
                     if (VERIFICAR_DEPARTAMENTO.rowCount > 0) {
                         contarDepartamento = contarDepartamento + 1;
                     }

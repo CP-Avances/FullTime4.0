@@ -139,6 +139,9 @@ import { BuscarAsistenciaComponent } from './componentes/horarios/asistencia/bus
 import { ReporteTiempoAlimentacionComponent } from './componentes/reportes/asistencia/reporte-tiempo-alimentacion/reporte-tiempo-alimentacion.component';
 import { AnalisisDatosComponent } from './componentes/reportes/analisis-datos/analisis-datos.component';
 import { PrincipalSucursalUsuarioComponent } from './componentes/empleado/sucursal-usuario/principal-sucursal-usuario/principal-sucursal-usuario.component';
+import { CargarPlantillaComponent } from './componentes/empleado/cargar-plantilla/cargar-plantilla.component';
+import { CatModalidaLaboralComponent } from './componentes/catalogos/cat-modalida-laboral/cat-modalida-laboral.component';
+import { CatTipoCargosComponent } from './componentes/catalogos/catalogoTipoCargo/listar-tipo-cargo/cat-tipo-cargos.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -286,6 +289,9 @@ const routes: Routes = [
   { path: 'titulos', component: ListarTitulosComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
 
   // ACCESO A RUTAS DE EMPLEADO
+  { path: 'cargarPlantilla', component: CargarPlantillaComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
+  { path: 'modalidaLaboral', component: CatModalidaLaboralComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
+  { path: 'tipoCargos', component: CatTipoCargosComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
   { path: 'registrarEmpleado', component: RegistroComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
   { path: 'empleado', component: ListaEmpleadosComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
 

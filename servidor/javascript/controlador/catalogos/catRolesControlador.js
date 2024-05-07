@@ -12,14 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const builder = require('xmlbuilder');
 const database_1 = __importDefault(require("../../database"));
 class RolesControlador {
     // METODO PARA LISTAR ROLES DEL SISTEMA
     ListarRoles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const ROL = yield database_1.default.query(`
-      SELECT id, nombre FROM cg_roles ORDER BY nombre ASC
+      SELECT id, nombre FROM ero_cat_roles ORDER BY nombre ASC
       `);
             if (ROL.rowCount > 0) {
                 return res.jsonp(ROL.rows);
@@ -34,7 +33,7 @@ class RolesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
             yield database_1.default.query(`
-      DELETE FROM cg_roles WHERE id = $1
+      DELETE FROM ero_cat_roles WHERE id = $1
       `, [id]);
             res.jsonp({ message: 'Registro eliminado.' });
         });
@@ -44,7 +43,7 @@ class RolesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.body;
             yield database_1.default.query(`
-       INSERT INTO cg_roles (nombre) VALUES ($1)
+       INSERT INTO ero_cat_roles (nombre) VALUES ($1)
        `, [nombre]);
             res.jsonp({ message: 'Registro guardado.' });
         });
@@ -52,7 +51,9 @@ class RolesControlador {
     ListarRolesActualiza(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const ROL = yield database_1.default.query('SELECT * FROM cg_roles WHERE NOT id = $1', [id]);
+            const ROL = yield database_1.default.query(`
+      SELECT * FROM ero_cat_roles WHERE NOT id = $1
+      `, [id]);
             if (ROL.rowCount > 0) {
                 return res.jsonp(ROL.rows);
             }
@@ -64,7 +65,9 @@ class RolesControlador {
     ObtnenerUnRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const ROL = yield database_1.default.query('SELECT * FROM cg_roles WHERE id = $1', [id]);
+            const ROL = yield database_1.default.query(`
+      SELECT * FROM ero_cat_roles WHERE id = $1
+      `, [id]);
             if (ROL.rowCount > 0) {
                 return res.jsonp(ROL.rows);
             }
@@ -76,8 +79,10 @@ class RolesControlador {
     ActualizarRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre, id } = req.body;
-            yield database_1.default.query('UPDATE cg_roles SET nombre = $1 WHERE id = $2', [nombre, id]);
-            res.jsonp({ message: 'Registro Actualizado' });
+            yield database_1.default.query(`
+      UPDATE ero_cat_roles SET nombre = $1 WHERE id = $2
+      `, [nombre, id]);
+            res.jsonp({ message: 'Registro actualizado.' });
         });
     }
 }

@@ -37,7 +37,7 @@ export class DepartamentosService {
 
   // REGISTRAR ACTUALIZACION DE DEPARTAMENTO  --**VERIFICADO
   ActualizarDepartamento(idDepartamento: number, data: any) {
-    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/departamento/${idDepartamento}`, data).pipe(
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/depatramento/${idDepartamento}`, data).pipe(
       catchError(data)
     );
   }
@@ -53,8 +53,8 @@ export class DepartamentosService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/departamento/eliminar/${id}`);
+  EliminarRegistro(id: any) {
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/departamento/eliminar/${id}`).pipe(catchError(id));
   }
 
   // METODO PARA CREAR ARCHIVO XML
@@ -83,8 +83,10 @@ export class DepartamentosService {
   }
 
   // METODO PARA ELIMINAR REGISTRO NIVEL DEPARTAMENTO   --**VERIFICADO
-  EliminarRegistroNivelDepa(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/departamento/eliminarniveldepa/${id}`);
+  EliminarRegistroNivelDepa(id: any) {
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/departamento/eliminarniveldepa/${id}`).pipe(
+      catchError(id)
+    );
   }
 
   // REGISTRAR NIVELDEPARTAMENTO  --**VERIFICADO
@@ -126,8 +128,13 @@ export class DepartamentosService {
 
 
 
-
-
+  RevisarFormato(formData) {
+    console.log('formDataDepartamentos: ',formData);
+    return this.http.post<any>(environment.url + '/departamento/upload/revision', formData);
+  }
+  subirArchivoExcel(formData) {
+    return this.http.post<any>(`${environment.url}/departamento/cargar_plantilla/`, formData);
+  }
 
 
   BuscarDepartamentoRegimen(id: number) {

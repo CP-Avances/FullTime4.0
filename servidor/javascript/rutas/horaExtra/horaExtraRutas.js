@@ -22,7 +22,6 @@ class HorasExtrasPedidasRutas {
         this.router.get('/observaciones', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], horaExtraControlador_1.default.ListarHorasExtrasPedidasObservacion);
         this.router.get('/datosSolicitud/:id_emple_hora', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], horaExtraControlador_1.default.ObtenerSolicitudHoraExtra);
         this.router.get('/datosAutorizacion/:id_hora', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], horaExtraControlador_1.default.ObtenerAutorizacionHoraExtra);
-        this.router.get('/horario-empleado/:id_cargo', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], horaExtraControlador_1.default.ObtenerHorarioEmpleado);
         this.router.get('/listar/solicitudes', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], horaExtraControlador_1.default.ListarPedidosHE);
         this.router.get('/solicitudes/autorizadas', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], horaExtraControlador_1.default.ListarPedidosHEAutorizadas);
         this.router.get('/listar/solicitudes/empleado/:id_empleado', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], horaExtraControlador_1.default.ListarPedidosHE_Empleado);

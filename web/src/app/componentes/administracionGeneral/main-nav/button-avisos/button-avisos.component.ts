@@ -36,7 +36,7 @@ export class ButtonAvisosComponent implements OnInit {
       // METODO DE ESCUCHA DE EVENTOS DE NOTIFICACIONES
       this.socket.on('recibir_aviso', (data) => {
         // VERIFICACION DE USUARIO QUE RECIBE NOTIFICACION
-        if (parseInt(data.id_receives_empl) === this.id_empleado_logueado) {
+        if (parseInt(data.id_empleado_recibe) === this.id_empleado_logueado) {
           // BUSQUEDA DE LOS DATOS DE LA NOTIFICACION RECIBIDA
           this.aviso.ObtenerUnAviso(data.id).subscribe(res => {
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION

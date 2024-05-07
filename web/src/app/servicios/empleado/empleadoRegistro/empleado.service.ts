@@ -123,6 +123,11 @@ export class EmpleadoService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empleado/img/codificado/${id}/${imagen}`)
   }
 
+  // METODO PARA ELIMINAR REGISTRO
+  EliminarEmpleados(id: any) {
+    return this.http.delete(`${environment.url}/empleado/eliminar/${id}`).pipe(catchError(id));
+  }
+
 
   /** *********************************************************************** **
    ** **       METODOS PARA MANEJO DE DATOS DE TITULO PROFESIONAL             **
@@ -337,6 +342,14 @@ export class EmpleadoService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/modalidad/trabajo/ultimo`);
   }
 
+
+  RevisarFormato(formData) {
+    return this.http.post<any>(`${environment.url}/contratoEmpleado/upload/revision`, formData);
+  }
+
+  subirArchivoExcelContrato(formData) {
+    return this.http.post<any>(`${environment.url}/contratoEmpleado/cargar_plantilla/`, formData);
+  }
 
 
 

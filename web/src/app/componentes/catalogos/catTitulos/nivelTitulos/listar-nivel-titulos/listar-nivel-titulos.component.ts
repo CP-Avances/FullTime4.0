@@ -26,6 +26,9 @@ import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla
 import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableNivelesEducacion } from 'src/app/model/reportes.model';
+
 
 @Component({
   selector: 'app-listar-nivel-titulos',
@@ -34,6 +37,9 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 })
 
 export class ListarNivelTitulosComponent implements OnInit {
+
+
+  nivelesEliminar: any = [];
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS
   nivelTitulos: any = [];
@@ -293,6 +299,14 @@ export class ListarNivelTitulosComponent implements OnInit {
       .afterClosed().subscribe(items => {
         this.ObtenerNiveles();
       });
+
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionNiveles.clear();
+    this.nivelesEliminar = [];
+
+
   }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -338,28 +352,7 @@ export class ListarNivelTitulosComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
-  Eliminar(id_nivel: number) {
-    this.nivel.EliminarNivel(id_nivel).subscribe(res => {
-      this.toastr.error("Registro eliminado.", '', {
-        timeOut: 6000,
-      });
-      this.ObtenerNiveles();
-    });
-  }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id);
-
-        } else {
-          this.router.navigate(['/nivelTitulos']);
-        }
-      });
-  }
 
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
@@ -611,4 +604,170 @@ export class ListarNivelTitulosComponent implements OnInit {
       }
     }
   }
+
+
+
+  // METODOS PARA LA SELECCION MULTIPLE
+
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionNiveles = new SelectionModel<ITableNivelesEducacion>(true, []);
+
+
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionNiveles.selected.length;
+    return numSelected === this.nivelTitulos.length
+  }
+
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionNiveles.clear() :
+      this.nivelTitulos.forEach((row: any) => this.selectionNiveles.select(row));
+  }
+
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableNivelesEducacion): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.nivelesEliminar = this.selectionNiveles.selected;
+    //console.log('paginas para Eliminar',this.paginasEliminar);
+
+    //console.log(this.selectionPaginas.selected)
+    return `${this.selectionNiveles.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+
+  }
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  Eliminar(id_nivel: number) {
+    this.nivel.EliminarNivel(id_nivel).subscribe(res => {
+
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerNiveles();
+      }
+    });
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.nivelesEliminar = [];
+          this.selectionNiveles.clear();
+
+          this.ObtenerNiveles();
+
+        } else {
+          this.router.navigate(['/nivelTitulos']);
+        }
+      });
+
+  }
+  contador: number = 0;
+  ingresar: boolean = false;
+
+  EliminarMultiple() {
+
+
+    this.ingresar = false;
+    this.contador = 0;
+
+    this.nivelesEliminar = this.selectionNiveles.selected;
+    this.nivelesEliminar.forEach((datos: any) => {
+
+      this.nivelTitulos = this.nivelTitulos.filter(item => item.id !== datos.id);
+
+
+      this.contador = this.contador + 1;
+
+      this.nivel.EliminarNivel(datos.id).subscribe(res => {
+
+        if (res.message === 'error') {
+          this.toastr.error('No se puede eliminar.', '', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+
+
+        } else {
+
+          
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ObtenerNiveles();
+
+        }
+      });
+    }
+    )
+  }
+
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+
+          if (this.nivelesEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+
+            this.nivelesEliminar = [];
+            this.selectionNiveles.clear();
+
+            this.ObtenerNiveles();
+
+
+          } else {
+            this.toastr.warning('No ha seleccionado NIVELES DE EDUCACIÓN.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        } else {
+          this.router.navigate(['/nivelTitulos']);
+        }
+
+      });
+
+  }
+
+
 }

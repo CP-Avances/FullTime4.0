@@ -26,6 +26,9 @@ import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableSucursales } from 'src/app/model/reportes.model';
+
 @Component({
   selector: 'app-lista-sucursales',
   templateUrl: './lista-sucursales.component.html',
@@ -33,6 +36,8 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 })
 
 export class ListaSucursalesComponent implements OnInit {
+
+  sucursalesEliminar: any = [];
 
   buscarNombre = new FormControl('', [Validators.minLength(2)]);
   buscarCiudad = new FormControl('', [Validators.minLength(2)]);
@@ -117,8 +122,8 @@ export class ListaSucursalesComponent implements OnInit {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -136,6 +141,8 @@ export class ListaSucursalesComponent implements OnInit {
 
   // METODO PARA BUSCAR SUCURSALES
   ObtenerSucursal() {
+
+    this.sucursales = [];
     this.rest.BuscarSucursal().subscribe(data => {
       this.sucursales = data;
     });
@@ -151,6 +158,16 @@ export class ListaSucursalesComponent implements OnInit {
           }
         }
       });
+      this.ObtenerSucursal();
+
+
+      this.activar_seleccion = true;
+
+      this.plan_multiple = false;
+      this.plan_multiple_ = false;
+      this.selectionSucursales.clear();
+      this.sucursalesEliminar = [];
+  
   }
 
   // METODO PARA EDITAR SUCURSAL
@@ -184,27 +201,6 @@ export class ListaSucursalesComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
-  Eliminar(id_sucursal: number) {
-    this.rest.EliminarRegistro(id_sucursal).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerSucursal();
-    });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id);
-        } else {
-          this.router.navigate(['/sucursales']);
-        }
-      });
-  }
 
   // METODO PARA VER DATOS DE DEPARTAMENTOS DE SUCURSAL
   ver_departamentos: boolean = false;
@@ -644,5 +640,168 @@ export class ListaSucursalesComponent implements OnInit {
       return true;
     }
   }
+
+
+
+  // METODOS PARA LA SELECCION MULTIPLE
+
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+
+
+
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionSucursales = new SelectionModel<ITableSucursales>(true, []);
+
+
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionSucursales.selected.length;
+    return numSelected === this.sucursales.length;
+  }
+
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionSucursales.clear() :
+      this.sucursales.forEach((row: any) => this.selectionSucursales.select(row));
+  }
+
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableSucursales): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.sucursalesEliminar = this.selectionSucursales.selected;
+    //console.log('paginas para Eliminar',this.paginasEliminar);
+
+    //console.log(this.selectionPaginas.selected)
+    return `${this.selectionSucursales.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+
+  }
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  Eliminar(id_sucursal: number) {
+    this.rest.EliminarRegistro(id_sucursal).subscribe(res => {
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerSucursal();
+      }
+    });
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.sucursalesEliminar = [];
+          this.selectionSucursales.clear();
+          this.ObtenerSucursal();
+
+        } else {
+          this.router.navigate(['/sucursales']);
+        }
+      });
+
+
+  }
+
+
+  contador: number = 0;
+  ingresar: boolean = false;
+  EliminarMultiple() {
+
+
+    this.ingresar = false;
+    this.contador = 0;
+
+    this.sucursalesEliminar = this.selectionSucursales.selected;
+    this.sucursalesEliminar.forEach((datos: any) => {
+
+      this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
+
+      this.contador = this.contador + 1;
+      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+        if (res.message === 'error') {
+
+          this.toastr.error('No se puede elminar ', datos.nombre, {
+            timeOut: 6000,
+          });
+
+          this.contador = this.contador - 1;
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ObtenerSucursal();
+
+        }
+      });
+    }
+    )
+  }
+
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+
+          if (this.sucursalesEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+            this.sucursalesEliminar = [];
+            this.selectionSucursales.clear();
+            this.ObtenerSucursal();
+
+
+          } else {
+            this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        } else {
+          this.router.navigate(['/sucursales']);
+        }
+      });
+
+
+  }
+
+
 
 }

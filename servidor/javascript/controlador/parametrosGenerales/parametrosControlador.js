@@ -14,19 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PARAMETROS_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
-const builder = require('xmlbuilder');
 class ParametrosControlador {
     // METODO PARA LISTAR PARAMETROS GENERALES
     ListarParametros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            /**
-              SELECT tp.id, tp.descripcion, dtp.descripcion AS detalle
-                FROM tipo_parametro AS tp, detalle_tipo_parametro AS dtp
-                WHERE tp.id = dtp.id_tipo_parametro
-             */
             const PARAMETRO = yield database_1.default.query(`
             SELECT tp.id, tp.descripcion
-            FROM tipo_parametro AS tp
+            FROM ep_parametro AS tp
             `);
             if (PARAMETRO.rowCount > 0) {
                 return res.jsonp(PARAMETRO.rows);
@@ -42,7 +36,7 @@ class ParametrosControlador {
             try {
                 const id = req.params.id;
                 yield database_1.default.query(`
-                DELETE FROM tipo_parametro WHERE id = $1
+                DELETE FROM ep_parametro WHERE id = $1
                 `, [id]);
                 res.jsonp({ message: 'Registro eliminado.' });
             }
@@ -56,7 +50,7 @@ class ParametrosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { descripcion, id } = req.body;
             yield database_1.default.query(`
-            UPDATE tipo_parametro SET descripcion = $1 WHERE id = $2
+            UPDATE ep_parametro SET descripcion = $1 WHERE id = $2
             `, [descripcion, id]);
             res.jsonp({ message: 'Registro exitoso.' });
         });
@@ -66,7 +60,7 @@ class ParametrosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const PARAMETRO = yield database_1.default.query(`
-            SELECT * FROM tipo_parametro WHERE id = $1
+            SELECT * FROM ep_parametro WHERE id = $1
             `, [id]);
             if (PARAMETRO.rowCount > 0) {
                 return res.jsonp(PARAMETRO.rows);
@@ -82,8 +76,8 @@ class ParametrosControlador {
             const { id } = req.params;
             const PARAMETRO = yield database_1.default.query(`
             SELECT tp.id AS id_tipo, tp.descripcion AS tipo, dtp.id AS id_detalle, dtp.descripcion
-            FROM tipo_parametro AS tp, detalle_tipo_parametro AS dtp
-            WHERE tp.id = dtp.id_tipo_parametro AND tp.id = $1
+            FROM ep_parametro AS tp, ep_detalle_parametro AS dtp
+            WHERE tp.id = dtp.id_parametro AND tp.id = $1
             `, [id]);
             if (PARAMETRO.rowCount > 0) {
                 return res.jsonp(PARAMETRO.rows);
@@ -113,8 +107,8 @@ class ParametrosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_tipo, descripcion } = req.body;
             yield database_1.default.query(`
-            INSERT INTO detalle_tipo_parametro
-            (id_tipo_parametro, descripcion) VALUES ($1, $2)
+            INSERT INTO ep_detalle_parametro
+            (id_parametro, descripcion) VALUES ($1, $2)
             `, [id_tipo, descripcion]);
             res.jsonp({ message: 'Registro exitoso.' });
         });
@@ -124,7 +118,7 @@ class ParametrosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id, descripcion } = req.body;
             yield database_1.default.query(`
-            UPDATE detalle_tipo_parametro SET descripcion = $1 WHERE id = $2
+            UPDATE ep_detalle_parametro SET descripcion = $1 WHERE id = $2
             `, [descripcion, id]);
             res.jsonp({ message: 'Registro exitoso.' });
         });
@@ -134,7 +128,7 @@ class ParametrosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { descripcion } = req.body;
             const response = yield database_1.default.query(`
-            INSERT INTO tipo_parametro (descripcion) VALUES ($1) RETURNING *
+            INSERT INTO ep_parametro (descripcion) VALUES ($1) RETURNING *
             `, [descripcion]);
             const [parametro] = response.rows;
             if (parametro) {

@@ -653,8 +653,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -898,21 +898,21 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                   ],
                   ...empl.atrasos.map((usu: any) => {
                     const fechaHorario = this.validacionService.FormatearFecha(
-                      usu.fec_hora_horario.split(' ')[0],
+                      usu.fecha_hora_horario.split(' ')[0],
                       this.formato_fecha,
                       this.validacionService.dia_abreviado);
 
                     const fechaTimbre = this.validacionService.FormatearFecha(
-                      usu.fec_hora_timbre.split(' ')[0],
+                      usu.fecha_hora_timbre.split(' ')[0],
                       this.formato_fecha,
                       this.validacionService.dia_abreviado);
 
                     const horaHorario = this.validacionService.FormatearHora(
-                      usu.fec_hora_horario.split(' ')[1],
+                      usu.fecha_hora_horario.split(' ')[1],
                       this.formato_hora);
 
                     const horaTimbre = this.validacionService.FormatearHora(
-                      usu.fec_hora_timbre.split(' ')[1],
+                      usu.fecha_hora_timbre.split(' ')[1],
                       this.formato_hora);
 
                     const tolerancia = this.MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
@@ -1032,21 +1032,21 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                   ...empl.atrasos.map((usu: any) => {
 
                     const fechaHorario = this.validacionService.FormatearFecha(
-                      usu.fec_hora_horario.split(' ')[0],
+                      usu.fecha_hora_horario.split(' ')[0],
                       this.formato_fecha,
                       this.validacionService.dia_abreviado);
 
                     const fechaTimbre = this.validacionService.FormatearFecha(
-                      usu.fec_hora_timbre.split(' ')[0],
+                      usu.fecha_hora_timbre.split(' ')[0],
                       this.formato_fecha,
                       this.validacionService.dia_abreviado);
 
                     const horaHorario = this.validacionService.FormatearHora(
-                      usu.fec_hora_horario.split(' ')[1],
+                      usu.feha_hora_horario.split(' ')[1],
                       this.formato_hora);
 
                     const horaTimbre = this.validacionService.FormatearHora(
-                      usu.fec_hora_timbre.split(' ')[1],
+                      usu.fecha_hora_timbre.split(' ')[1],
                       this.formato_hora);
 
                     const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
@@ -1396,21 +1396,21 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                         ],
                         ...empl.atrasos.map((usu: any) => {
                           const fechaHorario = this.validacionService.FormatearFecha(
-                            usu.fec_hora_horario.split(' ')[0],
+                            usu.fecha_hora_horario.split(' ')[0],
                             this.formato_fecha,
                             this.validacionService.dia_abreviado);
 
                           const fechaTimbre = this.validacionService.FormatearFecha(
-                            usu.fec_hora_timbre.split(' ')[0],
+                            usu.fecha_hora_timbre.split(' ')[0],
                             this.formato_fecha,
                             this.validacionService.dia_abreviado);
 
                           const horaHorario = this.validacionService.FormatearHora(
-                            usu.fec_hora_horario.split(' ')[1],
+                            usu.fecha_hora_horario.split(' ')[1],
                             this.formato_hora);
 
                           const horaTimbre = this.validacionService.FormatearHora(
-                            usu.fec_hora_timbre.split(' ')[1],
+                            usu.fecha_hora_timbre.split(' ')[1],
                             this.formato_hora);
 
                           const tolerancia = this.MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
@@ -1519,21 +1519,21 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                         ],
                         ...empl.atrasos.map((usu: any) => {
                           const fechaHorario = this.validacionService.FormatearFecha(
-                            usu.fec_hora_horario.split(' ')[0],
+                            usu.fecha_hora_horario.split(' ')[0],
                             this.formato_fecha,
                             this.validacionService.dia_abreviado);
 
                           const fechaTimbre = this.validacionService.FormatearFecha(
-                            usu.fec_hora_timbre.split(' ')[0],
+                            usu.fecha_hora_timbre.split(' ')[0],
                             this.formato_fecha,
                             this.validacionService.dia_abreviado);
 
                           const horaHorario = this.validacionService.FormatearHora(
-                            usu.fec_hora_horario.split(' ')[1],
+                            usu.fecha_hora_horario.split(' ')[1],
                             this.formato_hora);
 
                           const horaTimbre = this.validacionService.FormatearHora(
-                            usu.fec_hora_timbre.split(' ')[1],
+                            usu.fecha_hora_timbre.split(' ')[1],
                             this.formato_hora);
 
                           const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
@@ -1689,11 +1689,11 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
               empl.atrasos.forEach((usu: any) => {
                 n++;
                 const horaHorario = this.validacionService.FormatearHora(
-                  usu.fec_hora_horario.split(' ')[1],
+                  usu.fecha_hora_horario.split(' ')[1],
                   this.formato_hora);
 
                 const horaTimbre = this.validacionService.FormatearHora(
-                  usu.fec_hora_timbre.split(' ')[1],
+                  usu.fecha_hora_timbre.split(' ')[1],
                   this.formato_hora);
 
                 const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
@@ -1711,9 +1711,9 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                     'Régimen': empl.name_regimen,
                     'Departamento': empl.name_dep,
                     'Cargo': empl.name_cargo,
-                    'Fecha Horario': new Date(usu.fec_hora_horario),
+                    'Fecha Horario': new Date(usu.fecha_hora_horario),
                     'Hora Horario': horaHorario,
-                    'Fecha Timbre': new Date(usu.fec_hora_timbre),
+                    'Fecha Timbre': new Date(usu.fecha_hora_timbre),
                     'Hora Timbre': horaTimbre,
                     'Tolerancia': tolerancia,
                     'Atraso HH:MM:SS': tiempo,
@@ -1730,9 +1730,9 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                     'Régimen': empl.name_regimen,
                     'Departamento': empl.name_dep,
                     'Cargo': empl.name_crago,
-                    'Fecha Horario': new Date(usu.fec_hora_horario),
+                    'Fecha Horario': new Date(usu.fecha_hora_horario),
                     'Hora Horario': horaHorario,
-                    'Fecha Timbre': new Date(usu.fec_hora_timbre),
+                    'Fecha Timbre': new Date(usu.fecha_hora_timbre),
                     'Hora Timbre': horaTimbre,
                     'Atraso HH:MM:SS': tiempo,
                     'Atraso Minutos': minutos.toFixed(2),
@@ -1756,11 +1756,11 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
         empl.atrasos.forEach((usu: any) => {
           n++;
           const horaHorario = this.validacionService.FormatearHora(
-            usu.fec_hora_horario.split(' ')[1],
+            usu.fecha_hora_horario.split(' ')[1],
             this.formato_hora);
 
           const horaTimbre = this.validacionService.FormatearHora(
-            usu.fec_hora_timbre.split(' ')[1],
+            usu.fecha_hora_timbre.split(' ')[1],
             this.formato_hora);
 
           const minutos = this.SegundosAMinutosConDecimales(Number(usu.diferencia));
@@ -1778,9 +1778,9 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
               'Régimen': empl.name_regimen,
               'Departamento': empl.name_dep,
               'Cargo': empl.name_cargo,
-              'Fecha Horario': new Date(usu.fec_hora_horario),
+              'Fecha Horario': new Date(usu.fecha_hora_horario),
               'Hora Horario': horaHorario,
-              'Fecha Timbre': new Date(usu.fec_hora_timbre),
+              'Fecha Timbre': new Date(usu.fecha_hora_timbre),
               'Hora Timbre': horaTimbre,
               'Tolerancia': tolerancia,
               'Atraso HH:MM:SS': tiempo,
@@ -1797,9 +1797,9 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
               'Régimen': empl.name_cargo,
               'Departamento': empl.name_dep,
               'Cargo': empl.name_cargo,
-              'Fecha Horario': new Date(usu.fec_hora_horario),
+              'Fecha Horario': new Date(usu.fecha_hora_horario),
               'Hora Horario': horaHorario,
-              'Fecha Timbre': new Date(usu.fec_hora_timbre),
+              'Fecha Timbre': new Date(usu.fecha_hora_timbre),
               'Hora Timbre': horaTimbre,
               'Atraso HH:MM:SS': tiempo,
               'Atraso Minutos': minutos.toFixed(2),
@@ -1827,21 +1827,21 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
               empl.atrasos.forEach((usu: any) => {
 
                 const fechaHorario = this.validacionService.FormatearFecha(
-                  usu.fec_hora_horario.split(' ')[0],
+                  usu.fecha_hora_horario.split(' ')[0],
                   this.formato_fecha,
                   this.validacionService.dia_abreviado);
 
                 const fechaTimbre = this.validacionService.FormatearFecha(
-                  usu.fec_hora_timbre.split(' ')[0],
+                  usu.fecha_hora_timbre.split(' ')[0],
                   this.formato_fecha,
                   this.validacionService.dia_abreviado);
 
                 const horaHorario = this.validacionService.FormatearHora(
-                  usu.fec_hora_horario.split(' ')[1],
+                  usu.fecha_hora_horario.split(' ')[1],
                   this.formato_hora);
 
                 const horaTimbre = this.validacionService.FormatearHora(
-                  usu.fec_hora_timbre.split(' ')[1],
+                  usu.fecha_hora_timbre.split(' ')[1],
                   this.formato_hora);
 
                 const tolerancia = this.MinutosAHorasMinutosSegundos(Number(usu.tolerancia));
@@ -1881,21 +1881,21 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
         empl.atrasos.forEach((usu: any) => {
 
           const fechaHorario = this.validacionService.FormatearFecha(
-            usu.fec_hora_horario.split(' ')[0],
+            usu.fecha_hora_horario.split(' ')[0],
             this.formato_fecha,
             this.validacionService.dia_abreviado);
 
           const fechaTimbre = this.validacionService.FormatearFecha(
-            usu.fec_hora_timbre.split(' ')[0],
+            usu.fecha_hora_timbre.split(' ')[0],
             this.formato_fecha,
             this.validacionService.dia_abreviado);
 
           const horaHorario = this.validacionService.FormatearHora(
-            usu.fec_hora_horario.split(' ')[1],
+            usu.fecha_hora_horario.split(' ')[1],
             this.formato_hora);
 
           const horaTimbre = this.validacionService.FormatearHora(
-            usu.fec_hora_timbre.split(' ')[1],
+            usu.fecha_hora_timbre.split(' ')[1],
             this.formato_hora);
 
           const tolerancia = this.MinutosAHorasMinutosSegundos(Number(usu.tolerancia));

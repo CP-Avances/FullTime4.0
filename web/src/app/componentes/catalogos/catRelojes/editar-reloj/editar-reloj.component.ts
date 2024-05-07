@@ -109,7 +109,7 @@ export class EditarRelojComponent implements OnInit {
     this.rest.ConsultarUnReloj(this.idReloj).subscribe(datos => {
       this.datosReloj = datos[0];
       this.BuscarDatos(this.datosReloj.id_sucursal);
-      if (this.datosReloj.tien_funciones === true) {
+      if (this.datosReloj.tiene_funciones === true) {
         this.selec1 = true;
         this.activarCampo = true;
         this.primerFormulario.patchValue({
@@ -128,7 +128,7 @@ export class EditarRelojComponent implements OnInit {
         nombreForm: this.datosReloj.nombre,
         puertoForm: this.datosReloj.puerto,
         codigoForm: this.datosReloj.id,
-        funcionesForm: this.datosReloj.tien_funciones,
+        funcionesForm: this.datosReloj.tiene_funciones,
         idSucursalForm: this.datosReloj.id_sucursal,
         idDepartamentoForm: this.datosReloj.id_departamento,
       })

@@ -43,16 +43,16 @@ export class SettingsComponent implements OnInit {
     this.avisos.ObtenerConfiguracionEmpleado(this.data.id_empleado).subscribe(res => {
       this.btnActualizar = true;
       this.formGroup.patchValue({
-        vacaMail: res[0].vaca_mail,
-        vacaNoti: res[0].vaca_noti,
+        vacaMail: res[0].vacacion_mail,
+        vacaNoti: res[0].vacacion_notificacion,
         permisoMail: res[0].permiso_mail,
-        permisoNoti: res[0].permiso_noti,
+        permisoNoti: res[0].permiso_notificacion,
         horaExtraMail: res[0].hora_extra_mail,
-        horaExtraNoti: res[0].hora_extra_noti,
+        horaExtraNoti: res[0].hora_extra_notificacion,
         comidaMail: res[0].comida_mail,
-        comidaNoti: res[0].comida_noti,
+        comidaNoti: res[0].comida_notificacion,
         comunicadoMail: res[0].comunicado_mail,
-        comunicadoNoti: res[0].comunicado_noti
+        comunicadoNoti: res[0].comunicado_notificacion
       });
     }, error => {
       this.btnCrear = true;

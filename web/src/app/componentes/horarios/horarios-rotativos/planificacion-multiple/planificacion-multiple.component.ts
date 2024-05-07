@@ -242,7 +242,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     })
     if (!obj_res) return this.toastr.warning('Horario no válido.');
 
-    const { hora_trabajo, id, codigo, min_almuerzo } = obj_res;
+    const { hora_trabajo, id, codigo, minutos_comida } = obj_res;
 
     // VERIFICACION DE FORMATO CORRECTO DE HORARIOS
     if (!this.StringTimeToSegundosTime(hora_trabajo)) {
@@ -258,7 +258,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     }
     else {
       //this.SeleccionarHorario();
-      this.ObtenerDetallesHorario(id, codigo, min_almuerzo);
+      this.ObtenerDetallesHorario(id, codigo, minutos_comida);
       this.ver_registrar = true;
       this.ver_eliminar = true;
       this.ver_informacion = true;
@@ -1057,7 +1057,7 @@ export class PlanificacionMultipleComponent implements OnInit {
               var accion = 0;
               var nocturno: number = 0;
               if (element.tipo_accion === 'E') {
-                accion = element.minu_espera;
+                accion = element.tolerancia;
               }
               if (element.segundo_dia === true) {
                 nocturno = 1;
@@ -1072,10 +1072,10 @@ export class PlanificacionMultipleComponent implements OnInit {
               let plan = {
                 codigo: li.codigo,
                 tipo_dia: dia_tipo,
-                min_antes: element.min_antes,
+                min_antes: element.minutos_antes,
                 tolerancia: accion,
                 id_horario: element.id_horario,
-                min_despues: element.min_despues,
+                min_despues: element.minutos_despues,
                 fec_horario: asig.fecha,
                 estado_origen: origen,
                 estado_timbre: tipo,
@@ -1084,7 +1084,7 @@ export class PlanificacionMultipleComponent implements OnInit {
                 salida_otro_dia: nocturno,
                 tipo_entr_salida: element.tipo_accion,
                 fec_hora_horario: asig.fecha + ' ' + element.hora,
-                min_alimentacion: element.min_almuerzo,
+                min_alimentacion: element.minutos_comida,
               };
               if (element.segundo_dia === true) {
                 plan.fec_hora_horario = moment(asig.fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
@@ -1130,7 +1130,7 @@ export class PlanificacionMultipleComponent implements OnInit {
         if (ele.codigo === datos_o[i].codigo) {
 
           if ((moment(datos_o[i].fec_hora_horario).format('YYYY-MM-DD') === moment(ele.fec_hora_horario).format('YYYY-MM-DD')) &&
-            datos_o[i].tipo_entr_salida === 'E' && ele.tipo_entr_salida === 'S' && datos_o[i].tipo_dia === 'N') {
+            datos_o[i].tipo_accion === 'E' && ele.tipo_accion === 'S' && datos_o[i].tipo_dia === 'N') {
 
             if (moment(datos_o[i].fec_hora_horario).format('HH:mm:ss') <= moment(ele.fec_hora_horario).format('HH:mm:ss')) {
               contador = 1;

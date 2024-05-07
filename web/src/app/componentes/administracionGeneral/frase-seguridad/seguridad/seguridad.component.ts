@@ -64,7 +64,7 @@ export class SeguridadComponent implements OnInit {
     this.empresa = [];
     this.restEmpr.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(data => {
       this.empresa = data;
-      if (this.empresa[0].seg_contrasena === true) {
+      if (this.empresa[0].seguridad_contrasena === true) {
         this.contrasena = true;
       }
       else {

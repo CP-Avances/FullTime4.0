@@ -191,7 +191,7 @@ export class VacacionAutorizacionesComponent implements OnInit {
             this.cont = this.cont + 1;
             this.restAutorizaciones.getUnaAutorizacionByVacacionRest(o.id).subscribe(
               autorizacion => {
-                var autorizaciones = autorizacion[0].id_documento.split(',');
+                var autorizaciones = autorizacion[0].id_autoriza_estado.split(',');
                 autorizaciones.map((obj: string) => {
                   this.lectura = this.lectura + 1;
                   if (obj != '') {

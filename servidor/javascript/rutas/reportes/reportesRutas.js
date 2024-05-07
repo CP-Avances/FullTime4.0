@@ -20,14 +20,8 @@ class CiudadRutas {
         this.router.post('/horasExtrasReales/listaPedidos/total/solicitudes', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarPedidosTodos);
         this.router.post('/reporteTimbres/listaTimbres/:id_empleado', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarTimbres);
         this.router.get('/reportePermisos/horarios/:codigo', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarPermisoHorarioEmpleado);
-        this.router.get('/reportePermisos/planificacion/:id_empleado', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarPermisoPlanificaEmpleado);
         this.router.get('/reportePermisos/autorizaciones/:id_empleado', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarPermisoAutorizaEmpleado);
-        this.router.post('/reporteAtrasos/horarios/:id_empleado', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarAtrasosHorarioEmpleado);
-        this.router.post('/reporteAtrasos/planificacion/:id_empleado', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarAtrasosPlanificaEmpleado);
-        this.router.post('/reporteEntradaSalida/horarios/:id_empleado', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarEntradaSalidaHorarioEmpleado);
-        this.router.post('/reporteEntradaSalida/planificacion/:codigo', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarEntradaSalidaPlanificaEmpleado);
         this.router.post('/reportePermisos/fechas/horarios/:codigo', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarPermisoHorarioEmpleadoFechas);
-        this.router.post('/reportePermisos/fechas/planificacion/:id_empleado', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarPermisoPlanificaEmpleadoFechas);
         this.router.post('/reporteTimbres/buscarPlan/:codigo', verificarToken_1.TokenValidation, reportesControlador_1.default.BuscarPlan);
     }
 }

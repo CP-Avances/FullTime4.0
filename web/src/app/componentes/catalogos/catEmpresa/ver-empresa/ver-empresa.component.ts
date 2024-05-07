@@ -21,6 +21,8 @@ import { LogosComponent } from 'src/app/componentes/catalogos/catEmpresa/logos/l
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableSucursales } from 'src/app/model/reportes.model';
 
 
 @Component({
@@ -30,7 +32,9 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 })
 
 export class VerEmpresaComponent implements OnInit {
+  sucursalesEliminar: any = [];
 
+  // FILTROS
   idEmpresa: number;
   datosEmpresa: any = [];
   datosSucursales: any = [];
@@ -104,8 +108,8 @@ export class VerEmpresaComponent implements OnInit {
     this.datosEmpresa = [];
     this.empresa.ConsultarDatosEmpresa(this.idEmpresa).subscribe(datos => {
       this.datosEmpresa = datos;
-      this.p_color = this.datosEmpresa[0].color_p;
-      this.s_color = this.datosEmpresa[0].color_s;
+      this.p_color = this.datosEmpresa[0].color_principal;
+      this.s_color = this.datosEmpresa[0].color_secundario;
       if (this.datosEmpresa[0].establecimiento === null || this.datosEmpresa[0].establecimiento === '' || this.datosEmpresa[0].establecimiento === undefined) {
         this.nombre_establecimiento = 'establecimientos';
       }
@@ -150,6 +154,7 @@ export class VerEmpresaComponent implements OnInit {
 
   // METODO PARA MOSTRAR LISTA DE SUCURSALES
   ObtenerSucursal() {
+    this.datosSucursales= [];
     this.restS.BuscarSucursal().subscribe(data => {
       this.datosSucursales = data;
     });
@@ -185,6 +190,12 @@ export class VerEmpresaComponent implements OnInit {
           }
         }
       });
+    this.activar_seleccion = true;
+
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionSucursales.clear();
+    this.sucursalesEliminar = [];
   }
 
   // VENTANA PARA REVISAR FORMATO DE REPORTES COLORES
@@ -211,25 +222,7 @@ export class VerEmpresaComponent implements OnInit {
       })
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
-  Eliminar(id_sucursal: number) {
-    this.restS.EliminarRegistro(id_sucursal).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerSucursal();
-    });
-  }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id);
-        }
-      });
-  }
 
   // VENTANA DE REGISTRO DE FRASE DE SEGURIDAD
   AbrirVentanaSeguridad(datosSeleccionados: any) {
@@ -264,8 +257,8 @@ export class VerEmpresaComponent implements OnInit {
     this.empresas = [];
     this.empresa.ConsultarDatosEmpresa(this.datosEmpresa[0].id).subscribe(res => {
       this.empresas = res;
-      this.p_color = this.empresas[0].color_p;
-      this.s_color = this.empresas[0].color_s;
+      this.p_color = this.empresas[0].color_principal;
+      this.s_color = this.empresas[0].color_secundario;
       this.frase = this.empresas[0].marca_agua;
     });
   }
@@ -387,18 +380,19 @@ export class VerEmpresaComponent implements OnInit {
     };
   }
 
-  getEliminarSucursales() {
+  //Control Botones
+  getEditarInformacionGeneral() {
     var datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Eliminar Sucursales');
+      const index = datos.findIndex(item => item.accion === 'Editar Información General');
       if (index !== -1) {
         encontrado = true;
       }
       return encontrado;
     } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+      if (parseInt(localStorage.getItem('rol') as string) != 1) {
         return false;
       } else {
         return true;
@@ -406,37 +400,18 @@ export class VerEmpresaComponent implements OnInit {
     }
   }
 
-  getEditarSucursales() {
+  getConfigurarNivelSeguridad() {
     var datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Editar Sucursales');
+      const index = datos.findIndex(item => item.accion === 'Configurar Nivel Seguridad');
       if (index !== -1) {
         encontrado = true;
       }
       return encontrado;
     } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 3) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  }
-
-  getCrearSucursales() {
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Crear Sucursales');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
-    } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+      if (parseInt(localStorage.getItem('rol') as string) != 1) {
         return false;
       } else {
         return true;
@@ -455,7 +430,7 @@ export class VerEmpresaComponent implements OnInit {
       }
       return encontrado;
     } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+      if (parseInt(localStorage.getItem('rol') as string) != 1) {
         return false;
       } else {
         return true;
@@ -463,18 +438,18 @@ export class VerEmpresaComponent implements OnInit {
     }
   }
 
-  getConfigurarNivelSeguridad() {
+  getCrearSucursales() {
     var datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Configurar nivel de seguridad');
+      const index = datos.findIndex(item => item.accion === 'Crear Sucursal');
       if (index !== -1) {
         encontrado = true;
       }
       return encontrado;
     } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+      if (parseInt(localStorage.getItem('rol') as string) != 1) {
         return false;
       } else {
         return true;
@@ -482,18 +457,37 @@ export class VerEmpresaComponent implements OnInit {
     }
   }
 
-  getEditarInformacionGeneral() {
+  getEditarSucursales() {
     var datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Editar Información General');
+      const index = datos.findIndex(item => item.accion === 'Editar Sucursal');
       if (index !== -1) {
         encontrado = true;
       }
       return encontrado;
     } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+      if (parseInt(localStorage.getItem('rol') as string) != 1) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  getEliminarSucursales() {
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Eliminar Sucursal');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    } else {
+      if (parseInt(localStorage.getItem('rol') as string) != 1) {
         return false;
       } else {
         return true;
@@ -502,11 +496,201 @@ export class VerEmpresaComponent implements OnInit {
   }
 
   getSucursalesDepartamento() {
-    if (parseInt(localStorage.getItem('rol') as string) != 3) {
-      return false;
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Ver Departamento' && item.id_funcion === 1);
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
     } else {
-      return true;
+      if (parseInt(localStorage.getItem('rol') as string) != 1) {
+        return false;
+      } else {
+        return true;
+      }
     }
   }
 
+  getVerDepartamento() {
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Editar Información General' && item.id_funcion === 1);
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    } else {
+      if (parseInt(localStorage.getItem('rol') as string) != 1) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  
+
+  // CHECK SUCURSALES
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionSucursales = new SelectionModel<ITableSucursales>(true, []);
+
+
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionSucursales.selected.length;
+    return numSelected === this.datosSucursales.length
+  }
+
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionSucursales.clear() :
+      this.datosSucursales.forEach((row: any) => this.selectionSucursales.select(row));
+  }
+
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableSucursales): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.sucursalesEliminar = this.selectionSucursales.selected;
+    //console.log('paginas para Eliminar',this.paginasEliminar);
+
+    //console.log(this.selectionPaginas.selected)
+    return `${this.selectionSucursales.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+
+  }
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+
+  contador: number = 0;
+  ingresar: boolean = false;
+  Eliminar(id_sucursal: number) {
+    this.restS.EliminarRegistro(id_sucursal).subscribe(res => {
+
+
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
+
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerSucursal();
+      }
+    });
+
+
+
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.selectionSucursales.clear();
+          this.sucursalesEliminar = [];
+
+          this.ObtenerSucursal();
+        }
+      });
+  }
+
+  EliminarMultiple() {
+    this.ingresar = false;
+    this.contador = 0;
+
+    this.sucursalesEliminar = this.selectionSucursales.selected;
+    this.sucursalesEliminar.forEach((datos: any) => {
+
+      this.datosSucursales = this.datosSucursales.filter(item => item.id !== datos.id);
+
+      this.contador = this.contador + 1;
+      this.restS.EliminarRegistro(datos.id).subscribe(res => {
+
+        if (res.message === 'error') {
+
+          this.toastr.error('No se puede eliminar.', 'la: ' + datos.nombre, {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ObtenerSucursal();
+
+
+        }
+      });
+    }
+    )
+  }
+
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+
+          if (this.sucursalesEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+
+            this.sucursalesEliminar = [];
+            this.selectionSucursales.clear();
+
+            this.ObtenerSucursal();
+
+
+          } else {
+            this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+
+          }
+        } else {
+          this.router.navigate(['/vistaEmpresa']);
+        }
+      });
+
+
+  }
 }

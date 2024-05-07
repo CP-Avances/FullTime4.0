@@ -121,6 +121,11 @@ class EmpleadoRutas {
         this.router.put('/:id_empleado/uploadImage', [TokenValidation, upload.single('image')], EMPLEADO_CONTROLADOR.CrearImagenEmpleado);
         // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO
         this.router.put('/geolocalizacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.GeolocalizacionCrokis);
+        // METODO PARA ELIMINAR EMPLEADOS
+        this.router.delete('/eliminar/:id', TokenValidation, EMPLEADO_CONTROLADOR.EliminarEmpleado);
+
+
+
 
         /** **************************************************************************************** **
          ** **                       MANEJO DE DATOS DE TITULO PROFESIONAL                        ** ** 
@@ -181,33 +186,6 @@ class EmpleadoRutas {
         //this.router.post('/verificar/datos/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosManual);
         this.router.post('/cargar_manual/plantillaExcel/', TokenValidation, EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // HABILITACIÓN Y DESHABILITACIÓN DE USUARIOS
-
-
-
-        // METODOS PARA CONTROL DE MARCACIONES DENTRO DE UNA UBICACIÓN GEOGRÁFICA 
-        this.router.post('/geolocalizacion-domicilio/:id/:codigo', TokenValidation, EMPLEADO_CONTROLADOR.IngresarGelocalizacion);
-
-        this.router.put('/geolocalizacion-trabajo/:id', TokenValidation, EMPLEADO_CONTROLADOR.ActualizarTrabajo);
-        this.router.put('/geolocalizacion-nuevo-domicilio/:id', TokenValidation, EMPLEADO_CONTROLADOR.ActualizarDomicilio);
-        this.router.put('/actualizar-geolocalizacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.ActualizarGeolocalizacion);
 
     }
 

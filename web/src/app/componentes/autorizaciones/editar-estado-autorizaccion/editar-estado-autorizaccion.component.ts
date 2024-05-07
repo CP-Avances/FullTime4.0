@@ -158,7 +158,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
         this.solInfo = [];
         this.solInfo = {
           permiso_mail: res.permiso_mail,
-          permiso_noti: res.permiso_noti,
+          permiso_noti: res.permiso_notificacion,
           id_empleado: res.id_empleado,
           id_departamento: res.id_departamento,
           id_suc: res.id_sucursal,
@@ -187,7 +187,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
       var filtroArray: any = [];
       this.listadoDepaAutoriza.forEach(function(elemento, indice, array) {
         cont = cont + 1;
-        if(filtroArray.find(p=>p.id_dep_nivel == elemento.id_dep_nivel) == undefined)
+        if(filtroArray.find(p=>p.id_departamento_nivel == elemento.id_departamento_nivel) == undefined)
         {
           filtroArray.push(elemento);
         }
@@ -199,7 +199,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
   // METODO DE APROBACION DE SOLICITUD DE PERMISO
   ActualizarEstadoAprobacion(form: any) {
     let aprobacion = {
-      id_documento: this.data.auto.id_documento + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
+      id_documento: this.data.auto.id_autoriza_estado + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
     }
 
@@ -269,7 +269,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
     this.restA.BuscarAutorizacionPermiso(this.data.permiso.id).subscribe(res1 => {
       this.autorizacion = res1;
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
-      var autorizaciones = this.autorizacion[0].id_documento.split(',');
+      var autorizaciones = this.autorizacion[0].id_autoriza_estado.split(',');
       autorizaciones.map((obj: string) => {
         this.lectura = this.lectura + 1;
         if (obj != '') {
@@ -453,7 +453,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
     permiso.EmpleadosSendNotiEmail.forEach(e => {
       notificacion.id_receives_depa = e.id_departamento;
       notificacion.id_receives_empl = e.id_empleado;
-      if (e.permiso_noti) {
+      if (e.permiso_notificacion) {
         this.realTime.IngresarNotificacionEmpleado(notificacion).subscribe(
           resp => {
             this.restP.EnviarNotificacionRealTime(resp.respuesta);

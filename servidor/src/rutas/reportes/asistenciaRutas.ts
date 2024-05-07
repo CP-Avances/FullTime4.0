@@ -11,7 +11,6 @@ class AsistenciaRutas {
     }
 
     configuracion(): void {
-        this.router.get('/:id_empleado/:desde/:hasta', TokenValidation, ASISTENCIA_CONTROLADOR.ObtenerHorasTrabajadas);
         this.router.get('/lista-empleados/:id_empresa', TokenValidation, ASISTENCIA_CONTROLADOR.ObtenerListaEmpresa)
     }
 

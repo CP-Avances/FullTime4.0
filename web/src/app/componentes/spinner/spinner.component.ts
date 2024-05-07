@@ -9,6 +9,7 @@ import { SpinnerService } from 'src/app/servicios/intercepto/spinner.service';
   styleUrls: ['./spinner.component.css']
 })
 export class SpinnerComponent{
+  
   isLoading$ = this.SpinnerServices.isLoading$;
   constructor(private SpinnerServices: SpinnerService){}
 

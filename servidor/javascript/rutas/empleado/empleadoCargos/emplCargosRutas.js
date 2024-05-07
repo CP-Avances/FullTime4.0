@@ -6,6 +6,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const verificarToken_1 = require("../../../libs/verificarToken");
 const emplCargosControlador_1 = __importDefault(require("../../../controlador/empleado/empleadoCargos/emplCargosControlador"));
+const multer_1 = __importDefault(require("multer"));
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const storage_plantilla = multer_1.default.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)());
+    },
+    filename: function (req, file, cb) {
+        let documento = file.originalname;
+        cb(null, documento);
+    }
+});
+const upload_plantilla = (0, multer_1.default)({ storage: storage_plantilla });
 class EmpleadosCargpsRutas {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -22,7 +34,6 @@ class EmpleadosCargpsRutas {
         this.router.get('/cargoInfo/:id_empl_contrato', verificarToken_1.TokenValidation, emplCargosControlador_1.default.EncontrarCargoIDContrato);
         this.router.get('/', verificarToken_1.TokenValidation, emplCargosControlador_1.default.list);
         this.router.get('/lista-empleados/', verificarToken_1.TokenValidation, emplCargosControlador_1.default.ListarCargoEmpleado);
-        this.router.get('/empleadosAutorizan/:id', verificarToken_1.TokenValidation, emplCargosControlador_1.default.ListarEmpleadoAutoriza);
         this.router.get('/buscar/:id_empleado', verificarToken_1.TokenValidation, emplCargosControlador_1.default.EncontrarIdCargo);
         this.router.get('/buscar/cargoActual/:id_empleado', verificarToken_1.TokenValidation, emplCargosControlador_1.default.EncontrarIdCargoActual);
         /** ****************************************************************************************** **
@@ -37,6 +48,11 @@ class EmpleadosCargpsRutas {
         this.router.get('/buscar/cargo-departamento/:id', verificarToken_1.TokenValidation, emplCargosControlador_1.default.BuscarTipoDepartamento);
         this.router.get('/buscar/cargo-sucursal/:id', verificarToken_1.TokenValidation, emplCargosControlador_1.default.BuscarTipoSucursal);
         this.router.get('/buscar/cargo-regimen/:id', verificarToken_1.TokenValidation, emplCargosControlador_1.default.BuscarTipoRegimen);
+        /** ********************************************************************************************* **
+         ** **            METODO PAARA LA LECTURA DEL REGISTRO MULTIPLE DE CARGOS                   ** **
+         ** ********************************************************************************************* **/
+        this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload_plantilla.single('uploads')], emplCargosControlador_1.default.RevisarDatos);
+        this.router.post('/cargar_plantilla/', verificarToken_1.TokenValidation, emplCargosControlador_1.default.CargarPlantilla_cargos);
     }
 }
 const EMPLEADO_CARGO_RUTAS = new EmpleadosCargpsRutas();

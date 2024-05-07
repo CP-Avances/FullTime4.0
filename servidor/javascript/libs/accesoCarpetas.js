@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaContrato = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = void 0;
+exports.ObtenerRutaLeerPlantillas1 = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaContrato = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = void 0;
 const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE IMAGENES DE USUARIO
@@ -21,7 +21,7 @@ const ObtenerRutaUsuario = function (id) {
         let ruta = '';
         let separador = path_1.default.sep;
         const usuario = yield database_1.default.query(`
-        SELECT codigo, cedula FROM empleados WHERE id = $1
+        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
         `, [id]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
         return ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
@@ -34,7 +34,7 @@ const ObtenerRutaVacuna = function (id) {
         let ruta = '';
         let separador = path_1.default.sep;
         const usuario = yield database_1.default.query(`
-        SELECT codigo, cedula FROM empleados WHERE id = $1
+        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
         `, [id]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
         return ruta + separador + 'carnetVacuna' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
@@ -47,7 +47,7 @@ const ObtenerRutaPermisos = function (codigo) {
         let ruta = '';
         let separador = path_1.default.sep;
         const usuario = yield database_1.default.query(`
-        SELECT cedula FROM empleados WHERE codigo = $1
+        SELECT cedula FROM eu_empleados WHERE codigo = $1
         `, [codigo]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
         return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula;
@@ -91,7 +91,7 @@ const ObtenerRutaContrato = function (id) {
         let ruta = '';
         let separador = path_1.default.sep;
         const usuario = yield database_1.default.query(`
-        SELECT codigo, cedula FROM empleados WHERE id = $1
+        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
         `, [id]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
         return ruta + separador + 'contratos' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
@@ -114,3 +114,11 @@ const ObtenerRutaLeerPlantillas = function () {
     return ruta + separador + 'leerPlantillas';
 };
 exports.ObtenerRutaLeerPlantillas = ObtenerRutaLeerPlantillas;
+// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE ARCHIVOS DE DATOS
+const ObtenerRutaLeerPlantillas1 = function () {
+    let ruta = '';
+    let separador = path_1.default.sep;
+    ruta = path_1.default.join(__dirname, `..${separador}..`);
+    return ruta + separador + 'leerPlantillas';
+};
+exports.ObtenerRutaLeerPlantillas1 = ObtenerRutaLeerPlantillas1;

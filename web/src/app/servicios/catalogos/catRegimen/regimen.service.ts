@@ -43,8 +43,8 @@ export class RegimenService {
   }
 
   // ELIMINAR REGISTRO DE REGIMEN LABORAL
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/eliminar/${id}`);
+  EliminarRegistro(id: any) {
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/eliminar/${id}`).pipe(catchError(id));;
   }
 
   // BUSCAR REGISTRO DE REGIMEN LABORAL POR PAIS

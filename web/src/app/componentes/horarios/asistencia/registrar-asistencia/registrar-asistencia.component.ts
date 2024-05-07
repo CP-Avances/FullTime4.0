@@ -145,8 +145,8 @@ export class RegistrarAsistenciaComponent implements OnInit {
     let datos = {
       id: this.informacion.detalle.id,
       codigo: this.informacion.detalle.codigo,
-      fecha: moment(seleccionado.fec_hora_timbre_servidor).format('YYYY-MM-DD HH:mm:ss'),
-      accion: this.informacion.detalle.tipo_entr_salida,
+      fecha: moment(seleccionado.fecha_hora_timbre_servidor).format('YYYY-MM-DD HH:mm:ss'),
+      accion: this.informacion.detalle.tipo_accion,
       id_timbre: seleccionado.id
     }
     console.log('datos enviados ', datos)
@@ -216,7 +216,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
           }
           let proceso = {
             duracion: duration,
-            fec_hora_timbre_servidor: obj.fec_hora_timbre_servidor,
+            fec_hora_timbre_servidor: obj.fecha_hora_timbre_servidor,
             fecha: obj.t_fec_timbre,
             hora: obj.t_hora_timbre,
             id: obj.id
@@ -247,25 +247,25 @@ export class RegistrarAsistenciaComponent implements OnInit {
   // METODO PARA VERIFICAR FUNCION
   VerificarFuncion() {
     var funcion = '';
-    if (this.informacion.detalle.tipo_entr_salida === 'E') {
+    if (this.informacion.detalle.tipo_accion === 'E') {
       funcion = '0';
     }
-    else if (this.informacion.detalle.tipo_entr_salida === 'S') {
+    else if (this.informacion.detalle.tipo_accion === 'S') {
       funcion = '1';
     }
-    else if (this.informacion.detalle.tipo_entr_salida === 'I/A') {
+    else if (this.informacion.detalle.tipo_accion === 'I/A') {
       funcion = '2';
     }
-    else if (this.informacion.detalle.tipo_entr_salida === 'F/A') {
+    else if (this.informacion.detalle.tipo_accion === 'F/A') {
       funcion = '3';
     }
-    else if (this.informacion.detalle.tipo_entr_salida === 'I/P') {
+    else if (this.informacion.detalle.tipo_accion === 'I/P') {
       funcion = '4';
     }
-    else if (this.informacion.detalle.tipo_entr_salida === 'F/P') {
+    else if (this.informacion.detalle.tipo_accion === 'F/P') {
       funcion = '5';
     }
-    else if (this.informacion.detalle.tipo_entr_salida === 'HA') {
+    else if (this.informacion.detalle.tipo_accion === 'HA') {
       funcion = '7';
     }
     return funcion;

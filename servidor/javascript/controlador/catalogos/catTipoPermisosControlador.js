@@ -14,13 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TIPO_PERMISOS_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
-const builder = require('xmlbuilder');
 class TipoPermisosControlador {
     // METODO PARA BUSCAR TIPO DE PERMISOS
     Listar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const rolPermisos = yield database_1.default.query(`
-      SELECT * FROM cg_tipo_permisos ORDER BY descripcion ASC
+      SELECT * FROM mp_cat_tipo_permisos ORDER BY descripcion ASC
       `);
             if (rolPermisos.rowCount > 0) {
                 return res.jsonp(rolPermisos.rows);
@@ -35,7 +34,7 @@ class TipoPermisosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
             yield database_1.default.query(`
-      DELETE FROM cg_tipo_permisos WHERE id = $1
+      DELETE FROM mp_cat_tipo_permisos WHERE id = $1
       `, [id]);
             res.jsonp({ message: 'Registro eliminado.' });
         });
@@ -45,7 +44,7 @@ class TipoPermisosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const unTipoPermiso = yield database_1.default.query(`
-      SELECT * FROM cg_tipo_permisos WHERE id = $1
+      SELECT * FROM mp_cat_tipo_permisos WHERE id = $1
       `, [id]);
             if (unTipoPermiso.rowCount > 0) {
                 return res.jsonp(unTipoPermiso.rows);
@@ -59,11 +58,11 @@ class TipoPermisosControlador {
             const id = req.params.id;
             const { descripcion, tipo_descuento, num_dia_maximo, num_dia_anticipo, gene_justificacion, fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados, correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar, fecha_fin, num_dia_anterior } = req.body;
             yield database_1.default.query(`
-      UPDATE cg_tipo_permisos SET descripcion = $1, tipo_descuento = $2, num_dia_maximo = $3, num_dia_anticipo = $4, 
-        gene_justificacion = $5, fec_validar = $6, acce_empleado = $7, legalizar = $8, almu_incluir = $9, 
-        num_dia_justifica = $10, num_hora_maximo = $11, fecha_inicio = $12, documento = $13, contar_feriados = $14, 
-        correo_crear = $15, correo_editar = $16, correo_eliminar = $17, correo_preautorizar = $18, correo_autorizar = $19, 
-        correo_negar = $20, correo_legalizar = $21, fecha_fin = $22, num_dia_anterior = $23
+      UPDATE mp_cat_tipo_permisos SET descripcion = $1, tipo_descuento = $2, dias_maximo_permiso = $3, 
+        dias_anticipar_permiso = $4, justificar = $5, fecha_restriccion = $6, solicita_empleado = $7, legalizar = $8, 
+        incluir_minutos_comida = $9, dias_justificar = $10, horas_maximo_permiso = $11, fecha_inicio = $12, documento = $13, 
+        contar_feriados = $14, correo_crear = $15, correo_editar = $16, correo_eliminar = $17, correo_preautorizar = $18, 
+        correo_autorizar = $19, correo_negar = $20, correo_legalizar = $21, fecha_fin = $22, crear_dias_anteriores = $23
       WHERE id = $24
       `, [descripcion, tipo_descuento, num_dia_maximo, num_dia_anticipo, gene_justificacion, fec_validar, acce_empleado,
                 legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados, correo_crear,
@@ -78,10 +77,10 @@ class TipoPermisosControlador {
             try {
                 const { descripcion, tipo_descuento, num_dia_maximo, num_dia_anticipo, gene_justificacion, fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados, correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar, fecha_fin, num_dia_anterior } = req.body;
                 const response = yield database_1.default.query(`
-        INSERT INTO cg_tipo_permisos (descripcion, tipo_descuento, num_dia_maximo, num_dia_anticipo, gene_justificacion, 
-          fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento,
-           contar_feriados, correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, 
-           correo_legalizar, fecha_fin, num_dia_anterior)
+        INSERT INTO mp_cat_tipo_permisos (descripcion, tipo_descuento, dias_maximo_permiso, dias_anticipar_permiso, 
+          justificar, fecha_restriccion, solicita_empleado, legalizar, incluir_minutos_comida, dias_justificar, 
+          hora_maximo_permiso, fecha_inicio, documento, contar_feriados, correo_crear, correo_editar, correo_eliminar, 
+          correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar, fecha_fin, crear_dias_anteriores)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21,
            $22, $23) RETURNING *
         `, [descripcion, tipo_descuento, num_dia_maximo, num_dia_anticipo, gene_justificacion, fec_validar,
@@ -107,7 +106,7 @@ class TipoPermisosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const acce_empleado = req.params.acce_empleado;
             const rolPermisos = yield database_1.default.query(`
-      SELECT * FROM cg_tipo_permisos WHERE acce_empleado = $1 ORDER BY descripcion
+      SELECT * FROM mp_cat_tipo_permisos WHERE solicita_empleado = $1 ORDER BY descripcion
       `, [acce_empleado]);
             res.json(rolPermisos.rows);
         });

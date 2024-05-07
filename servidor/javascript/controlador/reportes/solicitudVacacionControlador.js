@@ -38,7 +38,7 @@ class SolicitudVacacionesControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No se ha encontrado registro de vacaciones.' });
+                return res.status(400).jsonp({ message: 'No se ha encontrado registros.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -47,15 +47,16 @@ const VACACIONES_REPORTE_CONTROLADOR = new SolicitudVacacionesControlador();
 exports.default = VACACIONES_REPORTE_CONTROLADOR;
 const BuscarVacaciones = function (id, desde, hasta) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.default.query('SELECT v.fec_inicio, v.fec_final, v.fec_ingreso,v.id AS id_vacacion, ' +
-            'a.id_documento, a.estado ' +
-            'FROM vacaciones AS v, autorizaciones AS a ' +
-            'WHERE v.id = a.id_vacacion AND v.codigo = $1 AND fec_inicio BETWEEN $2 AND $3', [id, desde, hasta])
+        return yield database_1.default.query(`
+        SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso,v.id AS id_vacacion, a.id_autoriza_estado, a.estado 
+        FROM mv_solicitud_vacacion AS v, ecm_autorizaciones AS a 
+        WHERE v.id = a.id_vacacion AND v.codigo = $1 AND fecha_inicio BETWEEN $2 AND $3
+        `, [id, desde, hasta])
             .then((res) => {
             if (res.rowCount > 0) {
                 res.rows.map((obj) => {
-                    if (obj.id_documento != null && obj.id_documento != '' && obj.estado != 1) {
-                        var autorizaciones = obj.id_documento.split(',');
+                    if (obj.id_autoriza_estado != null && obj.id_autoriza_estado != '' && obj.estado != 1) {
+                        var autorizaciones = obj.id_autoriza_estado.split(',');
                         let empleado_id = autorizaciones[autorizaciones.length - 2].split('_')[0];
                         obj.autoriza = parseInt(empleado_id);
                     }
@@ -74,14 +75,6 @@ const BuscarVacaciones = function (id, desde, hasta) {
                 });
             }
             return res.rows;
-        });
-    });
-};
-const BuscarAprobacion = function (id) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.default.query('SELECT e.nombre, e.apellido FROM empleados AS e WHERE e.id = $1 ', [id])
-            .then((res) => {
-            return res.rows[0].nombre + ' ' + res.rows[0].apellido;
         });
     });
 };

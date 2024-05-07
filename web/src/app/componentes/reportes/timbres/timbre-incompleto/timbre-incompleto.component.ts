@@ -530,8 +530,8 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -732,12 +732,12 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
                 ...obj2.timbres.map((obj3: any) => {
 
                   const fecha = this.validacionService.FormatearFecha(
-                    obj3.fec_hora_horario.split(' ')[0],
+                    obj3.fecha_hora_horario.split(' ')[0],
                     this.formato_fecha,
                     this.validacionService.dia_abreviado);
 
                   const hora = this.validacionService.FormatearHora(
-                    obj3.fec_hora_horario.split(' ')[1],
+                    obj3.fecha_hora_horario.split(' ')[1],
                     this.formato_hora);
 
                   switch (obj3.accion) {
@@ -896,12 +896,12 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
                   ],
                   ...obj2.timbres.map((obj3: any) => {
                     const fecha = this.validacionService.FormatearFecha(
-                      obj3.fec_hora_horario.split(' ')[0],
+                      obj3.fecha_hora_horario.split(' ')[0],
                       this.formato_fecha,
                       this.validacionService.dia_abreviado);
 
                     const hora = this.validacionService.FormatearHora(
-                      obj3.fec_hora_horario.split(' ')[1],
+                      obj3.fecha_hora_horario.split(' ')[1],
                       this.formato_hora);
 
                     switch (obj3.accion) {
@@ -982,7 +982,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
           obj3.timbres.forEach((obj4: any) => {
             n++;
             const hora = this.validacionService.FormatearHora(
-              obj4.fec_hora_horario.split(' ')[1],
+              obj4.fecha_hora_horario.split(' ')[1],
               this.formato_hora);
 
             switch (obj4.accion) {
@@ -1002,7 +1002,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
               'N°': n, 'Código': obj3.codigo, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula,
               'Sucursal': obj1.name_suc, 'Ciudad': obj1.ciudad, 'Régimen': obj3.regimen[0].name_regimen,
               'Departamento': obj2.name_dep, 'Cargo': obj3.cargo,
-              'Fecha Timbre': new Date(obj4.fec_hora_horario), 'Hora Timbre': hora,
+              'Fecha Timbre': new Date(obj4.fecha_hora_horario), 'Hora Timbre': hora,
               'Acción': accionT
             }
             nuevo.push(ele);
@@ -1022,7 +1022,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
         obj2.timbres.forEach((obj3: any) => {
           n++;
           const hora = this.validacionService.FormatearHora(
-            obj3.fec_hora_horario.split(' ')[1],
+            obj3.fecha_hora_horario.split(' ')[1],
             this.formato_hora);
           switch (obj3.accion) {
             case 'EoS': accionT = 'Entrada o salida'; break;
@@ -1042,7 +1042,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
             'Sucursal': obj2.sucursal, 'Ciudad': obj2.ciudad,
             'Régimen': this.bool.bool_cargo ? obj2.regimen : obj2.regimen[0].name_regimen,
             'Departamento': obj2.departamento, 'Cargo': obj2.cargo,
-            'Fecha Timbre': new Date(obj3.fec_hora_horario), 'Hora Timbre': hora,
+            'Fecha Timbre': new Date(obj3.fecha_hora_horario), 'Hora Timbre': hora,
             'Acción': accionT
           }
           nuevo.push(ele);
@@ -1065,12 +1065,12 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             const fecha = this.validacionService.FormatearFecha(
-              obj4.fec_hora_horario.split(' ')[0],
+              obj4.fecha_hora_horario.split(' ')[0],
               this.formato_fecha,
               this.validacionService.dia_abreviado);
 
             const hora = this.validacionService.FormatearHora(
-              obj4.fec_hora_horario.split(' ')[1],
+              obj4.fecha_hora_horario.split(' ')[1],
               this.formato_hora);
 
             n = n + 1;
@@ -1111,12 +1111,12 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
           const fecha = this.validacionService.FormatearFecha(
-            obj3.fec_hora_horario.split(' ')[0],
+            obj3.fecha_hora_horario.split(' ')[0],
             this.formato_fecha,
             this.validacionService.dia_abreviado);
 
           const hora = this.validacionService.FormatearHora(
-            obj3.fec_hora_horario.split(' ')[1],
+            obj3.fecha_hora_horario.split(' ')[1],
             this.formato_hora);
 
           n = n + 1;

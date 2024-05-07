@@ -111,7 +111,7 @@ export class EditarEmpresaComponent implements OnInit {
     // PRIMER FORMULARIO
     this.nombreF.setValue(this.data.nombre);
     this.rucF.setValue(this.data.ruc);
-    this.numeroF.setValue(this.data.num_partida);
+    this.numeroF.setValue(this.data.numero_partida);
     this.telefonoF.setValue(this.data.telefono);
     this.direccionF.setValue(this.data.direccion);
     this.correoF.setValue(this.data.correo_empresa);

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { Licencias, Modulos } from '../class/Licencia'
+import { Licencias, Modulos } from '../class/Licencia';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 

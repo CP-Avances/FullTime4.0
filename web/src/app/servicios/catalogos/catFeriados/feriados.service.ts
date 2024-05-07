@@ -18,8 +18,10 @@ export class FeriadosService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarFeriado(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/feriados/delete/${id}`);
+  EliminarFeriado(id: any) {
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/feriados/delete/${id}`).pipe(
+      catchError(id)
+    );
   }
 
   // METODO PARA CREAR ARCHIVO XML
@@ -76,6 +78,9 @@ export class FeriadosService {
   }
 
 
-
+  Crear_feriados_ciudad(form){
+    console.log('form: ',form);
+    return this.http.post<any>(environment.url + '/feriados/upload/crearFeriadoCiudad', form);
+  }
 
 }

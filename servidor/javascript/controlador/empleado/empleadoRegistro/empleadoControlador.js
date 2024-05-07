@@ -15,14 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPLEADO_CONTROLADOR = void 0;
 // SECCION LIBRERIAS
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 const ts_md5_1 = require("ts-md5");
+const moment_1 = __importDefault(require("moment"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const moment_1 = __importDefault(require("moment"));
-const builder = require('xmlbuilder');
-const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 class EmpleadoControlador {
     /** ** ********************************************************************************************* **
      ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
@@ -31,7 +30,7 @@ class EmpleadoControlador {
     ObtenerCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const VALOR = yield database_1.default.query(`
-      SELECT * FROM codigo
+      SELECT * FROM e_codigo
       `);
             if (VALOR.rowCount > 0) {
                 return res.jsonp(VALOR.rows);
@@ -46,7 +45,7 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id, valor, automatico, manual } = req.body;
             yield database_1.default.query(`
-      INSERT INTO codigo (id, valor, automatico, manual) VALUES ($1, $2, $3, $4)
+      INSERT INTO e_codigo (id, valor, automatico, manual) VALUES ($1, $2, $3, $4)
       `, [id, valor, automatico, manual]);
             res.jsonp({ message: 'Registro guardado.' });
         });
@@ -56,7 +55,7 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const VALOR = yield database_1.default.query(`
-        SELECT MAX(codigo::BIGINT) AS codigo FROM empleados
+        SELECT MAX(codigo::BIGINT) AS codigo FROM eu_empleados
         `); //TODO Revisar Instrucción SQL max codigo
                 if (VALOR.rowCount > 0) {
                     return res.jsonp(VALOR.rows);
@@ -66,7 +65,7 @@ class EmpleadoControlador {
                 }
             }
             catch (error) {
-                return res.status(404).jsonp({ text: 'Error al obtener código máximo' });
+                return res.status(404).jsonp({ text: 'Error al obtener código máximo.' });
             }
         });
     }
@@ -75,7 +74,7 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { valor, automatico, manual, cedula, id } = req.body;
             yield database_1.default.query(`
-      UPDATE codigo SET valor = $1, automatico = $2, manual = $3 , cedula = $4 WHERE id = $5
+      UPDATE e_codigo SET valor = $1, automatico = $2, manual = $3 , cedula = $4 WHERE id = $5
       `, [valor, automatico, manual, cedula, id]);
             res.jsonp({ message: 'Registro actualizado.' });
         });
@@ -85,7 +84,7 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { valor, id } = req.body;
             yield database_1.default.query(`
-      UPDATE codigo SET valor = $1 WHERE id = $2
+      UPDATE e_codigo SET valor = $1 WHERE id = $2
       `, [valor, id]);
             res.jsonp({ message: 'Registro actualizado.' });
         });
@@ -99,8 +98,8 @@ class EmpleadoControlador {
             try {
                 const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo } = req.body;
                 const response = yield database_1.default.query(`
-        INSERT INTO empleados ( cedula, apellido, nombre, esta_civil, genero, correo, 
-        fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo) 
+        INSERT INTO eu_empleados (cedula, apellido, nombre, estado_civil, genero, correo, 
+          fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *
         `, [cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio,
                     telefono, id_nacionalidad, codigo]);
@@ -175,9 +174,10 @@ class EmpleadoControlador {
                 const id = req.params.id;
                 const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo } = req.body;
                 yield database_1.default.query(`
-        UPDATE empleados SET cedula = $2, apellido = $3, nombre = $4, esta_civil = $5, 
-        genero = $6, correo = $7, fec_nacimiento = $8, estado = $9, domicilio = $10, 
-        telefono = $11, id_nacionalidad = $12, codigo = $13 WHERE id = $1 
+        UPDATE eu_empleados SET cedula = $2, apellido = $3, nombre = $4, estado_civil = $5, 
+          genero = $6, correo = $7, fecha_nacimiento = $8, estado = $9, domicilio = $10, 
+          telefono = $11, id_nacionalidad = $12, codigo = $13 
+        WHERE id = $1 
         `, [id, cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
                     domicilio, telefono, id_nacionalidad, codigo]);
                 let verificar_permisos = 0;
@@ -290,7 +290,7 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const EMPLEADO = yield database_1.default.query(`
-      SELECT * FROM empleados WHERE id = $1
+      SELECT * FROM eu_empleados WHERE id = $1
       `, [id]);
             if (EMPLEADO.rowCount > 0) {
                 return res.jsonp(EMPLEADO.rows);
@@ -304,7 +304,7 @@ class EmpleadoControlador {
     ListarBusquedaEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const empleado = yield database_1.default.query(`
-      SELECT id, nombre, apellido FROM empleados ORDER BY apellido
+      SELECT id, nombre, apellido FROM eu_empleados ORDER BY apellido
       `).then((result) => {
                 return result.rows.map((obj) => {
                     return {
@@ -320,7 +320,7 @@ class EmpleadoControlador {
     Listar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const empleado = yield database_1.default.query(`
-      SELECT * FROM empleados WHERE estado = 1 ORDER BY id
+      SELECT * FROM eu_empleados WHERE estado = 1 ORDER BY id
       `);
             res.jsonp(empleado.rows);
         });
@@ -329,7 +329,7 @@ class EmpleadoControlador {
     ListarEmpleadosDesactivados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const empleado = yield database_1.default.query(`
-      SELECT * FROM empleados WHERE estado = 2 ORDER BY id
+      SELECT * FROM eu_empleados WHERE estado = 2 ORDER BY id
       `);
             res.jsonp(empleado.rows);
         });
@@ -342,12 +342,12 @@ class EmpleadoControlador {
                 arrayIdsEmpleados.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
                     // 2 => DESACTIVADO O INACTIVO
                     yield database_1.default.query(`
-          UPDATE empleados SET estado = 2 WHERE id = $1
+          UPDATE eu_empleados SET estado = 2 WHERE id = $1
           `, [obj])
                         .then((result) => { });
                     // FALSE => YA NO TIENE ACCESO
                     yield database_1.default.query(`
-          UPDATE usuarios SET estado = false, app_habilita = false WHERE id_empleado = $1
+          UPDATE eu_usuarios SET estado = false, app_habilita = false WHERE id_empleado = $1
           `, [obj])
                         .then((result) => { });
                 }));
@@ -364,12 +364,12 @@ class EmpleadoControlador {
                 arrayIdsEmpleados.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
                     // 1 => ACTIVADO
                     yield database_1.default.query(`
-          UPDATE empleados SET estado = 1 WHERE id = $1
+          UPDATE eu_empleados SET estado = 1 WHERE id = $1
           `, [obj])
                         .then((result) => { });
                     // TRUE => TIENE ACCESO
                     yield database_1.default.query(`
-          UPDATE usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
+          UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
           `, [obj])
                         .then((result) => { });
                 }));
@@ -386,12 +386,12 @@ class EmpleadoControlador {
                 arrayIdsEmpleados.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
                     // 1 => ACTIVADO
                     yield database_1.default.query(`
-          UPDATE empleados SET estado = 1 WHERE id = $1
+          UPDATE eu_empleados SET estado = 1 WHERE id = $1
           `, [obj])
                         .then((result) => { });
                     // TRUE => TIENE ACCESO
                     yield database_1.default.query(`
-          UPDATE usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
+          UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
           `, [obj])
                         .then((result) => { });
                     // REVISAR
@@ -413,7 +413,7 @@ class EmpleadoControlador {
             let id = req.params.id_empleado;
             let separador = path_1.default.sep;
             const unEmpleado = yield database_1.default.query(`
-      SELECT * FROM empleados WHERE id = $1
+      SELECT * FROM eu_empleados WHERE id = $1
       `, [id]);
             if (unEmpleado.rowCount > 0) {
                 unEmpleado.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
@@ -433,20 +433,20 @@ class EmpleadoControlador {
                                 }
                             });
                             yield database_1.default.query(`
-              UPDATE empleados SET imagen = $2 Where id = $1
+              UPDATE eu_empleados SET imagen = $2 Where id = $1
               `, [id, imagen]);
                             res.jsonp({ message: 'Imagen actualizada.' });
                         }
                         catch (error) {
                             yield database_1.default.query(`
-              UPDATE empleados SET imagen = $2 Where id = $1
+              UPDATE eu_empleados SET imagen = $2 Where id = $1
               `, [id, imagen]);
                             res.jsonp({ message: 'Imagen actualizada.' });
                         }
                     }
                     else {
                         yield database_1.default.query(`
-            UPDATE empleados SET imagen = $2 Where id = $1
+            UPDATE eu_empleados SET imagen = $2 Where id = $1
             `, [id, imagen]);
                         res.jsonp({ message: 'Imagen actualizada.' });
                     }
@@ -462,7 +462,7 @@ class EmpleadoControlador {
             console.log(lat, lng, id);
             try {
                 yield database_1.default.query(`
-        UPDATE empleados SET latitud = $1, longitud = $2 WHERE id = $3
+        UPDATE eu_empleados SET latitud = $1, longitud = $2 WHERE id = $3
         `, [lat, lng, id])
                     .then((result) => { });
                 res.status(200).jsonp({ message: 'Registro actualizado.' });
@@ -482,8 +482,9 @@ class EmpleadoControlador {
             const unEmpleadoTitulo = yield database_1.default.query(`
         SELECT et.id, et.observacion As observaciones, et.id_titulo, 
           et.id_empleado, ct.nombre, nt.nombre as nivel
-        FROM empl_titulos AS et, cg_titulos AS ct, nivel_titulo AS nt
-        WHERE et.id_empleado = $1 and et.id_titulo = ct.id and ct.id_nivel = nt.id ORDER BY id
+        FROM eu_empleado_titulos AS et, et_titulos AS ct, et_cat_nivel_titulo AS nt
+        WHERE et.id_empleado = $1 and et.id_titulo = ct.id and ct.id_nivel = nt.id
+        ORDER BY id
         `, [id_empleado]);
             if (unEmpleadoTitulo.rowCount > 0) {
                 return res.jsonp(unEmpleadoTitulo.rows);
@@ -498,7 +499,7 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { observacion, id_empleado, id_titulo } = req.body;
             yield database_1.default.query(`
-      INSERT INTO empl_titulos (observacion, id_empleado, id_titulo) VALUES ($1, $2, $3)
+      INSERT INTO eu_empleado_titulos (observacion, id_empleado, id_titulo) VALUES ($1, $2, $3)
       `, [observacion, id_empleado, id_titulo]);
             res.jsonp({ message: 'Registro guardado.' });
         });
@@ -509,7 +510,7 @@ class EmpleadoControlador {
             const id = req.params.id_empleado_titulo;
             const { observacion, id_titulo } = req.body;
             yield database_1.default.query(`
-      UPDATE empl_titulos SET observacion = $1, id_titulo = $2 WHERE id = $3
+      UPDATE eu_empleado_titulos SET observacion = $1, id_titulo = $2 WHERE id = $3
       `, [observacion, id_titulo, id]);
             res.jsonp({ message: 'Registro actualizado.' });
         });
@@ -519,7 +520,7 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id_empleado_titulo;
             yield database_1.default.query(`
-      DELETE FROM empl_titulos WHERE id = $1
+      DELETE FROM eu_empleado_titulos WHERE id = $1
       `, [id]);
             res.jsonp({ message: 'Registro eliminado.' });
         });
@@ -532,7 +533,7 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const UBICACION = yield database_1.default.query(`
-      SELECT longitud, latitud FROM empleados WHERE id = $1
+      SELECT longitud, latitud FROM eu_empleados WHERE id = $1
       `, [id]);
             if (UBICACION.rowCount > 0) {
                 return res.jsonp(UBICACION.rows);
@@ -546,13 +547,15 @@ class EmpleadoControlador {
     BuscarEmpleadoNombre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { informacion } = req.body;
-            const EMPLEADO = yield database_1.default.query('SELECT * FROM empleados WHERE ' +
-                '(UPPER (apellido) || \' \' || UPPER (nombre)) = $1', [informacion]);
+            const EMPLEADO = yield database_1.default.query(`
+      SELECT * FROM eu_empleados WHERE
+      (UPPER (apellido) || \' \' || UPPER (nombre)) = $1
+      `, [informacion]);
             if (EMPLEADO.rowCount > 0) {
                 return res.jsonp(EMPLEADO.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'El empleado no ha sido encontrado' });
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
@@ -601,86 +604,30 @@ class EmpleadoControlador {
     ObtenerDepartamentoEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_emple, id_cargo } = req.body;
-            const DEPARTAMENTO = yield database_1.default.query('SELECT *FROM VistaDepartamentoEmpleado WHERE id_emple = $1 AND ' +
-                'id_cargo = $2', [id_emple, id_cargo]);
+            const DEPARTAMENTO = yield database_1.default.query(`
+      SELECT * FROM VistaDepartamentoEmpleado WHERE id_emple = $1 AND
+      id_cargo = $2
+      `, [id_emple, id_cargo]);
             if (DEPARTAMENTO.rowCount > 0) {
                 return res.jsonp(DEPARTAMENTO.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'Registros no encontrados' });
+                return res.status(404).jsonp({ text: 'Registros no encontrados.' });
             }
         });
     }
-    // METODO PARA INGRESAR DATOS DE UBICACIÓN DEL USUARIO
-    IngresarGelocalizacion(req, res) {
+    // METODO PARA ELIMINAR REGISTROS
+    EliminarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let id = req.params.id;
-            let codigo = req.params.codigo;
-            let { h_lat, h_lng, t_lat, t_lng } = req.body;
             try {
-                yield database_1.default.query('INSERT INTO ubicacion (t_latitud, t_longitud, h_latitud, h_longitud, codigo, id_empl) ' +
-                    'VALUES ($1, $2, $3, $4, $5, $6)', [t_lat, t_lng, h_lat, h_lng, codigo, id])
-                    .then((result) => {
-                    console.log(result.command);
-                });
-                res.status(200).jsonp({ message: 'Geolocalizacion domicilio ingresada' });
+                const id = req.params.id;
+                yield database_1.default.query(`
+        DELETE FROM eu_empleados WHERE id = $1
+        `, [id]);
+                res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
-                res.status(400).jsonp({ message: error });
-            }
-        });
-    }
-    // METODO PARA ACTUALIZAR DATOS DE UBICACIÓN DE DOMICILIO DEL USUARIO
-    ActualizarDomicilio(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let id = req.params.id;
-            let { lat, lng } = req.body;
-            console.log(lat, lng, id);
-            try {
-                yield database_1.default.query('UPDATE ubicacion SET h_latitud = $1, h_longitud = $2 WHERE id_empl = $3', [lat, lng, id])
-                    .then((result) => {
-                    console.log(result.command);
-                });
-                res.status(200).jsonp({ message: 'Geolocalizacion domicilio actualizada' });
-            }
-            catch (error) {
-                res.status(400).jsonp({ message: error });
-            }
-        });
-    }
-    // METODO PARA ACTUALIZAR DATOS DE UBICACIÓN DE TRABAJO DEL USUARIO
-    ActualizarTrabajo(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let id = req.params.id;
-            let { lat, lng } = req.body;
-            console.log(lat, lng, id);
-            try {
-                yield database_1.default.query('UPDATE ubicacion SET t_latitud = $1, t_longitud = $2 WHERE id_empl = $3', [lat, lng, id])
-                    .then((result) => {
-                    console.log(result.command);
-                });
-                res.status(200).jsonp({ message: 'Geolocalización de Lugar de Trabajo registrada.' });
-            }
-            catch (error) {
-                res.status(400).jsonp({ message: error });
-            }
-        });
-    }
-    // METODO PARA ACTUALIZAR DATOS DE UBICACIÓN DEL USUARIO
-    ActualizarGeolocalizacion(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let id = req.params.id;
-            let { h_lat, h_lng, t_lat, t_lng } = req.body;
-            try {
-                yield database_1.default.query('UPDATE ubicacion SET t_latitud = $1, t_longitud = $2, h_latitud = $3, ' +
-                    'h_longitud = $4 WHERE id_empl = $5', [t_lat, t_lng, h_lat, h_lng, id])
-                    .then((result) => {
-                    console.log(result);
-                });
-                res.status(200).jsonp({ message: 'Geolocalizacion ingresada' });
-            }
-            catch (error) {
-                res.status(400).jsonp({ message: error });
+                return res.jsonp({ message: 'error' });
             }
         });
     }
@@ -861,7 +808,7 @@ class EmpleadoControlador {
                         data.observacion = 'Usuario ' + data.observacion;
                     }
                     if (contrasena == undefined) {
-                        data.contrasena = contrasena;
+                        data.contrasena = 'No registrado';
                         data.observacion = 'Contraseña ' + data.observacion;
                     }
                     if (rol == undefined) {
@@ -869,9 +816,11 @@ class EmpleadoControlador {
                         data.observacion = 'Rol ' + data.observacion;
                     }
                     // Verificar si la variable tiene el formato de fecha correcto con moment
-                    if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) { }
-                    else {
-                        data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                    if (data.fec_nacimiento != 'No registrado') {
+                        if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) { }
+                        else {
+                            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                        }
                     }
                     //Valida si los datos de la columna telefono son numeros.
                     if (telefono != undefined) {
@@ -904,43 +853,6 @@ class EmpleadoControlador {
                     listEmpleados.push(data);
                 }
                 data = {};
-                /*
-                //TODO Revisar max codigo
-                // Verificar que el código no se duplique en los registros
-                codigo = codigo + 1;
-                console.log('codigo_ver', codigo);
-                const VERIFICAR_CODIGO = await pool.query('SELECT * FROM empleados WHERE codigo = $1', [codigo]);
-                if (VERIFICAR_CODIGO.rowCount === 0) {
-                  contarCodigo = contarCodigo + 1;
-                }
-          
-                //Verificar que los datos no esten vacios
-                if (cedula != undefined && estado_civil != undefined && genero != undefined && correo != undefined &&
-                  fec_nacimiento != undefined && estado != undefined && domicilio != undefined && telefono != undefined &&
-                  nacionalidad != undefined && usuario != undefined && estado_user != undefined && rol != undefined &&
-                  app_habilita != undefined && data.nombre != undefined && data.apellido != undefined) {
-                  contarLlenos = contarLlenos + 1;
-                }
-          
-                // Cuando todos los datos han sido leidos verificamos si todos los datos son correctos
-                console.log('codigo', contarCodigo, plantilla.length, contador);
-                console.log('cedula', contarCedula, plantilla.length, contador);
-                console.log('usuario', contarUsuario, plantilla.length, contador);
-                console.log('rol', contarRol, plantilla.length, contador);
-                console.log('llenos', contarLlenos, plantilla.length, contador);
-                if (contador === plantilla.length) {
-                  if (contarCodigo === plantilla.length && contarCedula === plantilla.length &&
-                    contarUsuario === plantilla.length && contarLlenos === plantilla.length &&
-                    contarRol === plantilla.length && contarECivil === plantilla.length &&
-                    contarGenero === plantilla.length && contarEstado === plantilla.length &&
-                    contarNacionalidad === plantilla.length) {
-                    return res.jsonp({ message: 'correcto' });
-                  } else {
-                    return res.jsonp({ message: 'error' });
-                  }
-                }
-                contador = contador + 1;
-                */
             }));
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
             fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
@@ -952,21 +864,29 @@ class EmpleadoControlador {
                 }
             });
             listEmpleados.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
-                var VERIFICAR_CEDULA = yield database_1.default.query('SELECT * FROM empleados WHERE cedula = $1', [valor.cedula]);
+                var VERIFICAR_CEDULA = yield database_1.default.query(`
+        SELECT * FROM eu_empleados WHERE cedula = $1
+        `, [valor.cedula]);
                 if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
                     valor.observacion = 'Cédula ya existe en el sistema';
                 }
                 else {
-                    var VERIFICAR_USUARIO = yield database_1.default.query('SELECT * FROM usuarios WHERE usuario = $1', [valor.usuario]);
+                    var VERIFICAR_USUARIO = yield database_1.default.query(`
+          SELECT * FROM eu_usuarios WHERE usuario = $1
+          `, [valor.usuario]);
                     if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
                         valor.observacion = 'Usuario ya existe en el sistema';
                     }
                     else {
                         if (valor.rol != 'No registrado') {
-                            var VERIFICAR_ROL = yield database_1.default.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [valor.rol.toUpperCase()]);
+                            var VERIFICAR_ROL = yield database_1.default.query(`
+              SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
+              `, [valor.rol.toUpperCase()]);
                             if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != '') {
                                 if (valor.nacionalidad != 'No registrado') {
-                                    var VERIFICAR_NACIONALIDAD = yield database_1.default.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1', [valor.nacionalidad.toUpperCase()]);
+                                    var VERIFICAR_NACIONALIDAD = yield database_1.default.query(`
+                  SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
+                  `, [valor.nacionalidad.toUpperCase()]);
                                     if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
                                         // Discriminación de elementos iguales
                                         if (duplicados1.find((p) => p.cedula === valor.cedula) == undefined) {
@@ -1047,9 +967,6 @@ class EmpleadoControlador {
     VerificarPlantilla_DatosAutomatico(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let list = req.files;
-            //let cadena = list.uploads[0].path;
-            //let filename = cadena.split("\\")[1];
-            //var filePath = `./plantillas/${filename}`
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_2.ObtenerRutaLeerPlantillas)() + separador + list;
             //const workbook = excel.readFile(filePath);
@@ -1057,55 +974,6 @@ class EmpleadoControlador {
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             console.log('plantilla1: ', plantilla);
-            /*
-            var contarCedulaData = 0;
-            var contarUsuarioData = 0;
-            var contador_arreglo = 1;
-            var arreglos_datos: any = [];
-            //Leer la plantilla para llenar un array con los datos cedula y usuario para verificar que no sean duplicados
-            plantilla.forEach(async (data: any) => {
-              // Datos que se leen de la plantilla ingresada
-              const { cedula, estado_civil, genero, correo, fec_nacimiento, estado, domicilio,
-                telefono, nacionalidad, usuario, estado_user, rol, app_habilita } = data;
-              let datos_array = {
-                cedula: cedula,
-                usuario: usuario,
-              }
-              arreglos_datos.push(datos_array);
-            });
-        
-            // Vamos a verificar dentro de arreglo_datos que no se encuentren datos duplicados
-            for (var i = 0; i <= arreglos_datos.length - 1; i++) {
-              for (var j = 0; j <= arreglos_datos.length - 1; j++) {
-                if (arreglos_datos[i].cedula === arreglos_datos[j].cedula) {
-                  contarCedulaData = contarCedulaData + 1;
-                }
-                if (arreglos_datos[i].usuario === arreglos_datos[j].usuario) {
-                  contarUsuarioData = contarUsuarioData + 1;
-                }
-              }
-              contador_arreglo = contador_arreglo + 1;
-            }
-        
-            // Cuando todos los datos han sido leidos verificamos si todos los datos son correctos
-            console.log('cedula_data', contarCedulaData, plantilla.length, contador_arreglo);
-            console.log('usuario_data', contarUsuarioData, plantilla.length, contador_arreglo);
-            if ((contador_arreglo - 1) === plantilla.length) {
-              if (contarCedulaData === plantilla.length && contarUsuarioData === plantilla.length) {
-                return res.jsonp({ message: 'correcto' });
-              } else {
-                return res.jsonp({ message: 'error' });
-              }
-            }
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs.access(filePath, fs.constants.F_OK, (err) => {
-              if (err) {
-              } else {
-                // ELIMINAR DEL SERVIDOR
-                fs.unlinkSync(filePath);
-              }
-            });
-            */
         });
     }
     CargarPlantilla_Automatico(req, res) {
@@ -1188,9 +1056,13 @@ class EmpleadoControlador {
                 var estado_user = true;
                 var app_habilita = false;
                 //Obtener id de la nacionalidad
-                const id_nacionalidad = yield database_1.default.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1', [nacionalidad.toUpperCase()]);
+                const id_nacionalidad = yield database_1.default.query(`
+        SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
+        `, [nacionalidad.toUpperCase()]);
                 //Obtener id del rol
-                const id_rol = yield database_1.default.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [rol.toUpperCase()]);
+                const id_rol = yield database_1.default.query(`
+        SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
+        `, [rol.toUpperCase()]);
                 console.log('codigo dato 222: ', codigo_dato);
                 console.log('codigo 222: ', codigo);
                 if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
@@ -1207,23 +1079,31 @@ class EmpleadoControlador {
                 console.log('genero: ', id_genero, ' estado: ', id_estado, ' nacionalidad: ', id_nacionalidad.rows, ' rol: ', id_rol);
                 console.log('longitud: ', _longitud, ' latitud: ', _latitud);
                 // Registro de nuevo empleado
-                yield database_1.default.query('INSERT INTO empleados (cedula, apellido, nombre, esta_civil, genero, correo, ' +
-                    'fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) VALUES ' +
-                    '($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)', [cedula, apellidoE, nombreE,
+                yield database_1.default.query(`
+        INSERT INTO eu_empleados (cedula, apellido, nombre, estado_civil, genero, correo,
+          fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+        `, [cedula, apellidoE, nombreE,
                     id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
                     domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
                 // Obtener el id del empleado ingresado
-                const oneEmpley = yield database_1.default.query('SELECT id FROM empleados WHERE cedula = $1', [cedula]);
+                const oneEmpley = yield database_1.default.query(`
+        SELECT id FROM eu_empleados WHERE cedula = $1
+        `, [cedula]);
                 const id_empleado = oneEmpley.rows[0].id;
                 // Registro de los datos de usuario
-                yield database_1.default.query('INSERT INTO usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita) ' +
-                    'VALUES ($1, $2, $3, $4, $5, $6)', [usuario, contrasena, estado_user, id_rol.rows[0]['id'],
+                yield database_1.default.query(`
+        INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        `, [usuario, contrasena, estado_user, id_rol.rows[0]['id'],
                     id_empleado, app_habilita]);
                 if (contador === plantilla.length) {
                     console.log('codigo_ver', codigo, VALOR.rows[0].id);
                     // Actualización del código
                     if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
-                        yield database_1.default.query('UPDATE codigo SET valor = $1 WHERE id = $2', [codigo, VALOR.rows[0].id]);
+                        yield database_1.default.query(`
+            UPDATE e_codigo SET valor = $1 WHERE id = $2
+            `, [codigo, VALOR.rows[0].id]);
                     }
                 }
                 contador = contador + 1;
@@ -1342,14 +1222,6 @@ class EmpleadoControlador {
                     else {
                         data.observacion = 'La cédula ingresada no es válida';
                     }
-                    //TODO Revisar max codigo
-                    // Verificar que el código no se duplique en los registros
-                    //codigo = codigo + 1;
-                    //console.log('codigo_ver', codigo);
-                    //const VERIFICAR_CODIGO = await pool.query('SELECT * FROM empleados WHERE codigo = $1', [codigo]);
-                    //if (VERIFICAR_CODIGO.rowCount === 0) {
-                    //contarCodigo = contarCodigo + 1;
-                    //}
                     listEmpleadosManual.push(data);
                 }
                 else {
@@ -1438,9 +1310,11 @@ class EmpleadoControlador {
                         data.observacion = 'Rol ' + data.observacion;
                     }
                     // Verificar si la variable tiene el formato de fecha correcto con moment
-                    if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) { }
-                    else {
-                        data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                    if (data.fec_nacimiento != 'No registrado') {
+                        if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) { }
+                        else {
+                            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                        }
                     }
                     //Valida si los datos de la columna telefono son numeros.
                     if (telefono != undefined) {
@@ -1490,26 +1364,36 @@ class EmpleadoControlador {
                 }
             });
             listEmpleadosManual.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
-                var VERIFICAR_CEDULA = yield database_1.default.query('SELECT * FROM empleados WHERE cedula = $1', [valor.cedula]);
+                var VERIFICAR_CEDULA = yield database_1.default.query(`
+        SELECT * FROM eu_empleados WHERE cedula = $1
+        `, [valor.cedula]);
                 if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
                     valor.observacion = 'Cédula ya existe en el sistema';
                 }
                 else {
-                    var VERIFICAR_CODIGO = yield database_1.default.query('SELECT * FROM empleados WHERE codigo = $1', [valor.codigo]);
+                    var VERIFICAR_CODIGO = yield database_1.default.query(`
+          SELECT * FROM eu_empleados WHERE codigo = $1
+          `, [valor.codigo]);
                     if (VERIFICAR_CODIGO.rows[0] != undefined && VERIFICAR_CODIGO.rows[0] != '') {
                         valor.observacion = 'Codigo ya existe en el sistema';
                     }
                     else {
-                        var VERIFICAR_USUARIO = yield database_1.default.query('SELECT * FROM usuarios WHERE usuario = $1', [valor.usuario]);
+                        var VERIFICAR_USUARIO = yield database_1.default.query(`
+            SELECT * FROM eu_usuarios WHERE usuario = $1
+            `, [valor.usuario]);
                         if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
                             valor.observacion = 'Usuario ya existe en el sistema';
                         }
                         else {
                             if (valor.rol != 'No registrado') {
-                                var VERIFICAR_ROL = yield database_1.default.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [valor.rol.toUpperCase()]);
+                                var VERIFICAR_ROL = yield database_1.default.query(`
+                SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
+                `, [valor.rol.toUpperCase()]);
                                 if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != '') {
                                     if (valor.nacionalidad != 'No registrado') {
-                                        var VERIFICAR_NACIONALIDAD = yield database_1.default.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1', [valor.nacionalidad.toUpperCase()]);
+                                        var VERIFICAR_NACIONALIDAD = yield database_1.default.query(`
+                    SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
+                    `, [valor.nacionalidad.toUpperCase()]);
                                         if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
                                             // Discriminación de elementos iguales
                                             if (duplicados1.find((p) => p.cedula === valor.cedula) == undefined) {
@@ -1730,25 +1614,37 @@ class EmpleadoControlador {
                 var estado_user = true;
                 var app_habilita = false;
                 //Obtener id de la nacionalidad
-                const id_nacionalidad = yield database_1.default.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1', [nacionalidad.toUpperCase()]);
+                const id_nacionalidad = yield database_1.default.query(`
+        SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
+        `, [nacionalidad.toUpperCase()]);
                 //Obtener id del rol
-                const id_rol = yield database_1.default.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [rol.toUpperCase()]);
+                const id_rol = yield database_1.default.query(`
+        SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
+        `, [rol.toUpperCase()]);
                 // Registro de nuevo empleado
-                yield database_1.default.query('INSERT INTO empleados ( cedula, apellido, nombre, esta_civil, genero, correo, ' +
-                    'fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) VALUES ' +
-                    '($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)', [cedula, apellidoE, nombreE,
+                yield database_1.default.query(`
+        INSERT INTO eu_empleados ( cedula, apellido, nombre, estado_civil, genero, correo,
+          fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+        `, [cedula, apellidoE, nombreE,
                     id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
                     domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
                 // Obtener el id del empleado ingresado
-                const oneEmpley = yield database_1.default.query('SELECT id FROM empleados WHERE cedula = $1', [cedula]);
+                const oneEmpley = yield database_1.default.query(`
+        SELECT id FROM eu_empleados WHERE cedula = $1
+        `, [cedula]);
                 const id_empleado = oneEmpley.rows[0].id;
                 // Registro de los datos de usuario
-                yield database_1.default.query('INSERT INTO usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita) ' +
-                    'VALUES ($1, $2, $3, $4, $5, $6)', [usuario, contrasena, estado_user, id_rol.rows[0]['id'], id_empleado,
+                yield database_1.default.query(`
+        INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        `, [usuario, contrasena, estado_user, id_rol.rows[0]['id'], id_empleado,
                     app_habilita]);
                 if (contador === plantilla.length) {
                     // Actualización del código
-                    yield database_1.default.query('UPDATE codigo SET valor = null WHERE id = 1');
+                    yield database_1.default.query(`
+          UPDATE e_codigo SET valor = null WHERE id = 1
+          `);
                     return res.jsonp({ message: 'correcto' });
                 }
                 contador = contador + 1;

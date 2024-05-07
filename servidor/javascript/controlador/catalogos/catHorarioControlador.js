@@ -26,8 +26,8 @@ class HorarioControlador {
             const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_ } = req.body;
             try {
                 const response = yield database_1.default.query(`
-      INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo,
-      nocturno, detalle, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+      INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
+        nocturno, detalle, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
       `, [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_]);
                 const [horario] = response.rows;
                 if (horario) {
@@ -49,7 +49,7 @@ class HorarioControlador {
             const { codigo } = req.body;
             try {
                 const HORARIOS = yield database_1.default.query(`
-        SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1
+        SELECT * FROM eh_cat_horarios WHERE UPPER(codigo) = $1
         `, [codigo.toUpperCase()]);
                 if (HORARIOS.rowCount > 0)
                     return res.status(200).jsonp({ message: 'No se encuentran registros.' });
@@ -75,7 +75,7 @@ class HorarioControlador {
             let documento = id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
             let separador = path_1.default.sep;
             yield database_1.default.query(`
-      UPDATE cg_horarios SET documento = $2 WHERE id = $1
+      UPDATE eh_cat_horarios SET documento = $2 WHERE id = $1
       `, [id, documento]);
             res.jsonp({ message: 'Documento actualizado.' });
             if (archivo != 'null' && archivo != '' && archivo != null) {
@@ -101,8 +101,8 @@ class HorarioControlador {
             const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_ } = req.body;
             try {
                 const respuesta = yield database_1.default.query(`
-        UPDATE cg_horarios SET nombre = $1, min_almuerzo = $2, hora_trabajo = $3,  
-        nocturno = $4, detalle = $5, codigo = $6, default_ = $7
+        UPDATE eh_cat_horarios SET nombre = $1, minutos_comida = $2, hora_trabajo = $3,  
+          nocturno = $4, detalle = $5, codigo = $6, default_ = $7
         WHERE id = $8 RETURNING *
         `, [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_, id,])
                     .then((result) => { return result.rows; });
@@ -121,8 +121,8 @@ class HorarioControlador {
             let { documento, id } = req.body;
             let separador = path_1.default.sep;
             yield database_1.default.query(`
-            UPDATE cg_horarios SET documento = null WHERE id = $1
-            `, [id]);
+      UPDATE eh_cat_horarios SET documento = null WHERE id = $1
+      `, [id]);
             if (documento != 'null' && documento != '' && documento != null) {
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + documento;
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
@@ -162,7 +162,7 @@ class HorarioControlador {
     ListarHorarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const HORARIOS = yield database_1.default.query(`
-      SELECT * FROM cg_horarios ORDER BY codigo ASC
+      SELECT * FROM eh_cat_horarios ORDER BY codigo ASC
       `);
             if (HORARIOS.rowCount > 0) {
                 return res.jsonp(HORARIOS.rows);
@@ -178,7 +178,7 @@ class HorarioControlador {
             const { id, codigo } = req.body;
             try {
                 const HORARIOS = yield database_1.default.query(`
-        SELECT * FROM cg_horarios WHERE NOT id = $1 AND UPPER(codigo) = $2)
+        SELECT * FROM eh_cat_horarios WHERE NOT id = $1 AND UPPER(codigo) = $2)
         `, [parseInt(id), codigo.toUpperCase()]);
                 if (HORARIOS.rowCount > 0)
                     return res.status(200).jsonp({
@@ -194,11 +194,16 @@ class HorarioControlador {
     // METODO PARA ELIMINAR REGISTROS
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-      DELETE FROM cg_horarios WHERE id = $1
-      `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                const id = req.params.id;
+                yield database_1.default.query(`
+        DELETE FROM eh_cat_horarios WHERE id = $1
+        `, [id]);
+                res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
         });
     }
     // METODO PARA BUSCAR DATOS DE UN HORARIO
@@ -206,7 +211,7 @@ class HorarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const UN_HORARIO = yield database_1.default.query(`
-      SELECT * FROM cg_horarios WHERE id = $1
+      SELECT * FROM eh_cat_horarios WHERE id = $1
       `, [id]);
             if (UN_HORARIO.rowCount > 0) {
                 return res.jsonp(UN_HORARIO.rows);
@@ -223,7 +228,7 @@ class HorarioControlador {
             const { hora_trabajo } = req.body;
             try {
                 const respuesta = yield database_1.default.query(`
-        UPDATE cg_horarios SET hora_trabajo = $1 WHERE id = $2 RETURNING *
+        UPDATE eh_cat_horarios SET hora_trabajo = $1 WHERE id = $2 RETURNING *
         `, [hora_trabajo, id])
                     .then((result) => { return result.rows; });
                 if (respuesta.length === 0)
@@ -293,8 +298,8 @@ class HorarioControlador {
                         HORAS_TOTALES = FormatearHoras(horario.HORAS_TOTALES.toString(), horario.DETALLE);
                         // INSERTAR EN LA BASE DE DATOS
                         const response = yield database_1.default.query(`
-            INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo,
-            nocturno, detalle, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+            INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
+              nocturno, detalle, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
             `, [DESCRIPCION, MIN_ALIMENTACION, HORAS_TOTALES, HORARIO_NOCTURNO, true, CODIGO_HORARIO, TIPO_HORARIO]);
                         const [correcto] = response.rows;
                         if (correcto) {
@@ -359,9 +364,10 @@ class HorarioControlador {
                         const ID_HORARIO = (_a = (codigosHorariosCargados.find((codigo) => codigo.codigoHorario === CODIGO_HORARIO))) === null || _a === void 0 ? void 0 : _a.idHorario;
                         // INSERTAR EN LA BASE DE DATOS
                         const response2 = yield database_1.default.query(`
-            INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes,
-                min_despues) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            `, [ORDEN, HORA, TOLERANCIA, ID_HORARIO, TIPO_ACCION, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES]);
+            INSERT INTO deta_horarios (orden, hora, tolerancia, id_horario, tipo_accion, segundo_dia, tercer_dia, 
+              minutos_antes, minutos_despues) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            `, [ORDEN, HORA, TOLERANCIA, ID_HORARIO, TIPO_ACCION, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES,
+                            MIN_DESPUES]);
                         if (response2.rowCount > 0) {
                             detallesCargados = true;
                         }
@@ -561,7 +567,9 @@ function VerificarFormatoDatos(data) {
 // FUNCION PARA VERIFICAR SI EXISTEN DATOS DUPLICADOS EN LA BASE DE DATOS
 function VerificarDuplicadoBase(codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        const result = yield database_1.default.query('SELECT * FROM cg_horarios WHERE LOWER(codigo) = $1', [codigo.toLowerCase()]);
+        const result = yield database_1.default.query(`
+    SELECT * FROM eh_cat_horarios WHERE LOWER(codigo) = $1
+    `, [codigo.toLowerCase()]);
         return result.rowCount > 0;
     });
 }
