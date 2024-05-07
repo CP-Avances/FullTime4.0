@@ -1,6 +1,6 @@
-<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;" [hidden]="verDetalle">
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;" [hidden]="verDetalle">
     <div id="titulo">
-        <span>REPORTE DE VACUNACIÓN</span>
+        <span>REPORTE DE USUARIOS</span>
     </div>
     <br>
     <div class="row">
@@ -35,10 +35,9 @@
                     <app-opcion-usuario (tipoUsuarioCambio)="ObtenerTipoUsuario($event)"></app-opcion-usuario>
                 </div>
             </mat-card>
-
         </div>
         <div class="col-lg-7">
-            <app-criterios-busqueda [num_option]="5" [limpiar]="limpiar"></app-criterios-busqueda>
+            <app-criterios-busqueda [num_option]="5" [limpiar]="limpiar" id="busqueda"></app-criterios-busqueda>
         </div>
     </div>
 </div>
@@ -79,11 +78,10 @@
             </table>
         </div>
         <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina_suc"
-            [pageSizeOptions]="pageSizeOptions_suc" (page)="ManejarPagina($event)" showFirstLastButtons>
+            [pageSizeOptions]="pageSizeOptions_suc" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
         <br>
     </div>
-
     <!-- TABLA PARA REGIMEN -->
     <div *ngIf="bool.bool_reg" class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="resultados">
@@ -164,7 +162,7 @@
                 </tbody>
             </table>
         </div>
-        <mat-paginator id="pagina" [length]="cargos.length" [pageSize]="tamanio_pagina_suc"
+        <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina_suc"
             [pageSizeOptions]="pageSizeOptions_suc" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
         <br>
@@ -212,13 +210,10 @@
         </mat-paginator>
         <br>
     </div>
+
     <!-- TABLA PARA EMPLEADOS -->
     <div *ngIf="bool.bool_emp" class="mat-elevation-z8" style="background: white;">
-        <div class="d-flex bd-highlight" id="resultados">
-            <span class="w-100 bd-highlight">
-                RESULTADO USUARIOS
-            </span>
-        </div>
+        <div id="titulo">LISTA DE USUARIOS</div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
@@ -234,6 +229,9 @@
                         <th scope="col">Cédula</th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Codigo</th>
+                        <th scope="col">Sucursal</th>
+                        <th scope="col">Departamento</th>
+                        <th scope="col">Cargo</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -249,12 +247,15 @@
                         <td>{{e.cedula}}</td>
                         <td>{{e.nombre}}</td>
                         <td>{{e.codigo}}</td>
+                        <td>{{e.sucursal}}</td>
+                        <td>{{e.departamento}}</td>
+                        <td>{{e.cargo}}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         <mat-paginator id="pagina" [length]="empleados.length" [pageSize]="tamanio_pagina_emp"
-            [pageSizeOptions]="pageSizeOptions_emp" (page)="ManejarPagina($event)" showFirstLastButtons>
+            [pageSizeOptions]="pageSizeOptions_emp" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
         <br>
     </div>
@@ -263,7 +264,7 @@
 <div class="container" style="padding-top: 15px" [hidden]="!verDetalle">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
-            <span>DETALLES DE VACUNAS - USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
+            <span>DETALLES DE USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
             <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
                 matTooltip="Regresar">
                 <i class="fas fa-arrow-left"></i>
@@ -279,54 +280,42 @@
                                 <th class="t_horarios" scope="col" rowspan="2">CÉDULA</th>
                                 <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">CIUDAD</th>
+                                <th class="t_horarios" scope="col" rowspan="2">SUCURSAL</th>
+                                <th class="t_horarios" scope="col" rowspan="2">RÉGIMEN</th>
                                 <th class="t_horarios" scope="col" rowspan="2">DEPARTAMENTO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CARGO</th>
-                                <th class="t_horarios" scope="col" rowspan="2">CORREO</th>
-                                <th class="t_horarios" scope="col" rowspan="2">CARNET</th>
-                                <th class="t_horarios" scope="col" rowspan="2">VACUNA</th>
-                                <th class="t_horarios" scope="col" rowspan="2">FECHA</th>
-                                <th class="t_horarios" scope="col" rowspan="2">DESCRIPCIÓN</th>
+                                <th class="t_horarios" scope="col" colspan="2">CORREO</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="
-                    let v of arr_vac | paginate : tamanio_pagina : numero_pagina
-                  ">
-                                <td class="t_horarios">{{ v.n }}</td>
-                                <td class="t_horarios">{{ v.cedula }}</td>
-                                <td class="t_horarios">{{ v.empleado.toUpperCase() }}</td>
-                                <td class="t_horarios">{{ v.codigo }}</td>
-                                <td class="t_horarios">{{ v.departamento }}</td>
-                                <td class="t_horarios">{{ v.cargo }}</td>
-                                <td class="t_horarios">{{ v.correo }}</td>
-                                <td class="t_horarios" *ngIf="v.carnet == null"></td>
-                                <td class="t_horarios" *ngIf="v.carnet != null"> <a class="fas fa-file-alt"
-                                        style="color:rgb(197, 95, 11); margin-left: 15px; text-align: center; text-decoration: none;"
-                                        matSuffix matTooltipPosition="right"
-                                        matTooltip="Dar click para ver o descargar el documento."
-                                        href="{{hipervinculo}}/vacunas/documentos/{{v.carnet}}/{{v.id_empleado}}"
-                                        target="_blank">
-                                        <p>carnet</p>
-                                    </a>
-                                </td>
-                                <td class="t_horarios">{{ v.vacuna }}</td>
-                                <td class="t_horarios">{{ v.fecha }}</td>
-                                <td class="t_horarios">{{ v.descripcion }}</td>
+                            <tr *ngFor="let e of arr_emp | paginate:tamanio_pagina:numero_pagina">
+                                <td class="t_horarios">{{ e.n }}</td>
+                                <td class="t_horarios">{{ e.cedula }}</td>
+                                <td class="t_horarios">{{ e.apellido.toUpperCase() }} {{ e.nombre.toUpperCase() }}</td>
+                                <td class="t_horarios">{{ e.codigo }}</td>
+                                <td class="t_horarios">{{ e.name_suc }}</td>
+                                <td class="t_horarios">{{ e.ciudad }}</td>
+                                <td class="t_horarios">{{ e.name_regimen }}</td>
+                                <td class="t_horarios">{{ e.name_dep }}</td>
+                                <td class="t_horarios">{{ e.name_cargo }}</td>
+                                <td class="t_horarios">{{ e.correo }}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <mat-paginator [length]="arr_vac.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
-                    (page)="ManejarPagina($event)" showFirstLastButtons aria-label="Seleccionar pagina">
+                <mat-paginator id="pagina" #paginatorDetalle  [length]="arr_emp.length" [pageSize]="tamanio_pagina"
+                    [pageSizeOptions]="pageSizeOptions" (page)="ManejarPaginaDet($event)" showFirstLastButtons
+                    aria-label="Seleccionar pagina">
                 </mat-paginator>
             </div>
             <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 0.5rem">
                 <i id="pdf" class="fas fa-file-pdf icon" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar reporte de vacunas en formato PDF." (click)="GenerarPDF('download')">
+                    matTooltip="Descargar reporte en formato PDF." (click)="GenerarPDF('download')">
                     <p>PDF</p>
                 </i>
                 <i id="excel" class="fas fa-file-excel icon" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar reporte de vacunas en formato EXCEL." (click)="ValidarExcel()">
+                    matTooltip="Descargar reporte en formato EXCEL." (click)="ValidarExcel()">
                     <p>XLSL</p>
                 </i>
             </div>

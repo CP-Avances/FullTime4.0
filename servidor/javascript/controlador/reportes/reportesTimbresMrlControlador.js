@@ -39,7 +39,7 @@ class ReportesTimbresMrlControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
+                return res.status(400).jsonp({ message: 'No se han encontrado registros.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -61,7 +61,7 @@ class ReportesTimbresMrlControlador {
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
+                return res.status(400).jsonp({ message: 'No se han encontrado registros.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -70,10 +70,13 @@ const REPORTES_TIMBRES_MRL_CONTROLADOR = new ReportesTimbresMrlControlador();
 exports.default = REPORTES_TIMBRES_MRL_CONTROLADOR;
 const BuscarTimbres = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.default.query('SELECT CAST(fec_hora_timbre_servidor AS VARCHAR), accion ' +
-            'FROM timbres WHERE CAST(fec_hora_timbre_servidor AS VARCHAR) BETWEEN $1 || \'%\' ' +
-            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 AND accion != \'99\' ' +
-            'ORDER BY fec_hora_timbre_servidor ASC', [fec_inicio, fec_final, codigo])
+        return yield database_1.default.query(`
+        SELECT CAST(fecha_hora_timbre_servidor AS VARCHAR), accion 
+        FROM eu_timbres 
+        WHERE CAST(fecha_hora_timbre_servidor AS VARCHAR) BETWEEN $1 || \'%\' 
+            AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 AND accion != \'99\' 
+        ORDER BY fecha_hora_timbre_servidor ASC
+        `, [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;
         });

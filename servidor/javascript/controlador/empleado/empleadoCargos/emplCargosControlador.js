@@ -13,11 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPLEADO_CARGO_CONTROLADOR = void 0;
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const moment_1 = __importDefault(require("moment"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const moment_1 = __importDefault(require("moment"));
-const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const xlsx_1 = __importDefault(require("xlsx"));
 class EmpleadoCargosControlador {
     // METODO BUSQUEDA DATOS DEL CARGO DE UN USUARIO
@@ -25,20 +25,20 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const unEmplCargp = yield database_1.default.query(`
-      SELECT ec.id, ec.id_empl_contrato, ec.cargo, ec.fec_inicio, ec.fec_final, ec.jefe, ec.sueldo, 
-      ec.hora_trabaja, ec.id_sucursal, s.nombre AS sucursal, ec.id_departamento, 
-      d.nombre AS departamento, e.id AS id_empresa, e.nombre AS empresa, tc.cargo AS nombre_cargo 
-      FROM empl_cargos AS ec, sucursales AS s, cg_departamentos AS d, cg_empresa AS e, 
-      tipo_cargo AS tc 
+      SELECT ec.id, ec.id_contrato, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.jefe, ec.sueldo, 
+        ec.hora_trabaja, ec.id_sucursal, s.nombre AS sucursal, ec.id_departamento, 
+        d.nombre AS departamento, e.id AS id_empresa, e.nombre AS empresa, tc.cargo AS nombre_cargo 
+      FROM eu_empleado_cargos AS ec, e_sucursales AS s, ed_departamentos AS d, e_empresa AS e, 
+        e_cat_tipo_cargo AS tc 
       WHERE ec.id = $1 AND ec.id_sucursal = s.id AND ec.id_departamento = d.id AND 
-      s.id_empresa = e.id AND ec.cargo = tc.id 
+        s.id_empresa = e.id AND ec.id_tipo_cargo = tc.id 
       ORDER BY ec.id
       `, [id]);
             if (unEmplCargp.rowCount > 0) {
                 return res.jsonp(unEmplCargp.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'Cargo del empleado no encontrado' });
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
@@ -47,8 +47,8 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe } = req.body;
             yield database_1.default.query(`
-      INSERT INTO empl_cargos (id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal,
-         sueldo, hora_trabaja, cargo, jefe) 
+      INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal,
+         sueldo, hora_trabaja, id_tipo_cargo, jefe) 
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       `, [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe]);
             res.jsonp({ message: 'Registro guardado.' });
@@ -60,9 +60,9 @@ class EmpleadoCargosControlador {
             const { id_empl_contrato, id } = req.params;
             const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe } = req.body;
             yield database_1.default.query(`
-      UPDATE empl_cargos SET id_departamento = $1, fec_inicio = $2, fec_final = $3, id_sucursal = $4, 
-        sueldo = $5, hora_trabaja = $6, cargo = $7, jefe = $8  
-      WHERE id_empl_contrato = $9 AND id = $10
+      UPDATE eu_empleado_cargos SET id_departamento = $1, fecha_inicio = $2, fecha_final = $3, id_sucursal = $4, 
+        sueldo = $5, hora_trabaja = $6, id_tipo_cargo = $7, jefe = $8  
+      WHERE id_contrato = $9 AND id = $10
       `, [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe,
                 id_empl_contrato, id]);
             res.jsonp({ message: 'Registro actualizado exitosamente.' });
@@ -73,10 +73,10 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empl_contrato } = req.params;
             const unEmplCargp = yield database_1.default.query(`
-      SELECT ec.id, ec.cargo, ec.fec_inicio, ec.fec_final, ec.sueldo, ec.hora_trabaja, 
-      s.nombre AS sucursal, d.nombre AS departamento 
-      FROM empl_cargos AS ec, sucursales AS s, cg_departamentos AS d 
-      WHERE ec.id_empl_contrato = $1 AND ec.id_sucursal = s.id AND ec.id_departamento = d.id
+      SELECT ec.id, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.sueldo, ec.hora_trabaja, 
+        s.nombre AS sucursal, d.nombre AS departamento 
+      FROM eu_empleado_cargos AS ec, e_sucursales AS s, ed_departamentos AS d 
+      WHERE ec.id_contrato = $1 AND ec.id_sucursal = s.id AND ec.id_departamento = d.id
       `, [id_empl_contrato]);
             if (unEmplCargp.rowCount > 0) {
                 return res.jsonp(unEmplCargp.rows);
@@ -88,35 +88,32 @@ class EmpleadoCargosControlador {
     }
     list(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const Cargos = yield database_1.default.query('SELECT * FROM empl_cargos');
+            const Cargos = yield database_1.default.query(`
+      SELECT * FROM eu_empleado_cargos
+      `);
             if (Cargos.rowCount > 0) {
                 return res.jsonp(Cargos.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado' });
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
     ListarCargoEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const empleadoCargos = yield database_1.default.query('SELECT cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, e.id AS empleado, e.nombre, e.apellido FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, sucursales AS s, empl_contratos AS ecn, empleados AS e WHERE da.id_empl_cargo = ecr.id AND da.id_departamento = cg.id AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND ecn.id_empleado = e.id ORDER BY nombre ASC');
+            const empleadoCargos = yield database_1.default.query(`
+      SELECT cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, e.id AS empleado, e.nombre, e.apellido 
+      FROM ed_autoriza_departamento AS da, eu_empleado_cargos AS ecr, ed_departamentos AS cg, e_sucursales AS s, 
+        eu_empleado_contratos AS ecn, eu_empleados AS e 
+      WHERE da.id_empleado_cargo = ecr.id AND da.id_departamento = cg.id AND cg.id_sucursal = s.id 
+        AND ecr.id_contrato = ecn.id AND ecn.id_empleado = e.id 
+      ORDER BY nombre ASC
+      `);
             if (empleadoCargos.rowCount > 0) {
                 return res.jsonp(empleadoCargos.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado' });
-            }
-        });
-    }
-    ListarEmpleadoAutoriza(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const empleadoCargos = yield database_1.default.query('SELECT * FROM Lista_empleados_autoriza WHERE id_notificacion = $1', [id]);
-            if (empleadoCargos.rowCount > 0) {
-                return res.jsonp(empleadoCargos.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado' });
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
@@ -125,80 +122,95 @@ class EmpleadoCargosControlador {
             const { id_empleado } = req.params;
             const CARGO = yield database_1.default.query(`
       SELECT ec.id 
-      FROM empl_cargos AS ec, empl_contratos AS ce, empleados AS e 
-      WHERE ce.id_empleado = e.id AND ec.id_empl_contrato = ce.id AND e.id = $1
+      FROM eu_empleado_cargos AS ec, eu_empleado_contratos AS ce, eu_empleados AS e 
+      WHERE ce.id_empleado = e.id AND ec.id_contrato = ce.id AND e.id = $1
       `, [id_empleado]);
             if (CARGO.rowCount > 0) {
                 return res.jsonp(CARGO.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado' });
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
     EncontrarIdCargoActual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
-            const CARGO = yield database_1.default.query('SELECT ec.id AS max, ec.hora_trabaja ' +
-                'FROM datos_actuales_empleado AS da, empl_cargos AS ec ' +
-                'WHERE ec.id = da.id_cargo AND da.id = $1', [id_empleado]);
+            const CARGO = yield database_1.default.query(`
+      SELECT ec.id AS max, ec.hora_trabaja 
+      FROM datos_actuales_empleado AS da, eu_empleado_cargos AS ec
+      WHERE ec.id = da.id_cargo AND da.id = $1
+      `, [id_empleado]);
             if (CARGO.rowCount > 0 && CARGO.rows[0]['max'] != null) {
                 return res.jsonp(CARGO.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado' });
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
     BuscarUnTipo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const Cargos = yield database_1.default.query('SELECT *FROM tipo_cargo WHERE id = $1', [id]);
+            const Cargos = yield database_1.default.query(`
+      SELECT * FROM e_cat_tipo_cargo WHERE id = $1
+      `, [id]);
             if (Cargos.rowCount > 0) {
                 return res.jsonp(Cargos.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado' });
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
     BuscarTipoDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const Cargos = yield database_1.default.query('SELECT tc.id, tc.cargo FROM tipo_cargo AS tc, empl_cargos AS ec ' +
-                'WHERE tc.id = ec.cargo AND id_departamento = $1 GROUP BY tc.cargo, tc.id', [id]);
+            const Cargos = yield database_1.default.query(`
+      SELECT tc.id, tc.cargo 
+      FROM e_cat_tipo_cargo AS tc, eu_empleado_cargos AS ec
+      WHERE tc.id = ec.id_tipo_cargo AND id_departamento = $1 
+      GROUP BY tc.cargo, tc.id
+      `, [id]);
             if (Cargos.rowCount > 0) {
                 return res.jsonp(Cargos.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado' });
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
     BuscarTipoSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const Cargos = yield database_1.default.query('SELECT tc.id, tc.cargo FROM tipo_cargo AS tc, empl_cargos AS ec ' +
-                'WHERE tc.id = ec.cargo AND id_sucursal = $1 GROUP BY tc.cargo, tc.id', [id]);
+            const Cargos = yield database_1.default.query(`
+      SELECT tc.id, tc.cargo 
+      FROM e_cat_tipo_cargo AS tc, eu_empleado_cargos AS ec 
+      WHERE tc.id = ec.id_tipo_cargo AND id_sucursal = $1 
+      GROUP BY tc.cargo, tc.id
+      `, [id]);
             if (Cargos.rowCount > 0) {
                 return res.jsonp(Cargos.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado' });
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
     BuscarTipoRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const Cargos = yield database_1.default.query('SELECT tc.id, tc.cargo FROM cg_regimenes AS r, empl_cargos AS ec, ' +
-                'empl_contratos AS c, tipo_cargo AS tc WHERE c.id_regimen = r.id AND c.id = ec.id_empl_contrato AND ' +
-                'ec.cargo = tc.id AND r.id = $1 GROUP BY tc.id, tc.cargo', [id]);
+            const Cargos = yield database_1.default.query(`
+      SELECT tc.id, tc.cargo 
+      FROM ere_cat_regimenes AS r, eu_empleado_cargos AS ec, eu_empleado_contratos AS c, e_cat_tipo_cargo AS tc 
+      WHERE c.id_regimen = r.id AND c.id = ec.id_contrato AND ec.id_tipo_cargo = tc.id AND r.id = $1 
+      GROUP BY tc.id, tc.cargo
+      `, [id]);
             if (Cargos.rowCount > 0) {
                 return res.jsonp(Cargos.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado' });
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
@@ -209,7 +221,7 @@ class EmpleadoCargosControlador {
     ListarTiposCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const Cargos = yield database_1.default.query(`
-      SELECT * FROM tipo_cargo
+      SELECT * FROM e_cat_tipo_cargo
       `);
             if (Cargos.rowCount > 0) {
                 return res.jsonp(Cargos.rows);
@@ -224,7 +236,7 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { cargo } = req.body;
             const response = yield database_1.default.query(`
-      INSERT INTO tipo_cargo (cargo) VALUES ($1) RETURNING *
+      INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
       `, [cargo]);
             const [tipo_cargo] = response.rows;
             if (tipo_cargo) {
@@ -411,24 +423,36 @@ class EmpleadoCargosControlador {
             listCargos.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
                 if (valor.cedula != 'No registrado' && valor.pais != 'No registrado' && valor.pais != '') {
                     if (valor.observacion == 'no registrado') {
-                        var VERIFICAR_CEDULA = yield database_1.default.query('SELECT * FROM datos_actuales_empleado WHERE cedula = $1', [valor.cedula]);
+                        var VERIFICAR_CEDULA = yield database_1.default.query(`
+            SELECT * FROM datos_actuales_empleado WHERE cedula = $1
+            `, [valor.cedula]);
                         if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                            const ID_CONTRATO = yield database_1.default.query('SELECT id_contrato FROM datos_contrato_actual WHERE cedula = $1', [valor.cedula]);
+                            const ID_CONTRATO = yield database_1.default.query(`
+              SELECT id_contrato FROM datos_contrato_actual WHERE cedula = $1
+              `, [valor.cedula]);
                             if (ID_CONTRATO.rows[0] != undefined && ID_CONTRATO.rows[0].id_contrato != null &&
                                 ID_CONTRATO.rows[0].id_contrato != 0 && ID_CONTRATO.rows[0].id_contrato != '') {
-                                const fechaRango = yield database_1.default.query('SELECT * FROM empl_cargos ' +
-                                    'WHERE id_empl_contrato = $1 and ($2  between fec_inicio and fec_final or ' +
-                                    '$3 between fec_inicio and fec_final or ' +
-                                    'fec_inicio between $2 and $3)', [VERIFICAR_CEDULA.rows[0].id_contrato, valor.fecha_inicio, valor.fecha_final]);
+                                const fechaRango = yield database_1.default.query(`
+                SELECT * FROM eu_empleado_cargos 
+                WHERE id_contrato = $1 AND 
+                ($2  BETWEEN fecha_inicio and fecha_final or $3 BETWEEN fecha_inicio and fecha_final or 
+                fecha_inicio BETWEEN $2 AND $3)
+                `, [VERIFICAR_CEDULA.rows[0].id_contrato, valor.fecha_inicio, valor.fecha_final]);
                                 if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
                                     valor.observacion = 'Existe un cargo vigente en esas fechas';
                                 }
                                 else {
-                                    var VERIFICAR_DEPARTAMENTO = yield database_1.default.query('SELECT  * FROM cg_departamentos WHERE UPPER(nombre) = $1', [valor.departamento.toUpperCase()]);
+                                    var VERIFICAR_DEPARTAMENTO = yield database_1.default.query(`
+                  SELECT  * FROM ed_departamentos WHERE UPPER(nombre) = $1
+                  `, [valor.departamento.toUpperCase()]);
                                     if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
-                                        var VERIFICAR_SUCURSALES = yield database_1.default.query('SELECT * FROM sucursales WHERE UPPER(nombre) = $1', [valor.sucursal.toUpperCase()]);
+                                        var VERIFICAR_SUCURSALES = yield database_1.default.query(`
+                    SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
+                    `, [valor.sucursal.toUpperCase()]);
                                         if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
-                                            var VERFICAR_CARGO = yield database_1.default.query('SELECT * FROM tipo_cargo WHERE UPPER(cargo) = $1', [valor.cargo.toUpperCase()]);
+                                            var VERFICAR_CARGO = yield database_1.default.query(`
+                      SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+                      `, [valor.cargo.toUpperCase()]);
                                             if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
                                             }
                                             else {
@@ -512,11 +536,21 @@ class EmpleadoCargosControlador {
                 console.log('data: ', data);
                 // Datos que se guardaran de la plantilla ingresada
                 const { item, cedula, departamento, fecha_inicio, fecha_final, sucursal, sueldo, cargo, hora_traba, jefe } = data;
-                const ID_EMPLEADO = yield database_1.default.query('SELECT id FROM empleados WHERE UPPER(cedula) = $1', [cedula]);
-                const ID_CONTRATO = yield database_1.default.query('SELECT id FROM empl_contratos WHERE id_empleado = $1', [ID_EMPLEADO.rows[0].id]);
-                const ID_DEPARTAMENTO = yield database_1.default.query('SELECT id FROM cg_departamentos WHERE UPPER(nombre) = $1', [departamento.toUpperCase()]);
-                const ID_SUCURSAL = yield database_1.default.query('SELECT id FROM sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
-                const ID_TIPO_CARGO = yield database_1.default.query('SELECT id FROM tipo_cargo WHERE UPPER(cargo) = $1', [cargo.toUpperCase()]);
+                const ID_EMPLEADO = yield database_1.default.query(`
+        SELECT id FROM eu_empleados WHERE UPPER(cedula) = $1
+        `, [cedula]);
+                const ID_CONTRATO = yield database_1.default.query(`
+        SELECT id FROM eu_empleado_contratos WHERE id_empleado = $1
+        `, [ID_EMPLEADO.rows[0].id]);
+                const ID_DEPARTAMENTO = yield database_1.default.query(`
+        SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
+        `, [departamento.toUpperCase()]);
+                const ID_SUCURSAL = yield database_1.default.query(`
+        SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+        `, [sucursal.toUpperCase()]);
+                const ID_TIPO_CARGO = yield database_1.default.query(`
+        SELECT id FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+        `, [cargo.toUpperCase()]);
                 var Jefe;
                 if (jefe.toUpperCase() === 'SI') {
                     Jefe = true;
@@ -540,10 +574,11 @@ class EmpleadoCargosControlador {
                 console.log('tipo cargo: ', ID_TIPO_CARGO.rows[0].id);
                 console.log('Jefe: ', Jefe);
                 // Registro de los datos de contratos
-                const response = yield database_1.default.query(`INSERT INTO empl_cargos (id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, 
-            sueldo, cargo, hora_trabaja, jefe) 
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
-          `, [id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal, sueldo, id_cargo,
+                const response = yield database_1.default.query(`
+        INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal, 
+          sueldo, id_tipo_cargo, hora_trabaja, jefe) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
+        `, [id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal, sueldo, id_cargo,
                     hora_traba, Jefe]);
                 const [cargos] = response.rows;
                 if (contador === plantilla.length) {

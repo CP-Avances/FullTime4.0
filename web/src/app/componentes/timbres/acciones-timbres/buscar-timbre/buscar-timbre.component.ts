@@ -137,8 +137,8 @@ export class BuscarTimbreComponent implements OnInit {
         //console.log('ver timbres ', timbres)
         this.timbres = timbres.timbres;
         this.timbres.forEach(data => {
-          data.fecha = this.validar.FormatearFecha(data.fec_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
-          data.hora = this.validar.FormatearHora(data.fec_hora_timbre_servidor.split(' ')[1], this.formato_hora);
+          data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
+          data.hora = this.validar.FormatearHora(data.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
         })
         //console.log('ver timbres ', this.timbres)
         this.mostrarTabla = false;

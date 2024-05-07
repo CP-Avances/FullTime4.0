@@ -12,8 +12,9 @@ class ReportesTiempoLaboradoRutas {
         this.configuracion();
     }
     configuracion() {
-        // REPORTES DE ATRASOS
+        // METODO DE BUSQUEDA DE DATOS DE TIEMPO LABORADO LISTA sucursales[regimenes[departamentos[cargos[empleados]]]]
         this.router.put('/tiempo-laborado-empleados/:desde/:hasta', verificarToken_1.TokenValidation, reportesTiempoLaboradoControlador_1.default.ReporteTiempoLaborado);
+        // METODO DE BUSQUEDA DE DATOS DE TIEMPO LABORADO LISTA sucursales[empleados]]
         this.router.put('/tiempo-laborado-empleados-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesTiempoLaboradoControlador_1.default.ReporteTiempoLaboradoRegimenCargo);
     }
 }

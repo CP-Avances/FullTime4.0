@@ -46,7 +46,6 @@ class EmpleadosCargpsRutas {
 
         this.router.get('/', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.list);
         this.router.get('/lista-empleados/', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.ListarCargoEmpleado);
-        this.router.get('/empleadosAutorizan/:id', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.ListarEmpleadoAutoriza);
         this.router.get('/buscar/:id_empleado', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EncontrarIdCargo);
         this.router.get('/buscar/cargoActual/:id_empleado', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EncontrarIdCargoActual);
 

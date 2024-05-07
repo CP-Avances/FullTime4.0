@@ -363,7 +363,7 @@ export class EditarPlanificacionComponent implements OnInit {
 
     if (!obj_res) return this.toastr.warning('Horario no válido.');
 
-    const { hora_trabajo, id, codigo, min_almuerzo } = obj_res;
+    const { hora_trabajo, id, codigo, minutos_comida } = obj_res;
 
     // VERIFICACION DE FORMATO CORRECTO DE HORARIOS
     if (!this.StringTimeToSegundosTime(hora_trabajo)) {
@@ -377,7 +377,7 @@ export class EditarPlanificacionComponent implements OnInit {
       });
     }
     else {
-      this.ObtenerDetallesHorario(id, codigo, min_almuerzo);
+      this.ObtenerDetallesHorario(id, codigo, minutos_comida);
       this.AgregarHorario();
     }
   }
@@ -391,7 +391,7 @@ export class EditarPlanificacionComponent implements OnInit {
   fin_comida = '';
   entrada: '';
   salida: '';
-  ObtenerDetallesHorario(id: number, codigo: any, min_almuerzo: any) {
+  ObtenerDetallesHorario(id: number, codigo: any, minutos_comida: any) {
     this.inicio_comida = '';
     this.fin_comida = '';
     this.entrada = '';
@@ -417,7 +417,7 @@ export class EditarPlanificacionComponent implements OnInit {
         inicio_comida: this.inicio_comida,
         fin_comida: this.fin_comida,
         salida: this.salida,
-        almuerzo: min_almuerzo,
+        almuerzo: minutos_comida,
       }]
 
       this.detalle_acciones = this.detalle_acciones.concat(tipos);
@@ -884,7 +884,7 @@ export class EditarPlanificacionComponent implements OnInit {
                 var accion = 0;
                 var nocturno: number = 0;
                 if (deta.tipo_accion === 'E') {
-                  accion = deta.minu_espera;
+                  accion = deta.tolerancia;
                 }
                 if (deta.segundo_dia === true) {
                   nocturno = 1;
@@ -929,10 +929,10 @@ export class EditarPlanificacionComponent implements OnInit {
                 let plan = {
                   codigo: this.datos_horarios.codigo,
                   tipo_dia: dia_tipo,
-                  min_antes: deta.min_antes,
+                  min_antes: deta.minutos_antes,
                   tolerancia: accion,
                   id_horario: h.horarios.id,
-                  min_despues: deta.min_despues,
+                  min_despues: deta.minutos_despues,
                   fec_horario: fecha,
                   estado_origen: origen,
                   estado_timbre: estado,
@@ -941,7 +941,7 @@ export class EditarPlanificacionComponent implements OnInit {
                   salida_otro_dia: nocturno,
                   tipo_entr_salida: deta.tipo_accion,
                   fec_hora_horario: fecha + ' ' + deta.hora,
-                  min_alimentacion: deta.min_almuerzo,
+                  min_alimentacion: deta.minutos_comida,
                 };
                 if (deta.segundo_dia === true) {
                   plan.fec_hora_horario = moment(fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + deta.hora;

@@ -191,14 +191,14 @@ export class EditarContratoComponent implements OnInit {
 
   // METODO PARA MOSTRAR DATOS DEL FORMULARIO
   ImprimirDatos() {
-    const { fec_ingreso, fec_salida, vaca_controla, asis_controla,
-      id_tipo_contrato } = this.contrato;
+    const { fecha_ingreso, fecha_salida, controlar_vacacion, controlar_asistencia,
+      id_modalidad_laboral } = this.contrato;
     this.ContratoForm.patchValue({
-      controlVacacionesForm: vaca_controla,
-      controlAsistenciaForm: asis_controla,
-      fechaIngresoForm: fec_ingreso,
-      fechaSalidaForm: fec_salida,
-      tipoForm: id_tipo_contrato
+      controlVacacionesForm: controlar_vacacion,
+      controlAsistenciaForm: controlar_asistencia,
+      fechaIngresoForm: fecha_ingreso,
+      fechaSalidaForm: fecha_salida,
+      tipoForm: id_modalidad_laboral
     });
   }
 
@@ -239,7 +239,7 @@ export class EditarContratoComponent implements OnInit {
 
   // METODO PARA VERIFICAR SI EL REGISTRO ENTRA O NO A VERIFICACION DE DUPLICIDAD
   VerificarDatos(datos: any, form: any) {
-    if (datos.fec_ingreso === this.contrato.fec_ingreso) {
+    if (datos.fec_ingreso === this.contrato.fecha_ingreso) {
       this.VerificarInformacion(datos, form);
     }
     else {
@@ -277,7 +277,7 @@ export class EditarContratoComponent implements OnInit {
       var ingreso = String(moment(datos.fec_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
       // COMPARACION DE CADA REGISTRO
       for (var i = 0; i <= this.revisarFecha.length - 1; i++) {
-        var fecha = String(moment(this.revisarFecha[i].fec_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
+        var fecha = String(moment(this.revisarFecha[i].fecha_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
         if (fecha === ingreso) {
           this.duplicado = 1;
         }

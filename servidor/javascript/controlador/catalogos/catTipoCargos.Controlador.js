@@ -14,17 +14,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tiposCargosControlador = void 0;
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
-const fs_1 = __importDefault(require("fs"));
-const builder = require('xmlbuilder');
 class TiposCargosControlador {
     listaTipoCargos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const TIPO_CARGO = yield database_1.default.query(`
-                SELECT * FROM tipo_cargo ORDER BY cargo ASC
+                SELECT * FROM e_cat_tipo_cargo ORDER BY cargo ASC
                 `);
                 if (TIPO_CARGO.rowCount > 0) {
                     return res.jsonp(TIPO_CARGO.rows);
@@ -42,13 +41,15 @@ class TiposCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { cargo } = req.body;
-                var VERIFICAR_CARGO = yield database_1.default.query('SELECT * FROM tipo_cargo WHERE UPPER(cargo) = $1', [cargo.toUpperCase()]);
+                var VERIFICAR_CARGO = yield database_1.default.query(`
+                SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+                `, [cargo.toUpperCase()]);
                 console.log('VERIFICAR_MODALIDAD: ', VERIFICAR_CARGO.rows[0]);
                 if (VERIFICAR_CARGO.rows[0] == undefined || VERIFICAR_CARGO.rows[0] == '') {
                     // Dar formato a la palabra de modalidad
                     const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
                     const response = yield database_1.default.query(`
-                        INSERT INTO tipo_cargo (cargo) VALUES ($1) RETURNING *
+                    INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
                     `, [tipoCargo]);
                     const [TipoCargos] = response.rows;
                     if (TipoCargos) {
@@ -75,7 +76,7 @@ class TiposCargosControlador {
                 // Dar formato a la palabra de cargo
                 const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
                 const response = yield database_1.default.query(`
-                UPDATE tipo_cargo SET cargo = $2
+                UPDATE e_cat_tipo_cargo SET cargo = $2
                 WHERE id = $1 RETURNING *
                 `, [id, tipoCargo]);
                 const [TipoCargos] = response.rows;
@@ -97,8 +98,8 @@ class TiposCargosControlador {
                 const id = req.params.id;
                 console.log('id: ', id);
                 yield database_1.default.query(`
-                DELETE FROM tipo_cargo WHERE id = $1
-            `, [id]);
+                DELETE FROM e_cat_tipo_cargo WHERE id = $1
+                `, [id]);
                 res.jsonp({ message: 'Registro eliminado.', code: '200' });
             }
             catch (error) {
@@ -163,7 +164,9 @@ class TiposCargosControlador {
                 });
                 listCargos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                     if (item.observacion == 'no registrado') {
-                        var VERIFICAR_CARGOS = yield database_1.default.query('SELECT * FROM tipo_cargo WHERE UPPER(cargo) = $1', [item.tipo_cargo.toUpperCase()]);
+                        var VERIFICAR_CARGOS = yield database_1.default.query(`
+                        SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+                        `, [item.tipo_cargo.toUpperCase()]);
                         if (VERIFICAR_CARGOS.rows[0] == undefined || VERIFICAR_CARGOS.rows[0] == '') {
                             item.observacion = 'ok';
                         }
@@ -231,8 +234,9 @@ class TiposCargosControlador {
                     const { item, tipo_cargo, observacion } = data;
                     const cargo = tipo_cargo.charAt(0).toUpperCase() + tipo_cargo.slice(1).toLowerCase();
                     // Registro de los datos de contratos
-                    const response = yield database_1.default.query(`INSERT INTO tipo_cargo (cargo) VALUES ($1) RETURNING *
-                `, [cargo]);
+                    const response = yield database_1.default.query(`
+                    INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
+                    `, [cargo]);
                     const [cargos] = response.rows;
                     if (contador === plantilla.length) {
                         if (cargos) {

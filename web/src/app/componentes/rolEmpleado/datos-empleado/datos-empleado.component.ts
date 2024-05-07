@@ -157,8 +157,8 @@ export class DatosEmpleadoComponent implements OnInit {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(this.empresa)).subscribe((res: any) => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -188,7 +188,7 @@ export class DatosEmpleadoComponent implements OnInit {
     this.empleadoUno = [];
     this.restEmpleado.BuscarUnEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
       this.empleadoUno = data;
-      this.empleadoUno[0].fec_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fec_nacimiento, formato_fecha, this.validar.dia_abreviado);
+      this.empleadoUno[0].fec_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fecha_nacimiento, formato_fecha, this.validar.dia_abreviado);
       var empleado = data[0].nombre + data[0].apellido;
       if (data[0]['imagen'] != null) {
         this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
@@ -524,8 +524,8 @@ export class DatosEmpleadoComponent implements OnInit {
     this.restEmpleado.BuscarDatosContrato(id_contrato).subscribe(res => {
       this.contratoEmpleado = res;
       this.contratoEmpleado.forEach((data: any) => {
-        data.fec_ingreso_ = this.validar.FormatearFecha(data.fec_ingreso, formato_fecha, this.validar.dia_abreviado);
-        data.fec_salida_ = this.validar.FormatearFecha(data.fec_salida, formato_fecha, this.validar.dia_abreviado);
+        data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, formato_fecha, this.validar.dia_abreviado);
+        data.fec_salida_ = this.validar.FormatearFecha(data.fecha_salida, formato_fecha, this.validar.dia_abreviado);
       })
     });
   }
@@ -542,8 +542,8 @@ export class DatosEmpleadoComponent implements OnInit {
     this.restCargo.BuscarCargoID(id_cargo).subscribe(datos => {
       this.cargoEmpleado = datos;
       this.cargoEmpleado.forEach(data => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
-        data.fec_final_ = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
+        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado);
+        data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, formato_fecha, this.validar.dia_abreviado);
       })
     });
   }
@@ -563,7 +563,7 @@ export class DatosEmpleadoComponent implements OnInit {
   }
 
   GetDocumentDefinicion() {
-    let estadoCivil = this.EstadoCivilSelect[this.empleadoUno[0].esta_civil - 1];
+    let estadoCivil = this.EstadoCivilSelect[this.empleadoUno[0].estado_civil - 1];
     let genero = this.GeneroSelect[this.empleadoUno[0].genero - 1];
     let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
     let nacionalidad: any;
@@ -690,10 +690,10 @@ export class DatosEmpleadoComponent implements OnInit {
             return [
               { text: contrato.descripcion, style: 'tableCell' },
               { text: contrato.fec_ingreso_, style: 'tableCell' },
-              { text: contrato.fec_salida === null ? 'Sin fecha' : contrato.fec_salida_, style: 'tableCell' },
+              { text: contrato.fecha_salida === null ? 'Sin fecha' : contrato.fec_salida_, style: 'tableCell' },
               { text: contrato.nombre_contrato, style: 'tableCell' },
-              { text: contrato.asis_controla ? 'Si' : 'No', style: 'tableCell' },
-              { text: contrato.vaca_controla ? 'Si' : 'No', style: 'tableCell' },
+              { text: contrato.controlar_asistencia ? 'Si' : 'No', style: 'tableCell' },
+              { text: contrato.controlar_vacacion ? 'Si' : 'No', style: 'tableCell' },
             ];
           }),
         ],
@@ -721,7 +721,7 @@ export class DatosEmpleadoComponent implements OnInit {
               { text: cargo.departamento, style: 'tableCell' },
               { text: cargo.nombre_cargo, style: 'tableCell' },
               { text: cargo.fec_inicio_, style: 'tableCell' },
-              { text: cargo.fec_final === null ? 'Sin fecha' : cargo.fec_final_, style: 'tableCell' },
+              { text: cargo.fecha_final === null ? 'Sin fecha' : cargo.fec_final_, style: 'tableCell' },
               { text: cargo.hora_trabaja, style: 'tableCell' },
               { text: '$' + cargo.sueldo, style: 'tableCell' },
             ]
@@ -744,7 +744,7 @@ export class DatosEmpleadoComponent implements OnInit {
             ],
             ...this.discapacidadUser.map(obj => {
               return [
-                { text: obj.carn_conadis, style: 'tableCell' },
+                { text: obj.carnet_conadis, style: 'tableCell' },
                 { text: obj.porcentaje + ' %', style: 'tableCell' },
                 { text: obj.tipo, style: 'tableCell' },
               ];
@@ -767,7 +767,7 @@ export class DatosEmpleadoComponent implements OnInit {
     let arregloContrato: any = [];
     let arregloCargo: any = [];
     this.empleadoUno.forEach((obj: any) => {
-      let estadoCivil = this.EstadoCivilSelect[obj.esta_civil - 1];
+      let estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
@@ -801,14 +801,14 @@ export class DatosEmpleadoComponent implements OnInit {
     if (this.contratoEmpleado !== null) {
       this.contratoEmpleado.map((contrato: any) => {
         let fechaI = contrato.fec_ingreso_.split(" ");
-        let fechaS: string = contrato.fec_salida === null ? 'Sin fecha' : contrato.fec_salida_.split(" ")[1];
+        let fechaS: string = contrato.fecha_salida === null ? 'Sin fecha' : contrato.fec_salida_.split(" ")[1];
         objetoContrato = {
           'Regimen': contrato.descripcion,
           'Fecha desde': fechaI[1],
           'Fecha hasta': fechaS,
           'Modalidad laboral': contrato.nombre_contrato,
-          'Control asistencia': contrato.asis_controla ? 'Si' : 'No',
-          'Control vacaciones': contrato.vaca_controla ? 'Si' : 'No',
+          'Control asistencia': contrato.controlar_asistencia ? 'Si' : 'No',
+          'Control vacaciones': contrato.controlar_vacacion ? 'Si' : 'No',
         };
         arregloContrato.push(objetoContrato);
       });
@@ -817,7 +817,7 @@ export class DatosEmpleadoComponent implements OnInit {
     if (this.cargoEmpleado !== null) {
       this.cargoEmpleado.map((cargo: any) => {
         let fechaI = cargo.fec_inicio_.split(" ");
-        let fechaS: string = cargo.fec_final === null ? 'Sin fecha' : cargo.fec_final_.split(" ")[1];
+        let fechaS: string = cargo.fecha_final === null ? 'Sin fecha' : cargo.fec_final_.split(" ")[1];
         objetoCargo = {
           'Sucursal': cargo.sucursal,
           'Departamento': cargo.departamento,
@@ -899,7 +899,7 @@ export class DatosEmpleadoComponent implements OnInit {
     let objeto: any;
     let arregloEmpleado: any = [];
     this.empleadoUno.forEach(obj => {
-      let estadoCivil = this.EstadoCivilSelect[obj.esta_civil - 1];
+      let estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
@@ -936,10 +936,10 @@ export class DatosEmpleadoComponent implements OnInit {
           objeto.empleado.contrato = {
             'regimen': contrato.descripcion,
             'fecha_desde': contrato.fec_ingreso_,
-            'fecha_hasta': contrato.fec_salida === null ? 'Sin fecha' : contrato.fec_salida_,
+            'fecha_hasta': contrato.fecha_salida === null ? 'Sin fecha' : contrato.fec_salida_,
             'modalidad_laboral': contrato.nombre_contrato,
-            'control_asistencia': contrato.asis_controla ? 'Si' : 'No',
-            'control_vacaciones': contrato.vaca_controla ? 'Si' : 'No',
+            'control_asistencia': contrato.controlar_asistencia ? 'Si' : 'No',
+            'control_vacaciones': contrato.controlar_vacacion ? 'Si' : 'No',
           };
         });
 
@@ -951,7 +951,7 @@ export class DatosEmpleadoComponent implements OnInit {
             'departamento': cargo.departamento,
             'cargo': cargo.nombre_cargo,
             'fecha_desde': cargo.fec_inicio_,
-            'fecha_hasta': cargo.fec_final === null ? 'Sin fecha' : cargo.fec_final_,
+            'fecha_hasta': cargo.fecha_final === null ? 'Sin fecha' : cargo.fec_final_,
             'sueldo': cargo.sueldo,
             'horas_trabaja': cargo.hora_trabaja,
           };

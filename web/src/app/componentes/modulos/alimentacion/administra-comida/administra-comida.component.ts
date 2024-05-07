@@ -58,9 +58,9 @@ export class AdministraComidaComponent implements OnInit {
     this.restU.BuscarDatosUser(this.datoEmpleado.idEmpleado).subscribe(datos => {
       this.usuario = datos;
       this.formulario.patchValue({
-        comidaForm: this.usuario[0].admin_comida
+        comidaForm: this.usuario[0].administra_comida
       })
-      if (this.usuario[0].admin_comida === true) {
+      if (this.usuario[0].administra_comida === true) {
         this.selec1 = true;
       }
       else {

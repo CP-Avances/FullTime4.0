@@ -204,7 +204,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     // METODO PARA BUSCAR FECHA DE CONTRATO REGISTRADO EN FICHA DE EMPLEADO
     this.restE.BuscarFechaContrato(datosBusqueda).subscribe(response => {
       // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS (CONTRATO)
-      if (Date.parse(response[0].fec_ingreso.split('T')[0]) < Date.parse(form.fechaInicioForm)) {
+      if (Date.parse(response[0].fecha_ingreso.split('T')[0]) < Date.parse(form.fechaInicioForm)) {
         // VERIFICAR FECHAS INGRESADAS
         if (Date.parse(form.fechaInicioForm) <= Date.parse(form.fechaFinalForm)) {
           this.VerificarDuplicidad(form);
@@ -686,7 +686,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       // BUSCAR FECHAS DE RECUPERACION DE FERIADOS
       if (this.recuperar.length != 0) {
         for (let j = 0; j < this.recuperar.length; j++) {
-          if (moment(this.recuperar[j].fec_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
+          if (moment(this.recuperar[j].fecha_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
             tipo = 'REC';
             tipo_dia = 'REC';
             break;
@@ -752,7 +752,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         var accion = 0;
         var nocturno: number = 0;
         if (element.tipo_accion === 'E') {
-          accion = element.minu_espera;
+          accion = element.tolerancia;
         }
         if (element.segundo_dia === true) {
           nocturno = 1;
@@ -768,10 +768,10 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         let plan = {
           codigo: this.empleado[0].codigo,
           tipo_dia: tipo_dia,
-          min_antes: element.min_antes,
+          min_antes: element.minutos_antes,
           tolerancia: accion,
           id_horario: element.id_horario,
-          min_despues: element.min_despues,
+          min_despues: element.minutos_despues,
           fec_horario: obj,
           estado_origen: origen,
           estado_timbre: tipo,
@@ -780,7 +780,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
           salida_otro_dia: nocturno,
           tipo_entr_salida: element.tipo_accion,
           fec_hora_horario: obj + ' ' + element.hora,
-          min_alimentacion: element.min_almuerzo,
+          min_alimentacion: element.minutos_comida,
         };
         if (element.segundo_dia === true) {
           plan.fec_hora_horario = moment(obj).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;

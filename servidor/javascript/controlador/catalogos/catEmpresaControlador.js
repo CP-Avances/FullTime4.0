@@ -15,17 +15,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPRESA_CONTROLADOR = void 0;
 const ImagenCodificacion_1 = require("../../libs/ImagenCodificacion");
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const moment_1 = __importDefault(require("moment"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
-const moment_1 = __importDefault(require("moment"));
 const fs_1 = __importDefault(require("fs"));
-const builder = require('xmlbuilder');
 class EmpresaControlador {
     // BUSCAR DATOS DE EMPRESA PARA RECUPERAR CUENTA
     BuscarCadena(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const EMPRESA = yield database_1.default.query(`
-            SELECT cadena FROM cg_empresa
+            SELECT cadena FROM e_empresa
             `);
             if (EMPRESA.rowCount > 0) {
                 return res.jsonp(EMPRESA.rows);
@@ -39,7 +38,7 @@ class EmpresaControlador {
     getImagenBase64(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const file_name = yield database_1.default.query(`
-            SELECT nombre, logo FROM cg_empresa WHERE id = $1
+            SELECT nombre, logo FROM e_empresa WHERE id = $1
             `, [req.params.id_empresa])
                 .then((result) => {
                 return result.rows[0];
@@ -72,7 +71,7 @@ class EmpresaControlador {
             let separador = path_1.default.sep;
             // CONSULTAR SI EXISTE UNA IMAGEN
             const logo_name = yield database_1.default.query(`
-            SELECT nombre, logo FROM cg_empresa WHERE id = $1
+            SELECT nombre, logo FROM e_empresa WHERE id = $1
             `, [id]);
             logo_name.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 // LA IMAGEN EXISTE
@@ -92,27 +91,27 @@ class EmpresaControlador {
                             });
                             // ACTUALIZAR REGISTRO DE IMAGEN
                             yield database_1.default.query(`
-                            UPDATE cg_empresa SET logo = $2 WHERE id = $1
+                            UPDATE e_empresa SET logo = $2 WHERE id = $1
                             `, [id, logo]);
                         }
                     }
                     catch (error) {
                         // ACTUALIZAR REGISTRO DE IMAGEN SI ESTA NO CONSTA EN EL SERVIDOR
                         yield database_1.default.query(`
-                            UPDATE cg_empresa SET logo = $2 WHERE id = $1
+                            UPDATE e_empresa SET logo = $2 WHERE id = $1
                             `, [id, logo]);
                     }
                 }
                 else {
                     // SI NO EXISTE UNA IMAGEN SE REGISTRA EN LA BASE DE DATOS Y EL SERVIDOR
                     yield database_1.default.query(`
-                        UPDATE cg_empresa SET logo = $2 WHERE id = $1
+                        UPDATE e_empresa SET logo = $2 WHERE id = $1
                         `, [id, logo]);
                 }
             }));
             // LEER DATOS DE IMAGEN
             const codificado = yield (0, ImagenCodificacion_1.ImagenBase64LogosEmpresas)(logo);
-            res.send({ imagen: codificado, nom_empresa: logo_name.rows[0].nombre, message: 'Logo actualizado' });
+            res.send({ imagen: codificado, nom_empresa: logo_name.rows[0].nombre, message: 'Logo actualizado.' });
         });
     }
     // METODO PARA BUSCAR DATOS GENERALES DE EMPRESA
@@ -120,7 +119,7 @@ class EmpresaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const EMPRESA = yield database_1.default.query(`
-            SELECT * FROM cg_empresa WHERE id = $1
+            SELECT * FROM e_empresa WHERE id = $1
             `, [id]);
             if (EMPRESA.rowCount > 0) {
                 return res.jsonp(EMPRESA.rows);
@@ -135,9 +134,9 @@ class EmpresaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre, ruc, direccion, telefono, correo_empresa, tipo_empresa, representante, establecimiento, dias_cambio, cambios, num_partida, id } = req.body;
             yield database_1.default.query(`
-            UPDATE cg_empresa SET nombre = $1, ruc = $2, direccion = $3, telefono = $4, correo_empresa = $5,
-            tipo_empresa = $6, representante = $7, establecimiento = $8, dias_cambio = $9, cambios = $10, 
-            num_partida = $11 WHERE id = $12
+            UPDATE e_empresa SET nombre = $1, ruc = $2, direccion = $3, telefono = $4, correo_empresa = $5,
+                tipo_empresa = $6, representante = $7, establecimiento = $8, dias_cambio = $9, cambios = $10, 
+                numero_partida = $11 WHERE id = $12
             `, [nombre, ruc, direccion, telefono, correo_empresa, tipo_empresa, representante, establecimiento,
                 dias_cambio, cambios, num_partida, id]);
             res.jsonp({ message: 'Registro actualizado.' });
@@ -148,7 +147,7 @@ class EmpresaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { color_p, color_s, id } = req.body;
             yield database_1.default.query(`
-            UPDATE cg_empresa SET color_p = $1, color_s = $2 WHERE id = $3
+            UPDATE e_empresa SET color_principal = $1, color_secundario = $2 WHERE id = $3
             `, [color_p, color_s, id]);
             res.jsonp({ message: 'Registro actualizado.' });
         });
@@ -158,7 +157,7 @@ class EmpresaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { marca_agua, id } = req.body;
             yield database_1.default.query(`
-            UPDATE cg_empresa SET marca_agua = $1 WHERE id = $2
+            UPDATE e_empresa SET marca_agua = $1 WHERE id = $2
             `, [marca_agua, id]);
             res.jsonp({ message: 'Registro actualizado.' });
         });
@@ -168,7 +167,7 @@ class EmpresaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { seg_contrasena, seg_frase, seg_ninguna, id } = req.body;
             yield database_1.default.query(`
-            UPDATE cg_empresa SET seg_contrasena = $1, seg_frase = $2, seg_ninguna = $3
+            UPDATE e_empresa SET seguridad_contrasena = $1, seguridad_frase = $2, seguridad_ninguna = $3
             WHERE id = $4
             `, [seg_contrasena, seg_frase, seg_ninguna, id]);
             res.jsonp({ message: 'Registro actualizado.' });
@@ -188,7 +187,7 @@ class EmpresaControlador {
             let id = req.params.id_empresa;
             let separador = path_1.default.sep;
             const logo_name = yield database_1.default.query(`
-            SELECT cabecera_firma FROM cg_empresa WHERE id = $1
+            SELECT cabecera_firma FROM e_empresa WHERE id = $1
             `, [id]);
             logo_name.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 if (obj.cabecera_firma != null) {
@@ -208,19 +207,19 @@ class EmpresaControlador {
                             ;
                             // ACTUALIZAR REGISTRO DE IMAGEN
                             yield database_1.default.query(`
-                            UPDATE cg_empresa SET cabecera_firma = $2 WHERE id = $1
+                            UPDATE e_empresa SET cabecera_firma = $2 WHERE id = $1
                             `, [id, logo]);
                         }
                     }
                     catch (error) {
                         yield database_1.default.query(`
-                        UPDATE cg_empresa SET cabecera_firma = $2 WHERE id = $1
+                        UPDATE e_empresa SET cabecera_firma = $2 WHERE id = $1
                         `, [id, logo]);
                     }
                 }
                 else {
                     yield database_1.default.query(`
-                    UPDATE cg_empresa SET cabecera_firma = $2 WHERE id = $1
+                    UPDATE e_empresa SET cabecera_firma = $2 WHERE id = $1
                     `, [id, logo]);
                 }
             }));
@@ -232,7 +231,7 @@ class EmpresaControlador {
     VerCabeceraCorreo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const file_name = yield database_1.default.query(`
-                SELECT cabecera_firma FROM cg_empresa WHERE id = $1
+                SELECT cabecera_firma FROM e_empresa WHERE id = $1
                 `, [req.params.id_empresa])
                 .then((result) => {
                 return result.rows[0];
@@ -260,7 +259,7 @@ class EmpresaControlador {
             let id = req.params.id_empresa;
             let separador = path_1.default.sep;
             const logo_name = yield database_1.default.query(`
-            SELECT pie_firma FROM cg_empresa WHERE id = $1
+            SELECT pie_firma FROM e_empresa WHERE id = $1
             `, [id]);
             logo_name.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 if (obj.pie_firma != null) {
@@ -279,19 +278,19 @@ class EmpresaControlador {
                             });
                             // ACTUALIZAR REGISTRO DE IMAGEN
                             yield database_1.default.query(`
-                            UPDATE cg_empresa SET pie_firma = $2 WHERE id = $1
+                            UPDATE e_empresa SET pie_firma = $2 WHERE id = $1
                             `, [id, logo]);
                         }
                     }
                     catch (error) {
                         yield database_1.default.query(`
-                        UPDATE cg_empresa SET pie_firma = $2 WHERE id = $1
+                        UPDATE e_empresa SET pie_firma = $2 WHERE id = $1
                         `, [id, logo]);
                     }
                 }
                 else {
                     yield database_1.default.query(`
-                    UPDATE cg_empresa SET pie_firma = $2 WHERE id = $1
+                    UPDATE e_empresa SET pie_firma = $2 WHERE id = $1
                     `, [id, logo]);
                 }
             }));
@@ -303,7 +302,7 @@ class EmpresaControlador {
     VerPieCorreo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const file_name = yield database_1.default.query(`
-                SELECT pie_firma FROM cg_empresa WHERE id = $1
+                SELECT pie_firma FROM e_empresa WHERE id = $1
                 `, [req.params.id_empresa])
                 .then((result) => {
                 return result.rows[0];
@@ -323,7 +322,7 @@ class EmpresaControlador {
             const id = req.params.id_empresa;
             const { correo, password_correo, servidor, puerto } = req.body;
             yield database_1.default.query(`
-            UPDATE cg_empresa SET correo = $1, password_correo = $2, servidor = $3, puerto = $4
+            UPDATE e_empresa SET correo = $1, password_correo = $2, servidor = $3, puerto = $4
             WHERE id = $5
             `, [correo, password_correo, servidor, puerto, id]);
             res.status(200).jsonp({ message: 'Registro actualizado.' });
@@ -335,7 +334,7 @@ class EmpresaControlador {
             try {
                 const { id, bool_acciones } = req.body;
                 yield database_1.default.query(`
-                UPDATE cg_empresa SET acciones_timbres = $1 WHERE id = $2
+                UPDATE e_empresa SET acciones_timbres = $1 WHERE id = $2
                 `, [bool_acciones, id]);
                 res.status(200).jsonp({
                     message: 'Empresa actualizada exitosamente.',
@@ -350,9 +349,9 @@ class EmpresaControlador {
     ListarEmpresa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const EMPRESA = yield database_1.default.query(`
-            SELECT id, nombre, ruc, direccion, telefono, correo,
-            representante, tipo_empresa, establecimiento, logo, color_p, color_s, num_partida, marca_agua,
-            correo_empresa FROM cg_empresa ORDER BY nombre ASC
+            SELECT id, nombre, ruc, direccion, telefono, correo, representante, tipo_empresa, establecimiento, logo, 
+                color_principal, color_secundario, numero_partida, marca_agua, correo_empresa 
+            FROM e_empresa ORDER BY nombre ASC
             `);
             if (EMPRESA.rowCount > 0) {
                 return res.jsonp(EMPRESA.rows);

@@ -179,7 +179,7 @@ export class VerHorarioDetalleComponent implements OnInit {
   // METODO PARA CALCULAR HORAS DE TRABAJO
   CalcularHorasTrabaja() {
     const [cg_horario] = this.datosHorario;
-    const { nocturno, id, min_almuerzo } = cg_horario;
+    const { nocturno, id, minutos_comida } = cg_horario;
 
     // SI LAS HORAS TIENEN FORMATO HH:mm SE REALIZA VALIDACIONES
     if (this.datosHorario[0].hora_trabajo.split(':').length === 2) {
@@ -195,7 +195,7 @@ export class VerHorarioDetalleComponent implements OnInit {
       );
 
       // VALIDAR SI EXISTE REGISTRO MINUTOS DE ALMUERZO
-      if (min_almuerzo != 0) {
+      if (minutos_comida != 0) {
         if (this.datosDetalle.length != 4) return this.toastr.error(
           `El horario debe tener 4 detalles. (Entrada - Inicio alimentación - Fin alimentación - Salida)`,
           'Detalle de horario incompleto.'
@@ -266,7 +266,7 @@ export class VerHorarioDetalleComponent implements OnInit {
       }
 
       // VALIDAR HORAS TOTALES DE HORARIO
-      this.ValidarHorario(nocturno, id, min_almuerzo);
+      this.ValidarHorario(nocturno, id, minutos_comida);
 
     }
     // VERIFICADO QUE LAS HORAS TENGAN EL FORMATO HH:mm:ss

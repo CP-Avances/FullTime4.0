@@ -452,7 +452,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   masterToggleReg() {
     this.isAllSelectedReg() ?
       this.selectionReg.clear() :
-      this.regimen.forEach(row => this.selectionReg.select(row));
+      this.regimen.forEach((row: any) => this.selectionReg.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -473,7 +473,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   masterToggleCarg() {
     this.isAllSelectedCarg() ?
       this.selectionCarg.clear() :
-      this.cargos.forEach(row => this.selectionCarg.select(row));
+      this.cargos.forEach((row: any) => this.selectionCarg.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -494,7 +494,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
-      this.departamentos.forEach(row => this.selectionDep.select(row));
+      this.departamentos.forEach((row: any) => this.selectionDep.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -515,7 +515,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
-      this.empleados.forEach(row => this.selectionEmp.select(row));
+      this.empleados.forEach((row: any) => this.selectionEmp.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -524,6 +524,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       return `${this.isAllSelectedEmp() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+
   }
 
   // EVENTO DE PAGINACION DE TABLAS

@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { ObtenerRutaVacuna } from '../../../libs/accesoCarpetas';
 import { QueryResult } from 'pg';
+import moment from 'moment';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
-import moment from 'moment';
 
 class VacunasControlador {
 
@@ -13,10 +13,9 @@ class VacunasControlador {
         const { id_empleado } = req.params;
         const VACUNA = await pool.query(
             `
-            SELECT ev.id, ev.id_empleado, ev.id_tipo_vacuna, ev.carnet, ev.fecha, 
-            tv.nombre, ev.descripcion
-            FROM empl_vacunas AS ev, tipo_vacuna AS tv 
-            WHERE ev.id_tipo_vacuna = tv.id AND ev.id_empleado = $1
+            SELECT ev.id, ev.id_empleado, ev.id_vacuna, ev.carnet, ev.fecha, tv.nombre, ev.descripcion
+            FROM eu_empleado_vacunas AS ev, e_cat_vacuna AS tv 
+            WHERE ev.id_vacuna = tv.id AND ev.id_empleado = $1
             ORDER BY ev.id DESC
             `
             , [id_empleado]);
@@ -32,7 +31,7 @@ class VacunasControlador {
     public async ListarTipoVacuna(req: Request, res: Response) {
         const VACUNA = await pool.query(
             `
-            SELECT * FROM tipo_vacuna
+            SELECT * FROM e_cat_vacuna
             `
         );
         if (VACUNA.rowCount > 0) {
@@ -48,7 +47,7 @@ class VacunasControlador {
         const { id_empleado, descripcion, fecha, id_tipo_vacuna } = req.body;
         const response: QueryResult = await pool.query(
             `
-            INSERT INTO empl_vacunas (id_empleado, descripcion, fecha, id_tipo_vacuna) 
+            INSERT INTO eu_empleado_vacunas (id_empleado, descripcion, fecha, id_vacuna) 
             VALUES ($1, $2, $3, $4) RETURNING *
             `
             , [id_empleado, descripcion, fecha, id_tipo_vacuna]);
@@ -78,7 +77,7 @@ class VacunasControlador {
 
         const response: QueryResult = await pool.query(
             `
-            SELECT codigo FROM empleados WHERE id = $1
+            SELECT codigo FROM eu_empleados WHERE id = $1
             `
             , [id_empleado]);
 
@@ -88,7 +87,7 @@ class VacunasControlador {
 
         await pool.query(
             `
-            UPDATE empl_vacunas SET carnet = $2 WHERE id = $1
+            UPDATE eu_empleado_vacunas SET carnet = $2 WHERE id = $1
             `
             , [id, documento]);
 
@@ -101,8 +100,8 @@ class VacunasControlador {
         const { id_empleado, descripcion, fecha, id_tipo_vacuna } = req.body;
         await pool.query(
             `
-            UPDATE empl_vacunas SET id_empleado = $1, descripcion = $2, fecha = $3, 
-            id_tipo_vacuna = $4 WHERE id = $5
+            UPDATE eu_empleado_vacunas SET id_empleado = $1, descripcion = $2, fecha = $3, id_vacuna = $4 
+            WHERE id = $5
             `
             , [id_empleado, descripcion, fecha, id_tipo_vacuna, id]);
 
@@ -135,7 +134,7 @@ class VacunasControlador {
 
         const response: QueryResult = await pool.query(
             `
-            UPDATE empl_vacunas SET carnet = null WHERE id = $1 RETURNING *
+            UPDATE eu_empleado_vacunas SET carnet = null WHERE id = $1 RETURNING *
             `
             , [id]);
 
@@ -162,7 +161,7 @@ class VacunasControlador {
         const { id, documento } = req.params;
         const response: QueryResult = await pool.query(
             `
-            DELETE FROM empl_vacunas WHERE id = $1 RETURNING *
+            DELETE FROM eu_empleado_vacunas WHERE id = $1 RETURNING *
             `
             , [id]);
 
@@ -189,7 +188,7 @@ class VacunasControlador {
 
             const response: QueryResult = await pool.query(
                 `
-                INSERT INTO tipo_vacuna (nombre) VALUES ($1) RETURNING *
+                INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
                 `
                 , [nombre]);
 
@@ -217,9 +216,9 @@ class VacunasControlador {
         fs.access(ruta, fs.constants.F_OK, (err) => {
             if (err) {
             } else {
-              res.sendFile(path.resolve(ruta));
+                res.sendFile(path.resolve(ruta));
             }
-          });
+        });
     }
 
 
@@ -248,10 +247,9 @@ class VacunasControlador {
     public async ListarRegistro(req: Request, res: Response) {
         const VACUNA = await pool.query(
             `
-            SELECT ev.id, ev.id_empleado, ev.id_tipo_vacuna, ev.carnet, ev.fecha, 
-            tv.nombre, ev.descripcion
-            FROM empl_vacunas AS ev, tipo_vacuna AS tv 
-            WHERE ev.id_tipo_vacuna = tv.id
+            SELECT ev.id, ev.id_empleado, ev.id_vacuna, ev.carnet, ev.fecha, tv.nombre, ev.descripcion
+            FROM eu_empleado_vacunas AS ev, e_cat_vacuna AS tv 
+            WHERE ev.id_vacuna = tv.id
             ORDER BY ev.id DESC
             `
         );

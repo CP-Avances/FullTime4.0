@@ -7,7 +7,7 @@ export const ObtenerRutaUsuario = async function (id: any) {
     let separador = path.sep;
     const usuario = await pool.query(
         `
-        SELECT codigo, cedula FROM empleados WHERE id = $1
+        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
         `
         , [id]);
     ruta = path.join(__dirname, `..${separador}..`);
@@ -20,7 +20,7 @@ export const ObtenerRutaVacuna = async function (id: any) {
     let separador = path.sep;
     const usuario = await pool.query(
         `
-        SELECT codigo, cedula FROM empleados WHERE id = $1
+        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
         `
         , [id]);
 
@@ -34,7 +34,7 @@ export const ObtenerRutaPermisos = async function (codigo: any) {
     let separador = path.sep;
     const usuario = await pool.query(
         `
-        SELECT cedula FROM empleados WHERE codigo = $1
+        SELECT cedula FROM eu_empleados WHERE codigo = $1
         `
         , [codigo]);
     ruta = path.join(__dirname, `..${separador}..`);
@@ -78,7 +78,7 @@ export const ObtenerRutaContrato = async function (id: any) {
     let separador = path.sep;
     const usuario = await pool.query(
         `
-        SELECT codigo, cedula FROM empleados WHERE id = $1
+        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
         `
         , [id]);
     ruta = path.join(__dirname, `..${separador}..`);

@@ -72,7 +72,7 @@ export class EditarVacunaComponent implements OnInit {
   MostrarDatos() {
     this.formulario.patchValue({
       fechaForm: this.dvacuna.fecha,
-      vacunaForm: this.dvacuna.id_tipo_vacuna,
+      vacunaForm: this.dvacuna.id_vacuna,
       nombreForm: this.dvacuna.descripcion
     })
   }

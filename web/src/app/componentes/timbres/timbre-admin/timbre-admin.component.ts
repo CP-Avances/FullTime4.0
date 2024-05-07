@@ -122,8 +122,8 @@ export class TimbreAdminComponent implements OnInit {
       this.lista = true;
       this.selec_nombre = nombre + ' ' + apellido;
       this.timbres.forEach(data => {
-        data.fecha = this.validar.FormatearFecha(data.fec_hora_timbre, this.formato_fecha, this.validar.dia_abreviado);
-        data.hora = this.validar.FormatearHora(data.fec_hora_timbre.split(' ')[1], this.formato_hora);
+        data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_abreviado);
+        data.hora = this.validar.FormatearHora(data.fecha_hora_timbre.split(' ')[1], this.formato_hora);
       })
     }, err => {
       this.toastr.error(err.error.message)

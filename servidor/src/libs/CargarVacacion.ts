@@ -31,12 +31,21 @@ export const RestarPeriodoVacacionAutorizada = async function (id_vacacion: numb
     console.log('Total ===>', total);
     console.log(total_DHM);
 
-    await pool.query('UPDATE peri_vacaciones SET dia_vacacion = $1, horas_vacaciones = $2, min_vacaciones = $3 WHERE id = $4', [total_DHM.dias, total_DHM.horas, total_DHM.min, vacacion.id_peri_vacacion])
+    await pool.query(
+        `
+        UPDATE mv_periodo_vacacion SET dia_vacacion = $1, horas_vacaciones = $2, minutos_vacaciones = $3 WHERE id = $4
+        `
+        , [total_DHM.dias, total_DHM.horas, total_DHM.min, vacacion.id_peri_vacacion])
 
 }
 
 async function ConsultarVacacion(id_vacacion: number) {
-    return await pool.query('SELECT fec_inicio, fec_final, id_peri_vacacion FROM vacaciones WHERE id = $1', [id_vacacion])
+    return await pool.query(
+        `
+        SELECT fecha_inicio, fecha_final, id_periodo_vacacion 
+        FROM mv_solicitud_vacacion WHERE id = $1
+        `
+        , [id_vacacion])
         .then(result => {
             return result.rows[0]
         })
@@ -44,17 +53,24 @@ async function ConsultarVacacion(id_vacacion: number) {
 
 async function ConsultarPerido(id_peri_vacacion: number) {
     return await pool.query(
-        `SELECT dia_vacacion AS dias, horas_vacaciones AS horas, min_vacaciones AS min 
-        FROM peri_vacaciones WHERE id = $1`, [id_peri_vacacion])
+        `
+        SELECT dia_vacacion AS dias, horas_vacaciones AS horas, minutos_vacaciones AS min 
+        FROM mv_periodo_vacacion WHERE id = $1
+        `
+        , [id_peri_vacacion])
         .then(result => {
             return result.rows[0]
         })
 }
 
 async function HorasTrabaja(id_periodo: number) {
-    return await pool.query('SELECT ca.hora_trabaja ' +
-        'FROM peri_vacaciones AS pv, empl_contratos AS co, empl_cargos AS ca ' +
-        'WHERE pv.id = $1 AND pv.id_empl_contrato = co.id AND co.id = ca.id_empl_contrato',
+    return await pool.query(
+        `
+        SELECT ca.hora_trabaja 
+        FROM mv_periodo_vacacion AS pv, eu_empleado_contratos AS co, eu_empleado_cargos AS ca 
+        WHERE pv.id = $1 AND pv.id_empleado_contrato = co.id AND co.id = ca.id_contrato
+        `
+        ,
         [id_periodo]).then(result => {
             return result.rows[0].hora_trabaja
         })

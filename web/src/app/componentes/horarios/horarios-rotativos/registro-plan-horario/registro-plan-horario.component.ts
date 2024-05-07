@@ -320,7 +320,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
       // BUSCAR FECHAS DE RECUPERACION DE FERIADOS
       if (this.recuperar.length != 0) {
         for (let j = 0; j < this.recuperar.length; j++) {
-          if (moment(this.recuperar[j].fec_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj.fecha) {
+          if (moment(this.recuperar[j].fecha_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj.fecha) {
             obj.tipo_dia = 'N';
             obj.observacion = 'RECUPERACIÓN*';
             break;
@@ -392,7 +392,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     })
     if (!obj_res) return this.toastr.warning('Horario no válido.');
 
-    const { hora_trabajo, id, codigo, min_almuerzo } = obj_res;
+    const { hora_trabajo, id, codigo, minutos_comida } = obj_res;
 
     // VERIFICACION DE FORMATO CORRECTO DE HORARIOS
     if (!this.StringTimeToSegundosTime(hora_trabajo)) {
@@ -408,7 +408,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     }
     else {
       this.SeleccionarHorario();
-      this.ObtenerDetallesHorario(id, codigo, min_almuerzo);
+      this.ObtenerDetallesHorario(id, codigo, minutos_comida);
     }
   }
 
@@ -756,7 +756,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     // METODO PARA BUSCAR FECHA DE CONTRATO REGISTRADO EN FICHA DE EMPLEADO
     this.restE.BuscarFechaContrato(datosBusqueda).subscribe(response => {
       // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS
-      if (Date.parse(response[0].fec_ingreso.split('T')[0]) < Date.parse(inicio)) {
+      if (Date.parse(response[0].fecha_ingreso.split('T')[0]) < Date.parse(inicio)) {
         //console.log('ingresa a verificar duplicidad');
         this.VerificarDuplicidad(opcion);
       }
@@ -1067,14 +1067,14 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
         if (ele.codigo === datos_o[i].codigo) {
 
-          if ((moment(datos_o[i].fec_hora_horario).format('YYYY-MM-DD') === moment(ele.fec_hora_horario).format('YYYY-MM-DD')) &&
-            datos_o[i].tipo_entr_salida === 'E' && ele.tipo_entr_salida === 'S' && datos_o[i].tipo_dia === 'N') {
+          if ((moment(datos_o[i].fecha_hora_horario).format('YYYY-MM-DD') === moment(ele.fecha_hora_horario).format('YYYY-MM-DD')) &&
+            datos_o[i].tipo_accion === 'E' && ele.tipo_accion === 'S' && datos_o[i].tipo_dia === 'N') {
 
-            if (moment(datos_o[i].fec_hora_horario).format('HH:mm:ss') <= moment(ele.fec_hora_horario).format('HH:mm:ss')) {
+            if (moment(datos_o[i].fecha_hora_horario).format('HH:mm:ss') <= moment(ele.fecha_hora_horario).format('HH:mm:ss')) {
               //console.log('existen horarios en rangos de tiempo similares ', contador)
               this.data_horarios.forEach(li => {
 
-                if (li.fecha === moment(ele.fec_hora_horario).format('YYYY-MM-DD')) {
+                if (li.fecha === moment(ele.fecha_hora_horario).format('YYYY-MM-DD')) {
                   li.horas_validas = 'RANGOS DE TIEMPO SIMILARES'
                 }
 
@@ -1239,7 +1239,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
               var accion = 0;
               var nocturno: number = 0;
               if (deta.tipo_accion === 'E') {
-                accion = deta.minu_espera;
+                accion = deta.tolerancia;
               }
               if (deta.segundo_dia === true) {
                 nocturno = 1;
@@ -1276,10 +1276,10 @@ export class RegistroPlanHorarioComponent implements OnInit {
               let plan = {
                 codigo: this.datoEmpleado.codigo,
                 tipo_dia: valor.tipo_dia,
-                min_antes: deta.min_antes,
+                min_antes: deta.minutos_antes,
                 tolerancia: accion,
                 id_horario: h.id_horario,
-                min_despues: deta.min_despues,
+                min_despues: deta.minutos_despues,
                 fec_horario: valor.fecha,
                 estado_origen: origen,
                 estado_timbre: valor.tipo_dia,
@@ -1288,7 +1288,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
                 salida_otro_dia: nocturno,
                 tipo_entr_salida: deta.tipo_accion,
                 fec_hora_horario: valor.fecha + ' ' + deta.hora,
-                min_alimentacion: deta.min_almuerzo,
+                min_alimentacion: deta.minutos_comida,
               };
               if (deta.segundo_dia === true) {
                 plan.fec_hora_horario = moment(valor.fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + deta.hora;

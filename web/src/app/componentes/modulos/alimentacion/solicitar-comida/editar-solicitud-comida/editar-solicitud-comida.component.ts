@@ -128,7 +128,7 @@ export class EditarSolicitudComidaComponent implements OnInit {
         this.solInfo = [];
         this.solInfo = {
           comida_mail: res.comida_mail,
-          comida_noti: res.comida_noti,
+          comida_noti: res.comida_notificacion,
           empleado: res.id_empleado,
           id_dep: res.id_departamento,
           id_suc: res.id_sucursal,

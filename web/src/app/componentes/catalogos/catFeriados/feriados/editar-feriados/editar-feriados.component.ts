@@ -51,7 +51,7 @@ export class EditarFeriadosComponent implements OnInit {
 
   // METODO PARA MOSTRAR DATOS EN FORMULARIO
   ImprimirDatos() {
-    if (this.data.datosFeriado.fec_recuperacion === null || this.data.datosFeriado.fec_recuperacion === '') {
+    if (this.data.datosFeriado.fecha_recuperacion === null || this.data.datosFeriado.fecha_recuperacion === '') {
       this.formulario.patchValue({
         fechaRecuperacionForm: null
       })
@@ -59,7 +59,7 @@ export class EditarFeriadosComponent implements OnInit {
     this.formulario.setValue({
       fechaForm: this.data.datosFeriado.fecha,
       descripcionForm: this.data.datosFeriado.descripcion,
-      fechaRecuperacionForm: this.data.datosFeriado.fec_recuperacion
+      fechaRecuperacionForm: this.data.datosFeriado.fecha_recuperacion
     })
   }
 
@@ -96,7 +96,7 @@ export class EditarFeriadosComponent implements OnInit {
   ValidarSinRecuperacion(feriado: any) {
     if (this.feriados.length != 0) {
       this.feriados.forEach(obj => {
-        if (moment(obj.fec_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
+        if (moment(obj.fecha_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
           this.contador = 1;
         }
       })
@@ -120,13 +120,13 @@ export class EditarFeriadosComponent implements OnInit {
   ValidarRecuperacion(feriado: any, form: any) {
     if (this.feriados.length != 0) {
       this.feriados.forEach(obj => {
-        if (obj.fecha.split('T')[0] === moment(feriado.fec_recuperacion).format('YYYY-MM-DD') ||
-          moment(obj.fec_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
+        if (obj.fecha.split('T')[0] === moment(feriado.fecha_recuperacion).format('YYYY-MM-DD') ||
+          moment(obj.fecha_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
           this.contador = 1;
         }
       })
       if (this.contador === 0) {
-        if (Date.parse(form.fechaForm) < Date.parse(feriado.fec_recuperacion)) {
+        if (Date.parse(form.fechaForm) < Date.parse(feriado.fecha_recuperacion)) {
           this.RegistrarFeriado(feriado);
         }
         else {

@@ -124,7 +124,7 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
 
     // VERIFICAR SI EXISTE DEPARTAMENTO O NIVEL YA REGISTRADO
     for (var i = 0; i <= this.listaDepaNiveles.length - 1; i++) {
-      if ((this.listaDepaNiveles[i].id_dep_nivel === departamento.dep_nivel) ||
+      if ((this.listaDepaNiveles[i].id_departamento_nivel === departamento.dep_nivel) ||
         (this.listaDepaNiveles[i].nivel === departamento.nivel)) {
         this.contador = 1;
         break;

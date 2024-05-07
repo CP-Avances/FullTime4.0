@@ -111,7 +111,7 @@
                             *ngFor="let horario of horarios | filtrosNombres: filtroNombreHorario | paginate:tamanio_pagina:numero_pagina">
                             <td>{{horario.codigo}}</td>
                             <td>{{horario.nombre}}</td>
-                            <td>{{horario.min_almuerzo}}</td>
+                            <td>{{horario.minutos_comida}}</td>
                             <td>{{horario.hora_trabajo}}</td>
                             <td>{{horario.default_tipo}}</td>
                             <td *ngIf="horario.nocturno == true">Sí</td>

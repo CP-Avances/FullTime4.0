@@ -142,12 +142,6 @@ class EmpleadoRutas {
         this.router.post('/verificar/manual/plantillaExcel/', [verificarToken_1.TokenValidation, upload_plantilla.single('uploads')], empleadoControlador_1.default.VerificarPlantilla_Manual);
         //this.router.post('/verificar/datos/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosManual);
         this.router.post('/cargar_manual/plantillaExcel/', verificarToken_1.TokenValidation, empleadoControlador_1.default.CargarPlantilla_Manual);
-        // HABILITACIÓN Y DESHABILITACIÓN DE USUARIOS
-        // METODOS PARA CONTROL DE MARCACIONES DENTRO DE UNA UBICACIÓN GEOGRÁFICA 
-        this.router.post('/geolocalizacion-domicilio/:id/:codigo', verificarToken_1.TokenValidation, empleadoControlador_1.default.IngresarGelocalizacion);
-        this.router.put('/geolocalizacion-trabajo/:id', verificarToken_1.TokenValidation, empleadoControlador_1.default.ActualizarTrabajo);
-        this.router.put('/geolocalizacion-nuevo-domicilio/:id', verificarToken_1.TokenValidation, empleadoControlador_1.default.ActualizarDomicilio);
-        this.router.put('/actualizar-geolocalizacion/:id', verificarToken_1.TokenValidation, empleadoControlador_1.default.ActualizarGeolocalizacion);
     }
 }
 const EMPLEADO_RUTAS = new EmpleadoRutas();

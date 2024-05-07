@@ -452,7 +452,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
-      this.planEmpleados.forEach(row => this.selectionUno.select(row));
+      this.planEmpleados.forEach((row: any) => this.selectionUno.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.

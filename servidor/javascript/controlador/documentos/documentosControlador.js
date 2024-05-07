@@ -15,9 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DOCUMENTOS_CONTROLADOR = exports.carpeta = void 0;
 const listarArchivos_1 = require("../../libs/listarArchivos");
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const fs_1 = __importDefault(require("fs"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
 const moment_1 = __importDefault(require("moment"));
 class DocumentosControlador {
     // METODO PARA MOSTRAR LISTA DE CARPETAS DEL SERVIDOR
@@ -109,7 +109,7 @@ class DocumentosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             let { id, documento } = req.params;
             yield database_1.default.query(`
-            DELETE FROM documentacion WHERE id = $1
+            DELETE FROM e_documentacion WHERE id = $1
             `, [id]);
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaDocumento)() + separador + documento;
@@ -136,7 +136,7 @@ class DocumentosControlador {
             var dia = fecha.format('DD');
             let documento = anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
             yield database_1.default.query(`
-            INSERT INTO documentacion (documento) VALUES ($1)
+            INSERT INTO e_documentacion (documento) VALUES ($1)
             `, [documento]);
             res.jsonp({ message: 'Registro guardado.' });
         });

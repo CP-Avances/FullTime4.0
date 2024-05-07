@@ -95,12 +95,12 @@ export class EditarTimbreComponent implements OnInit {
     this.datosTimbre = [];
     this.datosTimbre = this.data.timbre;
     console.log('ver timbre ', this.datosTimbre)
-    this.datosTimbre.fecha = this.validar.FormatearFecha(this.datosTimbre.fec_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
-    this.datosTimbre.hora = this.validar.FormatearHora(this.datosTimbre.fec_hora_timbre_servidor.split(' ')[1], this.formato_hora);
+    this.datosTimbre.fecha = this.validar.FormatearFecha(this.datosTimbre.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
+    this.datosTimbre.hora = this.validar.FormatearHora(this.datosTimbre.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
 
     this.EditartimbreForm = this.formBuilder.group({
       accionTimbre: [this.datosTimbre.accion, Validators.required],
-      teclaFunTimbre: [this.datosTimbre.tecl_funcion, Validators.required],
+      teclaFunTimbre: [this.datosTimbre.tecla_funcion, Validators.required],
       ObservacionForm: [this.datosTimbre.observacion, Validators.required]
     });
   }
@@ -137,7 +137,7 @@ export class EditarTimbreComponent implements OnInit {
       accion: formTimbre.accionTimbre,
       tecla: formTimbre.teclaFunTimbre,
       observacion: formTimbre.ObservacionForm,
-      fecha: this.datosTimbre.fec_hora_timbre_servidor,
+      fecha: this.datosTimbre.fecha_hora_timbre_servidor,
     }
 
     console.log('data: ', data);

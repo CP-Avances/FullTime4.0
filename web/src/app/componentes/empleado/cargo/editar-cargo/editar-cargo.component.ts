@@ -119,7 +119,7 @@ export class EditarCargoComponent implements OnInit {
   ObtenerCargoEmpleado() {
     this.restEmplCargos.BuscarCargoID(this.idSelectCargo).subscribe(res => {
       this.cargo = res;
-      this.id_empl_contrato = this.cargo[0].id_empl_contrato;
+      this.id_empl_contrato = this.cargo[0].id_contrato;
       this.cargo.forEach(obj => {
         this.ObtenerDepartamentosImprimir(obj.id_sucursal);
         // FORMATEAR HORAS
@@ -163,7 +163,7 @@ export class EditarCargoComponent implements OnInit {
       id_contrato: this.id_empl_contrato
     }
     this.restEmpleado.BuscarFechaIdContrato(datosBusqueda).subscribe(response => {
-      if (Date.parse(response[0].fec_ingreso.split('T')[0]) < Date.parse(form.fecInicioForm)) {
+      if (Date.parse(response[0].fecha_ingreso.split('T')[0]) < Date.parse(form.fecInicioForm)) {
         if (Date.parse(form.fecInicioForm) < Date.parse(form.fecFinalForm)) {
           this.ActualizarEmpleadoCargo(form);
         }

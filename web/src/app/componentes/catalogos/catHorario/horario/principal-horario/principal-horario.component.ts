@@ -142,8 +142,8 @@ export class PrincipalHorarioComponent implements OnInit {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -289,8 +289,8 @@ export class PrincipalHorarioComponent implements OnInit {
     this.listaHorariosCorrectos = [];
     this.listaDetalleCorrectos = [];
     this.archivo1Form.reset();
-    this.habilitarprogress = false;
     this.spinnerService.hide();
+    this.habilitarprogress = false;
     this.numero_paginaH = 1;
     this.numero_paginaD = 1;
     this.tamanio_paginaH = 5;
@@ -298,8 +298,8 @@ export class PrincipalHorarioComponent implements OnInit {
   }
 
   CargarPlantillaGeneral(element: any) {
-    this.habilitarprogress = true;
     this.spinnerService.show();
+    this.habilitarprogress = true;
     if (element.target.files && element.target.files[0]) {
       this.archivoSubido = element.target.files;
       this.nameFile = this.archivoSubido[0].name;
@@ -352,8 +352,8 @@ export class PrincipalHorarioComponent implements OnInit {
           this.listaDetalleCorrectos.push(obj);
         }
       });
-      this.habilitarprogress = false;
       this.spinnerService.hide();
+      this.habilitarprogress = false;
     });
   }
 
@@ -369,8 +369,8 @@ export class PrincipalHorarioComponent implements OnInit {
   }
 
   RegistrarHorariosDetalles() {
-    this.habilitarprogress = true;
     this.spinnerService.show();
+    this.habilitarprogress = true;
     const data = {
       horarios: this.listaHorariosCorrectos,
       detalles: this.listaDetalleCorrectos
@@ -389,8 +389,8 @@ export class PrincipalHorarioComponent implements OnInit {
           });
           this.archivo1Form.reset();
           this.nameFile = '';
-          this.habilitarprogress = false;
           this.spinnerService.hide();
+          this.habilitarprogress = false;
         } else {
           this.toastr.success('Plantilla de horarios importada','Operación exitosa.', {
             timeOut: 6000,
@@ -489,7 +489,7 @@ export class PrincipalHorarioComponent implements OnInit {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
-                  { text: obj.min_almuerzo, style: 'itemsTableC' },
+                  { text: obj.minutos_comida, style: 'itemsTableC' },
                   { text: obj.hora_trabajo, style: 'itemsTableC' },
                   { text: obj.noturno == true ? 'Sí' : 'No', style: 'itemsTableC' },
                   { text: obj.detalle == true ? 'Sí' : 'No', style: 'itemsTableC' },
@@ -547,7 +547,7 @@ export class PrincipalHorarioComponent implements OnInit {
         "horario": {
           "$": { "id": obj.id },
           "nombre": obj.nombre,
-          "min_almuerzo": obj.min_almuerzo,
+          "min_almuerzo": obj.minutos_comida,
           "hora_trabajo": obj.hora_trabajo,
           "noturno": obj.nocturno,
           "requiere_detalle": obj.detalle,

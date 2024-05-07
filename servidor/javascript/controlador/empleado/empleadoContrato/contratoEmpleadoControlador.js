@@ -12,21 +12,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
+const moment_1 = __importDefault(require("moment"));
+const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const moment_1 = __importDefault(require("moment"));
-const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
-const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
-const xlsx_1 = __importDefault(require("xlsx"));
 class ContratoEmpleadoControlador {
     // REGISTRAR CONTRATOS
     CrearContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen, id_tipo_contrato } = req.body;
             const response = yield database_1.default.query(`
-            INSERT INTO empl_contratos (id_empleado, fec_ingreso, fec_salida, vaca_controla, 
-            asis_controla, id_regimen, id_tipo_contrato) 
+            INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
+            controlar_asistencia, id_regimen, id_modalidad_laboral) 
             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
             `, [id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
                 id_tipo_contrato]);
@@ -50,12 +50,12 @@ class ContratoEmpleadoControlador {
             var dia = fecha.format('DD');
             let id = req.params.id;
             const response = yield database_1.default.query(`
-            SELECT codigo FROM empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+            SELECT codigo FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
             `, [id]);
             const [empleado] = response.rows;
             let documento = empleado.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
             yield database_1.default.query(`
-            UPDATE empl_contratos SET documento = $2 WHERE id = $1
+            UPDATE eu_empleado_contratos SET documento = $2 WHERE id = $1
             `, [id, documento]);
             res.jsonp({ message: 'Documento actualizado.' });
         });
@@ -66,7 +66,7 @@ class ContratoEmpleadoControlador {
             const docs = req.params.docs;
             const id = req.params.id;
             let separador = path_1.default.sep;
-            let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaContrato)(id)) + separador + docs;
+            let ruta = (yield (0, accesoCarpetas_2.ObtenerRutaContrato)(id)) + separador + docs;
             fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                 if (err) {
                 }
@@ -81,7 +81,8 @@ class ContratoEmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             const CONTRATO_EMPLEADO_REGIMEN = yield database_1.default.query(`
-            SELECT ec.id, ec.fec_ingreso, ec.fec_salida FROM empl_contratos AS ec
+            SELECT ec.id, ec.fecha_ingreso, ec.fecha_salida 
+            FROM eu_empleado_contratos AS ec
             WHERE ec.id_empleado = $1 ORDER BY ec.id ASC
             `, [id_empleado]);
             if (CONTRATO_EMPLEADO_REGIMEN.rowCount > 0) {
@@ -98,8 +99,8 @@ class ContratoEmpleadoControlador {
             const { id } = req.params;
             const { fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen, id_tipo_contrato } = req.body;
             yield database_1.default.query(`
-            UPDATE empl_contratos SET fec_ingreso = $1, fec_salida = $2, vaca_controla = $3,
-            asis_controla = $4, id_regimen = $5, id_tipo_contrato = $6 
+            UPDATE eu_empleado_contratos SET fecha_ingreso = $1, fecha_salida = $2, controlar_vacacion = $3,
+            controlar_asistencia = $4, id_regimen = $5, id_modalidad_laboral = $6 
             WHERE id = $7
             `, [fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
                 id_tipo_contrato, id]);
@@ -112,11 +113,11 @@ class ContratoEmpleadoControlador {
             let { documento, id } = req.body;
             let separador = path_1.default.sep;
             const response = yield database_1.default.query(`
-            UPDATE empl_contratos SET documento = null WHERE id = $1 RETURNING *
+            UPDATE eu_empleado_contratos SET documento = null WHERE id = $1 RETURNING *
             `, [id]);
             const [contrato] = response.rows;
             if (documento != 'null' && documento != '' && documento != null) {
-                let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaContrato)(contrato.id_empleado)) + separador + documento;
+                let ruta = (yield (0, accesoCarpetas_2.ObtenerRutaContrato)(contrato.id_empleado)) + separador + documento;
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                     if (err) {
@@ -136,7 +137,7 @@ class ContratoEmpleadoControlador {
             let { documento, id } = req.body;
             let separador = path_1.default.sep;
             if (documento != 'null' && documento != '' && documento != null) {
-                let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaContrato)(id)) + separador + documento;
+                let ruta = (yield (0, accesoCarpetas_2.ObtenerRutaContrato)(id)) + separador + documento;
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                     if (err) {
@@ -156,7 +157,7 @@ class ContratoEmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             const CONTRATO = yield database_1.default.query(`
-            SELECT MAX(ec.id) FROM empl_contratos AS ec, empleados AS e 
+            SELECT MAX(ec.id) FROM eu_empleado_contratos AS ec, eu_empleados AS e 
             WHERE ec.id_empleado = e.id AND e.id = $1
             `, [id_empleado]);
             if (CONTRATO.rowCount > 0) {
@@ -164,11 +165,11 @@ class ContratoEmpleadoControlador {
                     return res.jsonp(CONTRATO.rows);
                 }
                 else {
-                    return res.status(404).jsonp({ text: 'Registro no encontrado' });
+                    return res.status(404).jsonp({ text: 'Registro no encontrado.' });
                 }
             }
             else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado' });
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
@@ -177,11 +178,11 @@ class ContratoEmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const CONTRATO = yield database_1.default.query(`
-            SELECT ec.id, ec.id_empleado, ec.id_regimen, ec.fec_ingreso, ec.fec_salida, ec.vaca_controla,
-                ec.asis_controla, ec.documento, ec.id_tipo_contrato, cr.descripcion, 
+            SELECT ec.id, ec.id_empleado, ec.id_regimen, ec.fecha_ingreso, ec.fecha_salida, ec.controlar_vacacion,
+                ec.controlar_asistencia, ec.documento, ec.id_modalidad_laboral, cr.descripcion, 
                 cr.mes_periodo, mt.descripcion AS nombre_contrato 
-            FROM empl_contratos AS ec, cg_regimenes AS cr, modal_trabajo AS mt 
-            WHERE ec.id = $1 AND ec.id_regimen = cr.id AND mt.id = ec.id_tipo_contrato
+            FROM eu_empleado_contratos AS ec, ere_cat_regimenes AS cr, e_cat_modalidad_trabajo AS mt 
+            WHERE ec.id = $1 AND ec.id_regimen = cr.id AND mt.id = ec.id_modalidad_laboral
             `, [id]);
             if (CONTRATO.rowCount > 0) {
                 return res.jsonp(CONTRATO.rows);
@@ -196,8 +197,8 @@ class ContratoEmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
             const FECHA = yield database_1.default.query(`
-            SELECT ca.id_contrato, ec.fec_ingreso
-            FROM datos_contrato_actual AS ca, empl_contratos AS ec
+            SELECT ca.id_contrato, ec.fecha_ingreso
+            FROM datos_contrato_actual AS ca, eu_empleado_contratos AS ec
             WHERE ca.id = $1 AND ec.id = ca.id_contrato
             `, [id_empleado]);
             if (FECHA.rowCount > 0) {
@@ -215,7 +216,7 @@ class ContratoEmpleadoControlador {
     ListarTiposContratos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const CONTRATOS = yield database_1.default.query(`
-            SELECT * FROM modal_trabajo
+            SELECT * FROM e_cat_modalidad_trabajo
             `);
             if (CONTRATOS.rowCount > 0) {
                 return res.jsonp(CONTRATOS.rows);
@@ -230,7 +231,7 @@ class ContratoEmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { descripcion } = req.body;
             const response = yield database_1.default.query(`
-            INSERT INTO modal_trabajo (descripcion) VALUES ($1) RETURNING *
+            INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1) RETURNING *
             `, [descripcion]);
             const [contrato] = response.rows;
             if (contrato) {
@@ -243,49 +244,60 @@ class ContratoEmpleadoControlador {
     }
     ListarContratos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const CONTRATOS = yield database_1.default.query('SELECT * FROM empl_contratos');
+            const CONTRATOS = yield database_1.default.query(`
+            SELECT * FROM eu_empleado_contratos
+            `);
             if (CONTRATOS.rowCount > 0) {
                 return res.jsonp(CONTRATOS.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
     ObtenerUnContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const CONTRATOS = yield database_1.default.query('SELECT * FROM empl_contratos WHERE id = $1', [id]);
+            const CONTRATOS = yield database_1.default.query(`
+            SELECT * FROM eu_empleado_contratos WHERE id = $1
+            `, [id]);
             if (CONTRATOS.rowCount > 0) {
                 return res.jsonp(CONTRATOS.rows[0]);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
     EncontrarIdContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
-            const CONTRATO = yield database_1.default.query('SELECT ec.id FROM empl_contratos AS ec, empleados AS e WHERE ec.id_empleado = e.id AND e.id = $1 ORDER BY ec.fec_ingreso DESC ', [id_empleado]);
+            const CONTRATO = yield database_1.default.query(`
+            SELECT ec.id 
+            FROM eu_empleado_contratos AS ec, eu_empleados AS e 
+            WHERE ec.id_empleado = e.id AND e.id = $1 
+            ORDER BY ec.fecha_ingreso DESC 
+            `, [id_empleado]);
             if (CONTRATO.rowCount > 0) {
                 return res.jsonp(CONTRATO.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado' });
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
     EncontrarFechaContratoId(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_contrato } = req.body;
-            const FECHA = yield database_1.default.query('SELECT contrato.fec_ingreso FROM empl_contratos AS contrato ' +
-                'WHERE contrato.id = $1', [id_contrato]);
+            const FECHA = yield database_1.default.query(`
+            SELECT contrato.fecha_ingreso FROM eu_empleado_contratos AS contrato
+            WHERE contrato.id = $1
+            `, [id_contrato]);
             if (FECHA.rowCount > 0) {
                 return res.jsonp(FECHA.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado' });
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
@@ -295,7 +307,7 @@ class ContratoEmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let separador = path_1.default.sep;
-            let ruta = (0, accesoCarpetas_2.ObtenerRutaLeerPlantillas)() + separador + documento;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
             const workbook = xlsx_1.default.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
@@ -444,26 +456,36 @@ class ContratoEmpleadoControlador {
                 }
             });
             listContratos.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
-                var VERIFICAR_CEDULA = yield database_1.default.query('SELECT * FROM empleados WHERE cedula = $1', [valor.cedula]);
+                var VERIFICAR_CEDULA = yield database_1.default.query(`
+                SELECT * FROM eu_empleados WHERE cedula = $1
+                `, [valor.cedula]);
                 if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
                     if (valor.cedula != 'No registrado' && valor.pais != 'No registrado' && valor.pais != '') {
-                        const fechaRango = yield database_1.default.query('SELECT * FROM empl_contratos ' +
-                            'WHERE id_empleado = $1 and ($2  between fec_ingreso and fec_salida or ' +
-                            '$3 between fec_ingreso and fec_salida or ' +
-                            'fec_ingreso between $2 and $3)', [VERIFICAR_CEDULA.rows[0].id, valor.fecha_ingreso, valor.fecha_salida]);
+                        const fechaRango = yield database_1.default.query(`
+                        SELECT * FROM eu_empleado_contratos 
+                        WHERE id_empleado = $1 AND 
+                            ($2 BETWEEN fecha_ingreso and fecha_salida OR $3 BETWEEN fecha_ingreso AND fecha_salida OR 
+                            fecha_ingreso BETWEEN $2 AND $3)
+                        `, [VERIFICAR_CEDULA.rows[0].id, valor.fecha_ingreso, valor.fecha_salida]);
                         if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
                             valor.observacion = 'Existe un contrato vigente en esas fechas';
                         }
                         else {
-                            var VERIFICAR_PAISES = yield database_1.default.query('SELECT * FROM cg_paises WHERE UPPER(nombre) = $1', [valor.pais.toUpperCase()]);
+                            var VERIFICAR_PAISES = yield database_1.default.query(`
+                            SELECT * FROM e_cat_paises WHERE UPPER(nombre) = $1
+                            `, [valor.pais.toUpperCase()]);
                             if (VERIFICAR_PAISES.rows[0] != undefined && VERIFICAR_PAISES.rows[0] != '') {
                                 var id_pais = VERIFICAR_PAISES.rows[0].id;
                                 if (valor.regimen_la != 'No registrado' && valor.regimen_la != '') {
-                                    var VERIFICAR_REGIMENES = yield database_1.default.query('SELECT * FROM cg_regimenes WHERE UPPER(descripcion) = $1', [valor.regimen_la.toUpperCase()]);
+                                    var VERIFICAR_REGIMENES = yield database_1.default.query(`
+                                    SELECT * FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
+                                    `, [valor.regimen_la.toUpperCase()]);
                                     if (VERIFICAR_REGIMENES.rows[0] != undefined && VERIFICAR_REGIMENES.rows[0] != '') {
                                         if (id_pais == VERIFICAR_REGIMENES.rows[0].id_pais) {
                                             if (valor.modalida_la != 'No registrado' && valor.modalida_la != '') {
-                                                var VERIFICAR_MODALIDAD = yield database_1.default.query('SELECT * FROM modal_trabajo WHERE UPPER(descripcion) = $1', [valor.modalida_la.toUpperCase()]);
+                                                var VERIFICAR_MODALIDAD = yield database_1.default.query(`
+                                                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                                                `, [valor.modalida_la.toUpperCase()]);
                                                 if (VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != '') {
                                                 }
                                                 else {
@@ -548,9 +570,15 @@ class ContratoEmpleadoControlador {
                 console.log('data: ', data);
                 // Datos que se guardaran de la plantilla ingresada
                 const { item, cedula, pais, regimen_la, modalida_la, fecha_ingreso, fecha_salida, control_asis, control_vaca } = data;
-                const ID_EMPLEADO = yield database_1.default.query('SELECT id FROM empleados WHERE UPPER(cedula) = $1', [cedula]);
-                const ID_REGIMEN = yield database_1.default.query('SELECT id FROM cg_regimenes WHERE UPPER(descripcion) = $1', [regimen_la.toUpperCase()]);
-                const ID_TIPO_CONTRATO = yield database_1.default.query('SELECT id FROM modal_trabajo WHERE UPPER(descripcion) = $1', [modalida_la.toUpperCase()]);
+                const ID_EMPLEADO = yield database_1.default.query(`
+                SELECT id FROM eu_empleados WHERE UPPER(cedula) = $1
+                `, [cedula]);
+                const ID_REGIMEN = yield database_1.default.query(`
+                SELECT id FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
+                `, [regimen_la.toUpperCase()]);
+                const ID_TIPO_CONTRATO = yield database_1.default.query(`
+                SELECT id FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                `, [modalida_la.toUpperCase()]);
                 //Transformar el string en booleano
                 var vaca_controla;
                 if (control_vaca.toUpperCase() === 'SI') {
@@ -573,8 +601,9 @@ class ContratoEmpleadoControlador {
                 console.log('id_regimen: ', id_regimen);
                 console.log('id_tipo_contrato: ', id_tipo_contrato);
                 // Registro de los datos de contratos
-                const response = yield database_1.default.query(`INSERT INTO empl_contratos (id_empleado, fec_ingreso, fec_salida, vaca_controla, 
-                asis_controla, id_regimen, id_tipo_contrato) 
+                const response = yield database_1.default.query(`
+                INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
+                    controlar_asistencia, id_regimen, id_modalidad_laboral) 
                 VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
                 `, [id_empleado, fecha_ingreso, fecha_salida, vaca_controla, asis_controla, id_regimen,
                     id_tipo_contrato]);

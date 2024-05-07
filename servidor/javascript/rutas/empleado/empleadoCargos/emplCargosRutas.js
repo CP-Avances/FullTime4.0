@@ -34,7 +34,6 @@ class EmpleadosCargpsRutas {
         this.router.get('/cargoInfo/:id_empl_contrato', verificarToken_1.TokenValidation, emplCargosControlador_1.default.EncontrarCargoIDContrato);
         this.router.get('/', verificarToken_1.TokenValidation, emplCargosControlador_1.default.list);
         this.router.get('/lista-empleados/', verificarToken_1.TokenValidation, emplCargosControlador_1.default.ListarCargoEmpleado);
-        this.router.get('/empleadosAutorizan/:id', verificarToken_1.TokenValidation, emplCargosControlador_1.default.ListarEmpleadoAutoriza);
         this.router.get('/buscar/:id_empleado', verificarToken_1.TokenValidation, emplCargosControlador_1.default.EncontrarIdCargo);
         this.router.get('/buscar/cargoActual/:id_empleado', verificarToken_1.TokenValidation, emplCargosControlador_1.default.EncontrarIdCargoActual);
         /** ****************************************************************************************** **

@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DETALLE_CATALOGO_HORARIO_CONTROLADOR = void 0;
-const database_1 = __importDefault(require("../../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
+const database_1 = __importDefault(require("../../../database"));
 const fs_1 = __importDefault(require("fs"));
 class DetalleCatalogoHorarioControlador {
     // METODO PARA BUSCAR DETALLE DE UN HORARIO   --**VERIFICADO
@@ -22,8 +22,8 @@ class DetalleCatalogoHorarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_horario } = req.params;
             const HORARIO = yield database_1.default.query(`
-            SELECT dh.*, cg.min_almuerzo
-            FROM deta_horarios AS dh, cg_horarios AS cg
+            SELECT dh.*, cg.minutos_comida
+            FROM eh_detalle_horarios AS dh, eh_cat_horarios AS cg
             WHERE dh.id_horario = cg.id AND dh.id_horario = $1
             ORDER BY orden ASC
             `, [id_horario])
@@ -69,7 +69,7 @@ class DetalleCatalogoHorarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
             yield database_1.default.query(`
-            DELETE FROM deta_horarios WHERE id = $1
+            DELETE FROM eh_detalle_horarios WHERE id = $1
             `, [id]);
             res.jsonp({ message: 'Registro eliminado.' });
         });
@@ -79,8 +79,8 @@ class DetalleCatalogoHorarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues } = req.body;
             yield database_1.default.query(`
-            INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes,
-                min_despues) 
+            INSERT INTO eh_detalle_horarios (orden, hora, tolerancia, id_horario, tipo_accion, segundo_dia, tercer_dia, 
+                minutos_antes, minutos_depues) 
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             `, [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues]);
             res.jsonp({ message: 'Registro guardado.' });
@@ -91,20 +91,23 @@ class DetalleCatalogoHorarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id } = req.body;
             yield database_1.default.query(`
-                UPDATE deta_horarios SET orden = $1, hora = $2, minu_espera = $3, id_horario = $4,
-                tipo_accion = $5, segundo_dia = $6, tercer_dia = $7, min_antes = $8, min_despues= $9 WHERE id = $10
-                `, [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id]);
+            UPDATE eh_detalle_horarios SET orden = $1, hora = $2, tolerancia = $3, id_horario = $4,
+                tipo_accion = $5, segundo_dia = $6, tercer_dia = $7, minutos_antes = $8, minutos_despues= $9 
+            WHERE id = $10
+            `, [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id]);
             res.jsonp({ message: 'Registro actualizado.' });
         });
     }
     ListarDetalleHorarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const HORARIO = yield database_1.default.query('SELECT * FROM deta_horarios');
+            const HORARIO = yield database_1.default.query(`
+            SELECT * FROM eh_detalle_horarios
+            `);
             if (HORARIO.rowCount > 0) {
                 return res.jsonp(HORARIO.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -131,7 +134,9 @@ class DetalleCatalogoHorarioControlador {
                 }
                 // Verificar que exita el nombre del horario
                 if (nombre_horario != undefined) {
-                    const HORARIO = yield database_1.default.query('SELECT * FROM cg_horarios WHERE UPPER(nombre) = $1', [nombre_horario.toUpperCase()]);
+                    const HORARIO = yield database_1.default.query(`
+                    SELECT * FROM eh_cat_horarios WHERE UPPER(nombre) = $1
+                    `, [nombre_horario.toUpperCase()]);
                     if (HORARIO.rowCount != 0) {
                         contarHorario = contarHorario + 1;
                     }
@@ -172,15 +177,22 @@ class DetalleCatalogoHorarioControlador {
             plantillaD.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                 var { nombre_horario, orden, hora, tipo_accion, minutos_espera } = data;
                 var nombre = nombre_horario;
-                const idHorario = yield database_1.default.query('SELECT id FROM cg_horarios WHERE UPPER(nombre) = $1', [nombre.toUpperCase()]);
+                const idHorario = yield database_1.default.query(`
+                SELECT id FROM eh_cat_horarios WHERE UPPER(nombre) = $1
+                `, [nombre.toUpperCase()]);
                 var id_horario = idHorario.rows[0]['id'];
                 if (minutos_espera != undefined) {
-                    yield database_1.default.query('INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion) VALUES ($1, $2, $3, $4, $5)', [orden, hora, minutos_espera, id_horario, tipo_accion.split("=")[0]]);
+                    yield database_1.default.query(`
+                    INSERT INTO eh_detalle_horarios (orden, hora, tolerancia, id_horario, tipo_accion) 
+                    VALUES ($1, $2, $3, $4, $5)
+                    `, [orden, hora, minutos_espera, id_horario, tipo_accion.split("=")[0]]);
                     res.jsonp({ message: 'correcto' });
                 }
                 else {
                     minutos_espera = 0;
-                    yield database_1.default.query('INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion) VALUES ($1, $2, $3, $4, $5)', [orden, hora, minutos_espera, id_horario, tipo_accion.split("=")[0]]);
+                    yield database_1.default.query(`
+                    INSERT INTO eh_detalle_horarios (orden, hora, tolerancia, id_horario, tipo_accion) VALUES ($1, $2, $3, $4, $5)
+                    `, [orden, hora, minutos_espera, id_horario, tipo_accion.split("=")[0]]);
                     res.jsonp({ message: 'correcto' });
                 }
             }));

@@ -229,7 +229,7 @@ export class ListarSolicitudComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
-      this.lista_solicitudes_filtradas.forEach(row => this.selectionUno.select(row));
+      this.lista_solicitudes_filtradas.forEach((row: any) => this.selectionUno.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
@@ -355,7 +355,7 @@ export class ListarSolicitudComponent implements OnInit {
   masterToggleEstado() {
     this.isAllSelectedEstado() ?
       this.selectionUnoEstado.clear() :
-      this.solicitudesAutorizadas_filtradas.forEach(row => this.selectionUnoEstado.select(row));
+      this.solicitudesAutorizadas_filtradas.forEach((row: any) => this.selectionUnoEstado.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA..

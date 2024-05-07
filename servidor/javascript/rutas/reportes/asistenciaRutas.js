@@ -12,7 +12,6 @@ class AsistenciaRutas {
         this.configuracion();
     }
     configuracion() {
-        this.router.get('/:id_empleado/:desde/:hasta', verificarToken_1.TokenValidation, asistenciaControlador_1.default.ObtenerHorasTrabajadas);
         this.router.get('/lista-empleados/:id_empresa', verificarToken_1.TokenValidation, asistenciaControlador_1.default.ObtenerListaEmpresa);
     }
 }

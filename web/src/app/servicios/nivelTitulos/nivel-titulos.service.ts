@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -17,8 +18,8 @@ export class NivelTitulosService {
   }
 
   // ELIMIAR REGISTRO
-  EliminarNivel(id: number) {
-    return this.http.delete(`${environment.url}/nivel-titulo/eliminar/${id}`);
+  EliminarNivel(id: any) {
+    return this.http.delete(`${environment.url}/nivel-titulo/eliminar/${id}`).pipe(catchError(id));
   }
 
   // METODO PARA CREAR ARCHIVO XML

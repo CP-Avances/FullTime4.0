@@ -75,10 +75,10 @@ export class PlantillaReportesService {
     if (p === null || s === null) {
       // BUSCAR DATOS DE COLORES
       this.http.get(`${environment.url}/empresas/buscar/datos/${id}`).subscribe(res => {
-        this.setColorPrimary(res[0].color_p);
-        this.setColorSecondary(res[0].color_s);
-        sessionStorage.setItem('p_color', res[0].color_p)
-        sessionStorage.setItem('s_color', res[0].color_s)
+        this.setColorPrimary(res[0].color_principal);
+        this.setColorSecondary(res[0].color_secundario);
+        sessionStorage.setItem('p_color', res[0].color_principal)
+        sessionStorage.setItem('s_color', res[0].color_secundario)
       }, err => {
         // QUITAR DATOS DE COLORES
         sessionStorage.removeItem('p_color');

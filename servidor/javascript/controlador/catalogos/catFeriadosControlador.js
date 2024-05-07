@@ -18,13 +18,12 @@ const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const builder = require('xmlbuilder');
 class FeriadosControlador {
     // CONSULTA DE LISTA DE FERIADOS ORDENADOS POR SU DESCRIPCION
     ListarFeriados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const FERIADOS = yield database_1.default.query(`
-            SELECT * FROM cg_feriados ORDER BY descripcion ASC
+            SELECT * FROM ef_cat_feriados ORDER BY descripcion ASC
             `);
             if (FERIADOS.rowCount > 0) {
                 return res.jsonp(FERIADOS.rows);
@@ -39,7 +38,7 @@ class FeriadosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
             yield database_1.default.query(`
-            DELETE FROM cg_feriados WHERE id = $1
+            DELETE FROM ef_cat_feriados WHERE id = $1
             `, [id]);
             res.jsonp({ text: 'Registro eliminado.' });
         });
@@ -50,7 +49,7 @@ class FeriadosControlador {
             try {
                 const { fecha, descripcion, fec_recuperacion } = req.body;
                 const response = yield database_1.default.query(`
-                INSERT INTO cg_feriados (fecha, descripcion, fec_recuperacion) 
+                INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
                 VALUES ($1, $2, $3) RETURNING *
                 `, [fecha, descripcion, fec_recuperacion]);
                 const [feriado] = response.rows;
@@ -71,7 +70,7 @@ class FeriadosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
             const FERIADOS = yield database_1.default.query(`
-            SELECT * FROM cg_feriados WHERE NOT id = $1
+            SELECT * FROM ef_cat_feriados WHERE NOT id = $1
             `, [id]);
             if (FERIADOS.rowCount > 0) {
                 return res.jsonp(FERIADOS.rows);
@@ -87,7 +86,7 @@ class FeriadosControlador {
             try {
                 const { fecha, descripcion, fec_recuperacion, id } = req.body;
                 yield database_1.default.query(`
-                UPDATE cg_feriados SET fecha = $1, descripcion = $2, fec_recuperacion = $3
+                UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
                 WHERE id = $4
                 `, [fecha, descripcion, fec_recuperacion, id]);
                 res.jsonp({ message: 'Registro actualizado.' });
@@ -102,7 +101,7 @@ class FeriadosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const FERIADO = yield database_1.default.query(`
-            SELECT * FROM cg_feriados WHERE id = $1
+            SELECT * FROM ef_cat_feriados WHERE id = $1
             `, [id]);
             if (FERIADO.rowCount > 0) {
                 return res.jsonp(FERIADO.rows);
@@ -116,8 +115,9 @@ class FeriadosControlador {
             try {
                 const { fecha_inicio, fecha_final, id_empleado } = req.body;
                 const FERIADO = yield database_1.default.query(`
-                SELECT f.fecha, f.fec_recuperacion, cf.id_ciudad, c.descripcion, s.nombre
-                FROM cg_feriados AS f, ciud_feriados AS cf, ciudades AS c, sucursales AS s, datos_actuales_empleado AS de
+                SELECT f.fecha, f.fecha_recuperacion, cf.id_ciudad, c.descripcion, s.nombre
+                FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s, 
+                    datos_actuales_empleado AS de
                 WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
                     AND s.id_ciudad = cf.id_ciudad AND de.id_sucursal = s.id AND de.id = $3
                 `, [fecha_inicio, fecha_final, id_empleado]);
@@ -139,11 +139,12 @@ class FeriadosControlador {
             try {
                 const { fecha_inicio, fecha_final, id_empleado } = req.body;
                 const FERIADO = yield database_1.default.query(`
-                SELECT f.fecha, f.fec_recuperacion, cf.id_ciudad, c.descripcion, s.nombre
-                FROM cg_feriados AS f, ciud_feriados AS cf, ciudades AS c, sucursales AS s, datos_actuales_empleado AS de
+                SELECT f.fecha, f.fecha_recuperacion, cf.id_ciudad, c.descripcion, s.nombre
+                FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s, 
+                    datos_actuales_empleado AS de
                 WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
                     AND s.id_ciudad = cf.id_ciudad AND de.id_sucursal = s.id AND de.id = $3
-                    AND f.fec_recuperacion IS NOT null
+                    AND f.fecha_recuperacion IS NOT null
                 `, [fecha_inicio, fecha_final, id_empleado]);
                 if (FERIADO.rowCount > 0) {
                     return res.jsonp(FERIADO.rows);
@@ -217,8 +218,10 @@ class FeriadosControlador {
                     }
                     if (fecha_correcta == true) {
                         // VERIFICACIÓN SI LA FECHA DEL FERIADO NO ESTE REGISTRADA EN EL SISTEMA
-                        const VERIFICAR_FECHA = yield database_1.default.query('SELECT * FROM cg_feriados ' +
-                            'WHERE fecha = $1 OR fec_recuperacion = $1', [data.fecha]);
+                        const VERIFICAR_FECHA = yield database_1.default.query(`
+                        SELECT * FROM ef_cat_feriados 
+                        WHERE fecha = $1 OR fecha_recuperacion = $1
+                        `, [data.fecha]);
                         data.fila = dato.item;
                         data.fecha = dato.fecha;
                         data.descripcion = dato.descripcion;
@@ -363,13 +366,16 @@ class FeriadosControlador {
             listFeriados_ciudades.forEach((value) => __awaiter(this, void 0, void 0, function* () {
                 if (value.provincia != 'No registrado') {
                     //consultamos la id la provincia para validar que exista la ciudad registrada
-                    var OBTENER_IDPROVINCI = yield database_1.default.query('SELECT id FROM cg_provincias WHERE UPPER(nombre) = $1', [value.provincia.toUpperCase()]);
+                    var OBTENER_IDPROVINCI = yield database_1.default.query(`
+                    SELECT id FROM e_provincias WHERE UPPER(nombre) = $1
+                    `, [value.provincia.toUpperCase()]);
                     if (OBTENER_IDPROVINCI.rows[0] != undefined && OBTENER_IDPROVINCI.rows[0] != '') {
                         var id_provincia = OBTENER_IDPROVINCI.rows[0].id;
                         if (value.ciudad != 'No registrado') {
-                            var VERIFICAR_CIUDAD = yield database_1.default.query('SELECT * FROM ciudades WHERE id_provincia = $1 AND UPPER(descripcion) = $2', [id_provincia, value.ciudad.toUpperCase()]);
+                            var VERIFICAR_CIUDAD = yield database_1.default.query(`
+                            SELECT * FROM e_ciudades WHERE id_provincia = $1 AND UPPER (descripcion) = $2
+                            `, [id_provincia, value.ciudad.toUpperCase()]);
                             if (VERIFICAR_CIUDAD.rows[0] != undefined && VERIFICAR_CIUDAD.rows[0] != '') {
-                                //var VERIFICAR_FERICIUDAD = await pool.query('SELECT * FROM'); 
                                 value.observacion = 'registrado';
                             }
                             else {
@@ -455,8 +461,8 @@ class FeriadosControlador {
                     // Datos que se leen de la plantilla ingresada
                     const { provincia, ciudad, feriado, observacion } = data;
                     //Obtener id de la ciudad
-                    const id_ciudad = yield database_1.default.query('SELECT id FROM ciudades WHERE UPPER(descripcion) = $1', [ciudad.toUpperCase()]);
-                    const id_feriado = yield database_1.default.query;
+                    const id_ciudad = yield database_1.default.query('SELECT id FROM e_ciudades WHERE UPPER(descripcion) = $1', [ciudad.toUpperCase()]);
+                    const id_feriado = yield database_1.default.query('SELECT id FROM ef_cat_feriados WHERE UPPER(descripcion) = $1', [feriado.toUpperCase()]);
                     // Registro de los datos
                     const response = yield database_1.default.query(`INSERT INTO ciud_feriados (id_feriado, id_ciudad) VALUES ($1, $2) RETURNING *
                     `, [id_feriado, id_ciudad]);
@@ -588,8 +594,10 @@ class FeriadosControlador {
                     recuperar = fec_recuperacion;
                 }
                 // REGISTRO DE DATOS EN EL SISTEMA
-                yield database_1.default.query('INSERT INTO cg_feriados (fecha, descripcion, fec_recuperacion) ' +
-                    'VALUES ($1, $2, $3)', [fecha, descripcion, recuperar]);
+                yield database_1.default.query(`
+                INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
+                VALUES ($1, $2, $3)
+                `, [fecha, descripcion, recuperar]);
                 // ENVIO DE MENSAJE UNA VEZ QUE SE HA LEIDO TODOS LOS DATOS DE LA PLANTILLA
                 if (contador === plantilla.length) {
                     return res.jsonp({ message: 'CORRECTO' });

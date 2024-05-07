@@ -341,7 +341,7 @@ export class AsignarUsuarioComponent implements OnInit {
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionAsignados.clear() :
-      this.asignados.forEach(row => this.selectionAsignados.select(row));
+      this.asignados.forEach((row: any) => this.selectionAsignados.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA

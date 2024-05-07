@@ -50,7 +50,6 @@ const horaExtraRutas_1 = __importDefault(require("./rutas/horaExtra/horaExtraRut
 const birthdayRutas_1 = __importDefault(require("./rutas/birthday/birthdayRutas"));
 const kardexVacacionesRutas_1 = __importDefault(require("./rutas/reportes/kardexVacacionesRutas"));
 const asistenciaRutas_1 = __importDefault(require("./rutas/reportes/asistenciaRutas"));
-const cargaMultipleRutas_1 = __importDefault(require("./rutas/cargaMultiple/cargaMultipleRutas"));
 const reportesRutas_1 = __importDefault(require("./rutas/reportes/reportesRutas"));
 const planHoraExtraRutas_1 = __importDefault(require("./rutas/planHoraExtra/planHoraExtraRutas"));
 const datosGeneralesRutas_1 = __importDefault(require("./rutas/datosGenerales/datosGeneralesRutas"));
@@ -192,8 +191,6 @@ class Servidor {
         this.app.use('/alimentacion', alimentacionRutas_1.default); // acceso controlado por ModuloAlimentacionValidation
         // HORAS EXTRAS
         this.app.use('/planificacionHoraExtra', planHoraExtraRutas_1.default); // acceso controlado por ModuloHoraExtraValidation
-        // CARGA MULTIPLE
-        this.app.use('/cargaMultiple', cargaMultipleRutas_1.default);
         // DATOS GENERALES QUE COMPARTEN VARIOS ARCHIVOS
         this.app.use('/generalidades', datosGeneralesRutas_1.default);
         // GRAFICAS PARA MOSTRAR EN EL HOME
@@ -224,11 +221,11 @@ class Servidor {
             socket.on("nueva_notificacion", (data) => {
                 let data_llega = {
                     id: data.id,
-                    id_send_empl: data.id_send_empl,
-                    id_receives_empl: data.id_receives_empl,
-                    id_receives_depa: data.id_receives_depa,
+                    id_send_empl: data.id_empleado_envia,
+                    id_receives_empl: data.id_empleado_recibe,
+                    id_receives_depa: data.id_departamento_recibe,
                     estado: data.estado,
-                    create_at: data.create_at,
+                    create_at: data.fecha_hora,
                     id_permiso: data.id_permiso,
                     id_vacaciones: data.id_vacaciones,
                     id_hora_extra: data.id_hora_extra,
@@ -244,8 +241,8 @@ class Servidor {
                 let data_llega = {
                     id: data.id,
                     create_at: data.create_at,
-                    id_send_empl: data.id_send_empl,
-                    id_receives_empl: data.id_receives_empl,
+                    id_send_empl: data.id_empleado_envia,
+                    id_receives_empl: data.id_empleado_recibe,
                     visto: data.visto,
                     descripcion: data.descripcion,
                     id_timbre: data.id_timbre,
@@ -264,8 +261,6 @@ SERVIDOR.start();
 const sendBirthday_1 = require("./libs/sendBirthday");
 const avisoVacaciones_1 = require("./libs/avisoVacaciones");
 const ContarHoras_1 = require("./libs/ContarHoras");
-const NotiTimbres_1 = require("./libs/NotiTimbres");
-const SinTimbres_1 = require("./libs/SinTimbres");
 const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
 // LLAMA AL MEODO DE CUMPLEAÑOS
 (0, sendBirthday_1.cumpleanios)();
@@ -276,7 +271,5 @@ const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
 (0, avisoVacaciones_1.Peri_Vacacion_Automatico)();
 (0, ContarHoras_1.RegistrarAsistenciaByTimbres)();
 // ----------// conteoPermisos();
-(0, NotiTimbres_1.NotificacionTimbreAutomatica)();
-(0, SinTimbres_1.NotificacionSinTimbres)();
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
 //generarTimbres('35', '2023-11-01', '2023-11-02');

@@ -113,7 +113,7 @@ export class ListaEmpleadosComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
-      this.empleado.forEach(row => this.selectionUno.select(row));
+      this.empleado.forEach((row: any) => this.selectionUno.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -177,7 +177,7 @@ export class ListaEmpleadosComponent implements OnInit {
   masterToggleDos() {
     this.isAllSelectedDos() ?
       this.selectionDos.clear() :
-      this.desactivados.forEach(row => this.selectionDos.select(row));
+      this.desactivados.forEach((row: any) => this.selectionDos.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -253,8 +253,8 @@ export class ListaEmpleadosComponent implements OnInit {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -774,7 +774,7 @@ export class ListaEmpleadosComponent implements OnInit {
                 { text: 'Nacionalidad', style: 'tableHeader' },
               ],
               ...arreglo.map(obj => {
-                var estadoCivil = this.EstadoCivilSelect[obj.esta_civil - 1];
+                var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
                 var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
                 let nacionalidad;
@@ -788,7 +788,7 @@ export class ListaEmpleadosComponent implements OnInit {
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.apellido, style: 'itemsTable' },
                   { text: obj.cedula, style: 'itemsTableD' },
-                  { text: obj.fec_nacimiento.split("T")[0], style: 'itemsTableD' },
+                  { text: obj.fecha_nacimiento.split("T")[0], style: 'itemsTableD' },
                   { text: obj.correo, style: 'itemsTableD' },
                   { text: genero, style: 'itemsTableD' },
                   { text: estadoCivil, style: 'itemsTableD' },
@@ -835,8 +835,8 @@ export class ListaEmpleadosComponent implements OnInit {
         CEDULA: obj.cedula,
         APELLIDO: obj.apellido,
         NOMBRE: obj.nombre,
-        FECHA_NACIMIENTO: obj.fec_nacimiento.split("T")[0],
-        ESTADO_CIVIL: this.EstadoCivilSelect[obj.esta_civil - 1],
+        FECHA_NACIMIENTO: obj.fecha_nacimiento.split("T")[0],
+        ESTADO_CIVIL: this.EstadoCivilSelect[obj.estado_civil - 1],
         GENERO: this.GeneroSelect[obj.genero - 1],
         CORREO: obj.correo,
         ESTADO: this.EstadoSelect[obj.estado - 1],
@@ -872,7 +872,7 @@ export class ListaEmpleadosComponent implements OnInit {
     var objeto: any;
     var arregloEmpleado: any = [];
     arreglo.forEach(obj => {
-      var estadoCivil = this.EstadoCivilSelect[obj.esta_civil - 1];
+      var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
       var genero = this.GeneroSelect[obj.genero - 1];
       var estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
@@ -890,7 +890,7 @@ export class ListaEmpleadosComponent implements OnInit {
           "estadoCivil": estadoCivil,
           "genero": genero,
           "correo": obj.correo,
-          "fechaNacimiento": obj.fec_nacimiento.split("T")[0],
+          "fechaNacimiento": obj.fecha_nacimiento.split("T")[0],
           "estado": estado,
           "domicilio": obj.domicilio,
           "telefono": obj.telefono,
@@ -952,8 +952,8 @@ export class ListaEmpleadosComponent implements OnInit {
         CEDULA: obj.cedula,
         APELLIDO: obj.apellido,
         NOMBRE: obj.nombre,
-        FECHA_NACIMIENTO: obj.fec_nacimiento.split("T")[0],
-        ESTADO_CIVIL: this.EstadoCivilSelect[obj.esta_civil - 1],
+        FECHA_NACIMIENTO: obj.fecha_nacimiento.split("T")[0],
+        ESTADO_CIVIL: this.EstadoCivilSelect[obj.estado_civil - 1],
         GENERO: this.GeneroSelect[obj.genero - 1],
         CORREO: obj.correo,
         ESTADO: this.EstadoSelect[obj.estado - 1],

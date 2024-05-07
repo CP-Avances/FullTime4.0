@@ -30,15 +30,7 @@ export class RolesService {
     console.log(data);
     return this.http.post(`${environment.url}/rol`, data);
   }
-
-
-
-
-
-
-
   
-
   // Roles
 
 

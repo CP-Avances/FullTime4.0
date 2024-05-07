@@ -1,7 +1,7 @@
 export interface ITiempoLaboral{
     datos: any[]
     id_horario: number,
-    min_almuerzo: number,
+    minutos_comida: number,
 }
 
 export interface IAsistenciaDetalle  {

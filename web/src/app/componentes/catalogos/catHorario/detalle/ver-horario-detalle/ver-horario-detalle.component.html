@@ -27,7 +27,7 @@
                     <div class="col-md">
                         <div class="espacio d-flex justify-content-start">
                             <label id="datosF">Minutos alimentación:</label>
-                            <label>{{h.min_almuerzo}} min.</label>
+                            <label>{{h.minutos_comida}} min.</label>
                         </div>
                         <div class="espacio d-flex justify-content-start">
                             <label id="datosF">Horario nocturno:</label>
@@ -91,14 +91,14 @@
                                 <tr *ngFor="let dh of detalles | paginate:tamanio_pagina:numero_pagina">
                                     <td>{{dh.orden}}</td>
                                     <td>{{dh.hora_}}</td>
-                                    <td>{{dh.minu_espera}}</td>
+                                    <td>{{dh.tolerancia}}</td>
                                     <td>{{dh.tipo_accion_show}}</td>
                                     <td *ngIf="dh.segundo_dia === false && dh.tercer_dia === false">
                                     </td>
                                     <td *ngIf="dh.segundo_dia === true">SI</td>
                                     <td *ngIf="dh.tercer_dia === true">SI</td>
-                                    <td>{{dh.min_antes}}</td>
-                                    <td>{{dh.min_despues}}</td>
+                                    <td>{{dh.minutos_antes}}</td>
+                                    <td>{{dh.minutos_despues}}</td>
                                     <td>
                                         <i id="editarI" (click)="AbrirVentanaEditarDetalle(dh)" matSuffix
                                             matTooltipPosition="right" matTooltip="Modificar datos de este registro."

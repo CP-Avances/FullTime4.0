@@ -334,7 +334,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
-      this.lista_HorasExtras.forEach(row => this.selectionUno.select(row));
+      this.lista_HorasExtras.forEach((row: any) => this.selectionUno.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
@@ -537,7 +537,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   masterToggleObserva() {
     this.isAllSelectedObserva() ?
       this.selectionUnoObserva.clear() :
-      this.listaHorasExtrasObservaFiltradas.forEach(row => this.selectionUnoObserva.select(row));
+      this.listaHorasExtrasObservaFiltradas.forEach((row: any) => this.selectionUnoObserva.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
