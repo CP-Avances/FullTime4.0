@@ -2092,6 +2092,7 @@ export class MainNavComponent implements OnInit {
               //guardado de datosPaginaRol
               sessionStorage.setItem('paginaRol', JSON.stringify(this.datosPaginaRol));
 
+              //FIXME
               //Armado de json con elementos de menu COMPLETE
               this.menuGeneralUsuarios = [
                 {

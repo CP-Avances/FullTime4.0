@@ -46,7 +46,7 @@ export class TipoPermisosService {
 
   // LISTAR PERMISOS DE ACUERDO AL ROL
   ListarTipoPermisoRol(access: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/tipoPermisos ${access}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/tipoPermisos/${access}`);
   }
 
 }
