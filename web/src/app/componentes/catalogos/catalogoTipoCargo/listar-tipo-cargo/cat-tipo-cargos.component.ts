@@ -5,11 +5,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
-import { MetodosComponent } from '../../administracionGeneral/metodoEliminar/metodos.component';
+import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/metodos.component';
 import { PageEvent } from '@angular/material/paginator';
 import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
-import { RegistrarCargoComponent } from './registrarCargo/registrar-cargo/registrar-cargo.component';
-import { EditarCargosComponent } from './editarCargo/editar-cargo/editar-cargo.component';
+import { RegistrarCargoComponent } from '../registrar-cargo/registrar-cargo.component';
+import { EditarTipoCargoComponent } from '../editar-tipo-cargo/editar-tipo-cargo.component';
+
 
 @Component({
   selector: 'app-cat-tipo-cargos',
@@ -76,7 +77,7 @@ export class CatTipoCargosComponent {
       });
   }
   AbrirEditar(item_cargo: any): void{
-    this.ventana.open(EditarCargosComponent, { width: '450px', data: item_cargo })
+    this.ventana.open(EditarTipoCargoComponent, { width: '450px', data: item_cargo })
       .afterClosed().subscribe(items => {
         this.ngOnInit();
       });
