@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Location } from '@angular/common';
 import { RolPermisosService } from 'src/app/servicios/catalogos/catRolPermisos/rol-permisos.service';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
@@ -15,8 +15,7 @@ import { map } from 'rxjs/operators';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
-
-
+import { VistaRolesComponent } from '../vista-roles/vista-roles.component';
 
 
 interface Funciones {
@@ -38,9 +37,10 @@ interface Etiquetas {
   styleUrls: ['./seleccionar-rol-permiso.component.css'],
   //encapsulation: ViewEncapsulation.None,
 })
+
 export class SeleccionarRolPermisoComponent implements OnInit {
 
-
+  @Input() id_rol: number;
 
   // BUSQUEDA DE FUNCIONES ACTIVAS
   get geolocalizacion(): boolean { return this.varificarFunciones.geolocalizacion; }
@@ -131,7 +131,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     { value: 'para eliminar información' }
   ];
 
-  idRol: string;
+
   idPermiso: string;
   guardarRol: any = [];
   guardarRoles: any = [];
@@ -168,6 +168,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     private validar: ValidacionesService,
 
     public ventana: MatDialog,
+    public componenter: VistaRolesComponent,
 
 
 
@@ -182,16 +183,16 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
   ) {
-    // codigo para obtner el id del rol seleccionado
-    var url = this.location.prepareExternalUrl(this.location.path());
-    this.idRol = url.split('/')[2];
-    // codigo para obtener el nombre del rol
-    this.rol.getOneRol(parseInt(this.idRol)).subscribe(data => {
-      this.nombreRol = data[0].nombre.toUpperCase();
-    })
+
+
   }
 
   ngOnInit(): void {
+    console.log('id rol ---', this.id_rol)
+    this.rol.getOneRol(this.id_rol).subscribe(data => {
+      this.nombreRol = data[0].nombre.toUpperCase();
+    })
+
     this.limpliarCampos();
     // this.obtenerPermisosRolUsuario();
     this.ObtenerMenu();
@@ -230,6 +231,12 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.ObtenerTodasModulosAcciones();
 
 
+  }
+
+  // METODO PARA VER LISTA DE ROLES DEL SISTEMA
+  VerRoles() {
+    this.componenter.ver_funciones = false;
+    this.componenter.ver_roles = true;
   }
 
   ManejarPagina(e: PageEvent) {
@@ -277,7 +284,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       this.idPermiso = this.guardarRol.id;
 
       let dataPermisoDenegado = {
-        id_rol: this.idRol,
+        id_rol: this.id_rol,
         id_permiso: this.idPermiso
       };
 
@@ -294,7 +301,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   obtenerPermisosRolUsuario() {
     this.guardarRoles = [];
 
-    this.rest.getPermisosUsuarioRolRest(parseInt(this.idRol)).subscribe(res => {
+    this.rest.getPermisosUsuarioRolRest(this.id_rol).subscribe(res => {
       this.guardarRoles = res;
     }, error => {
       console.log(error);
@@ -795,7 +802,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             this.accionesSeleccionadasPorPagina[obj.id].map(accion => {
               var buscarPagina = {
                 funcion: obj.nombre,
-                id_rol: this.idRol,
+                id_rol: this.id_rol,
                 id_accion: accion.id
               };
 
@@ -819,7 +826,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
                     funcion: obj.nombre,
                     link: obj.link,
-                    id_rol: this.idRol,
+                    id_rol: this.id_rol,
                     id_accion: accion.id
                   }
                   this.contador = this.contador + 1;
@@ -870,13 +877,13 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
           var buscarPagina = {
             funcion: obj.nombre,
-            id_rol: this.idRol
+            id_rol: this.id_rol
           };
           var rolPermisosbody = {
 
             funcion: obj.nombre,
             link: obj.link,
-            id_rol: this.idRol,
+            id_rol: this.id_rol,
             id_accion: null
           }
           this.rest.BuscarIdPaginas(buscarPagina).subscribe(datos => {
@@ -935,7 +942,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       );
 
       var rol = {
-        id_rol: this.idRol
+        id_rol: this.id_rol
       };
 
 
@@ -980,7 +987,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
               var buscarPagina = {
                 funcion: obj.nombre,
-                id_rol: this.idRol,
+                id_rol: this.id_rol,
                 id_accion: accion.id
               };
 
@@ -1002,7 +1009,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                   var rolPermisosbody = {
                     funcion: obj.nombre,
                     link: obj.link,
-                    id_rol: this.idRol,
+                    id_rol: this.id_rol,
                     id_accion: accion.id
                   }
 
@@ -1051,13 +1058,13 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
           var buscarPagina = {
             funcion: obj.nombre,
-            id_rol: this.idRol
+            id_rol: this.id_rol
           };
 
           var rolPermisosbody = {
             funcion: obj.nombre,
             link: obj.link,
-            id_rol: this.idRol,
+            id_rol: this.id_rol,
             id_accion: null
           }
 
@@ -1119,7 +1126,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       })
 
       var rol = {
-        id_rol: this.idRol
+        id_rol: this.id_rol
       }
 
     } else {
@@ -1142,7 +1149,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
     this.paginas = [];
     var buscarPagina = {
-      id_rol: this.idRol
+      id_rol: this.id_rol
     };
     this.rest.BuscarPaginasRol(buscarPagina).subscribe(datos => {
       this.paginas = datos;
@@ -1251,7 +1258,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     )
 
 
-   // this.MostrarPaginasRol();
+    // this.MostrarPaginasRol();
 
     console.log("Paginas eliminadas", this.paginasEliminar);
 
@@ -1268,7 +1275,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
           if (this.paginasEliminar.length != 0) {
             this.EliminarPaginaRol();
-            
+
             this.activar_seleccion = true;
             this.plan_multiple = false;
             this.plan_multiple_ = false;
@@ -1282,12 +1289,10 @@ export class SeleccionarRolPermisoComponent implements OnInit {
           }
 
 
-        } else {
-          this.router.navigate(['/seleccionarPermisos', this.idRol]);
         }
       });
 
-     // this.MostrarPaginasRol();
+    // this.MostrarPaginasRol();
 
   }
 

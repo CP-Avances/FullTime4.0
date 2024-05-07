@@ -2,17 +2,16 @@
 import { FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+import * as moment from 'moment';
+import * as xml2js from 'xml2js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
 
 // IMPORTACION DE COMPONENTES
 import { RegistroRolComponent } from 'src/app/componentes/catalogos/catRoles/registro-rol/registro-rol.component';
@@ -32,6 +31,9 @@ import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service
 })
 
 export class VistaRolesComponent implements OnInit {
+
+  ver_roles: boolean = true;
+  ver_funciones: boolean = false;
 
   filtroRoles = ''; // VARIABLE DE BUSQUEDA DE DATOS
   idEmpleado: number; // VARIABLE DE ID DE EMPLEADO QUE INICIA SESIÓN
@@ -157,6 +159,16 @@ export class VistaRolesComponent implements OnInit {
     }
     array.sort(compare);
   }
+
+  // METODO PARA ABRIR PAGINA LISTA DE FUNCIONES
+  rol_id: number = 0;
+  VerFunciones(id_rol: number) {
+    this.rol_id = id_rol;
+    console.log('ver rol --- ', this.rol_id)
+    this.ver_roles = false;
+    this.ver_funciones = true;
+  }
+
 
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
