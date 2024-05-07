@@ -137,7 +137,7 @@ class RolPermisosControlador {
 
   // METODO PARA ASIGNAR PERMISOS AL ROL
   public async AsignarPaginaRol(req: Request, res: Response) {
-    try {
+    //try {
       const { funcion, link, id_rol, id_accion } = req.body;
       const response: QueryResult = await pool.query(
         `
@@ -153,9 +153,9 @@ class RolPermisosControlador {
       else {
         return res.status(404).jsonp({ message: 'error' })
       }
-    } catch (error) {
-      return res.status(500).jsonp({ message: 'error' })
-    }
+   // } catch (error) {
+     // return res.status(500).jsonp({ message: 'error' })
+    //}
 
   }
 
@@ -229,7 +229,7 @@ class RolPermisosControlador {
     const { id_funcion } = req.body;
     const PAGINA_ROL = await pool.query(
       `
-          SELECT * FROM es_acciones_paginas WHERE id_funcion = $1 
+          SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
           `
       , [id_funcion]);
     if (PAGINA_ROL.rowCount > 0) {
