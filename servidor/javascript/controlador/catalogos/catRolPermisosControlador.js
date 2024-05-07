@@ -187,7 +187,7 @@ class RolPermisosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_funcion } = req.body;
             const PAGINA_ROL = yield database_1.default.query(`
-          SELECT * FROM cg_acciones_roles WHERE id_funcion = $1 
+          SELECT * FROM es_acciones_paginas WHERE id_funcion = $1 
           `, [id_funcion]);
             if (PAGINA_ROL.rowCount > 0) {
                 return res.jsonp(PAGINA_ROL.rows);
