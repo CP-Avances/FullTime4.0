@@ -63,7 +63,7 @@ class FeriadosRuta {
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catFeriadosControlador_1.default.RevisarDatos);
         this.router.post('/upload/revision_data', [verificarToken_1.TokenValidation, upload.single('uploads')], catFeriadosControlador_1.default.RevisarDatos_Duplicados);
         this.router.post('/upload', [verificarToken_1.TokenValidation, upload.single('uploads')], catFeriadosControlador_1.default.CrearFeriadoPlantilla);
-        this.router.post('/upload/revisionFeriadoCiudad', [verificarToken_1.TokenValidation, upload1.single('uploads')], catFeriadosControlador_1.default.RivisarDatosFeriado_Ciudad);
+        this.router.post('/upload/crearFeriadoCiudad', [verificarToken_1.TokenValidation, upload1.single('uploads')], catFeriadosControlador_1.default.RegistrarFeriado_Ciudad);
     }
 }
 const FERIADOS_RUTA = new FeriadosRuta();

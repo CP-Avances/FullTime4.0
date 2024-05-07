@@ -369,6 +369,7 @@ class FeriadosControlador {
                         if (value.ciudad != 'No registrado') {
                             var VERIFICAR_CIUDAD = yield database_1.default.query('SELECT * FROM ciudades WHERE id_provincia = $1 AND UPPER(descripcion) = $2', [id_provincia, value.ciudad.toUpperCase()]);
                             if (VERIFICAR_CIUDAD.rows[0] != undefined && VERIFICAR_CIUDAD.rows[0] != '') {
+                                //var VERIFICAR_FERICIUDAD = await pool.query('SELECT * FROM'); 
                                 value.observacion = 'registrado';
                             }
                             else {
@@ -444,105 +445,23 @@ class FeriadosControlador {
         });
     }
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
-    RivisarDatosFeriado_Ciudad(req, res) {
-        var _a;
+    RegistrarFeriado_Ciudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
-                let separador = path_1.default.sep;
-                let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas1)() + separador + documento;
-                const workbook = xlsx_1.default.readFile(ruta);
-                const sheet_name_list = workbook.SheetNames;
-                const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[1]]);
-                let data = {
-                    fila: '',
-                    provincia: '',
-                    ciudad: '',
-                    feriado: '',
-                    observacion: ''
-                };
-                var listFeriados_ciudades = [];
-                var duplicados = [];
-                var mensaje = 'correcto';
-                // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                    var { item, provincia, ciudad, feriado } = dato;
-                    if ((item != undefined && item != '') &&
-                        (provincia != undefined) && (provincia != '') &&
-                        (ciudad != undefined) && (ciudad != '') &&
-                        (feriado != undefined) && (feriado != '')) {
-                        data.fila = item;
-                        data.provincia = provincia;
-                        data.ciudad = ciudad;
-                        data.feriado = feriado;
-                        data.observacion = 'registrado';
-                        listFeriados_ciudades.push(data);
-                    }
-                    else {
-                        data.fila = item;
-                        data.provincia = provincia;
-                        data.ciudad = ciudad;
-                        data.feriado = feriado;
-                        data.observacion = 'no registrado';
-                        if (data.fila == '' || data.fila == undefined) {
-                            data.fila = 'error';
-                            mensaje = 'error';
-                        }
-                        if (provincia == undefined) {
-                            data.provincia = 'No registrado';
-                            data.observacion = 'Provincia ' + data.observacion;
-                        }
-                        if (ciudad == undefined) {
-                            data.ciudad = 'No registrado';
-                            data.observacion = 'Ciudad ' + data.observacion;
-                        }
-                        if (feriado == undefined) {
-                            data.feriado = 'No registrado';
-                            data.observacion = 'Feriado ' + data.observacion;
-                        }
-                        listFeriados_ciudades.push(data);
-                    }
-                    data = {};
+                const plantilla = req.body;
+                console.log('datos manual: ', plantilla);
+                var contador = 1;
+                plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
+                    // Datos que se leen de la plantilla ingresada
+                    const { provincia, ciudad, feriado, observacion } = data;
+                    //Obtener id de la ciudad
+                    const id_ciudad = yield database_1.default.query('SELECT id FROM ciudades WHERE UPPER(descripcion) = $1', [ciudad.toUpperCase()]);
+                    const id_feriado = yield database_1.default.query;
+                    // Registro de los datos
+                    const response = yield database_1.default.query(`INSERT INTO ciud_feriados (id_feriado, id_ciudad) VALUES ($1, $2) RETURNING *
+                    `, [id_feriado, id_ciudad]);
+                    const [ciudad_feria] = response.rows;
                 }));
-                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                    if (err) {
-                    }
-                    else {
-                        // ELIMINAR DEL SERVIDOR
-                        fs_1.default.unlinkSync(ruta);
-                    }
-                });
-                setTimeout(() => {
-                    listFeriados_ciudades.sort((a, b) => {
-                        // Compara los números de los objetos
-                        if (a.fila < b.fila) {
-                            return -1;
-                        }
-                        if (a.fila > b.fila) {
-                            return 1;
-                        }
-                        return 0; // Son iguales
-                    });
-                    var filaDuplicada = 0;
-                    listFeriados_ciudades.forEach((item) => {
-                        //Valida si los datos de la columna N son numeros.
-                        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
-                            if (item.fila == filaDuplicada) {
-                                mensaje = 'error';
-                            }
-                        }
-                        else {
-                            return mensaje = 'error';
-                        }
-                        filaDuplicada = item.fila;
-                    });
-                    if (mensaje == 'error') {
-                        listFeriados_ciudades = undefined;
-                    }
-                    return res.jsonp({ message: mensaje, data: listFeriados_ciudades });
-                }, 1500);
             }
             catch (error) {
                 console.log('error_ ', error);

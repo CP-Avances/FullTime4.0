@@ -76,9 +76,9 @@ export class FeriadosService {
   }
 
 
-  RevisarDatos_feriados_ciudad(form){
+  Crear_feriados_ciudad(form){
     console.log('form: ',form);
-    return this.http.post<any>(environment.url + '/feriados/upload/revisionFeriadoCiudad', form);
+    return this.http.post<any>(environment.url + '/feriados/upload/crearFeriadoCiudad', form);
   }
 
 }

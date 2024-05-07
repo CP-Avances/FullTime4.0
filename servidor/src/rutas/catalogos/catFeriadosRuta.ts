@@ -73,7 +73,7 @@ class FeriadosRuta {
         this.router.post('/upload/revision_data', [TokenValidation, upload.single('uploads')], FERIADOS_CONTROLADOR.RevisarDatos_Duplicados);
         this.router.post('/upload', [TokenValidation, upload.single('uploads')], FERIADOS_CONTROLADOR.CrearFeriadoPlantilla);
 
-        this.router.post('/upload/revisionFeriadoCiudad',[TokenValidation, upload1.single('uploads')], FERIADOS_CONTROLADOR.RivisarDatosFeriado_Ciudad);
+        this.router.post('/upload/crearFeriadoCiudad',[TokenValidation, upload1.single('uploads')], FERIADOS_CONTROLADOR.RegistrarFeriado_Ciudad);
 
     }
 }

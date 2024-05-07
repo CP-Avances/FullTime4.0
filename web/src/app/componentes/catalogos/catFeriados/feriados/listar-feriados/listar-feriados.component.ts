@@ -298,6 +298,7 @@ export class ListarFeriadosComponent implements OnInit {
   // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
   Revisarplantilla() {
     this.listFeriadosCorrectos = [];
+    this.listaFerediadCiudadCorrectos = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
@@ -323,6 +324,13 @@ export class ListarFeriadosComponent implements OnInit {
             this.listFeriadosCorrectos.push(item);
           }
         });
+
+        this.DataFerieados_ciudades.forEach(item => {
+          if (item.observacion.toLowerCase() == 'ok') {
+            this.listaFerediadCiudadCorrectos.push(item);
+          }
+        });
+
       }
 
     }, error => {
@@ -338,41 +346,10 @@ export class ListarFeriadosComponent implements OnInit {
 
   DataFerieados_ciudades: any = [];
   messajeExcel2: string = ''; 
-  Revisarplantilla_feriado_ciudad(){
-    let form = new FormData();
-    for (var i = 0; i < this.archivoSubido.length; i++) {
-      form.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
-    }
-
-    this.progreso = true;
-
-    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
-    setTimeout(() => {
-      this.rest.RevisarDatos_feriados_ciudad(form).subscribe(res => {
-        this.DataFerieados_ciudades = res.data;
-        this.messajeExcel2 = res.message;
-        console.log('probando plantilla1 feriados ciudad', this.DataFerieados_ciudades);
-
-        if (this.messajeExcel2 == 'error') {
-          this.toastr.error('Revisar que la numeración de la columna "item" sea correcta en FeriadoCiudad.', 'Plantilla no aceptada.', {
-            timeOut: 4500,
-          });
-          this.mostrarbtnsubir = false;
-        } else {
-          
-        }
-
-      }, error => {
-        console.log('Serivicio rest -> metodo RevisarFormato - ', error);
-        this.toastr.error('Error al cargar los datos FeriadoCiudad', 'Plantilla no aceptada', {
-          timeOut: 4000,
-        });
-        this.progreso = false;
-      }, () => {
-        this.progreso = false;
-      });
-    },500)
-    
+  Crear_feriado_ciudad(){
+    this.rest.Crear_feriados_ciudad(this.listaFerediadCiudadCorrectos).subscribe(res => {
+      console.log('respuesta: ',res);
+    });
   }
 
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
@@ -387,6 +364,7 @@ export class ListarFeriadosComponent implements OnInit {
   }
 
   listFeriadosCorrectos: any = [];
+  listaFerediadCiudadCorrectos: any = [];
   registrarFeriados() {
     var data = {
       fecha: '',
@@ -397,6 +375,8 @@ export class ListarFeriadosComponent implements OnInit {
     if (this.listFeriadosCorrectos.length > 0) {
       console.log('lista sucursales correctas: ', this.listFeriadosCorrectos);
       var cont = 0;
+      this.Crear_feriado_ciudad();
+      /*
       this.listFeriadosCorrectos.forEach(datos => {
         data.fecha = datos.fecha;
         data.descripcion = datos.descripcion;
@@ -409,6 +389,7 @@ export class ListarFeriadosComponent implements OnInit {
             })
           } else {
             if (this.listFeriadosCorrectos.length == cont) {
+              this.Crear_feriado_ciudad();
               this.toastr.success('Operación exitosa.', 'Plantilla de feriados importada.', {
                 timeOut: 10000,
               });
@@ -416,7 +397,9 @@ export class ListarFeriadosComponent implements OnInit {
           }
           this.LimpiarCampos();
         });
+
       })
+      */
     } else {
       this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
         timeOut: 4000,
@@ -490,9 +473,14 @@ export class ListarFeriadosComponent implements OnInit {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'Formato de fecha incorrecto (YYYY-MM-DD)') {
       return 'rgb(230, 176, 96)';
-    } else if (arrayObservacion[0] == 'Fecha' || arrayObservacion[0] == 'Descripción') {
+    } else if (arrayObservacion[0] == 'Fecha' || arrayObservacion[0] == 'Descripción'
+      || arrayObservacion[0] == 'Provincia' || arrayObservacion[0] == 'Ciudad'
+      || arrayObservacion[0] == 'Feriado'
+    ) {
       return 'rgb(242, 21, 21)';
-    } else {
+    }else if(observacion == 'feriado invalido'){
+      return 'rgb(238, 34, 207)';
+    }else {
       return 'white'
     }
   }
