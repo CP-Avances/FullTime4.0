@@ -972,99 +972,55 @@ export class ListaEmpleadosComponent implements OnInit {
 
   //Control Botones
   getCrearUsuarios(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Crear Usuarios');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Crear Usuarios');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getActivarDesactivarUsuarios(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Activar o desactivar Usuarios');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Activar o Desactivar Usuarios');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getPlantilla(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Plantilla' && item.id_funcion === 13));
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Cargar Plantilla Usuarios');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getVerUsuario(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Ver Usuario');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Ver Datos');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getDescargarReportes(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes' && item.id_funcion === 13));
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Descargar Reportes Usuarios');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
+
   // Metodos para la eliminacion de empleados activos e inactivos
 
   // METODOS PARA LA SELECCION MULTIPLE

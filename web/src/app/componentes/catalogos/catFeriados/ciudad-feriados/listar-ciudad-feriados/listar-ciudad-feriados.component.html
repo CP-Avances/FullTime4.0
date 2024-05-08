@@ -9,7 +9,7 @@
                 </button>
                 <span>{{f.descripcion.toUpperCase()}}</span>
                 <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                    (click)="AbrirVentanaEditarFeriado(f)">
+                    (click)="AbrirVentanaEditarFeriado(f)" *ngIf="">
                     Editar
                 </button>
             </div>
@@ -78,12 +78,12 @@
                                     <td>{{dc.nombreferiado}}</td>
                                     <td>{{dc.nombreciudad}}</td>
                                     <td>
-                                        <i *ngIf="auto_individual" id="editarI" (click)="AbrirVentanaEditarCiudad(dc)"
+                                        <i *ngIf="auto_individual && getVerFeriadoEditarCiudadFeriado()" id="editarI" (click)="AbrirVentanaEditarCiudad(dc)"
                                             matSuffix matTooltipPosition="right"
                                             matTooltip="Modificar datos de este registro" class="fas fa-edit">
                                             <p>Editar</p>
                                         </i>
-                                        <i *ngIf="auto_individual" class="far fa-trash-alt"
+                                        <i *ngIf="auto_individual  && getVerFeriadoEliminarCiudadFeriado()" class="far fa-trash-alt"
                                             (click)="ConfirmarProceso(dc, 1)" style="color:red; margin-left: 15px;"
                                             id="i-cursor" matSuffix matTooltipPosition="right"
                                             matTooltip="Eliminar registro">

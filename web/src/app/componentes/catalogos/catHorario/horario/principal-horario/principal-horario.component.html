@@ -83,9 +83,8 @@
 
 
                 <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-
                     <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                        (click)="ConfirmarDeleteMultiple()">Eliminar </button>
+                        (click)="ConfirmarDeleteMultiple()" *ngIf="getEliminarHorario()">Eliminar </button>
                 </div>
             </div>
 
@@ -162,7 +161,7 @@
                                     style="color:rgb(197, 95, 11); margin-left: 15px; text-align: center; text-decoration: none;"
                                     matSuffix matTooltipPosition="right"
                                     matTooltip="Dar click para ver o descargar el documento."
-                                    href="{{hipervinculo}}/horario/documentos/{{horario.documento}}" target="_blank">
+                                    href="{{hipervinculo}}/horario/documentos/{{horario.documento}}" target="_blank" *ngIf="getDescargarDocumento()">
                                     <p>Documento</p>
                                 </a>
                             </td>
@@ -172,7 +171,7 @@
                                     (click)="VerDetallesHorario(horario.id)">
                                     <p>Ver</p>
                                 </i>
-                                <i *ngIf="horario.detalle == true" matSuffix matTooltipPosition="right"
+                                <i *ngIf="horario.detalle == true && getCrearDetalleHorario()" matSuffix matTooltipPosition="right"
                                     matTooltip="Agregar Detalles de Horario." class="fas fa-list-alt" id="t-detalles"
                                     (click)="AbrirRegistraDetalle(horario)">
                                     <p>Detalle</p>

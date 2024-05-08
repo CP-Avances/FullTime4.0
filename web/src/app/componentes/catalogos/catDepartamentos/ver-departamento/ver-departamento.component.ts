@@ -436,6 +436,11 @@ export class VerDepartamentoComponent implements OnInit {
         if (index !== -1) {
           encontrado = true;
         }
+      }else if (contenidoDerecha === 'departamento'){
+        const index = datos.findIndex(item => item.accion === 'Ver Niveles - Añadir Nivel');
+        if (index !== -1) {
+          encontrado = true;
+        }
       }
       return encontrado;
     } else {
@@ -470,6 +475,11 @@ export class VerDepartamentoComponent implements OnInit {
         if (index !== -1) {
           encontrado = true;
         }
+      }else if (contenidoDerecha === 'departamento'){
+        const index = datos.findIndex(item => item.accion === 'Ver Niveles - Eliminar Nivel');
+        if (index !== -1) {
+          encontrado = true;
+        }
       }
 
       return encontrado;
@@ -496,12 +506,17 @@ export class VerDepartamentoComponent implements OnInit {
       }
 
       if(contenidoDerecha === 'vistaEmpresa'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Ver Autoridades1' && item.id_funcion === 1);
+        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Ver Autoridades' && item.id_funcion === 1);
         if (index !== -1) {
           encontrado = true;
         }
       }else if (contenidoDerecha === 'sucursales'){
-        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Ver Autoridades1' && item.id_funcion === 10);
+        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Ver Autoridades' && item.id_funcion === 10);
+        if (index !== -1) {
+          encontrado = true;
+        }
+      }else if (contenidoDerecha === 'departamento'){
+        const index = datos.findIndex(item => item.accion === 'Ver Niveles - Ver Autoridades');
         if (index !== -1) {
           encontrado = true;
         }

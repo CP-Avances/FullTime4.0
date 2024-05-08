@@ -134,6 +134,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log(this.habilitarPermiso);
     if (this.habilitarPermiso === false) {
       let mensaje = {
         access: false,

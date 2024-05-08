@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
 
         const usuario = await pool.query(
             `
-            SELECT codigo FROM empleados WHERE id = $1
+            SELECT codigo FROM eu_empleados WHERE id = $1
             `
             , [id]);
 

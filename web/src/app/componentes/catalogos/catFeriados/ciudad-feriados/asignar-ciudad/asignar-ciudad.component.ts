@@ -313,4 +313,15 @@ export class AsignarCiudadComponent implements OnInit {
       this.componentef.ver_ciudades = true;
     }
   }
+
+  //Control Botones
+  getAsignarCiudadFeriado(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Asignar Ciudad Feriado');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
 }

@@ -615,116 +615,82 @@ export class PrincipalHorarioComponent implements OnInit {
 
   //Control Botones
   getCrearHorario(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Crear Horario');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Crear Horario');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getVerHorario(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Ver horario');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Ver Horario');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getEditarHorario(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Editar horario');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Editar Horario');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getEliminarHorario(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Eliminar horario');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Eliminar Horario');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getPlantilla(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Plantilla' && item.id_funcion === 15));
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Cargar Plantilla Horarios');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getDescargarReportes(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes' && item.id_funcion === 15));
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Descargar Reportes Horarios');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getDescargarDocumento(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Descargar Documento Horario');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getCrearDetalleHorario(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Crear Detalle Horario');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 

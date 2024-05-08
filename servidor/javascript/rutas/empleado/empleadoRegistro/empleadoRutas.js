@@ -46,7 +46,7 @@ const storage = multer_1.default.diskStorage({
             // DATOS DOCUMENTO
             let id = req.params.id_empleado;
             const usuario = yield database_1.default.query(`
-            SELECT codigo FROM empleados WHERE id = $1
+            SELECT codigo FROM eu_empleados WHERE id = $1
             `, [id]);
             let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
             cb(null, documento);

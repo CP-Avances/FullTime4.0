@@ -90,7 +90,7 @@
                 <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                     
                     <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                        (click)="ConfirmarDeleteMultiple()">Eliminar </button>
+                        (click)="ConfirmarDeleteMultiple()" *ngIf="getEliminarDepartamento()">Eliminar </button>
                 </div>
             </div>
             <div class="table-responsive">
@@ -189,7 +189,7 @@
             <mat-paginator id="pagina" [length]="departamentos.length" [pageSize]="tamanio_pagina"
                 [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
-            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;" *ngIf="getReportesDepartamento()">
                 <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
                     matTooltipPosition="right" matTooltip="Descargar Lista de Departamentos en formato PDF.">
                     <p>PDF</p>

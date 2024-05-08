@@ -6,7 +6,7 @@
                                 Listar tipo permisos
                         </button>
                         <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                                (click)="VerFormularioEditar(p.id)">
+                                (click)="VerFormularioEditar(p.id)" *ngIf="getEditarCumpleanos()">
                                 Editar
                         </button>
                         <span>TIPO DE PERMISO <br> {{p.descripcion.toUpperCase()}}</span>
@@ -15,42 +15,42 @@
                         <div class="container" style="padding-top: 15px;">
                                 <div class="row">
                                         <div class="col-md" id="verticalLine">
-                                                <label class="col-sm col-form-label" *ngIf="p.acce_empleado == true">
+                                                <label class="col-sm col-form-label" *ngIf="p.solicita_empleado == 1">
                                                         <b>Usuario podrá solicitar permiso:</b> Sí
                                                 </label>
-                                                <label class="col-sm col-form-label" *ngIf="p.acce_empleado == false">
+                                                <label class="col-sm col-form-label" *ngIf="p.solicita_empleado == 2">
                                                         <b>Usuario podrá solicitar permiso:</b> No
                                                 </label>
                                                 <br>
                                                 <label class="col-sm col-form-label">
-                                                        <b>Horas máximas de permiso:</b> {{p.num_hora_maximo}}
+                                                        <b>Horas máximas de permiso:</b> {{p.horas_maximo_permiso}}
                                                 </label>
                                                 <br>
                                                 <label class="col-sm col-form-label">
-                                                        <b>Días máximos de permiso:</b> {{p.num_dia_maximo}} días
+                                                        <b>Días máximos de permiso:</b> {{p.dias_maximo_permiso}} días
                                                 </label>
                                                 <br>
                                                 <label class="col-sm col-form-label">
-                                                        <b>Días previos de solicitud:</b> {{p.num_dia_anticipo}} días
+                                                        <b>Días previos de solicitud:</b> {{p.dias_anticipar_permiso}} días
                                                 </label>
                                                 <br>
                                                 <label class="col-sm col-form-label">
                                                         <b>Días posteriores para solicitudes (años anteriores):</b>
-                                                        {{p.num_dia_anterior}} días
+                                                        {{p.crear_dias_anteriores}} días
                                                 </label>
                                                 <br>
                                                 <label class="col-sm col-form-label"
-                                                        *ngIf="p.gene_justificacion == true">
+                                                        *ngIf="p.justificar == true">
                                                         <b>Requiere justificación:</b> Sí
                                                 </label>
                                                 <label class="col-sm col-form-label"
-                                                        *ngIf="p.gene_justificacion == false">
+                                                        *ngIf="p.justificar == false">
                                                         <b>Requiere justificación:</b> No
                                                 </label>
-                                                <br *ngIf="p.gene_justificacion == true">
+                                                <br *ngIf="p.dias_justificar == true">
                                                 <label class="col-sm col-form-label"
-                                                        *ngIf="p.gene_justificacion == true">
-                                                        <b>Días para justificar:</b> {{p.num_dia_justifica}}
+                                                        *ngIf="p.justificar == true">
+                                                        <b>Días para justificar:</b> {{p.dias_justificar}}
                                                 </label>
                                                 <br>
                                                 <label class="col-sm col-form-label" *ngIf="p.tipo_descuento == '1'">
@@ -60,19 +60,19 @@
                                                         <b>Descuento:</b> Ninguno
                                                 </label>
                                                 <br>
-                                                <label class="col-sm col-form-label" *ngIf="p.fec_validar == true">
+                                                <label class="col-sm col-form-label" *ngIf="p.fecha_restriccion == true">
                                                         <b>Restricción por fecha:</b> Sí
                                                 </label>
-                                                <label class="col-sm col-form-label" *ngIf="p.fec_validar == false">
+                                                <label class="col-sm col-form-label" *ngIf="p.fecha_restriccion == false">
                                                         <b>Restricción por fecha:</b> No
                                                 </label>
-                                                <br *ngIf="p.fec_validar == true">
-                                                <label class="col-sm col-form-label" *ngIf="p.fec_validar == true">
-                                                        <b>Fecha desde no permitida:</b> {{p.fecha_inicio_}}
+                                                <br *ngIf="p.fecha_restriccion == true">
+                                                <label class="col-sm col-form-label" *ngIf="p.fecha_restriccion == true">
+                                                        <b>Fecha desde no permitida:</b> {{p.fecha_inicio}}
                                                 </label>
-                                                <br *ngIf="p.fec_validar == true">
-                                                <label class="col-sm col-form-label" *ngIf="p.fec_validar == true">
-                                                        <b>Fecha hasta no permitida:</b> {{p.fecha_fin_}}
+                                                <br *ngIf="p.fecha_restriccion == true">
+                                                <label class="col-sm col-form-label" *ngIf="p.fecha_restriccion == true">
+                                                        <b>Fecha hasta no permitida:</b> {{p.fecha_fin}}
                                                 </label>
                                                 <br>
                                                 <label class="col-sm col-form-label" *ngIf="p.documento == false">
@@ -82,10 +82,10 @@
                                                         <b>Cargar documento:</b> Requerido
                                                 </label>
                                                 <br>
-                                                <label class="col-sm col-form-label" *ngIf="p.almu_incluir == true">
+                                                <label class="col-sm col-form-label" *ngIf="p.incluir_minutos_comida == true">
                                                         <b>Incluye alimentación:</b> Sí
                                                 </label>
-                                                <label class="col-sm col-form-label" *ngIf="p.almu_incluir == false">
+                                                <label class="col-sm col-form-label" *ngIf="p.incluir_minutos_comida == false">
                                                         <b>Incluye alimentación:</b> No
                                                 </label>
                                                 <br>

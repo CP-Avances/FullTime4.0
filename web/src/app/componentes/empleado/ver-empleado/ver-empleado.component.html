@@ -92,7 +92,7 @@
                             <div style="text-align: right;">
                                 <i type="submit" id="edit" (click)="AbirVentanaEditarEmpleado(e)" matSuffix
                                     matTooltipPosition="right"
-                                    matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
+                                    matTooltip="Modificar los datos generales de este registro" class="fas fa-edit" *ngIf="getEditarDatos()">
                                     <p>Editar</p>
                                 </i>
                             </div>
@@ -163,7 +163,7 @@
                                     Cambiar Frase
                                 </button>
                             </mat-grid-tile>
-                            <mat-grid-tile>
+                            <mat-grid-tile *ngIf="getCrearDatos()">
                                 <button class="btn btn-block d-flex align-items-center justify-content-center"
                                     id="Selector" (click)="AbrirUbicacion(e.nombre, e.apellido)">
                                     Ubicación Domicilio
@@ -197,7 +197,7 @@
                             </div>
                             <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="AbrirVentanaRegistarTituloEmpleado()">Añadir</button>
+                                    (click)="AbrirVentanaRegistarTituloEmpleado()" *ngIf="getCrearDatos()">Añadir</button>
                             </div>
                         </div>
                         <mat-card-content>
@@ -223,12 +223,12 @@
                                         <i type="submit" id="edit" (click)="AbrirVentanaEditarTitulo(rte)" matSuffix
                                             matTooltipPosition="right"
                                             matTooltip="Editar los datos generales de este registro."
-                                            class="fas fa-edit">
+                                            class="fas fa-edit" *ngIf="getEditarDatos()">
                                             <p>Editar</p>
                                         </i>
                                         <i style="margin-left: 2%;" class="far fa-trash-alt"
                                             (click)="ConfirmarDeleteTitulo(rte.id)" matSuffix matTooltipPosition="right"
-                                            id="delete" matTooltip="Eliminar este registro">
+                                            id="delete" matTooltip="Eliminar este registro" *ngIf="getEliminarDatos()">
                                             <p>Eliminar</p>
                                         </i>
                                     </div>
@@ -246,7 +246,7 @@
                             </div>
                             <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="MostrarDis()">{{btnDisc}}</button>
+                                    (click)="MostrarDis()" *ngIf="getCrearDatos()">{{btnDisc}}</button>
                             </div>
                         </div>
                         <mat-card-content>
@@ -271,7 +271,7 @@
                                     <div class="col" style="text-align: right;">
                                         <i type="submit" style="margin-left: 2%;" class="far fa-trash-alt"
                                             (click)="ConfirmarDeleteDiscapacidad(d.id_empleado)" matSuffix
-                                            matTooltipPosition="right" id="delete" matTooltip="Eliminar registro">
+                                            matTooltipPosition="right" id="delete" matTooltip="Eliminar registro" *ngIf="getEliminarDatos()">
                                             <p>Eliminar</p>
                                         </i>
                                     </div>
@@ -299,7 +299,7 @@
                             </div>
                             <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="MostrarVentanaVacuna()">Añadir</button>
+                                    (click)="MostrarVentanaVacuna()" *ngIf="getCrearDatos()">Añadir</button>
                             </div>
                         </div>
                         <mat-card-content>
@@ -338,11 +338,11 @@
                                         <i type="submit" id="edit" style="margin-right: 20px;"
                                             (click)="AbrirVentanaEditar(dv)" matSuffix matTooltipPosition="right"
                                             matTooltip="Modificar los datos generales de este registro"
-                                            class="fas fa-edit">
+                                            class="fas fa-edit" *ngIf="getEditarDatos()">
                                             <p>Editar</p>
                                         </i>
                                         <i class="far fa-trash-alt" id="delete" (click)="ConfirmarEliminarVacuna(dv)"
-                                            matSuffix matTooltipPosition="right" matTooltip="Eliminar registro.">
+                                            matSuffix matTooltipPosition="right" matTooltip="Eliminar registro." *ngIf="getEliminarDatos()">
                                             <p>Eliminar</p>
                                         </i>
                                     </div>
@@ -387,7 +387,7 @@
                             <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;"
                                 *ngIf="!editar_contrato">
                                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="AbrirVentanaCrearContrato()">
+                                    (click)="AbrirVentanaCrearContrato()" *ngIf="getCrearDatos()">
                                     Añadir
                                 </button>
                             </div>
@@ -472,7 +472,7 @@
                                 <div style="text-align: right; padding-top: 3%;" *ngIf="!editar_contrato">
                                     <i type="submit" id="edit" style="margin-right: 20px;"
                                         (click)="AbrirVentanaEditarContrato(ce)" matSuffix matTooltipPosition="right"
-                                        matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
+                                        matTooltip="Modificar los datos generales de este registro" class="fas fa-edit" *ngIf="getEditarDatos()">
                                         <p>Editar</p>
                                     </i>
                                 </div>
@@ -593,7 +593,7 @@
                             <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;"
                                 *ngIf="btnActualizarCargo">
                                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="AbrirVentanaCargo()">{{btnTitulo}}</button>
+                                    (click)="AbrirVentanaCargo()" *ngIf="getCrearDatos()">{{btnTitulo}}</button>
                             </div>
                         </div>
                         <mat-card-content>
@@ -668,7 +668,7 @@
                                     </div>
                                 </div>
                                 <div style="text-align: right;">
-                                    <i type="submit" id="edit" style="margin-right: 20px;" *ngIf="btnActualizarCargo"
+                                    <i type="submit" id="edit" style="margin-right: 20px;" *ngIf="btnActualizarCargo && getEditarDatos()"
                                         (click)="VerCargoEdicion(false); ObtenerIdCargoSeleccionado(c.id)" matSuffix
                                         matTooltipPosition="right"
                                         matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
@@ -856,7 +856,7 @@
                                         <div class="col-md" style="text-align: center;">
                                             <div style="padding-top: 5px; margin: 0 auto;">
                                                 <button id="boton_redondo" class="btn btn-sm"
-                                                    (click)="AbrirPlanificarHorario()">
+                                                    (click)="AbrirPlanificarHorario()" *ngIf="getCrearDatos()">
                                                     Horario Fijo
                                                 </button>
                                             </div>
@@ -868,7 +868,7 @@
                                         <div class="col-md" style="text-align: center;">
                                             <div style="padding-top: 5px; margin: 0 auto;">
                                                 <button id="boton_redondo" class="btn btn-sm"
-                                                    (click)="AbrirVentanaHorarioRotativo()">
+                                                    (click)="AbrirVentanaHorarioRotativo()" *ngIf="getCrearDatos()">
                                                     Horario Múltiple
                                                 </button>
                                             </div>
@@ -882,7 +882,7 @@
                                         <div class="col-md" style="text-align: center;">
                                             <div style="padding-top: 5px; margin: 0 auto;">
                                                 <button id="boton_redondo" class="btn btn-sm"
-                                                    (click)="EliminarHorarios()">
+                                                    (click)="EliminarHorarios()" *ngIf="getEliminarDatos()">
                                                     Eliminar
                                                 </button>
                                             </div>
@@ -1514,7 +1514,7 @@
                     </div>
                     <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                         <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="AbrirVentanaPermiso()">
+                            (click)="AbrirVentanaPermiso()" *ngIf="getCrearDatos()">
                             {{btnTitulo}}
                         </button>
                     </div>
@@ -1614,12 +1614,12 @@
                                 matTooltip="Descargar solicitud de permiso.">
                                 <p>Descargar</p>
                             </i>
-                            <i *ngIf="pt.estado === 1" class="fas fa-edit" id="edit" style="margin-right: 5px;"
+                            <i *ngIf="pt.estado === 1 && getEditarDatos()" class="fas fa-edit" id="edit" style="margin-right: 5px;"
                                 (click)="EditarPermiso(pt)" matSuffix matTooltipPosition="right"
                                 matTooltip="Modificar los datos generales de este registro.">
                                 <p>Editar</p>
                             </i>
-                            <i *ngIf="pt.estado === 1" class="fas fa-trash-alt" id="delete"
+                            <i *ngIf="pt.estado === 1 && getEliminarDatos()" class="fas fa-trash-alt" id="delete"
                                 (click)="CancelarPermiso(pt)" matSuffix matTooltipPosition="right"
                                 matTooltip="Cancelar solicitud de permiso.">
                                 <p>Eliminar</p>
@@ -1651,7 +1651,7 @@
                     </div>
                     <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                         <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="AbrirVentanaPerVacaciones()">Añadir</button>
+                            (click)="AbrirVentanaPerVacaciones()" *ngIf="getCrearDatos()">Añadir</button>
                     </div>
                 </div>
                 <mat-card-content>
@@ -1705,7 +1705,7 @@
                         </div>
                         <div style="text-align: right; margin-right: 1px;">
                             <i (click)="AbrirEditarPeriodoVacaciones(p)" class="fas fa-edit" id="edit" matSuffix
-                                matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro.">
+                                matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro." *ngIf="getEditarDatos()">
                                 <p>Editar</p>
                             </i>
                         </div>
@@ -1723,7 +1723,7 @@
                     </div>
                     <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                         <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="AbrirVentanaVacaciones()">{{btnTitulo}}</button>
+                            (click)="AbrirVentanaVacaciones()" *ngIf="getCrearDatos()">{{btnTitulo}}</button>
                     </div>
                 </div>
                 <mat-card-content>
@@ -1773,7 +1773,7 @@
                         <div class="float-right" *ngIf="v.estado === 1">
                             <i class="fas fa-edit" id="edit" style="margin-right: 20px;" (click)="EditarVacaciones(v)"
                                 matSuffix matTooltipPosition="right"
-                                matTooltip="Modificar los datos generales de este registro">
+                                matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()">
                                 <p>Editar</p>
                             </i>
                             <i class="fas fa-backspace" id="cancel" (click)="CancelarVacaciones(v)" matSuffix
@@ -1942,7 +1942,7 @@
                     <div style="text-align: right;" *ngIf="h.estado === 'Pendiente'">
                         <i class="fas fa-edit" id="edit" style="margin-right: 20px;" (click)="AbrirEditarPlan(h)"
                             matSuffix matTooltipPosition="right"
-                            matTooltip="Modificar los datos generales de este registro.">
+                            matTooltip="Modificar los datos generales de este registro." *ngIf="getEditarDatos()">
                             <p>Editar</p>
                         </i>
                         <i class="fas fa-backspace" id="cancel" (click)="ConfirmarDeletePlan(h)" matSuffix
@@ -2039,7 +2039,7 @@
                     <div style="text-align: right;"
                         *ngIf="(pc.aprobada === false || pc.aprobada === null) && pc.fec_comida > FechaActual">
                         <i class="fas fa-edit" id="edit" (click)="AbrirEditarPlanComidas(pc)" matSuffix
-                            matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro">
+                            matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()">
                             <p>Editar</p>
                         </i>
                     </div>
@@ -2124,12 +2124,12 @@
                     </div>
                     <div style="text-align: right;" *ngIf="pc.fec_final > FechaActual">
                         <i class="fas fa-edit" id="edit" (click)="AbrirEditarPlanComidas(pc)" matSuffix
-                            matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro">
+                            matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()">
                             <p>Editar</p>
                         </i>
                         <i style="color:red; margin-left: 15px;" (click)="ConfirmarDeletePlanComidas(pc)"
                             class=" far fa-trash-alt" matTooltipPosition="right" id="delete"
-                            matTooltip="Eliminar registro">
+                            matTooltip="Eliminar registro" *ngIf="getEliminarDatos()">
                             <p>Eliminar</p>
                         </i>
                     </div>
@@ -2155,7 +2155,7 @@
                         <div class="d-flex bd-highlight" id="titulo">
                             <span class="w-100 bd-highlight">PROCESOS</span>
                             <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                                (click)="AbrirVentanaProcesos()">Añadir</button>
+                                (click)="AbrirVentanaProcesos()" *ngIf="getCrearDatos()">Añadir</button>
                         </div>
                         <mat-card-content>
                             <div class="container"
@@ -2185,11 +2185,11 @@
                                     <div style="text-align: right;">
                                         <i class="fas fa-edit" id="edit" (click)="AbrirVentanaEditarProceso(e)"
                                             matSuffix matTooltipPosition="right"
-                                            matTooltip="Modificar los datos generales de este registro">
+                                            matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()">
                                             <p>Editar</p>
                                         </i>
                                         <i class=" far fa-trash-alt" id="delete" (click)="ConfirmarDeleteProceso(e)"
-                                            matTooltipPosition="right" matTooltip="Eliminar registro">
+                                            matTooltipPosition="right" matTooltip="Eliminar registro" *ngIf="getEliminarDatos()">
                                             <p>Eliminar</p>
                                         </i>
                                     </div>
@@ -2219,7 +2219,7 @@
                     <div class="d-flex bd-highlight" id="titulo">
                         <span class="w-100 bd-highlight">ADMINISTRAR MÓDULO ALIMENTACIÓN</span>
                         <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="AbrirVentanaAdminComida()">Añadir</button>
+                            (click)="AbrirVentanaAdminComida()" *ngIf="getCrearDatos()">Añadir</button>
                     </div>
                     <mat-card-content>
                         <div class="nota" style="margin-left: 10px; padding-top: 20px;">
@@ -2249,7 +2249,7 @@
                     <div class="d-flex bd-highlight" id="titulo">
                         <span class="w-100 bd-highlight">AUTORIZACIÓN DEPARTAMENTOS</span>
                         <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="AbrirVentanaAutorizar()">Crear</button>
+                            (click)="AbrirVentanaAutorizar()" *ngIf="getCrearDatos()">Crear</button>
                     </div>
                     <mat-card-content>
                         <div class="container" style="padding-top: 15px;">
@@ -2276,13 +2276,13 @@
                                             <td class="justify-content-center">
                                                 <i class="fas fa-edit" id="edit" (click)="AbrirEditarAutorizar(autoD)"
                                                     matSuffix matTooltipPosition="right"
-                                                    matTooltip="Modificar los datos generales de este registro">
+                                                    matTooltip="Modificar los datos generales de este registro" *ngIf="getEditarDatos()">
                                                     <p>Editar</p>
                                                 </i>
                                                 <i style="color:red; margin-left: 15px;"
                                                     (click)="ConfirmarDeleteAutorizacion(autoD)"
                                                     class=" far fa-trash-alt" matTooltipPosition="right" id="delete"
-                                                    matTooltip="Eliminar registro">
+                                                    matTooltip="Eliminar registro" *ngIf="getEliminarDatos()">
                                                     <p>Eliminar</p>
                                                 </i>
                                             </td>

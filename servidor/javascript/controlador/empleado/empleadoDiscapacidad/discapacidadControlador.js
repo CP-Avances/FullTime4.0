@@ -21,7 +21,7 @@ class DiscapacidadControlador {
             const { id_empleado } = req.params;
             const unaDiscapacidad = yield database_1.default.query(`
       SELECT cd.id_empleado, cd.carnet_conadis, cd.porcentaje, cd.id_discapacidad, td.nombre AS nom_tipo
-      FROM eu_empleado_discapacidad cd, e_cat_discapacidad td, empleados e
+      FROM eu_empleado_discapacidad cd, e_cat_discapacidad td, eu_empleados e
       WHERE cd.id_empleado = e.id AND cd.id_discapacidad = td.id AND cd.id_empleado = $1
       `, [id_empleado]);
             if (unaDiscapacidad.rowCount > 0) {
@@ -37,7 +37,7 @@ class DiscapacidadControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, carn_conadis, porcentaje, tipo } = req.body;
             yield database_1.default.query(`
-      INSERT INTO eu_empleado_discapacidad (id_empleado, carnet_conadis, porcentaje, tipo) 
+      INSERT INTO eu_empleado_discapacidad (id_empleado, carnet_conadis, porcentaje, id_discapacidad) 
       VALUES ($1, $2, $3, $4)
       `, [id_empleado, carn_conadis, porcentaje, tipo]);
             res.jsonp({ message: 'Registro guardado.' });
@@ -49,7 +49,7 @@ class DiscapacidadControlador {
             const id_empleado = req.params.id_empleado;
             const { carn_conadis, porcentaje, tipo } = req.body;
             yield database_1.default.query(`
-      UPDATE eu_empleado_discapacidad SET carnet_conadis = $1, porcentaje = $2, tipo = $3 
+      UPDATE eu_empleado_discapacidad SET carnet_conadis = $1, porcentaje = $2, id_discapacidad = $3 
       WHERE id_empleado = $4
       `, [carn_conadis, porcentaje, tipo, id_empleado]);
             res.jsonp({ message: 'Registro actualizado.' });

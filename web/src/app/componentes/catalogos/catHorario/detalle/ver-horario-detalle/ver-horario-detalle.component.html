@@ -7,7 +7,7 @@
             </button>
             <span>{{h.nombre.toUpperCase()}}</span>
             <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                (click)="AbrirVentanaEditar(h)">
+                (click)="AbrirVentanaEditar(h)" *ngIf="getEditarHorario()">
                 Editar
             </button>
         </div>
@@ -40,7 +40,7 @@
                                 <a class="fas fa-file-alt"
                                     style="color:rgb(197, 95, 11); margin-left: 15px; text-align: center;" matSuffix
                                     matTooltipPosition="right" matTooltip="Dar click para ver o descargar el documento."
-                                    href="{{hipervinculo}}/horario/documentos/{{h.documento}}" target="_blank">
+                                    href="{{hipervinculo}}/horario/documentos/{{h.documento}}" target="_blank" *ngIf="getDescargarDocumentoHorario()">
                                     <p>{{h.documento}}</p>
                                 </a>
                             </label>
@@ -66,7 +66,7 @@
                     <div id="titulo">
                         <span>DETALLES DE HORARIO</span>
                         <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="AbrirVentanaDetalles(h)">
+                            (click)="AbrirVentanaDetalles(h)" *ngIf="getCrearDetalleHorario()">
                             Registrar detalle
                         </button>
                     </div>
@@ -102,11 +102,11 @@
                                     <td>
                                         <i id="editarI" (click)="AbrirVentanaEditarDetalle(dh)" matSuffix
                                             matTooltipPosition="right" matTooltip="Modificar datos de este registro."
-                                            class="fas fa-edit">
+                                            class="fas fa-edit" *ngIf="getVerEditarDetalleHorario()">
                                             <p>Editar</p>
                                         </i>
                                         <i matSuffix matTooltipPosition="right" matTooltip="Eliminar registro."
-                                            class="far fa-trash-alt" (click)="ConfirmarDelete(dh)" id="t-eliminar">
+                                            class="far fa-trash-alt" (click)="ConfirmarDelete(dh)" id="t-eliminar" *ngIf="getVerEliminarDetalleHorario()">
                                             <p>Eliminar</p>
                                         </i>
                                     </td>

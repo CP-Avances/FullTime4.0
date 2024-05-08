@@ -16,12 +16,12 @@
                             <div class="row">
                                 <div class="col-md" style="padding-top: 5px;">
                                     <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
-                                        <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
+                                        <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;" *ngIf="getCargarContratos()">
                                             <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                                 accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                             <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
                                                 style="height: 65px; padding-top: 25px;"
-                                                matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                                matTooltip="Dar click para selecionar plantilla y cargar registros." >
                                                 Subir plantilla
                                             </label>
                                             <label for="file"  matSuffix matTooltipPosition="right"
@@ -136,7 +136,7 @@
                                         <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
                                             <input (change)="FileChangeCargo($event)" type="file" [formControl]="archivoForm" id="file"
                                                 accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                            <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                            <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir && getCargarCargos()"
                                                 style="height: 65px; padding-top: 25px;"
                                                 matTooltip="Dar click para selecionar plantilla y cargar registros.">
                                                 Subir plantilla

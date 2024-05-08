@@ -153,10 +153,10 @@ export class EditarTipoPermisosComponent implements OnInit {
     // PRIMER FORMULARIO
     this.primeroFormGroup.patchValue({
       descripcionForm: this.tipoPermiso.descripcion,
-      numDiaIngresoForm: this.tipoPermiso.num_dia_anticipo,
-      numDiasAtrasForm: this.tipoPermiso.num_dia_anterior,
-      numDiaMaximoForm: this.tipoPermiso.num_dia_maximo,
-      numHoraMaximoForm: this.tipoPermiso.num_hora_maximo,
+      numDiaIngresoForm: this.tipoPermiso.dias_anticipar_permiso,
+      numDiasAtrasForm: this.tipoPermiso.crear_dias_anteriores,
+      numDiaMaximoForm: this.tipoPermiso.dias_maximo_permiso,
+      numHoraMaximoForm: this.tipoPermiso.horas_maximo_permiso,
       tipoDescuentoForm: this.tipoPermiso.tipo_descuento,
     });
     // SEGUNDO FORMULARIO
@@ -164,10 +164,10 @@ export class EditarTipoPermisosComponent implements OnInit {
       feriadosForm: this.tipoPermiso.contar_feriados,
       documentoForm: this.tipoPermiso.documento,
       legalizarForm: this.tipoPermiso.legalizar,
-      fecValidarForm: this.tipoPermiso.fec_validar,
-      almuIncluirForm: this.tipoPermiso.almu_incluir,
-      numDiaJustificaForm: this.tipoPermiso.num_dia_justifica,
-      geneJustificacionForm: this.tipoPermiso.gene_justificacion,
+      fecValidarForm: this.tipoPermiso.fecha_restriccion,
+      almuIncluirForm: this.tipoPermiso.incluir_minutos_comida,
+      numDiaJustificaForm: this.tipoPermiso.dias_justificar,
+      geneJustificacionForm: this.tipoPermiso.justificar,
     });
     this.tercerFormGroup.patchValue({
       correo_crearForm: this.tipoPermiso.correo_crear,
@@ -187,7 +187,7 @@ export class EditarTipoPermisosComponent implements OnInit {
       j++;
     });
     // JUSTIFICACION DE PERMISO
-    this.ActivarJustificacionSet(this.tipoPermiso.gene_justificacion);
+    this.ActivarJustificacionSet(this.tipoPermiso.justificar);
 
     if (this.tipoPermiso.fecha_inicio != '' && this.tipoPermiso.fecha_inicio != null &&
       this.tipoPermiso.fecha_fin != '' && this.tipoPermiso.fecha_fin != null) {
@@ -247,7 +247,7 @@ export class EditarTipoPermisosComponent implements OnInit {
     if (generarJustificacion === true) {
       this.HabilitarJustifica = false;
       this.segundoFormGroup.patchValue({
-        numDiaJustificaForm: this.tipoPermiso.num_dia_justifica
+        numDiaJustificaForm: this.tipoPermiso.dias_justificar
       });
     } else if (generarJustificacion === false) {
       this.HabilitarJustifica = true;

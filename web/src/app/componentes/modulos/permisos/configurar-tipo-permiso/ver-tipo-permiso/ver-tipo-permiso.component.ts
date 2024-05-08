@@ -77,4 +77,15 @@ export class VerTipoPermisoComponent implements OnInit {
     this.componentl.pagina = 'ver-datos';
   }
 
+  //Control Botones
+  getEditarCumpleanos(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Editar Tipo Permiso');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
 }

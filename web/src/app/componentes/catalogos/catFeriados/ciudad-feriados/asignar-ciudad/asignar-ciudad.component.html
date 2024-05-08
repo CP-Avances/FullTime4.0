@@ -117,7 +117,7 @@
 
                 <div class="d-flex justify-content-between" style="padding-top: 15px; margin-bottom: 2%;">
                     <button id="btn-raised" class="btn btn-sm float-left" [disabled]="!formulario.valid"
-                        (click)="InsertarFeriadoCiudad()" value="Guardar">
+                        (click)="InsertarFeriadoCiudad()" value="Guardar" *ngIf="getAsignarCiudadFeriado()">
                         Guardar
                     </button>
                     <button id="btn-raised" class="btn btn-sm float-right" (click)="CerrarVentana(1)" value="Cancelar">

@@ -29,7 +29,7 @@ const storage = multer_1.default.diskStorage({
         return __awaiter(this, void 0, void 0, function* () {
             let id = req.params.id;
             const usuario = yield database_1.default.query(`
-            SELECT e.id FROM empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+            SELECT e.id FROM eu_empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
             `, [id]);
             var ruta = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(usuario.rows[0].id);
             cb(null, ruta);
@@ -45,7 +45,7 @@ const storage = multer_1.default.diskStorage({
             // DATOS DOCUMENTO
             let id = req.params.id;
             const usuario = yield database_1.default.query(`
-            SELECT codigo FROM empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+            SELECT codigo FROM eu_empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
             `, [id]);
             let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
             cb(null, documento);

@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
         let id = req.params.id;
         const usuario = await pool.query(
             `
-            SELECT e.id FROM empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+            SELECT e.id FROM eu_empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
             `
             , [id]);
         var ruta = await ObtenerRutaContrato(usuario.rows[0].id);
@@ -39,7 +39,7 @@ const storage = multer.diskStorage({
 
         const usuario = await pool.query(
             `
-            SELECT codigo FROM empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+            SELECT codigo FROM eu_empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
             `
             , [id]);
 

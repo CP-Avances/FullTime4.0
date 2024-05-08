@@ -91,7 +91,7 @@
                 <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
 
                     <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                        (click)="ConfirmarDeleteMultiple()">Eliminar </button>
+                        (click)="ConfirmarDeleteMultiple()" *ngIf="getEliminarFeriado()">Eliminar </button>
                 </div>
             </div>
 
@@ -163,7 +163,7 @@
                                 </i>
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Asignar ciudad en la que rige este feriado." class="fas fa-city"
-                                    id="t-detalles" (click)="VerAsignarCiudad(f.id)">
+                                    id="t-detalles" (click)="VerAsignarCiudad(f.id)" *ngIf="getAsignarCiudadFeriado()">
                                     <p>Ciudad</p>
                                 </i>
                                 <i matSuffix matTooltipPosition="right"
