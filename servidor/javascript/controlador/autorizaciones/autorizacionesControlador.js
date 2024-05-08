@@ -13,10 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AUTORIZACION_CONTROLADOR = void 0;
-const database_1 = __importDefault(require("../../database"));
 const settingsMail_1 = require("../../libs/settingsMail");
-const path_1 = __importDefault(require("path"));
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
+const database_1 = __importDefault(require("../../database"));
+const path_1 = __importDefault(require("path"));
 class AutorizacionesControlador {
     // METODO PARA BUSCAR AUTORIZACIONES DE PERMISOS
     ObtenerAutorizacionPermiso(req, res) {
@@ -95,7 +95,7 @@ class AutorizacionesControlador {
             catch (error) {
                 // CANCELAR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(404).jsonp({ text: 'error' });
+                return res.status(500).jsonp({ text: 'error' });
             }
         });
     }
@@ -137,7 +137,7 @@ class AutorizacionesControlador {
             catch (error) {
                 // CANCELAR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(404).jsonp({ text: 'error' });
+                return res.status(500).jsonp({ text: 'error' });
             }
         });
     }
@@ -269,7 +269,7 @@ class AutorizacionesControlador {
                 catch (error) {
                     // CANCELAR TRANSACCION
                     yield database_1.default.query('ROLLBACK');
-                    return res.status(404).jsonp({ text: 'error' });
+                    return res.status(500).jsonp({ text: 'error' });
                 }
             }
             else {
@@ -324,7 +324,7 @@ class AutorizacionesControlador {
             catch (error) {
                 // CANCELAR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(404).jsonp({ text: 'error' });
+                return res.status(500).jsonp({ text: 'error' });
             }
         });
     }

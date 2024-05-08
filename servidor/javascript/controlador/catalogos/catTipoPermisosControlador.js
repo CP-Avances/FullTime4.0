@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TIPO_PERMISOS_CONTROLADOR = void 0;
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
-const builder = require('xmlbuilder');
 class TipoPermisosControlador {
     // METODO PARA BUSCAR TIPO DE PERMISOS
     Listar(req, res) {
@@ -33,11 +33,52 @@ class TipoPermisosControlador {
     // METODO PARA ELIMINAR REGISTROS
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-      DELETE FROM cg_tipo_permisos WHERE id = $1
-      `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                // TODO ANALIZAR COMOOBTENER USER_NAME E IP DESDE EL FRONT
+                const { user_name, ip } = req.body;
+                const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const rol = yield database_1.default.query('SELECT * FROM cg_tipo_permisos WHERE id = $1', [id]);
+                const [datosOriginales] = rol.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'cg_tipo_permisos',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar el tipo de permiso con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM cg_tipo_permisos WHERE id = $1
+        `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_tipo_permisos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+            }
         });
     }
     // METODO PARA LISTAR DATOS DE UN TIPO DE PERMISO
@@ -56,27 +97,75 @@ class TipoPermisosControlador {
     // METODO PARA EDITAR REGISTRO
     Editar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const { descripcion, tipo_descuento, num_dia_maximo, num_dia_anticipo, gene_justificacion, fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados, correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar, fecha_fin, num_dia_anterior } = req.body;
-            yield database_1.default.query(`
-      UPDATE cg_tipo_permisos SET descripcion = $1, tipo_descuento = $2, num_dia_maximo = $3, num_dia_anticipo = $4, 
-        gene_justificacion = $5, fec_validar = $6, acce_empleado = $7, legalizar = $8, almu_incluir = $9, 
-        num_dia_justifica = $10, num_hora_maximo = $11, fecha_inicio = $12, documento = $13, contar_feriados = $14, 
-        correo_crear = $15, correo_editar = $16, correo_eliminar = $17, correo_preautorizar = $18, correo_autorizar = $19, 
-        correo_negar = $20, correo_legalizar = $21, fecha_fin = $22, num_dia_anterior = $23
-      WHERE id = $24
-      `, [descripcion, tipo_descuento, num_dia_maximo, num_dia_anticipo, gene_justificacion, fec_validar, acce_empleado,
-                legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados, correo_crear,
-                correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar, fecha_fin,
-                num_dia_anterior, id]);
-            res.jsonp({ message: 'Registro actualizado.' });
+            try {
+                const id = req.params.id;
+                const { descripcion, tipo_descuento, num_dia_maximo, num_dia_anticipo, gene_justificacion, fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados, correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar, fecha_fin, num_dia_anterior, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const tipo = yield database_1.default.query('SELECT * FROM cg_tipo_permisos WHERE id = $1', [id]);
+                const [datosOriginales] = tipo.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'cg_tipo_permisos',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el tipo de permiso con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+                }
+                yield database_1.default.query(`
+        UPDATE cg_tipo_permisos SET descripcion = $1, tipo_descuento = $2, num_dia_maximo = $3, num_dia_anticipo = $4, 
+          gene_justificacion = $5, fec_validar = $6, acce_empleado = $7, legalizar = $8, almu_incluir = $9, 
+          num_dia_justifica = $10, num_hora_maximo = $11, fecha_inicio = $12, documento = $13, contar_feriados = $14, 
+          correo_crear = $15, correo_editar = $16, correo_eliminar = $17, correo_preautorizar = $18, correo_autorizar = $19, 
+          correo_negar = $20, correo_legalizar = $21, fecha_fin = $22, num_dia_anterior = $23
+        WHERE id = $24
+        `, [descripcion, tipo_descuento, num_dia_maximo, num_dia_anticipo, gene_justificacion, fec_validar, acce_empleado,
+                    legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados, correo_crear,
+                    correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar, fecha_fin,
+                    num_dia_anterior, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_tipo_permisos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{descripcion: ${descripcion}, tipo_descuento: ${tipo_descuento}, num_dia_maximo: ${num_dia_maximo}, 
+                      num_dia_anticipo: ${num_dia_anticipo}, gene_justificacion: ${gene_justificacion}, fec_validar: ${fec_validar}, 
+                      acce_empleado: ${acce_empleado}, legalizar: ${legalizar}, almu_incluir: ${almu_incluir}, 
+                      num_dia_justifica: ${num_dia_justifica}, num_hora_maximo: ${num_hora_maximo}, fecha_inicio: ${fecha_inicio}, 
+                      documento: ${documento}, contar_feriados: ${contar_feriados}, correo_crear: ${correo_crear}, 
+                      correo_editar: ${correo_editar}, correo_eliminar: ${correo_eliminar}, correo_preautorizar: ${correo_preautorizar}, 
+                      correo_autorizar: ${correo_autorizar}, correo_negar: ${correo_negar}, correo_legalizar: ${correo_legalizar}, 
+                      fecha_fin: ${fecha_fin}, num_dia_anterior: ${num_dia_anterior}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+            }
         });
     }
     // METODO PARA CREAR REGISTRO DE TIPO DE PERMISO
     Crear(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { descripcion, tipo_descuento, num_dia_maximo, num_dia_anticipo, gene_justificacion, fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados, correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar, fecha_fin, num_dia_anterior } = req.body;
+                const { descripcion, tipo_descuento, num_dia_maximo, num_dia_anticipo, gene_justificacion, fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados, correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar, fecha_fin, num_dia_anterior, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
         INSERT INTO cg_tipo_permisos (descripcion, tipo_descuento, num_dia_maximo, num_dia_anticipo, gene_justificacion, 
           fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento,
@@ -89,6 +178,18 @@ class TipoPermisosControlador {
                     correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar,
                     fecha_fin, num_dia_anterior]);
                 const [tipo] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_tipo_permisos',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(tipo),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 if (tipo) {
                     return res.status(200).jsonp(tipo);
                 }
@@ -97,8 +198,9 @@ class TipoPermisosControlador {
                 }
             }
             catch (error) {
-                console.log(error);
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
             }
         });
     }

@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.horaExtraPedidasControlador = void 0;
 const MetodosHorario_1 = require("../../libs/MetodosHorario");
 const settingsMail_1 = require("../../libs/settingsMail");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
@@ -220,7 +221,9 @@ class HorasExtrasPedidasControlador {
     CrearHoraExtraPedida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl_cargo, id_usua_solicita, fec_inicio, fec_final, fec_solicita, num_hora, descripcion, estado, observacion, tipo_funcion, depa_user_loggin, codigo } = req.body;
+                const { id_empl_cargo, id_usua_solicita, fec_inicio, fec_final, fec_solicita, num_hora, descripcion, estado, observacion, tipo_funcion, depa_user_loggin, codigo, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
         INSERT INTO hora_extr_pedidos ( id_empl_cargo, id_usua_solicita, fec_inicio, fec_final, 
         fec_solicita, num_hora, descripcion, estado, observacion, tipo_funcion, codigo ) 
@@ -228,6 +231,21 @@ class HorasExtrasPedidasControlador {
         `, [id_empl_cargo, id_usua_solicita, fec_inicio, fec_final, fec_solicita, num_hora, descripcion,
                     estado, observacion, tipo_funcion, codigo]);
                 const [objetoHoraExtra] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'hora_extr_pedidos',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{ id_empl_cargo: ${id_empl_cargo}, id_usua_solicita: ${id_usua_solicita}, 
+          fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, fec_solicita: ${fec_solicita}, 
+          num_hora: ${num_hora}, descripcion: ${descripcion}, estado: ${estado}, observacion: ${observacion}, 
+          tipo_funcion: ${tipo_funcion}, codigo: ${codigo} }`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 if (!objetoHoraExtra)
                     return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
                 const hora_extra = objetoHoraExtra;
@@ -281,6 +299,8 @@ class HorasExtrasPedidasControlador {
                 }
             }
             catch (error) {
+                // REVERTIR TRNASACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500)
                     .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
             }
@@ -289,98 +309,230 @@ class HorasExtrasPedidasControlador {
     // METODO PARA EDITAR HORA EXTRA
     EditarHoraExtra(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const { fec_inicio, fec_final, num_hora, descripcion, estado, tipo_funcion, depa_user_loggin } = req.body;
-            const response = yield database_1.default.query(`
-        UPDATE hora_extr_pedidos SET fec_inicio = $1, fec_final = $2, num_hora = $3, descripcion = $4, 
-        estado = $5, tipo_funcion = $6 WHERE id = $7 RETURNING *
-      `, [fec_inicio, fec_final, num_hora, descripcion, estado, tipo_funcion, id]);
-            const [objetoHoraExtra] = response.rows;
-            if (!objetoHoraExtra)
-                return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
-            const hora_extra = objetoHoraExtra;
-            const JefesDepartamentos = yield database_1.default.query(`
-        SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
-        cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,
-        e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo, 
-        c.hora_extra_mail, c.hora_extra_noti
-        FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-        sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-        WHERE da.id_departamento = $1 AND 
-        da.id_empl_cargo = ecr.id AND 
-        da.id_departamento = cg.id AND 
-        da.estado = true AND 
-        cg.id_sucursal = s.id AND 
-        ecr.id_empl_contrato = ecn.id AND 
-        ecn.id_empleado = e.id AND 
-        e.id = c.id_empleado
-        `, [depa_user_loggin])
-                .then((result) => {
-                return result.rows;
-            });
-            if (JefesDepartamentos.length === 0)
-                return res.status(400)
-                    .jsonp({ message: 'Ups !!! algo salio mal. Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.' });
-            const [obj] = JefesDepartamentos;
-            let depa_padre = obj.depa_padre;
-            let JefeDepaPadre;
-            if (depa_padre !== null) {
-                do {
-                    JefeDepaPadre = yield database_1.default.query(`
-              SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, 
-              cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, 
-              ecn.id AS contrato, e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname, e.cedula, 
-              e.correo, c.hora_extra_mail, c.hora_extra_noti 
-              FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-              sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-              WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND da.id_departamento = cg.id AND 
-              da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND 
-              ecn.id_empleado = e.id AND e.id = c.id_empleado
-              `, [depa_padre]);
-                    depa_padre = JefeDepaPadre.rows[0].depa_padre;
-                    JefesDepartamentos.push(JefeDepaPadre.rows[0]);
-                } while (depa_padre !== null);
-                hora_extra.EmpleadosSendNotiEmail = JefesDepartamentos;
-                return res.status(200).jsonp(hora_extra);
+            try {
+                const id = req.params.id;
+                const { fec_inicio, fec_final, num_hora, descripcion, estado, tipo_funcion, depa_user_loggin, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const datosOriginales = yield database_1.default.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id]);
+                const [objetoHoraExtraOriginal] = datosOriginales.rows;
+                if (!objetoHoraExtraOriginal) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'hora_extr_pedidos',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar hora extra con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+                const response = yield database_1.default.query(`
+          UPDATE hora_extr_pedidos SET fec_inicio = $1, fec_final = $2, num_hora = $3, descripcion = $4, 
+          estado = $5, tipo_funcion = $6 WHERE id = $7 RETURNING *
+        `, [fec_inicio, fec_final, num_hora, descripcion, estado, tipo_funcion, id]);
+                const [objetoHoraExtra] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'hora_extr_pedidos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
+                    datosNuevos: `{ fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, num_hora: ${num_hora}, descripcion: ${descripcion}, estado: ${estado}, tipo_funcion: ${tipo_funcion} }`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (!objetoHoraExtra)
+                    return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
+                const hora_extra = objetoHoraExtra;
+                const JefesDepartamentos = yield database_1.default.query(`
+          SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
+          cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,
+          e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo, 
+          c.hora_extra_mail, c.hora_extra_noti
+          FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
+          sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
+          WHERE da.id_departamento = $1 AND 
+          da.id_empl_cargo = ecr.id AND 
+          da.id_departamento = cg.id AND 
+          da.estado = true AND 
+          cg.id_sucursal = s.id AND 
+          ecr.id_empl_contrato = ecn.id AND 
+          ecn.id_empleado = e.id AND 
+          e.id = c.id_empleado
+          `, [depa_user_loggin])
+                    .then((result) => {
+                    return result.rows;
+                });
+                if (JefesDepartamentos.length === 0)
+                    return res.status(400)
+                        .jsonp({ message: 'Ups !!! algo salio mal. Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.' });
+                const [obj] = JefesDepartamentos;
+                let depa_padre = obj.depa_padre;
+                let JefeDepaPadre;
+                if (depa_padre !== null) {
+                    do {
+                        JefeDepaPadre = yield database_1.default.query(`
+                SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, 
+                cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, 
+                ecn.id AS contrato, e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname, e.cedula, 
+                e.correo, c.hora_extra_mail, c.hora_extra_noti 
+                FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
+                sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
+                WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND da.id_departamento = cg.id AND 
+                da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND 
+                ecn.id_empleado = e.id AND e.id = c.id_empleado
+                `, [depa_padre]);
+                        depa_padre = JefeDepaPadre.rows[0].depa_padre;
+                        JefesDepartamentos.push(JefeDepaPadre.rows[0]);
+                    } while (depa_padre !== null);
+                    hora_extra.EmpleadosSendNotiEmail = JefesDepartamentos;
+                    return res.status(200).jsonp(hora_extra);
+                }
+                else {
+                    hora_extra.EmpleadosSendNotiEmail = JefesDepartamentos;
+                    return res.status(200).jsonp(hora_extra);
+                }
             }
-            else {
-                hora_extra.EmpleadosSendNotiEmail = JefesDepartamentos;
-                return res.status(200).jsonp(hora_extra);
+            catch (error) {
+                // REVERTIR TRNASACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
     // ELIMINAR REGISTRO DE HORAS EXTRAS
     EliminarHoraExtra(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_hora_extra, documento } = req.params;
-            yield database_1.default.query(`
-      DELETE FROM realtime_noti WHERE id_hora_extra = $1
-      `, [id_hora_extra]);
-            yield database_1.default.query(`
-      DELETE FROM autorizaciones WHERE id_hora_extra = $1
-      `, [id_hora_extra]);
-            const response = yield database_1.default.query(`
-      DELETE FROM hora_extr_pedidos WHERE id = $1 RETURNING *
-      `, [id_hora_extra]);
-            if (documento != 'null' && documento != '' && documento != null) {
-                let filePath = `servidor\\horasExtras\\${documento}`;
-                let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                fs_1.default.access(direccionCompleta, fs_1.default.constants.F_OK, (err) => {
-                    if (err) {
-                    }
-                    else {
-                        // ELIMINAR DEL SERVIDOR
-                        fs_1.default.unlinkSync(direccionCompleta);
-                    }
+            try {
+                const { id_hora_extra, documento } = req.params;
+                // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+                const { user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES REALTIME_NOTI
+                const datosOriginalesRealTime = yield database_1.default.query('SELECT * FROM realtime_noti WHERE id_hora_extra = $1', [id_hora_extra]);
+                const [objetoRealTime] = datosOriginalesRealTime.rows;
+                if (!objetoRealTime) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'realtime_noti',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar registro de realtime_noti con id_hora_extra ${id_hora_extra}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM realtime_noti WHERE id_hora_extra = $1
+        `, [id_hora_extra]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'realtime_noti',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(objetoRealTime),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
                 });
+                // CONSULTAR DATOSORIGINALES AUTORIZACIONES
+                const datosOriginalesAutorizaciones = yield database_1.default.query('SELECT * FROM autorizaciones WHERE id_hora_extra = $1', [id_hora_extra]);
+                const [objetoAutorizaciones] = datosOriginalesAutorizaciones.rows;
+                if (!objetoAutorizaciones) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'autorizaciones',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar registro de autorizaciones con id_hora_extra ${id_hora_extra}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM autorizaciones WHERE id_hora_extra = $1
+        `, [id_hora_extra]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'autorizaciones',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(objetoAutorizaciones),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // CONSULTAR DATOSORIGINALES HORA_EXTR_PEDIDOS
+                const datosOriginalesHoraExtra = yield database_1.default.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id_hora_extra]);
+                const [objetoHoraExtraOriginal] = datosOriginalesHoraExtra.rows;
+                if (!objetoHoraExtraOriginal) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'hora_extr_pedidos',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar registro de hora_extr_pedidos con id ${id_hora_extra}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+                const response = yield database_1.default.query(`
+        DELETE FROM hora_extr_pedidos WHERE id = $1 RETURNING *
+        `, [id_hora_extra]);
+                const [objetoHoraExtra] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'hora_extr_pedidos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (documento != 'null' && documento != '' && documento != null) {
+                    let filePath = `servidor\\horasExtras\\${documento}`;
+                    let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs_1.default.access(direccionCompleta, fs_1.default.constants.F_OK, (err) => {
+                        if (err) {
+                        }
+                        else {
+                            // ELIMINAR DEL SERVIDOR
+                            fs_1.default.unlinkSync(direccionCompleta);
+                        }
+                    });
+                }
+                if (objetoHoraExtra) {
+                    return res.status(200).jsonp(objetoHoraExtra);
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'Solicitud no eliminada.' });
+                }
             }
-            const [objetoHoraExtra] = response.rows;
-            if (objetoHoraExtra) {
-                return res.status(200).jsonp(objetoHoraExtra);
-            }
-            else {
-                return res.status(404).jsonp({ message: 'Solicitud no eliminada.' });
+            catch (error) {
+                // REVERTIR TRNASACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -404,11 +556,42 @@ class HorasExtrasPedidasControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id_hora = parseInt(req.params.id_hora);
-                const { hora } = req.body;
+                const { hora, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const datosOriginales = yield database_1.default.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id_hora]);
+                const [objetoHoraExtraOriginal] = datosOriginales.rows;
+                if (!objetoHoraExtraOriginal) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'hora_extr_pedidos',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar hora extra con id ${id_hora}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
                 const response = yield database_1.default.query(`
         UPDATE hora_extr_pedidos SET tiempo_autorizado = $2 WHERE id = $1 RETURNING *
         `, [id_hora, hora]);
                 const [horaExtra] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'hora_extr_pedidos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
+                    datosNuevos: `{ tiempo_autorizado: ${hora} }`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 if (!horaExtra) {
                     return res.status(400)
                         .jsonp({ message: 'Upps !!! algo salio mal. Solicitud de hora extra no ingresada' });
@@ -418,6 +601,8 @@ class HorasExtrasPedidasControlador {
                 }
             }
             catch (error) {
+                // REVERTIR TRNASACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500)
                     .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
             }
@@ -428,11 +613,42 @@ class HorasExtrasPedidasControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { estado } = req.body;
+                const { estado, usser_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const datosOriginales = yield database_1.default.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id]);
+                const [objetoHoraExtraOriginal] = datosOriginales.rows;
+                if (!objetoHoraExtraOriginal) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'hora_extr_pedidos',
+                        usuario: usser_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar hora extra con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
                 const response = yield database_1.default.query(`
           UPDATE hora_extr_pedidos SET estado = $1 WHERE id = $2 RETURNING *
         `, [estado, id]);
                 const [horaExtra] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'hora_extr_pedidos',
+                    usuario: usser_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
+                    datosNuevos: `{ estado: ${estado} }`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 if (!horaExtra) {
                     return res.status(400)
                         .jsonp({ message: 'Upps !!! algo salio mal. Solicitud de hora extra no ingresada' });
@@ -442,6 +658,8 @@ class HorasExtrasPedidasControlador {
                 }
             }
             catch (error) {
+                // REVERTIR TRNASACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500)
                     .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
             }
@@ -452,11 +670,42 @@ class HorasExtrasPedidasControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { observacion } = req.body;
+                const { observacion, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const datosOriginales = yield database_1.default.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id]);
+                const [objetoHoraExtraOriginal] = datosOriginales.rows;
+                if (!objetoHoraExtraOriginal) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'hora_extr_pedidos',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar hora extra con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
                 const response = yield database_1.default.query(`
       UPDATE hora_extr_pedidos SET observacion = $1 WHERE id = $2 RETURNING *
       `, [observacion, id]);
                 const [horaExtra] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'hora_extr_pedidos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
+                    datosNuevos: `{ observacion: ${observacion} }`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 if (!horaExtra) {
                     return res.status(400)
                         .jsonp({ message: 'Upps !!! algo salio mal. Solicitud de hora extra no ingresada' });
@@ -466,6 +715,8 @@ class HorasExtrasPedidasControlador {
                 }
             }
             catch (error) {
+                // REVERTIR TRNASACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500)
                     .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
             }
@@ -493,37 +744,115 @@ class HorasExtrasPedidasControlador {
     // REGISTRAR DOCUMENTO DE RESPALDO DE HORAS EXTRAS 
     GuardarDocumentoHoras(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
-            let doc = list.uploads[0].path.split("\\")[1];
-            let { nombre } = req.params;
-            let id = req.params.id;
-            yield database_1.default.query(`
-      UPDATE hora_extr_pedidos SET documento = $2, docu_nombre = $3 WHERE id = $1
-      `, [id, doc, nombre]);
-            res.jsonp({ message: 'Documento Actualizado' });
+            try {
+                let list = req.files;
+                let doc = list.uploads[0].path.split("\\")[1];
+                let { nombre } = req.params;
+                let id = req.params.id;
+                // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+                const { user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const datosOriginales = yield database_1.default.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id]);
+                const [objetoHoraExtraOriginal] = datosOriginales.rows;
+                if (!objetoHoraExtraOriginal) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'hora_extr_pedidos',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar hora extra con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+                yield database_1.default.query(`
+        UPDATE hora_extr_pedidos SET documento = $2, docu_nombre = $3 WHERE id = $1
+        `, [id, doc, nombre]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'hora_extr_pedidos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
+                    datosNuevos: `{ documento: ${doc}, docu_nombre: ${nombre} }`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Documento Actualizado' });
+            }
+            catch (error) {
+                // REVERTIR TRNASACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     // ELIMINAR DOCUMENTO DE RESPALDO DE HORAS EXTRAS 
     EliminarDocumentoHoras(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let { documento, id } = req.body;
-            yield database_1.default.query(`
-      UPDATE hora_extr_pedidos SET documento = null, docu_nombre = null WHERE id = $1
-      `, [id]);
-            if (documento != 'null' && documento != '' && documento != null) {
-                let filePath = `servidor\\horasExtras\\${documento}`;
-                let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                fs_1.default.access(direccionCompleta, fs_1.default.constants.F_OK, (err) => {
-                    if (err) {
-                    }
-                    else {
-                        // ELIMINAR DEL SERVIDOR
-                        fs_1.default.unlinkSync(direccionCompleta);
-                    }
+            try {
+                let { documento, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const datosOriginales = yield database_1.default.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id]);
+                const [objetoHoraExtraOriginal] = datosOriginales.rows;
+                if (!objetoHoraExtraOriginal) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'hora_extr_pedidos',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar hora extra con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+                yield database_1.default.query(`
+        UPDATE hora_extr_pedidos SET documento = null, docu_nombre = null WHERE id = $1
+        `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'hora_extr_pedidos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
+                    datosNuevos: `{ documento: null, docu_nombre: null }`,
+                    ip,
+                    observacion: null
                 });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (documento != 'null' && documento != '' && documento != null) {
+                    let filePath = `servidor\\horasExtras\\${documento}`;
+                    let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs_1.default.access(direccionCompleta, fs_1.default.constants.F_OK, (err) => {
+                        if (err) {
+                        }
+                        else {
+                            // ELIMINAR DEL SERVIDOR
+                            fs_1.default.unlinkSync(direccionCompleta);
+                        }
+                    });
+                }
+                return res.jsonp({ message: 'Documento Actualizado' });
             }
-            res.jsonp({ message: 'Documento Actualizado' });
+            catch (error) {
+                // REVERTIR TRNASACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     // ELIMINAR DOCUMENTO DE PERMISO DESDE APLICACION MOVIL

@@ -16,12 +16,12 @@ exports.EMPLEADO_CONTROLADOR = void 0;
 // SECCION LIBRERIAS
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const ts_md5_1 = require("ts-md5");
+const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const moment_1 = __importDefault(require("moment"));
-const builder = require('xmlbuilder');
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 class EmpleadoControlador {
     /** ** ********************************************************************************************* **
@@ -44,11 +44,32 @@ class EmpleadoControlador {
     // CREAR CODIGO DE EMPLEADO
     CrearCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id, valor, automatico, manual } = req.body;
-            yield database_1.default.query(`
-      INSERT INTO codigo (id, valor, automatico, manual) VALUES ($1, $2, $3, $4)
-      `, [id, valor, automatico, manual]);
-            res.jsonp({ message: 'Registro guardado.' });
+            try {
+                const { id, valor, automatico, manual, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query(`
+        INSERT INTO codigo (id, valor, automatico, manual) VALUES ($1, $2, $3, $4)
+        `, [id, valor, automatico, manual]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'codigo',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{id: ${id}, valor: ${valor}, automatico: ${automatico}, manual: ${manual}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'Error al guardar código.' });
+            }
         });
     }
     // BUSQUEDA DEL ULTIMO CODIGO REGISTRADO EN EL SISTEMA
@@ -73,21 +94,97 @@ class EmpleadoControlador {
     // METODO PARA ACTUALIZAR INFORMACION DE CODIGOS
     ActualizarCodigoTotal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { valor, automatico, manual, cedula, id } = req.body;
-            yield database_1.default.query(`
-      UPDATE codigo SET valor = $1, automatico = $2, manual = $3 , cedula = $4 WHERE id = $5
-      `, [valor, automatico, manual, cedula, id]);
-            res.jsonp({ message: 'Registro actualizado.' });
+            try {
+                const { valor, automatico, manual, cedula, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const codigo = yield database_1.default.query('SELECT * FROM codigo WHERE id = $1', [id]);
+                const [datosOriginales] = codigo.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'codigo',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar código con id: ${id}`
+                    });
+                    //FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar código' });
+                }
+                yield database_1.default.query(`
+        UPDATE codigo SET valor = $1, automatico = $2, manual = $3 , cedula = $4 WHERE id = $5
+        `, [valor, automatico, manual, cedula, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'codigo',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{valor: ${valor}, automatico: ${automatico}, manual: ${manual}, cedula: ${cedula}}`,
+                    ip,
+                    observacion: null
+                });
+                //FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                //REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar código.' });
+            }
         });
     }
     // METODO PARA ACTUALIZAR CODIGO DE EMPLEADO
     ActualizarCodigo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { valor, id } = req.body;
-            yield database_1.default.query(`
-      UPDATE codigo SET valor = $1 WHERE id = $2
-      `, [valor, id]);
-            res.jsonp({ message: 'Registro actualizado.' });
+            try {
+                const { valor, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const codigo = yield database_1.default.query('SELECT * FROM codigo WHERE id = $1', [id]);
+                const [datosOriginales] = codigo.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'codigo',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar código con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar código' });
+                }
+                yield database_1.default.query(`
+        UPDATE codigo SET valor = $1 WHERE id = $2
+        `, [valor, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'codigo',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{valor: ${valor}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar código.' });
+            }
         });
     }
     /** ** ********************************************************************************************* **
@@ -97,7 +194,9 @@ class EmpleadoControlador {
     InsertarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo } = req.body;
+                const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
         INSERT INTO empleados ( cedula, apellido, nombre, esta_civil, genero, correo, 
         fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo) 
@@ -105,6 +204,18 @@ class EmpleadoControlador {
         `, [cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio,
                     telefono, id_nacionalidad, codigo]);
                 const [empleado] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'empleados',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(empleado),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 if (empleado) {
                     let verificar = 0;
                     // RUTA DE LA CARPETA PRINCIPAL PERMISOS
@@ -164,7 +275,9 @@ class EmpleadoControlador {
                 }
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -173,13 +286,44 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo } = req.body;
+                const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const empleado = yield database_1.default.query('SELECT * FROM empleados WHERE id = $1', [id]);
+                const [datosOriginales] = empleado.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'empleados',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar empleado con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar empleado' });
+                }
                 yield database_1.default.query(`
         UPDATE empleados SET cedula = $2, apellido = $3, nombre = $4, esta_civil = $5, 
         genero = $6, correo = $7, fec_nacimiento = $8, estado = $9, domicilio = $10, 
         telefono = $11, id_nacionalidad = $12, codigo = $13 WHERE id = $1 
         `, [id, cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
                     domicilio, telefono, id_nacionalidad, codigo]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'empleados',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{cedula: ${cedula}, apellido: ${apellido}, nombre: ${nombre}, esta_civil: ${esta_civil}, genero: ${genero}, correo: ${correo}, fec_nacimiento: ${fec_nacimiento}, estado: ${estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad}, codigo: ${codigo}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 let verificar_permisos = 0;
                 // RUTA DE LA CARPETA PERMISOS DEL USUARIO
                 const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
@@ -281,7 +425,9 @@ class EmpleadoControlador {
                 }
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -337,19 +483,77 @@ class EmpleadoControlador {
     // METODO PARA INHABILITAR USUARIOS EN EL SISTEMA
     DesactivarMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const arrayIdsEmpleados = req.body;
+            const { arrayIdsEmpleados, user_name, ip } = req.body;
             if (arrayIdsEmpleados.length > 0) {
                 arrayIdsEmpleados.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
-                    // 2 => DESACTIVADO O INACTIVO
-                    yield database_1.default.query(`
-          UPDATE empleados SET estado = 2 WHERE id = $1
-          `, [obj])
-                        .then((result) => { });
-                    // FALSE => YA NO TIENE ACCESO
-                    yield database_1.default.query(`
-          UPDATE usuarios SET estado = false, app_habilita = false WHERE id_empleado = $1
-          `, [obj])
-                        .then((result) => { });
+                    try {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // CONSULTAR DATOSORIGINALES
+                        const empleado = yield database_1.default.query('SELECT * FROM empleados WHERE id = $1', [obj]);
+                        const [datosOriginales] = empleado.rows;
+                        const usuario = yield database_1.default.query('SELECT * FROM usuarios WHERE id_empleado = $1', [obj]);
+                        const [datosOriginalesUsuario] = usuario.rows;
+                        if (!datosOriginales || !datosOriginalesUsuario) {
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'empleados',
+                                usuario: user_name,
+                                accion: 'U',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al inhabilitar empleado con id: ${obj}`
+                            });
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'usuarios',
+                                usuario: user_name,
+                                accion: 'U',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al inhabilitar usuario con id_empleado: ${obj}`
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            throw new Error('Error al inhabilitar empleado con id: ' + obj);
+                        }
+                        // 2 => DESACTIVADO O INACTIVO
+                        yield database_1.default.query(`
+            UPDATE empleados SET estado = 2 WHERE id = $1
+            `, [obj])
+                            .then((result) => { });
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'empleados',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: JSON.stringify(datosOriginales),
+                            datosNuevos: `{estado: 2}`,
+                            ip,
+                            observacion: null
+                        });
+                        // FALSE => YA NO TIENE ACCESO
+                        yield database_1.default.query(`
+            UPDATE usuarios SET estado = false, app_habilita = false WHERE id_empleado = $1
+            `, [obj])
+                            .then((result) => { });
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'usuarios',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: JSON.stringify(datosOriginalesUsuario),
+                            datosNuevos: `{estado: false, app_habilita: false}`,
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                    }
+                    catch (error) {
+                        // REVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
+                    }
                 }));
                 return res.jsonp({ message: 'Usuarios inhabilitados exitosamente.' });
             }
@@ -359,19 +563,77 @@ class EmpleadoControlador {
     // METODO PARA HABILITAR EMPLEADOS
     ActivarMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const arrayIdsEmpleados = req.body;
+            const { arrayIdsEmpleados, user_name, ip } = req.body;
             if (arrayIdsEmpleados.length > 0) {
                 arrayIdsEmpleados.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
-                    // 1 => ACTIVADO
-                    yield database_1.default.query(`
-          UPDATE empleados SET estado = 1 WHERE id = $1
-          `, [obj])
-                        .then((result) => { });
-                    // TRUE => TIENE ACCESO
-                    yield database_1.default.query(`
-          UPDATE usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
-          `, [obj])
-                        .then((result) => { });
+                    try {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // CONSULTAR DATOSORIGINALES
+                        const empleado = yield database_1.default.query('SELECT * FROM empleados WHERE id = $1', [obj]);
+                        const [datosOriginales] = empleado.rows;
+                        const usuario = yield database_1.default.query('SELECT * FROM usuarios WHERE id_empleado = $1', [obj]);
+                        const [datosOriginalesUsuario] = usuario.rows;
+                        if (!datosOriginales || !datosOriginalesUsuario) {
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'empleados',
+                                usuario: user_name,
+                                accion: 'U',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al activar empleado con id: ${obj}`
+                            });
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'usuarios',
+                                usuario: user_name,
+                                accion: 'U',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al activar usuario con id_empleado: ${obj}`
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            throw new Error('Error al activar empleado con id: ' + obj);
+                        }
+                        // 1 => ACTIVADO
+                        yield database_1.default.query(`
+            UPDATE empleados SET estado = 1 WHERE id = $1
+            `, [obj])
+                            .then((result) => { });
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'empleados',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: JSON.stringify(datosOriginales),
+                            datosNuevos: `{estado: 1}`,
+                            ip,
+                            observacion: null
+                        });
+                        // TRUE => TIENE ACCESO
+                        yield database_1.default.query(`
+            UPDATE usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
+            `, [obj])
+                            .then((result) => { });
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'usuarios',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: JSON.stringify(datosOriginalesUsuario),
+                            datosNuevos: `{estado: true, app_habilita: true}`,
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                    }
+                    catch (error) {
+                        // REVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
+                    }
                 }));
                 return res.jsonp({ message: 'Usuarios habilitados exitosamente.' });
             }
@@ -381,21 +643,79 @@ class EmpleadoControlador {
     // METODO PARA HABILITAR TODA LA INFORMACION DEL EMPLEADO
     ReactivarMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const arrayIdsEmpleados = req.body;
+            const { arrayIdsEmpleados, user_name, ip } = req.body;
             if (arrayIdsEmpleados.length > 0) {
                 arrayIdsEmpleados.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
-                    // 1 => ACTIVADO
-                    yield database_1.default.query(`
-          UPDATE empleados SET estado = 1 WHERE id = $1
-          `, [obj])
-                        .then((result) => { });
-                    // TRUE => TIENE ACCESO
-                    yield database_1.default.query(`
-          UPDATE usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
-          `, [obj])
-                        .then((result) => { });
-                    // REVISAR
-                    //EstadoHorarioPeriVacacion(obj);
+                    try {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // CONSULTAR DATOSORIGINALES
+                        const empleado = yield database_1.default.query('SELECT * FROM empleados WHERE id = $1', [obj]);
+                        const [datosOriginales] = empleado.rows;
+                        const usuario = yield database_1.default.query('SELECT * FROM usuarios WHERE id_empleado = $1', [obj]);
+                        const [datosOriginalesUsuario] = usuario.rows;
+                        if (!datosOriginales || !datosOriginalesUsuario) {
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'empleados',
+                                usuario: user_name,
+                                accion: 'U',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al reactivar empleado con id: ${obj}`
+                            });
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'usuarios',
+                                usuario: user_name,
+                                accion: 'U',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al reactivar usuario con id_empleado: ${obj}`
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            throw new Error('Error al reactivar empleado con id: ' + obj);
+                        }
+                        // 1 => ACTIVADO
+                        yield database_1.default.query(`
+            UPDATE empleados SET estado = 1 WHERE id = $1
+            `, [obj])
+                            .then((result) => { });
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'empleados',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: JSON.stringify(datosOriginales),
+                            datosNuevos: `{estado: 1}`,
+                            ip,
+                            observacion: null
+                        });
+                        // TRUE => TIENE ACCESO
+                        yield database_1.default.query(`
+            UPDATE usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
+            `, [obj])
+                            .then((result) => { });
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'usuarios',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: JSON.stringify(datosOriginalesUsuario),
+                            datosNuevos: `{estado: true, app_habilita: true}`,
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        // REVISAR
+                        //EstadoHorarioPeriVacacion(obj);
+                    }
+                    catch (error) {
+                        // REVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
+                    }
                 }));
                 return res.jsonp({ message: 'Usuarios habilitados exitosamente.' });
             }
@@ -406,51 +726,69 @@ class EmpleadoControlador {
     CrearImagenEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             // FECHA DEL SISTEMA
-            var fecha = (0, moment_1.default)();
-            var anio = fecha.format('YYYY');
-            var mes = fecha.format('MM');
-            var dia = fecha.format('DD');
-            let id = req.params.id_empleado;
-            let separador = path_1.default.sep;
-            const unEmpleado = yield database_1.default.query(`
-      SELECT * FROM empleados WHERE id = $1
-      `, [id]);
+            const fecha = (0, moment_1.default)();
+            const anio = fecha.format('YYYY');
+            const mes = fecha.format('MM');
+            const dia = fecha.format('DD');
+            const id = req.params.id_empleado;
+            const separador = path_1.default.sep;
+            // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
+            const { user_name, ip } = req.body;
+            const unEmpleado = yield database_1.default.query('SELECT * FROM empleados WHERE id = $1', [id]);
             if (unEmpleado.rowCount > 0) {
-                unEmpleado.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                const promises = unEmpleado.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
                     var _a;
-                    let imagen = obj.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
-                    if (obj.imagen != 'null' && obj.imagen != '' && obj.imagen != null) {
-                        try {
-                            // ELIMINAR IMAGEN DE SERVIDOR
-                            let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(obj.id)) + separador + obj.imagen;
-                            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    try {
+                        const imagen = `${obj.codigo}_${anio}_${mes}_${dia}_${(_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname}`;
+                        if (obj.imagen && obj.imagen !== 'null') {
+                            const ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(obj.id)) + separador + obj.imagen;
                             fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                                if (err) {
-                                }
-                                else {
-                                    // ELIMINAR DEL SERVIDOR
+                                if (!err) {
                                     fs_1.default.unlinkSync(ruta);
                                 }
                             });
-                            yield database_1.default.query(`
-              UPDATE empleados SET imagen = $2 Where id = $1
-              `, [id, imagen]);
-                            res.jsonp({ message: 'Imagen actualizada.' });
                         }
-                        catch (error) {
-                            yield database_1.default.query(`
-              UPDATE empleados SET imagen = $2 Where id = $1
-              `, [id, imagen]);
-                            res.jsonp({ message: 'Imagen actualizada.' });
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // CONSULTAR DATOSORIGINALES
+                        const empleado = yield database_1.default.query('SELECT * FROM empleados WHERE id = $1', [id]);
+                        const [datosOriginales] = empleado.rows;
+                        if (!datosOriginales) {
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'empleados',
+                                usuario: user_name,
+                                accion: 'U',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al actualizar imagen de empleado con id: ${id}`
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            throw new Error('Error al actualizar imagen de empleado con id: ' + id);
                         }
+                        yield database_1.default.query('UPDATE empleados SET imagen = $2 WHERE id = $1', [id, imagen]);
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'empleados',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: JSON.stringify(datosOriginales),
+                            datosNuevos: `{imagen: ${imagen}}`,
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
                     }
-                    else {
-                        yield database_1.default.query(`
-            UPDATE empleados SET imagen = $2 Where id = $1
-            `, [id, imagen]);
-                        res.jsonp({ message: 'Imagen actualizada.' });
+                    catch (error) {
+                        // REVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
+                        res.status(500).jsonp({ message: 'Error al actualizar imagen de empleado.' });
                     }
                 }));
+                yield Promise.all(promises);
+                res.jsonp({ message: 'Imagen actualizada.' });
             }
         });
     }
@@ -458,17 +796,50 @@ class EmpleadoControlador {
     GeolocalizacionCrokis(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let id = req.params.id;
-            let { lat, lng } = req.body;
+            let { lat, lng, user_name, ip } = req.body;
             console.log(lat, lng, id);
             try {
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const empleado = yield database_1.default.query('SELECT * FROM empleados WHERE id = $1', [id]);
+                const [datosOriginales] = empleado.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'empleados',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar geolocalización de empleado con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar geolocalización de empleado.' });
+                }
                 yield database_1.default.query(`
         UPDATE empleados SET latitud = $1, longitud = $2 WHERE id = $3
         `, [lat, lng, id])
                     .then((result) => { });
-                res.status(200).jsonp({ message: 'Registro actualizado.' });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'empleados',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{latitud: ${lat}, longitud: ${lng}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.status(200).jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
-                res.status(400).jsonp({ message: error });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -496,32 +867,131 @@ class EmpleadoControlador {
     // INGRESAR TITULO PROFESIONAL DEL EMPLEADO
     CrearEmpleadoTitulos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { observacion, id_empleado, id_titulo } = req.body;
-            yield database_1.default.query(`
-      INSERT INTO empl_titulos (observacion, id_empleado, id_titulo) VALUES ($1, $2, $3)
-      `, [observacion, id_empleado, id_titulo]);
-            res.jsonp({ message: 'Registro guardado.' });
+            try {
+                const { observacion, id_empleado, id_titulo, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query(`
+        INSERT INTO empl_titulos (observacion, id_empleado, id_titulo) VALUES ($1, $2, $3)
+        `, [observacion, id_empleado, id_titulo]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'empl_titulos',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{observacion: ${observacion}, id_empleado: ${id_empleado}, id_titulo: ${id_titulo}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     // ACTUALIZAR TITULO PROFESIONAL DEL EMPLEADO
     EditarTituloEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id_empleado_titulo;
-            const { observacion, id_titulo } = req.body;
-            yield database_1.default.query(`
-      UPDATE empl_titulos SET observacion = $1, id_titulo = $2 WHERE id = $3
-      `, [observacion, id_titulo, id]);
-            res.jsonp({ message: 'Registro actualizado.' });
+            try {
+                const id = req.params.id_empleado_titulo;
+                const { observacion, id_titulo, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const empleado = yield database_1.default.query('SELECT * FROM empl_titulos WHERE id = $1', [id]);
+                const [datosOriginales] = empleado.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'empl_titulos',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar titulo del empleado con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar titulo del empleado.' });
+                }
+                yield database_1.default.query(`
+        UPDATE empl_titulos SET observacion = $1, id_titulo = $2 WHERE id = $3
+        `, [observacion, id_titulo, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'empl_titulos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{observacion: ${observacion}, id_titulo: ${id_titulo}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     // METODO PARA ELIMINAR TITULO PROFESIONAL DEL EMPLEADO
     EliminarTituloEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id_empleado_titulo;
-            yield database_1.default.query(`
-      DELETE FROM empl_titulos WHERE id = $1
-      `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
+                const { user_name, ip } = req.body;
+                const id = req.params.id_empleado_titulo;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const empleado = yield database_1.default.query('SELECT * FROM empl_titulos WHERE id = $1', [id]);
+                const [datosOriginales] = empleado.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'empl_titulos',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar titulo del empleado con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al eliminar titulo del empleado.' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM empl_titulos WHERE id = $1
+        `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'empl_titulos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     /** ******************************************************************************************* **
@@ -546,8 +1016,10 @@ class EmpleadoControlador {
     BuscarEmpleadoNombre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { informacion } = req.body;
+            console.log(informacion);
             const EMPLEADO = yield database_1.default.query('SELECT * FROM empleados WHERE ' +
                 '(UPPER (apellido) || \' \' || UPPER (nombre)) = $1', [informacion]);
+            console.log(EMPLEADO.rows);
             if (EMPLEADO.rowCount > 0) {
                 return res.jsonp(EMPLEADO.rows);
             }
@@ -616,17 +1088,31 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             let id = req.params.id;
             let codigo = req.params.codigo;
-            let { h_lat, h_lng, t_lat, t_lng } = req.body;
+            let { h_lat, h_lng, t_lat, t_lng, user_name, ip } = req.body;
             try {
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
                 yield database_1.default.query('INSERT INTO ubicacion (t_latitud, t_longitud, h_latitud, h_longitud, codigo, id_empl) ' +
                     'VALUES ($1, $2, $3, $4, $5, $6)', [t_lat, t_lng, h_lat, h_lng, codigo, id])
                     .then((result) => {
                     console.log(result.command);
                 });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ubicacion',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{t_latitud: ${t_lat}, t_longitud: ${t_lng}, h_latitud: ${h_lat}, h_longitud: ${h_lng}, codigo: ${codigo}, id_empl: ${id}}`,
+                    ip,
+                    observacion: null
+                });
                 res.status(200).jsonp({ message: 'Geolocalizacion domicilio ingresada' });
             }
             catch (error) {
-                res.status(400).jsonp({ message: error });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -634,17 +1120,49 @@ class EmpleadoControlador {
     ActualizarDomicilio(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let id = req.params.id;
-            let { lat, lng } = req.body;
-            console.log(lat, lng, id);
+            let { lat, lng, user_name, ip } = req.body;
             try {
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const empleado = yield database_1.default.query('SELECT * FROM ubicacion WHERE id_empl = $1', [id]);
+                const [datosOriginales] = empleado.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ubicacion',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar geolocalización de domicilio del empleado con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar geolocalización de domicilio del empleado.' });
+                }
                 yield database_1.default.query('UPDATE ubicacion SET h_latitud = $1, h_longitud = $2 WHERE id_empl = $3', [lat, lng, id])
                     .then((result) => {
                     console.log(result.command);
                 });
-                res.status(200).jsonp({ message: 'Geolocalizacion domicilio actualizada' });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ubicacion',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{h_latitud: ${lat}, h_longitud: ${lng}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.status(200).jsonp({ message: 'Geolocalizacion domicilio actualizada' });
             }
             catch (error) {
-                res.status(400).jsonp({ message: error });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -652,17 +1170,49 @@ class EmpleadoControlador {
     ActualizarTrabajo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let id = req.params.id;
-            let { lat, lng } = req.body;
-            console.log(lat, lng, id);
+            let { lat, lng, user_name, ip } = req.body;
             try {
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const empleado = yield database_1.default.query('SELECT * FROM ubicacion WHERE id_empl = $1', [id]);
+                const [datosOriginales] = empleado.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ubicacion',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar geolocalización de lugar de trabajo del empleado con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar geolocalización de lugar de trabajo del empleado.' });
+                }
                 yield database_1.default.query('UPDATE ubicacion SET t_latitud = $1, t_longitud = $2 WHERE id_empl = $3', [lat, lng, id])
                     .then((result) => {
                     console.log(result.command);
                 });
-                res.status(200).jsonp({ message: 'Geolocalización de Lugar de Trabajo registrada.' });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ubicacion',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{t_latitud: ${lat}, t_longitud: ${lng}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.status(200).jsonp({ message: 'Geolocalización de Lugar de Trabajo registrada.' });
             }
             catch (error) {
-                res.status(400).jsonp({ message: error });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -670,17 +1220,50 @@ class EmpleadoControlador {
     ActualizarGeolocalizacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let id = req.params.id;
-            let { h_lat, h_lng, t_lat, t_lng } = req.body;
+            let { h_lat, h_lng, t_lat, t_lng, user_name, ip } = req.body;
             try {
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const empleado = yield database_1.default.query('SELECT * FROM ubicacion WHERE id_empl = $1', [id]);
+                const [datosOriginales] = empleado.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ubicacion',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar geolocalización del empleado con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar geolocalización del empleado.' });
+                }
                 yield database_1.default.query('UPDATE ubicacion SET t_latitud = $1, t_longitud = $2, h_latitud = $3, ' +
                     'h_longitud = $4 WHERE id_empl = $5', [t_lat, t_lng, h_lat, h_lng, id])
                     .then((result) => {
                     console.log(result);
                 });
-                res.status(200).jsonp({ message: 'Geolocalizacion ingresada' });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ubicacion',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{t_latitud: ${t_lat}, t_longitud: ${t_lng}, h_latitud: ${h_lat}, h_longitud: ${h_lng}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.status(200).jsonp({ message: 'Geolocalizacion ingresada' });
             }
             catch (error) {
-                res.status(400).jsonp({ message: error });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -1110,8 +1693,7 @@ class EmpleadoControlador {
     }
     CargarPlantilla_Automatico(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const plantilla = req.body;
-            console.log('datos automatico: ', plantilla);
+            const { plantilla, user_name, ip } = req.body;
             const VALOR = yield database_1.default.query('SELECT * FROM codigo');
             var codigo_dato = VALOR.rows[0].valor;
             var codigo = 0;
@@ -1121,112 +1703,151 @@ class EmpleadoControlador {
             var contador = 1;
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                 var _a;
-                // Realiza un capital letter a los nombres y apellidos
-                var nombreE;
-                let nombres = data.nombre.split(' ');
-                if (nombres.length > 1) {
-                    let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
-                    let name2 = nombres[1].charAt(0).toUpperCase() + nombres[1].slice(1);
-                    nombreE = name1 + ' ' + name2;
-                }
-                else {
-                    let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
-                    nombreE = name1;
-                }
-                var apellidoE;
-                let apellidos = data.apellido.split(' ');
-                if (apellidos.length > 1) {
-                    let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
-                    let lastname2 = apellidos[1].charAt(0).toUpperCase() + apellidos[1].slice(1);
-                    apellidoE = lastname1 + ' ' + lastname2;
-                }
-                else {
-                    let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
-                    apellidoE = lastname1;
-                }
-                // Encriptar contraseña
-                var md5 = new ts_md5_1.Md5();
-                var contrasena = (_a = md5.appendStr(data.contrasena).end()) === null || _a === void 0 ? void 0 : _a.toString();
-                // Datos que se leen de la plantilla ingresada
-                const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono, nacionalidad, usuario, rol } = data;
-                //Obtener id del estado_civil
-                var id_estado_civil = 0;
-                if (estado_civil.toUpperCase() === 'SOLTERO/A') {
-                    id_estado_civil = 1;
-                }
-                else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
-                    id_estado_civil = 2;
-                }
-                else if (estado_civil.toUpperCase() === 'CASADO/A') {
-                    id_estado_civil = 3;
-                }
-                else if (estado_civil.toUpperCase() === 'DIVORCIADO/A') {
-                    id_estado_civil = 4;
-                }
-                else if (estado_civil.toUpperCase() === 'VIUDO/A') {
-                    id_estado_civil = 5;
-                }
-                //Obtener id del genero
-                var id_genero = 0;
-                if (genero.toUpperCase() === 'MASCULINO') {
-                    id_genero = 1;
-                }
-                else if (genero.toUpperCase() === 'FEMENINO') {
-                    id_genero = 2;
-                }
-                var _longitud = null;
-                if (longitud != 'No registrado') {
-                    _longitud = longitud;
-                }
-                var _latitud = null;
-                if (latitud != 'No registrado') {
-                    _latitud = latitud;
-                }
-                //OBTENER ID DEL ESTADO
-                var id_estado = 1;
-                var estado_user = true;
-                var app_habilita = false;
-                //Obtener id de la nacionalidad
-                const id_nacionalidad = yield database_1.default.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1', [nacionalidad.toUpperCase()]);
-                //Obtener id del rol
-                const id_rol = yield database_1.default.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [rol.toUpperCase()]);
-                console.log('codigo dato 222: ', codigo_dato);
-                console.log('codigo 222: ', codigo);
-                if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
-                    // Incrementar el valor del código
-                    codigo = codigo + 1;
-                }
-                else {
-                    codigo = cedula;
-                }
-                var fec_nacimi = new Date((0, moment_1.default)(fec_nacimiento).format('YYYY-MM-DD'));
-                console.log('codigo: ', codigo);
-                console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
-                console.log('nombre: ', nombreE, ' usuario: ', apellidoE, ' fecha nacimien: ', fec_nacimi, ' estado civil: ', id_estado_civil);
-                console.log('genero: ', id_genero, ' estado: ', id_estado, ' nacionalidad: ', id_nacionalidad.rows, ' rol: ', id_rol);
-                console.log('longitud: ', _longitud, ' latitud: ', _latitud);
-                // Registro de nuevo empleado
-                yield database_1.default.query('INSERT INTO empleados (cedula, apellido, nombre, esta_civil, genero, correo, ' +
-                    'fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) VALUES ' +
-                    '($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)', [cedula, apellidoE, nombreE,
-                    id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
-                    domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
-                // Obtener el id del empleado ingresado
-                const oneEmpley = yield database_1.default.query('SELECT id FROM empleados WHERE cedula = $1', [cedula]);
-                const id_empleado = oneEmpley.rows[0].id;
-                // Registro de los datos de usuario
-                yield database_1.default.query('INSERT INTO usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita) ' +
-                    'VALUES ($1, $2, $3, $4, $5, $6)', [usuario, contrasena, estado_user, id_rol.rows[0]['id'],
-                    id_empleado, app_habilita]);
-                if (contador === plantilla.length) {
-                    console.log('codigo_ver', codigo, VALOR.rows[0].id);
-                    // Actualización del código
-                    if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
-                        yield database_1.default.query('UPDATE codigo SET valor = $1 WHERE id = $2', [codigo, VALOR.rows[0].id]);
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    // REALIZA UN CAPITAL LETTER A LOS NOMBRES Y APELLIDOS
+                    var nombreE;
+                    let nombres = data.nombre.split(' ');
+                    if (nombres.length > 1) {
+                        let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
+                        let name2 = nombres[1].charAt(0).toUpperCase() + nombres[1].slice(1);
+                        nombreE = name1 + ' ' + name2;
                     }
+                    else {
+                        let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
+                        nombreE = name1;
+                    }
+                    var apellidoE;
+                    let apellidos = data.apellido.split(' ');
+                    if (apellidos.length > 1) {
+                        let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
+                        let lastname2 = apellidos[1].charAt(0).toUpperCase() + apellidos[1].slice(1);
+                        apellidoE = lastname1 + ' ' + lastname2;
+                    }
+                    else {
+                        let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
+                        apellidoE = lastname1;
+                    }
+                    // ENCRIPTAR CONTRASEÑA
+                    var md5 = new ts_md5_1.Md5();
+                    var contrasena = (_a = md5.appendStr(data.contrasena).end()) === null || _a === void 0 ? void 0 : _a.toString();
+                    // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
+                    const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono, nacionalidad, usuario, rol } = data;
+                    //OBTENER ID DEL ESTADO_CIVIL
+                    var id_estado_civil = 0;
+                    if (estado_civil.toUpperCase() === 'SOLTERO/A') {
+                        id_estado_civil = 1;
+                    }
+                    else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
+                        id_estado_civil = 2;
+                    }
+                    else if (estado_civil.toUpperCase() === 'CASADO/A') {
+                        id_estado_civil = 3;
+                    }
+                    else if (estado_civil.toUpperCase() === 'DIVORCIADO/A') {
+                        id_estado_civil = 4;
+                    }
+                    else if (estado_civil.toUpperCase() === 'VIUDO/A') {
+                        id_estado_civil = 5;
+                    }
+                    //OBTENER ID DEL GENERO
+                    var id_genero = 0;
+                    if (genero.toUpperCase() === 'MASCULINO') {
+                        id_genero = 1;
+                    }
+                    else if (genero.toUpperCase() === 'FEMENINO') {
+                        id_genero = 2;
+                    }
+                    var _longitud = null;
+                    if (longitud != 'No registrado') {
+                        _longitud = longitud;
+                    }
+                    var _latitud = null;
+                    if (latitud != 'No registrado') {
+                        _latitud = latitud;
+                    }
+                    //OBTENER ID DEL ESTADO
+                    var id_estado = 1;
+                    var estado_user = true;
+                    var app_habilita = false;
+                    //OBTENER ID DE LA NACIONALIDAD
+                    const id_nacionalidad = yield database_1.default.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1', [nacionalidad.toUpperCase()]);
+                    //OBTENER ID DEL ROL
+                    const id_rol = yield database_1.default.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [rol.toUpperCase()]);
+                    if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
+                        // INCREMENTAR EL VALOR DEL CÓDIGO
+                        codigo = codigo + 1;
+                    }
+                    else {
+                        codigo = cedula;
+                    }
+                    var fec_nacimi = new Date((0, moment_1.default)(fec_nacimiento).format('YYYY-MM-DD'));
+                    console.log('codigo: ', codigo);
+                    console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
+                    console.log('nombre: ', nombreE, ' usuario: ', apellidoE, ' fecha nacimien: ', fec_nacimi, ' estado civil: ', id_estado_civil);
+                    console.log('genero: ', id_genero, ' estado: ', id_estado, ' nacionalidad: ', id_nacionalidad.rows, ' rol: ', id_rol);
+                    console.log('longitud: ', _longitud, ' latitud: ', _latitud);
+                    // REGISTRO DE NUEVO EMPLEADO
+                    yield database_1.default.query('INSERT INTO empleados (cedula, apellido, nombre, esta_civil, genero, correo, ' +
+                        'fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) VALUES ' +
+                        '($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)', [cedula, apellidoE, nombreE,
+                        id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
+                        domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'empleados',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{cedula: ${cedula}, apellido: ${apellidoE}, nombre: ${nombreE}, esta_civil: ${id_estado_civil}, genero: ${id_genero}, correo: ${correo}, fec_nacimiento: ${fec_nacimiento}, estado: ${id_estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad.rows[0]['id']}, codigo: ${codigo}, longitud: ${_longitud}, latitud: ${_latitud}}`,
+                        ip,
+                        observacion: null
+                    });
+                    // OBTENER EL ID DEL EMPLEADO INGRESADO
+                    const oneEmpley = yield database_1.default.query('SELECT id FROM empleados WHERE cedula = $1', [cedula]);
+                    const id_empleado = oneEmpley.rows[0].id;
+                    // REGISTRO DE LOS DATOS DE USUARIO
+                    yield database_1.default.query('INSERT INTO usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita) ' +
+                        'VALUES ($1, $2, $3, $4, $5, $6)', [usuario, contrasena, estado_user, id_rol.rows[0]['id'],
+                        id_empleado, app_habilita]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'usuarios',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{usuario: ${usuario}, contrasena: ${contrasena}, estado: ${estado_user}, id_rol: ${id_rol.rows[0]['id']}, id_empleado: ${id_empleado}, app_habilita: ${app_habilita}}`,
+                        ip,
+                        observacion: null
+                    });
+                    if (contador === plantilla.length) {
+                        console.log('codigo_ver', codigo, VALOR.rows[0].id);
+                        // ACTUALIZACIÓN DEL CÓDIGO
+                        if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
+                            yield database_1.default.query('UPDATE codigo SET valor = $1 WHERE id = $2', [codigo, VALOR.rows[0].id]);
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'codigo',
+                                usuario: user_name,
+                                accion: 'U',
+                                datosOriginales: JSON.stringify(codigo_dato),
+                                datosNuevos: `{valor: ${codigo}}`,
+                                ip,
+                                observacion: null
+                            });
+                        }
+                    }
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    contador = contador + 1;
+                    contrasena = undefined;
                 }
-                contador = contador + 1;
-                contrasena = undefined;
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    return res.status(500).jsonp({ message: error });
+                }
             }));
             setTimeout(() => {
                 return res.jsonp({ message: 'correcto' });
@@ -1271,9 +1892,9 @@ class EmpleadoControlador {
             var duplicados3 = [];
             var mensaje = 'correcto';
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                // Datos que se leen de la plantilla ingresada
+                // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
                 var { item, cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, latitud, longitud, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
-                //Verificar que el registo no tenga datos vacios
+                //VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                 if ((item != undefined && item != '') &&
                     (cedula != undefined) && (apellido != undefined) &&
                     (nombre != undefined) && (codigo != undefined) && (estado_civil != undefined) &&
@@ -1301,7 +1922,7 @@ class EmpleadoControlador {
                     data.usuario = usuario;
                     data.contrasena = contrasena;
                     data.rol = rol;
-                    //Valida si los datos de la columna cedula son numeros.
+                    //VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                     const rege = /^[0-9]+$/;
                     if (rege.test(data.cedula)) {
                         if (data.cedula.toString().length > 10 || data.cedula.toString().length < 10) {
@@ -1309,9 +1930,9 @@ class EmpleadoControlador {
                         }
                         else {
                             if (rege.test(data.codigo)) {
-                                // Verificar si la variable tiene el formato de fecha correcto con moment
+                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                                 if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
-                                    //Valida si los datos de la columna telefono son numeros.
+                                    //VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                                     if (telefono != undefined) {
                                         if (rege.test(data.telefono)) {
                                             if (data.telefono.toString().length < 10) {
@@ -1435,12 +2056,12 @@ class EmpleadoControlador {
                         data.rol = 'No registrado';
                         data.observacion = 'Rol ' + data.observacion;
                     }
-                    // Verificar si la variable tiene el formato de fecha correcto con moment
+                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON MOMENT
                     if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) { }
                     else {
                         data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                     }
-                    //Valida si los datos de la columna telefono son numeros.
+                    //VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                     if (telefono != undefined) {
                         const regex = /^[0-9]+$/;
                         if (regex.test(data.telefono)) {
@@ -1463,7 +2084,7 @@ class EmpleadoControlador {
                         data.observacion = 'Cédula ' + data.observacion;
                     }
                     else {
-                        //Valida si los datos de la columna cedula son numeros.
+                        //VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                         const rege = /^[0-9]+$/;
                         if (rege.test(data.cedula)) {
                             if (data.cedula.toString().length != 10) {
@@ -1509,13 +2130,13 @@ class EmpleadoControlador {
                                     if (valor.nacionalidad != 'No registrado') {
                                         var VERIFICAR_NACIONALIDAD = yield database_1.default.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1', [valor.nacionalidad.toUpperCase()]);
                                         if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
-                                            // Discriminación de elementos iguales
+                                            // DISCRIMINACIÓN DE ELEMENTOS IGUALES
                                             if (duplicados1.find((p) => p.cedula === valor.cedula) == undefined) {
-                                                // Discriminación de elementos iguales
+                                                // DISCRIMINACIÓN DE ELEMENTOS IGUALES
                                                 if (duplicados3.find((c) => c.codigo === valor.codigo) == undefined) {
-                                                    // Discriminación de elementos iguales
+                                                    // DISCRIMINACIÓN DE ELEMENTOS IGUALES
                                                     if (duplicados2.find((a) => a.usuario === valor.usuario) == undefined) {
-                                                        //valor.observacion = 'ok'
+                                                        //VALOR.OBSERVACION = 'OK'
                                                         duplicados2.push(valor);
                                                     }
                                                     else {
@@ -1547,14 +2168,14 @@ class EmpleadoControlador {
             }));
             setTimeout(() => {
                 listEmpleadosManual.sort((a, b) => {
-                    // Compara los números de los objetos
+                    // COMPARA LOS NÚMEROS DE LOS OBJETOS
                     if (a.fila < b.fila) {
                         return -1;
                     }
                     if (a.fila > b.fila) {
                         return 1;
                     }
-                    return 0; // Son iguales
+                    return 0; // SON IGUALES
                 });
                 var filaDuplicada = 0;
                 listEmpleadosManual.forEach((item) => {
@@ -1573,9 +2194,9 @@ class EmpleadoControlador {
                             item.observacion = 'ok';
                         }
                     }
-                    //Valida si los datos de la columna N son numeros.
+                    //VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                     if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                        //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                        //CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                         if (item.fila == filaDuplicada) {
                             mensaje = 'error';
                         }
@@ -1606,9 +2227,9 @@ class EmpleadoControlador {
             var contarCodigoData = 0;
             var contador_arreglo = 1;
             var arreglos_datos = [];
-            //Leer la plantilla para llenar un array con los datos cedula y usuario para verificar que no sean duplicados
+            //LEER LA PLANTILLA PARA LLENAR UN ARRAY CON LOS DATOS CEDULA Y USUARIO PARA VERIFICAR QUE NO SEAN DUPLICADOs
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                // Datos que se leen de la plantilla ingresada
+                // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
                 const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, nacionalidad, usuario, estado_user, rol, app_habilita } = data;
                 let datos_array = {
                     cedula: cedula,
@@ -1617,7 +2238,7 @@ class EmpleadoControlador {
                 };
                 arreglos_datos.push(datos_array);
             }));
-            // Vamos a verificar dentro de arreglo_datos que no se encuentren datos duplicados
+            // VAMOS A VERIFICAR DENTRO DE ARREGLO_DATOS QUE NO SE ENCUENTREN DATOS DUPLICADos
             for (var i = 0; i <= arreglos_datos.length - 1; i++) {
                 for (var j = 0; j <= arreglos_datos.length - 1; j++) {
                     if (arreglos_datos[i].cedula === arreglos_datos[j].cedula) {
@@ -1632,7 +2253,7 @@ class EmpleadoControlador {
                 }
                 contador_arreglo = contador_arreglo + 1;
             }
-            // Cuando todos los datos han sido leidos verificamos si todos los datos son correctos
+            // CUANDO TODOS LOS DATOS HAN SIDO LEIDOS VERIFICAMOS SI TODOS LOS DATOS SON CORRECTOS
             console.log('cedula_data', contarCedulaData, plantilla.length, contador_arreglo);
             console.log('usuario_data', contarUsuarioData, plantilla.length, contador_arreglo);
             console.log('codigo_data', contarCodigoData, plantilla.length, contador_arreglo);
@@ -1658,98 +2279,141 @@ class EmpleadoControlador {
     }
     CargarPlantilla_Manual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const plantilla = req.body;
+            const { plantilla, user_name, ip } = req.body;
             console.log('datos manual: ', plantilla);
             var contador = 1;
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                // Realiza un capital letter a los nombres y apellidos
-                var nombreE;
-                let nombres = data.nombre.split(' ');
-                if (nombres.length > 1) {
-                    let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
-                    let name2 = nombres[1].charAt(0).toUpperCase() + nombres[1].slice(1);
-                    nombreE = name1 + ' ' + name2;
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    // REALIZA UN CAPITAL LETTER A LOS NOMBRES Y APELLIDOS
+                    var nombreE;
+                    let nombres = data.nombre.split(' ');
+                    if (nombres.length > 1) {
+                        let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
+                        let name2 = nombres[1].charAt(0).toUpperCase() + nombres[1].slice(1);
+                        nombreE = name1 + ' ' + name2;
+                    }
+                    else {
+                        let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
+                        nombreE = name1;
+                    }
+                    var apellidoE;
+                    let apellidos = data.apellido.split(' ');
+                    if (apellidos.length > 1) {
+                        let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
+                        let lastname2 = apellidos[1].charAt(0).toUpperCase() + apellidos[1].slice(1);
+                        apellidoE = lastname1 + ' ' + lastname2;
+                    }
+                    else {
+                        let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
+                        apellidoE = lastname1;
+                    }
+                    // ENCRIPTAR CONTRASEÑA
+                    const md5 = new ts_md5_1.Md5();
+                    const contrasena = md5.appendStr(data.contrasena).end();
+                    // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
+                    const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, longitud, latitud, telefono, nacionalidad, usuario, rol } = data;
+                    //OBTENER ID DEL ESTADO_CIVIL
+                    var id_estado_civil = 0;
+                    if (estado_civil.toUpperCase() === 'SOLTERA/A') {
+                        id_estado_civil = 1;
+                    }
+                    else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
+                        id_estado_civil = 2;
+                    }
+                    else if (estado_civil.toUpperCase() === 'CASADO/A') {
+                        id_estado_civil = 3;
+                    }
+                    else if (estado_civil.toUpperCase() === 'DIVORCIADO/A') {
+                        id_estado_civil = 4;
+                    }
+                    else if (estado_civil.toUpperCase() === 'VIUDO/A') {
+                        id_estado_civil = 5;
+                    }
+                    //OBTENER ID DEL GENERO
+                    var id_genero = 0;
+                    if (genero.toUpperCase() === 'MASCULINO') {
+                        id_genero = 1;
+                    }
+                    else if (genero.toUpperCase() === 'FEMENINO') {
+                        id_genero = 2;
+                    }
+                    var _longitud = null;
+                    if (longitud != 'No registrado') {
+                        _longitud = longitud;
+                    }
+                    var _latitud = null;
+                    if (latitud != 'No registrado') {
+                        _latitud = latitud;
+                    }
+                    //OBTENER ID DEL ESTADO
+                    var id_estado = 1;
+                    var estado_user = true;
+                    var app_habilita = false;
+                    //OBTENER ID DE LA NACIONALIDAD
+                    const id_nacionalidad = yield database_1.default.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1', [nacionalidad.toUpperCase()]);
+                    //OBTENER ID DEL ROL
+                    const id_rol = yield database_1.default.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [rol.toUpperCase()]);
+                    // REGISTRO DE NUEVO EMPLEADO
+                    yield database_1.default.query('INSERT INTO empleados ( cedula, apellido, nombre, esta_civil, genero, correo, ' +
+                        'fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) VALUES ' +
+                        '($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)', [cedula, apellidoE, nombreE,
+                        id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
+                        domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'empleados',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{cedula: ${cedula}, apellido: ${apellidoE}, nombre: ${nombreE}, esta_civil: ${id_estado_civil}, genero: ${id_genero}, correo: ${correo}, fec_nacimiento: ${fec_nacimiento}, estado: ${id_estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad.rows[0]['id']}, codigo: ${codigo}, longitud: ${_longitud}, latitud: ${_latitud}}`,
+                        ip,
+                        observacion: null
+                    });
+                    // OBTENER EL ID DEL EMPLEADO INGRESADO
+                    const oneEmpley = yield database_1.default.query('SELECT id FROM empleados WHERE cedula = $1', [cedula]);
+                    const id_empleado = oneEmpley.rows[0].id;
+                    // REGISTRO DE LOS DATOS DE USUARIO
+                    yield database_1.default.query('INSERT INTO usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita) ' +
+                        'VALUES ($1, $2, $3, $4, $5, $6)', [usuario, contrasena, estado_user, id_rol.rows[0]['id'], id_empleado,
+                        app_habilita]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'usuarios',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{usuario: ${usuario}, contrasena: ${contrasena}, estado: ${estado_user}, id_rol: ${id_rol.rows[0]['id']}, id_empleado: ${id_empleado}, app_habilita: ${app_habilita}}`,
+                        ip,
+                        observacion: null
+                    });
+                    if (contador === plantilla.length) {
+                        // ACTUALIZACIÓN DEL CÓDIGO
+                        yield database_1.default.query('UPDATE codigo SET valor = null WHERE id = 1');
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'codigo',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: '',
+                            datosNuevos: `{valor: null}`,
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        return res.jsonp({ message: 'correcto' });
+                    }
+                    contador = contador + 1;
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                 }
-                else {
-                    let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
-                    nombreE = name1;
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    return res.status(500).jsonp({ message: error });
                 }
-                var apellidoE;
-                let apellidos = data.apellido.split(' ');
-                if (apellidos.length > 1) {
-                    let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
-                    let lastname2 = apellidos[1].charAt(0).toUpperCase() + apellidos[1].slice(1);
-                    apellidoE = lastname1 + ' ' + lastname2;
-                }
-                else {
-                    let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
-                    apellidoE = lastname1;
-                }
-                // Encriptar contraseña
-                const md5 = new ts_md5_1.Md5();
-                const contrasena = md5.appendStr(data.contrasena).end();
-                // Datos que se leen de la plantilla ingresada
-                const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, longitud, latitud, telefono, nacionalidad, usuario, rol } = data;
-                //Obtener id del estado_civil
-                var id_estado_civil = 0;
-                if (estado_civil.toUpperCase() === 'SOLTERA/A') {
-                    id_estado_civil = 1;
-                }
-                else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
-                    id_estado_civil = 2;
-                }
-                else if (estado_civil.toUpperCase() === 'CASADO/A') {
-                    id_estado_civil = 3;
-                }
-                else if (estado_civil.toUpperCase() === 'DIVORCIADO/A') {
-                    id_estado_civil = 4;
-                }
-                else if (estado_civil.toUpperCase() === 'VIUDO/A') {
-                    id_estado_civil = 5;
-                }
-                //Obtener id del genero
-                var id_genero = 0;
-                if (genero.toUpperCase() === 'MASCULINO') {
-                    id_genero = 1;
-                }
-                else if (genero.toUpperCase() === 'FEMENINO') {
-                    id_genero = 2;
-                }
-                var _longitud = null;
-                if (longitud != 'No registrado') {
-                    _longitud = longitud;
-                }
-                var _latitud = null;
-                if (latitud != 'No registrado') {
-                    _latitud = latitud;
-                }
-                //OBTENER ID DEL ESTADO
-                var id_estado = 1;
-                var estado_user = true;
-                var app_habilita = false;
-                //Obtener id de la nacionalidad
-                const id_nacionalidad = yield database_1.default.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1', [nacionalidad.toUpperCase()]);
-                //Obtener id del rol
-                const id_rol = yield database_1.default.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [rol.toUpperCase()]);
-                // Registro de nuevo empleado
-                yield database_1.default.query('INSERT INTO empleados ( cedula, apellido, nombre, esta_civil, genero, correo, ' +
-                    'fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) VALUES ' +
-                    '($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)', [cedula, apellidoE, nombreE,
-                    id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
-                    domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
-                // Obtener el id del empleado ingresado
-                const oneEmpley = yield database_1.default.query('SELECT id FROM empleados WHERE cedula = $1', [cedula]);
-                const id_empleado = oneEmpley.rows[0].id;
-                // Registro de los datos de usuario
-                yield database_1.default.query('INSERT INTO usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita) ' +
-                    'VALUES ($1, $2, $3, $4, $5, $6)', [usuario, contrasena, estado_user, id_rol.rows[0]['id'], id_empleado,
-                    app_habilita]);
-                if (contador === plantilla.length) {
-                    // Actualización del código
-                    yield database_1.default.query('UPDATE codigo SET valor = null WHERE id = 1');
-                    return res.jsonp({ message: 'correcto' });
-                }
-                contador = contador + 1;
             }));
         });
     }

@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PLAN_GENERAL_CONTROLADOR = void 0;
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class PlanGeneralControlador {
     // METODO PARA REGISTRAR PLAN GENERAL   --**VERIFICADO
@@ -25,41 +26,62 @@ class PlanGeneralControlador {
             errores = 0;
             iterar = 0;
             cont = 0;
+            const { user_name, ip } = req.body;
             for (var i = 0; i < req.body.length; i++) {
-                database_1.default.query(`
-                INSERT INTO plan_general (fec_hora_horario, tolerancia, estado_timbre, id_det_horario,
-                    fec_horario, id_empl_cargo, tipo_entr_salida, codigo, id_horario, tipo_dia, salida_otro_dia,
-                    min_antes, min_despues, estado_origen, min_alimentacion) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                `, [req.body[i].fec_hora_horario, req.body[i].tolerancia, req.body[i].estado_timbre,
-                    req.body[i].id_det_horario, req.body[i].fec_horario, req.body[i].id_empl_cargo,
-                    req.body[i].tipo_entr_salida, req.body[i].codigo, req.body[i].id_horario, req.body[i].tipo_dia,
-                    req.body[i].salida_otro_dia, req.body[i].min_antes, req.body[i].min_despues, req.body[i].estado_origen,
-                    req.body[i].min_alimentacion], (error) => {
-                    iterar = iterar + 1;
-                    try {
-                        console.log('if ', error);
-                        if (error) {
-                            errores = errores + 1;
-                            if (iterar === req.body.length && errores > 0) {
-                                return res.status(200).jsonp({ message: 'error' });
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    database_1.default.query(`
+                    INSERT INTO plan_general (fec_hora_horario, tolerancia, estado_timbre, id_det_horario,
+                        fec_horario, id_empl_cargo, tipo_entr_salida, codigo, id_horario, tipo_dia, salida_otro_dia,
+                        min_antes, min_despues, estado_origen, min_alimentacion) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                    `, [req.body[i].fec_hora_horario, req.body[i].tolerancia, req.body[i].estado_timbre,
+                        req.body[i].id_det_horario, req.body[i].fec_horario, req.body[i].id_empl_cargo,
+                        req.body[i].tipo_entr_salida, req.body[i].codigo, req.body[i].id_horario, req.body[i].tipo_dia,
+                        req.body[i].salida_otro_dia, req.body[i].min_antes, req.body[i].min_despues, req.body[i].estado_origen,
+                        req.body[i].min_alimentacion], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                        iterar = iterar + 1;
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'plan_general',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: JSON.stringify(results.rows),
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        try {
+                            console.log('if ', error);
+                            if (error) {
+                                errores = errores + 1;
+                                if (iterar === req.body.length && errores > 0) {
+                                    return res.status(200).jsonp({ message: 'error' });
+                                }
+                            }
+                            else {
+                                cont = cont + 1;
+                                if (iterar === req.body.length && cont === req.body.length) {
+                                    return res.status(200).jsonp({ message: 'OK' });
+                                }
+                                else if (iterar === req.body.length && cont != req.body.length) {
+                                    return res.status(200).jsonp({ message: 'error' });
+                                }
                             }
                         }
-                        else {
-                            cont = cont + 1;
-                            if (iterar === req.body.length && cont === req.body.length) {
-                                return res.status(200).jsonp({ message: 'OK' });
-                            }
-                            else if (iterar === req.body.length && cont != req.body.length) {
-                                return res.status(200).jsonp({ message: 'error' });
-                            }
+                        catch (error) {
+                            throw error;
                         }
-                    }
-                    catch (error) {
-                        console.log('ver el error ', error);
-                        return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
-                    }
-                });
+                    }));
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
+                }
             }
         });
     }
@@ -89,33 +111,73 @@ class PlanGeneralControlador {
             errores = 0;
             iterar = 0;
             cont = 0;
+            const { user_name, ip } = req.body;
             for (var i = 0; i < req.body.length; i++) {
-                database_1.default.query(`
-                DELETE FROM plan_general WHERE id = $1
-                `, [req.body[i].id], (error) => {
-                    iterar = iterar + 1;
-                    try {
-                        if (error) {
-                            errores = errores + 1;
-                            if (iterar === req.body.length && errores > 0) {
-                                return res.status(200).jsonp({ message: 'error' });
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    // CONSULTAR DATOSORIGINALES
+                    const consulta = yield database_1.default.query(`SELECT * FROM plan_general WHERE id = $1`, [req.body[i].id]);
+                    const [datosOriginales] = consulta.rows;
+                    if (!datosOriginales) {
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'plan_general',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip,
+                            observacion: `Error al eliminar el registro con id ${req.body[i].id}. Registro no encontrado.`
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        return res.status(404).jsonp({ message: 'error' });
+                    }
+                    database_1.default.query(`
+                    DELETE FROM plan_general WHERE id = $1
+                    `, [req.body[i].id], (error) => __awaiter(this, void 0, void 0, function* () {
+                        iterar = iterar + 1;
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'plan_general',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: JSON.stringify(datosOriginales),
+                            datosNuevos: '',
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        try {
+                            if (error) {
+                                errores = errores + 1;
+                                if (iterar === req.body.length && errores > 0) {
+                                    return res.status(200).jsonp({ message: 'error' });
+                                }
+                            }
+                            else {
+                                cont = cont + 1;
+                                if (iterar === req.body.length && cont === req.body.length) {
+                                    return res.status(200).jsonp({ message: 'OK' });
+                                }
+                                else if (iterar === req.body.length && cont != req.body.length) {
+                                    return res.status(200).jsonp({ message: 'error' });
+                                }
                             }
                         }
-                        else {
-                            cont = cont + 1;
-                            if (iterar === req.body.length && cont === req.body.length) {
-                                return res.status(200).jsonp({ message: 'OK' });
-                            }
-                            else if (iterar === req.body.length && cont != req.body.length) {
-                                return res.status(200).jsonp({ message: 'error' });
-                            }
+                        catch (error) {
+                            throw error;
                         }
-                    }
-                    catch (error) {
-                        return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
-                    }
-                });
+                    }));
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
+                }
             }
+            return res.status(200).jsonp({ message: 'OK' });
         });
     }
     // METODO PARA BUSCAR PLANIFICACION EN UN RANGO DE FECHAS
@@ -348,26 +410,71 @@ class PlanGeneralControlador {
     ActualizarManual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { codigo, fecha, id, accion, id_timbre } = req.body;
+                const { codigo, fecha, id, accion, id_timbre, user_name, ip } = req.body;
                 console.log('ver datos ', codigo, ' ', fecha, ' ', id);
                 const ASIGNADO = yield database_1.default.query(`
                 SELECT * FROM fnbuscarregistroasignado ($1, $2::character varying);
                 `, [fecha, codigo]);
                 //console.log('ver asignado ', ASIGNADO)
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM plan_general WHERE id = $1`, [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'plan_general',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el registro con id ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
                 const PLAN = yield database_1.default.query(`
                 UPDATE plan_general SET fec_hora_timbre = $1, estado_timbre = 'R' WHERE id = $2 RETURNING *
                 `, [fecha, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'plan_general',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(PLAN.rows),
+                    ip,
+                    observacion: null
+                });
                 if (PLAN.rowCount > 0) {
                     const TIMBRE = yield database_1.default.query(`
                     UPDATE timbres SET accion = $1 WHERE id = $2
                     `, [accion, id_timbre]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'timbres',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(TIMBRE.rows),
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                     return res.jsonp({ message: 'OK', respuesta: PLAN.rows });
                 }
                 else {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
                     res.status(404).jsonp({ message: 'error' });
                 }
             }
             catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error', error: error });
             }
         });

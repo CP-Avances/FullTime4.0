@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.rolPermisosControlador = void 0;
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class RolPermisosControlador {
     list(req, res) {
@@ -33,21 +34,61 @@ class RolPermisosControlador {
     }
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { funcion, link, etiqueta } = req.body;
-            yield database_1.default.query('INSERT INTO cg_rol_permisos ( funcion, link, etiqueta ) VALUES ($1, $2, $3)', [funcion, link, etiqueta]);
-            console.log(req.body);
-            const rolPermisos = yield database_1.default.query('SELECT id FROM cg_rol_permisos');
-            const ultimoDato = rolPermisos.rows.length - 1;
-            const idRespuesta = rolPermisos.rows[ultimoDato].id;
-            res.jsonp({ message: 'Rol permiso Guardado', id: idRespuesta });
+            try {
+                const { funcion, link, etiqueta, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query('INSERT INTO cg_rol_permisos ( funcion, link, etiqueta ) VALUES ($1, $2, $3)', [funcion, link, etiqueta]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_rol_permisos',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{funcion: ${funcion}, link: ${link}, etiqueta: ${etiqueta}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                const rolPermisos = yield database_1.default.query('SELECT id FROM cg_rol_permisos');
+                const ultimoDato = rolPermisos.rows.length - 1;
+                const idRespuesta = rolPermisos.rows[ultimoDato].id;
+                res.jsonp({ message: 'Rol permiso Guardado', id: idRespuesta });
+            }
+            catch (error) {
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'Error al guardar el rol permiso.' });
+            }
         });
     }
     createPermisoDenegado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_rol, id_permiso } = req.body;
-            yield database_1.default.query('INSERT INTO rol_perm_denegado ( id_rol, id_permiso ) VALUES ($1, $2)', [id_rol, id_permiso]);
-            console.log(req.body);
-            res.jsonp({ message: 'Permiso denegado Guardado' });
+            try {
+                const { id_rol, id_permiso, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query('INSERT INTO rol_perm_denegado ( id_rol, id_permiso ) VALUES ($1, $2)', [id_rol, id_permiso]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'rol_perm_denegado',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{id_rol: ${id_rol}, id_permiso: ${id_permiso}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Permiso denegado Guardado' });
+            }
+            catch (error) {
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'Error al guardar el permiso denegado.' });
+            }
         });
     }
     getPermisosUsuario(req, res) {

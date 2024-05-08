@@ -13,28 +13,67 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.timbresControlador = void 0;
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class TimbresControlador {
     // ELIMINAR NOTIFICACIONES TABLA DE AVISOS --**VERIFICADO
     EliminarMultiplesAvisos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const arregloAvisos = req.body;
-            let contador = 0;
-            if (arregloAvisos.length > 0) {
-                contador = 0;
-                arregloAvisos.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
-                    yield database_1.default.query('DELETE FROM realtime_timbres WHERE id = $1', [obj])
-                        .then((result) => {
-                        contador = contador + 1;
-                        if (contador === arregloAvisos.length) {
-                            return res.jsonp({ message: 'OK' });
+            try {
+                const { arregloAvisos, user_name, ip } = req.body;
+                let contador = 0;
+                if (arregloAvisos.length > 0) {
+                    contador = 0;
+                    arregloAvisos.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // CONSULTAR DATOSORIGINALES
+                        const consulta = yield database_1.default.query('SELECT * FROM realtime_timbres WHERE id = $1', [obj]);
+                        const [datosOriginales] = consulta.rows;
+                        if (!datosOriginales) {
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'realtime_timbres',
+                                usuario: user_name,
+                                accion: 'D',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al eliminar el registro con id ${obj}. Registro no encontrado.`
+                            });
+                            //FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                         }
-                        console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
-                    });
-                }));
+                        yield database_1.default.query('DELETE FROM realtime_timbres WHERE id = $1', [obj])
+                            .then((result) => __awaiter(this, void 0, void 0, function* () {
+                            contador = contador + 1;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'realtime_timbres',
+                                usuario: user_name,
+                                accion: 'D',
+                                datosOriginales: JSON.stringify(datosOriginales),
+                                datosNuevos: '',
+                                ip,
+                                observacion: null
+                            });
+                            //FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            if (contador === arregloAvisos.length) {
+                                return res.jsonp({ message: 'OK' });
+                            }
+                            console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
+                        }));
+                    }));
+                }
+                else {
+                    return res.jsonp({ message: 'error' });
+                }
             }
-            else {
-                return res.jsonp({ message: 'error' });
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -225,7 +264,7 @@ class TimbresControlador {
                 if (clientIp != null && clientIp != '' && clientIp != undefined) {
                     ip_cliente = clientIp.split(':')[3];
                 }
-                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion } = req.body;
+                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip } = req.body;
                 //console.log('ingresa informacion ', req.body)
                 let f = new Date();
                 const id_empleado = req.userIdEmpleado;
@@ -235,24 +274,40 @@ class TimbresControlador {
                 if (code.length === 0)
                     return { mensaje: 'El usuario no tiene un código asignado.' };
                 var codigo = parseInt(code[0].codigo);
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
                 const [timbre] = yield database_1.default.query(`
                 INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, 
                     codigo, fec_hora_timbre_servidor, id_reloj, ubicacion, dispositivo_timbre)
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id
                 `, [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
                     f.toLocaleString(), id_reloj, ubicacion, ip_cliente])
-                    .then((result) => {
+                    .then((result) => __awaiter(this, void 0, void 0, function* () {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'timbres',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{fec_hora_timbre: ${fec_hora_timbre}, accion: ${accion}, tecl_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fec_hora_timbre_servidor: ${f.toLocaleString()}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: ${ip_cliente}}`,
+                        ip,
+                        observacion: null
+                    });
+                    //FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                     return result.rows;
-                }).catch((err) => {
+                })).catch((err) => {
                     return err;
                 });
                 if (timbre) {
                     return res.status(200).jsonp({ message: 'Registro guardado.' });
                 }
-                return res.status(400).jsonp({ message: 'Ups!!! algo ha salido mal.' });
+                return res.status(500).jsonp({ message: 'Ups!!! algo ha salido mal.' });
             }
             catch (error) {
-                res.status(400).jsonp({ message: error });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -283,20 +338,34 @@ class TimbresControlador {
                     return { mensaje: 'El usuario no tiene un código asignado.' };
                 // var codigo = parseInt(code[0].codigo);
                 var codigo = code[0].codigo;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
                 INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, 
                     longitud, codigo, id_reloj, dispositivo_timbre, fec_hora_timbre_servidor) 
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 `, [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
                     id_reloj, ip_cliente, servidor])
-                    .then((result) => {
+                    .then((result) => __awaiter(this, void 0, void 0, function* () {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'timbres',
+                        usuario: 'admin',
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{fec_hora_timbre: ${fec_hora_timbre}, accion: ${accion}, tecl_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: ${ip_cliente}, fec_hora_timbre_servidor: ${servidor}}`,
+                        ip: ip_cliente,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                     res.status(200).jsonp({ message: 'Registro guardado.' });
-                }).catch((err) => {
-                    res.status(400).jsonp({ message: err });
-                });
+                }));
             }
             catch (error) {
-                res.status(400).jsonp({ message: error });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -423,13 +492,48 @@ class TimbresControlador {
     }
     ActualizarVista(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id_noti_timbre;
-            const { visto } = req.body;
-            console.log(id, visto);
-            yield database_1.default.query('UPDATE realtime_timbres SET visto = $1 WHERE id = $2', [visto, id])
-                .then((result) => {
-                res.jsonp({ message: 'Vista Actualizada' });
-            });
+            try {
+                const id = req.params.id_noti_timbre;
+                const { visto, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query('SELECT * FROM realtime_timbres WHERE id = $1', [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'realtime_timbres',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el registro con id ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query('UPDATE realtime_timbres SET visto = $1 WHERE id = $2', [visto, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'realtime_timbres',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{visto: ${visto}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.status(200).jsonp({ message: 'Vista actualizada' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar la vista.' });
+            }
         });
     }
     ObtenerUltimoTimbreEmpleado(req, res) {

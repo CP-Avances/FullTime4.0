@@ -13,21 +13,37 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DEPARTAMENTO_CONTROLADOR = void 0;
-const builder = require('xmlbuilder');
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class DepartamentoControlador {
     // REGISTRAR DEPARTAMENTO
     CrearDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id_sucursal } = req.body;
+                const { nombre, id_sucursal, user_name, ip } = req.body;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
         INSERT INTO cg_departamentos (nombre, id_sucursal ) VALUES ($1, $2)
         `, [nombre, id_sucursal]);
-                res.jsonp({ message: 'Registro guardado.' });
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_departamentos',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{Nombre: ${nombre}, Sucursal: ${id_sucursal}}`,
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -35,17 +51,49 @@ class DepartamentoControlador {
     ActualizarDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id_sucursal } = req.body;
+                const { nombre, id_sucursal, user_name, ip } = req.body;
                 const id = req.params.id;
-                console.log(id);
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOS ANTES DE ACTUALIZAR
+                const response = yield database_1.default.query('SELECT * FROM cg_departamentos WHERE id = $1', [id]);
+                const datos = response.rows[0];
+                if (!datos) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'cg_departamentos',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        observacion: `Error al actualizar el departamento con ID: ${id}`,
+                    });
+                    // FINALIZAR TRANSACCIÓN
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
                 yield database_1.default.query(`
         UPDATE cg_departamentos set nombre = $1, id_sucursal = $2 
         WHERE id = $3
         `, [nombre, id_sucursal, id]);
-                res.jsonp({ message: 'Registro actualizado.' });
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_departamentos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: `{Nombre: ${nombre}, Sucursal: ${id_sucursal}}`,
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -167,26 +215,81 @@ class DepartamentoControlador {
     // METODO PARA ELIMINAR REGISTRO
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-      DELETE FROM cg_departamentos WHERE id = $1
-      `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                const id = req.params.id;
+                const { user_name, ip } = req.body;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOS ANTES DE ELIMINAR
+                const response = yield database_1.default.query('SELECT * FROM cg_departamentos WHERE id = $1', [id]);
+                const datos = response.rows[0];
+                if (!datos) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'cg_departamentos',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        observacion: `Error al eliminar el departamento con ID: ${id}`,
+                    });
+                    // FINALIZAR TRANSACCIÓN
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM cg_departamentos WHERE id = $1
+        `, [id]);
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_departamentos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: '',
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
     CrearNivelDepa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_departamento, departamento, nivel, dep_nivel, dep_nivel_nombre, id_establecimiento, id_suc_dep_nivel } = req.body;
+                const { id_departamento, departamento, nivel, dep_nivel, dep_nivel_nombre, id_establecimiento, id_suc_dep_nivel, user_name, ip } = req.body;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
         INSERT INTO nivel_jerarquicodep (departamento, id_departamento, nivel, dep_nivel_nombre, id_dep_nivel, 
           id_establecimiento, id_suc_dep_nivel ) VALUES ($1, $2, $3, $4, $5, $6, $7)
         `, [departamento, id_departamento, nivel, dep_nivel_nombre, dep_nivel, id_establecimiento, id_suc_dep_nivel]);
-                res.jsonp({ message: 'Registro guardado.' });
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'nivel_jerarquicodep',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{Departamento: ${departamento}, Nivel: ${nivel}, Departamento Nivel: ${dep_nivel_nombre}}`,
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -211,46 +314,161 @@ class DepartamentoControlador {
     ActualizarNivelDepa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nivel } = req.body;
+                const { nivel, user_name, ip } = req.body;
                 const id = req.params.id;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOS ANTES DE ACTUALIZAR
+                const response = yield database_1.default.query('SELECT * FROM nivel_jerarquicodep WHERE id = $1', [id]);
+                const datos = response.rows[0];
+                if (!datos) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'nivel_jerarquicodep',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        observacion: `Error al actualizar el nivel de departamento con ID: ${id}`,
+                    });
+                    // FINALIZAR TRANSACCIÓN
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
                 yield database_1.default.query(`
         UPDATE nivel_jerarquicodep set nivel = $1 
         WHERE id = $2
         `, [nivel, id]);
-                res.jsonp({ message: 'Registro actualizado.' });
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'nivel_jerarquicodep',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: `{Nivel: ${nivel}}`,
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
     // METODO PARA ELIMINAR REGISTRO DE NIVEL DE DEPARTAMENTO   --**VERIFICADO
     EliminarRegistroNivelDepa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-      DELETE FROM nivel_jerarquicodep WHERE id = $1
-      `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                const id = req.params.id;
+                const { user_name, ip } = req.body;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOS ANTES DE ELIMINAR
+                const response = yield database_1.default.query('SELECT * FROM nivel_jerarquicodep WHERE id = $1', [id]);
+                const datos = response.rows[0];
+                if (!datos) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'nivel_jerarquicodep',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        observacion: `Error al eliminar el nivel de departamento con ID: ${id}`,
+                    });
+                    // FINALIZAR TRANSACCIÓN
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM nivel_jerarquicodep WHERE id = $1
+        `, [id]);
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'nivel_jerarquicodep',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: '',
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
     ActualizarNombreNivel(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_departamento, departamento } = req.body;
+                const { id_departamento, departamento, user_name, ip } = req.body;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOS ANTES DE ACTUALIZAR
+                const response = yield database_1.default.query('SELECT * FROM nivel_jerarquicodep WHERE id_departamento = $1', [id_departamento]);
+                const [datos] = response.rows;
+                if (!datos) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'nivel_jerarquicodep',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        observacion: `Error al actualizar el nivel de departamento con ID: ${id_departamento}`,
+                    });
+                    // FINALIZAR TRANSACCIÓN
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
                 yield database_1.default.query(`
         UPDATE nivel_jerarquicodep SET departamento = $1
         WHERE id_departamento = $2
         `, [departamento, id_departamento]);
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'nivel_jerarquicodep',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: `{Departamento: ${departamento}}`,
+                    ip: ip,
+                    observacion: null
+                });
                 yield database_1.default.query(`
         UPDATE nivel_jerarquicodep SET dep_nivel_nombre = $1
         WHERE id_dep_nivel = $2
         `, [departamento, id_departamento]);
-                res.jsonp({ message: 'Registro guardado.' });
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'nivel_jerarquicodep',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: `{Departamento: ${departamento}}`,
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }

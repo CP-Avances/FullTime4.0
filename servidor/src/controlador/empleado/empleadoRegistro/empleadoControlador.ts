@@ -1147,8 +1147,11 @@ class EmpleadoControlador {
   // BUSQUEDA DE DATOS DE EMPLEADO INGRESANDO EL NOMBRE
   public async BuscarEmpleadoNombre(req: Request, res: Response): Promise<any> {
     const { informacion } = req.body;
+    console.log(informacion);
     const EMPLEADO = await pool.query('SELECT * FROM empleados WHERE ' +
       '(UPPER (apellido) || \' \' || UPPER (nombre)) = $1', [informacion]);
+
+    console.log(EMPLEADO.rows);
     if (EMPLEADO.rowCount > 0) {
       return res.jsonp(EMPLEADO.rows)
     }

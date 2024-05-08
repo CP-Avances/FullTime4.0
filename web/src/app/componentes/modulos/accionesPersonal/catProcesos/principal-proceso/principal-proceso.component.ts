@@ -39,10 +39,14 @@ export class PrincipalProcesoComponent implements OnInit {
   filtroNombre = '';
   filtroNivel: number;
   filtroProPadre = '';
-  
+
   procesos: any = [];
   empleado: any = [];
   idEmpleado: number;
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   get habilitarAccion(): boolean { return this.funciones.accionesPersonal; }
 
@@ -57,6 +61,8 @@ export class PrincipalProcesoComponent implements OnInit {
     private funciones: MainNavService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   // ITEMS DE PAGINACION DE LA TABLA
@@ -82,7 +88,7 @@ export class PrincipalProcesoComponent implements OnInit {
     }
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -98,7 +104,7 @@ export class PrincipalProcesoComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -148,7 +154,12 @@ export class PrincipalProcesoComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTROS
   Eliminar(id_proceso: number) {
-    this.rest.deleteProcesoRest(id_proceso).subscribe(res => {
+    let datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.rest.deleteProcesoRest(id_proceso, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -179,7 +190,7 @@ export class PrincipalProcesoComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                               METODO PARA EXPORTAR A PDF                                     ** **
    ** ************************************************************************************************** **/
 
@@ -275,7 +286,7 @@ export class PrincipalProcesoComponent implements OnInit {
     };
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   exportToExcel() {
@@ -285,7 +296,7 @@ export class PrincipalProcesoComponent implements OnInit {
     xlsx.writeFile(wb, "Procesos" + new Date().getTime() + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
    ** ************************************************************************************************** **/
 

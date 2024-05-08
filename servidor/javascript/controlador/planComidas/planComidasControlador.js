@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PLAN_COMIDAS_CONTROLADOR = void 0;
 const settingsMail_1 = require("../../libs/settingsMail");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const builder = require('xmlbuilder');
@@ -166,13 +167,27 @@ class PlanComidasControlador {
     CrearPlanComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, fec_inicio, fec_final } = req.body;
+                const { fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, fec_inicio, fec_final, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
         INSERT INTO plan_comidas (fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, 
           fec_inicio, fec_final) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
         `, [fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, fec_inicio, fec_final]);
                 const [planAlimentacion] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'plan_comidas',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(planAlimentacion),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 if (!planAlimentacion) {
                     return res.status(404).jsonp({ message: 'error' });
                 }
@@ -181,6 +196,8 @@ class PlanComidasControlador {
                 }
             }
             catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
             }
         });
@@ -198,11 +215,49 @@ class PlanComidasControlador {
     }
     ActualizarPlanComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id } = req.body;
-            yield database_1.default.query('UPDATE plan_comidas SET id_empleado = $1, fecha = $2, id_comida = $3, ' +
-                'observacion = $4, fec_comida = $5, hora_inicio = $6, hora_fin = $7, extra = $8 ' +
-                'WHERE id = $9', [fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id]);
-            res.jsonp({ message: 'Planificación del almuerzo ha sido guardado con éxito' });
+            try {
+                const { fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const planComida = yield database_1.default.query('SELECT * FROM plan_comidas WHERE id = $1', [id]);
+                const [datosOriginales] = planComida.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'plan_comidas',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar planificación de comidas con id: ${id}. Registro no encontrado`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado' });
+                }
+                yield database_1.default.query('UPDATE plan_comidas SET id_empleado = $1, fecha = $2, id_comida = $3, ' +
+                    'observacion = $4, fec_comida = $5, hora_inicio = $6, hora_fin = $7, extra = $8 ' +
+                    'WHERE id = $9', [fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'plan_comidas',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{"id": ${id}, "fecha": "${fecha}", "id_comida": ${id_comida}, "observacion": "${observacion}", "fec_comida": "${fec_comida}", "hora_inicio": "${hora_inicio}", "hora_fin": "${hora_fin}", "extra": "${extra}"}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Planificación del almuerzo ha sido guardado con éxito' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     EncontrarPlanComidaEmpleadoConsumido(req, res) {
@@ -272,16 +327,37 @@ class PlanComidasControlador {
     }
     CrearTipoComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre } = req.body;
-            const response = yield database_1.default.query('INSERT INTO tipo_comida (nombre) VALUES ($1) RETURNING *', [nombre]);
-            const [tipo] = response.rows;
-            if (tipo) {
-                return res.status(200).jsonp(tipo);
+            try {
+                const { nombre, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query('INSERT INTO tipo_comida (nombre) VALUES ($1) RETURNING *', [nombre]);
+                const [tipo] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'tipo_comida',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(tipo),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (tipo) {
+                    return res.status(200).jsonp(tipo);
+                }
+                else {
+                    return res.status(404).jsonp({ message: "error" });
+                }
+                ;
             }
-            else {
-                return res.status(404).jsonp({ message: "error" });
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
-            ;
         });
     }
     VerUltimoTipoComidas(req, res) {
@@ -302,10 +378,24 @@ class PlanComidasControlador {
     CrearSolicitaComida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, verificar, id_departamento } = req.body;
+                const { id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, verificar, id_departamento, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query('INSERT INTO solicita_comidas (id_empleado, fecha, id_comida, observacion, fec_comida, ' +
                     'hora_inicio, hora_fin, extra, verificar) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *', [id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, verificar]);
                 const [objetoAlimento] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'solicita_comidas',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(objetoAlimento),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 if (!objetoAlimento)
                     return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
                 const alimento = objetoAlimento;
@@ -357,7 +447,8 @@ class PlanComidasControlador {
                 }
             }
             catch (error) {
-                console.log(error);
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
             }
         });
@@ -365,151 +456,412 @@ class PlanComidasControlador {
     // METODO DE ACTUALIZACIÓN DE SERVICIO DE ALIMENTACION
     ActualizarSolicitaComida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id, id_departamento } = req.body;
-            const response = yield database_1.default.query(`
-      UPDATE solicita_comidas SET id_empleado = $1, fecha = $2, id_comida = $3, 
-      observacion = $4, fec_comida = $5, hora_inicio = $6, hora_fin = $7, extra = $8 
-      WHERE id = $9 RETURNING *
-      `, [id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id]);
-            const [objetoAlimento] = response.rows;
-            if (!objetoAlimento)
-                return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
-            const alimento = objetoAlimento;
-            const JefesDepartamentos = yield database_1.default.query(`
-        SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc, 
-        cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato, 
-        e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo, 
-        c.comida_mail, c.comida_noti 
-        FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-        sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-        WHERE da.id_departamento = $1 AND 
-        da.id_empl_cargo = ecr.id AND 
-        da.id_departamento = cg.id AND 
-        da.estado = true AND 
-        cg.id_sucursal = s.id AND 
-        ecr.id_empl_contrato = ecn.id AND 
-        ecn.id_empleado = e.id AND 
-        e.id = c.id_empleado
-        `, [id_departamento]).then((result) => { return result.rows; });
-            console.log(JefesDepartamentos);
-            if (JefesDepartamentos.length === 0)
-                return res.status(400)
-                    .jsonp({ message: 'Ups !!! algo salio mal. Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.' });
-            const [obj] = JefesDepartamentos;
-            let depa_padre = obj.depa_padre;
-            let JefeDepaPadre;
-            if (depa_padre !== null) {
-                do {
-                    JefeDepaPadre = yield database_1.default.query(`
-            SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, 
-            cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, 
-            ecn.id AS contrato, e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname, e.cedula, 
-            e.correo, c.comida_mail, 
-            c.comida_noti FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-            sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-            WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND da.id_departamento = cg.id AND 
-            da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND 
-            ecn.id_empleado = e.id AND e.id = c.id_empleado
-            `, [depa_padre]);
-                    depa_padre = JefeDepaPadre.rows[0].depa_padre;
-                    JefesDepartamentos.push(JefeDepaPadre.rows[0]);
-                } while (depa_padre !== null);
-                alimento.EmpleadosSendNotiEmail = JefesDepartamentos;
-                return res.status(200).jsonp(alimento);
+            try {
+                const { id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id, id_departamento, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const planComida = yield database_1.default.query('SELECT * FROM solicita_comidas WHERE id = $1', [id]);
+                const [datosOriginales] = planComida.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'solicita_comidas',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar solicitud de comidas con id: ${id}. Registro no encontrado`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado' });
+                }
+                const response = yield database_1.default.query(`
+        UPDATE solicita_comidas SET id_empleado = $1, fecha = $2, id_comida = $3, 
+        observacion = $4, fec_comida = $5, hora_inicio = $6, hora_fin = $7, extra = $8 
+        WHERE id = $9 RETURNING *
+        `, [id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id]);
+                const [objetoAlimento] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'solicita_comidas',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(objetoAlimento),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (!objetoAlimento)
+                    return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
+                const alimento = objetoAlimento;
+                const JefesDepartamentos = yield database_1.default.query(`
+          SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc, 
+          cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato, 
+          e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo, 
+          c.comida_mail, c.comida_noti 
+          FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
+          sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
+          WHERE da.id_departamento = $1 AND 
+          da.id_empl_cargo = ecr.id AND 
+          da.id_departamento = cg.id AND 
+          da.estado = true AND 
+          cg.id_sucursal = s.id AND 
+          ecr.id_empl_contrato = ecn.id AND 
+          ecn.id_empleado = e.id AND 
+          e.id = c.id_empleado
+          `, [id_departamento]).then((result) => { return result.rows; });
+                console.log(JefesDepartamentos);
+                if (JefesDepartamentos.length === 0)
+                    return res.status(400)
+                        .jsonp({ message: 'Ups !!! algo salio mal. Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.' });
+                const [obj] = JefesDepartamentos;
+                let depa_padre = obj.depa_padre;
+                let JefeDepaPadre;
+                if (depa_padre !== null) {
+                    do {
+                        JefeDepaPadre = yield database_1.default.query(`
+              SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, 
+              cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, 
+              ecn.id AS contrato, e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname, e.cedula, 
+              e.correo, c.comida_mail, 
+              c.comida_noti FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
+              sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
+              WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND da.id_departamento = cg.id AND 
+              da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND 
+              ecn.id_empleado = e.id AND e.id = c.id_empleado
+              `, [depa_padre]);
+                        depa_padre = JefeDepaPadre.rows[0].depa_padre;
+                        JefesDepartamentos.push(JefeDepaPadre.rows[0]);
+                    } while (depa_padre !== null);
+                    alimento.EmpleadosSendNotiEmail = JefesDepartamentos;
+                    return res.status(200).jsonp(alimento);
+                }
+                else {
+                    alimento.EmpleadosSendNotiEmail = JefesDepartamentos;
+                    return res.status(200).jsonp(alimento);
+                }
             }
-            else {
-                alimento.EmpleadosSendNotiEmail = JefesDepartamentos;
-                return res.status(200).jsonp(alimento);
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
     // ELIMINAR REGISTRO DE SOLIICTUD DE COMIDA
     EliminarSolicitudComida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const response = yield database_1.default.query(`
-      DELETE FROM solicita_comidas WHERE id = $1 RETURNING *
-      `, [id]);
-            const [alimentacion] = response.rows;
-            if (alimentacion) {
-                return res.status(200).jsonp(alimentacion);
+            try {
+                // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
+                const { user_name, ip } = req.body;
+                const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const planComida = yield database_1.default.query('SELECT * FROM solicita_comidas WHERE id = $1', [id]);
+                const [datosOriginales] = planComida.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'solicita_comidas',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar solicitud de comidas con id: ${id}. Registro no encontrado`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado' });
+                }
+                const response = yield database_1.default.query(`
+        DELETE FROM solicita_comidas WHERE id = $1 RETURNING *
+        `, [id]);
+                const [alimentacion] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'solicita_comidas',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (alimentacion) {
+                    return res.status(200).jsonp(alimentacion);
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'Solicitud no eliminada.' });
+                }
             }
-            else {
-                return res.status(404).jsonp({ message: 'Solicitud no eliminada.' });
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
     // METODO PARA ACTUALIZAR ESTADO DE SOLICITUD DE ALIMENTACION
     AprobarSolicitaComida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { aprobada, verificar, id } = req.body;
-            const response = yield database_1.default.query(`
-      UPDATE solicita_comidas SET aprobada = $1, verificar = $2 WHERE id = $3 RETURNING *
-      `, [aprobada, verificar, id]);
-            const [objetoAlimento] = response.rows;
-            if (objetoAlimento) {
-                return res.status(200).jsonp(objetoAlimento);
+            try {
+                const { aprobada, verificar, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const planComida = yield database_1.default.query('SELECT * FROM solicita_comidas WHERE id = $1', [id]);
+                const [datosOriginales] = planComida.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'solicita_comidas',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar estado de solicitud de comidas con id: ${id}. Registro no encontrado`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado' });
+                }
+                const response = yield database_1.default.query(`
+        UPDATE solicita_comidas SET aprobada = $1, verificar = $2 WHERE id = $3 RETURNING *
+        `, [aprobada, verificar, id]);
+                const [objetoAlimento] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'solicita_comidas',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(objetoAlimento),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (objetoAlimento) {
+                    return res.status(200).jsonp(objetoAlimento);
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
             }
-            else {
-                return res.status(404).jsonp({ message: 'error' });
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
     //  CREAR REGISTRO DE ALIMENTOS APROBADOS POR EMPLEADO
     CrearComidaAprobada(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { codigo, id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido } = req.body;
-            const response = yield database_1.default.query(`
-      INSERT INTO plan_comida_empleado (codigo, id_empleado, id_sol_comida, fecha,
-      hora_inicio, hora_fin, consumido ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-      `, [codigo, id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido]);
-            const [objetoAlimento] = response.rows;
-            if (objetoAlimento) {
-                return res.status(200).jsonp(objetoAlimento);
+            try {
+                const { codigo, id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query(`
+        INSERT INTO plan_comida_empleado (codigo, id_empleado, id_sol_comida, fecha,
+        hora_inicio, hora_fin, consumido ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+        `, [codigo, id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido]);
+                const [objetoAlimento] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'plan_comida_empleado',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(objetoAlimento),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (objetoAlimento) {
+                    return res.status(200).jsonp(objetoAlimento);
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
             }
-            else {
-                return res.status(404).jsonp({ message: 'error' });
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
     // ELIMINAR ALIMENTACION APROBADA
     EliminarComidaAprobada(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const fecha = req.params.fecha;
-            const id_empleado = req.params.id_empleado;
-            const response = yield database_1.default.query(`
-      DELETE FROM plan_comida_empleado WHERE id_sol_comida = $1 AND fecha = $2 AND id_empleado = $3
-      RETURNING *
-      `, [id, fecha, id_empleado]);
-            const [objetoAlimento] = response.rows;
-            if (objetoAlimento) {
-                return res.status(200).jsonp(objetoAlimento);
+            try {
+                const id = req.params.id;
+                const fecha = req.params.fecha;
+                const id_empleado = req.params.id_empleado;
+                // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
+                const { user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const planComida = yield database_1.default.query(`
+        SELECT * FROM plan_comida_empleado WHERE id_sol_comida = $1 AND fecha = $2 AND id_empleado = $3
+        `, [id, fecha, id_empleado]);
+                const [datosOriginales] = planComida.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'plan_comida_empleado',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar registro de planificación de comidas con id: ${id}. Registro no encontrado`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado' });
+                }
+                const response = yield database_1.default.query(`
+        DELETE FROM plan_comida_empleado WHERE id_sol_comida = $1 AND fecha = $2 AND id_empleado = $3
+        RETURNING *
+        `, [id, fecha, id_empleado]);
+                const [objetoAlimento] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'plan_comida_empleado',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (objetoAlimento) {
+                    return res.status(200).jsonp(objetoAlimento);
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
             }
-            else {
-                return res.status(404).jsonp({ message: 'error' });
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
     // ELIMINAR REGISTRO DE ALIMENTACION
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-      DELETE FROM plan_comidas WHERE id = $1
-      `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
+                const { user_name, ip } = req.body;
+                const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const planComida = yield database_1.default.query('SELECT * FROM plan_comidas WHERE id = $1', [id]);
+                const [datosOriginales] = planComida.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'plan_comidas',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar registro de planificación de comidas con id: ${id}. Registro no encontrado`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM plan_comidas WHERE id = $1
+        `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'plan_comidas',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     // ELIMINAR PLANIFICACION DE UN USUARIO ESPECIFICO
     EliminarPlanComidaEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const id_empleado = req.params.id_empleado;
-            yield database_1.default.query(`
-      DELETE FROM plan_comida_empleado WHERE id_plan_comida = $1 AND id_empleado = $2
-      `, [id, id_empleado]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
+                const { user_name, ip } = req.body;
+                const id = req.params.id;
+                const id_empleado = req.params.id_empleado;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const planComida = yield database_1.default.query(`
+        SELECT * FROM plan_comida_empleado WHERE id_plan_comida = $1 AND id_empleado = $2
+        `, [id, id_empleado]);
+                const [datosOriginales] = planComida.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'plan_comida_empleado',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar registro de planificación de comidas con id: ${id}. Registro no encontrado`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM plan_comida_empleado WHERE id_plan_comida = $1 AND id_empleado = $2
+        `, [id, id_empleado]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'plan_comida_empleado',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     // BUSQUEDA DE PLANIFICCAIONES DE ALIMENTACION POR ID DE PLANIFICACION
@@ -537,12 +889,33 @@ class PlanComidasControlador {
     // CREAR PLANIFICACIÓN POR EMPLEADO
     CrearPlanEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { codigo, id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido } = req.body;
-            yield database_1.default.query(`
-        INSERT INTO plan_comida_empleado (codigo, id_empleado, id_plan_comida, fecha, 
-        hora_inicio, hora_fin, consumido ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-        `, [codigo, id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido]);
-            res.jsonp({ message: 'Planificación del almuerzo ha sido guardada con éxito' });
+            try {
+                const { codigo, id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                yield database_1.default.query(`
+          INSERT INTO plan_comida_empleado (codigo, id_empleado, id_plan_comida, fecha, 
+          hora_inicio, hora_fin, consumido ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+          `, [codigo, id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'plan_comida_empleado',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(req.body),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Planificación del almuerzo ha sido guardada con éxito' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     // METODO PARA BUSCAR DATOS DE PLANIFICACIÓN DE ALIMENTACIÓN POR ID DE USUARIO
@@ -574,30 +947,51 @@ class PlanComidasControlador {
     // NOTIFICACIONES DE SOLICITUDES Y PLANIFICACIÓN DE SERVICIO DE ALIMENTACIÓN
     EnviarNotificacionComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let { id_empl_envia, id_empl_recive, mensaje, tipo, id_comida } = req.body;
-            var tiempo = (0, settingsMail_1.fechaHora)();
-            let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
-            const SERVICIO_SOLICITADO = yield database_1.default.query(`
-        SELECT tc.nombre AS servicio, ctc.nombre AS menu, ctc.hora_inicio, ctc.hora_fin, 
-          dm.nombre AS comida, dm.valor, dm.observacion 
-        FROM tipo_comida AS tc, cg_tipo_comidas AS ctc, detalle_menu AS dm 
-        WHERE tc.id = ctc.tipo_comida AND ctc.id = dm.id_menu AND dm.id = $1
-      `, [id_comida]);
-            let notifica = mensaje + SERVICIO_SOLICITADO.rows[0].servicio;
-            const response = yield database_1.default.query(`
-      INSERT INTO realtime_timbres(create_at, id_send_empl, id_receives_empl, descripcion, tipo) 
-      VALUES($1, $2, $3, $4, $5) RETURNING *
-      `, [create_at, id_empl_envia, id_empl_recive, notifica, tipo]);
-            const [notificiacion] = response.rows;
-            if (!notificiacion)
-                return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
-            const USUARIO = yield database_1.default.query(`
-      SELECT (nombre || ' ' || apellido) AS usuario
-      FROM empleados WHERE id = $1
-      `, [id_empl_envia]);
-            notificiacion.usuario = USUARIO.rows[0].usuario;
-            return res.status(200)
-                .jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
+            try {
+                let { id_empl_envia, id_empl_recive, mensaje, tipo, id_comida, user_name, ip } = req.body;
+                var tiempo = (0, settingsMail_1.fechaHora)();
+                let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
+                const SERVICIO_SOLICITADO = yield database_1.default.query(`
+          SELECT tc.nombre AS servicio, ctc.nombre AS menu, ctc.hora_inicio, ctc.hora_fin, 
+            dm.nombre AS comida, dm.valor, dm.observacion 
+          FROM tipo_comida AS tc, cg_tipo_comidas AS ctc, detalle_menu AS dm 
+          WHERE tc.id = ctc.tipo_comida AND ctc.id = dm.id_menu AND dm.id = $1
+        `, [id_comida]);
+                let notifica = mensaje + SERVICIO_SOLICITADO.rows[0].servicio;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query(`
+        INSERT INTO realtime_timbres(create_at, id_send_empl, id_receives_empl, descripcion, tipo) 
+        VALUES($1, $2, $3, $4, $5) RETURNING *
+        `, [create_at, id_empl_envia, id_empl_recive, notifica, tipo]);
+                const [notificiacion] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'realtime_timbres',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(notificiacion),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (!notificiacion)
+                    return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
+                const USUARIO = yield database_1.default.query(`
+        SELECT (nombre || ' ' || apellido) AS usuario
+        FROM empleados WHERE id = $1
+        `, [id_empl_envia]);
+                notificiacion.usuario = USUARIO.rows[0].usuario;
+                return res.status(200)
+                    .jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     /** ******************************************************************************************** **

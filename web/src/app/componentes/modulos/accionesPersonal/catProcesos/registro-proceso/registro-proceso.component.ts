@@ -20,6 +20,10 @@ interface Nivel {
 
 export class RegistroProcesoComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   nombre = new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z ]*')]);
   nivel = new FormControl('', Validators.required);
@@ -53,6 +57,8 @@ export class RegistroProcesoComponent implements OnInit {
 
   ngOnInit(): void {
     this.Obtenerprocesos();
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   // METODO DE VALIDACION DE CAMPOS
@@ -71,6 +77,8 @@ export class RegistroProcesoComponent implements OnInit {
       let dataProceso = {
         nombre: form.procesoNombreForm,
         nivel: form.procesoNivelForm,
+        user_name: this.user_name,
+        ip: this.ip
       };
       this.rest.postProcesoRest(dataProceso)
         .subscribe(response => {
@@ -85,7 +93,9 @@ export class RegistroProcesoComponent implements OnInit {
         let dataProceso = {
           nombre: form.procesoNombreForm,
           nivel: form.procesoNivelForm,
-          proc_padre: procesoPadreId
+          proc_padre: procesoPadreId,
+          user_name: this.user_name,
+          ip: this.ip
         };
         this.rest.postProcesoRest(dataProceso)
           .subscribe(response => {

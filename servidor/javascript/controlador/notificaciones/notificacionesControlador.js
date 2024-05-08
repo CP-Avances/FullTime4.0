@@ -15,26 +15,63 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NOTIFICACION_TIEMPO_REAL_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
 const settingsMail_1 = require("../../libs/settingsMail");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const path_1 = __importDefault(require("path"));
 class NotificacionTiempoRealControlador {
     // METODO PARA ELIMINAR NOTIFICACIONES DE PERMISOS - VACACIONES - HORAS EXTRAS  --**VERIFICACION
     EliminarMultiplesNotificaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const arregloNotificaciones = req.body;
+            const { arregloNotificaciones, user_name, ip } = req.body;
             let contador = 0;
             console.log('VER IDS', arregloNotificaciones);
             if (arregloNotificaciones.length > 0) {
                 contador = 0;
                 arregloNotificaciones.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
-                    yield database_1.default.query('DELETE FROM realtime_noti WHERE id = $1', [obj])
-                        .then((result) => {
-                        contador = contador + 1;
-                        if (contador === arregloNotificaciones.length) {
-                            return res.jsonp({ message: 'OK' });
+                    try {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // OBTENER DATOSORIGINALES
+                        const consulta = yield database_1.default.query('SELECT * FROM realtime_noti WHERE id = $1', [obj]);
+                        const [datosOriginales] = consulta.rows;
+                        if (!datosOriginales) {
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'realtime_noti',
+                                usuario: user_name,
+                                accion: 'D',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al eliminar el registro con id ${obj}. No existe el registro en la base de datos.`
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                         }
-                        console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
-                    });
+                        yield database_1.default.query('DELETE FROM realtime_noti WHERE id = $1', [obj])
+                            .then((result) => {
+                            contador = contador + 1;
+                            console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
+                        });
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'realtime_noti',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: JSON.stringify(datosOriginales),
+                            datosNuevos: '',
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                    }
+                    catch (error) {
+                        // ROEVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
+                        return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+                    }
                 }));
+                return res.jsonp({ message: 'OK' });
             }
             else {
                 return res.jsonp({ message: 'error' });
@@ -66,8 +103,10 @@ class NotificacionTiempoRealControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 var tiempo = (0, settingsMail_1.fechaHora)();
-                const { id_send_empl, id_receives_empl, id_receives_depa, estado, id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo } = req.body;
+                const { id_send_empl, id_receives_empl, id_receives_depa, estado, id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo, user_name, ip } = req.body;
                 let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
         INSERT INTO realtime_noti( id_send_empl, id_receives_empl, id_receives_depa, estado, create_at, 
           id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo ) 
@@ -75,6 +114,18 @@ class NotificacionTiempoRealControlador {
         `, [id_send_empl, id_receives_empl, id_receives_depa, estado, create_at, id_permiso, id_vacaciones,
                     id_hora_extra, mensaje, tipo]);
                 const [notificiacion] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'realtime_noti',
+                    usuario: user_name,
+                    accion: 'C',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(notificiacion),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 if (!notificiacion)
                     return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
                 const USUARIO = yield database_1.default.query(`
@@ -86,6 +137,8 @@ class NotificacionTiempoRealControlador {
                     .jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
             }
             catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500)
                     .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
             }
@@ -159,10 +212,48 @@ class NotificacionTiempoRealControlador {
     }
     ActualizarVista(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const { visto } = req.body;
-            yield database_1.default.query('UPDATE realtime_noti SET visto = $1 WHERE id = $2', [visto, id]);
-            res.jsonp({ message: 'Vista modificado' });
+            try {
+                const id = req.params.id;
+                const { visto, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOSORIGINALES
+                const consulta = yield database_1.default.query('SELECT * FROM realtime_noti WHERE id = $1', [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'realtime_noti',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al modificar el registro con id ${id}. No existe el registro en la base de datos.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query('UPDATE realtime_noti SET visto = $1 WHERE id = $2', [visto, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'realtime_noti',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{"visto": "${visto}"}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Vista modificado' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al modificar el registro.' });
+            }
         });
     }
     /** *********************************************************************************************** **
@@ -171,26 +262,85 @@ class NotificacionTiempoRealControlador {
     // METODO PARA REGISTRAR CONFIGURACIÓN DE RECEPCIÓN DE NOTIFICACIONES
     CrearConfiguracion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti } = req.body;
-            yield database_1.default.query('INSERT INTO config_noti ( id_empleado, vaca_mail, vaca_noti, permiso_mail, ' +
-                'permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, ' +
-                'comunicado_noti) ' +
-                'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)', [id_empleado, vaca_mail, vaca_noti,
-                permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti,
-                comunicado_mail, comunicado_noti]);
-            res.jsonp({ message: 'Configuracion guardada' });
+            try {
+                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query('INSERT INTO config_noti ( id_empleado, vaca_mail, vaca_noti, permiso_mail, ' +
+                    'permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, ' +
+                    'comunicado_noti) ' +
+                    'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)', [id_empleado, vaca_mail, vaca_noti,
+                    permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti,
+                    comunicado_mail, comunicado_noti]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'config_noti',
+                    usuario: user_name,
+                    accion: 'C',
+                    datosOriginales: '',
+                    datosNuevos: `{"id_empleado": "${id_empleado}", "vaca_mail": "${vaca_mail}", "vaca_noti": "${vaca_noti}", permiso_mail: "${permiso_mail}", permiso_noti: "${permiso_noti}", hora_extra_mail: "${hora_extra_mail}", hora_extra_noti: "${hora_extra_noti}", comida_mail: "${comida_mail}", comida_noti: "${comida_noti}", comunicado_mail: "${comunicado_mail}", comunicado_noti: "${comunicado_noti}"}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Configuracion guardada' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'Error al guardar la configuración.' });
+            }
         });
     }
     // METODO PARA ACTUALIZAR CONFIGURACIÓN DE RECEPCIÓN DE NOTIFICACIONES
     ActualizarConfigEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti } = req.body;
-            const id_empleado = req.params.id;
-            yield database_1.default.query('UPDATE config_noti SET vaca_mail = $1, vaca_noti = $2, permiso_mail = $3, ' +
-                'permiso_noti = $4, hora_extra_mail = $5, hora_extra_noti = $6, comida_mail = $7, comida_noti = $8, ' +
-                'comunicado_mail = $9, comunicado_noti = $10 WHERE id_empleado = $11', [vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti,
-                comida_mail, comida_noti, comunicado_mail, comunicado_noti, id_empleado]);
-            res.jsonp({ message: 'Configuración actualizada.' });
+            try {
+                const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+                const id_empleado = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOSORIGINALES
+                const consulta = yield database_1.default.query('SELECT * FROM config_noti WHERE id_empleado = $1', [id_empleado]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'config_noti',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al modificar el registro con id ${id_empleado}. No existe el registro en la base de datos.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query('UPDATE config_noti SET vaca_mail = $1, vaca_noti = $2, permiso_mail = $3, ' +
+                    'permiso_noti = $4, hora_extra_mail = $5, hora_extra_noti = $6, comida_mail = $7, comida_noti = $8, ' +
+                    'comunicado_mail = $9, comunicado_noti = $10 WHERE id_empleado = $11', [vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti,
+                    comida_mail, comida_noti, comunicado_mail, comunicado_noti, id_empleado]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'config_noti',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{"vaca_mail": "${vaca_mail}", "vaca_noti": "${vaca_noti}", permiso_mail: "${permiso_mail}", permiso_noti: "${permiso_noti}", hora_extra_mail: "${hora_extra_mail}", hora_extra_noti: "${hora_extra_noti}", comida_mail: "${comida_mail}", comida_noti: "${comida_noti}", comunicado_mail: "${comunicado_mail}", comunicado_noti: "${comunicado_noti}"}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Configuración actualizada.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al modificar el registro.' });
+            }
         });
     }
     /** ******************************************************************************************** **
@@ -401,23 +551,45 @@ class NotificacionTiempoRealControlador {
     // NOTIFICACIONES GENERALES
     EnviarNotificacionGeneral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let { id_empl_envia, id_empl_recive, mensaje, tipo } = req.body;
-            var tiempo = (0, settingsMail_1.fechaHora)();
-            let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
-            const response = yield database_1.default.query(`
-          INSERT INTO realtime_timbres(create_at, id_send_empl, id_receives_empl, descripcion, tipo) 
-          VALUES($1, $2, $3, $4, $5) RETURNING *
-        `, [create_at, id_empl_envia, id_empl_recive, mensaje, tipo]);
-            const [notificiacion] = response.rows;
-            if (!notificiacion)
-                return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
-            const USUARIO = yield database_1.default.query(`
-        SELECT (nombre || ' ' || apellido) AS usuario
-        FROM empleados WHERE id = $1
-        `, [id_empl_envia]);
-            notificiacion.usuario = USUARIO.rows[0].usuario;
-            return res.status(200)
-                .jsonp({ message: 'Comunicado enviado exitosamente.', respuesta: notificiacion });
+            try {
+                let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip } = req.body;
+                var tiempo = (0, settingsMail_1.fechaHora)();
+                let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query(`
+            INSERT INTO realtime_timbres(create_at, id_send_empl, id_receives_empl, descripcion, tipo) 
+            VALUES($1, $2, $3, $4, $5) RETURNING *
+          `, [create_at, id_empl_envia, id_empl_recive, mensaje, tipo]);
+                const [notificiacion] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'realtime_timbres',
+                    usuario: user_name,
+                    accion: 'C',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(notificiacion),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (!notificiacion)
+                    return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
+                const USUARIO = yield database_1.default.query(`
+          SELECT (nombre || ' ' || apellido) AS usuario
+          FROM empleados WHERE id = $1
+          `, [id_empl_envia]);
+                notificiacion.usuario = USUARIO.rows[0].usuario;
+                return res.status(200)
+                    .jsonp({ message: 'Comunicado enviado exitosamente.', respuesta: notificiacion });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500)
+                    .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
         });
     }
     /** ***************************************************************************************** **

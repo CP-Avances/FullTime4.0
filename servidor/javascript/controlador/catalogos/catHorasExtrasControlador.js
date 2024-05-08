@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.horaExtraControlador = void 0;
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
-const builder = require('xmlbuilder');
 class HorasExtrasControlador {
     ListarHorasExtras(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -41,33 +41,134 @@ class HorasExtrasControlador {
     }
     CrearHoraExtra(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion } = req.body;
-            const response = yield database_1.default.query(`
-      INSERT INTO cg_hora_extras ( descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, 
-        tipo_dia, codigo, incl_almuerzo, tipo_funcion ) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
-      `, [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion]);
-            const [HORA] = response.rows;
-            if (HORA) {
-                return res.status(200).jsonp(HORA);
+            try {
+                const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query(`
+        INSERT INTO cg_hora_extras ( descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, 
+          tipo_dia, codigo, incl_almuerzo, tipo_funcion ) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
+        `, [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion]);
+                const [HORA] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_hora_extras',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(HORA),
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (HORA) {
+                    return res.status(200).jsonp(HORA);
+                }
+                else {
+                    return res.status(404).jsonp({ message: "error" });
+                }
             }
-            else {
-                return res.status(404).jsonp({ message: "error" });
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query('DELETE FROM cg_hora_extras WHERE id = $1', [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
+                const { user_name, ip } = req.body;
+                const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const horaExtra = yield database_1.default.query('SELECT * FROM cg_hora_extras WHERE id = $1', [id]);
+                const [datosOriginales] = horaExtra.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'cg_hora_extras',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        observacion: `Error al eliminar el registro con id: ${id}.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query('DELETE FROM cg_hora_extras WHERE id = $1', [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_hora_extras',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
+            }
         });
     }
     ActualizarHoraExtra(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, id } = req.body;
-            yield database_1.default.query('UPDATE cg_hora_extras SET descripcion = $1, tipo_descuento = $2, reca_porcentaje = $3, hora_inicio = $4, hora_final = $5, hora_jornada = $6, tipo_dia = $7, codigo = $8, incl_almuerzo = $9, tipo_funcion = $10 WHERE id = $11', [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, id]);
-            res.jsonp({ message: 'Hora extra actualizada' });
+            try {
+                const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const horaExtra = yield database_1.default.query('SELECT * FROM cg_hora_extras WHERE id = $1', [id]);
+                const [datosOriginales] = horaExtra.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'cg_hora_extras',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        observacion: `Error al actualizar el registro con id: ${id}.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query('UPDATE cg_hora_extras SET descripcion = $1, tipo_descuento = $2, reca_porcentaje = $3, hora_inicio = $4, hora_final = $5, hora_jornada = $6, tipo_dia = $7, codigo = $8, incl_almuerzo = $9, tipo_funcion = $10 WHERE id = $11', [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_hora_extras',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{"descripcion": "${descripcion}", "tipo_descuento": "${tipo_descuento}", "reca_porcentaje": "${reca_porcentaje}", "hora_inicio": "${hora_inicio}", "hora_final": "${hora_final}", "hora_jornada": "${hora_jornada}", "tipo_dia": "${tipo_dia}", "codigo": "${codigo}", "incl_almuerzo": "${incl_almuerzo}", "tipo_funcion": "${tipo_funcion}"}`,
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Hora extra actualizada' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
+            }
         });
     }
 }

@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CIUDAD_CONTROLADOR = void 0;
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
-const builder = require('xmlbuilder');
 class CiudadControlador {
     // BUSCAR DATOS RELACIONADOS A LA CIUDAD
     ListarInformacionCiudad(req, res) {
@@ -65,11 +65,32 @@ class CiudadControlador {
     // REGISTRAR CIUDAD
     CrearCiudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_provincia, descripcion } = req.body;
-            yield database_1.default.query(`
-            INSERT INTO ciudades (id_provincia, descripcion) VALUES ($1, $2)
-            `, [id_provincia, descripcion]);
-            res.jsonp({ message: 'Registro guardado.' });
+            try {
+                const { id_provincia, descripcion, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query(`
+                INSERT INTO ciudades (id_provincia, descripcion) VALUES ($1, $2)
+                `, [id_provincia, descripcion]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ciudades',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{id_provincia: ${id_provincia}, descripcion: ${descripcion}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'Error al guardar el registro.' });
+            }
         });
     }
     // METODO PARA LISTAR NOMBRE DE CIUDADES - PROVINCIAS
@@ -92,11 +113,52 @@ class CiudadControlador {
     // METODO PARA ELIMINAR REGISTRO
     EliminarCiudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-            DELETE FROM ciudades WHERE id = $1
-            `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+                const { user_name, ip } = req.body;
+                const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOS ORIGINALES
+                const ciudad = yield database_1.default.query('SELECT * FROM ciudades WHERE id = $1', [id]);
+                const [datosOriginales] = ciudad.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ciudades',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar la ciudad con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+                }
+                yield database_1.default.query(`
+                DELETE FROM ciudades WHERE id = $1
+                `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ciudades',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+            }
         });
     }
     // METODO PARA CONSULTAR DATOS DE UNA CIUDAD

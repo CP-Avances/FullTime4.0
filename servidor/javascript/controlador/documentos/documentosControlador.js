@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DOCUMENTOS_CONTROLADOR = exports.carpeta = void 0;
 const listarArchivos_1 = require("../../libs/listarArchivos");
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
@@ -107,38 +108,102 @@ class DocumentosControlador {
     // METODO PARA ELIMINAR REGISTROS DE DOCUMENTACION
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let { id, documento } = req.params;
-            yield database_1.default.query(`
-            DELETE FROM documentacion WHERE id = $1
-            `, [id]);
-            let separador = path_1.default.sep;
-            let ruta = (0, accesoCarpetas_1.ObtenerRutaDocumento)() + separador + documento;
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                if (err) {
+            try {
+                // TODO ANALIZAR COMOOBTENER USER_NAME E IP DESDE EL FRONT
+                const { user_name, ip } = req.body;
+                let { id, documento } = req.params;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const doc = yield database_1.default.query('SELECT * FROM documentacion WHERE id = $1', [id]);
+                const [datosOriginales] = doc.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'documentacion',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar el documento con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
                 }
-                else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs_1.default.unlinkSync(ruta);
-                }
-            });
-            res.jsonp({ message: 'Registro eliminado.' });
+                yield database_1.default.query(`
+                DELETE FROM documentacion WHERE id = $1
+                `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'documentacion',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                let separador = path_1.default.sep;
+                let ruta = (0, accesoCarpetas_1.ObtenerRutaDocumento)() + separador + documento;
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(ruta);
+                    }
+                });
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+            }
         });
     }
     // METODO PARA REGISTRAR UN DOCUMENTO    --**VERIFICADO
     CrearDocumento(req, res) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            // FECHA DEL SISTEMA
-            var fecha = (0, moment_1.default)();
-            var anio = fecha.format('YYYY');
-            var mes = fecha.format('MM');
-            var dia = fecha.format('DD');
-            let documento = anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
-            yield database_1.default.query(`
-            INSERT INTO documentacion (documento) VALUES ($1)
-            `, [documento]);
-            res.jsonp({ message: 'Registro guardado.' });
+            try {
+                // TODO ANALIZAR COMOOBTENER USER_NAME E IP DESDE EL FRONT
+                const { user_name, ip } = req.body;
+                // FECHA DEL SISTEMA
+                var fecha = (0, moment_1.default)();
+                var anio = fecha.format('YYYY');
+                var mes = fecha.format('MM');
+                var dia = fecha.format('DD');
+                let documento = anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query(`
+                INSERT INTO documentacion (documento) VALUES ($1)
+                `, [documento]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'documentacion',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify({ documento }),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'Error al guardar el registro.' });
+            }
         });
     }
 }

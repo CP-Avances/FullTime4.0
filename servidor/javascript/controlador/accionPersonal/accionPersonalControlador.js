@@ -14,8 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ACCION_PERSONAL_CONTROLADOR = void 0;
 const ImagenCodificacion_1 = require("../../libs/ImagenCodificacion");
-const database_1 = __importDefault(require("../../database"));
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
+const database_1 = __importDefault(require("../../database"));
 const builder = require('xmlbuilder');
 class AccionPersonalControlador {
     /** TABLA TIPO_ACCION */
@@ -34,6 +34,7 @@ class AccionPersonalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { descripcion, user_name, ip } = req.body;
+                console.log('datos', req.body);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
@@ -57,12 +58,12 @@ class AccionPersonalControlador {
                 }
                 else {
                     yield database_1.default.query('ROLLBACK');
-                    return res.status(404).jsonp({ message: 'error' });
+                    return res.status(500).jsonp({ message: 'error' });
                 }
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
-                return res.status(404).jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -95,12 +96,12 @@ class AccionPersonalControlador {
                 }
                 else {
                     yield database_1.default.query('ROLLBACK');
-                    return res.status(404).jsonp({ message: 'error' });
+                    return res.status(500).jsonp({ message: 'error' });
                 }
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
-                return res.status(404).jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -150,7 +151,7 @@ class AccionPersonalControlador {
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
-                return res.status(404).jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -212,7 +213,7 @@ class AccionPersonalControlador {
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
-                return res.status(404).jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -321,7 +322,7 @@ class AccionPersonalControlador {
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
-                return res.status(404).jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -366,7 +367,7 @@ class AccionPersonalControlador {
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
-                return res.status(404).jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -415,7 +416,7 @@ class AccionPersonalControlador {
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
-                return res.status(404).jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -482,7 +483,7 @@ class AccionPersonalControlador {
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
-                return res.status(404).jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }

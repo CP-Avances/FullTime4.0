@@ -14,11 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SUCURSAL_CONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const builder = require('xmlbuilder');
 class SucursalControlador {
     // BUSCAR SUCURSALES POR EL NOMBRE
     BuscarNombreSucursal(req, res) {
@@ -38,27 +38,86 @@ class SucursalControlador {
     // GUARDAR REGISTRO DE SUCURSAL
     CrearSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, id_ciudad, id_empresa } = req.body;
-            const response = yield database_1.default.query(`
-      INSERT INTO sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
-      `, [nombre, id_ciudad, id_empresa]);
-            const [sucursal] = response.rows;
-            if (sucursal) {
-                return res.status(200).jsonp(sucursal);
+            try {
+                const { nombre, id_ciudad, id_empresa, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query(`
+        INSERT INTO sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
+        `, [nombre, id_ciudad, id_empresa]);
+                const [sucursal] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'sucursales',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(sucursal),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (sucursal) {
+                    return res.status(200).jsonp(sucursal);
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
             }
-            else {
-                return res.status(404).jsonp({ message: 'error' });
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
     // ACTUALIZAR REGISTRO DE ESTABLECIMIENTO
     ActualizarSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, id_ciudad, id } = req.body;
-            yield database_1.default.query(`
-      UPDATE sucursales SET nombre = $1, id_ciudad = $2 WHERE id = $3
-      `, [nombre, id_ciudad, id]);
-            res.jsonp({ message: 'Registro actualizado.' });
+            try {
+                const { nombre, id_ciudad, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query('SELECT * FROM sucursales WHERE id = $1', [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'sucursales',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        UPDATE sucursales SET nombre = $1, id_ciudad = $2 WHERE id = $3
+        `, [nombre, id_ciudad, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'sucursales',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{ "nombre": "${nombre}", "id_ciudad": "${id_ciudad}" }`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     // BUSCAR SUCURSAL POR ID DE EMPRESA
@@ -96,11 +155,51 @@ class SucursalControlador {
     // METODO PARA ELIMINAR REGISTRO
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-      DELETE FROM sucursales WHERE id = $1
-      `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
+                const { user_name, ip } = req.body;
+                const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query('SELECT * FROM sucursales WHERE id = $1', [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'sucursales',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM sucursales WHERE id = $1
+        `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'sucursales',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     // METODO PARA BUSCAR DATOS DE UNA SUCURSAL

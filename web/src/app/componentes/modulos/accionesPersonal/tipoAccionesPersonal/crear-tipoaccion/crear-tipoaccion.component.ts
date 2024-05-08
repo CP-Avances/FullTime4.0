@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { AccionPersonalService } from 'src/app/servicios/accionPersonal/accion-personal.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ListarTipoAccionComponent } from '../listar-tipo-accion/listar-tipo-accion.component';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-crear-tipoaccion',
@@ -13,6 +14,10 @@ import { ListarTipoAccionComponent } from '../listar-tipo-accion/listar-tipo-acc
 })
 
 export class CrearTipoaccionComponent implements OnInit {
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   selec1: boolean = false;
   selec2: boolean = false;
@@ -49,6 +54,8 @@ export class CrearTipoaccionComponent implements OnInit {
     this.ObtenerTiposAccionPersonal();
     this.ObtenerTiposAccion();
     this.tipos[this.tipos.length] = { descripcion: "OTRO" };
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   // METODO PARA CREAR TIPO DE ACCION
@@ -59,7 +66,9 @@ export class CrearTipoaccionComponent implements OnInit {
       base_legal: form.baseLegalForm,
       tipo_permiso: this.selec1,
       tipo_vacacion: this.selec2,
-      tipo_situacion_propuesta: this.selec3
+      tipo_situacion_propuesta: this.selec3,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     if (form.tipoAccionForm != undefined) {
       this.GuardarInformacion(datosAccion);
@@ -163,7 +172,9 @@ export class CrearTipoaccionComponent implements OnInit {
   IngresarNuevoTipo(form: any, datos: any) {
     if (form.otroTipoForm != '') {
       let tipo = {
-        descripcion: form.otroTipoForm
+        descripcion: form.otroTipoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.VerificarDuplicidad(form, tipo, datos);
     }

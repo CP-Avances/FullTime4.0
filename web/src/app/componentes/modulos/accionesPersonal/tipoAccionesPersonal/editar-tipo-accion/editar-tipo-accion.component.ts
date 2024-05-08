@@ -17,6 +17,10 @@ export class EditarTipoAccionComponent implements OnInit {
   @Input() data: any;
   @Input() pagina: any;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   selec1: boolean = false;
   selec2: boolean = false;
   selec3: boolean = false;
@@ -57,6 +61,8 @@ export class EditarTipoAccionComponent implements OnInit {
 
   // METODO PARA MOSTRAR DATOS
   CargarDatos() {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.selec1 = false;
     this.selec2 = false;
     this.selec3 = false;
@@ -88,7 +94,9 @@ export class EditarTipoAccionComponent implements OnInit {
       tipo_permiso: this.selec1,
       tipo_vacacion: this.selec2,
       tipo_situacion_propuesta: this.selec3,
-      id: this.data.id
+      id: this.data.id,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     if (form.tipoAccionForm != undefined) {
       this.GuardarInformacion(datosAccion);
@@ -223,7 +231,9 @@ export class EditarTipoAccionComponent implements OnInit {
   IngresarNuevoTipo(form: any, datos: any) {
     if (form.otroTipoForm != '') {
       let tipo = {
-        descripcion: form.otroTipoForm
+        descripcion: form.otroTipoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.VerificarDuplicidad(form, tipo, datos);
     }

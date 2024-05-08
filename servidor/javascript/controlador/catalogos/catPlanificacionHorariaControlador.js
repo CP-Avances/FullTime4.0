@@ -13,8 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PLANIFICACION_HORARIA_CONTROLADOR = void 0;
-const path_1 = __importDefault(require("path"));
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
+const path_1 = __importDefault(require("path"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
 const moment_1 = __importDefault(require("moment"));
@@ -120,7 +121,8 @@ class PlanificacionHorariaControlador {
     RegistrarPlanificacionHoraria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const planificacionHoraria = req.body;
+                const { planificacionHoraria, user_name, ip } = req.body;
+                const datosUsuario = { user_name, ip };
                 const horarioDefaultLibre = yield ConsultarHorarioDefault('DEFAULT-LIBRE');
                 const horarioDefaultFeriado = yield ConsultarHorarioDefault('DEFAULT-FERIADO');
                 let planificacionesImportadas = 0;
@@ -209,7 +211,7 @@ class PlanificacionHorariaControlador {
                                     finAlimentacion,
                                     salida
                                 };
-                                yield CrearPlanificacionHoraria(planificacion);
+                                yield CrearPlanificacionHoraria(planificacion, datosUsuario);
                                 planificacionesImportadas++;
                             }
                             else if (horario.observacion === 'DEFAULT-LIBRE') {
@@ -260,7 +262,7 @@ class PlanificacionHorariaControlador {
                                     finAlimentacion,
                                     salida
                                 };
-                                yield CrearPlanificacionHoraria(planificacion);
+                                yield CrearPlanificacionHoraria(planificacion, datosUsuario);
                                 planificacionesImportadas++;
                             }
                             else if (horario.observacion === 'DEFAULT-FERIADO') {
@@ -311,7 +313,7 @@ class PlanificacionHorariaControlador {
                                     finAlimentacion,
                                     salida
                                 };
-                                yield CrearPlanificacionHoraria(planificacion);
+                                yield CrearPlanificacionHoraria(planificacion, datosUsuario);
                                 planificacionesImportadas++;
                             }
                         }
@@ -323,7 +325,7 @@ class PlanificacionHorariaControlador {
                 return res.status(200).jsonp({ message: 'correcto' });
             }
             catch (error) {
-                return res.status(400).jsonp({ message: error });
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -635,11 +637,13 @@ function ConsultarHorarioDefault(codigo) {
     });
 }
 // FUNCION PARA CREAR PLANIFICACION HORARIA
-function CrearPlanificacionHoraria(planificacionHoraria) {
+function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // DESESCTRUCTURAR PLANIFICACION HORARIA
             let { entrada, inicioAlimentacion, finAlimentacion, salida } = planificacionHoraria;
+            // DESESTRUCTURAR DATOS USUARIO
+            let { user_name, ip } = datosUsuario;
             // INICIAR TRANSACCION
             yield database_1.default.query('BEGIN');
             // CREAR ENTRADA
@@ -651,6 +655,16 @@ function CrearPlanificacionHoraria(planificacionHoraria) {
             `, [entrada.codigo, entrada.id_empl_cargo, entrada.id_horario, entrada.fec_horario, entrada.fec_hora_horario, entrada.tolerancia,
                 entrada.id_det_horario, entrada.tipo_entr_salida, entrada.tipo_dia, entrada.salida_otro_dia, entrada.min_antes, entrada.min_despues,
                 entrada.estado_origen, entrada.min_alimentacion]);
+            // AUDITORIA
+            yield auditoriaControlador_1.default.InsertarAuditoria({
+                tabla: 'plan_general',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(entrada),
+                ip,
+                observacion: null
+            });
             // CREAR INICIO ALIMENTACION
             if (inicioAlimentacion) {
                 yield database_1.default.query(`
@@ -661,6 +675,16 @@ function CrearPlanificacionHoraria(planificacionHoraria) {
                 `, [inicioAlimentacion.codigo, inicioAlimentacion.id_empl_cargo, inicioAlimentacion.id_horario, inicioAlimentacion.fec_horario, inicioAlimentacion.fec_hora_horario, inicioAlimentacion.tolerancia,
                     inicioAlimentacion.id_det_horario, inicioAlimentacion.tipo_entr_salida, inicioAlimentacion.tipo_dia, inicioAlimentacion.salida_otro_dia, inicioAlimentacion.min_antes, inicioAlimentacion.min_despues,
                     inicioAlimentacion.estado_origen, inicioAlimentacion.min_alimentacion]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'plan_general',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(inicioAlimentacion),
+                    ip,
+                    observacion: null
+                });
             }
             // CREAR FIN ALIMENTACION
             if (finAlimentacion) {
@@ -672,6 +696,16 @@ function CrearPlanificacionHoraria(planificacionHoraria) {
                 `, [finAlimentacion.codigo, finAlimentacion.id_empl_cargo, finAlimentacion.id_horario, finAlimentacion.fec_horario, finAlimentacion.fec_hora_horario, finAlimentacion.tolerancia,
                     finAlimentacion.id_det_horario, finAlimentacion.tipo_entr_salida, finAlimentacion.tipo_dia, finAlimentacion.salida_otro_dia, finAlimentacion.min_antes, finAlimentacion.min_despues,
                     finAlimentacion.estado_origen, finAlimentacion.min_alimentacion]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'plan_general',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(finAlimentacion),
+                    ip,
+                    observacion: null
+                });
             }
             // CREAR SALIDA
             yield database_1.default.query(`
@@ -682,6 +716,16 @@ function CrearPlanificacionHoraria(planificacionHoraria) {
             `, [salida.codigo, salida.id_empl_cargo, salida.id_horario, salida.fec_horario, salida.fec_hora_horario, salida.tolerancia,
                 salida.id_det_horario, salida.tipo_entr_salida, salida.tipo_dia, salida.salida_otro_dia, salida.min_antes, salida.min_despues,
                 salida.estado_origen, salida.min_alimentacion]);
+            // AUDITORIA
+            yield auditoriaControlador_1.default.InsertarAuditoria({
+                tabla: 'plan_general',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(salida),
+                ip,
+                observacion: null
+            });
             // FINALIZAR TRANSACCION
             yield database_1.default.query('COMMIT');
         }

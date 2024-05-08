@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // IMPORTAR LIBRERIAS
 const settingsMail_1 = require("../../libs/settingsMail");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -257,14 +258,53 @@ class LoginControlador {
     // METODO PARA CAMBIAR CONTRASEÑA
     CambiarContrasenia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            var token = req.body.token;
-            var contrasena = req.body.contrasena;
+            let { token, contrasena, user_name, ip } = req.body;
             try {
                 const payload = jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail');
                 const id_empleado = payload._id;
-                yield database_1.default.query(`
-        UPDATE usuarios SET contrasena = $2 WHERE id_empleado = $1
-        `, [id_empleado, contrasena]);
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    // OBTENER DATOSORIGINALES
+                    const datosOriginales = yield database_1.default.query(`
+          SELECT contrasena FROM usuarios WHERE id_empleado = $1
+          `, [id_empleado]);
+                    const [contrasenaOriginal] = datosOriginales.rows;
+                    if (!contrasenaOriginal) {
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'usuarios',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip,
+                            observacion: `Error al cambiar la contraseña del usuario con id ${id_empleado}`
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        return res.status(404).jsonp({ message: 'error' });
+                    }
+                    yield database_1.default.query(`
+          UPDATE usuarios SET contrasena = $2 WHERE id_empleado = $1
+          `, [id_empleado, contrasena]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'usuarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: JSON.stringify(contrasenaOriginal),
+                        datosNuevos: `{"contrasena": "${contrasena}"}`,
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                }
+                catch (error) {
+                    // ROLLBACK
+                    yield database_1.default.query('ROLLBACK');
+                    return res.status(500).jsonp({ message: 'error' });
+                }
                 return res.jsonp({
                     expiro: 'no',
                     message: "Contraseña actualizada. Intente ingresar con la nueva contraseña."
@@ -276,17 +316,6 @@ class LoginControlador {
                     message: "Tiempo para cambiar contraseña ha expirado. Vuelva a solicitar cambio de contraseña."
                 });
             }
-        });
-    }
-    // PRUEBA AUDITAR
-    Auditar(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { esquema, tabla, user, ip, old_data, new_data, accion } = req.body;
-            yield database_1.default.query(' INSERT INTO audit.auditoria (schema_name, table_name, user_name, action, ' +
-                'original_data, new_data, ip) ' +
-                'VALUES ($1, $2, $3, substring($7,1,1), $4, $5, $6)', [esquema, tabla, user, old_data, new_data, ip, accion]);
-            console.log('req auditar', req.body);
-            res.jsonp({ message: 'Auditar' });
         });
     }
 }

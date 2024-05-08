@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const moment_1 = __importDefault(require("moment"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
@@ -37,23 +38,77 @@ class FeriadosControlador {
     // METODO PARA ELIMINAR UN REGISTRO DE FERIADOS
     EliminarFeriado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-            DELETE FROM cg_feriados WHERE id = $1
-            `, [id]);
-            res.jsonp({ text: 'Registro eliminado.' });
+            try {
+                const id = req.params.id;
+                // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
+                const { user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOS ORIGINALES
+                const datosOriginales = yield database_1.default.query('SELECT * FROM cg_feriados WHERE id = $1', [id]);
+                const [feriado] = datosOriginales.rows;
+                if (!feriado) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'cg_feriados',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar feriado con id ${id}.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+                DELETE FROM cg_feriados WHERE id = $1
+                `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_feriados',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(feriado),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ text: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ text: 'Error al eliminar el registro.' });
+            }
         });
     }
     // METODO PARA CREAR REGISTRO DE FERIADO
     CrearFeriados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fecha, descripcion, fec_recuperacion } = req.body;
+                const { fecha, descripcion, fec_recuperacion, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
                 INSERT INTO cg_feriados (fecha, descripcion, fec_recuperacion) 
                 VALUES ($1, $2, $3) RETURNING *
                 `, [fecha, descripcion, fec_recuperacion]);
                 const [feriado] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_feriados',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(feriado),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 if (feriado) {
                     return res.status(200).jsonp(feriado);
                 }
@@ -62,7 +117,9 @@ class FeriadosControlador {
                 }
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -85,15 +142,48 @@ class FeriadosControlador {
     ActualizarFeriado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fecha, descripcion, fec_recuperacion, id } = req.body;
+                const { fecha, descripcion, fec_recuperacion, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOS ORIGINALES
+                const datosOriginales = yield database_1.default.query('SELECT * FROM cg_feriados WHERE id = $1', [id]);
+                const [feriado] = datosOriginales.rows;
+                if (!feriado) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'cg_feriados',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar feriado con id ${id}.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+                }
                 yield database_1.default.query(`
                 UPDATE cg_feriados SET fecha = $1, descripcion = $2, fec_recuperacion = $3
                 WHERE id = $4
                 `, [fecha, descripcion, fec_recuperacion, id]);
-                res.jsonp({ message: 'Registro actualizado.' });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_feriados',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(feriado),
+                    datosNuevos: JSON.stringify({ fecha, descripcion, fec_recuperacion }),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -431,6 +521,7 @@ class FeriadosControlador {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            const { user_name, ip } = req.body;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
             var contador = 1;
@@ -439,22 +530,42 @@ class FeriadosControlador {
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[2]]);
             // LECTURA DE DATOS DE LA PLANTILLA
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                const { fecha, descripcion, fec_recuperacion } = data;
-                // VERIFICACIÓN DE EXISTENCIA DE DATOS DE FECHA DE RECUPERACIÓN
-                if (fec_recuperacion === undefined) {
-                    var recuperar = null;
+                try {
+                    const { fecha, descripcion, fec_recuperacion } = data;
+                    // VERIFICACIÓN DE EXISTENCIA DE DATOS DE FECHA DE RECUPERACIÓN
+                    if (fec_recuperacion === undefined) {
+                        var recuperar = null;
+                    }
+                    else {
+                        recuperar = fec_recuperacion;
+                    }
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    // REGISTRO DE DATOS EN EL SISTEMA
+                    yield database_1.default.query('INSERT INTO cg_feriados (fecha, descripcion, fec_recuperacion) ' +
+                        'VALUES ($1, $2, $3)', [fecha, descripcion, recuperar]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'cg_feriados',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify({ fecha, descripcion, recuperar }),
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    // ENVIO DE MENSAJE UNA VEZ QUE SE HA LEIDO TODOS LOS DATOS DE LA PLANTILLA
+                    if (contador === plantilla.length) {
+                        return res.jsonp({ message: 'CORRECTO' });
+                    }
+                    contador = contador + 1;
                 }
-                else {
-                    recuperar = fec_recuperacion;
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
                 }
-                // REGISTRO DE DATOS EN EL SISTEMA
-                yield database_1.default.query('INSERT INTO cg_feriados (fecha, descripcion, fec_recuperacion) ' +
-                    'VALUES ($1, $2, $3)', [fecha, descripcion, recuperar]);
-                // ENVIO DE MENSAJE UNA VEZ QUE SE HA LEIDO TODOS LOS DATOS DE LA PLANTILLA
-                if (contador === plantilla.length) {
-                    return res.jsonp({ message: 'CORRECTO' });
-                }
-                contador = contador + 1;
             }));
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
             fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {

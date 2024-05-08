@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DETALLE_CATALOGO_HORARIO_CONTROLADOR = void 0;
+const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const fs_1 = __importDefault(require("fs"));
@@ -67,34 +68,133 @@ class DetalleCatalogoHorarioControlador {
     // METODO PARA ELIMINAR REGISTRO
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-            DELETE FROM deta_horarios WHERE id = $1
-            `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                const id = req.params.id;
+                // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+                const { user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOSORIGINALES
+                const consulta = yield database_1.default.query('SELECT * FROM deta_horarios WHERE id = $1', [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'deta_horarios',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar registro con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+                }
+                yield database_1.default.query(`
+                DELETE FROM deta_horarios WHERE id = $1
+                `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'deta_horarios',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: ''
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
+            }
         });
     }
     // METODO PARA REGISTRAR DETALLES
     CrearDetalleHorarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues } = req.body;
-            yield database_1.default.query(`
-            INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes,
-                min_despues) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            `, [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues]);
-            res.jsonp({ message: 'Registro guardado.' });
+            try {
+                const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query(`
+                INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes,
+                    min_despues) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                `, [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'deta_horarios',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{orden: ${orden}, hora: ${hora}, minu_espera: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
+                    ip,
+                    observacion: ''
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'Error al guardar registro.' });
+            }
         });
     }
     // METODO PARA ACTUALIZAR DETALLE DE HORARIO
     ActualizarDetalleHorarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id } = req.body;
-            yield database_1.default.query(`
-                UPDATE deta_horarios SET orden = $1, hora = $2, minu_espera = $3, id_horario = $4,
-                tipo_accion = $5, segundo_dia = $6, tercer_dia = $7, min_antes = $8, min_despues= $9 WHERE id = $10
-                `, [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id]);
-            res.jsonp({ message: 'Registro actualizado.' });
+            try {
+                const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOSORIGINALES
+                const consulta = yield database_1.default.query('SELECT * FROM deta_horarios WHERE id = $1', [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'deta_horarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar registro con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+                }
+                yield database_1.default.query(`
+                    UPDATE deta_horarios SET orden = $1, hora = $2, minu_espera = $3, id_horario = $4,
+                    tipo_accion = $5, segundo_dia = $6, tercer_dia = $7, min_antes = $8, min_despues= $9 WHERE id = $10
+                    `, [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'deta_horarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{orden: ${orden}, hora: ${hora}, minu_espera: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
+                    ip,
+                    observacion: ''
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar registro.' });
+            }
         });
     }
     ListarDetalleHorarios(req, res) {
@@ -168,20 +268,43 @@ class DetalleCatalogoHorarioControlador {
             const workbook = xlsx_1.default.readFile(filePath);
             const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
             const plantillaD = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+            const { user_name, ip } = req.body;
             /** Detalle de Horarios */
             plantillaD.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                var { nombre_horario, orden, hora, tipo_accion, minutos_espera } = data;
-                var nombre = nombre_horario;
-                const idHorario = yield database_1.default.query('SELECT id FROM cg_horarios WHERE UPPER(nombre) = $1', [nombre.toUpperCase()]);
-                var id_horario = idHorario.rows[0]['id'];
-                if (minutos_espera != undefined) {
-                    yield database_1.default.query('INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion) VALUES ($1, $2, $3, $4, $5)', [orden, hora, minutos_espera, id_horario, tipo_accion.split("=")[0]]);
-                    res.jsonp({ message: 'correcto' });
+                try {
+                    let { nombre_horario, orden, hora, tipo_accion, minutos_espera } = data;
+                    let nombre = nombre_horario;
+                    const idHorario = yield database_1.default.query('SELECT id FROM cg_horarios WHERE UPPER(nombre) = $1', [nombre.toUpperCase()]);
+                    let id_horario = idHorario.rows[0]['id'];
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    if (minutos_espera != undefined) {
+                        yield database_1.default.query('INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion) VALUES ($1, $2, $3, $4, $5)', [orden, hora, minutos_espera, id_horario, tipo_accion.split("=")[0]]);
+                        res.jsonp({ message: 'correcto' });
+                    }
+                    else {
+                        minutos_espera = 0;
+                        yield database_1.default.query('INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion) VALUES ($1, $2, $3, $4, $5)', [orden, hora, minutos_espera, id_horario, tipo_accion.split("=")[0]]);
+                        res.jsonp({ message: 'correcto' });
+                    }
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'deta_horarios',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{orden: ${orden}, hora: ${hora}, minu_espera: ${minutos_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion.split("=")[0]}}`,
+                        ip,
+                        observacion: ''
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                 }
-                else {
-                    minutos_espera = 0;
-                    yield database_1.default.query('INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion) VALUES ($1, $2, $3, $4, $5)', [orden, hora, minutos_espera, id_horario, tipo_accion.split("=")[0]]);
-                    res.jsonp({ message: 'correcto' });
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    res.status(500).jsonp({ message: 'Error al guardar registro.' });
                 }
             }));
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO

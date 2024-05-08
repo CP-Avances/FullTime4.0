@@ -23,6 +23,8 @@ class AccionPersonalControlador {
         try {
             const { descripcion, user_name, ip } = req.body;
 
+            console.log('datos', req.body);
+
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
     

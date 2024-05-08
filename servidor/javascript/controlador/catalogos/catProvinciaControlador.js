@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PROVINCIA_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
-const builder = require('xmlbuilder');
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 class ProvinciaControlador {
     // LISTA DE PAISES DE ACUERDO AL CONTINENTE
     ListarPaises(req, res) {
@@ -79,21 +79,83 @@ class ProvinciaControlador {
     // METODO PARA ELIMINAR REGISTROS
     EliminarProvincia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-      DELETE FROM cg_provincias WHERE id = $1
-      `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
+                const { user_name, ip } = req.body;
+                const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const provincia = yield database_1.default.query('SELECT * FROM cg_provincias WHERE id = $1', [id]);
+                const [datosOriginales] = provincia.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'cg_provincias',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        observacion: `Error al eliminar el registro con id: ${id}.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM cg_provincias WHERE id = $1
+        `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_provincias',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
+            }
         });
     }
     // METODO PARA REGISTRAR PROVINCIA
     CrearProvincia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, id_pais } = req.body;
-            yield database_1.default.query(`
-      INSERT INTO cg_provincias (nombre, id_pais) VALUES ($1, $2)
-      `, [nombre, id_pais]);
-            res.jsonp({ message: 'Registro guardado.' });
+            try {
+                const { nombre, id_pais, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query(`
+        INSERT INTO cg_provincias (nombre, id_pais) VALUES ($1, $2)
+        `, [nombre, id_pais]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_provincias',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{"nombre": "${nombre}", "id_pais": "${id_pais}"}`,
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: error });
+            }
         });
     }
     // METODO PARA BUSCAR INFORMACION DE UN PAIS

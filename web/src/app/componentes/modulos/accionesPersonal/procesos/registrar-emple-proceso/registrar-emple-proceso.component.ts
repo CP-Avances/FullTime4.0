@@ -26,6 +26,10 @@ export class RegistrarEmpleProcesoComponent implements OnInit {
   empleados: any = [];
   procesos: any = [];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   nombreEmpleado = new FormControl('', [Validators.required]);
   fechaInicio = new FormControl('', Validators.required);
   fechaFinal = new FormControl('', Validators.required);
@@ -50,9 +54,11 @@ export class RegistrarEmpleProcesoComponent implements OnInit {
   ngOnInit(): void {
     this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
     this.ObtenerProcesos();
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -89,6 +95,8 @@ export class RegistrarEmpleProcesoComponent implements OnInit {
       fec_inicio: form.fecInicioForm,
       fec_final: form.fecFinalForm,
       id: form.idProcesoForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.restP.RegistrarEmpleProcesos(datosProceso).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Período de Procesos del Empleado registrados', {

@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.USUARIO_CONTROLADOR = void 0;
 const settingsMail_1 = require("../../libs/settingsMail");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -22,14 +23,30 @@ class UsuarioControlador {
     CrearUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { usuario, contrasena, estado, id_rol, id_empleado } = req.body;
+                const { usuario, contrasena, estado, id_rol, id_empleado, user_name, ip } = req.body;
+                // INCIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
         INSERT INTO usuarios (usuario, contrasena, estado, id_rol, id_empleado) 
         VALUES ($1, $2, $3, $4, $5)
         `, [usuario, contrasena, estado, id_rol, id_empleado]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'usuarios',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{usuario: ${usuario}, contrasena: ${contrasena}, estado: ${estado}, id_rol: ${id_rol}, id_empleado: ${id_empleado}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 res.jsonp({ message: 'Usuario Guardado' });
             }
             catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });
             }
         });
@@ -69,35 +86,144 @@ class UsuarioControlador {
     ActualizarUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { usuario, contrasena, id_rol, id_empleado } = req.body;
+                const { usuario, contrasena, id_rol, id_empleado, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'usuarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
                 yield database_1.default.query(`
         UPDATE usuarios SET usuario = $1, contrasena = $2, id_rol = $3 WHERE id_empleado = $4
         `, [usuario, contrasena, id_rol, id_empleado]);
-                res.jsonp({ message: 'Registro actualizado.' });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'usuarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{usuario: ${usuario}, contrasena: ${contrasena}, id_rol: ${id_rol}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
     // METODO PARA ACTUALIZAR CONTRASEÑA
     CambiarPasswordUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { contrasena, id_empleado } = req.body;
-            yield database_1.default.query(`
-      UPDATE usuarios SET contrasena = $1 WHERE id_empleado = $2
-      `, [contrasena, id_empleado]);
-            res.jsonp({ message: 'Registro actualizado.' });
+            try {
+                const { contrasena, id_empleado, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'usuarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        UPDATE usuarios SET contrasena = $1 WHERE id_empleado = $2
+        `, [contrasena, id_empleado]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'usuarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{contrasena: ${contrasena}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     // ADMINISTRACION DEL MODULO DE ALIMENTACION
     RegistrarAdminComida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { admin_comida, id_empleado } = req.body;
-            yield database_1.default.query(`
-      UPDATE usuarios SET admin_comida = $1 WHERE id_empleado = $2
-      `, [admin_comida, id_empleado]);
-            res.jsonp({ message: 'Registro guardado.' });
+            try {
+                const { admin_comida, id_empleado, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'usuarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        UPDATE usuarios SET admin_comida = $1 WHERE id_empleado = $2
+        `, [admin_comida, id_empleado]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'usuarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{admin_comida: ${admin_comida}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     /** ************************************************************************************* **
@@ -106,11 +232,49 @@ class UsuarioControlador {
     // METODO PARA GUARDAR FRASE DE SEGURIDAD
     ActualizarFrase(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { frase, id_empleado } = req.body;
-            yield database_1.default.query(`
-      UPDATE usuarios SET frase = $1 WHERE id_empleado = $2
-      `, [frase, id_empleado]);
-            res.jsonp({ message: 'Registro guardado.' });
+            try {
+                const { frase, id_empleado, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'usuarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        UPDATE usuarios SET frase = $1 WHERE id_empleado = $2
+        `, [frase, id_empleado]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'usuarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{frase: ${frase}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     /** ******************************************************************************************** **
@@ -502,18 +666,51 @@ class UsuarioControlador {
     ActualizarEstadoTimbreWeb(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const array = req.body;
+                const { array, user_name, ip } = req.body;
                 if (array.length === 0)
                     return res.status(400).jsonp({ message: 'No se ha encontrado registros.' });
                 const nuevo = yield Promise.all(array.map((o) => __awaiter(this, void 0, void 0, function* () {
                     try {
+                        // INICIA TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // CONSULTA DATOSORIGINALES
+                        const consulta = yield database_1.default.query(`SELECT * FROM usuarios WHERE id = $1`, [o.userid]);
+                        const [datosOriginales] = consulta.rows;
+                        if (!datosOriginales) {
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'usuarios',
+                                usuario: user_name,
+                                accion: 'U',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al actualizar usuario con id: ${o.userid}. Registro no encontrado.`
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                        }
                         const [result] = yield database_1.default.query(`
             UPDATE usuarios SET web_habilita = $1 WHERE id = $2 RETURNING id
             `, [!o.web_habilita, o.userid])
                             .then((result) => { return result.rows; });
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'usuarios',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: JSON.stringify(datosOriginales),
+                            datosNuevos: `{web_habilita: ${!o.web_habilita}}`,
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
                         return result;
                     }
                     catch (error) {
+                        // REVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
                         return { error: error.toString() };
                     }
                 })));
@@ -913,19 +1110,51 @@ class UsuarioControlador {
     ActualizarEstadoTimbreMovil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log(req.body);
-                const array = req.body;
+                const { array, user_name, ip } = req.body;
                 if (array.length === 0)
                     return res.status(400).jsonp({ message: 'No se ha encontrado registros.' });
                 const nuevo = yield Promise.all(array.map((o) => __awaiter(this, void 0, void 0, function* () {
                     try {
+                        // INICIA TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // CONSULTA DATOSORIGINALES
+                        const consulta = yield database_1.default.query(`SELECT * FROM usuarios WHERE id = $1`, [o.userid]);
+                        const [datosOriginales] = consulta.rows;
+                        if (!datosOriginales) {
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'usuarios',
+                                usuario: user_name,
+                                accion: 'U',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al actualizar usuario con id: ${o.userid}. Registro no encontrado.`
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                        }
                         const [result] = yield database_1.default.query(`
             UPDATE usuarios SET app_habilita = $1 WHERE id = $2 RETURNING id
             `, [!o.app_habilita, o.userid])
                             .then((result) => { return result.rows; });
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'usuarios',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: JSON.stringify(datosOriginales),
+                            datosNuevos: `{"app_habilita": ${!o.app_habilita}}`,
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
                         return result;
                     }
                     catch (error) {
+                        // REVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
                         return { error: error.toString() };
                     }
                 })));
@@ -961,19 +1190,54 @@ class UsuarioControlador {
     EliminarDispositivoMovil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
+                const { user_name, ip } = req.body;
                 const array = req.params.dispositivo;
                 let dispositivos = array.split(',');
                 if (dispositivos.length === 0)
                     return res.status(400).jsonp({ message: 'No se han encontrado registros.' });
                 const nuevo = yield Promise.all(dispositivos.map((id_dispo) => __awaiter(this, void 0, void 0, function* () {
                     try {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // CONSULTA DATOSORIGINALES
+                        const consulta = yield database_1.default.query(`SELECT * FROM id_dispositivos WHERE id_dispositivo = $1`, [id_dispo]);
+                        const [datosOriginales] = consulta.rows;
+                        if (!datosOriginales) {
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'id_dispositivos',
+                                usuario: user_name,
+                                accion: 'D',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al eliminar dispositivo con id: ${id_dispo}. Registro no encontrado.`
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                        }
                         const [result] = yield database_1.default.query(`
             DELETE FROM id_dispositivos WHERE id_dispositivo = $1 RETURNING *
             `, [id_dispo])
                             .then((result) => { return result.rows; });
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'id_dispositivos',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: JSON.stringify(datosOriginales),
+                            datosNuevos: '',
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
                         return result;
                     }
                     catch (error) {
+                        // REVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
                         return { error: error.toString() };
                     }
                 })));
@@ -1077,15 +1341,49 @@ class UsuarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             var token = req.body.token;
             var frase = req.body.frase;
+            const { user_name, ip } = req.body;
             try {
                 const payload = jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail');
                 const id_empleado = payload._id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTA DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'usuarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar usuario con id: ${id_empleado}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
                 yield database_1.default.query(`
         UPDATE usuarios SET frase = $2 WHERE id_empleado = $1
         `, [id_empleado, frase]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'usuarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{"frase": "${frase}"}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 return res.jsonp({ expiro: 'no', message: "Frase de seguridad actualizada." });
             }
             catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ expiro: 'si', message: "Tiempo para cambiar su frase de seguridad ha expirado." });
             }
         });
@@ -1135,14 +1433,30 @@ class UsuarioControlador {
     CrearUsuarioSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, id_sucursal, principal } = req.body;
+                const { id_empleado, id_sucursal, principal, user_name, ip } = req.body;
+                // INICIA TRANSACCION
+                yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
         INSERT INTO usuario_sucursal (id_empleado, id_sucursal, principal) 
         VALUES ($1, $2, $3)
         `, [id_empleado, id_sucursal, principal]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'usuario_sucursal',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{"id_empleado": ${id_empleado}, "id_sucursal": ${id_sucursal}, "principal": ${principal}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });
             }
         });
@@ -1166,13 +1480,46 @@ class UsuarioControlador {
     ActualizarUsuarioSucursalPrincipal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_sucursal, id_empleado } = req.body;
+                const { id_sucursal, id_empleado, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTA DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM usuario_sucursal WHERE id_empleado = $1 AND principal = true`, [id_empleado]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'usuario_sucursal',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar usuario con id: ${id_empleado}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
                 yield database_1.default.query(`
         UPDATE usuario_sucursal SET id_sucursal = $1 WHERE id_empleado = $2 AND principal = true;
         `, [id_sucursal, id_empleado]);
-                res.jsonp({ message: 'Registro actualizado.' });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'usuario_sucursal',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{"id_sucursal": ${id_sucursal}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });
             }
         });
@@ -1180,20 +1527,82 @@ class UsuarioControlador {
     // METODO PARA ELIMINAR REGISTROS
     EliminarUsuarioSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-      DELETE FROM usuario_sucursal WHERE id = $1
-      `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
+                const { user_name, ip } = req.body;
+                const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTA DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM usuario_sucursal WHERE id = $1`, [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'usuario_sucursal',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar usuario_sucursal con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM usuario_sucursal WHERE id = $1
+        `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'usuario_sucursal',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     //ACCESOS AL SISTEMA
     AuditarAcceso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { modulo, user_name, fecha, hora, acceso, ip_address } = req.body;
-            yield database_1.default.query('INSERT INTO logged_user ( modulo, user_name, fecha, hora, acceso, ip_address ) ' +
-                'VALUES ($1, $2, $3, $4, $5, $6)', [modulo, user_name, fecha, hora, acceso, ip_address]);
-            return res.jsonp({ message: 'Auditoria Realizada' });
+            try {
+                // TODO: VER SI EL USER_NAME Y EL IP_ADDRES SON LOS DATOSQUE NECESITA LA AUDITORIA
+                const { modulo, user_name, fecha, hora, acceso, ip_address } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query('INSERT INTO logged_user ( modulo, user_name, fecha, hora, acceso, ip_address ) ' +
+                    'VALUES ($1, $2, $3, $4, $5, $6)', [modulo, user_name, fecha, hora, acceso, ip_address]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'logged_user',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{"modulo": "${modulo}", "user_name": "${user_name}", "fecha": "${fecha}", "hora": "${hora}", "acceso": "${acceso}", "ip_address": "${ip_address}"}`,
+                    ip: ip_address,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Auditoria Realizada' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
 }

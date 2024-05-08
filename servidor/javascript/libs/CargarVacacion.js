@@ -14,7 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RestarPeriodoVacacionAutorizada = void 0;
 const database_1 = __importDefault(require("../database"));
-const RestarPeriodoVacacionAutorizada = function (id_vacacion) {
+const auditoriaControlador_1 = __importDefault(require("../controlador/auditoria/auditoriaControlador"));
+const RestarPeriodoVacacionAutorizada = function (id_vacacion, user_name, ip) {
     return __awaiter(this, void 0, void 0, function* () {
         let vacacion = yield ConsultarVacacion(id_vacacion);
         let num_dias = ContabilizarDiasVacacion(vacacion.fec_inicio, vacacion.fec_final) || 0;
@@ -35,7 +36,33 @@ const RestarPeriodoVacacionAutorizada = function (id_vacacion) {
         console.log(d_h_m);
         console.log('Total ===>', total);
         console.log(total_DHM);
-        yield database_1.default.query('UPDATE peri_vacaciones SET dia_vacacion = $1, horas_vacaciones = $2, min_vacaciones = $3 WHERE id = $4', [total_DHM.dias, total_DHM.horas, total_DHM.min, vacacion.id_peri_vacacion]);
+        try {
+            // INICIAR TRANSACCION
+            yield database_1.default.query('BEGIN');
+            // CONSULTAR DATOSORIGINALES
+            const consulta = yield database_1.default.query('SELECT * FROM peri_vacaciones WHERE id = $1', [vacacion.id_peri_vacacion]);
+            const [datosOriginales] = consulta.rows;
+            if (!datosOriginales) {
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'peri_vacaciones',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar periodo de vacaciones con id ${vacacion.id_peri_vacacion}. Registro no encontrado`
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return;
+            }
+            yield database_1.default.query('UPDATE peri_vacaciones SET dia_vacacion = $1, horas_vacaciones = $2, min_vacaciones = $3 WHERE id = $4', [total_DHM.dias, total_DHM.horas, total_DHM.min, vacacion.id_peri_vacacion]);
+        }
+        catch (error) {
+            // REVERTIR TRANSACCION
+            yield database_1.default.query('ROLLBACK');
+            return;
+        }
     });
 };
 exports.RestarPeriodoVacacionAutorizada = RestarPeriodoVacacionAutorizada;
