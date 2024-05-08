@@ -13,53 +13,53 @@ export class RolPermisosService {
   ) {
   }
 
-  // ENLISTAR PAGINAS
+  //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
   getMenu() {
     return this.http.get(`${environment.url}/rolPermisos/menu/paginas`);
   }
 
-  // ENLISTAR PAGINAS DE LOS MOPDULOS
+  //METODO PARA ENLISTAR PAGINAS SEAN MODULOS
   getModulos() {
     return this.http.get(`${environment.url}/rolPermisos/menu/modulos`);
   }
 
-  //ENLISTAR PAGINAS SEGUN CADA MODULO
+  //METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO
   getMenuModulos(datos) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginasmodulos`, datos);
   }
 
 
-  // METODO PARA BUSCAR LAS PAGINAS POR ID
+  // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION
   BuscarIdPaginas(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/ide`, datos);
   }
 
-  //BUSCAR SI LA PAGINA CON SUS ACCIONES YA FUE ASIGNADA
+  // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL Y POR SU ACCION
   BuscarIdPaginasConAcciones(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/ideaccion`, datos);
   }
 
-  // INSERTAR PAGINAS
+  // METODO PARA ASIGNAR PERMISOS AL ROL
   crearPaginaRol(data: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/insertar`, data);
   }
 
-  // BUSCAR LAS PAGINAS INSERTADAS
+  //METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL
   BuscarPaginasRol(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/todaspaginasrol`, datos);
   }
 
-// ELIMINAR PAGINAS ROL
+  // ELIMINAR PAGINAS ROL
   EliminarPaginasRol(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/eliminar`, datos).pipe(catchError(datos));
   }
 
-  // ELIMINAR  ACCIONES DE PAGINAS ROL
+  // METODO PARA BUSCAR LAS ACCIONES POR CADA PAGINA
   BuscarAccionesPaginas(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/acciones`, datos);
   }
 
-  // ELIMINAR  ACCIONES DE PAGINAS ROL
+  // METODO PARA ENLISTAR ACCIONES SEGUN LA PAGINA 
   BuscarAccionesExistentesPaginas(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/accionesexistentes`, datos);
   }

@@ -15,29 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.rolPermisosControlador = void 0;
 const database_1 = __importDefault(require("../../database"));
 class RolPermisosControlador {
-    /*
-    public async list(req: Request, res: Response) {
-      const rolPermisos = await pool.query(
-        `
-        SELECT * FROM ero_rol_permisos
-        `
-      );
-      res.jsonp(rolPermisos.rows);
-    }
-  
-    public async getOne(req: Request, res: Response): Promise<any> {
-      const { id } = req.params;
-      const unRolPermiso = await pool.query(
-        `
-        SELECT * FROM ero_rol_permisos WHERE id = $1
-        `
-        , [id]);
-      if (unRolPermiso.rowCount > 0) {
-        return res.jsonp(unRolPermiso.rows)
-      }
-      res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-  */
     //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
     ListarMenuRoles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -52,7 +29,7 @@ class RolPermisosControlador {
             }
         });
     }
-    //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
+    //METODO PARA ENLISTAR PAGINAS SEAN MODULOS
     ListarMenuModulosRoles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const Roles = yield database_1.default.query(`
@@ -81,7 +58,7 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA
+    // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION
     ObtenerIdPaginas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { funcion, id_rol } = req.body;

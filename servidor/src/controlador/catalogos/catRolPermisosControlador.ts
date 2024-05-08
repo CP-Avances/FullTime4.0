@@ -5,30 +5,6 @@ import pool from '../../database';
 class RolPermisosControlador {
 
 
-  /*
-  public async list(req: Request, res: Response) {
-    const rolPermisos = await pool.query(
-      `
-      SELECT * FROM ero_rol_permisos
-      `
-    );
-    res.jsonp(rolPermisos.rows);
-  }
-
-  public async getOne(req: Request, res: Response): Promise<any> {
-    const { id } = req.params;
-    const unRolPermiso = await pool.query(
-      `
-      SELECT * FROM ero_rol_permisos WHERE id = $1
-      `
-      , [id]);
-    if (unRolPermiso.rowCount > 0) {
-      return res.jsonp(unRolPermiso.rows)
-    }
-    res.status(404).jsonp({ text: 'Registro no encontrado.' });
-  }
-*/
-
   //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
   public async ListarMenuRoles(req: Request, res: Response) {
     const Roles = await pool.query(
@@ -44,9 +20,7 @@ class RolPermisosControlador {
     }
   }
 
-
-
-  //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
+  //METODO PARA ENLISTAR PAGINAS SEAN MODULOS
   public async ListarMenuModulosRoles(req: Request, res: Response) {
     const Roles = await pool.query(
       `
@@ -61,14 +35,9 @@ class RolPermisosControlador {
     }
   }
 
-
-
-
   //METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO
   public async ListarModuloPorNombre(req: Request, res: Response) {
-
     const { nombre_modulo } = req.body;
-
     const Roles = await pool.query(
       `
       SELECT * FROM es_paginas WHERE nombre_modulo = $1
@@ -83,12 +52,7 @@ class RolPermisosControlador {
     }
   }
 
-
-
-
-
-
-  // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA
+  // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION
   public async ObtenerIdPaginas(req: Request, res: Response): Promise<any> {
     const { funcion, id_rol } = req.body;
     const PAGINA_ROL = await pool.query(
@@ -103,6 +67,7 @@ class RolPermisosControlador {
       return res.status(404).jsonp({ text: 'Registros no encontrados.' });
     }
   }
+
   // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA
   public async ObtenerIdPaginasConAcciones(req: Request, res: Response): Promise<any> {
     const { funcion, id_rol, id_accion } = req.body;
@@ -118,7 +83,6 @@ class RolPermisosControlador {
       return res.status(404).jsonp({ text: 'Registros no encontrados.' });
     }
   }
-
 
   // METODO PARA BUSCAR LAS PAGINAS POR EL ID DEL ROL
   public async ObtenerPaginasRol(req: Request, res: Response): Promise<any> {
@@ -154,10 +118,8 @@ class RolPermisosControlador {
     }
   }
 
-
   // METODO PARA ELIMINAR REGISTRO
   public async EliminarPaginaRol(req: Request, res: Response): Promise<void> {
-
     const { id } = req.body
     await pool.query(
       `
@@ -166,7 +128,7 @@ class RolPermisosControlador {
       , [id]);
     res.jsonp({ message: 'Registro eliminado.' });
   }
-  
+
   // METODO PARA BUSCAR LAS ACCIONES POR CADA PAGINA
   public async ObtenerAccionesPaginas(req: Request, res: Response): Promise<any> {
     const { id_funcion } = req.body;
