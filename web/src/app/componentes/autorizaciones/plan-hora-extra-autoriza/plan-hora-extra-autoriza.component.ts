@@ -140,6 +140,8 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
       id_documento: documento + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
       id_plan_hora_extra: id_hora,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restAutorizaciones.PutEstadoAutoPermisoMultiple(newAutorizacionesM).subscribe(resA => {
       this.toastr.success('Operación exitosa.', 'Autorización Guardada', {

@@ -542,6 +542,8 @@ export class AutorizacionesComponent implements OnInit {
       id_documento: documento + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
       id_permiso: id_permiso,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
 
