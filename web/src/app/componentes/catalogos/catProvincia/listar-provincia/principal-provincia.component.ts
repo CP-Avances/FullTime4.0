@@ -36,7 +36,6 @@ export class PrincipalProvinciaComponent implements OnInit {
 
   provinciasEliminar: any = [];
 
-
   // ALMACENAMIENTO DE DATOS
   provincias: any = [];
   filtroPais = '';
@@ -376,7 +375,7 @@ export class PrincipalProvinciaComponent implements OnInit {
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -395,7 +394,7 @@ export class PrincipalProvinciaComponent implements OnInit {
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -408,13 +407,13 @@ export class PrincipalProvinciaComponent implements OnInit {
     if(datosRecuperados){
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes' && item.id_funcion === 6));
+      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes Provincias'));
       if (index !== -1) {
         encontrado = true;
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -585,6 +584,7 @@ export class PrincipalProvinciaComponent implements OnInit {
       });
 
   }
+
 
 
 }

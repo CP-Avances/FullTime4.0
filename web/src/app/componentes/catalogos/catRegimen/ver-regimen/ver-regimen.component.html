@@ -9,7 +9,7 @@
                 {{regimen.descripcion}}
             </span>
             <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                (click)="AbrirEditar(regimen.id)">
+                (click)="AbrirEditar(regimen.id)" *ngIf="getEditarRegimenLaboral()">
                 Editar
             </button>
         </div>

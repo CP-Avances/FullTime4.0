@@ -3,12 +3,12 @@
 <div class="mat-elevation-z8" style="background: white;">
     <div class="d-flex bd-highlight" id="resultados">
 
-        <button class="btn btn-outline-light btn-sm" [routerLink]="['/roles/']"
+        <button class="btn btn-outline-light btn-sm" (click)="VerRoles()"
             style="float: right; margin-right: 10px;">Atras</button>
         <span class="w-100 bd-highlight">
             FUNCIONES QUE TIENE EL ROL {{nombreRol}} </span>
         <button (click)="ConfirmarDelete()" class="btn btn-outline-light btn-sm"
-            style="float: right; margin-right: 10px;">Eliminar</button>
+            style="float: right; margin-right: 10px;" *ngIf="getVerFuncionesEliminar()">Eliminar</button>
     </div>
     <div class="table-responsive">
         <table class="table table-hover table-sm">
@@ -180,7 +180,7 @@
         <mat-card-actions>
             <div class="container" style="text-align: center;">
                 <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaRol()"
-                    value="Guardar">Guardar</button>
+                    value="Guardar" *ngIf="getVerFuncionesGuardar()">Guardar</button>
             </div>
         </mat-card-actions>
     </mat-card>
@@ -296,7 +296,7 @@
         <mat-card-actions>
             <div class="container" style="text-align: center;">
                 <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaModulosRol()"
-                    value="Guardar">Guardar</button>
+                    value="Guardar" *ngIf="getVerFuncionesGuardar()">Guardar</button>
             </div>
         </mat-card-actions>
     </mat-card>

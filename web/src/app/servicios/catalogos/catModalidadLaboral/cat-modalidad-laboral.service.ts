@@ -13,31 +13,31 @@ export class CatModalidadLaboralService {
   ) { }
 
   listaModalidad_laboral(){
-    return this.http.get<any>(environment.url + '/modalidadLaboral');
+    return this.http.get<any>((localStorage.getItem('empresaURL') as string) + '/modalidadLaboral');
   }
   // METODO PARA REGISTRAR NIVEL DE TITULO
   RegistrarNivel(data: any) {
-    return this.http.post<any>(`${environment.url}/nivel-titulo`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/nivel-titulo`, data);
   }
   CrearModalidadLaboral(modalidad: any){
     console.log('modalidad: ',modalidad)
-    return this.http.post(`${environment.url}/modalidadLaboral/crearModalidad`, modalidad).pipe(
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/modalidadLaboral/crearModalidad`, modalidad).pipe(
       catchError(modalidad)
     );
   }
   // METODO PARA ACTUALIZAR REGISTRO
   ActualizarModalidadLab(datos: any) {
-    return this.http.put(`${environment.url}/modalidadLaboral`, datos)
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/modalidadLaboral`, datos)
     .pipe(catchError(datos));
   }
   eliminar(id: any){
-    return this.http.delete<any>(`${environment.url}/modalidadLaboral/eliminar/${id}`)
+    return this.http.delete<any>(`${(localStorage.getItem('empresaURL') as string)}/modalidadLaboral/eliminar/${id}`)
   }
   RevisarFormato(formData) {
-    return this.http.post<any>(environment.url + '/modalidadLaboral/upload/revision', formData);
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/modalidadLaboral/upload/revision', formData);
   }
   subirArchivoExcel(formData) {
-    return this.http.post<any>(`${environment.url}/modalidadLaboral/cargar_plantilla`, formData);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/modalidadLaboral/cargar_plantilla`, formData);
   }
 
 }

@@ -6,7 +6,7 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button *ngIf="!Datos_modalidad_laboral" id="btn-raised" class="btn btn-sm"
+                    <button *ngIf="!Datos_modalidad_laboral && getCrearModalidadLaboral()" id="btn-raised" class="btn btn-sm"
                         (click)="AbrirVentanaRegistrarModalidad()">
                         Crear Modalidad Laboral
                     </button>
@@ -25,7 +25,7 @@
                 <span>REGISTRO MULTIPLE</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
-                <div class="row">
+                <div class="row" *ngIf="getCargarPlantillaModalidadLaboral()">
                     <div class="col-md" style="padding-top: 5px; padding-bottom: 5px;">
                         <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
                             <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
@@ -104,12 +104,12 @@
                         <td>{{Modal.descripcion}}</td>
                         <td class="justify-content-center">
                             <i (click)="ConfirmarDelete(Modal)" class="far fa-trash-alt" id="t-eliminar"
-                                matSuffix matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                matSuffix matTooltipPosition="right" matTooltip="Eliminar este registro." *ngIf="getEliminarModalidadLaboral()">
                                 <p>Eliminar</p>
                             </i>
                             <i id="t-editar" (click)="AbrirEditar(Modal)" matSuffix
                                 matTooltipPosition="right" matTooltip="Modificar datos de este registro"
-                                class="fas fa-edit">
+                                class="fas fa-edit" *ngIf="getEditarModalidadLaboral()">
                                 <p>Editar</p>
                             </i>
                         </td>
@@ -120,7 +120,7 @@
         <mat-paginator id="pagina" [length]="listaModalida_Laboral.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;" *ngIf="getDescargarReportesModalidadLaboral()">
             <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
                 matTooltipPosition="right" matTooltip="Descargar Lista de Feriados en formato PDF.">
                 <p>PDF</p>

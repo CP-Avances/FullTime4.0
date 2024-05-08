@@ -418,8 +418,90 @@ export class VerDepartamentoComponent implements OnInit {
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      if(this.pagina === 'sucursal'){
+
+      const currentUrl: string = window.location.href;
+      const ultimaBarraIndex: number = currentUrl.lastIndexOf("/");
+      let contenidoDerecha: string = ''; 
+      if (ultimaBarraIndex !== -1) {
+        contenidoDerecha = currentUrl.substring(ultimaBarraIndex + 1);
+      }
+
+      if(contenidoDerecha === 'vistaEmpresa'){
         const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Añadir Nivel' && item.id_funcion === 1);
+        if (index !== -1) {
+          encontrado = true;
+        }
+      }else if (contenidoDerecha === 'sucursales'){
+        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Añadir Nivel' && item.id_funcion === 10);
+        if (index !== -1) {
+          encontrado = true;
+        }
+      }
+      return encontrado;
+    } else {
+      if (parseInt(localStorage.getItem('rol') as string) != 1) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  getVerDepartamentoEliminarNiveles() {
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      
+      const currentUrl: string = window.location.href;
+      const ultimaBarraIndex: number = currentUrl.lastIndexOf("/");
+      let contenidoDerecha: string = ''; 
+      if (ultimaBarraIndex !== -1) {
+        contenidoDerecha = currentUrl.substring(ultimaBarraIndex + 1);
+      }
+
+      if(contenidoDerecha === 'vistaEmpresa'){
+        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Eliminar Nivel' && item.id_funcion === 1);
+        if (index !== -1) {
+          encontrado = true;
+        }
+      }else if (contenidoDerecha === 'sucursales'){
+        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Eliminar Nivel' && item.id_funcion === 10);
+        if (index !== -1) {
+          encontrado = true;
+        }
+      }
+
+      return encontrado;
+    } else {
+      if (parseInt(localStorage.getItem('rol') as string) != 1) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  getVerDepartamentoVerAutoridades() {
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      
+      const currentUrl: string = window.location.href;
+      const ultimaBarraIndex: number = currentUrl.lastIndexOf("/");
+      let contenidoDerecha: string = ''; 
+      if (ultimaBarraIndex !== -1) {
+        contenidoDerecha = currentUrl.substring(ultimaBarraIndex + 1);
+      }
+
+      if(contenidoDerecha === 'vistaEmpresa'){
+        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Ver Autoridades1' && item.id_funcion === 1);
+        if (index !== -1) {
+          encontrado = true;
+        }
+      }else if (contenidoDerecha === 'sucursales'){
+        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles - Ver Autoridades1' && item.id_funcion === 10);
         if (index !== -1) {
           encontrado = true;
         }

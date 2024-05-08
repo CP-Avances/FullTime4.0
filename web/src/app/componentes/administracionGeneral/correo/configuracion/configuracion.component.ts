@@ -108,18 +108,19 @@ export class ConfiguracionComponent implements OnInit {
       })
   }
 
+  //Control Botones
   getConfigurarImagenes(){
     var datosRecuperados = sessionStorage.getItem('paginaRol');
     if(datosRecuperados){
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Configurar imágenes de correo');
+      const index = datos.findIndex(item => item.accion === 'Configurar Imágenes Correo');
       if (index !== -1) {
         encontrado = true;
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -132,13 +133,13 @@ export class ConfiguracionComponent implements OnInit {
     if(datosRecuperados){
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Configurar Servidor');
+      const index = datos.findIndex(item => item.accion === 'Configurar Servidor Correo');
       if (index !== -1) {
         encontrado = true;
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;

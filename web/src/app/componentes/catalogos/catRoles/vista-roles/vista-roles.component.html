@@ -1,97 +1,103 @@
 <br>
-<div class="container" tyle="margin-bottom: 25px; padding-bottom: 15px;">
-    <div class="row">
-        <div class="col-md">
-            <div id="titulo">
-                <span>ROLES</span>
-            </div>
-            <mat-card class="example-card mat-elevation-z8">
-                <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button id="btn-raised"  class="btn btn-sm" (click)="AbrirVentanaRegistrarRol()" *ngIf="getCrearRol()">
-                        Crear rol
-                    </button>
-                    <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarCampoBuscar()" matSuffix
-                        matTooltipPosition="right"
-                        matTooltip="Limpiar campos de búsqueda y mostrar todos los datos.">
-                        Mostrar lista
-                    </button>
+<!-- COMPONENTE VISTA PRINCIPAL  -->
+<div *ngIf="ver_roles">
+    <div class="container" tyle="margin-bottom: 25px; padding-bottom: 15px;">
+        <div class="row">
+            <div class="col-md">
+                <div id="titulo">
+                    <span>ROLES</span>
                 </div>
-            </mat-card>
+                <mat-card class="example-card mat-elevation-z8">
+                    <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarRol()" *ngIf="getCrearRol()">
+                            Crear rol
+                        </button>
+                        <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampoBuscar()" matSuffix
+                            matTooltipPosition="right"
+                            matTooltip="Limpiar campos de búsqueda y mostrar todos los datos.">
+                            Mostrar lista
+                        </button>
+                    </div>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="padding-bottom: 10px; margin-bottom: 35px; padding-top: 30px;">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div id="resultados">RESULTADO DE BÚSQUEDA</div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr style="text-align: center;">
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <mat-form-field id="t-inputs">
+                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroRoles"
+                                        [formControl]="buscarDescripcion">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de roles por su descripción.">
+                                    help_outline
+                                </mat-icon>
+                            </td>
+                        </tr>
+                        <tr *ngFor="let rol of roles | roles:filtroRoles | paginate:tamanio_pagina:numero_pagina">
+                            <td style="font-size: 14px;">{{rol.nombre}}</td>
+                            <td class="d-flex justify-content-center">
+                                <i matSuffix matTooltipPosition="right" matTooltip="Agregar funciones a este Rol."
+                                    class="fas fa-grip-horizontal" id="funtion" (click)="VerFunciones(rol.id)" *ngIf="getVerFuncionesRol()">
+                                    <p>Funciones</p>
+                                </i>
+                                <i *ngIf="rol.id != 1 && getEditarRol()" matSuffix (click)="AbrirVentanaEditar(rol)"
+                                    matTooltipPosition="right" id="t-editar"
+                                    matTooltip="Modificar datos generales de este registro." class="fas fa-edit">
+                                    <p>Editar</p>
+                                </i>
+                                <i *ngIf="rol.id != 1 && getEliminarRol()" class="far fa-trash-alt"
+                                    (click)="ConfirmarDelete(rol)" id="t-eliminar" matSuffix matTooltipPosition="right"
+                                    matTooltip="Eliminar registro.">
+                                    <p>Eliminar</p>
+                                </i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <mat-paginator id="pagina" [length]="roles.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;" *ngIf="getDescargarReportes()">
+                <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista de Roles en formato PDF.">
+                    <p>PDF</p>
+                </i>
+                <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Roles en formato EXCEL.">
+                    <p>XLSL</p>
+                </i>
+                <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Roles en formato CSV.">
+                    <p>CSV</p>
+                </i>
+                <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Roles en formato XML.">
+                    <p>XML</p>
+                </i>
+            </div>
+            <div class="d-flex justify-content-end"
+                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                <p> Reporte de roles. </p>
+            </div>
         </div>
     </div>
 </div>
-<div class="container" style="padding-bottom: 10px; margin-bottom: 35px; padding-top: 30px;">
-    <div class="mat-elevation-z8" style="background: white;">
-        <div id="resultados">RESULTADO DE BÚSQUEDA</div>
-        <div class="table-responsive">
-            <table class="table table-hover table-sm">
-                <thead class="thead-light">
-                    <tr style="text-align: center;">
-                        <th scope="col">Descripción</th>
-                        <th scope="col">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroRoles"
-                                    [formControl]="buscarDescripcion">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
-                                matTooltip="Búsqueda de roles por su descripción.">
-                                help_outline
-                            </mat-icon>
-                        </td>
-                    </tr>
-                    <tr *ngFor="let rol of roles | roles:filtroRoles | paginate:tamanio_pagina:numero_pagina">
-                        <td style="font-size: 14px;">{{rol.nombre}}</td>
-                        <td class="d-flex justify-content-center">
-                            <i matSuffix matTooltipPosition="right" matTooltip="Agregar funciones a este Rol."
-                                class="fas fa-grip-horizontal" id="funtion"
-                                [routerLink]="['/seleccionarPermisos/', rol.id]" *ngIf="getFuncionesRol()">
-                                <p>Funciones</p>
-                            </i>
-                            <i *ngIf="getEditarRol()" matSuffix (click)="AbrirVentanaEditar(rol)"
-                                matTooltipPosition="right" id="t-editar"
-                                matTooltip="Modificar datos generales de este registro." class="fas fa-edit">
-                                <p>Editar</p>
-                            </i>
-                            <i *ngIf="getEliminarRol() && rol.id != 3" class="far fa-trash-alt"
-                                (click)="ConfirmarDelete(rol)" id="t-eliminar" matSuffix matTooltipPosition="right"
-                                matTooltip="Eliminar registro.">
-                                <p>Eliminar</p>
-                            </i>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <mat-paginator id="pagina" [length]="roles.length" [pageSize]="tamanio_pagina"
-            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
-        </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;" *ngIf="getDescargarReportes()">
-            <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Roles en formato PDF.">
-                <p>PDF</p>
-            </i>
-            <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Roles en formato EXCEL.">
-                <p>XLSL</p>
-            </i>
-            <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Roles en formato CSV.">
-                <p>CSV</p>
-            </i>
-            <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Roles en formato XML.">
-                <p>XML</p>
-            </i>
-        </div>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-            <p> Reporte de roles. </p>
-        </div>
-    </div>
-</div>
+
+<!-- COMPONENTE SELECCION DE FUNCIONES DEL SISTEMA -->
+<app-seleccionar-rol-permiso *ngIf="ver_funciones" [id_rol]="rol_id"></app-seleccionar-rol-permiso>

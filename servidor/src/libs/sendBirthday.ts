@@ -20,12 +20,12 @@ export const cumpleanios = function () {
         if (hora === 15 && minutos === 0) {
             const felizCumple = await pool.query(
                 `
-                SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, s.id_empresa, 
+                SELECT da.nombre, da.apellido, da.correo, da.fec_nacimiento, s.id_empresa, 
                     ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
                     ce.pie_firma, ce.cabecera_firma, m.asunto, m.mensaje, m.imagen, m.link  
                 FROM datos_actuales_empleado AS da, e_sucursales AS s, e_message_birthday AS m,
                     e_empresa AS ce 
-                WHERE CAST(da.fecha_nacimiento AS VARCHAR) LIKE '%' || $1 AND da.id_sucursal = s.id
+                WHERE CAST(da.fec_nacimiento AS VARCHAR) LIKE '%' || $1 AND da.id_sucursal = s.id
                     AND da.estado = 1
                 `
                 , [fecha]);

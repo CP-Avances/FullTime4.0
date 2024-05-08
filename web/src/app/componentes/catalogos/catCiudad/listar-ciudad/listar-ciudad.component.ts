@@ -370,7 +370,7 @@ export class ListarCiudadComponent implements OnInit {
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -389,7 +389,7 @@ export class ListarCiudadComponent implements OnInit {
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -402,13 +402,13 @@ export class ListarCiudadComponent implements OnInit {
     if(datosRecuperados){
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes' && item.id_funcion === 7));
+      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes Ciudades'));
       if (index !== -1) {
         encontrado = true;
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -420,10 +420,6 @@ export class ListarCiudadComponent implements OnInit {
 
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
-
-
-
-
 
   HabilitarSeleccion() {
     this.plan_multiple = true;

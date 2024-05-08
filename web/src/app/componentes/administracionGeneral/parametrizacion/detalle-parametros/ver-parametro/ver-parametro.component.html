@@ -10,7 +10,7 @@
             </div>
             <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                    (click)="AbrirVentanaEditar(tp)">
+                    (click)="AbrirVentanaEditar(tp)" *ngIf="getVerParametroEditarDetalleParametro()">
                     Editar
                 </button>
             </div>
@@ -96,14 +96,14 @@
                 </div>
 
                 <div style="text-align: center; margin-top: 1.5rem;">
-                    <button class="btn btn-sm" *ngIf="ver_eliminar_atraso" (click)="EliminarAtrasos()">
+                    <button class="btn btn-sm" *ngIf="ver_eliminar_atraso && getVerParametroEliminarDetalleParametro()" (click)="EliminarAtrasos()" >
                         Eliminar
                     </button>
-                    <button class="btn btn-sm" *ngIf="ver_guardar_atraso" (click)="RegistrarAtraso()"
+                    <button class="btn btn-sm" *ngIf="ver_guardar_atraso && getVerParametroRegistrarDetalleParametro()" (click)="RegistrarAtraso()"
                         [disabled]="ver_registrar_atraso">
                         Registrar
                     </button>
-                    <button class="btn btn-sm" *ngIf="ver_actualizar_atraso" (click)="ActualizarAtraso()"
+                    <button class="btn btn-sm" *ngIf="ver_actualizar_atraso && getVerParametroRegistrarDetalleParametro()" (click)="ActualizarAtraso()"
                         [disabled]="ver_registrar_atraso">
                         Actualizar
                     </button>
@@ -324,7 +324,7 @@
                     <div id="titulo">
                         <span>DETALLES DE PARÁMETRO GENERAL</span>
                         <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="AbrirVentanaDetalles(tp)">
+                            (click)="AbrirVentanaDetalles(tp)" *ngIf="getVerParametroEditarDetalleParametro()">
                             Registrar detalle
                         </button>
                     </div>
@@ -346,7 +346,7 @@
                                             <p>Editar</p>
                                         </i>
                                         <i matSuffix matTooltipPosition="right" matTooltip="Eliminar registro."
-                                            class="far fa-trash-alt" (click)="ConfirmarDelete(dp)" id="t-eliminar">
+                                            class="far fa-trash-alt" (click)="ConfirmarDelete(dp)" id="t-eliminar" *ngIf="getVerParametroEliminarDetalleParametro()">
                                             <p>Eliminar</p>
                                         </i>
                                     </td>

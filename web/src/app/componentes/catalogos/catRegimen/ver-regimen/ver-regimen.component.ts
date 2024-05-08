@@ -112,4 +112,24 @@ export class VerRegimenComponent implements OnInit {
     this.componentl.regimen_id = id;
   }
 
+  //Control Botones
+  getEditarRegimenLaboral(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Editar Régimen Laboral');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
 }

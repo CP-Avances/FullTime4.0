@@ -492,4 +492,62 @@ export class VerParametroComponent implements OnInit {
       this.ver_guardar_atraso = true;
     }
   }
+
+  getVerParametroRegistrarDetalleParametro(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Ver Parámetro - Registrar Detalle Parámetro');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getVerParametroEditarDetalleParametro(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Ver Parámetro - Editar Detalle Parámetro');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getVerParametroEliminarDetalleParametro(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Ver Parámetro - Eliminar Detalle Parámetro');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
 }

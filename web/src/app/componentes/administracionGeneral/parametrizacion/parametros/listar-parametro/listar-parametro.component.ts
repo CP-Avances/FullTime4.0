@@ -345,18 +345,38 @@ export class ListarParametroComponent implements OnInit {
     a.click();
   }
 
-  getEditarParametros(){
+  //Control Botones
+  getCrearParametro(){
     var datosRecuperados = sessionStorage.getItem('paginaRol');
     if(datosRecuperados){
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Editar Parámetros');
+      const index = datos.findIndex(item => item.accion === 'Crear Parámetro');
       if (index !== -1) {
         encontrado = true;
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getEditarParametros(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Editar Parámetro');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -369,13 +389,13 @@ export class ListarParametroComponent implements OnInit {
     if(datosRecuperados){
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Eliminar Parámetros');
+      const index = datos.findIndex(item => item.accion === 'Eliminar Parámetro');
       if (index !== -1) {
         encontrado = true;
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -388,13 +408,13 @@ export class ListarParametroComponent implements OnInit {
     if(datosRecuperados){
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Descargar Reportes Parámetros');
+      const index = datos.findIndex(item => item.accion === 'Descargar Reportes Parámetro');
       if (index !== -1) {
         encontrado = true;
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -402,22 +422,24 @@ export class ListarParametroComponent implements OnInit {
     }
   }
 
-  getCrearParametro(){
+  getVerParametro(){
     var datosRecuperados = sessionStorage.getItem('paginaRol');
     if(datosRecuperados){
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Crear Parámetro');
+      const index = datos.findIndex(item => item.accion === 'Ver Parámetro');
       if (index !== -1) {
         encontrado = true;
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
       }
     }
   }
+
+  
 }

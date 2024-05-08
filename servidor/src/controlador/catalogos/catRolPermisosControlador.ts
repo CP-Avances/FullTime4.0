@@ -250,7 +250,7 @@ class RolPermisosControlador {
     const { id_funcion } = req.body;
     const PAGINA_ROL = await pool.query(
       `
-          SELECT * FROM cg_acciones_roles WHERE id_funcion = $1 
+          SELECT * FROM cg_acciones_roles WHERE id_pagina = $1 
           `
       , [id_funcion]);
     if (PAGINA_ROL.rowCount > 0) {

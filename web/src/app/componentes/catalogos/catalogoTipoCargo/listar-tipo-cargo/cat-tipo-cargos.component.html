@@ -6,7 +6,7 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button *ngIf="!Datos_tipo_cargos" id="btn-raised" class="btn btn-sm"
+                    <button *ngIf="!Datos_tipo_cargos && getCrearTipoCargo()" id="btn-raised" class="btn btn-sm"
                         (click)="AbrirVentanaRegistrarCargo()">
                         Crear Cargos
                     </button>
@@ -25,7 +25,7 @@
                 <span>REGISTRO MULTIPLE</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
-                <div class="row">
+                <div class="row" *ngIf="getCargarPlantillaTipoCargo()">
                     <div class="col-md" style="padding-top: 5px;">
                         <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
                             <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
@@ -66,7 +66,6 @@
                             </button>
                         </div>
                     </div>
-                    
                 </div>    
             </mat-card>
         </div>
@@ -104,12 +103,12 @@
                         <td>{{cargo.cargo}}</td>
                         <td class="justify-content-center">
                             <i (click)="ConfirmarDelete(cargo)" class="far fa-trash-alt" id="t-eliminar"
-                                matSuffix matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                matSuffix matTooltipPosition="right" matTooltip="Eliminar este registro." *ngIf="getEliminarTipoCargo()">
                                 <p>Eliminar</p>
                             </i>
                             <i id="t-editar" (click)="AbrirEditar(cargo)" matSuffix
                                 matTooltipPosition="right" matTooltip="Modificar datos de este registro"
-                                class="fas fa-edit">
+                                class="fas fa-edit" *ngIf="getEditarTipoCargo()">
                                 <p>Editar</p>
                             </i>
                         </td>

@@ -13,28 +13,28 @@ export class CatTipoCargosService {
   ) { }
 
   listaCargos(){
-    return this.http.get<any>(environment.url + '/tipoCargos');
+    return this.http.get<any>((localStorage.getItem('empresaURL') as string) + '/tipoCargos');
   }
   
   CrearCargo(cargo: any){
     console.log('cargo: ',cargo)
-    return this.http.post(`${environment.url}/tipoCargos/crearCargo`, cargo)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/tipoCargos/crearCargo`, cargo)
     .pipe(catchError(cargo));
   }
 
   ActualizarCargo(datos: any) {
-    return this.http.put(`${environment.url}/tipoCargos`, datos)
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/tipoCargos`, datos)
     .pipe(catchError(datos));
   }
   eliminar(id: any){
-    return this.http.delete<any>(`${environment.url}/tipoCargos/eliminar/${id}`)
+    return this.http.delete<any>(`${(localStorage.getItem('empresaURL') as string)}/tipoCargos/eliminar/${id}`)
   }
 
   RevisarFormato(formData) {
-    return this.http.post<any>(environment.url + '/tipoCargos/upload/revision', formData);
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/tipoCargos/upload/revision', formData);
   }
   subirArchivoExcel(formData) {
-    return this.http.post<any>(`${environment.url}/tipoCargos/cargar_plantilla`, formData);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/tipoCargos/cargar_plantilla`, formData);
   }
 
 }

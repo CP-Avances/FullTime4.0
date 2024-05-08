@@ -26,7 +26,7 @@
                     <span>REGISTRO MULTIPLE</span>
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
-                    <div class="row">
+                    <div class="row" *ngIf="getPlantillaEstablecimiento()">
                         <div class="col-md" style="padding-top: 5px;">
                             <div class="d-flex flex-wrap justify-content-around"
                                 style="text-align: center; justify-content: center;">
@@ -90,7 +90,7 @@
                 <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                     
                     <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                        (click)="ConfirmarDeleteMultiple()">Eliminar </button>
+                        (click)="ConfirmarDeleteMultiple()" *ngIf="getEliminarEstablecimiento()">Eliminar </button>
                 </div>
             </div>
             <div class="table-responsive">
@@ -155,10 +155,9 @@
                             <td>{{s.nombre}}</td>
                             <td>{{s.descripcion}}</td>
                             <td class="justify-content-center">
-                                <!--getDepartamentoEstablecimiento()-->
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Ver lista de departamentos del establecimiento." class="fa fa-building"
-                                    id="ver" (click)="VerDepartamentos(s.id)" >
+                                    id="ver" (click)="VerDepartamentos(s.id)" *ngIf="getVerDepartamento()">
                                     <p>Departamento</p>
                                 </i>
                                 <i id="t-editar" class="fas fa-edit" (click)="AbrirVentanaEditar(s)" matSuffix

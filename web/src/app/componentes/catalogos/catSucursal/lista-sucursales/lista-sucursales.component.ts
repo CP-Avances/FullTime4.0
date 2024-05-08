@@ -587,7 +587,7 @@ export class ListaSucursalesComponent implements OnInit {
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -606,7 +606,7 @@ export class ListaSucursalesComponent implements OnInit {
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -625,7 +625,7 @@ export class ListaSucursalesComponent implements OnInit {
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -633,11 +633,23 @@ export class ListaSucursalesComponent implements OnInit {
     }
   }
 
-  getDepartamentoEstablecimiento(){
-    if(parseInt(localStorage.getItem('rol') as string) != 3){
-      return false;
+  getPlantillaEstablecimiento(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Cargar Plantilla Establecimientos');
     }else{
-      return true;
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getVerDepartamento(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Ver Departamento' && item.id_funcion === 10);
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 

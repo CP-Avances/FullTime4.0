@@ -53,6 +53,7 @@ export class VerSucursalComponent implements OnInit {
   ngOnInit(): void {
     this.CargarDatosSucursal();
     this.ListaDepartamentos();
+    console.log('pagina_', this.pagina_);
   }
 
   // METODO PARA MANEJAR PAGINACION
@@ -419,6 +420,12 @@ export class VerSucursalComponent implements OnInit {
           encontrado = true;
         }
       }
+      else if (this.pagina_ === 'lista-sucursal'){
+        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Crear Departamento' && item.id_funcion === 10);
+        if (index !== -1) {
+          encontrado = true;
+        }
+      }
       //FIXME Añadir control para sucursal
       return encontrado;
     } else {
@@ -435,11 +442,9 @@ export class VerSucursalComponent implements OnInit {
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      if(this.pagina_ === 'datos-empresa'){
-        const index = datos.findIndex(item => item.accion === 'Editar Sucursal' && item.id_funcion === 1);
-        if (index !== -1) {
-          encontrado = true;
-        }
+      const index = datos.findIndex(item => item.accion === 'Editar Sucursal' && item.id_funcion === 1);
+      if (index !== -1) {
+        encontrado = true;
       }
       return encontrado;
     } else {
@@ -458,6 +463,11 @@ export class VerSucursalComponent implements OnInit {
       var encontrado = false;
       if(this.pagina_ === 'datos-empresa'){
         const index = datos.findIndex(item => item.accion === 'Ver Departamento - Eliminar Departamento' && item.id_funcion === 1);
+        if (index !== -1) {
+          encontrado = true;
+        }
+      }else if (this.pagina_ === 'lista-sucursal'){
+        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Eliminar Departamento' && item.id_funcion === 10);
         if (index !== -1) {
           encontrado = true;
         }
@@ -482,6 +492,11 @@ export class VerSucursalComponent implements OnInit {
         if (index !== -1) {
           encontrado = true;
         }
+      }else if (this.pagina_ === 'lista-sucursal'){
+        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Editar Departamento' && item.id_funcion === 10);
+        if (index !== -1) {
+          encontrado = true;
+        }
       }
       return encontrado;
     } else {
@@ -500,6 +515,11 @@ export class VerSucursalComponent implements OnInit {
       var encontrado = false;
       if(this.pagina_ === 'datos-empresa'){
         const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles' && item.id_funcion === 1);
+        if (index !== -1) {
+          encontrado = true;
+        }
+      }else if (this.pagina_ === 'lista-sucursal'){
+        const index = datos.findIndex(item => item.accion === 'Ver Departamento - Ver Niveles' && item.id_funcion === 10);
         if (index !== -1) {
           encontrado = true;
         }

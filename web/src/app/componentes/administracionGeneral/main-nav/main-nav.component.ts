@@ -73,6 +73,8 @@ export class MainNavComponent implements OnInit {
   vistaConfigurarCorreo: boolean = false;
   vistaRoles: boolean = false;
   vistaListarRegimen: boolean = false;
+  vistaModalidadLaboral: boolean = false;
+  vistaTipoCargos: boolean = false;
   subItemConfiguracionLocalizacion: boolean = false;
   childrenLocalizacion: any = [];
   vistaProvincia: boolean = false;
@@ -391,6 +393,8 @@ export class MainNavComponent implements OnInit {
               { name: 'Correo', url: '/configurarCorreo', color: true, ver: true },
               { name: 'Roles', url: '/roles', color: true, ver: true },
               { name: 'Régimen Laboral', url: '/listarRegimen', color: true, ver: true },
+              { name: 'Modalida Laboral', url: '/modalidaLaboral', color: true, ver: true },
+              { name: 'Tipo Cargos', url: '/tipoCargos', color: true, ver: true }
             ]
           },
           {
@@ -422,8 +426,6 @@ export class MainNavComponent implements OnInit {
           { name: 'Título Profesional', url: '/titulos', color: true, ver: true },
           { name: 'Empleados', url: '/empleado', color: true, ver: true },
           { name: 'Cargar Plantillas', url: '/cargarPlantilla', color: true, ver: true },
-          { name: 'Modalida Laboral', url: '/modalidaLaboral', color: true, ver: true },
-          { name: 'Tipo Cargos', url: '/tipoCargos', color: true, ver: true },
           { name: 'Asignar Establecimientos', url: '/administrarSucursales', color: true, ver: this.superadmin },
         ]
       },
@@ -1285,6 +1287,30 @@ export class MainNavComponent implements OnInit {
                       }
                       if(!this.vistaListarRegimen){
                         this.childrenParametrizacion.push({name: 'Régimen Laboral', url: '/listarRegimen', color: true, ver: true}); 
+                      }
+                      break;
+                    case 'modalidadLaboral':
+                      this.itemConfiguracion = true;
+                      this.subItemConfiguracionParametrizacion = true;
+                      for (const parametrizacion of this.childrenParametrizacion) {
+                        if(parametrizacion.url === '/modalidaLaboral'){
+                          this.vistaModalidadLaboral = true;
+                        }
+                      }
+                      if(!this.vistaModalidadLaboral){
+                        this.childrenParametrizacion.push({name: 'Modalidad Laboral', url: '/modalidaLaboral', color: true, ver: true}); 
+                      }
+                      break;
+                    case 'tipoCargos':
+                      this.itemConfiguracion = true;
+                      this.subItemConfiguracionParametrizacion = true;
+                      for (const parametrizacion of this.childrenParametrizacion) {
+                        if(parametrizacion.url === '/tipoCargos'){
+                          this.vistaTipoCargos = true;
+                        }
+                      }
+                      if(!this.vistaTipoCargos){
+                        this.childrenParametrizacion.push({name: 'Tipo Cargos', url: '/tipoCargos', color: true, ver: true}); 
                       }
                       break;
                     case 'provincia':

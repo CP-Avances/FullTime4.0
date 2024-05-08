@@ -551,7 +551,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -570,7 +570,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -589,7 +589,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -608,7 +608,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -621,10 +621,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
-
-
-
-
 
   HabilitarSeleccion() {
     this.plan_multiple = true;

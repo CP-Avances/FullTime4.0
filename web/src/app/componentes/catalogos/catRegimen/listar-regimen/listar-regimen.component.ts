@@ -469,7 +469,7 @@ export class ListarRegimenComponent implements OnInit {
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -488,7 +488,7 @@ export class ListarRegimenComponent implements OnInit {
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -507,7 +507,7 @@ export class ListarRegimenComponent implements OnInit {
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -526,7 +526,7 @@ export class ListarRegimenComponent implements OnInit {
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
@@ -539,13 +539,13 @@ export class ListarRegimenComponent implements OnInit {
     if(datosRecuperados){
       var datos = JSON.parse(datosRecuperados);
       var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes' && item.id_funcion === 5));
+      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes Régimen Laboral' && item.id_funcion === 5));
       if (index !== -1) {
         encontrado = true;
       }
       return encontrado;
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
+      if(parseInt(localStorage.getItem('rol') as string) != 1){
         return false;
       }else{
         return true;
