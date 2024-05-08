@@ -14,8 +14,6 @@ class ParametrosRutas {
     configuracion() {
         // BUSCAR LISTA DE PARAMETROS
         this.router.get('/', verificarToken_1.TokenValidation, parametrosControlador_1.default.ListarParametros);
-        // METODO PARA ELIMINAR PARAMETRO
-        this.router.delete('/eliminar-tipo/:id', verificarToken_1.TokenValidation, parametrosControlador_1.default.EliminarTipoParametro);
         // METODO PARA ACTUALIZAR PARAMETRO
         this.router.put('/actual-tipo', verificarToken_1.TokenValidation, parametrosControlador_1.default.ActualizarTipoParametro);
         // METODO PARA VER DATOS DE UN PARAMETRO
@@ -28,8 +26,6 @@ class ParametrosRutas {
         this.router.post('/detalle', verificarToken_1.TokenValidation, parametrosControlador_1.default.IngresarDetalleParametro);
         // METODO PARA ACTUALIZAR DETALLE DE PARAMETRO
         this.router.put('/actual-detalle', verificarToken_1.TokenValidation, parametrosControlador_1.default.ActualizarDetalleParametro);
-        // METODO PARA REGISTRAR PARAMETRO
-        this.router.post('/tipo', verificarToken_1.TokenValidation, parametrosControlador_1.default.IngresarTipoParametro);
         // METODO PARA COMPARAR COORDENADAS
         this.router.post('/coordenadas', verificarToken_1.TokenValidation, parametrosControlador_1.default.CompararCoordenadas);
     }

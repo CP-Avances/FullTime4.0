@@ -1,14 +1,16 @@
 <br>
-
 <div class="mat-elevation-z8" style="background: white;">
     <div class="d-flex bd-highlight" id="resultados">
-
-        <button class="btn btn-outline-light btn-sm" (click)="VerRoles()"
-            style="float: right; margin-right: 10px;">Atras</button>
+        <button class="btn btn-outline-light btn-sm" (click)="VerRoles()" style="float: right; margin-right: 10px;">
+            Atras
+        </button>
         <span class="w-100 bd-highlight">
-            FUNCIONES QUE TIENE EL ROL {{nombreRol}} </span>
+            FUNCIONES QUE TIENE EL ROL {{nombreRol}}
+        </span>
         <button (click)="ConfirmarDelete()" class="btn btn-outline-light btn-sm"
-            style="float: right; margin-right: 10px;">Eliminar</button>
+            style="float: right; margin-right: 10px;">
+            Eliminar
+        </button>
     </div>
     <div class="table-responsive">
         <table class="table table-hover table-sm">
@@ -25,20 +27,14 @@
                             [indeterminate]="selectionPaginas.hasValue() && !isAllSelectedPag()"
                             [aria-label]="checkboxLabelPag()">
                         </mat-checkbox>
-
-
-
                     </th>
                     <th scope="col">Funciones</th>
                     <th scope="col">Acciones</th>
-
                 </tr>
             </thead>
             <tbody>
-
                 <tr>
                     <td></td>
-
                     <td>
                         <mat-form-field class="input-tables funcion" style="float: left;">
                             <input matInput placeholder="Buscar" [(ngModel)]="filtrofuncion" [formControl]="funcion"
@@ -46,9 +42,7 @@
                         </mat-form-field>
                     </td>
                     <td></td>
-
                 </tr>
-
                 <tr *ngFor="let p of paginas | roles: filtrofuncion | paginate:tamanio_pagina:numero_pagina "
                     style="text-align: left;">
                     <td>
@@ -59,7 +53,6 @@
                     </td>
                     <td style="text-align: left;">{{p.pagina}}</td>
                     <td style="text-align: left;">{{MetodoParaMostrarAccion(p.id_accion)}}</td>
-
                 </tr>
             </tbody>
         </table>
@@ -69,10 +62,7 @@
     </mat-paginator>
     <br>
 </div>
-
 <br>
-
-
 <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
     <div id="titulo">
         <span>FUNCIONES DEL SISTEMA</span>
@@ -88,10 +78,8 @@
             <form >
                 <div class="container">
                     <div class="row">
-
                         <div class="col-sm">
                             <!-- Tabla de menu -->
-
                             <div class="d-flex flex-wrap justify-content-start">
                                 <div class="modal-body" style="margin-left: 60px; padding-top: 15px;">
                                     <div class="container-fluid">
@@ -114,15 +102,11 @@
                                                     class="form-check-label" for="inlineCheckbox1">
                                                     {{n.nombre}}
                                                     <!--Acciones de las paginas-->
-
-
                                                 </label>
-
                                                 <div class="d-flex flex-wrap justify-content-start">
                                                     <div class="modal-body"
                                                         style="margin-left: 60px; padding-top: 15px;">
                                                         <div class="container-fluid">
-
                                                             <div class="row"
                                                                 style="text-align: left; padding-top: 10px;"
                                                                 *ngFor="let pagina of nombresAccionesPorPagina[n.id]; index as j">
@@ -134,8 +118,6 @@
                                                                     style="margin-left: 1px; font-size: 14px; color: green; font-weight: bold; padding-bottom: 10px;">
                                                                     Todos las acciones
                                                                 </label>
-
-
                                                                 <div class="col-md-6 col-lg-6 col-6"
                                                                     style="text-align:left; padding-bottom: 10px; "
                                                                     *ngFor="let accion of pagina; index as i">
@@ -148,31 +130,16 @@
                                                                         {{accion.accion}}
                                                                     </label>
                                                                 </div>
-
-
-
                                                             </div>
-
-
                                                         </div>
                                                     </div>
-
-
                                                 </div>
-
                                             </div>
-
-
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-
-
                         </div>
-
-
                     </div>
                 </div>
             </form>
@@ -185,8 +152,6 @@
         </mat-card-actions>
     </mat-card>
 </div>
-
-
 <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
     <div id="titulo">
         <span>MODULOS DEL SISTEMA</span>
@@ -202,18 +167,12 @@
             <form >
                 <div class="container">
                     <div class="row">
-
                         <div class="col-sm">
                             <!-- Tabla de menu -->
-
                             <div class="d-flex flex-wrap justify-content-start">
                                 <div class="modal-body" style="margin-left: 60px; padding-top: 15px;">
                                     <div class="container-fluid" *ngFor="let modulo of nombreModulos; index as j">
-                                        <div class="row" >
-
-                                        <!--
                                         <div class="row" *ngIf="diccionarioFuncionesActivas[modulo]">
--->
                                             <input class="form-check-input" type="checkbox"
                                                 id="seleccionarmodulo{{modulo}}"
                                                 (change)="SeleccionarTodasModulos($event, modulo)">
@@ -233,14 +192,11 @@
                                                     class="form-check-label" for="inlineCheckbox1">
                                                     {{n.nombre}}
                                                     <!--Acciones de las paginas-->
-
                                                 </label>
-
                                                 <div class="d-flex flex-wrap justify-content-start">
                                                     <div class="modal-body"
                                                         style="margin-left: 60px; padding-top: 15px;">
                                                         <div class="container-fluid">
-
                                                             <div class="row"
                                                                 style="text-align: left; padding-top: 10px;"
                                                                 *ngFor="let pagina of nombresAccionesPorPagina[n.id]; index as j">
@@ -252,8 +208,6 @@
                                                                     style="margin-left: 1px; font-size: 14px; color: green; font-weight: bold; padding-bottom: 10px;">
                                                                     Todos las acciones
                                                                 </label>
-
-
                                                                 <div class="col-md-6 col-lg-6 col-6"
                                                                     style="text-align:left; padding-bottom: 10px; "
                                                                     *ngFor="let accion of pagina; index as i">
@@ -266,32 +220,16 @@
                                                                         {{accion.accion}}
                                                                     </label>
                                                                 </div>
-
-
-
                                                             </div>
-
-
                                                         </div>
                                                     </div>
-
-
                                                 </div>
-
                                             </div>
-
                                         </div>
-
-
                                     </div>
                                 </div>
                             </div>
-
-
-
                         </div>
-
-
                     </div>
                 </div>
             </form>

@@ -30,21 +30,6 @@ class ParametrosControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR TIPO PARAMETRO GENERAL
-    EliminarTipoParametro(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const id = req.params.id;
-                yield database_1.default.query(`
-                DELETE FROM ep_parametro WHERE id = $1
-                `, [id]);
-                res.jsonp({ message: 'Registro eliminado.' });
-            }
-            catch (_a) {
-                res.jsonp({ message: 'false' });
-            }
-        });
-    }
     // METODO PARA ACTUALIZAR TIPO PARAMETRO GENERAL
     ActualizarTipoParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -93,7 +78,7 @@ class ParametrosControlador {
             try {
                 const id = req.params.id;
                 yield database_1.default.query(`
-                DELETE FROM detalle_tipo_parametro WHERE id = $1
+                DELETE FROM ep_detalle_parametro WHERE id = $1
                 `, [id]);
                 res.jsonp({ message: 'Registro eliminado.' });
             }
@@ -121,22 +106,6 @@ class ParametrosControlador {
             UPDATE ep_detalle_parametro SET descripcion = $1 WHERE id = $2
             `, [descripcion, id]);
             res.jsonp({ message: 'Registro exitoso.' });
-        });
-    }
-    // METODO PARA INGRESAR TIPO PARAMETRO GENERAL
-    IngresarTipoParametro(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { descripcion } = req.body;
-            const response = yield database_1.default.query(`
-            INSERT INTO ep_parametro (descripcion) VALUES ($1) RETURNING *
-            `, [descripcion]);
-            const [parametro] = response.rows;
-            if (parametro) {
-                return res.status(200).jsonp({ message: 'OK', respuesta: parametro });
-            }
-            else {
-                return res.status(404).jsonp({ message: 'error' });
-            }
         });
     }
     // METODO PARA COMPARAR COORDENADAS

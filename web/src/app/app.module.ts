@@ -209,7 +209,6 @@ import { RecuperarFraseComponent } from './componentes/administracionGeneral/fra
 
 import { OlvidarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/olvidar-frase/olvidar-frase.component';
 import { TipoVacunaComponent } from './componentes/empleado/vacunacion/tipo-vacuna/tipo-vacuna.component';
-import { CrearParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/crear-parametro/crear-parametro.component';
 import { ListarParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/listar-parametro/listar-parametro.component';
 import { EditarParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/editar-parametro/editar-parametro.component';
 import { VerParametroComponent } from './componentes/administracionGeneral/parametrizacion/detalle-parametros/ver-parametro/ver-parametro.component';
@@ -553,7 +552,6 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     ListaWebComponent,
     OlvidarFraseComponent,
     TipoVacunaComponent,
-    CrearParametroComponent,
     ListarParametroComponent,
     EditarParametroComponent,
     VerParametroComponent,

@@ -13,70 +13,43 @@ export class RolPermisosService {
   ) {
   }
 
-  // catalogo de ROL PERMISOS
-
-  /*
-  getRolPermisoRest() {
-    return this.http.get(`${environment.url}/rolPermisos`);
-  }
-
-  getOneRolPermisoRest(id: number) {
-    return this.http.get(`${environment.url}/rolPermisos/${id}`);
-  }
-
-  postRolPermisoRest(data: any) {
-    return this.http.post(`${environment.url}/rolPermisos`, data);
-  }
-*/
-  // permisos denegado
-
-  getPermisosUsuarioRolRest(id: number) {
-    return this.http.get(`${environment.url}/rolPermisos/denegado/${id}`);
-  }
-
-  postPermisoDenegadoRest(data: any) {
-    return this.http.post(`${environment.url}/rolPermisos/denegado`, data);
-  }
-
-  // ENLISTAR LINKS
+  // ENLISTAR PAGINAS
   getMenu() {
     return this.http.get(`${environment.url}/rolPermisos/menu/paginas`);
   }
 
-  // ENLISTAR LINKS
+  // ENLISTAR PAGINAS DE LOS MOPDULOS
   getModulos() {
     return this.http.get(`${environment.url}/rolPermisos/menu/modulos`);
   }
 
-  //ENLISTAR PAGINAS MODULOS
+  //ENLISTAR PAGINAS SEGUN CADA MODULO
   getMenuModulos(datos) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginasmodulos`, datos);
   }
 
 
   // METODO PARA BUSCAR LAS PAGINAS POR ID
-
   BuscarIdPaginas(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/ide`, datos);
   }
 
+  //BUSCAR SI LA PAGINA CON SUS ACCIONES YA FUE ASIGNADA
   BuscarIdPaginasConAcciones(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/ideaccion`, datos);
   }
 
-
-
+  // INSERTAR PAGINAS
   crearPaginaRol(data: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/insertar`, data);
   }
 
-
+  // BUSCAR LAS PAGINAS INSERTADAS
   BuscarPaginasRol(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/todaspaginasrol`, datos);
   }
 
-
-  // ELIMINAR PAGINAS ROL
+// ELIMINAR PAGINAS ROL
   EliminarPaginasRol(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/eliminar`, datos).pipe(catchError(datos));
   }

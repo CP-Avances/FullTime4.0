@@ -983,7 +983,7 @@ export class ListaEmpleadosComponent implements OnInit {
   Eliminar(id_empleado: number) {
     this.rest.EliminarEmpleados(id_empleado).subscribe(res => {
       if (res.message === 'error') {
-        this.toastr.error('No se puede elminar.', '', {
+        this.toastr.error('No se puede eliminar.', '', {
           timeOut: 6000,
         });
       } else {
@@ -1043,7 +1043,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
               this.rest.EliminarEmpleados(datos.id).subscribe(res => {
                 if (res.message === 'error') {
-                  this.toastr.error('No se puede elminar.', '', {
+                  this.toastr.error('No se puede eliminar.', '', {
                     timeOut: 6000,
                   });
 
@@ -1052,7 +1052,7 @@ export class ListaEmpleadosComponent implements OnInit {
                 } else {
 
                   if (!this.ingresar) {
-                    this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+                    this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
                       timeOut: 6000,
                     });
                     this.ingresar = true;
@@ -1125,7 +1125,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
               this.rest.EliminarEmpleados(datos.id).subscribe(res => {
                 if (res.message === 'error') {
-                  this.toastr.error('No se puede elminar.', '', {
+                  this.toastr.error('No se puede eliminar.', '', {
                     timeOut: 6000,
                   });
 
@@ -1134,7 +1134,7 @@ export class ListaEmpleadosComponent implements OnInit {
                 } else {
 
                   if (!this.ingresar) {
-                    this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+                    this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
                       timeOut: 6000,
                     });
                     this.ingresar = true;

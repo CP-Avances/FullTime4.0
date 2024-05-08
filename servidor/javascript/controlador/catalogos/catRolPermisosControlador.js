@@ -15,26 +15,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.rolPermisosControlador = void 0;
 const database_1 = __importDefault(require("../../database"));
 class RolPermisosControlador {
-    list(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const rolPermisos = yield database_1.default.query(`
-      SELECT * FROM ero_rol_permisos
-      `);
-            res.jsonp(rolPermisos.rows);
-        });
+    /*
+    public async list(req: Request, res: Response) {
+      const rolPermisos = await pool.query(
+        `
+        SELECT * FROM ero_rol_permisos
+        `
+      );
+      res.jsonp(rolPermisos.rows);
     }
-    getOne(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const unRolPermiso = yield database_1.default.query(`
-      SELECT * FROM ero_rol_permisos WHERE id = $1
-      `, [id]);
-            if (unRolPermiso.rowCount > 0) {
-                return res.jsonp(unRolPermiso.rows);
-            }
-            res.status(404).jsonp({ text: 'Registro no encontrado.' });
-        });
+  
+    public async getOne(req: Request, res: Response): Promise<any> {
+      const { id } = req.params;
+      const unRolPermiso = await pool.query(
+        `
+        SELECT * FROM ero_rol_permisos WHERE id = $1
+        `
+        , [id]);
+      if (unRolPermiso.rowCount > 0) {
+        return res.jsonp(unRolPermiso.rows)
+      }
+      res.status(404).jsonp({ text: 'Registro no encontrado.' });
     }
+  */
     //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
     ListarMenuRoles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -121,20 +124,6 @@ class RolPermisosControlador {
             catch (error) {
                 return res.status(404).jsonp({ text: 'Registros no encontrados.' });
             }
-            /*
-            const { id_rol } = req.body;
-            const PAGINA_ROL = await pool.query(
-              `
-              SELECT * FROM ero_rol_permisos WHERE id_rol = $1
-              `
-              , [id_rol]);
-            if (PAGINA_ROL.rowCount > 0) {
-              return res.jsonp(PAGINA_ROL.rows)
-            }
-            else {
-              return res.status(404).jsonp({ text: 'Registros no encontrados.' });
-            }
-            */
         });
     }
     // METODO PARA ASIGNAR PERMISOS AL ROL
@@ -168,8 +157,7 @@ class RolPermisosControlador {
             res.jsonp({ message: 'Registro eliminado.' });
         });
     }
-    // METODO PARA GUARDAR TODAS LAS ACCIONES EXISTENTES EN UN OBJETO
-    // METODO PARA Buscar las acciones de cada pagina
+    // METODO PARA BUSCAR LAS ACCIONES POR CADA PAGINA
     ObtenerAccionesPaginas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_funcion } = req.body;
@@ -181,10 +169,10 @@ class RolPermisosControlador {
             }
             else {
                 return res.jsonp([]);
-                // return res.status(404).jsonp({ text: 'Registros no encontrados.' });
             }
         });
     }
+    // METODO PARA ENLISTAR ACCIONES SEGUN LA PAGINA 
     ObtenerAccionesPaginasExistentes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_funcion } = req.body;
@@ -195,28 +183,10 @@ class RolPermisosControlador {
                 return res.jsonp(PAGINA_ROL.rows);
             }
             else {
-                //return res.jsonp([])
                 return res.status(404).jsonp({ text: 'Registros no encontrados.' });
             }
         });
     }
-    /*
-    public async ObtenerAccionPorId(req: Request, res: Response): Promise<any> {
-      const { id } = req.body;
-      const PAGINA_ROL = await pool.query(
-        `
-        SELECT * FROM es_acciones_paginas WHERE id = $1
-        `
-        , [id]);
-      if (PAGINA_ROL.rowCount > 0) {
-        return res.jsonp(PAGINA_ROL.rows)
-      }
-      else {
-        return res.status(404).jsonp({ text: 'Registros no encontrados.' });
-      }
-    }
-  
-    */
     //METODO PARA ENLISTAR ACCIONES 
     ListarAcciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

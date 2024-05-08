@@ -249,10 +249,10 @@ export class EditarSucursalComponent implements OnInit {
         }
         // VERIFICACION DE NOMBRES DUPLICADOS
         this.restSucursal.BuscarNombreSucursal(buscar).subscribe(responseS => {
-          this.habilitarprogress === false;
           this.toastr.warning('El nombre de Sucursal ya se encuentra registrado.', 'Ups!! algo salio mal.', {
             timeOut: 6000,
           });
+          this.habilitarprogress = false;
         }, vacio => {
           this.ActualizarSucursal(sucursal);
         })
