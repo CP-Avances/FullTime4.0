@@ -40,6 +40,10 @@ export class EditarDepartamentoComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private rest: DepartamentosService,
     private restS: SucursalService,
@@ -52,6 +56,9 @@ export class EditarDepartamentoComponent implements OnInit {
   datos: any;
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.datos = this.info.data;
     if (this.info.establecimiento === true) {
       this.Habilitar = false;
@@ -101,6 +108,8 @@ export class EditarDepartamentoComponent implements OnInit {
     var departamento = {
       id_sucursal: form.idSucursalForm,
       nombre: form.nombreForm.toUpperCase(),
+      user_name: this.user_name,
+      ip: this.ip
     };
 
     // VERIFICAR ID DE SUCURSAL
@@ -136,7 +145,7 @@ export class EditarDepartamentoComponent implements OnInit {
     }
   }
 
-  // METODO DE ACTUALIZACION DE REGISTRO EN BASE DE DATOS  
+  // METODO DE ACTUALIZACION DE REGISTRO EN BASE DE DATOS
   ActualizarDepartamento(departamento: any) {
     this.habilitarprogress = true;
     this.rest.ActualizarDepartamento(this.datos.id, departamento).subscribe(response => {
