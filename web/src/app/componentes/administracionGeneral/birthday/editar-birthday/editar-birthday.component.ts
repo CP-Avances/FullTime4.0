@@ -13,6 +13,10 @@ import { BirthdayService } from 'src/app/servicios/birthday/birthday.service';
 
 export class EditarBirthdayComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   archivoForm = new FormControl('');
   mensajeF = new FormControl('', [Validators.required]);
   imagenF = new FormControl('');
@@ -36,6 +40,8 @@ export class EditarBirthdayComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.ImprimirDatos();
   }
 
@@ -53,7 +59,9 @@ export class EditarBirthdayComponent implements OnInit {
     let dataMensaje = {
       mensaje: form.mensajeForm,
       titulo: form.tituloForm,
-      link: form.linkForm
+      link: form.linkForm,
+      user_name: this.user_name,
+      ip: this.ip
     }
     if (form.imagenForm != undefined && form.imagenForm != '' && form.imagenForm != 'null') {
       this.VerificarArchivo(dataMensaje);
@@ -115,6 +123,9 @@ export class EditarBirthdayComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restB.SubirImagenBirthday(formData, id).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Imagen subida con éxito.', {
         timeOut: 6000,
