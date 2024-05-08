@@ -71,6 +71,7 @@ export class PrincipalProcesoComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+
     if (this.habilitarAccion === false) {
       let mensaje = {
         access: false,

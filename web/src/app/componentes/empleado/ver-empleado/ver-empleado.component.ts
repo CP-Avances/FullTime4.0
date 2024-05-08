@@ -89,6 +89,10 @@ export class VerEmpleadoComponent implements OnInit {
 
   @ViewChild('tabla2') tabla2: ElementRef;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // VARIABLES DE ALMACENAMIENTO DE DATOS CONSULTADOS
   discapacidadUser: any = [];
   empleadoLogueado: any = [];
@@ -163,6 +167,9 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     var a = moment();
     this.FechaActual = a.format('YYYY-MM-DD');
     this.activatedRoute.params
@@ -2614,7 +2621,12 @@ export class VerEmpleadoComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
   EliminarAutorizacion(id_auto: number) {
-    this.restAutoridad.EliminarRegistro(id_auto).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.restAutoridad.EliminarRegistro(id_auto, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
