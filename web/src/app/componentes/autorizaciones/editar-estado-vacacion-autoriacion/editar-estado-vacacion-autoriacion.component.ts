@@ -38,6 +38,10 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   FechaActual: any;
   NotifiRes: any;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   public InfoListaAutoriza: any = [];
   public ArrayAutorizacionTipos: any = [];
   public autorizacion: any []
@@ -62,6 +66,9 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     if (this.data.auto.estado === 1) {
       this.toastr.info('Solicitud pendiente de aprobación.', '', {
         timeOut: 6000,
@@ -151,6 +158,8 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
     let aprobacion = {
       id_documento: this.data.auto.id_documento + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     this.restA.ActualizarAprobacion(this.data.auto.id, aprobacion).subscribe(res => {
@@ -268,7 +277,7 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
                 if(this.autorizaDirecto === true){
                   this.listaEnvioCorreo = this.listadoDepaAutoriza;
                 }
-                
+
                 console.log('listaEnvioCorreo 2: ',this.listaEnvioCorreo );
                 this.EnviarCorreo(this.listaEnvioCorreo, vacacion, estado_v, estado_c, desde, hasta);
               });
@@ -279,7 +288,7 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
             this.listadoDepaAutoriza = res;
             this.listadoDepaAutoriza.filter(item => {
               if(item.nivel < 3 ){
-                return this.listaEnvioCorreo.push(item);  
+                return this.listaEnvioCorreo.push(item);
               }
             })
 
@@ -288,10 +297,10 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
           });
         }
       })
-    });   
+    });
 
 
-    
+
   }
 
   EnviarCorreo(listaEnvioCorreo: any, vacacion: any, estado_v: string, estado_c: string, desde: any, hasta: any){

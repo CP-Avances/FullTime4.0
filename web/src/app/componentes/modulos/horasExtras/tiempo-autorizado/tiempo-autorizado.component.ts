@@ -47,6 +47,10 @@ export class TiempoAutorizadoComponent implements OnInit {
   ocultarPre: boolean = true;
   ocultarAu: boolean = true;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   public autorizacion: any []
   public lectura: any;
   public estado_auto: any;
@@ -69,6 +73,9 @@ export class TiempoAutorizadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.obtenerInformacionEmpleado();
     this.MostrarProceso();
     this.BuscarParametro();
@@ -76,7 +83,7 @@ export class TiempoAutorizadoComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -201,6 +208,8 @@ export class TiempoAutorizadoComponent implements OnInit {
     let aprobacion = {
       id_documento: this.data.auto.id_documento + localStorage.getItem('empleado') as string + '_' + estado + ',',
       estado: estado,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restA.ActualizarAprobacion(this.data.auto.id, aprobacion).subscribe(res => {
       this.EditarEstadoHoraExtra(estado);
@@ -352,7 +361,7 @@ export class TiempoAutorizadoComponent implements OnInit {
             this.listadoDepaAutoriza = res;
             this.listadoDepaAutoriza.filter(item => {
               if(item.nivel < 3 ){
-                return this.listaEnvioCorreo.push(item);  
+                return this.listaEnvioCorreo.push(item);
               }
             })
             console.log('this.listaEnvioCorreo3: ',this.listaEnvioCorreo);
@@ -436,7 +445,7 @@ export class TiempoAutorizadoComponent implements OnInit {
 
       }
     })
-  }  
+  }
 
 
   // METODO PARA ENVIAR NOTIIFICACIONES AL SISTEMA
@@ -496,7 +505,7 @@ export class TiempoAutorizadoComponent implements OnInit {
 
 
   /** ****************************************************************************************************** **
-   ** **           NOTIFICACIONES PARA SOLICITAR JUSTIFICACIÓN DE SOLICITUD DE HORA EXTRA                 ** ** 
+   ** **           NOTIFICACIONES PARA SOLICITAR JUSTIFICACIÓN DE SOLICITUD DE HORA EXTRA                 ** **
    ** ****************************************************************************************************** **/
 
   EnviarCorreoJustificacion(horaExtra: any, mensaje: string) {

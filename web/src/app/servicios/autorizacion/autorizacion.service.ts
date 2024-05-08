@@ -57,10 +57,12 @@ export class AutorizacionService {
     return this.http.put(`${environment.url}/autorizaciones/estado-permiso/multiple`, datos);
   }
 
+  // TODO: BUSCAR RUTA HASTA EL CONTROLADOR
   PutEstadoAutoHoraExtra(id: number, datos: any) {
     return this.http.put(`${environment.url}/autorizaciones/${id}/estado-hora-extra`, datos);
   }
 
+  // NO SE USA
   PutEstadoAutoPlanHoraExtra(id: number, datos: any) {
     return this.http.put(`${environment.url}/autorizaciones/${id}/estado-plan-hora-extra`, datos);
   }
