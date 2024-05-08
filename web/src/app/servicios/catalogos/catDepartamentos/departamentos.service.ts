@@ -37,7 +37,7 @@ export class DepartamentosService {
 
   // REGISTRAR ACTUALIZACION DE DEPARTAMENTO  --**VERIFICADO
   ActualizarDepartamento(idDepartamento: number, data: any) {
-    return this.http.put(`${environment.url}/depatramento/${idDepartamento}`, data).pipe(
+    return this.http.put(`${environment.url}/departamento/${idDepartamento}`, data).pipe(
       catchError(data)
     );
   }

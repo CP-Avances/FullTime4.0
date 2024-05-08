@@ -511,7 +511,7 @@ export class ListarRelojesComponent implements OnInit {
   EliminarRelojes(id_reloj: number) {
     this.rest.EliminarRegistro(id_reloj).subscribe(res => {
       if (res.message === 'error') {
-        this.toastr.error('No se puede elminar.', '', {
+        this.toastr.error('No se puede eliminar.', '', {
           timeOut: 6000,
         });
       } else {
@@ -565,7 +565,7 @@ export class ListarRelojesComponent implements OnInit {
 
 
         if (res.message === 'error') {
-          this.toastr.error('No se puede elminar.', '', {
+          this.toastr.error('No se puede eliminar.', '', {
             timeOut: 6000,
           });
 
@@ -574,7 +574,7 @@ export class ListarRelojesComponent implements OnInit {
         } else {
 
           if (!this.ingresar) {
-            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
               timeOut: 6000,
             });
             this.ingresar = true;

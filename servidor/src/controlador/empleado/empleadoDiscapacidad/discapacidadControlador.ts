@@ -10,7 +10,7 @@ class DiscapacidadControlador {
     const unaDiscapacidad = await pool.query(
       `
       SELECT cd.id_empleado, cd.carnet_conadis, cd.porcentaje, cd.id_discapacidad, td.nombre AS nom_tipo
-      FROM eu_empleado_discapacidad cd, e_cat_discapacidad td, empleados e
+      FROM eu_empleado_discapacidad cd, e_cat_discapacidad td, eu_empleados e
       WHERE cd.id_empleado = e.id AND cd.id_discapacidad = td.id AND cd.id_empleado = $1
       `
       , [id_empleado]);

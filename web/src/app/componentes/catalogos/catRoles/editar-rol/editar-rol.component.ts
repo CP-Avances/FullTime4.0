@@ -70,9 +70,8 @@ export class EditarRolComponent implements OnInit {
         });
       }
       else {
-        this.toastr.error('Para el correcto funcionamiento del sistema ingresar un nuevo rol ' +
-          'que no se encuentre registrado en el sistema.',
-          'Nombre de Rol Duplicado', {
+        this.toastr.error('',
+          'Nombre ingresado ya existe en el sistema.', {
           timeOut: 6000,
         });
       }

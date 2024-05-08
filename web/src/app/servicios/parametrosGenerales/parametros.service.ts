@@ -16,11 +16,6 @@ export class ParametrosService {
     return this.http.get<any>(`${environment.url}/parametrizacion`);
   }
 
-  // ELIMINAR REGISTRO DE PARAMETRO
-  EliminarTipoParametro(id: number) {
-    return this.http.delete<any>(`${environment.url}/parametrizacion/eliminar-tipo/${id}`);
-  }
-
   // ACTUALIZAR REGISTRO PARAMETRO
   ActualizarTipoParametro(datos: any) {
     return this.http.put(`${environment.url}/parametrizacion/actual-tipo`, datos);
@@ -49,11 +44,6 @@ export class ParametrosService {
   // METODO PARA ACTUALIZAR DETALLE DE PARAMETRO
   ActualizarDetalleParametro(datos: any) {
     return this.http.put(`${environment.url}/parametrizacion/actual-detalle`, datos);
-  }
-
-  // REGISTRAR PARAMETRO
-  IngresarTipoParametro(data: any) {
-    return this.http.post<any>(`${environment.url}/parametrizacion/tipo`, data);
   }
 
   // METODO PARA COMPARAR CORDENADAS
