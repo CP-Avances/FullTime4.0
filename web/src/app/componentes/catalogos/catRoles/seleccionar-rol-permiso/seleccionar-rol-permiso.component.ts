@@ -989,6 +989,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   }
 
 
+  // OBTENER LAS ACCIONES QUE EXISTEN EN CADA PAGINA
   ObtenerAcciones(id: any) {
     this.nombresAcciones = [];
     var buscarAcciones = {
@@ -1006,11 +1007,12 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   // OBTENER ACCION POR ID
 
+  /*
   ObtenerAccionPorId(id: any): Observable<any> {
     var buscarAcciones = {
       id: id
     };
-
+    
     return this.rest.BuscarAccionesPorId(buscarAcciones).pipe(
       map((accion: any) => {
         accion.accion
@@ -1018,14 +1020,16 @@ export class SeleccionarRolPermisoComponent implements OnInit {
         console.log("quiero ver que muestra", accion);
       })
     );
-
-
   }
+*/
+
 
   todasAcciones: { [id_funcion: number]: any } = {};
 
   acciones: any = [];
 
+
+  // METODO PARA OBTENER TODAS LAS ACCIONES
   ObtenerTodasAcciones() {
     this.acciones = [];
     this.rest.ObtenerAcciones().subscribe(res => {
@@ -1042,6 +1046,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   }
 
 
+  // METODO PARA OBTENER EL NOMBRE DE LA ACCION POR SU ID
   MetodoParaMostrarAccion(id: any): any {
 
     if (id != null) {

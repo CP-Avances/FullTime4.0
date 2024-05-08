@@ -79,7 +79,7 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR ID DE PAGINAS
+    // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA
     ObtenerIdPaginas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { funcion, id_rol } = req.body;
@@ -94,7 +94,7 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR ID DE PAGINAS
+    // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA
     ObtenerIdPaginasConAcciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { funcion, id_rol, id_accion } = req.body;
@@ -109,19 +109,33 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR ID DE PAGINAS
+    // METODO PARA BUSCAR LAS PAGINAS POR EL ID DEL ROL
     ObtenerPaginasRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_rol } = req.body;
-            const PAGINA_ROL = yield database_1.default.query(`
+            try {
+                const { id_rol } = req.body;
+                const PAGINA_ROL = yield database_1.default.query(`
       SELECT * FROM ero_rol_permisos WHERE id_rol = $1 
       `, [id_rol]);
-            if (PAGINA_ROL.rowCount > 0) {
                 return res.jsonp(PAGINA_ROL.rows);
             }
-            else {
+            catch (error) {
                 return res.status(404).jsonp({ text: 'Registros no encontrados.' });
             }
+            /*
+            const { id_rol } = req.body;
+            const PAGINA_ROL = await pool.query(
+              `
+              SELECT * FROM ero_rol_permisos WHERE id_rol = $1
+              `
+              , [id_rol]);
+            if (PAGINA_ROL.rowCount > 0) {
+              return res.jsonp(PAGINA_ROL.rows)
+            }
+            else {
+              return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+            }
+            */
         });
     }
     // METODO PARA ASIGNAR PERMISOS AL ROL
@@ -149,19 +163,8 @@ class RolPermisosControlador {
     EliminarPaginaRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.body;
-            //console.log(funcion);
-            //console.log(id_rol);
             yield database_1.default.query(`
       DELETE FROM ero_rol_permisos WHERE id = $1
-      `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
-        });
-    }
-    EliminarPaginaRolSinAccion(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.body;
-            yield database_1.default.query(`
-      DELETE FROM ero_rol_permisos WHERE id = $1 
       `, [id]);
             res.jsonp({ message: 'Registro eliminado.' });
         });

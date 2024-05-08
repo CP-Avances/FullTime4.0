@@ -42,7 +42,6 @@ class RolPermisosRutas {
 
         // METODO PARA ELIMINAR LAS PAGINAS  
         this.router.post('/menu/paginas/eliminar', TokenValidation, rolPermisosControlador.EliminarPaginaRol);
-        this.router.post('/menu/paginas/eliminarsinaccion', TokenValidation, rolPermisosControlador.EliminarPaginaRolSinAccion);
 
 
 
