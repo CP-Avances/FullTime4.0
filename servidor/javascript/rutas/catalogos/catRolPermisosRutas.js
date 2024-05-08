@@ -19,7 +19,7 @@ class RolPermisosRutas {
         // MENU ENLISTAR Modulo
         this.router.get('/menu/modulos', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarMenuModulosRoles);
         //MENU ENLISTAR POR MODULO
-        this.router.post('/menu/paginasmodulos', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarMenuRolesModulos);
+        this.router.post('/menu/paginasmodulos', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarModuloPorNombre);
         // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL
         this.router.post('/menu/paginas/ide', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerIdPaginas);
         this.router.post('/menu/paginas/ideaccion', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerIdPaginasConAcciones);
@@ -29,12 +29,13 @@ class RolPermisosRutas {
         this.router.post('/menu/paginas/insertar', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.AsignarPaginaRol);
         // METODO PARA ELIMINAR LAS PAGINAS  
         this.router.post('/menu/paginas/eliminar', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.EliminarPaginaRol);
-        this.router.post('/menu/paginas/eliminarsinaccion', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.EliminarPaginaRolSinAccion);
         // METODO PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
         this.router.post('/menu/paginas/acciones', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerAccionesPaginas);
         this.router.post('/menu/paginas/accionesexistentes', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerAccionesPaginasExistentes);
+        /*
         // METODO PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
-        this.router.post('/menu/paginas/acciones/id', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerAccionPorId);
+        this.router.post('/menu/paginas/acciones/id', TokenValidation, rolPermisosControlador.ObtenerAccionPorId);
+*/
         // METODO PARA OBTENER TODAS LAS ACCIONES
         this.router.get('/menu/paginas/acciones/todas', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarAcciones);
     }

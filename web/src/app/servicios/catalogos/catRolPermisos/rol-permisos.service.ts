@@ -15,6 +15,7 @@ export class RolPermisosService {
 
   // catalogo de ROL PERMISOS
 
+  /*
   getRolPermisoRest() {
     return this.http.get(`${environment.url}/rolPermisos`);
   }
@@ -26,7 +27,7 @@ export class RolPermisosService {
   postRolPermisoRest(data: any) {
     return this.http.post(`${environment.url}/rolPermisos`, data);
   }
-
+*/
   // permisos denegado
 
   getPermisosUsuarioRolRest(id: number) {
@@ -47,10 +48,7 @@ export class RolPermisosService {
     return this.http.get(`${environment.url}/rolPermisos/menu/modulos`);
   }
 
-
-
   //ENLISTAR PAGINAS MODULOS
-
   getMenuModulos(datos) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginasmodulos`, datos);
   }
@@ -83,13 +81,6 @@ export class RolPermisosService {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/eliminar`, datos).pipe(catchError(datos));
   }
 
-
-  // ELIMINAR PAGINAS ROL
-  EliminarPaginasRolSinAccion(datos: any) {
-    return this.http.post(`${environment.url}/rolPermisos/menu/paginas/eliminarsinaccion`, datos);
-  }
-
-
   // ELIMINAR  ACCIONES DE PAGINAS ROL
   BuscarAccionesPaginas(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/acciones`, datos);
@@ -100,18 +91,9 @@ export class RolPermisosService {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/accionesexistentes`, datos);
   }
 
-
-  // ELIMINAR  ACCIONES DE PAGINAS ROL
-  BuscarAccionesPorId(datos: any) {
-    return this.http.post(`${environment.url}/rolPermisos/menu/paginas/acciones/id`, datos);
-  }
-
-
   // ENLISTAR ACCIONES
   ObtenerAcciones() {
     return this.http.get(`${environment.url}/rolPermisos/menu/paginas/acciones/todas`);
   }
-
-
 
 }
