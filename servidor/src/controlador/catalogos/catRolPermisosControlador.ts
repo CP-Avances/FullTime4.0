@@ -63,8 +63,7 @@ class RolPermisosControlador {
 
 
   //METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO
-  //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
-  public async ListarMenuRolesModulos(req: Request, res: Response) {
+  public async ListarModuloPorNombre(req: Request, res: Response) {
 
     const { nombre_modulo } = req.body;
 
@@ -243,6 +242,8 @@ class RolPermisosControlador {
     }
   }
 
+
+  /*
   public async ObtenerAccionPorId(req: Request, res: Response): Promise<any> {
     const { id } = req.body;
     const PAGINA_ROL = await pool.query(
@@ -258,6 +259,7 @@ class RolPermisosControlador {
     }
   }
 
+  */
 
 
   //METODO PARA ENLISTAR ACCIONES 

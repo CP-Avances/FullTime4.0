@@ -64,8 +64,7 @@ class RolPermisosControlador {
         });
     }
     //METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO
-    //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
-    ListarMenuRolesModulos(req, res) {
+    ListarModuloPorNombre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre_modulo } = req.body;
             const Roles = yield database_1.default.query(`
@@ -201,20 +200,23 @@ class RolPermisosControlador {
             }
         });
     }
-    ObtenerAccionPorId(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.body;
-            const PAGINA_ROL = yield database_1.default.query(`
-      SELECT * FROM es_acciones_paginas WHERE id = $1 
-      `, [id]);
-            if (PAGINA_ROL.rowCount > 0) {
-                return res.jsonp(PAGINA_ROL.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registros no encontrados.' });
-            }
-        });
+    /*
+    public async ObtenerAccionPorId(req: Request, res: Response): Promise<any> {
+      const { id } = req.body;
+      const PAGINA_ROL = await pool.query(
+        `
+        SELECT * FROM es_acciones_paginas WHERE id = $1
+        `
+        , [id]);
+      if (PAGINA_ROL.rowCount > 0) {
+        return res.jsonp(PAGINA_ROL.rows)
+      }
+      else {
+        return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+      }
     }
+  
+    */
     //METODO PARA ENLISTAR ACCIONES 
     ListarAcciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
