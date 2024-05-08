@@ -60,8 +60,8 @@
                                     matTooltip="Modificar datos generales de este registro." class="fas fa-edit">
                                     <p>Editar</p>
                                 </i>
-                                <i *ngIf="rol.id != 1 && getEliminarRol()" class="far fa-trash-alt"
-                                    (click)="ConfirmarDelete(rol)" id="t-eliminar" matSuffix matTooltipPosition="right"
+                                <i *ngIf="rol.id != 1 && getEliminarRol()" class="far fa-trash-alt" (click)="ConfirmarDelete(rol)"
+                                    id="t-eliminar" matSuffix matTooltipPosition="right"
                                     matTooltip="Eliminar registro.">
                                     <p>Eliminar</p>
                                 </i>
@@ -73,27 +73,30 @@
             <mat-paginator id="pagina" [length]="roles.length" [pageSize]="tamanio_pagina"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
-            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;" *ngIf="getDescargarReportes()">
-                <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
-                    matTooltipPosition="right" matTooltip="Descargar Lista de Roles en formato PDF.">
-                    <p>PDF</p>
-                </i>
-                <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar Lista de Roles en formato EXCEL.">
-                    <p>XLSL</p>
-                </i>
-                <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar Lista de Roles en formato CSV.">
-                    <p>CSV</p>
-                </i>
-                <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar Lista de Roles en formato XML.">
-                    <p>XML</p>
-                </i>
-            </div>
-            <div class="d-flex justify-content-end"
-                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-                <p> Reporte de roles. </p>
+            <!--  ************************************  DESCARGA DE REPORTES  ***************************  -->
+            <div *ngIf="getDescargarReportes()">
+                <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                    <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                        matTooltipPosition="right" matTooltip="Descargar Lista de Roles en formato PDF.">
+                        <p>PDF</p>
+                    </i>
+                    <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix
+                        matTooltipPosition="right" matTooltip="Descargar Lista de Roles en formato EXCEL.">
+                        <p>XLSL</p>
+                    </i>
+                    <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                        matTooltip="Descargar Lista de Roles en formato CSV.">
+                        <p>CSV</p>
+                    </i>
+                    <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                        matTooltip="Descargar Lista de Roles en formato XML.">
+                        <p>XML</p>
+                    </i>
+                </div>
+                <div class="d-flex justify-content-end"
+                    style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                    <p> Reporte de roles. </p>
+                </div>
             </div>
         </div>
     </div>

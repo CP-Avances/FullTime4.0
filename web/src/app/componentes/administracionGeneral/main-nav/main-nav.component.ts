@@ -362,11 +362,15 @@ export class MainNavComponent implements OnInit {
 
   // METODO DE LLMANADO DE MENU
   MetodoSubSelectMenu(nombre: string) {
+    this.dataSource.data = this.menuGeneralUsuarios as MenuNode[];
+    /*
     if (this.inicio.getRolMenu() === true) {
-      this.dataSource.data = this.MenuAdministracion(nombre) as MenuNode[];
+      //this.dataSource.data = this.MenuAdministracion(nombre) as MenuNode[];
+      this.dataSource.data = this.menuGeneralUsuarios as MenuNode[];
     } else {
       this.dataSource.data = this.menuGeneralUsuarios as MenuNode[];
     }
+    */
   }
 
   // MENU PERFIL ADMINISTRADOR
@@ -1022,7 +1026,7 @@ export class MainNavComponent implements OnInit {
 
   MenuGeneral(){
     var buscarPagina = {id_rol: this.inicio.getRol()};
-    if(this.menuGeneralUsuarios.length < 1 && buscarPagina.id_rol !== 3){
+    if(this.menuGeneralUsuarios.length < 1){
       this.restRolPermiso.BuscarPaginasMenuRol(buscarPagina).subscribe(
         {
           next: (v) => 

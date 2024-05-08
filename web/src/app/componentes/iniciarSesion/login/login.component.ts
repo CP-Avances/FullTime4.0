@@ -273,7 +273,7 @@ export class LoginComponent implements OnInit {
           timeOut: 6000,
         });
         console.log('datos.rol ', datos.rol);
-        if (datos.rol === 1 || datos.rol === 3) { // ADMIN
+        if (datos.rol === 1) { // ADMIN
           console.log('ver redireccionar ', localStorage.getItem("redireccionar"));
           if (!!localStorage.getItem("redireccionar")) {
             let redi = localStorage.getItem("redireccionar");
@@ -282,8 +282,8 @@ export class LoginComponent implements OnInit {
           } else {
             this.router.navigate(['/home'])
           };
-        }
-        if (datos.rol === 2) { // EMPLEADO
+        }else{
+          // EMPLEADO
           this.router.navigate(['/estadisticas']);
         }
         this.IngresoSistema(form.usuarioF, 'Exitoso', datos.ip_adress);

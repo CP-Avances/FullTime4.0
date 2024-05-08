@@ -2,7 +2,6 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -16,8 +15,6 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as xml2js from 'xml2js';
 
 import { EditarParametroComponent } from '../editar-parametro/editar-parametro.component';
-import { CrearParametroComponent } from '../crear-parametro/crear-parametro.component';
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
@@ -120,18 +117,6 @@ export class ListarParametroComponent implements OnInit {
     this.ObtenerParametros();
   }
 
-  // METODO PARA ABRIR VENTANA CREACIÓN DE REGISTRO
-  CrearParametro(): void {
-    this.ventana.open(CrearParametroComponent,
-      { width: '400px' }).afterClosed().subscribe(item => {
-        if (item) {
-          if (item > 0) {
-            this.VerDetalleParametro(item);
-          }
-        }
-      });
-  }
-
   // METODO PARA ABRIR VENTANA EDICIÓN DE REGISTRO
   AbrirEditar(datos: any): void {
     this.ventana.open(EditarParametroComponent,
@@ -140,35 +125,6 @@ export class ListarParametroComponent implements OnInit {
           if (item > 0) {
             this.VerDetalleParametro(item);
           }
-        }
-      });
-  }
-
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
-  Eliminar(id: number) {
-    this.restP.EliminarTipoParametro(id).subscribe(res => {
-      if (res.message === 'false') {
-        this.toastr.error('No es posible eliminar registro.', 'Verificar dependencias.', {
-          timeOut: 6000,
-        });
-      }
-      else {
-        this.toastr.error('Registro eliminado.', '', {
-          timeOut: 6000,
-        });
-        this.ObtenerParametros();
-      }
-    });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id);
-        } else {
-          this.router.navigate(['/parametros']);
         }
       });
   }

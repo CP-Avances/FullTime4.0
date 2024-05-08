@@ -9,7 +9,7 @@ const pool = new pg_pool_1.default({
     user: 'postgres',
     host: '192.168.0.144',
     port: 5435,
-    database: 'ft_v4_md',
+    database: 'ft_v4_mdf',
     password: 'postgres'
 });
 pool.query('SELECT NOW()', (err, res) => {

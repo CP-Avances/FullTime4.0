@@ -34,7 +34,6 @@ import { ITableSucursales } from 'src/app/model/reportes.model';
 export class VerEmpresaComponent implements OnInit {
   sucursalesEliminar: any = [];
 
-  // FILTROS
   idEmpresa: number;
   datosEmpresa: any = [];
   datosSucursales: any = [];
@@ -154,7 +153,7 @@ export class VerEmpresaComponent implements OnInit {
 
   // METODO PARA MOSTRAR LISTA DE SUCURSALES
   ObtenerSucursal() {
-    this.datosSucursales= [];
+    this.datosSucursales = [];
     this.restS.BuscarSucursal().subscribe(data => {
       this.datosSucursales = data;
     });
@@ -221,8 +220,6 @@ export class VerEmpresaComponent implements OnInit {
         this.ObtenerLogotipo();
       })
   }
-
-
 
   // VENTANA DE REGISTRO DE FRASE DE SEGURIDAD
   AbrirVentanaSeguridad(datosSeleccionados: any) {
@@ -552,14 +549,11 @@ export class VerEmpresaComponent implements OnInit {
 
   selectionSucursales = new SelectionModel<ITableSucursales>(true, []);
 
-
-
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
     const numSelected = this.selectionSucursales.selected.length;
     return numSelected === this.datosSucursales.length
   }
-
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
@@ -568,33 +562,25 @@ export class VerEmpresaComponent implements OnInit {
       this.datosSucursales.forEach((row: any) => this.selectionSucursales.select(row));
   }
 
-
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelPag(row?: ITableSucursales): string {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.sucursalesEliminar = this.selectionSucursales.selected;
-    //console.log('paginas para Eliminar',this.paginasEliminar);
-
-    //console.log(this.selectionPaginas.selected)
     return `${this.selectionSucursales.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
 
   }
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
-
   contador: number = 0;
   ingresar: boolean = false;
   Eliminar(id_sucursal: number) {
     this.restS.EliminarRegistro(id_sucursal).subscribe(res => {
-
-
       if (res.message === 'error') {
-        this.toastr.error('No se puede elminar.', '', {
+        this.toastr.error('Existen datos relacionados a este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
         });
-
       } else {
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
@@ -602,9 +588,6 @@ export class VerEmpresaComponent implements OnInit {
         this.ObtenerSucursal();
       }
     });
-
-
-
   }
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
@@ -613,14 +596,11 @@ export class VerEmpresaComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
-
           this.activar_seleccion = true;
-
           this.plan_multiple = false;
           this.plan_multiple_ = false;
           this.selectionSucursales.clear();
           this.sucursalesEliminar = [];
-
           this.ObtenerSucursal();
         }
       });
@@ -629,68 +609,50 @@ export class VerEmpresaComponent implements OnInit {
   EliminarMultiple() {
     this.ingresar = false;
     this.contador = 0;
-
     this.sucursalesEliminar = this.selectionSucursales.selected;
     this.sucursalesEliminar.forEach((datos: any) => {
-
       this.datosSucursales = this.datosSucursales.filter(item => item.id !== datos.id);
-
       this.contador = this.contador + 1;
       this.restS.EliminarRegistro(datos.id).subscribe(res => {
-
         if (res.message === 'error') {
-
-          this.toastr.error('No se puede eliminar.', 'la: ' + datos.nombre, {
+          this.toastr.error('Existen datos relacionado con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
-
         } else {
           if (!this.ingresar) {
-            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
               timeOut: 6000,
             });
             this.ingresar = true;
           }
           this.ObtenerSucursal();
-
-
         }
       });
     }
     )
   }
 
-
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-
           if (this.sucursalesEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
-
             this.plan_multiple = false;
             this.plan_multiple_ = false;
-
             this.sucursalesEliminar = [];
             this.selectionSucursales.clear();
-
             this.ObtenerSucursal();
-
-
           } else {
             this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
         } else {
           this.router.navigate(['/vistaEmpresa']);
         }
       });
-
-
   }
 }
