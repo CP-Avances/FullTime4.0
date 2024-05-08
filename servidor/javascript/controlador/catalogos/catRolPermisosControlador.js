@@ -127,21 +127,22 @@ class RolPermisosControlador {
     // METODO PARA ASIGNAR PERMISOS AL ROL
     AsignarPaginaRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            //try {
-            const { funcion, link, id_rol, id_accion } = req.body;
-            const response = yield database_1.default.query(`
+            try {
+                const { funcion, link, id_rol, id_accion } = req.body;
+                const response = yield database_1.default.query(`
         INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion) VALUES ($1, $2, $3, $4) RETURNING *
         `, [funcion, link, id_rol, id_accion]);
-            const [rol] = response.rows;
-            if (rol) {
-                return res.status(200).jsonp({ message: 'OK', reloj: rol });
+                const [rol] = response.rows;
+                if (rol) {
+                    return res.status(200).jsonp({ message: 'OK', reloj: rol });
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
             }
-            else {
-                return res.status(404).jsonp({ message: 'error' });
+            catch (error) {
+                return res.status(500).jsonp({ message: 'error' });
             }
-            // } catch (error) {
-            // return res.status(500).jsonp({ message: 'error' })
-            //}
         });
     }
     // METODO PARA ELIMINAR REGISTRO
