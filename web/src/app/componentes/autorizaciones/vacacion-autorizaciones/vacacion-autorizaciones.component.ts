@@ -67,6 +67,10 @@ export class VacacionAutorizacionesComponent implements OnInit {
   oculDepa: boolean = true;
   ocultar: boolean = true;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restAutorizaciones: AutorizacionService,
     public restAutoriza: AutorizaDepartamentoService,
@@ -79,8 +83,10 @@ export class VacacionAutorizacionesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log(this.data, 'data_vacaciones');
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
     this.obtenerDepartamento();
@@ -342,6 +348,8 @@ export class VacacionAutorizacionesComponent implements OnInit {
       id_hora_extra: null,
       id_documento: localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       id_plan_hora_extra: null,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restAutorizaciones.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
       this.EditarEstadoVacacion(form, id_vacacion, empleado_solicita, id_departamento);

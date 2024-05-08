@@ -65,11 +65,12 @@ export class ListarTipoAccionComponent implements OnInit {
     private funciones: MainNavService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
-    this.user_name = localStorage.getItem('usuario');
-    this.ip = localStorage.getItem('ip');
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     if (this.habilitarAccion === false) {
       let mensaje = {
         access: false,

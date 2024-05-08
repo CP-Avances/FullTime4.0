@@ -49,6 +49,10 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
 
   estados: Estado[] = [];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   Habilitado: boolean = true;
   id_empleado_loggin: number;
   FechaActual: any;
@@ -86,6 +90,9 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
     if (this.data.datosHora.length == 0) {
       this.toastr.error("No ha seleccionado solicitudes para aprobar");
     }
+
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   BuscarTipoAutorizacion() {
@@ -407,6 +414,8 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
       id_hora_extra: id_hora_extra,
       id_documento: localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       id_plan_hora_extra: null,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restAutorizaciones.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
       console.log('pasa')

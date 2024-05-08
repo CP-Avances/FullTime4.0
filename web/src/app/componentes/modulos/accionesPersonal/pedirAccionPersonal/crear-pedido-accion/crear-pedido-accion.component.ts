@@ -166,11 +166,12 @@ export class CrearPedidoAccionComponent implements OnInit {
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem("empleado") as string);
     this.departamento = parseInt(localStorage.getItem("departamento") as string);
-    this.user_name = localStorage.getItem("usuario");
-    this.ip = localStorage.getItem("ip");
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem("usuario");
+    this.ip = localStorage.getItem("ip");
+
     if (this.habilitarAccion === false) {
       let mensaje = {
         access: false,

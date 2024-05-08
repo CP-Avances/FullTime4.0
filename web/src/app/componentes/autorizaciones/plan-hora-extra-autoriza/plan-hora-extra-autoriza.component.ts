@@ -55,6 +55,10 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
 
   id_user_loggin: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restAutorizaciones: AutorizacionService,
     public restDepartamento: DepartamentosService,
@@ -67,6 +71,8 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
   ngOnInit(): void {
     console.log('datos, planificacion', this.data);
     this.id_user_loggin = parseInt(localStorage.getItem("empleado") as string);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.obtenerDepartamento();
   }
 
@@ -112,6 +118,8 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
       id_hora_extra: null,
       id_plan_hora_extra: id_hora,
       id_documento: localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restAutorizaciones.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Autorizacion guardada', {

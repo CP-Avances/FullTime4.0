@@ -80,6 +80,10 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
   informacion3: string = '';
   informacion4: string = '';
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   horas_alimentacionF = new FormControl('');
   horas_solicitadasF = new FormControl('');
@@ -142,6 +146,9 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
   public datosEmple: any = []
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.datos = this.solicita_permiso[0];
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
@@ -154,7 +161,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -177,7 +184,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       });
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   empleado: any = [];
   ObtenerEmpleado() {
     this.empleado = [];
@@ -300,7 +307,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
     })
   }
 
-  // ACTIVAR FORMULARIO DE ACUERDO A SELECCION DE TIPO 
+  // ACTIVAR FORMULARIO DE ACUERDO A SELECCION DE TIPO
   ActivarDiasHoras(form: any) {
     this.LimpiarComida(false);
     if (form.solicitarForm === 'Dias') {
@@ -464,12 +471,12 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
             this.fechaFinalF.setValue('');
           }
           else {
-            // BUSQUEDA DE FERIADOS 
+            // BUSQUEDA DE FERIADOS
             this.BuscarFeriados(form);
           }
         }
         else {
-          // BUSQUEDA DE FERIADOS 
+          // BUSQUEDA DE FERIADOS
           this.BuscarFeriados(form);
         }
       }
@@ -504,7 +511,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
     }
     else if (this.configuracion_permiso === 'Horas') {
       this.toastr.warning
-        (`No puede solicitar días de permiso. 
+        (`No puede solicitar días de permiso.
           Las horas de permiso que puede solicitar deben ser menores o iguales a: ${String(this.Thoras)} horas.`,
           'Este tipo de permiso esta configurado por horas.', {
           timeOut: 6000,
@@ -1352,7 +1359,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
     this.contar_laborables = 0;
     this.contar_recuperables = 0;
 
-    this.fechas_solicitud = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO 
+    this.fechas_solicitud = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
     var inicio = moment(this.dSalida, "YYYY/MM/DD").format("YYYY-MM-DD");
     var fin = moment(this.dIngreso, "YYYY/MM/DD").format("YYYY-MM-DD");
 
@@ -1365,7 +1372,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
     //console.log('fechas form ---- ', this.fechas_solicitud)
     //console.log('feriados form ---- ', this.feriados)
 
-    // BUSCAR FERIADOS 
+    // BUSCAR FERIADOS
     if (this.feriados.length != 0) {
       this.fechas_solicitud.map(obj => {
         for (let i = 0; i < this.feriados.length; i++) {
@@ -1441,7 +1448,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
 
   /** ********************************************************************************** **
-   ** **                    TRATAMIENTO DE DATOS DE REGISTRO DE PERMISO               ** ** 
+   ** **                    TRATAMIENTO DE DATOS DE REGISTRO DE PERMISO               ** **
    ** ********************************************************************************** **/
 
   // GUARDAR DATOS DE PERMISO
@@ -1588,7 +1595,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
     //console.log('this.departamento: ', this.departamento);
     // ARREGLO DE DATOS PARA INGRESAR UNA AUTORIZACION
     let newAutorizaciones = {
-      orden: 1, // ORDEN DE LA AUTORIZACIÓN 
+      orden: 1, // ORDEN DE LA AUTORIZACIÓN
       estado: 1, // ESTADO PENDIENTE
       id_departamento: this.departamento,
       id_permiso: permiso.id,
@@ -1596,6 +1603,8 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       id_hora_extra: null,
       id_documento: '',
       id_plan_hora_extra: null,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     //console.log('this.departamento: ', newAutorizaciones);
     this.restAutoriza.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
@@ -1603,8 +1612,8 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
   }
 
 
-  /** *************************************************************************************** ** 
-   ** **                   METODOS ENVIO DE NOTIFICACIONES DE PERMISOS                     ** ** 
+  /** *************************************************************************************** **
+   ** **                   METODOS ENVIO DE NOTIFICACIONES DE PERMISOS                     ** **
    ** *************************************************************************************** **/
 
   // METODO PARA OBTENER CONFIGURACION DE NOTIFICACIONES
@@ -1809,7 +1818,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
   }
 
   /** ********************************************************************************* **
-   ** **                    LIMPIAR CAMPOS DEL FORMULARIO                            ** **             
+   ** **                    LIMPIAR CAMPOS DEL FORMULARIO                            ** **
    ** ********************************************************************************* **/
 
   // LIMPIAR CAMPOS DEL FORMULARIO

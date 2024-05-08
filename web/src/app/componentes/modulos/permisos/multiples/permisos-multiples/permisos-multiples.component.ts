@@ -81,6 +81,10 @@ export class PermisosMultiplesComponent implements OnInit {
   informacion4: string = '';
   ver_informacion: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreCertificadoF = new FormControl('');
   descripcionF = new FormControl('');
@@ -129,7 +133,9 @@ export class PermisosMultiplesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('ver data ', this.data)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
     this.ObtenerTiposPermiso();
@@ -138,7 +144,7 @@ export class PermisosMultiplesComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -191,7 +197,7 @@ export class PermisosMultiplesComponent implements OnInit {
     }
   }
 
-  // METODO PARA MOSTRAR INFORMACION DEL TIPO DE PERMISO 
+  // METODO PARA MOSTRAR INFORMACION DEL TIPO DE PERMISO
   legalizar: boolean = false;
   descuento: boolean = false;
   activar_hora: boolean = false;
@@ -463,7 +469,7 @@ export class PermisosMultiplesComponent implements OnInit {
     }
     else if (this.configuracion_permiso === 'Horas') {
       this.toastr.warning
-        (`No puede solicitar días de permiso. 
+        (`No puede solicitar días de permiso.
           Las horas de permiso que puede solicitar deben ser menores o iguales a: ${String(this.Thoras)} horas.`,
           'Este tipo de permiso esta configurado por horas.', {
           timeOut: 6000,
@@ -623,7 +629,7 @@ export class PermisosMultiplesComponent implements OnInit {
 
 
   /** ********************************************************************************* **
-   ** **                    LIMPIAR CAMPOS DEL FORMULARIO                            ** **             
+   ** **                    LIMPIAR CAMPOS DEL FORMULARIO                            ** **
    ** ********************************************************************************* **/
 
   // METODO PARA LIMPIAR CAMPOS DEL FORMULARIO
@@ -1000,7 +1006,7 @@ export class PermisosMultiplesComponent implements OnInit {
     this.contar_laborables = 0;
     this.contar_recuperables = 0;
 
-    this.fechas_solicitud = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO 
+    this.fechas_solicitud = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
     var inicio = moment(this.dSalida, "YYYY/MM/DD").format("YYYY-MM-DD");
     var fin = moment(this.dIngreso, "YYYY/MM/DD").format("YYYY-MM-DD");
 
@@ -1011,7 +1017,7 @@ export class PermisosMultiplesComponent implements OnInit {
       inicio = newDate;
     }
 
-    // BUSCAR FERIADOS 
+    // BUSCAR FERIADOS
     if (this.feriados.length != 0) {
       this.fechas_solicitud.map(obj => {
         for (let i = 0; i < this.feriados.length; i++) {
@@ -1767,7 +1773,7 @@ export class PermisosMultiplesComponent implements OnInit {
    **  **                           REGISTRAR PERMISO MULTIPLE                                      ** **
    **  *********************************************************************************************** **/
 
-  // METODO PARA CAMBIAR VALOR DE 
+  // METODO PARA CAMBIAR VALOR DE
   CambiarValoresDiasHoras(form: any, datos: any) {
     if (form.solicitarForm === 'Dias') {
       datos.hora_numero = '00:00:00';
@@ -2076,7 +2082,7 @@ export class PermisosMultiplesComponent implements OnInit {
   IngresarAutorizacion(id_permiso: number) {
     // ARREGLO DE DATOS PARA INGRESAR UNA AUTORIZACION
     let newAutorizaciones = {
-      orden: 1, // ORDEN DE LA AUTORIZACION 
+      orden: 1, // ORDEN DE LA AUTORIZACION
       estado: 1, // ESTADO PENDIENTE
       id_departamento: parseInt(localStorage.getItem('departamento') as string),
       id_permiso: id_permiso,
@@ -2084,6 +2090,8 @@ export class PermisosMultiplesComponent implements OnInit {
       id_hora_extra: null,
       id_documento: '',
       id_plan_hora_extra: null,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restAutoriza.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
     })
@@ -2152,7 +2160,7 @@ export class PermisosMultiplesComponent implements OnInit {
     this.EnviarNotificaciones(this.totalNotifica_aprueba);
   }
 
-  // METODO PARA LEER DATOS DE NOTIIFCACION SISTEMA 
+  // METODO PARA LEER DATOS DE NOTIIFCACION SISTEMA
   verificador: boolean = false;
   EnviarNotificaciones(datos_usuario: any) {
     let contador = 0;
