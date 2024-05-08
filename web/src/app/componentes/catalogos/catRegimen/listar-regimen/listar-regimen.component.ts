@@ -2,18 +2,17 @@
 import { FormGroup, FormControl } from "@angular/forms";
 import { Component, OnInit } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
-import { environment } from "src/environments/environment";
 import { PageEvent } from "@angular/material/paginator";
 import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 
-import * as FileSaver from "file-saver";
-import * as moment from "moment";
 import * as xlsx from "xlsx";
+import * as xml2js from 'xml2js';
+import * as moment from "moment";
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from "file-saver";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
 
 // IMPORTAR COMPONENTES
 import { MetodosComponent } from "src/app/componentes/administracionGeneral/metodoEliminar/metodos.component";
@@ -22,7 +21,6 @@ import { MetodosComponent } from "src/app/componentes/administracionGeneral/meto
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
 import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
 import { RegimenService } from "src/app/servicios/catalogos/catRegimen/regimen.service";
-
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRegimen } from 'src/app/model/reportes.model';
@@ -37,7 +35,6 @@ import { ITableRegimen } from 'src/app/model/reportes.model';
 export class ListarRegimenComponent implements OnInit {
 
   regimenesEliminar: any = [];
-
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   descripcionF = new FormControl("");
@@ -78,7 +75,7 @@ export class ListarRegimenComponent implements OnInit {
     private toastr: ToastrService, // VARIABLE DE USO DE MENSAJES DE NOTIFICACIONES
     private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     private rest: RegimenService, // SERVICIO DE DATOS DE REGIMEN
-    public router: Router, // VARIABLE DE NAVEGACIÓN DE PÁGINAS CON URL
+    public router: Router, // VARIABLE DE NAVEGACION DE PAGINAS CON URL
     public ventana: MatDialog // VARIABLE MANEJO DE VENTANAS
   ) {
     this.idEmpleado = parseInt(localStorage.getItem("empleado") as string);
@@ -137,23 +134,17 @@ export class ListarRegimenComponent implements OnInit {
    ** **          VENTANAS PARA REGISTRAR Y EDITAR DATOS DE UN REGIMEN LABORAL       ** **
    ** ********************************************************************************* **/
 
-
-
   // METODO PARA ABRIR FORMULARIO REGISTRAR
   ver_lista: boolean = true;
   ver_registrar: boolean = false;
   AbrirRegistrar() {
     this.ver_lista = false;
     this.ver_registrar = true;
-
-
-
     this.ObtenerRegimen();
     this.plan_multiple = false;
     this.plan_multiple_ = false;
     this.selectionRegimen.clear();
     this.regimenesEliminar = [];
-
   }
 
   // METODO PARA VER DATOS DE REGIMEN LABORAL
@@ -343,7 +334,7 @@ export class ListarRegimenComponent implements OnInit {
   ExportToExcel() {
     this.OrdenarDatos(this.regimen);
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
-      this.regimen.map((obj) => {
+      this.regimen.map((obj: any) => {
         return {
           CODIGO: obj.id,
           DESCRIPCION: obj.descripcion,
@@ -499,9 +490,6 @@ export class ListarRegimenComponent implements OnInit {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.regimenesEliminar = this.selectionRegimen.selected;
-    //console.log('paginas para Eliminar',this.paginasEliminar);
-
-    //console.log(this.selectionPaginas.selected)
     return `${this.selectionRegimen.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
 
   }
@@ -510,26 +498,19 @@ export class ListarRegimenComponent implements OnInit {
 
 
   EliminarMultiple() {
-
     this.ingresar = false;
     this.contador = 0;
     this.regimenesEliminar = this.selectionRegimen.selected;
     this.regimenesEliminar.forEach((datos: any) => {
-
       this.regimen = this.regimen.filter(item => item.id !== datos.id);
-
       this.contador = this.contador + 1;
-
       //AQUI MODIFICAR EL METODO 
       this.rest.EliminarRegistro(datos.id).subscribe(res => {
-
         if (res.message === 'error') {
-          this.toastr.error('No se puede eliminar.', '', {
+          this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
-
-
         } else {
           if (!this.ingresar) {
             this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
@@ -540,55 +521,39 @@ export class ListarRegimenComponent implements OnInit {
           this.ObtenerRegimen();
         }
       });
-
     }
     )
   }
-
-
-
-
 
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-
           if (this.regimenesEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
-
             this.plan_multiple = false;
             this.plan_multiple_ = false;
             this.regimenesEliminar = [];
             this.selectionRegimen.clear();
-
             this.ObtenerRegimen();
-
-
           } else {
-            this.toastr.warning('No ha seleccionado REGÍMENES.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado RÉGIMENES.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
-
-
         } else {
           this.router.navigate(['/listarRegimen']);
-
         }
       });
   }
 
 
-
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_regimen: number) {
     this.rest.EliminarRegistro(id_regimen).subscribe((res) => {
-
       if (res.message === 'error') {
-        this.toastr.error('No se puede eliminar.', '', {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
         });
       } else {
@@ -609,25 +574,16 @@ export class ListarRegimenComponent implements OnInit {
         if (confirmado) {
           this.Eliminar(datos.id);
           this.activar_seleccion = true;
-
           this.plan_multiple = false;
           this.plan_multiple_ = false;
           this.regimenesEliminar = [];
           this.selectionRegimen.clear();
-
           this.ObtenerRegimen();
-
-
         } else {
           this.router.navigate(["/listarRegimen"]);
         }
       });
   }
-
-
-
-
-
 }
 
 
