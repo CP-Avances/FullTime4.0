@@ -94,6 +94,11 @@ export class PrincipalHorarioComponent implements OnInit {
   listaHorariosCorrectos: any = [];
   listaDetalleCorrectos: any = [];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
+
   constructor(
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
     public validar: ValidacionesService, // VARIABLE USADA PARA CONTROL DE VALIDACIONES
@@ -108,6 +113,9 @@ export class PrincipalHorarioComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.nameFile = '';
     this.ObtenerLogo();
     this.ObtenerColores();
@@ -243,7 +251,12 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
   EliminarDetalle(id_horario: any) {
-    this.rest.EliminarRegistro(id_horario.id).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.rest.EliminarRegistro(id_horario.id, datos).subscribe(res => {
       // METODO PARA AUDITAR CATÁLOGO HORARIOS
       this.validar.Auditar('app-web', 'cg_horarios', id_horario, '', 'DELETE');
       this.toastr.error('Registro eliminado.', '', {
@@ -363,8 +376,11 @@ export class PrincipalHorarioComponent implements OnInit {
   RegistrarHorariosDetalles() {
     const data = {
       horarios: this.listaHorariosCorrectos,
-      detalles: this.listaDetalleCorrectos
-    }
+      detalles: this.listaDetalleCorrectos,
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
     if (this.listaHorariosCorrectos.length == 0) {
       this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada.', {
         timeOut: 6000,

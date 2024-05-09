@@ -58,6 +58,10 @@ export class EditarHorarioComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public ventana: MatDialogRef<EditarHorarioComponent>, // VARIABLES DE NAVEGACIÓN ENTRE VENTANAS
     public validar: ValidacionesService, // VARIABLE DE CONTROL DE VALIDACIONES
@@ -69,7 +73,9 @@ export class EditarHorarioComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('data ', this.data)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ImprimirDatos();
   }
 
@@ -152,6 +158,8 @@ export class EditarHorarioComponent implements OnInit {
       nombre: form.nombreForm,
       codigo: form.codigoForm,
       default_: tipo,
+      user_name: this.user_name,
+      ip: this.ip,
     };
 
     // FORMATEAR HORAS
@@ -216,7 +224,9 @@ export class EditarHorarioComponent implements OnInit {
     if (this.opcion === 1) {
       let eliminar = {
         documento: this.data.horario.documento,
-        id: parseInt(this.data.horario.id)
+        id: parseInt(this.data.horario.id),
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.rest.EliminarArchivo(eliminar).subscribe(res => {
       });
@@ -306,7 +316,7 @@ export class EditarHorarioComponent implements OnInit {
   }
 
   /** *********************************************************************************************** **
-   ** **                             METODO PARA SUBIR ARCHIVO                                     ** ** 
+   ** **                             METODO PARA SUBIR ARCHIVO                                     ** **
    ** *********************************************************************************************** **/
 
   // METODO PARA SELECCIONAR UN ARCHIVO
@@ -335,6 +345,10 @@ export class EditarHorarioComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.rest.SubirArchivo(formData, id, this.data.horario.documento, this.data.horario.codigo).subscribe(res => {
       this.archivoForm.reset();
       this.nameFile = '';
@@ -357,7 +371,7 @@ export class EditarHorarioComponent implements OnInit {
     this.archivoForm.patchValue('');
   }
 
-  // METODOS DE ACTIVACION DE CARGA DE ARCHIVO 
+  // METODOS DE ACTIVACION DE CARGA DE ARCHIVO
   activar: boolean = false;
   opcion: number = 0;
   ActivarArchivo() {
