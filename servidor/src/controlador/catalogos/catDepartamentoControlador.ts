@@ -383,12 +383,12 @@ class DepartamentoControlador {
           datosOriginales: '',
           datosNuevos: '',
           ip: ip,
-          observacion: `Error al actualizar el nivel de departamento con ID: ${id}`,
+          observacion: `Error al actualizar el nivel de departamento con ID: ${id}, Registro no encontrado.`,
         });
 
         // FINALIZAR TRANSACCIÓN
         await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'error' });
+        return res.status(404).jsonp({ message: 'Registro no encontrado' });
       }
 
       await pool.query(
@@ -496,12 +496,12 @@ class DepartamentoControlador {
           datosOriginales: '',
           datosNuevos: '',
           ip: ip,
-          observacion: `Error al actualizar el nivel de departamento con ID: ${id_departamento}`,
+          observacion: `Error al actualizar el nombre de nivel del departamento con ID: ${id_departamento}. Registro no encontrado.`,
         });
 
         // FINALIZAR TRANSACCIÓN
         await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'error' });
+        return res.status(404).jsonp({ message: 'Registro no encontrado' });
       }
 
       await pool.query(
@@ -517,7 +517,7 @@ class DepartamentoControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datos),
-        datosNuevos: `{Departamento: ${departamento}}`,
+        datosNuevos: `{departamento: ${departamento}}`,
         ip: ip,
         observacion: null
       });
@@ -535,7 +535,7 @@ class DepartamentoControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datos),
-        datosNuevos: `{Departamento: ${departamento}}`,
+        datosNuevos: `{dep_nivel_nombre: ${departamento}}`,
         ip: ip,
         observacion: null
       });

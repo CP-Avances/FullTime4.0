@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-editar-departamento',
@@ -174,7 +175,9 @@ export class EditarDepartamentoComponent implements OnInit {
   ActulizarNombreNiveles(departamento: any) {
     let data = {
       departamento: departamento.nombre,
-      id_departamento: this.datos.id
+      id_departamento: this.datos.id,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.rest.ActualizarNombreNivel(data).subscribe(response => {
     });

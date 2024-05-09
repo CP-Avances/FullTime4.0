@@ -61,6 +61,10 @@ export class PrincipalDepartamentoComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private scriptService: ScriptService,
     private toastr: ToastrService,
@@ -75,13 +79,16 @@ export class PrincipalDepartamentoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ListaDepartamentos();
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
     this.ObtenerLogo();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -97,7 +104,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -134,7 +141,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       });
   }
 
-  // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO 
+  // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO
   AbrirEditarDepartamento(departamento: any): void {
     this.ventana.open(EditarDepartamentoComponent,
       { width: '400px', data: { data: departamento, establecimiento: false } })
@@ -165,15 +172,23 @@ export class PrincipalDepartamentoComponent implements OnInit {
   public departamentosNiveles: any = [];
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
-    this.rest.EliminarRegistro(id_dep).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+    this.rest.EliminarRegistro(id_dep, datos).subscribe(res => {
       this.departamentosNiveles = [];
       var id_departamento = id_dep;
       var id_establecimiento = id_sucursal;
+      const datos = {
+        user_name: this.user_name,
+        ip: this.ip
+      };
       if (nivel > 0) {
         this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
           this.departamentosNiveles = datos;
           this.departamentosNiveles.filter(item => {
-            this.rest.EliminarRegistroNivelDepa(item.id).subscribe({})
+            this.rest.EliminarRegistroNivelDepa(item.id, datos).subscribe({})
           })
         })
       }
@@ -185,7 +200,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   }
 
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -197,7 +212,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       });
   }
 
-  // ORDENAR LOS DATOS SEGUN EL ID 
+  // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
       if (a.nomsucursal < b.nomsucursal) {
@@ -225,7 +240,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   }
 
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                       METODO PARA EXPORTAR A PDF                             ** **
    ** ************************************************************************************************** **/
 
@@ -324,7 +339,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     };
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A EXCEL                                 ** **
    ** ************************************************************************************************** **/
   exportToExcel() {
@@ -334,7 +349,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     xlsx.writeFile(wb, "Departamentos" + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A CSV                               ** **
    ** ************************************************************************************************** **/
 

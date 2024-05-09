@@ -20,7 +20,7 @@ export class DepartamentosService {
     );
   }
 
-  // BUSCAR DEPARTAMENTOS POR ID SUCURSAL 
+  // BUSCAR DEPARTAMENTOS POR ID SUCURSAL
   BuscarDepartamentoSucursal(id: number) {
     return this.http.get(`${environment.url}/departamento/sucursal-departamento/${id}`);
   }
@@ -53,8 +53,12 @@ export class DepartamentosService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/departamento/eliminar/${id}`);
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${environment.url}/departamento/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA CREAR ARCHIVO XML
@@ -83,8 +87,12 @@ export class DepartamentosService {
   }
 
   // METODO PARA ELIMINAR REGISTRO NIVEL DEPARTAMENTO   --**VERIFICADO
-  EliminarRegistroNivelDepa(id: number) {
-    return this.http.delete(`${environment.url}/departamento/eliminarniveldepa/${id}`);
+  EliminarRegistroNivelDepa(id: number, datos: any) {
+    const url = `${environment.url}/departamento/eliminarniveldepa/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // REGISTRAR NIVELDEPARTAMENTO  --**VERIFICADO
