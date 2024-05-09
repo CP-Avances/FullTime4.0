@@ -4,13 +4,10 @@ import { TokenValidation } from '../../libs/verificarToken';
 
 class RolPermisosRutas {
     public router: Router = Router();
-
     constructor() {
         this.configuracion();
     }
-
     configuracion(): void {
-
 
         //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
         this.router.get('/menu/paginas', TokenValidation, rolPermisosControlador.ListarMenuRoles);
@@ -30,7 +27,7 @@ class RolPermisosRutas {
         //METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL
         this.router.post('/menu/todaspaginasrol', TokenValidation, rolPermisosControlador.ObtenerPaginasRol);
 
-        // METODO PARA ASIGNAR PERMISOS AL ROL
+        // METODO PARA ASIGNAR FUNCIONES AL ROL
         this.router.post('/menu/paginas/insertar', TokenValidation, rolPermisosControlador.AsignarPaginaRol);
 
         // METODO PARA ELIMINAR REGISTRO
@@ -48,5 +45,4 @@ class RolPermisosRutas {
 }
 
 const rolPermisosRutas = new RolPermisosRutas();
-
 export default rolPermisosRutas.router;

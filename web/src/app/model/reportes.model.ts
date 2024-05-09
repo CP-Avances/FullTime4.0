@@ -542,3 +542,8 @@ export interface ITableNivel {
     nivel: string,
     
 }
+
+export interface ITableRoles {
+    nombre: string,
+    
+}

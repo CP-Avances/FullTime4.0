@@ -75,7 +75,7 @@
                     Seleccionar las funciones o acciones que puede realizar el rol {{nombreRol}} dentro del sistema.
                 </span>
             </div>
-            <form >
+            <form>
                 <div class="container">
                     <div class="row">
                         <div class="col-sm">
@@ -164,11 +164,11 @@
                     Seleccionar las funciones o acciones que puede realizar el rol {{nombreRol}} dentro del sistema.
                 </span>
             </div>
-            <form >
+            <form>
                 <div class="container">
                     <div class="row">
                         <div class="col-sm">
-                            <!-- Tabla de menu -->
+                            <!-- Tabla de menu Modulos -->
                             <div class="d-flex flex-wrap justify-content-start">
                                 <div class="modal-body" style="margin-left: 60px; padding-top: 15px;">
                                     <div class="container-fluid" *ngFor="let modulo of nombreModulos; index as j">
@@ -203,7 +203,6 @@
                                                                 <input class="form-check-input" type="checkbox"
                                                                     id="seleccionarAccion{{n.id}}"
                                                                     (change)="SeleccionarTodasAcciones($event, n.id)">
-
                                                                 <label class="form-check-label" for="inlineCheckbox1"
                                                                     style="margin-left: 1px; font-size: 14px; color: green; font-weight: bold; padding-bottom: 10px;">
                                                                     Todos las acciones

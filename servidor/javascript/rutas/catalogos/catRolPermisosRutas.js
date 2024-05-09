@@ -24,7 +24,7 @@ class RolPermisosRutas {
         this.router.post('/menu/paginas/ideaccion', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerIdPaginasConAcciones);
         //METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL
         this.router.post('/menu/todaspaginasrol', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerPaginasRol);
-        // METODO PARA ASIGNAR PERMISOS AL ROL
+        // METODO PARA ASIGNAR FUNCIONES AL ROL
         this.router.post('/menu/paginas/insertar', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.AsignarPaginaRol);
         // METODO PARA ELIMINAR REGISTRO
         this.router.post('/menu/paginas/eliminar', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.EliminarPaginaRol);

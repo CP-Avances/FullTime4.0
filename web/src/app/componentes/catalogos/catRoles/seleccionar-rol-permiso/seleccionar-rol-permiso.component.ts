@@ -16,7 +16,6 @@ import { VistaRolesComponent } from '../vista-roles/vista-roles.component';
   selector: 'app-seleccionar-rol-permiso',
   templateUrl: './seleccionar-rol-permiso.component.html',
   styleUrls: ['./seleccionar-rol-permiso.component.css'],
-  //encapsulation: ViewEncapsulation.None,
 })
 
 export class SeleccionarRolPermisoComponent implements OnInit {
@@ -35,7 +34,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   funcion = new FormControl('', [Validators.minLength(2)]);
 
-
   // DICCIONARIO DE MODULOS 
   diccionarioFuncionesActivas: { [id_funcion: string]: boolean } = {
     "permisos": this.permisos,
@@ -48,14 +46,13 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     "reloj_virtual": this.reloj_virtual,
   };
 
+  nombreRol: string;
 
   //filtros
   filtrofuncion: '';
-  nombresMenu: any = [];
-  nombresAcciones: any = [];
-  nombreRol: string;
 
   // ITEMS PAGINAS
+  nombresMenu: any = [];
   nombrePaginas: any = [];
   nombreModulosAsignados: any = [];
   paginasEliminar: any = [];
@@ -68,6 +65,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   paginasSeleccionadasM: any = [];
 
   // ITEMS ACCIONES DE PAGINAS
+  nombresAcciones: any = [];
   accionesPaginas: any = [];
   nombresAccionesPorPagina: { [id_funcion: number]: any[] } = {};
   todasPaginasAcciones: { [id_funcion: number]: any } = {};
@@ -76,16 +74,10 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   acciones: any = [];
   accionesSeleccionadasPorPagina: { [id_funcion: number]: any } = {};
 
-
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
-
-
-
-
-
 
   constructor(
     private varificarFunciones: MainNavService,
@@ -95,10 +87,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     private validar: ValidacionesService,
     public ventana: MatDialog,
     public componenter: VistaRolesComponent,
-  ) {
-
-
-  }
+  ) { }
 
   ngOnInit(): void {
     console.log('id rol ---', this.id_rol)
@@ -120,10 +109,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.ObtenerTodasPaginasAcciones();
     this.ObtenerModulos();
     this.ObtenerTodasModulosAcciones();
-
   }
-
-
 
   // METODO PARA VER LISTA DE ROLES DEL SISTEMA
   VerRoles() {
@@ -159,7 +145,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     });
   }
 
-
   nombreModulos: string[] = [
     'permisos',
     'vacaciones',
@@ -170,7 +155,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     'timbre_virtual',
     'reloj_virtual',
   ]
-
   // METODO PARA BUSCAR LAS PAGINAS SEGUN EL NOMBRE DE SU MODULO Y ALMACENARLAS EN UN OBJETO
   ObtenerMenuModulos() {
     this.nombreModulos.map(nombre => {
@@ -207,7 +191,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     if (this.paginasSeleccionadasM.some(subArreglo => JSON.stringify(subArreglo) === JSON.stringify(data))) {
     } else {
       this.paginasSeleccionadasM.push(data);
-
     }
     this.accionesSeleccionadasPorPagina[data.id] = [];
   }
@@ -285,7 +268,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       (<HTMLInputElement>document.getElementById(id + 'accionesSeleccionadasPorPagina' + i)).checked = true;
     }
   }
-
 
   //METODO PARA QUITAR TODAS LAS PAGINAS
   limpiarData: any = [];
@@ -459,7 +441,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                     id_accion: accion.id
                   }
                   this.contador = this.contador + 1;
-
                   this.rest.crearPaginaRol(rolPermisosbody).subscribe(response => {
                     if (!this.ingresar) {
                       this.toastr.success('Operación exitosa.', 'Se ha guardado ' + this.contador + ' registros.', {
@@ -502,8 +483,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             this.toastr.info('Se indica que ' + obj.nombre + ' ya fue asignada a este Rol.', '', {
               timeOut: 7000,
             })
-
-
           }, error => {
             // INSERTAR PAGINA
             this.contador = this.contador + 1;
@@ -665,6 +644,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     }
   }
 
+  // METODO PARA BUSCAR LAS PAGINAS QUE FUERON ASIGNADAS A ESE ROL
   MostrarPaginasRol() {
     this.paginas = [];
     var buscarPagina = {
@@ -688,22 +668,19 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.activar_seleccion = false;
   }
 
-  //CHECK PAGINAS - ACCIONES
+  // CHECK PAGINAS - ACCIONES
   selectionPaginas = new SelectionModel<ITableFuncionesRoles>(true, []);
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
     const numSelected = this.selectionPaginas.selected.length;
     return numSelected === this.paginas.length
   }
-
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
     this.isAllSelectedPag() ?
       this.selectionPaginas.clear() :
       this.paginas.forEach((row: any) => this.selectionPaginas.select(row));
   }
-
-
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelPag(row?: ITableFuncionesRoles): string {
     if (!row) {
@@ -713,8 +690,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     return `${this.selectionPaginas.isSelected(row) ? 'deselect' : 'select'} row ${row.funcion + 1}`;
   }
 
-
-  // ELIMINAR PAGINAS SLECCIONADAS POR EL ROL
+  // ELIMINAR PAGINAS SELECCIONADAS POR EL ROL
   EliminarPaginaRol() {
     this.ingresar = false;
     this.contador = 0;
@@ -728,14 +704,11 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       this.rest.EliminarPaginasRol(buscarPagina).subscribe(
         res => {
           if (res.message === 'error') {
-
             this.toastr.error('No se puede eliminar.', 'la: ' + datos.nombre, {
               timeOut: 6000,
             });
-
           } else {
             if (!this.ingresar) {
-
               this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
                 timeOut: 6000,
               });
@@ -749,7 +722,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     )
     console.log("Paginas eliminadas", this.paginasEliminar);
   }
-
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
   ConfirmarDelete() {
@@ -770,7 +742,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
         }
       });
   }
-
 
   //FUNCION PARA BUSCAR LAS ACCIONES DE LAS PAGINAS 
   ObtenerTodasPaginasAcciones(): any {

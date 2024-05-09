@@ -98,7 +98,7 @@ class RolPermisosControlador {
     }
   }
 
-  // METODO PARA ASIGNAR PERMISOS AL ROL
+  // METODO PARA ASIGNAR FUNCIONES AL ROL
   public async AsignarPaginaRol(req: Request, res: Response) {
     try {
       const { funcion, link, id_rol, id_accion } = req.body;
@@ -119,14 +119,18 @@ class RolPermisosControlador {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  public async EliminarPaginaRol(req: Request, res: Response): Promise<void> {
-    const { id } = req.body
-    await pool.query(
-      `
+  public async EliminarPaginaRol(req: Request, res: Response): Promise<any> {
+    try {
+      const { id } = req.body
+      await pool.query(
+        `
       DELETE FROM ero_rol_permisos WHERE id = $1
       `
-      , [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+        , [id]);
+      res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      return res.jsonp({ message: 'error' });
+    }
   }
 
   // METODO PARA BUSCAR LAS ACCIONES POR CADA PAGINA
@@ -178,5 +182,4 @@ class RolPermisosControlador {
 }
 
 export const rolPermisosControlador = new RolPermisosControlador();
-
 export default rolPermisosControlador;

@@ -103,7 +103,7 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA ASIGNAR PERMISOS AL ROL
+    // METODO PARA ASIGNAR FUNCIONES AL ROL
     AsignarPaginaRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -127,11 +127,16 @@ class RolPermisosControlador {
     // METODO PARA ELIMINAR REGISTRO
     EliminarPaginaRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.body;
-            yield database_1.default.query(`
+            try {
+                const { id } = req.body;
+                yield database_1.default.query(`
       DELETE FROM ero_rol_permisos WHERE id = $1
       `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+                res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
         });
     }
     // METODO PARA BUSCAR LAS ACCIONES POR CADA PAGINA

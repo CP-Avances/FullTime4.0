@@ -10,8 +10,7 @@ export class RolPermisosService {
 
   constructor(
     private http: HttpClient
-  ) {
-  }
+  ) { }
 
   //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
   getMenu() {
@@ -27,8 +26,7 @@ export class RolPermisosService {
   getMenuModulos(datos) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginasmodulos`, datos);
   }
-
-
+  
   // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION
   BuscarIdPaginas(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/ide`, datos);
@@ -68,5 +66,4 @@ export class RolPermisosService {
   ObtenerAcciones() {
     return this.http.get(`${environment.url}/rolPermisos/menu/paginas/acciones/todas`);
   }
-
 }

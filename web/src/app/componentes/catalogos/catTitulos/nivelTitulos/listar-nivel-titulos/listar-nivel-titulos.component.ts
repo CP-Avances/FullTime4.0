@@ -305,8 +305,6 @@ export class ListarNivelTitulosComponent implements OnInit {
     this.plan_multiple_ = false;
     this.selectionNiveles.clear();
     this.nivelesEliminar = [];
-
-
   }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -602,16 +600,12 @@ export class ListarNivelTitulosComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
-
           this.activar_seleccion = true;
-
           this.plan_multiple = false;
           this.plan_multiple_ = false;
           this.nivelesEliminar = [];
           this.selectionNiveles.clear();
-
           this.ObtenerNiveles();
-
         } else {
           this.router.navigate(['/nivelTitulos']);
         }
@@ -631,8 +625,6 @@ export class ListarNivelTitulosComponent implements OnInit {
     this.nivelesEliminar.forEach((datos: any) => {
 
       this.nivelTitulos = this.nivelTitulos.filter(item => item.id !== datos.id);
-
-
       this.contador = this.contador + 1;
 
       this.nivel.EliminarNivel(datos.id).subscribe(res => {
@@ -642,11 +634,7 @@ export class ListarNivelTitulosComponent implements OnInit {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
-
-
         } else {
-
-          
           if (!this.ingresar) {
             this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
               timeOut: 6000,
@@ -670,16 +658,11 @@ export class ListarNivelTitulosComponent implements OnInit {
           if (this.nivelesEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
-
             this.plan_multiple = false;
             this.plan_multiple_ = false;
-
             this.nivelesEliminar = [];
             this.selectionNiveles.clear();
-
             this.ObtenerNiveles();
-
-
           } else {
             this.toastr.warning('No ha seleccionado NIVELES DE EDUCACIÓN.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -688,10 +671,6 @@ export class ListarNivelTitulosComponent implements OnInit {
         } else {
           this.router.navigate(['/nivelTitulos']);
         }
-
       });
-
   }
-
-
 }
