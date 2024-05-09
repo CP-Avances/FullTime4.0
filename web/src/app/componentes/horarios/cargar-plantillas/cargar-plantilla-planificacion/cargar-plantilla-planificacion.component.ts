@@ -56,6 +56,10 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
   planificacionesHorarias: any;
   planificacionesCorrectas: any;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public componentem: HorarioMultipleEmpleadoComponent,
     public componenteb: BuscarPlanificacionComponent,
@@ -65,6 +69,9 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.usuarios = this.datosSeleccionados.usuarios;
   }
 
@@ -248,7 +255,13 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
       return planificacion;
     });
 
-    this.restP.RegistrarPlanificacionHoraria(this.planificacionesCorrectas).subscribe( (res: any) => {
+    const datos = {
+      planificacionHoraria: this.planificacionesCorrectas,
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.restP.RegistrarPlanificacionHoraria(datos).subscribe( (res: any) => {
 
       if (res.message === 'No existen datos para registrar') {
         this.toastr.warning('No existen datos para registrar', 'Plantilla no importada.', {
