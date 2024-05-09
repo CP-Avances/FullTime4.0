@@ -481,8 +481,7 @@ export interface ITableRegimen {
 
 
 export interface ITableProvincias {
-    nombre: string,
-    
+    nombre: string,  
 }
 
 
@@ -521,19 +520,14 @@ export interface ITableFeriados {
 
 
 export interface ITableHorarios {
-    
     descripcion: string,
-    
 }
 
 export interface ITableDispositivos {
-    
     codigo: string,
-    
 }
 
 export interface ITableArchivos{
-
     nombre: string,
 }
 
