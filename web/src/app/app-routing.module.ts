@@ -160,7 +160,7 @@ const routes: Routes = [
   { path: 'calcularHoraExtra', component: CalculoHoraExtraComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
 
   // VISTA DE SUPER ADMINSITRADOR
-  { path: 'administrarSucursales', component: PrincipalSucursalUsuarioComponent, canActivate: [AuthGuard], data: { roles: 3 } },
+  { path: 'administrarSucursales', component: PrincipalSucursalUsuarioComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
 
 
   { path: 'verEmpleado/:id', component: VerEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },

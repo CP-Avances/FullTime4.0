@@ -569,7 +569,7 @@ export class PrincipalHorarioComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
+    
 
     const a = document.createElement('a');
     a.href = xmlUrl;
@@ -654,9 +654,9 @@ export class PrincipalHorarioComponent implements OnInit {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.horariosEliminar = this.selectionHorarios.selected;
-    //console.log('paginas para Eliminar',this.paginasEliminar);
+    
 
-    //console.log(this.selectionPaginas.selected)
+    
     return `${this.selectionHorarios.isSelected(row) ? 'deselect' : 'select'} row ${row.descripcion + 1}`;
 
   }

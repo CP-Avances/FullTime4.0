@@ -228,9 +228,9 @@ export class ListaArchivosComponent implements OnInit {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.archivosEliminar = this.selectionArchivos.selected;
-    //console.log('paginas para Eliminar',this.paginasEliminar);
+    
 
-    //console.log(this.selectionPaginas.selected)
+    
     return `${this.selectionArchivos.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
 
   }

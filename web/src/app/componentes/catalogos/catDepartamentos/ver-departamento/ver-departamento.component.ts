@@ -31,9 +31,6 @@ interface Nivel {
 
 export class VerDepartamentoComponent implements OnInit {
 
-  nivelesEliminar: any = [];
-
-
   @Input() id_departamento: number;
   @Input() pagina: string;
 
@@ -46,6 +43,7 @@ export class VerDepartamentoComponent implements OnInit {
   // DATOS DEPARTAMENTO
   sucursales: any = [];
   departamentos: any = [];
+  nivelesEliminar: any = [];
   Habilitar: boolean = false;
 
   // ITEMS DE PAGINACION DE LA TABLA
@@ -109,7 +107,6 @@ export class VerDepartamentoComponent implements OnInit {
     var id_establecimiento = info.id_sucursal;
     this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
       this.departamentos = datos;
-      console.log('ver data de departamentos ', this.departamentos)
     })
   }
 
@@ -128,8 +125,6 @@ export class VerDepartamentoComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1
   }
 
-
-
   // METODO PARA ACTUALIZAR NIVELES DE APROBACION
   ActualizarRegistros(datos: any) {
     var data = { nivel: 0 };
@@ -137,7 +132,7 @@ export class VerDepartamentoComponent implements OnInit {
     var contador = 0;
     var actualiza = 0;
     arreglo = this.departamentos;
-    arreglo.forEach(item => {
+    arreglo.forEach((item: any) => {
       contador = contador + 1;
       if (datos.nivel < item.nivel) {
         data.nivel = item.nivel - 1;
@@ -197,7 +192,6 @@ export class VerDepartamentoComponent implements OnInit {
     this.plan_multiple_ = false;
     this.selectionNivel.clear();
     this.nivelesEliminar = [];
-
   }
 
   // METODO PARA VISUALIZAR LISTA DE USUARIOS QUE AUTORIZAN
@@ -239,10 +233,7 @@ export class VerDepartamentoComponent implements OnInit {
     }
   }
 
-
-
   // METODOS PARA LA SELECCION MULTIPLE
-
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
 
@@ -259,14 +250,11 @@ export class VerDepartamentoComponent implements OnInit {
 
   selectionNivel = new SelectionModel<ITableNivel>(true, []);
 
-
-
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
     const numSelected = this.selectionNivel.selected.length;
     return numSelected === this.departamentos.length
   }
-
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
@@ -275,16 +263,13 @@ export class VerDepartamentoComponent implements OnInit {
       this.departamentos.forEach((row: any) => this.selectionNivel.select(row));
   }
 
-
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelPag(row?: ITableNivel): string {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.nivelesEliminar = this.selectionNivel.selected;
-    //console.log('paginas para Eliminar',this.paginasEliminar);
 
-    //console.log(this.selectionPaginas.selected)
     return `${this.selectionNivel.isSelected(row) ? 'deselect' : 'select'} row ${row.nivel + 1}`;
 
   }
@@ -294,25 +279,19 @@ export class VerDepartamentoComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_dep: number, datos: any) {
-
-
     this.rest.EliminarRegistroNivelDepa(id_dep).subscribe(res => {
-
       if (res.message === 'error') {
-        this.toastr.error('No se puede eliminar.', '', {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
         });
       } else {
-
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
-
         this.ActualizarRegistros(datos);
       }
     });
   }
-
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
   ConfirmarDelete(datos: any) {
@@ -325,33 +304,19 @@ export class VerDepartamentoComponent implements OnInit {
 
         }
       });
-
     this.ActualizarRegistros(datos);
-
   }
 
-
-
   EliminarMultiple() {
-
-
     this.ingresar = false;
     this.contador = 0;
-
     this.nivelesEliminar = this.selectionNivel.selected;
     this.nivelesEliminar.forEach((datos: any) => {
-
       this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
-
       this.contador = this.contador + 1;
-
-
       this.rest.EliminarRegistroNivelDepa(datos.id).subscribe(res => {
-
-
         if (res.message === 'error') {
-
-          this.toastr.error('No se puede eliminar ', datos.nombre, {
+          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
@@ -363,26 +328,20 @@ export class VerDepartamentoComponent implements OnInit {
             this.ingresar = true;
           }
           this.ActualizarRegistros(datos);
-          // this.ListaDepartamentos();
-
         }
       });
       this.ActualizarRegistros(datos);
-
     }
     )
   }
-
 
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-
           if (this.nivelesEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
-
             this.plan_multiple = false;
             this.plan_multiple_ = false;
             this.nivelesEliminar = [];
@@ -392,14 +351,11 @@ export class VerDepartamentoComponent implements OnInit {
             this.toastr.warning('No ha seleccionado NIVEL.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
         } else {
           this.router.navigate(['/departamento']);
-
         }
       });
   }
-
 
 }

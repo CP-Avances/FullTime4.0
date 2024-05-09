@@ -197,7 +197,7 @@ export class MainNavComponent implements OnInit {
   SeleccionMenu() {
     const name_emp = localStorage.getItem('name_empresa');
 
-    if (this.inicio.getRol() === 3) {
+    if (this.inicio.getRol() === 1) {
       this.superadmin = true;
     }
     else {

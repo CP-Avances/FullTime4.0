@@ -496,9 +496,9 @@ export class ListarRelojesComponent implements OnInit {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.dispositivosEliminar = this.selectionDispositivos.selected;
-    //console.log('paginas para Eliminar',this.paginasEliminar);
+    
 
-    //console.log(this.selectionPaginas.selected)
+    
     return `${this.selectionDispositivos.isSelected(row) ? 'deselect' : 'select'} row ${row.codigo + 1}`;
 
   }
