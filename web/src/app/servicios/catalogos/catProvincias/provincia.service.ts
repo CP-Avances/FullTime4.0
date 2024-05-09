@@ -33,8 +33,12 @@ export class ProvinciaService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarProvincia(id: number) {
-    return this.http.delete(`${environment.url}/provincia/eliminar/${id}`);
+  EliminarProvincia(id: number, datos: any) {
+    const url = `${environment.url}/provincia/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA CREAR ARCHIVO XML
@@ -60,7 +64,7 @@ export class ProvinciaService {
 
 
 
-  
+
   getIdProvinciaRest(nombre: string) {
     return this.http.get(`${environment.url}/provincia/nombreProvincia/${nombre}`);
   }

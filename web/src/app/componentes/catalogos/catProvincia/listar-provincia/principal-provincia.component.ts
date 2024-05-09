@@ -44,6 +44,10 @@ export class PrincipalProvinciaComponent implements OnInit {
 
   confirmacion = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   paisF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
   provinciaF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
@@ -67,13 +71,16 @@ export class PrincipalProvinciaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ListarProvincias();
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
     this.ObtenerLogo();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -89,7 +96,7 @@ export class PrincipalProvinciaComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -129,7 +136,12 @@ export class PrincipalProvinciaComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_prov: number) {
-    this.rest.EliminarProvincia(id_prov).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.rest.EliminarProvincia(id_prov, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -365,7 +377,7 @@ export class PrincipalProvinciaComponent implements OnInit {
     a.download = 'Provincias.xml';
     // Simular un clic en el enlace para iniciar la descarga
     a.click();
-    
+
   }
 
 }
