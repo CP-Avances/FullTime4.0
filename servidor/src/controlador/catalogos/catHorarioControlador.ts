@@ -80,8 +80,6 @@ class HorarioControlador {
     try {
       let id = req.params.id;
       let { archivo, codigo } = req.params;
-  
-      // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
       const { user_name, ip } = req.body;
   
       // FECHA DEL SISTEMA
@@ -361,7 +359,6 @@ class HorarioControlador {
   // METODO PARA ELIMINAR REGISTROS
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
       const { user_name, ip } = req.body;
       const id = req.params.id;
 

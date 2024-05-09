@@ -83,7 +83,6 @@ class HorarioControlador {
             try {
                 let id = req.params.id;
                 let { archivo, codigo } = req.params;
-                // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
                 const { user_name, ip } = req.body;
                 // FECHA DEL SISTEMA
                 var fecha = (0, moment_1.default)();
@@ -331,7 +330,6 @@ class HorarioControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
                 const { user_name, ip } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
