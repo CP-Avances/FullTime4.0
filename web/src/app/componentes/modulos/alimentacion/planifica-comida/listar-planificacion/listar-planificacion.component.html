@@ -133,12 +133,12 @@
                         <td>{{e.horaInicio}}</td>
                         <td>{{e.horaFin}}</td>
                         <td class="justify-content-center">
-                            <i *ngIf="ver_editar" class="fas fa-edit" (click)="AbrirEditarPlanComidas(e, 'individual')"
+                            <i *ngIf="ver_editar && getEditarPlanificacion()" class="fas fa-edit" (click)="AbrirEditarPlanComidas(e, 'individual')"
                                 matSuffix matTooltipPosition="right"
                                 matTooltip="Modificar los datos generales de este registro.">
                                 <p>Editar</p>
                             </i>
-                            <i *ngIf="ver_eliminar" (click)="ConfirmarDeletePlanComidas(e)" class="far fa-trash-alt"
+                            <i *ngIf="ver_eliminar && getEliminarPlanificacion()" (click)="ConfirmarDeletePlanComidas(e)" class="far fa-trash-alt"
                                 id="t-eliminar" matSuffix matTooltipPosition="right"
                                 matTooltip="Eliminar este registro.">
                                 <p>Eliminar</p>
