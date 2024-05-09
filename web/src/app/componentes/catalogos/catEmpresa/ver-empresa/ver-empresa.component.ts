@@ -65,13 +65,9 @@ export class VerEmpresaComponent implements OnInit {
   verColores: boolean = false;
   verFrase: boolean = false;
 
-  // /**
-  //  * VARIABLES PROGRESS SPINNER
-  //  */
-  // color: ThemePalette = 'primary';
-  // mode: ProgressSpinnerMode = 'indeterminate';
-  // value = 10;
-  // habilitarprogress: boolean = false;
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   constructor(
     public ventana: MatDialog,
@@ -86,6 +82,9 @@ export class VerEmpresaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.CargarDatosEmpresa();
     this.ObtenerSucursal();
@@ -246,7 +245,9 @@ export class VerEmpresaComponent implements OnInit {
     let datos = {
       color_p: this.p_color,
       color_s: this.s_color,
-      id: this.datosEmpresa[0].id
+      id: this.datosEmpresa[0].id,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.empresa.ActualizarColores(datos).subscribe(data => {
       this.toastr.success('Operación exitosa.', 'Colores de reportes configurados.', {

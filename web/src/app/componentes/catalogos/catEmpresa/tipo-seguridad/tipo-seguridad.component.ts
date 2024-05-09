@@ -31,6 +31,10 @@ export class TipoSeguridadComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private rest: EmpresaService,
     private toastr: ToastrService,
@@ -39,6 +43,9 @@ export class TipoSeguridadComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ImprimirDatos();
   }
 
@@ -66,7 +73,9 @@ export class TipoSeguridadComponent implements OnInit {
       seg_contrasena: false,
       seg_ninguna: false,
       seg_frase: false,
-      id: parseInt(localStorage.getItem('empresa') as string)
+      id: parseInt(localStorage.getItem('empresa') as string),
+      user_name: this.user_name,
+      ip: this.ip
     };
     if (form.tipoForm === 'contrasena') {
       datosEmpresa.seg_contrasena = true;

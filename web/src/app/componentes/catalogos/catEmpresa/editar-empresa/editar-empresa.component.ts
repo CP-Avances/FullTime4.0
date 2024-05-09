@@ -51,6 +51,10 @@ export class EditarEmpresaComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   @Input() idEmpresa: number;
 
   constructor(
@@ -68,6 +72,9 @@ export class EditarEmpresaComponent implements OnInit {
   HabilitarOtro: boolean = false;
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.CargarDatosEmpresa();
     this.ValidarFormulario();
   }
@@ -176,6 +183,8 @@ export class EditarEmpresaComponent implements OnInit {
       tipo_empresa: form2.tipoForm,
       dias_cambio: form2.dias_cambioForm,
       cambios: true,
+      user_name: this.user_name,
+      ip: this.ip
     };
 
     if (form2.tipoForm === 'Otro') {
@@ -269,7 +278,7 @@ export class EditarEmpresaComponent implements OnInit {
       this.dias_cambioF.setValue('');
       this.habilitarDias = true;
       this.toastr.info(
-        `Ingresar número de días previos a la fecha de expiración de la solicitud para realizar cambios 
+        `Ingresar número de días previos a la fecha de expiración de la solicitud para realizar cambios
         en el estado de la aprobación realizada.`, '', {
         timeOut: 6000,
       })
