@@ -52,7 +52,9 @@
                 </form>
 
                 <div style="text-align: center; padding-top: 15px;">
-                    <button id="btn-raised" class="btn btn-sm float-left">Visualizar</button>
+                    <button id="btn-raised" class="btn btn-sm float-left" (click)="VisualizarConfiguracion()">
+                        Visualizar
+                    </button>
                     <button id="btn-raised" class="btn btn-sm" (click)="RegistrarConfiguracion(formulario.value)"
                         [disabled]="registrar">
                         Guardar

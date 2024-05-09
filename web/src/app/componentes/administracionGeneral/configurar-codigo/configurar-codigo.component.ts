@@ -226,4 +226,8 @@ export class ConfigurarCodigoComponent implements OnInit {
     }
   }
 
+  VisualizarConfiguracion(){
+    
+  }
+
 }
