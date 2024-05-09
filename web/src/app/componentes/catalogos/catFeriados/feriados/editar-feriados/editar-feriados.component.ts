@@ -38,6 +38,10 @@ export class EditarFeriadosComponent implements OnInit {
   value = 10;
   mode: ProgressSpinnerMode = 'indeterminate';
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private rest: FeriadosService,
     private toastr: ToastrService,
@@ -45,6 +49,9 @@ export class EditarFeriadosComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ImprimirDatos();
     this.ObtenerFeriados();
   }
@@ -80,7 +87,9 @@ export class EditarFeriadosComponent implements OnInit {
       id: this.data.datosFeriado.id,
       fecha: form.fechaForm,
       descripcion: form.descripcionForm,
-      fec_recuperacion: form.fechaRecuperacionForm
+      fec_recuperacion: form.fechaRecuperacionForm,
+      user_name: this.user_name,
+      ip: this.ip
     };
     // VALIDAR INGRESO DE FECHAS
     if (feriado.fec_recuperacion === '' || feriado.fec_recuperacion === null) {

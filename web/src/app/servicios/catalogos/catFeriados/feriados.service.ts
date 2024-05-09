@@ -18,8 +18,12 @@ export class FeriadosService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarFeriado(id: number) {
-    return this.http.delete(`${environment.url}/feriados/delete/${id}`);
+  EliminarFeriado(id: number, datos: any) {
+    const url = `${environment.url}/feriados/delete/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA CREAR ARCHIVO XML

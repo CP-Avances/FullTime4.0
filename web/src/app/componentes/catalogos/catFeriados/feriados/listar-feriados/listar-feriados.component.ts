@@ -70,6 +70,10 @@ export class ListarFeriadosComponent implements OnInit {
 
   expansion: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
   get p_color(): string { return this.plantillaPDF.color_Primary }
@@ -89,6 +93,9 @@ export class ListarFeriadosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.BuscarParametro();
   }
@@ -171,7 +178,12 @@ export class ListarFeriadosComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_feriado: number) {
-    this.rest.EliminarFeriado(id_feriado).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.rest.EliminarFeriado(id_feriado, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -334,7 +346,9 @@ export class ListarFeriadosComponent implements OnInit {
     var data = {
       fecha: '',
       descripcion: '',
-      fec_recuperacion: ''
+      fec_recuperacion: '',
+      user_name: this.user_name,
+      ip: this.ip
     }
 
     if (this.listFeriadosCorrectos.length > 0) {

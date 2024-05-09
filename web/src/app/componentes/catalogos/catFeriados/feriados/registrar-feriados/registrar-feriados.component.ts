@@ -54,6 +54,10 @@ export class RegistrarFeriadosComponent implements OnInit {
   color: ThemePalette = 'primary';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private rest: FeriadosService,
     private restP: ProvinciaService,
@@ -64,6 +68,9 @@ export class RegistrarFeriadosComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerFeriados();
     this.ObtenerContinentes();
   }
@@ -77,14 +84,16 @@ export class RegistrarFeriadosComponent implements OnInit {
     })
   }
 
-  // METODO PARA GUARDAR DATOS 
+  // METODO PARA GUARDAR DATOS
   contador: number = 0;
   InsertarFeriado(form: any) {
     this.contador = 0;
     let feriado = {
       fecha: form.fechaForm,
       descripcion: form.descripcionForm,
-      fec_recuperacion: form.fechaRecuperacionForm
+      fec_recuperacion: form.fechaRecuperacionForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     // VERIFICAR INGRESO DE FECHAS
     if (feriado.fec_recuperacion === '' || feriado.fec_recuperacion === null) {
@@ -189,7 +198,7 @@ export class RegistrarFeriadosComponent implements OnInit {
   }
 
   /** ******************************************************************************************************* **
-   ** **                                         ASIGNAR CIUDADES                                          ** **                                                   
+   ** **                                         ASIGNAR CIUDADES                                          ** **
    ** ******************************************************************************************************* **/
 
   // DATOS CIUDAD-FERIADO
