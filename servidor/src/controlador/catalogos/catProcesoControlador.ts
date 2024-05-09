@@ -116,7 +116,6 @@ class ProcesoControlador {
   public async EliminarProceso(req: Request, res: Response): Promise<Response> {
     try {
       const id = req.params.id;
-      // TODO ANALIZAR COMOOBTNER USER_NAME E IP DESDE EL FRONT
       const { user_name, ip } = req.body;
 
       // INICIAR TRANSACCION
