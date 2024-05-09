@@ -200,7 +200,7 @@ export class CatTipoCargosComponent {
     });
   }
 
-  //Metodo para dar color a las celdas y representar las validaciones
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");

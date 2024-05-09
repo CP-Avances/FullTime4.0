@@ -14,7 +14,7 @@ class PeriodoVacacionControlador {
             SELECT pv.id, pv.id_empleado_contrato
             FROM mv_periodo_vacacion AS pv
             WHERE pv.id = (SELECT MAX(pv.id) AS id 
-                           FROM mv_periodo_vacacion AS pv, empleados AS e 
+                           FROM mv_periodo_vacacion AS pv, eu_empleados AS e 
                            WHERE pv.codigo = e.codigo AND e.id = $1 )
             `
             , [id_empleado]);

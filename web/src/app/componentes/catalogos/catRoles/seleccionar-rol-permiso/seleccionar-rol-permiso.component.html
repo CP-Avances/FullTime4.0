@@ -7,7 +7,7 @@
         <span class="w-100 bd-highlight">
             FUNCIONES QUE TIENE EL ROL {{nombreRol}}
         </span>
-        <button (click)="ConfirmarDelete()" class="btn btn-outline-light btn-sm"
+        <button *ngIf="id_rol != 1" (click)="ConfirmarDelete()" class="btn btn-outline-light btn-sm"
             style="float: right; margin-right: 10px;">
             Eliminar
         </button>
@@ -17,8 +17,8 @@
             <thead class="thead-light">
                 <tr style="text-align: left;">
                     <th>
-                        <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
-                            matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                        <mat-icon *ngIf="activar_seleccion === true && id_rol != 1" class="flex-shrink-1 bd-highlight"
+                            matSuffix matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
                             id="SelectCheck" (click)="HabilitarSeleccion()">
                             library_add_check
                         </mat-icon>
@@ -28,8 +28,8 @@
                             [aria-label]="checkboxLabelPag()">
                         </mat-checkbox>
                     </th>
-                    <th scope="col">Funciones</th>
-                    <th scope="col">Acciones</th>
+                    <th scope="col" style="text-align: center;">Funciones</th>
+                    <th scope="col" style="text-align: center;">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -63,7 +63,7 @@
     <br>
 </div>
 <br>
-<div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+<div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="id_rol != 1">
     <div id="titulo">
         <span>FUNCIONES DEL SISTEMA</span>
     </div>
@@ -87,7 +87,7 @@
                                             [(ngModel)]="isChecked" (change)="SeleccionarTodas(isChecked)"
                                             [ngModelOptions]="{standalone: true}">
                                         <label class="form-check-label" for="inlineCheckbox1"
-                                            style="margin-left: 10px; font-size: 14px; color: blue; font-weight: bold;">
+                                            style="margin-left: 10px; font-size: 12px; color: blue; font-weight: bold;">
                                             Todos los links
                                         </label>
                                         <div class="row" style="text-align: center; padding-top: 10px;">
@@ -98,7 +98,7 @@
                                                     name="paginasSeleccionadas" id="paginasSeleccionadas{{i}}"
                                                     (change)="SeleccionarIndividual($event, n)"
                                                     style="text-align: center; margin-left: 10px;">
-                                                <label style="margin-left: 30px; font-size: 14px;"
+                                                <label style="margin-left: 30px; font-size: 11px;"
                                                     class="form-check-label" for="inlineCheckbox1">
                                                     {{n.nombre}}
                                                     <!--Acciones de las paginas-->
@@ -115,7 +115,7 @@
                                                                     (change)="SeleccionarTodasAcciones($event, n.id)">
 
                                                                 <label class="form-check-label" for="inlineCheckbox1"
-                                                                    style="margin-left: 1px; font-size: 14px; color: green; font-weight: bold; padding-bottom: 10px;">
+                                                                    style="margin-left: 1px; font-size: 12px; color: green; font-weight: bold; padding-bottom: 10px;">
                                                                     Todos las acciones
                                                                 </label>
                                                                 <div class="col-md-6 col-lg-6 col-6"
@@ -125,7 +125,7 @@
                                                                         name="accionesSeleccionadasPorPagina"
                                                                         id="{{n.id}}accionesSeleccionadasPorPagina{{i}}"
                                                                         (change)="SeleccionarIndividualAccion($event, n.id, accion)">
-                                                                    <label style="margin-left: 10px; font-size: 14px;"
+                                                                    <label style="margin-left: 10px; font-size: 11px;"
                                                                         class="form-check-label" for="inlineCheckbox1">
                                                                         {{accion.accion}}
                                                                     </label>
@@ -152,7 +152,7 @@
         </mat-card-actions>
     </mat-card>
 </div>
-<div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+<div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="id_rol != 1">
     <div id="titulo">
         <span>MODULOS DEL SISTEMA</span>
     </div>
@@ -177,7 +177,7 @@
                                                 id="seleccionarmodulo{{modulo}}"
                                                 (change)="SeleccionarTodasModulos($event, modulo)">
                                             <label class="form-check-label" for="inlineCheckbox1"
-                                                style="margin-left: 10px; font-size: 14px; color: blue; font-weight: bold;">
+                                                style="margin-left: 10px; font-size: 12px; color: blue; font-weight: bold;">
                                                 Todos los links de {{modulo}}
                                             </label>
                                             <div class="col-md-6 col-lg-6 col-6"
@@ -188,7 +188,7 @@
                                                     id="paginasSeleccionadasModulos{{i}}{{modulo}}"
                                                     (change)="SeleccionarIndividualModulos($event, n,modulo )"
                                                     style="text-align: center; margin-left: 10px;">
-                                                <label style="margin-left: 30px; font-size: 14px;"
+                                                <label style="margin-left: 30px; font-size: 11px;"
                                                     class="form-check-label" for="inlineCheckbox1">
                                                     {{n.nombre}}
                                                     <!--Acciones de las paginas-->
@@ -204,7 +204,7 @@
                                                                     id="seleccionarAccion{{n.id}}"
                                                                     (change)="SeleccionarTodasAcciones($event, n.id)">
                                                                 <label class="form-check-label" for="inlineCheckbox1"
-                                                                    style="margin-left: 1px; font-size: 14px; color: green; font-weight: bold; padding-bottom: 10px;">
+                                                                    style="margin-left: 1px; font-size: 12px; color: green; font-weight: bold; padding-bottom: 10px;">
                                                                     Todos las acciones
                                                                 </label>
                                                                 <div class="col-md-6 col-lg-6 col-6"
@@ -214,7 +214,7 @@
                                                                         name="accionesSeleccionadasPorPagina"
                                                                         id="{{n.id}}accionesSeleccionadasPorPagina{{i}}"
                                                                         (change)="SeleccionarIndividualAccion($event, n.id, accion)">
-                                                                    <label style="margin-left: 10px; font-size: 14px;"
+                                                                    <label style="margin-left: 10px; font-size: 11px;"
                                                                         class="form-check-label" for="inlineCheckbox1">
                                                                         {{accion.accion}}
                                                                     </label>
