@@ -9,6 +9,7 @@ import excel from 'xlsx';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
+import FUNCIONES_LLAVES from '../../../controlador/llaves/rsa-keys.service';//Importacion de llaves
 
 class EmpleadoControlador {
 
@@ -1131,8 +1132,8 @@ class EmpleadoControlador {
       }
 
       // Encriptar contraseña
-      var md5 = new Md5();
-      var contrasena = md5.appendStr(data.contrasena).end()?.toString();
+      //var contrasena = md5.appendStr(data.contrasena).end()?.toString();
+      var contrasena = FUNCIONES_LLAVES.encriptarLogin(data.contrasena.toString());
 
       // Datos que se leen de la plantilla ingresada
       const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono,
@@ -1256,7 +1257,7 @@ class EmpleadoControlador {
       }
 
       contador = contador + 1;
-      contrasena = undefined
+      contrasena = 'undefined';//FIXME
     });
 
     setTimeout(() => {
@@ -1743,8 +1744,9 @@ class EmpleadoControlador {
       }
 
       // Encriptar contraseña
-      const md5 = new Md5();
-      const contrasena = md5.appendStr(data.contrasena).end();
+      //const md5 = new Md5();
+      //const contrasena = md5.appendStr(data.contrasena).end();
+      const contrasena = FUNCIONES_LLAVES.encriptarLogin(data.contrasena.toString());
 
       // Datos que se leen de la plantilla ingresada
       const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, longitud, latitud,
@@ -1852,5 +1854,4 @@ class EmpleadoControlador {
 }
 
 export const EMPLEADO_CONTROLADOR = new EmpleadoControlador();
-
 export default EMPLEADO_CONTROLADOR;

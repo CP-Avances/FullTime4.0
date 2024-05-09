@@ -16,12 +16,12 @@ exports.EMPLEADO_CONTROLADOR = void 0;
 // SECCION LIBRERIAS
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
-const ts_md5_1 = require("ts-md5");
 const moment_1 = __importDefault(require("moment"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const rsa_keys_service_1 = __importDefault(require("../../../controlador/llaves/rsa-keys.service")); //Importacion de llaves
 class EmpleadoControlador {
     /** ** ********************************************************************************************* **
      ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
@@ -989,7 +989,6 @@ class EmpleadoControlador {
             }
             var contador = 1;
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                var _a;
                 // Realiza un capital letter a los nombres y apellidos
                 var nombreE;
                 let nombres = data.nombre.split(' ');
@@ -1014,8 +1013,8 @@ class EmpleadoControlador {
                     apellidoE = lastname1;
                 }
                 // Encriptar contraseña
-                var md5 = new ts_md5_1.Md5();
-                var contrasena = (_a = md5.appendStr(data.contrasena).end()) === null || _a === void 0 ? void 0 : _a.toString();
+                //var contrasena = md5.appendStr(data.contrasena).end()?.toString();
+                var contrasena = rsa_keys_service_1.default.encriptarLogin(data.contrasena.toString());
                 // Datos que se leen de la plantilla ingresada
                 const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono, nacionalidad, usuario, rol } = data;
                 //Obtener id del estado_civil
@@ -1107,7 +1106,7 @@ class EmpleadoControlador {
                     }
                 }
                 contador = contador + 1;
-                contrasena = undefined;
+                contrasena = 'undefined'; //FIXME
             }));
             setTimeout(() => {
                 return res.jsonp({ message: 'correcto' });
@@ -1572,8 +1571,9 @@ class EmpleadoControlador {
                     apellidoE = lastname1;
                 }
                 // Encriptar contraseña
-                const md5 = new ts_md5_1.Md5();
-                const contrasena = md5.appendStr(data.contrasena).end();
+                //const md5 = new Md5();
+                //const contrasena = md5.appendStr(data.contrasena).end();
+                const contrasena = rsa_keys_service_1.default.encriptarLogin(data.contrasena.toString());
                 // Datos que se leen de la plantilla ingresada
                 const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, longitud, latitud, telefono, nacionalidad, usuario, rol } = data;
                 //Obtener id del estado_civil
