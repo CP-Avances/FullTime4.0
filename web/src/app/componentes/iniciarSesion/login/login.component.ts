@@ -273,6 +273,15 @@ export class LoginComponent implements OnInit {
           timeOut: 6000,
         });
         console.log('datos.rol ', datos.rol);
+        if (!!localStorage.getItem("redireccionar")) {
+          let redi = localStorage.getItem("redireccionar");
+          this.router.navigate([redi], { relativeTo: this.route, skipLocationChange: false });
+          localStorage.removeItem("redireccionar");
+        } else {
+          this.router.navigate(['/home'])
+        };
+        //REDIRECCIONAMIENTO A /home Y RECARGA TRAS LOGIN
+        /*
         if (datos.rol === 1) { // ADMIN
           console.log('ver redireccionar ', localStorage.getItem("redireccionar"));
           if (!!localStorage.getItem("redireccionar")) {
@@ -287,8 +296,10 @@ export class LoginComponent implements OnInit {
           this.router.navigate(['/home']);
           //this.router.navigate(['/estadisticas']);
         }
-        this.IngresoSistema(form.usuarioF, 'Exitoso', datos.ip_adress);
+        */
+        //this.IngresoSistema(form.usuarioF, 'Exitoso', datos.ip_adress);
 
+        /*
         //inicio recarga pagina al inicio, recarga valores iniciales por defecto
         const paginaRecargada = sessionStorage.getItem('paginaRecargada');
         if (!paginaRecargada) {
@@ -296,6 +307,7 @@ export class LoginComponent implements OnInit {
           location.reload();
         }
         //fin recarga pagina al inicio, recarga valores iniciales por defecto
+        */
       }
     }, err => {
       this.toastr.error(err.error.message)

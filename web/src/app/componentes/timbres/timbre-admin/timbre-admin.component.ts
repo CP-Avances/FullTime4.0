@@ -178,7 +178,7 @@ export class TimbreAdminComponent implements OnInit {
       var datos = JSON.parse(datosRecuperados);
       return datos.some(item => item.accion === 'Ver Timbres');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 }

@@ -252,7 +252,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     this.nameFile = '';
   }
 
-  //Metodo para dar color a las celdas y representar las validaciones
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
@@ -303,8 +303,6 @@ export class ListarNivelTitulosComponent implements OnInit {
     this.plan_multiple_ = false;
     this.selectionNiveles.clear();
     this.nivelesEliminar = [];
-
-
   }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -495,20 +493,20 @@ export class ListarNivelTitulosComponent implements OnInit {
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
-    // Abrir una nueva pestaña o ventana con el contenido XML
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
-      newTab.focus(); // Dar foco a la nueva pestaña
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
+    
 
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Niveles_titulos.xml';
-    // Simular un clic en el enlace para iniciar la descarga
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
     this.ObtenerNiveles();
   }
@@ -620,9 +618,9 @@ export class ListarNivelTitulosComponent implements OnInit {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.nivelesEliminar = this.selectionNiveles.selected;
-    //console.log('paginas para Eliminar',this.paginasEliminar);
+    
 
-    //console.log(this.selectionPaginas.selected)
+    
     return `${this.selectionNiveles.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
 
   }
@@ -650,16 +648,12 @@ export class ListarNivelTitulosComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
-
           this.activar_seleccion = true;
-
           this.plan_multiple = false;
           this.plan_multiple_ = false;
           this.nivelesEliminar = [];
           this.selectionNiveles.clear();
-
           this.ObtenerNiveles();
-
         } else {
           this.router.navigate(['/nivelTitulos']);
         }
@@ -679,8 +673,6 @@ export class ListarNivelTitulosComponent implements OnInit {
     this.nivelesEliminar.forEach((datos: any) => {
 
       this.nivelTitulos = this.nivelTitulos.filter(item => item.id !== datos.id);
-
-
       this.contador = this.contador + 1;
 
       this.nivel.EliminarNivel(datos.id).subscribe(res => {
@@ -690,11 +682,7 @@ export class ListarNivelTitulosComponent implements OnInit {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
-
-
         } else {
-
-          
           if (!this.ingresar) {
             this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
               timeOut: 6000,
@@ -718,16 +706,11 @@ export class ListarNivelTitulosComponent implements OnInit {
           if (this.nivelesEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
-
             this.plan_multiple = false;
             this.plan_multiple_ = false;
-
             this.nivelesEliminar = [];
             this.selectionNiveles.clear();
-
             this.ObtenerNiveles();
-
-
           } else {
             this.toastr.warning('No ha seleccionado NIVELES DE EDUCACIÓN.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -736,10 +719,6 @@ export class ListarNivelTitulosComponent implements OnInit {
         } else {
           this.router.navigate(['/nivelTitulos']);
         }
-
       });
-
   }
-
-
 }

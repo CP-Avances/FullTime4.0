@@ -10,67 +10,39 @@ export class RolPermisosService {
 
   constructor(
     private http: HttpClient
-  ) {
-  }
+  ) { }
 
-  // catalogo de ROL PERMISOS
-
-  /*
-  getRolPermisoRest() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos`);
-  }
-
-  getOneRolPermisoRest(id: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/${id}`);
-  }
-
-  postRolPermisoRest(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos`, data);
-  }
-*/
-  // permisos denegado
-
-  getPermisosUsuarioRolRest(id: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/denegado/${id}`);
-  }
-
-  postPermisoDenegadoRest(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/denegado`, data);
-  }
-
-  // ENLISTAR LINKS NUEVOS SERVICIOS
+  //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
   getMenu() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas`);
   }
 
-  // ENLISTAR LINKS
+  //METODO PARA ENLISTAR PAGINAS SEAN MODULOS
   getModulos() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/modulos`);
   }
 
-  //ENLISTAR PAGINAS MODULOS
+  //METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO
   getMenuModulos(datos) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginasmodulos`, datos);
   }
-
-
-  // METODO PARA BUSCAR LAS PAGINAS POR ID
-
+  
+  // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION
   BuscarIdPaginas(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/ide`, datos);
   }
 
+  // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL Y POR SU ACCION
   BuscarIdPaginasConAcciones(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/ideaccion`, datos);
   }
 
-
-
+  // METODO PARA ASIGNAR PERMISOS AL ROL
   crearPaginaRol(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/insertar`, data);
   }
 
-
+  //METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL
   BuscarPaginasRol(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/todaspaginasrol`, datos);
   }
@@ -79,18 +51,17 @@ export class RolPermisosService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/todaspaginasmenurol`, datos);
   }
 
-
   // ELIMINAR PAGINAS ROL
   EliminarPaginasRol(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/eliminar`, datos).pipe(catchError(datos));
   }
 
-  // ELIMINAR  ACCIONES DE PAGINAS ROL
+  // METODO PARA BUSCAR LAS ACCIONES POR CADA PAGINA
   BuscarAccionesPaginas(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/acciones`, datos);
   }
 
-  // ELIMINAR  ACCIONES DE PAGINAS ROL
+  // METODO PARA ENLISTAR ACCIONES SEGUN LA PAGINA 
   BuscarAccionesExistentesPaginas(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/accionesexistentes`, datos);
   }
@@ -99,5 +70,4 @@ export class RolPermisosService {
   ObtenerAcciones() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/acciones/todas`);
   }
-
 }

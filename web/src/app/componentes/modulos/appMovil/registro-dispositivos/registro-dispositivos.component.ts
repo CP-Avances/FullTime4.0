@@ -455,6 +455,24 @@ export class RegistroDispositivosComponent implements OnInit {
   }
 
   //Control Botones
-  //NO HAY BOTONES
+  getEliminarDispositivos(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Eliminar Dispositivos Móviles');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getDescargaReportesDispositivos(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Descargar Reportes Dispositivos Móviles');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
 
 }

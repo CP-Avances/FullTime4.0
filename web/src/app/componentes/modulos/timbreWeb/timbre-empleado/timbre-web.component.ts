@@ -187,9 +187,9 @@ export class TimbreWebComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.link === 'timbres-personal');
+      return datos.some(item => item.accion === 'Ver Timbres Personales');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 

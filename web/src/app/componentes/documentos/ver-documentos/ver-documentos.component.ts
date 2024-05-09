@@ -36,14 +36,14 @@ export class VerDocumentosComponent implements OnInit {
     this.router.navigate([nombre_carpeta], { relativeTo: this.route, skipLocationChange: false });
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getContratos(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Contratos');
+      return datos.some(item => item.accion === 'Ver Documentos Contratos');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
   
@@ -51,9 +51,9 @@ export class VerDocumentosComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Respaldos horarios');
+      return datos.some(item => item.accion === 'Ver Documentos Respaldos horarios');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -61,9 +61,9 @@ export class VerDocumentosComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Respaldos Permisos');
+      return datos.some(item => item.accion === 'Ver Documentos Respaldos Permisos');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -71,9 +71,9 @@ export class VerDocumentosComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Documentación');
+      return datos.some(item => item.accion === 'Gestionar Documentación');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 

@@ -125,7 +125,7 @@ export class EmpleadoService {
 
   // METODO PARA ELIMINAR REGISTRO
   EliminarEmpleados(id: any) {
-    return this.http.delete(`${environment.url}/empleado/eliminar/${id}`).pipe(catchError(id));
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/empleado/eliminar/${id}`).pipe(catchError(id));
   }
 
 
@@ -344,11 +344,11 @@ export class EmpleadoService {
 
 
   RevisarFormato(formData) {
-    return this.http.post<any>(`${environment.url}/contratoEmpleado/upload/revision`, formData);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/upload/revision`, formData);
   }
 
   subirArchivoExcelContrato(formData) {
-    return this.http.post<any>(`${environment.url}/contratoEmpleado/cargar_plantilla/`, formData);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/cargar_plantilla/`, formData);
   }
 
 

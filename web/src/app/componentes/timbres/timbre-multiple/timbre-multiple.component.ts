@@ -969,9 +969,9 @@ export class TimbreMultipleComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Registrar Timbres');
+      return datos.some(item => item.accion === 'Registrar Timbres Múltiples');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 

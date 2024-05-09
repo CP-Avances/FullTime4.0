@@ -9,7 +9,7 @@
             <span class="w-100 bd-highlight">
                 LISTA DISPOSITIVOS MÓVILES REGISTRADOS
             </span>
-            <button *ngIf="multiple" class="btn btn-outline-light btn-sm" matSuffix matTooltipPosition="right"
+            <button *ngIf="multiple && getEliminarDispositivos()" class="btn btn-outline-light btn-sm" matSuffix matTooltipPosition="right"
                 matTooltip="Elimina los dispositivos seleccionados." style="float: right; margin-right: 10px;"
                 (click)="AbrirVentanaEliminar(1)">
                 Eliminar Dispositivo
@@ -82,7 +82,7 @@
                         <td>{{d.modelo_dispositivo}}</td>
                         <td class="justify-content-center">
                             <div style="height: 100%;">
-                                <i (click)="AbrirVentanaEliminar(d)" *ngIf="individual" class="far fa-trash-alt"
+                                <i (click)="AbrirVentanaEliminar(d)" *ngIf="individual && getEliminarDispositivos()" class="far fa-trash-alt"
                                     id="t-eliminar" matSuffix matTooltipPosition="right"
                                     matTooltip="Eliminar registro de dispositivo.">
                                     <p>Eliminar</p>
@@ -97,7 +97,7 @@
             [pageSizeOptions]="pageSizeOptions" id="estilo" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
 
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;" *ngIf="getDescargaReportesDispositivos()">
             <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Dispositivos en formato PDF.">
                 <p>PDF</p>

@@ -105,11 +105,11 @@ export class EmplCargosService {
 
 
   RevisarFormato(formData) {
-    return this.http.post<any>(`${environment.url}/empleadoCargos/upload/revision`, formData);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/upload/revision`, formData);
   }
 
   subirArchivoExcelCargo(formData) {
-    return this.http.post<any>(`${environment.url}/empleadoCargos/cargar_plantilla/`, formData);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/cargar_plantilla/`, formData);
   }
 
 }

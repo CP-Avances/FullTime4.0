@@ -21,29 +21,23 @@
 </div>
 <div class="container" style="padding-bottom: 50px; text-align: center;">
     <div class="mat-elevation-z8" style="background: white;">
-
         <div class="d-flex bd-highlight" id="titulo">
-
-            
             <div class="w-100 bd-highlight">
                 <h5>
                     RESULTADO DE BÚSQUEDA
                 </h5>
             </div>
-            
-
             <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                
-                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                    (click)="ConfirmarDeleteMultiple()" *ngIf="getEliminarCiudad()">Eliminar </button>
+                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;" *ngIf="getEliminarCiudad()"
+                    (click)="ConfirmarDeleteMultiple()">
+                    Eliminar
+                </button>
             </div>
         </div>
-
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-
                         <th>
                             <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
                                 matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
@@ -55,9 +49,6 @@
                                 [indeterminate]="selectiondatosCiudades.hasValue() && !isAllSelectedPag()"
                                 [aria-label]="checkboxLabelPag()">
                             </mat-checkbox>
-
-
-
                         </th>
                         <th scope="col">Provincia-Departamento-Estado</th>
                         <th scope="col">Ciudad</th>
@@ -67,7 +58,6 @@
                 <tbody>
                     <tr>
                         <td></td>
-
                         <td>
                             <mat-form-field id="t-inputs">
                                 <input matInput placeholder="Buscar" (keypress)="IngresarSoloLetras($event)"
@@ -89,11 +79,11 @@
                     </tr>
                     <tr
                         *ngFor="let ciudad of datosCiudades | filtroProvincia: filtroProvincias | filtrosNombres: filtroCiudad | paginate:tamanio_pagina:numero_pagina">
-
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectiondatosCiudades.toggle(ciudad) : null"
-                                [checked]="selectiondatosCiudades.isSelected(ciudad)" [aria-label]="checkboxLabelPag(ciudad)">
+                                [checked]="selectiondatosCiudades.isSelected(ciudad)"
+                                [aria-label]="checkboxLabelPag(ciudad)">
                             </mat-checkbox>
                         </td>
                         <td>{{ciudad.provincia}}</td>
@@ -111,6 +101,7 @@
         <mat-paginator id="pagina" [length]="datosCiudades.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+<<<<<<< HEAD
 
         <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;" *ngIf="getDescargarReportes()">
             <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
@@ -132,6 +123,32 @@
         </div>
         <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
             <p> Reporte de ciudades. </p>
+=======
+        <!-- ***********************  DESCARGAR REPORTES  ****************************  -->
+        <div>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista de Ciudades en formato PDF.">
+                    <p>PDF</p>
+                </i>
+                <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Ciudades en formato EXCEL.">
+                    <p>XLSL</p>
+                </i>
+                <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Ciudades en formato CSV.">
+                    <p>CSV</p>
+                </i>
+                <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Ciudades en formato XML.">
+                    <p>XML</p>
+                </i>
+            </div>
+            <div class="d-flex justify-content-end"
+                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                <p> Reporte de ciudades. </p>
+            </div>
+>>>>>>> f43b42c077c222cfbc82c9754f5fb7508779defb
         </div>
     </div>
 </div>

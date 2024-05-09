@@ -183,24 +183,14 @@ export class BuscarTimbreComponent implements OnInit {
     this.mostrarTabla = true
   }
 
-  //Control Botones
-  getVerInformacionTimbre(){
-    const datosRecuperados = sessionStorage.getItem('paginaRol');
-    if (datosRecuperados) {
-      var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver información timbre');
-    }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
-    }
-  }
-
+  //CONTROL BOTONES
   getEditarTimbre(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar timbres');
+      return datos.some(item => item.accion === 'Editar Acción Timbre');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 

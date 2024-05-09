@@ -66,4 +66,14 @@ export class VerDipositivoComponent implements OnInit {
 
   }
 
+  getEditarDispositivo(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Editar Dispositivos');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
 }

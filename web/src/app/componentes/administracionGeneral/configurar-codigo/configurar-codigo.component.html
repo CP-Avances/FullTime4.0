@@ -44,16 +44,24 @@
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Indicar valor inicial para generar código del empleado.">
-                                    help_outline</mat-icon>
+                                    help_outline
+                                </mat-icon>
                             </mat-form-field>
                         </div>
                     </mat-card-content>
                 </form>
-                <mat-card-actions class="d-flex flex-wrap justify-content-center">
-                    <button id="btn-raised" class="btn btn-sm" (click)="RegistrarConfiguracion(formulario.value)"
-                        [disabled]="registrar" *ngIf="getConfigurar()">Guardar</button>
-                    <button id="btn-raised" class="btn btn-sm" [routerLink]="['/home']">Cancelar</button>
-                </mat-card-actions>
+
+                <div style="text-align: center; padding-top: 15px;">
+                    <button id="btn-raised" class="btn btn-sm float-left" (click)="VisualizarConfiguracion()">
+                        Visualizar
+                    </button>
+                    <button id="btn-raised" class="btn btn-sm" (click)="RegistrarConfiguracion(formulario.value)" *ngIf="getConfigurar()"
+                        [disabled]="registrar">
+                        Guardar
+                    </button>
+                    <button id="btn-raised" class="btn btn-sm float-right" [routerLink]="['/home']">Cancelar</button>
+                </div>
+
             </mat-card>
         </div>
     </div>

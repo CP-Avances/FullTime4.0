@@ -60,9 +60,9 @@ export class VerBirthdayComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar' && item.id_funcion === 45);
+      return datos.some(item => item.accion === 'Gestionar mensajes cumpleaños');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 

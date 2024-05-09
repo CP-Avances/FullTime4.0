@@ -851,7 +851,7 @@ export class ListaNotificacionComponent implements OnInit {
             var datos = JSON.parse(datosRecuperados);
             return datos.some(item => item.accion === 'Configurar Notificación');
         }else{
-            return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+            return !(parseInt(localStorage.getItem('rol') as string) !== 1);
         }
     }
 }

@@ -34,7 +34,7 @@ class BirthdayControlador {
 
         const oneMessage = await pool.query(
             `
-            SELECT id FROM message_birthday WHERE id_empresa = $1
+            SELECT id FROM e_message_birthday WHERE id_empresa = $1
             `
             , [id_empresa]);
 

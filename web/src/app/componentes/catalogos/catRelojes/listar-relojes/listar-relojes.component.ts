@@ -34,7 +34,6 @@ export class ListarRelojesComponent implements OnInit {
 
   dispositivosEliminar: any = [];
 
-
   // ALMACENAMIENTO DE DATOS Y BUSQUEDA
   filtroDepartamentoReloj = '';
   filtroSucursalReloj = '';
@@ -453,14 +452,14 @@ export class ListarRelojesComponent implements OnInit {
     });
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getCrearDispositivos(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
       return datos.some(item => item.accion === 'Crear Dispositivos');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -468,9 +467,9 @@ export class ListarRelojesComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Plantilla' && item.id_funcion === 39);
+      return datos.some(item => item.accion === 'Cargar Plantilla Dispositivos');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -478,9 +477,9 @@ export class ListarRelojesComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Dispositivos');
+      return datos.some(item => item.accion === 'Ver Información Dipositivo');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -490,7 +489,7 @@ export class ListarRelojesComponent implements OnInit {
       var datos = JSON.parse(datosRecuperados);
       return datos.some(item => item.accion === 'Editar Dispositivos');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -500,7 +499,7 @@ export class ListarRelojesComponent implements OnInit {
       var datos = JSON.parse(datosRecuperados);
       return datos.some(item => item.accion === 'Eliminar Dispositivos');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -508,9 +507,9 @@ export class ListarRelojesComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Reportes' && item.id_funcion === 39);
+      return datos.some(item => item.accion === 'Descargar Reportes Dispositivos');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -557,9 +556,9 @@ export class ListarRelojesComponent implements OnInit {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.dispositivosEliminar = this.selectionDispositivos.selected;
-    //console.log('paginas para Eliminar',this.paginasEliminar);
+    
 
-    //console.log(this.selectionPaginas.selected)
+    
     return `${this.selectionDispositivos.isSelected(row) ? 'deselect' : 'select'} row ${row.codigo + 1}`;
 
   }

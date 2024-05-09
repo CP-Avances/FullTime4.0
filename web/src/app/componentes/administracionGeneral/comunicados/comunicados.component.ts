@@ -917,7 +917,7 @@ export class ComunicadosComponent implements OnInit {
       var datos = JSON.parse(datosRecuperados);
       return datos.some(item => item.accion === 'Enviar Comunicado');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 

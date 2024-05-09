@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment'
+import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +17,8 @@ export class RolesService {
   }
 
   // ELIMINAR REGISTRO DE ROL
-  EliminarRoles(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/rol/eliminar/${id}`);
+  EliminarRoles(id: any) {
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/rol/eliminar/${id}`).pipe(catchError(id));
   }
 
   // METODO PARA CREAR ARCHIVO XML

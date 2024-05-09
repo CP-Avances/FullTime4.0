@@ -80,7 +80,7 @@ export class FeriadosService {
 
   Crear_feriados_ciudad(form){
     console.log('form: ',form);
-    return this.http.post<any>(environment.url + '/feriados/upload/crearFeriadoCiudad', form);
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/feriados/upload/crearFeriadoCiudad', form);
   }
 
 }

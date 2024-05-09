@@ -317,13 +317,6 @@ export class MainNavComponent implements OnInit {
   // METODO DE NAVEGACION SEGUN ROL DE ACCESO
   irHome() {
     this.router.navigate(['/home'], { relativeTo: this.route, skipLocationChange: false });
-    /*
-    if (this.inicio.getRol() === 1) {
-      this.router.navigate(['/home'], { relativeTo: this.route, skipLocationChange: false });
-    } else {
-      this.router.navigate(['/estadisticas'], { relativeTo: this.route, skipLocationChange: false });
-    }
-    */
   }
 
   // CONTROL DE FUNCIONES DEL SISTEMA
@@ -347,7 +340,7 @@ export class MainNavComponent implements OnInit {
   SeleccionMenu() {
     const name_emp = localStorage.getItem('name_empresa');
 
-    if (this.inicio.getRol() === 3) {
+    if (this.inicio.getRol() === 1) {
       this.superadmin = true;
     }
     else {
@@ -367,665 +360,6 @@ export class MainNavComponent implements OnInit {
   // METODO DE LLMANADO DE MENU
   MetodoSubSelectMenu(nombre: string) {
     this.dataSource.data = this.menuGeneralUsuarios as MenuNode[];
-    /*
-    if (this.inicio.getRolMenu() === true) {
-      //this.dataSource.data = this.MenuAdministracion(nombre) as MenuNode[];
-      this.dataSource.data = this.menuGeneralUsuarios as MenuNode[];
-    } else {
-      this.dataSource.data = this.menuGeneralUsuarios as MenuNode[];
-    }
-    */
-  }
-
-  // MENU PERFIL ADMINISTRADOR
-  MenuAdministracion(nombre: string) {
-    this.menuGeneralAdministrador = [
-      {
-        name: 'Configuración',
-        accion: true,
-        estado: true,
-        color: true,
-        subtitulo: false,
-        icono: 'settings',
-        children: [
-          {
-            name: 'Parametrización',
-            accion: true,
-            estado: true,
-            color: true,
-            subtitulo: true,
-            icono: 'widgets',
-            children: [
-              { name: nombre, url: '/vistaEmpresa', color: true, ver: true },
-              { name: 'Parámetros', url: '/parametros', color: true, ver: true },
-              { name: 'Correo', url: '/configurarCorreo', color: true, ver: true },
-              { name: 'Roles', url: '/roles', color: true, ver: true },
-              { name: 'Régimen Laboral', url: '/listarRegimen', color: true, ver: true },
-              { name: 'Modalida Laboral', url: '/modalidaLaboral', color: true, ver: true },
-              { name: 'Tipo Cargos', url: '/tipoCargos', color: true, ver: true }
-            ]
-          },
-          {
-            name: 'Localización',
-            accion: true,
-            estado: true,
-            color: true,
-            subtitulo: true,
-            icono: 'location_on',
-            children: [
-              { name: 'Provincia', url: '/provincia', color: true, ver: true },
-              { name: 'Ciudad', url: '/listarCiudades', color: true, ver: true },
-              { name: 'Establecimiento', url: '/sucursales', color: true, ver: true },
-              { name: 'Departamento', url: '/departamento', color: true, ver: true },
-            ]
-          },
-        ]
-      },
-      {
-        name: 'Usuarios',
-        accion: true,
-        estado: true,
-        color: true,
-        subtitulo: false,
-        icono: 'account_circle',
-        children: [
-          { name: 'Configurar Código', url: '/codigo', color: true, ver: true },
-          { name: 'Nivel de Educación', url: '/nivelTitulos', color: true, ver: true },
-          { name: 'Título Profesional', url: '/titulos', color: true, ver: true },
-          { name: 'Empleados', url: '/empleado', color: true, ver: true },
-          { name: 'Cargar Plantillas', url: '/cargarPlantilla', color: true, ver: true },
-          { name: 'Asignar Establecimientos', url: '/administrarSucursales', color: true, ver: this.superadmin },
-        ]
-      },
-      {
-        name: 'Horarios',
-        accion: true,
-        estado: true,
-        color: true,
-        subtitulo: false,
-        icono: 'assignment',
-        children: [
-          { name: 'Feriados', url: '/listarFeriados', color: true, ver: true },
-          { name: 'Horarios', url: '/horario', color: true, ver: true },
-          { name: 'Planificar Horarios', url: '/horariosMultiples', color: true, ver: true },
-          { name: 'Actualizar Asistencia', url: '/asistencia', color: true, ver: true },
-        ]
-      },
-      {
-        name: 'Módulos',
-        accion: true,
-        estado: true,
-        color: true,
-        subtitulo: false,
-        icono: 'games',
-        children: [
-          {
-            name: 'Permisos',
-            accion: this.HabilitarPermisos,
-            estado: this.HabilitarPermisos,
-            color: true,
-            subtitulo: true,
-            icono: 'insert_emoticon',
-            children: [
-              { name: 'Configurar Permisos', url: '/verTipoPermiso', color: true, ver: true },
-              { name: 'Permisos Múltiples', url: '/permisosMultiples', color: true, ver: true },
-              { name: 'Aprobación Múltiple P.', url: '/permisos-solicitados', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Permisos.',
-            accion: !this.HabilitarPermisos,
-            estado: !this.HabilitarPermisos,
-            color: false,
-            activo: this.HabilitarPermisos,
-            icono: 'insert_emoticon',
-            url: '/verTipoPermiso'
-          },
-          {
-            name: 'Vacaciones',
-            accion: this.HabilitarVacaciones,
-            estado: this.HabilitarVacaciones,
-            icono: 'flight',
-            subtitulo: true,
-            color: true,
-            children: [
-              { name: 'Aprobación Múltiple V.', url: '/vacaciones-solicitados', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Vacaciones.',
-            accion: !this.HabilitarVacaciones,
-            estado: !this.HabilitarVacaciones,
-            activo: this.HabilitarVacaciones,
-            icono: 'flight',
-            color: false,
-            url: '/vacaciones-solicitados'
-          },
-          {
-            name: 'Horas Extras',
-            accion: this.HabilitarHoraExtra,
-            estado: this.HabilitarHoraExtra,
-            color: true,
-            subtitulo: true,
-            icono: 'schedule',
-            children: [
-              { name: 'Configurar HoraExtra', url: '/listaHorasExtras', color: true, ver: true },
-              { name: 'Planificar Hora Extra', url: '/planificaHoraExtra', color: true, ver: true },
-              { name: 'Listar Planificación', url: '/listadoPlanificaciones', color: true, ver: true },
-              { name: 'Aprobación Múltiple HE.', url: '/horas-extras-solicitadas', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Horas Extras.',
-            accion: !this.HabilitarHoraExtra,
-            estado: !this.HabilitarHoraExtra,
-            activo: this.HabilitarHoraExtra,
-            icono: 'schedule',
-            color: false,
-            url: '/listaHorasExtras'
-          },
-          {
-            name: 'Alimentación',
-            accion: this.HabilitarAlimentacion,
-            estado: this.HabilitarAlimentacion,
-            subtitulo: true,
-            icono: 'local_dining',
-            color: true,
-            children: [
-              { name: 'Configurar comidas', url: '/listarTipoComidas', color: true, ver: true },
-              { name: 'Planificar Servicio', url: '/alimentacion', color: true, ver: true },
-              { name: 'Listar Planificación', url: '/listaPlanComida', color: true, ver: true },
-              { name: 'Aprobación Múltiple A.', url: '/listaSolicitaComida', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Alimentación.',
-            accion: !this.HabilitarAlimentacion,
-            estado: !this.HabilitarAlimentacion,
-            activo: this.HabilitarAlimentacion,
-            icono: 'local_dining',
-            color: false,
-            url: '/listarTipoComidas'
-          },
-          {
-            name: 'Acción Personal',
-            accion: this.HabilitarAccion,
-            estado: this.HabilitarAccion,
-            icono: 'how_to_reg',
-            color: true,
-            subtitulo: true,
-            children: [
-              { name: 'Procesos', url: '/proceso', color: true, ver: true },
-              { name: 'Tipo Acción Personal', url: '/acciones-personal', color: true, ver: true },
-              { name: 'Pedido Acción Personal', url: '/pedidoAccion', color: true, ver: true },
-              { name: 'Listar Pedidos', url: '/listaPedidos', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Acción Personal.',
-            accion: !this.HabilitarAccion,
-            estado: !this.HabilitarAccion,
-            activo: this.HabilitarAccion,
-            icono: 'how_to_reg',
-            color: false,
-            url: '/proceso'
-          },
-          {
-            name: 'Geolocalización',
-            accion: this.HabilitarGeolocalizacion,
-            estado: this.HabilitarGeolocalizacion,
-            icono: 'my_location',
-            subtitulo: true,
-            color: true,
-            children: [
-              { name: 'Registrar Geolocalización', url: '/coordenadas', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Geolocalización.',
-            accion: !this.HabilitarGeolocalizacion,
-            estado: !this.HabilitarGeolocalizacion,
-            activo: this.HabilitarGeolocalizacion,
-            icono: 'my_location',
-            color: false,
-            url: '/coordenadas'
-          },
-          {
-            name: 'Timbre Virtual',
-            accion: this.HabilitarTimbreWeb,
-            estado: this.HabilitarTimbreWeb,
-            icono: 'computer',
-            color: true,
-            subtitulo: true,
-            children: [
-              { name: 'Configurar Timbre Virtual', url: '/timbresWeb', color: true, ver: true },
-              { name: 'Timbrar', url: '/timbres-personal', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Timbre Virtual.',
-            accion: !this.HabilitarTimbreWeb,
-            estado: !this.HabilitarTimbreWeb,
-            activo: this.HabilitarTimbreWeb,
-            icono: 'computer',
-            color: false,
-            url: '/timbresWeb'
-          },
-          {
-            name: 'Aplicación Móvil',
-            accion: this.HabilitarMovil,
-            estado: this.HabilitarMovil,
-            icono: 'phone_android',
-            color: true,
-            subtitulo: true,
-            children: [
-              { name: 'Reloj Virtual', url: '/app-movil', color: true, ver: true },
-              { name: 'Registro Dispositivos', url: '/registro-dispositivos', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'Aplicación Móvil.',
-            accion: !this.HabilitarMovil,
-            estado: !this.HabilitarMovil,
-            activo: this.HabilitarMovil,
-            icono: 'phone_android',
-            color: false,
-            url: '/app-movil'
-          },
-        ]
-      },
-      {
-        name: 'Timbres',
-        accion: true,
-        estado: true,
-        icono: 'fingerprint',
-        color: true,
-        subtitulo: false,
-        children: [
-          { name: 'Dispositivos', url: '/listarRelojes', color: true, ver: true },
-          { name: 'Administrar Timbres', url: '/timbres-admin', color: true, ver: true },
-          { name: 'Registrar Timbres', url: '/timbres-multiples', color: true, ver: true },
-          { name: 'Actualizar Timbres', url: '/buscar-timbre', color: true, ver: true },
-        ]
-      },
-      {
-        name: 'Notificaciones',
-        accion: true,
-        estado: true,
-        subtitulo: false,
-        icono: 'notifications',
-        color: true,
-        children: [
-          { name: 'Configurar Notificaciones', url: '/configurarNotificaciones', color: true, ver: true },
-          { name: 'Documentos', url: '/archivos', color: true, ver: true },
-          { name: 'Cumpleaños', url: '/cumpleanios', color: true, ver: true },
-          { name: 'Comunicados', url: '/comunicados', color: true, ver: true },
-        ]
-      },
-      {
-        name: 'Reportes',
-        accion: true,
-        estado: true,
-        subtitulo: false,
-        icono: 'description',
-        color: true,
-        children: [
-          {
-            name: 'R. Generales',
-            accion: true,
-            estado: true,
-            subtitulo: true,
-            icono: 'group',
-            color: true,
-            children: [
-              { name: 'Usuarios', url: '/reporteEmpleados', color: true, ver: true },
-              { name: 'Registro Vacunación', url: '/lista-vacunados', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'R. Asistencia',
-            accion: true,
-            estado: true,
-            subtitulo: true,
-            icono: 'check_circle_outline',
-            color: true,
-            children: [
-              { name: 'Faltas', url: '/reporte-faltas', color: true, ver: true },
-              { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true, ver: true },
-              { name: 'Tiempo Laborado', url: '/reporte-horas-trabajadas', color: true, ver: true },
-              { name: 'Tiempo Alimentación', url: '/tiempo-alimentacion', color: true, ver: true },
-              { name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true, ver: true },
-              { name: 'Resumen Asistencia', url: '/reporte-resumen-asistencia', color: true, ver: true },
-              { name: 'Planificación Horaria', url: '/reporte-planificacion-horaria', color: true, ver: true }
-            ]
-          },
-          {
-            name: 'R. Timbres',
-            accion: true,
-            estado: true,
-            subtitulo: true,
-            icono: 'touch_app',
-            color: true,
-            children: [
-              { name: 'Timbres', url: '/reporte-timbres-multiples', color: true, ver: true },
-              { name: 'Timbres MRL', url: '/reporte-timbre-mrl', color: true, ver: true },
-              { name: 'Timbres Libres', url: '/reporte-timbre-abierto', color: true, ver: true },
-              { name: 'Timbres Incompletos', url: '/reporte-timbre-incompleto', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'R. Permisos',
-            accion: this.HabilitarPermisos,
-            estado: this.HabilitarPermisos,
-            icono: 'insert_emoticon',
-            color: true,
-            subtitulo: true,
-            children: [
-              { name: 'Permisos', url: '/reportePermisos', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'R. Permisos.',
-            accion: !this.HabilitarPermisos,
-            estado: !this.HabilitarPermisos,
-            color: false,
-            activo: this.HabilitarPermisos,
-            icono: 'insert_emoticon',
-            url: '/home'
-          },
-          {
-            name: 'R. Vacaciones',
-            accion: this.HabilitarVacaciones,
-            estado: this.HabilitarVacaciones,
-            icono: 'flight',
-            color: true,
-            subtitulo: true,
-            children: [
-              { name: 'Kardex', url: '/reporteKardex', color: true, ver: true },
-              { name: 'Vacaciones Solicitadas', url: '/solicitud-vacacion', color: this.HabilitarVacaciones, ver: true },
-            ]
-          },
-          {
-            name: 'R. Vacaciones.',
-            accion: !this.HabilitarVacaciones,
-            estado: !this.HabilitarVacaciones,
-            color: false,
-            activo: this.HabilitarVacaciones,
-            icono: 'flight',
-            url: '/home'
-          },
-          {
-            name: 'R. Horas Extras',
-            accion: this.HabilitarHoraExtra,
-            estado: this.HabilitarHoraExtra,
-            icono: 'schedule',
-            color: true,
-            subtitulo: true,
-            children: [
-              { name: 'Solicitudes Horas Extras', url: '/horas/extras', color: true, ver: true },
-              { name: 'Horas Extras Autorizaciones', url: '/reporteHorasExtras', color: true, ver: true },
-              { name: 'Horas Extras', url: '/macro/hora-extra', color: true, ver: true },
-              { name: 'Jornada vs Horas extras', url: '/macro/jornada-vs-hora-extra', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'R. Horas Extras.',
-            accion: !this.HabilitarHoraExtra,
-            estado: !this.HabilitarHoraExtra,
-            color: false,
-            activo: this.HabilitarHoraExtra,
-            icono: 'schedule',
-            url: '/home'
-          },
-          {
-            name: 'R. Aplicación Móvil',
-            accion: this.HabilitarMovil,
-            estado: this.HabilitarMovil,
-            icono: 'phone_android',
-            subtitulo: true,
-            color: true,
-            children: [
-              { name: 'Timbre Reloj Virtual', url: '/reporte-timbre-reloj-virtual', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'R. Aplicación Móvil.',
-            accion: !this.HabilitarMovil,
-            estado: !this.HabilitarMovil,
-            color: false,
-            activo: this.HabilitarMovil,
-            icono: 'schedule',
-            url: '/home'
-          },
-          {
-            name: 'R. Timbre Virtual',
-            accion: this.HabilitarTimbreWeb,
-            estado: this.HabilitarTimbreWeb,
-            icono: 'computer',
-            subtitulo: true,
-            color: true,
-            children: [
-              { name: 'Timbre Virtual', url: '/reporte-timbre-sistema', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'R. Timbre Virtual.',
-            accion: !this.HabilitarTimbreWeb,
-            estado: !this.HabilitarTimbreWeb,
-            color: false,
-            activo: this.HabilitarTimbreWeb,
-            icono: 'computer',
-            url: '/home'
-          },
-          {
-            name: 'R. Alimentación',
-            accion: this.HabilitarAlimentacion,
-            estado: true,
-            icono: 'restaurant',
-            subtitulo: true,
-            color: true,
-            children: [
-              { name: 'Tickets Consumidos', url: '/alimentosGeneral', color: true, ver: true },
-              { name: 'Detalle Tickets Consumidos', url: '/alimentosDetallado', color: true, ver: true },
-              { name: 'Servicios Invitados', url: '/alimentosInvitados', color: true, ver: true },
-            ]
-          },
-          {
-            name: 'R. Alimentación.',
-            accion: !this.HabilitarAlimentacion,
-            estado: !this.HabilitarAlimentacion,
-            color: false,
-            activo: this.HabilitarAlimentacion,
-            icono: 'restaurant',
-            url: '/home'
-          },
-          {
-            name: 'R. Análisis Datos',
-            accion: this.HabilitarAlimentacion,
-            estado: true,
-            icono: 'dashboard',
-            subtitulo: true,
-            color: true,
-            children: [
-              { name: 'Análisis Datos', url: '/analisisDatos', color: true, ver: true },
-            ]
-          }
-        ]
-      },
-    ];
-
-    //Complemento de elementos
-    //Modulos-Permisos              
-    if (!this.HabilitarPermisos) {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Permisos');
-      }
-    } else {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Permisos.');
-      }
-    }
-    //Modulos-Vacaciones
-    if (!this.HabilitarVacaciones) {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Vacaciones');
-      }
-    } else {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Vacaciones.');
-      }
-    }
-    //Modulos-HorasExtras
-    if (!this.HabilitarHoraExtra) {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Horas Extras');
-      }
-    } else {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Horas Extras.');
-      }
-    }
-    //Modulos-Alimentacion
-    if (!this.HabilitarAlimentacion) {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Alimentación');
-      }
-    } else {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Alimentación.');
-      }
-    }
-    //Modulos-AccionPersonal
-    if (!this.HabilitarAccion) {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Acción Personal');
-      }
-    } else {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Acción Personal.');
-      }
-    }
-    //Modulos-Geolocalizacion
-    if (!this.HabilitarGeolocalizacion) {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Geolocalización');
-      }
-    } else {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Geolocalización.');
-      }
-    }
-    //Modulos-TimbreVirtual
-    if (!this.HabilitarTimbreWeb) {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Timbre Virtual');
-      }
-    } else {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Timbre Virtual.');
-      }
-    }
-    //Modulos-AplicacionMovil
-    if (!this.HabilitarMovil) {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Aplicación Móvil');
-      }
-    } else {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'Aplicación Móvil.');
-      }
-    }
-    //Reportes-Permisos
-    if (!this.HabilitarPermisos) {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'R. Permisos');
-      }
-    } else {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'R. Permisos.');
-      }
-    }
-    //Reportes-Vacaciones
-    if (!this.HabilitarVacaciones) {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'R. Vacaciones');
-      }
-    } else {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'R. Vacaciones.');
-      }
-    }
-    //Reportes-HorasExtras
-    if (!this.HabilitarHoraExtra) {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'R. Horas Extras');
-      }
-    } else {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'R. Horas Extras.');
-      }
-    }
-    //Reportes-Aplicación Móvil
-    if (!this.HabilitarMovil) {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'R. Aplicación Móvil');
-      }
-    } else {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'R. Aplicación Móvil.');
-      }
-    }
-    //Reportes-Timbre Virtual
-    if (!this.HabilitarTimbreWeb) {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'R. Timbre Virtual');
-      }
-    } else {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'R. Timbre Virtual.');
-      }
-    }
-    //Reportes-Alimentación
-    if (!this.HabilitarAlimentacion) {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'R. Alimentación');
-      }
-    } else {
-      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
-      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
-        this.filterMenuChildrenAdministrador(configurationItem, 'R. Alimentación.');
-      }
-    }
-    //Fin Complemento de elementos
-
-    return this.menuGeneralAdministrador;
   }
 
   MenuGeneral(){
@@ -2383,7 +1717,7 @@ export class MainNavComponent implements OnInit {
                       accion: !this.subItemReportesGenerales,
                       estado: !this.subItemReportesGenerales,
                       color: false,
-                      activo: this.subItemReportesGenerales,
+                      activo: false,
                       icono: 'group',
                       url: '/home'
                     },
@@ -2401,7 +1735,7 @@ export class MainNavComponent implements OnInit {
                       accion: !this.subItemReportesAsistencia,
                       estado: !this.subItemReportesAsistencia,
                       color: false,
-                      activo: this.subItemReportesAsistencia,
+                      activo: false,
                       icono: 'check_circle_outline',
                       url: '/home'
                     },
@@ -2419,7 +1753,7 @@ export class MainNavComponent implements OnInit {
                       accion: !this.subItemReportesTimbres,
                       estado: !this.subItemReportesTimbres,
                       color: false,
-                      activo: this.subItemReportesTimbres,
+                      activo: false,
                       icono: 'touch_app',
                       url: '/home'
                     },
@@ -2434,10 +1768,10 @@ export class MainNavComponent implements OnInit {
                     },
                     {
                       name: 'R. Permisos.',
-                      accion: !this.HabilitarPermisos || !this.subItemReportesTimbres,
-                      estado: !this.HabilitarPermisos || !this.subItemReportesTimbres,
+                      accion: !this.HabilitarPermisos || !this.subItemReportesPermisos,
+                      estado: !this.HabilitarPermisos || !this.subItemReportesPermisos,
                       color: false,
-                      activo: !this.subItemReportesTimbres && this.HabilitarPermisos ? this.subItemReportesPermisos : this.HabilitarPermisos,
+                      activo: false,
                       icono: 'insert_emoticon',
                       url: '/home'
                     },
@@ -2455,7 +1789,7 @@ export class MainNavComponent implements OnInit {
                       accion: !this.HabilitarVacaciones || !this.subItemReportesVacaciones,
                       estado: !this.HabilitarVacaciones || !this.subItemReportesVacaciones,
                       color: false,
-                      activo: !this.subItemReportesVacaciones && this.HabilitarVacaciones ? this.subItemReportesVacaciones : this.HabilitarVacaciones,
+                      activo: false,
                       icono: 'flight',
                       url: '/home'
                     },
@@ -2473,7 +1807,7 @@ export class MainNavComponent implements OnInit {
                       accion: !this.HabilitarHoraExtra || !this.subItemReportesHorasExtras,
                       estado: !this.HabilitarHoraExtra || !this.subItemReportesHorasExtras,
                       color: false,
-                      activo: !this.subItemReportesHorasExtras && this.HabilitarHoraExtra ? this.subItemReportesHorasExtras : this.HabilitarHoraExtra,
+                      activo: false,
                       icono: 'schedule',
                       url: '/home'
                     },
@@ -2491,7 +1825,7 @@ export class MainNavComponent implements OnInit {
                       accion: !this.HabilitarMovil || !this.subItemReportesAplicacionMovil,
                       estado: !this.HabilitarMovil || !this.subItemReportesAplicacionMovil,
                       color: false,
-                      activo: !this.subItemReportesAplicacionMovil && this.HabilitarMovil ? this.subItemReportesAplicacionMovil : this.HabilitarMovil,
+                      activo: false,
                       icono: 'phone_android',
                       url: '/home'
                     },
@@ -2509,7 +1843,7 @@ export class MainNavComponent implements OnInit {
                       accion: !this.HabilitarTimbreWeb || !this.subItemReportesTimbreVirtual,
                       estado: !this.HabilitarTimbreWeb || !this.subItemReportesTimbreVirtual,
                       color: false,
-                      activo: !this.subItemReportesTimbreVirtual && this.HabilitarTimbreWeb ? this.subItemReportesTimbreVirtual : this.HabilitarTimbreWeb,
+                      activo: false,
                       icono: 'computer',
                       url: '/home'
                     },
@@ -2527,13 +1861,13 @@ export class MainNavComponent implements OnInit {
                       accion: !this.HabilitarAlimentacion || !this.subItemReportesAlimentacion,
                       estado: !this.HabilitarAlimentacion || !this.subItemReportesAlimentacion,
                       color: false,
-                      activo: !this.subItemReportesAlimentacion && this.HabilitarAlimentacion ? this.subItemReportesAlimentacion : this.HabilitarAlimentacion,
+                      activo: false,
                       icono: 'restaurant',
                       url: '/home'
                     },
                     {
                       name: 'R. Análisis Datos',
-                      accion: this.HabilitarAlimentacion,
+                      accion: this.subItemReportesAnalisisDatos,
                       estado: true,
                       icono: 'dashboard',
                       subtitulo: true,
@@ -2542,10 +1876,10 @@ export class MainNavComponent implements OnInit {
                     },
                     {
                       name: 'R. Análisis Datos.',
-                      accion: !this.HabilitarAlimentacion || !this.subItemReportesAnalisisDatos,
-                      estado: !this.HabilitarAlimentacion || !this.subItemReportesAnalisisDatos,
+                      accion: !this.subItemReportesAnalisisDatos,
+                      estado: !this.subItemReportesAnalisisDatos,
                       color: false,
-                      activo: !this.subItemReportesAnalisisDatos && this.HabilitarAlimentacion ? this.subItemReportesAnalisisDatos : this.HabilitarAlimentacion,
+                      activo: false,
                       icono: 'dashboard',
                       url: '/home'
                     }

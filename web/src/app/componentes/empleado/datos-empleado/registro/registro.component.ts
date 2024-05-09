@@ -8,12 +8,12 @@ import { ToastrService } from 'ngx-toastr'
 import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { Md5 } from 'ts-md5/dist/md5';
 
 // SECCIÓN DE SERVICIOS
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service';
+import { RsaKeysService } from 'src/app/servicios/llaves/rsa-keys.service';//Importacion de llaves
 
 @Component({
   selector: 'app-registro',
@@ -51,6 +51,7 @@ export class RegistroComponent implements OnInit {
     private rol: RolesService,
     private rest: EmpleadoService,
     private user: UsuarioService,
+    private rsaKeysService: RsaKeysService,
     private toastr: ToastrService,
     private router: Router,
     private _formBuilder: FormBuilder,
@@ -219,8 +220,7 @@ export class RegistroComponent implements OnInit {
   contador: number = 0;
   GuardarDatosUsuario(form3: any, id: any, form1: any) {
     // CIFRADO DE CONTRASEÑA
-    const md5 = new Md5();
-    let clave = md5.appendStr(form3.passForm).end();
+    let clave = this.rsaKeysService.encriptarLogin(form3.passForm.toString());
     let dataUser = {
       id_empleado: id,
       contrasena: clave,
