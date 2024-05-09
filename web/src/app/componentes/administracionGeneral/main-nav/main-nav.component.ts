@@ -89,6 +89,7 @@ export class MainNavComponent implements OnInit {
   vistaTitulos: boolean = false;
   vistaEmpleados: boolean = false;
   vistaAdministrarSucursales: boolean = false;
+  vistaCargarPlantillas: boolean = false;
 
   itemHorarios: boolean = false;
   childrenHorarios: any = [];
@@ -315,11 +316,14 @@ export class MainNavComponent implements OnInit {
 
   // METODO DE NAVEGACION SEGUN ROL DE ACCESO
   irHome() {
+    this.router.navigate(['/home'], { relativeTo: this.route, skipLocationChange: false });
+    /*
     if (this.inicio.getRol() === 1) {
       this.router.navigate(['/home'], { relativeTo: this.route, skipLocationChange: false });
     } else {
       this.router.navigate(['/estadisticas'], { relativeTo: this.route, skipLocationChange: false });
     }
+    */
   }
 
   // CONTROL DE FUNCIONES DEL SISTEMA
@@ -1418,6 +1422,17 @@ export class MainNavComponent implements OnInit {
                       }
                       if(!this.vistaAdministrarSucursales){
                         this.childrenUsuarios.push({name: 'Asignar Establecimientos', url: '/administrarSucursales', color: true, ver: true}); 
+                      }
+                      break;
+                    case 'cargarPlantilla':
+                      this.itemUsuarios = true;
+                      for (const parametrizacion of this.childrenUsuarios) {
+                        if(parametrizacion.url === '/cargarPlantilla'){
+                          this.vistaCargarPlantillas = true;
+                        }
+                      }
+                      if(!this.vistaCargarPlantillas){
+                        this.childrenUsuarios.push({name: 'Cargar Plantillas', url: '/cargarPlantilla', color: true, ver: true}); 
                       }
                       break;
                     case 'listarFeriados':

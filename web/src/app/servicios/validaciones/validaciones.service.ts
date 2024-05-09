@@ -54,7 +54,8 @@ export class ValidacionesService {
             window.open(`https://${url}`, "_blank");
           }
         });
-      this.router.navigate(['/estadisticas']);
+        this.router.navigate(['/home']);
+      //this.router.navigate(['/estadisticas']);
     }
   }
 

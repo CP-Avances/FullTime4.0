@@ -337,14 +337,14 @@ export class ListarCoordenadasComponent implements OnInit {
     });
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getRegistrarPerimetro(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Registrar Perímetro');
+      return datos.some(item => item.accion === 'Registrar Ubicación');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -352,9 +352,9 @@ export class ListarCoordenadasComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver' && item.id_funcion === 34);
+      return datos.some(item => item.accion === 'Ver Ubicación');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -362,9 +362,9 @@ export class ListarCoordenadasComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar' && item.id_funcion === 34);
+      return datos.some(item => item.accion === 'Editar Ubicación');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -372,9 +372,9 @@ export class ListarCoordenadasComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Eliminar' && item.id_funcion === 34);
+      return datos.some(item => item.accion === 'Eliminar Ubicación');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -382,9 +382,9 @@ export class ListarCoordenadasComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Reportes' && item.id_funcion === 34);
+      return datos.some(item => item.accion === 'Descargar Reportes Ubicación');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 

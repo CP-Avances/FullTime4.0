@@ -7,7 +7,7 @@
             </button>
             <span>DATOS GENERALES</span>
             <button id="btn-raised" class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                (click)="AbrirVentanaEditar(c)">
+                (click)="AbrirVentanaEditar(c)" *ngIf="getEditarUbicacion()">
                 Editar
             </button>
         </div>
@@ -453,7 +453,7 @@
                             USUARIOS ASIGNADOS EN {{c.descripcion.toUpperCase()}}
                         </span>
                         <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="AbrirVentanaBusqueda()" value="Asignar a usuario">
+                            (click)="AbrirVentanaBusqueda()" value="Asignar a usuario" *ngIf="getVerAsignarUsuario()">
                             Asignar usuarios
                         </button>
                     </div>
@@ -488,7 +488,7 @@
                                     <td>{{dp.nombre}}</td>
                                     <td>{{dp.apellido}}</td>
                                     <td>
-                                        <i *ngIf="auto_individual" matSuffix matTooltipPosition="right"
+                                        <i *ngIf="auto_individual && getVerEliminarAsignacionUsuario()" matSuffix matTooltipPosition="right"
                                             matTooltip="Eliminar registro." class="far fa-trash-alt"
                                             (click)="ConfirmarDelete(dp)" id="t-eliminar">
                                             <p>Eliminar</p>

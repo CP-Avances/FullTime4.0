@@ -284,7 +284,8 @@ export class LoginComponent implements OnInit {
           };
         }else{
           // EMPLEADO
-          this.router.navigate(['/estadisticas']);
+          this.router.navigate(['/home']);
+          //this.router.navigate(['/estadisticas']);
         }
         this.IngresoSistema(form.usuarioF, 'Exitoso', datos.ip_adress);
 

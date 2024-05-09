@@ -82,23 +82,34 @@ export class PrincipalSucursalUsuarioComponent implements OnInit {
     this.ver_departamentos = true;
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getVerSucursales(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Ver Sucursales');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Ver Asignación Establecimiento');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getAsignar(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Asignar Establecimiento');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getEliminarAsignacion(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Eliminar Asignación Establecimiento');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 

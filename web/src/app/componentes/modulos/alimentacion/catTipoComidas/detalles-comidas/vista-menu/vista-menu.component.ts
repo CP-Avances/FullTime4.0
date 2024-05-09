@@ -160,4 +160,45 @@ export class VistaMenuComponent implements OnInit {
     this.componentel.BuscarHora();
   }
 
+  //CONTROL BOTONES
+  getEditarMenu(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Editar Horario Alimentación');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getRegistrarDetalle(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Crear Detalle Alimentación');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getEditarDetalleMenu(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Ver - Editar Detalle Alimentación');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getEliminarDetalleMenu(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Ver - Eliminar Detalle Alimentación');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
 }

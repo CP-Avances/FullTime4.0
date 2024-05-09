@@ -905,4 +905,36 @@ export class VerCoordenadasComponent implements OnInit {
     this.componentec.ObtenerCoordenadas();
   }
 
+  //CONTROL BOTONES
+  getEditarUbicacion(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Editar Ubicación');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getVerAsignarUsuario(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Ver Ubicación - Asignar Usuario');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getVerEliminarAsignacionUsuario(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Ver Ubicación - Eliminar Asignación Usuario');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+
 }

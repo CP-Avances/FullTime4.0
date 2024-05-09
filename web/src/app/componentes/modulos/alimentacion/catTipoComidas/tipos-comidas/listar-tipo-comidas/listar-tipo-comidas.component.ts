@@ -388,116 +388,62 @@ export class ListarTipoComidasComponent implements OnInit {
 
   //Control Botones
   getCrearNuevoMenu(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Crear nuevo menú');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Crear Horario Alimentación');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getVerMenu(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Ver menú');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Ver Detalle Alimentación');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getDetalleMenu(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Detalle menú');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Crear Detalle Alimentación');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getEditarMenu(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Editar menú');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Editar Horario Alimentación');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getEliminarMenu(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Eliminar menú');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Eliminar Horario Alimentación');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getDescargarReportes(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Descargar reportes' && item.id_funcion === 26));
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Descargar Reportes Alimentación');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 

@@ -14,9 +14,11 @@ export class AuthGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
 
+
     if (this.loginService.loggedIn()) {
       //console.log('INGRESA', this.loginService.getRol());
-
+      return true;
+      /*
       if (this.loginService.getRol() >= route.data['rolMix'] && this.loginService.getEstado() === true) {
         //console.log('ingresa 1 ')
         return true;
@@ -57,6 +59,7 @@ export class AuthGuard implements CanActivate {
           return true;
         }
       }
+      */
     }
 
     if (!this.loginService.loggedIn()) {

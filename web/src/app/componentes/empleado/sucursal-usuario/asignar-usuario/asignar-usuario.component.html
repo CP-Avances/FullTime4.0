@@ -89,7 +89,7 @@
                                 </table>
                             </div>
                             <div class="container d-flex flex-wrap justify-content-center">
-                                <button *ngIf="this.selectionAsignados.selected.length != 0" id="btn-raised"
+                                <button *ngIf="this.selectionAsignados.selected.length != 0 && getEliminarAsignacionEstablecimiento()" id="btn-raised"
                                     class="btn btn-sm" (click)="ConfirmarDeleteProceso()">
                                     Eliminar
                                 </button>
@@ -199,7 +199,7 @@
                                             class="btn btn-sm" (click)="VerificarDatos()">
                                             Verificar
                                         </button>
-                                        <button *ngIf="ver_guardar" id="btn-raised" class="btn btn-sm"
+                                        <button *ngIf="ver_guardar && getAsignarEstablecimiento()" id="btn-raised" class="btn btn-sm"
                                             (click)="IngresarUsuarioSucursal()">
                                             Guardar
                                         </button>

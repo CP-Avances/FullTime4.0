@@ -8,7 +8,7 @@
                 matTooltip="Autorizar a todos los empleados su solicitud de servicio de alimentación." id="SelectCheck">
                 library_add_check
             </mat-icon>
-            <button *ngIf="btnCheckHabilitar" class="btn btn-primary" (click)="AutorizarSolicitudMultiple()"
+            <button *ngIf="btnCheckHabilitar && getAprobar()" class="btn btn-primary" (click)="AutorizarSolicitudMultiple()"
                 style="float: left; margin-left: 10px;">
                 Autorizar
             </button>

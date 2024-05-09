@@ -9,7 +9,7 @@
                     id="SelectCheck">
                     library_add_check
                 </mat-icon>
-                <button *ngIf="btnCheckHabilitar" class="btn btn-primary" (click)="AutorizarVacacionesMultiple()"
+                <button *ngIf="btnCheckHabilitar && getAprobarMultipleVacacion()" class="btn btn-primary" (click)="AutorizarVacacionesMultiple()"
                     style="float: left; margin-left: 10px;">
                     Autorizar
                 </button>

@@ -7,7 +7,7 @@
             </button>
             <span>MENÚ: {{m.nombre.toUpperCase()}}</span>
             <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                (click)="AbrirVentanaEditar(m)">
+                (click)="AbrirVentanaEditar(m)" *ngIf="getEditarMenu()">
                 Editar
             </button>
         </div>
@@ -37,7 +37,7 @@
                     <div id="titulo">
                         <span> DETALLES DEL MENÚ</span>
                         <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="AbrirVentanaDetalles(m)">
+                            (click)="AbrirVentanaDetalles(m)" *ngIf="getRegistrarDetalle()">
                             Registrar detalle
                         </button>
                     </div>
@@ -59,12 +59,12 @@
                                     <td>
                                         <i id="editarI" (click)="AbrirVentanaEditarDetalle(dm)" matSuffix
                                             matTooltipPosition="right" matTooltip="Modificar datos de este registro"
-                                            class="fas fa-edit">
+                                            class="fas fa-edit" *ngIf="getEditarDetalleMenu()">
                                             <p>Editar</p>
                                         </i>
                                         <i matSuffix matTooltipPosition="right" matTooltip="Eliminar registro"
                                             class="far fa-trash-alt" (click)="ConfirmarDelete(dm)"
-                                            style="color:red; margin-left: 15px;">
+                                            style="color:red; margin-left: 15px;" *ngIf="getEliminarDetalleMenu()">
                                             <p>Eliminar</p>
                                         </i>
                                     </td>

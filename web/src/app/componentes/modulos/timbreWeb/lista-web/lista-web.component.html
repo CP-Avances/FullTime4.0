@@ -194,7 +194,7 @@
                 </form>
 
                 <div *ngIf="activar_boton" class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
-                    <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0)">
+                    <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0)" *ngIf="getDesactivarUsuarios()">
                         Deshabilitar usuarios
                     </button>
                     <button id="btn-raised" class="btn btn-sm" (click)="LimpiarFormulario(2)">Cancelar</button>
@@ -242,7 +242,7 @@
                                     </td>
                                     <td>{{s.sucursal}}</td>
                                     <td class="justify-content-center">
-                                        <i (click)="GuardarRegistros(s)" id="plan" *ngIf="individual"
+                                        <i (click)="GuardarRegistros(s)" id="plan" *ngIf="individual && getDesactivarUsuarios()"
                                             class="fas fa-thumbs-down" matSuffix matTooltipPosition="right"
                                             matTooltip="Deshabilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Deshabilitar</p>
@@ -301,7 +301,7 @@
                                     <td>{{r.sucursal}}</td>
                                     <td>{{r.nombre}}</td>
                                     <td class="justify-content-center">
-                                        <i (click)="GuardarRegistros(r)" id="plan" *ngIf="individual"
+                                        <i (click)="GuardarRegistros(r)" id="plan" *ngIf="individual && getDesactivarUsuarios()"
                                             class="fas fa-thumbs-down" matSuffix matTooltipPosition="right"
                                             matTooltip="Deshabilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Deshabilitar</p>
@@ -360,7 +360,7 @@
                                     <td>{{c.sucursal}}</td>
                                     <td>{{c.nombre}}</td>
                                     <td lass="justify-content-center">
-                                        <i (click)="GuardarRegistros(c)" id="plan" *ngIf="individual"
+                                        <i (click)="GuardarRegistros(c)" id="plan" *ngIf="individual && getDesactivarUsuarios()"
                                             class="fas fa-thumbs-down" matSuffix matTooltipPosition="right"
                                             matTooltip="Deshabilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Deshabilitar</p>
@@ -420,7 +420,7 @@
                                     <td>{{d.sucursal}}</td>
                                     <td>{{d.departamento}}</td>
                                     <td class="d-flex justify-content-center">
-                                        <i (click)="GuardarRegistros(d)" id="plan" *ngIf="individual"
+                                        <i (click)="GuardarRegistros(d)" id="plan" *ngIf="individual && getDesactivarUsuarios()"
                                             class="fas fa-thumbs-down" matSuffix matTooltipPosition="right"
                                             matTooltip="Deshabilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Deshabilitar</p>
@@ -699,7 +699,7 @@
 
                 <div *ngIf="activar_boton_dh" class="d-flex flex-wrap justify-content-center"
                     style="padding-top: 15px;">
-                    <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros_DH(0)">
+                    <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros_DH(0)" *ngIf="getActivarUsuarios()">
                         Habilitar usuarios
                     </button>
                     <button id="btn-raised" class="btn btn-sm" (click)="LimpiarFormulario(1)">Cancelar</button>
@@ -752,7 +752,7 @@
                                     </td>
                                     <td>{{sdh.sucursal}}</td>
                                     <td class="justify-content-center">
-                                        <i (click)="GuardarRegistros_DH(sdh)" id="plan_dh" *ngIf="individual_dh"
+                                        <i (click)="GuardarRegistros_DH(sdh)" id="plan_dh" *ngIf="individual_dh && getActivarUsuarios()"
                                             class="fas fa-thumbs-up" matSuffix matTooltipPosition="right"
                                             matTooltip="Habilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Habilitar</p>
@@ -816,7 +816,7 @@
                                     <td>{{rdh.sucursal}}</td>
                                     <td>{{rdh.nombre}}</td>
                                     <td class="justify-content-center">
-                                        <i (click)="GuardarRegistros_DH(rdh)" id="plan_dh" *ngIf="individual_dh"
+                                        <i (click)="GuardarRegistros_DH(rdh)" id="plan_dh" *ngIf="individual_dh && getActivarUsuarios()"
                                             class="fas fa-thumbs-up" matSuffix matTooltipPosition="right"
                                             matTooltip="Habilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Habilitar</p>
@@ -878,7 +878,7 @@
                                     <td>{{c.sucursal}}</td>
                                     <td>{{c.nombre}}</td>
                                     <td lass="justify-content-center">
-                                        <i (click)="GuardarRegistros_DH(c)" id="plan_dh" *ngIf="individual_dh"
+                                        <i (click)="GuardarRegistros_DH(c)" id="plan_dh" *ngIf="individual_dh && getActivarUsuarios()"
                                             class="fas fa-thumbs-up" matSuffix matTooltipPosition="right"
                                             matTooltip="Habilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Habilitar</p>
@@ -940,7 +940,7 @@
                                     <td>{{d.sucursal}}</td>
                                     <td>{{d.departamento}}</td>
                                     <td class="d-flex justify-content-center">
-                                        <i (click)="GuardarRegistros_DH(d)" id="plan_dh" *ngIf="individual_dh"
+                                        <i (click)="GuardarRegistros_DH(d)" id="plan_dh" *ngIf="individual_dh && getActivarUsuarios()"
                                             class="fas fa-thumbs-up" matSuffix matTooltipPosition="right"
                                             matTooltip="Habilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Habilitar</p>

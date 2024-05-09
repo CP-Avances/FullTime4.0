@@ -28,11 +28,11 @@
                         <td>{{e.horaInicio}}</td>
                         <td>{{e.horaFin}}</td>
                         <td class="justify-content-center">
-                            <i *ngIf="ver_icono" class="fas fa-edit" (click)="HabilitarTablaEditar(e.id)" matSuffix
+                            <i *ngIf="ver_icono && getEditarPlanificacion()" class="fas fa-edit" (click)="HabilitarTablaEditar(e.id)" matSuffix
                                 matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro.">
                                 <p>Editar</p>
                             </i>
-                            <i *ngIf="ver_icono" (click)="HabilitarTablaEliminar(e.id)" class="far fa-trash-alt"
+                            <i *ngIf="ver_icono && getEliminarPlanificacion()" (click)="HabilitarTablaEliminar(e.id)" class="far fa-trash-alt"
                                 id="t-eliminar" matSuffix matTooltipPosition="right"
                                 matTooltip="Eliminar este registro.">
                                 <p>Eliminar</p>

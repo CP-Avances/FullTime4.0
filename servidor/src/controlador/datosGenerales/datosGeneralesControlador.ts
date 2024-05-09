@@ -440,7 +440,7 @@ class DatosGeneralesControlador {
         return res.status(200).jsonp(empleados);
     }
 
-
+    //AND NOT da.id_rol = 2 AND da.id = $1
     // METODO PARA BUSCAR USUARIOS ADMINISTRADORES Y JEFES DE UNA SUCURSAL
     public async BuscarInformacionUserRol(req: Request, res: Response) {
         const { id_empleado } = req.body;
@@ -449,10 +449,10 @@ class DatosGeneralesControlador {
             SELECT da.id, da.nombre, da.apellido, da.id_departamento, 
                 ce.jefe, r.nombre AS rol, r.id AS id_rol
             FROM datos_actuales_empleado AS da, eu_empleado_cargos AS ce, ero_cat_roles AS r
-            WHERE da.id_cargo = ce.id AND da.id_rol = r.id AND NOT da.id_rol = 2 AND da.id = $1
+            WHERE da.id_cargo = ce.id AND da.id_rol = r.id 
             ORDER BY da.apellido ASC
             `
-            , [id_empleado]);
+            );
 
         if (DATOS.rowCount > 0) {
             return res.jsonp(DATOS.rows)
@@ -1299,7 +1299,7 @@ class DatosGeneralesControlador {
                             da.id = e.id) 
                             AND s.id = d.id_sucursal
                             AND co.id_regimen = r.id AND e.estado = $2
-                            AND NOT EXISTS (SELECT eu.id_empl FROM mg_empleado_ubicacion AS eu 
+                            AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
                                 WHERE eu.id_empleado = e.id AND eu.id_ubicacion = $3)
                         ORDER BY name_empleado ASC
                         `,
@@ -1325,7 +1325,7 @@ class DatosGeneralesControlador {
                             da.id = e.id) 
                             AND s.id = d.id_sucursal
                             AND co.id_regimen = r.id AND e.estado = $2
-                            AND NOT EXISTS (SELECT eu.id_empl FROM mg_empleado_ubicacion AS eu 
+                            AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
                                 WHERE eu.id_empleado = e.id AND eu.id_ubicacion = $3)
                         ORDER BY name_empleado ASC
                         `,
@@ -1438,7 +1438,7 @@ class DatosGeneralesControlador {
                         da.id = e.id) 
                         AND s.id = d.id_sucursal
                         AND co.id_regimen = r.id AND e.estado = $2
-                        AND NOT EXISTS (SELECT eu.id_empl FROM mg_empleado_ubicacion AS eu 
+                        AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
                             WHERE eu.id_empleado = e.id AND eu.id_ubicacion = $3)
                     ORDER BY name_empleado ASC
                     `
@@ -1465,7 +1465,7 @@ class DatosGeneralesControlador {
                         da.id = e.id) 
                         AND s.id = d.id_sucursal
                         AND co.id_regimen = r.id AND e.estado = $2
-                        AND NOT EXISTS (SELECT eu.id_empl FROM mg_empleado_ubicacion AS eu 
+                        AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
                             WHERE eu.id_empleado = e.id AND eu.id_ubicacion = $3)
                     ORDER BY name_empleado ASC
                     `,

@@ -209,7 +209,8 @@ export class ButtonNotificacionComponent implements OnInit {
         this.router.navigate(['/home']);
       }
       else {
-        this.router.navigate(['/estadisticas']);
+        this.router.navigate(['/home']);
+        //this.router.navigate(['/estadisticas']);
       }
     }
   }

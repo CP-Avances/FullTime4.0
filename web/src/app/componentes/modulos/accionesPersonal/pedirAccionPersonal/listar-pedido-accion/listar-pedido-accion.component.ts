@@ -4216,14 +4216,14 @@ export class ListarPedidoAccionComponent implements OnInit {
     );
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getVer(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver' && item.id_funcion === 33);
+      return datos.some(item => item.accion === 'Ver Pedido Acción Personal');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -4231,9 +4231,9 @@ export class ListarPedidoAccionComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar' && item.id_funcion === 33);
+      return datos.some(item => item.accion === 'Editar Pedido Acción Personal');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -4241,9 +4241,9 @@ export class ListarPedidoAccionComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Pedido en formatro PDF');
+      return datos.some(item => item.accion === 'Ver Acción Personal en formato PDF');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -4251,9 +4251,29 @@ export class ListarPedidoAccionComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Pedido en formato EXCEL');
+      return datos.some(item => item.accion === 'Ver Acción Personal en formato EXCEL');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getDescargaReportes(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Descargar Reporte Lista Pedidos Acciones Personal');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getRegistrarAccionPersonal(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Registrar Pedido Acción Personal');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 }

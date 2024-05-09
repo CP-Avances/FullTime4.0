@@ -415,4 +415,25 @@ export class AsignarUsuarioComponent implements OnInit {
     this.BuscarAdministradoresJefes();
   }
 
+  //CONTROL BOTONES
+  getAsignarEstablecimiento(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Asignar Establecimiento');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getEliminarAsignacionEstablecimiento(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Eliminar Asignación Establecimiento');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
 }

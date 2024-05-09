@@ -324,14 +324,14 @@ export class PrincipalProcesoComponent implements OnInit {
     });
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getCrearProceso(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear proceso');
+      return datos.some(item => item.accion === 'Crear Proceso');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -339,9 +339,9 @@ export class PrincipalProcesoComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar' && item.id_funcion === 30);
+      return datos.some(item => item.accion === 'Editar Proceso');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -349,9 +349,9 @@ export class PrincipalProcesoComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Eliminar' && item.id_funcion === 30);
+      return datos.some(item => item.accion === 'Eliminar Proceso');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -359,9 +359,9 @@ export class PrincipalProcesoComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar reportes' && item.id_funcion === 30);
+      return datos.some(item => item.accion === 'Descargar Reportes Proceso');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 }

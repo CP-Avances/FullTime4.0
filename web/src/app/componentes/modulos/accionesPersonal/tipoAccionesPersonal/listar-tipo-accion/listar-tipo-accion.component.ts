@@ -327,14 +327,14 @@ export class ListarTipoAccionComponent implements OnInit {
     });
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getCrearTipoAccion(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Crear Tipo de acción');
+      return datos.some(item => item.accion === 'Crear Tipo Acción Personal');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -342,9 +342,9 @@ export class ListarTipoAccionComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver' && item.id_funcion === 31);
+      return datos.some(item => item.accion === 'Ver Tipo Acción Personal');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -352,9 +352,9 @@ export class ListarTipoAccionComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Editar' && item.id_funcion === 31);
+      return datos.some(item => item.accion === 'Editar Tipo Acción Personal');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -362,9 +362,9 @@ export class ListarTipoAccionComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Eliminar' && item.id_funcion === 31);
+      return datos.some(item => item.accion === 'Eliminar Tipo Acción Personal');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -372,9 +372,9 @@ export class ListarTipoAccionComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Descargar Reportes' && item.id_funcion === 31);
+      return datos.some(item => item.accion === 'Descargar Reportes Tipo Acción Personal');
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 }

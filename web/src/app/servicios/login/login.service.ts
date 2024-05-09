@@ -67,8 +67,8 @@ export class LoginService {
 
   getRolMenu() {
     let rol = parseInt(localStorage.getItem('rol') as string);
-    if (rol === 1) {
-      return true; // SUPER-ADMIN - ADMINISTRADOR - ADMINISTRADOR-JEF
+    if (rol === 1 ) {
+      return false; // SUPER-ADMIN - ADMINISTRADOR - ADMINISTRADOR-JEF
     }
     return false; // EMPLEADO
   }

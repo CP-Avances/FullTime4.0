@@ -284,7 +284,7 @@ export class ListaWebComponent implements OnInit {
       //console.log('ver sucursales ', codigos);
 
       // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
-      if (usuario.id_rol === 1 && usuario.jefe === false) {
+      /*if (usuario.id_rol === 1 && usuario.jefe === false) {
         this.usua_sucursales = { id_sucursal: codigos };
         this.BuscarInformacionAdministrador(this.usua_sucursales, false, this.sucursales_dh, this.regimen_dh, this.departamentos_dh, this.cargos_dh, this.empleados_dh);
         this.BuscarInformacionAdministrador(this.usua_sucursales, true, this.sucursales, this.regimen, this.departamentos, this.cargos, this.empleados);
@@ -294,10 +294,10 @@ export class ListaWebComponent implements OnInit {
         this.BuscarInformacionJefe(this.usua_sucursales, false, this.sucursales_dh, this.regimen_dh, this.departamentos_dh, this.cargos_dh, this.empleados_dh);
         this.BuscarInformacionJefe(this.usua_sucursales, true, this.sucursales, this.regimen, this.departamentos, this.cargos, this.empleados);
       }
-      else if (usuario.id_rol === 3) {
+      else if (usuario.id_rol === 1) {*/
         this.BuscarInformacionSuperAdministrador(false, this.sucursales_dh, this.regimen_dh, this.departamentos_dh, this.cargos_dh, this.empleados_dh);
         this.BuscarInformacionSuperAdministrador(true, this.sucursales, this.regimen, this.departamentos, this.cargos, this.empleados);
-      }
+      //}
     });
   }
 
@@ -1414,14 +1414,14 @@ export class ListaWebComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getActivarUsuarios(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Activar Usuarios' && item.id_funcion === 35);
+      return datos.some(item => item.accion === 'Activar Usuarios' && item.id_funcion === 39);
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -1429,9 +1429,9 @@ export class ListaWebComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Inactivar Usuarios' && item.id_funcion === 35);
+      return datos.some(item => item.accion === 'Inactivar Usuarios' && item.id_funcion === 39);
     }else{
-      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 

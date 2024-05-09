@@ -422,78 +422,42 @@ export class ListaHorasExtrasComponent implements OnInit {
 
   //Control Botones
   getConfigurar(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Configurar' && item.id_funcion === 22));
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Configurar Hora Extra');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getEliminar(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Eliminar' && item.id_funcion === 22));
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Eliminar Configuración Hora Extra');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getEditar(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Editar' && item.id_funcion === 22));
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Editar Configuración Hora Extra');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getDescargarReportes(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes' && item.id_funcion === 22));
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Descargar Reportes Configuración Hora Extra');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
