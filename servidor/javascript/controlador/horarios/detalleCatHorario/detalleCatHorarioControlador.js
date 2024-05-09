@@ -80,7 +80,7 @@ class DetalleCatalogoHorarioControlador {
             const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues } = req.body;
             yield database_1.default.query(`
             INSERT INTO eh_detalle_horarios (orden, hora, tolerancia, id_horario, tipo_accion, segundo_dia, tercer_dia, 
-                minutos_antes, minutos_depues) 
+                minutos_antes, minutos_despues) 
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             `, [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues]);
             res.jsonp({ message: 'Registro guardado.' });

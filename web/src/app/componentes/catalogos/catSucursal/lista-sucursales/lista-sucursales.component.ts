@@ -141,6 +141,8 @@ export class ListaSucursalesComponent implements OnInit {
 
   // METODO PARA BUSCAR SUCURSALES
   ObtenerSucursal() {
+
+    this.sucursales = [];
     this.rest.BuscarSucursal().subscribe(data => {
       this.sucursales = data;
     });
@@ -156,6 +158,16 @@ export class ListaSucursalesComponent implements OnInit {
           }
         }
       });
+      this.ObtenerSucursal();
+
+
+      this.activar_seleccion = true;
+
+      this.plan_multiple = false;
+      this.plan_multiple_ = false;
+      this.selectionSucursales.clear();
+      this.sucursalesEliminar = [];
+  
   }
 
   // METODO PARA EDITAR SUCURSAL
@@ -189,7 +201,7 @@ export class ListaSucursalesComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
-  
+
   // METODO PARA VER DATOS DE DEPARTAMENTOS DE SUCURSAL
   ver_departamentos: boolean = false;
   sucursal_id: number;
@@ -617,52 +629,79 @@ export class ListaSucursalesComponent implements OnInit {
 
   }
 
- // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
- Eliminar(id_sucursal: number) {
-  this.rest.EliminarRegistro(id_sucursal).subscribe(res => {
-    this.toastr.error('Registro eliminado.', '', {
-      timeOut: 6000,
-    });
-    this.ObtenerSucursal();
-  });
-}
-
-// FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-ConfirmarDelete(datos: any) {
-  this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-    .subscribe((confirmado: Boolean) => {
-      if (confirmado) {
-        this.Eliminar(datos.id);
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  Eliminar(id_sucursal: number) {
+    this.rest.EliminarRegistro(id_sucursal).subscribe(res => {
+      if (res.message === 'error') {
+        this.toastr.error('No se puede eliminar.', '', {
+          timeOut: 6000,
+        });
       } else {
-        this.router.navigate(['/sucursales']);
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerSucursal();
       }
     });
-}
+  }
 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.sucursalesEliminar = [];
+          this.selectionSucursales.clear();
+          this.ObtenerSucursal();
+
+        } else {
+          this.router.navigate(['/sucursales']);
+        }
+      });
+
+
+  }
+
+
+  contador: number = 0;
+  ingresar: boolean = false;
   EliminarMultiple() {
+
+
+    this.ingresar = false;
+    this.contador = 0;
 
     this.sucursalesEliminar = this.selectionSucursales.selected;
     this.sucursalesEliminar.forEach((datos: any) => {
 
       this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
 
-
-
-     
-
+      this.contador = this.contador + 1;
       this.rest.EliminarRegistro(datos.id).subscribe(res => {
-        this.toastr.error('Registro eliminado.', '', {
-          timeOut: 6000,
-        });
-        this.ObtenerSucursal();
+        if (res.message === 'error') {
+
+          this.toastr.error('No se puede eliminar ', datos.nombre, {
+            timeOut: 6000,
+          });
+
+          this.contador = this.contador - 1;
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ObtenerSucursal();
+
+        }
       });
-
-      
-
-      this.rest.BuscarSucursal().subscribe(data => {
-        this.sucursales = data;
-      });
-
     }
     )
   }
@@ -679,20 +718,22 @@ ConfirmarDelete(datos: any) {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
-
-
-
-
+            this.sucursalesEliminar = [];
+            this.selectionSucursales.clear();
+            this.ObtenerSucursal();
 
 
           } else {
-            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
+        } else {
+          this.router.navigate(['/sucursales']);
         }
       });
+
+
   }
 
 

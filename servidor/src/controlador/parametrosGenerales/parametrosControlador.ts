@@ -20,22 +20,6 @@ class ParametrosControlador {
         }
     }
 
-    // METODO PARA ELIMINAR TIPO PARAMETRO GENERAL
-    public async EliminarTipoParametro(req: Request, res: Response): Promise<void> {
-        try {
-            const id = req.params.id;
-            await pool.query(
-                `
-                DELETE FROM ep_parametro WHERE id = $1
-                `
-                , [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
-        }
-        catch {
-            res.jsonp({ message: 'false' });
-        }
-    }
-
     // METODO PARA ACTUALIZAR TIPO PARAMETRO GENERAL
     public async ActualizarTipoParametro(req: Request, res: Response): Promise<void> {
         const { descripcion, id } = req.body;
@@ -87,7 +71,7 @@ class ParametrosControlador {
             const id = req.params.id;
             await pool.query(
                 `
-                DELETE FROM detalle_tipo_parametro WHERE id = $1
+                DELETE FROM ep_detalle_parametro WHERE id = $1
                 `
                 , [id]);
             res.jsonp({ message: 'Registro eliminado.' });
@@ -118,25 +102,6 @@ class ParametrosControlador {
             `
             , [descripcion, id]);
         res.jsonp({ message: 'Registro exitoso.' });
-    }
-
-    // METODO PARA INGRESAR TIPO PARAMETRO GENERAL
-    public async IngresarTipoParametro(req: Request, res: Response): Promise<any> {
-        const { descripcion } = req.body;
-        const response: QueryResult = await pool.query(
-            `
-            INSERT INTO ep_parametro (descripcion) VALUES ($1) RETURNING *
-            `
-            , [descripcion]);
-
-        const [parametro] = response.rows;
-
-        if (parametro) {
-            return res.status(200).jsonp({ message: 'OK', respuesta: parametro })
-        }
-        else {
-            return res.status(404).jsonp({ message: 'error' })
-        }
     }
 
     // METODO PARA COMPARAR COORDENADAS

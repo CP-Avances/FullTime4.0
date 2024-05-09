@@ -15,8 +15,8 @@ import { VerEmpresaComponent } from '../../catEmpresa/ver-empresa/ver-empresa.co
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 
-import { SelectionModel } from '@angular/cdk/collections';
 import { ITableDepartamentos } from 'src/app/model/reportes.model';
+import { SelectionModel } from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-ver-sucursal',
@@ -26,14 +26,12 @@ import { ITableDepartamentos } from 'src/app/model/reportes.model';
 
 export class VerSucursalComponent implements OnInit {
 
-  departamentosEliminar: any = [];
-
-
   @Input() idSucursal: number;
   @Input() pagina_: string = '';
 
   datosSucursal: any = [];
   datosDepartamentos: any = [];
+  departamentosEliminar: any = [];
 
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
@@ -121,9 +119,12 @@ export class VerSucursalComponent implements OnInit {
       afterClosed().subscribe(item => {
         this.ListaDepartamentos();
       });
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionDepartamentos.clear();
+    this.departamentosEliminar = [];
   }
-
-
 
   // METODO PARA NAVEGAR A PANTALLA DE NIVELES
   data_id: number = 0;
@@ -151,21 +152,9 @@ export class VerSucursalComponent implements OnInit {
     }
   }
 
-
-
-
   // CHECK SUCURSALES
-
-
-
-
-
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
-
-
-
-
 
   HabilitarSeleccion() {
     this.plan_multiple = true;
@@ -180,14 +169,11 @@ export class VerSucursalComponent implements OnInit {
 
   selectionDepartamentos = new SelectionModel<ITableDepartamentos>(true, []);
 
-
-
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
     const numSelected = this.selectionDepartamentos.selected.length;
     return numSelected === this.datosDepartamentos.length
   }
-
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
@@ -196,29 +182,58 @@ export class VerSucursalComponent implements OnInit {
       this.datosDepartamentos.forEach((row: any) => this.selectionDepartamentos.select(row));
   }
 
-
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelPag(row?: ITableDepartamentos): string {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.departamentosEliminar = this.selectionDepartamentos.selected;
-    //console.log('paginas para Eliminar',this.paginasEliminar);
-
-    //console.log(this.selectionPaginas.selected)
     return `${this.selectionDepartamentos.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
-
   }
 
-
+  public departamentosNiveles: any = [];
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
-  Eliminar(id_dep: number) {
+  Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
     this.restD.EliminarRegistro(id_dep).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ListaDepartamentos();
+      if (res.message === 'error') {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+          timeOut: 6000,
+        });
+      } else {
+        this.departamentosNiveles = [];
+        var id_departamento = id_dep;
+        var id_establecimiento = id_sucursal;
+        if (nivel != 0) {
+          this.restD.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
+            this.departamentosNiveles = datos;
+            this.departamentosNiveles.filter(item => {
+              this.restD.EliminarRegistroNivelDepa(item.id).subscribe(
+                res => {
+                  if (res.message === 'error') {
+                    this.toastr.error('No se puede eliminar.', '', {
+                      timeOut: 6000,
+                    });
+                  } else {
+                    this.toastr.error('Nivel eliminado de: ' + item.departamento, '', {
+                      timeOut: 6000,
+                    });
+                    this.ListaDepartamentos();
+                  }
+                }
+              );
+
+            })
+          })
+          this.ListaDepartamentos();
+        } else {
+          this.ListaDepartamentos();
+        }
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ListaDepartamentos();
+      }
     });
   }
 
@@ -227,46 +242,87 @@ export class VerSucursalComponent implements OnInit {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.Eliminar(datos.id);
+          this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
+          this.activar_seleccion = true;
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.departamentosEliminar = [];
+          this.selectionDepartamentos.clear();
+          this.ListaDepartamentos();
         }
       });
   }
 
-
+  contador: number = 0;
+  ingresar: boolean = false;
   EliminarMultiple() {
-
+    this.ingresar = false;
+    this.contador = 0;
     this.departamentosEliminar = this.selectionDepartamentos.selected;
     this.departamentosEliminar.forEach((datos: any) => {
-
       this.datosDepartamentos = this.datosDepartamentos.filter(item => item.id !== datos.id);
       //AQUI MODIFICAR EL METODO 
+      this.contador = this.contador + 1;
       this.restD.EliminarRegistro(datos.id).subscribe(res => {
-        this.toastr.error('Registro eliminado.', '', {
-          timeOut: 6000,
-        });
-        this.ListaDepartamentos();
-      });
-      this.restD.BuscarInformacionDepartamento(this.idSucursal).subscribe(datos => {
-        this.datosDepartamentos = datos;
-       this.OrdenarDatos(this.datosDepartamentos);
+        if (res.message === 'error') {
+          this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+        } else {
+          this.departamentosNiveles = [];
+          var id_departamento = datos.id;
+          var id_establecimiento = datos.id_sucursal;
+          if (datos.nivel != 0) {
+            this.restD.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
+              this.departamentosNiveles = datos;
+              this.departamentosNiveles.filter(item => {
+                this.restD.EliminarRegistroNivelDepa(item.id).subscribe(
+                  res => {
+                    if (res.message === 'error') {
+                      this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+                        timeOut: 6000,
+                      });
+                    } else {
+                      this.toastr.error('Nivel eliminado de: ' + item.departamento, '', {
+                        timeOut: 6000,
+                      });
+                      this.ListaDepartamentos();
+                    }
+                  }
+                )
+                this.ListaDepartamentos();
+              })
+            })
+            this.ListaDepartamentos();
+          } else {
+            this.ListaDepartamentos();
+          }
+          if (!this.ingresar) {
+            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ListaDepartamentos();
+        }
       });
     }
     )
-
   }
-
 
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-
           if (this.departamentosEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
-
             this.plan_multiple = false;
             this.plan_multiple_ = false;
+            this.departamentosEliminar = [];
+            this.selectionDepartamentos.clear();
+            this.ListaDepartamentos();
           } else {
             this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -276,6 +332,5 @@ export class VerSucursalComponent implements OnInit {
         }
       });
   }
-
 
 }

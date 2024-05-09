@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../../environments/environment'
+import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -53,8 +54,8 @@ export class HorarioService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/horario/eliminar/${id}`);
+  EliminarRegistro(id: any) {
+    return this.http.delete(`${environment.url}/horario/eliminar/${id}`).pipe(catchError(id));
   }
 
   // METODO PARA CREAR ARCHIVO XML

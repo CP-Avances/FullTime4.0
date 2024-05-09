@@ -35,11 +35,11 @@ class RolPermisosControlador {
             res.status(404).jsonp({ text: 'Registro no encontrado.' });
         });
     }
-    //METODO PARA ENLISTAR LINKS 
+    //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
     ListarMenuRoles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const Roles = yield database_1.default.query(`
-      SELECT * FROM es_paginas
+      SELECT * FROM es_paginas WHERE modulo = false
       `);
             if (Roles.rowCount > 0) {
                 return res.jsonp(Roles.rows);
@@ -49,7 +49,36 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR ID DE PAGINAS
+    //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
+    ListarMenuModulosRoles(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const Roles = yield database_1.default.query(`
+      SELECT * FROM es_paginas WHERE modulo = true
+      `);
+            if (Roles.rowCount > 0) {
+                return res.jsonp(Roles.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
+    //METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO
+    ListarModuloPorNombre(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { nombre_modulo } = req.body;
+            const Roles = yield database_1.default.query(`
+      SELECT * FROM es_paginas WHERE nombre_modulo = $1
+      `, [nombre_modulo]);
+            if (Roles.rowCount > 0) {
+                return res.jsonp(Roles.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA
     ObtenerIdPaginas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { funcion, id_rol } = req.body;
@@ -64,7 +93,7 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR ID DE PAGINAS
+    // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA
     ObtenerIdPaginasConAcciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { funcion, id_rol, id_accion } = req.body;
@@ -79,19 +108,33 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR ID DE PAGINAS
+    // METODO PARA BUSCAR LAS PAGINAS POR EL ID DEL ROL
     ObtenerPaginasRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_rol } = req.body;
-            const PAGINA_ROL = yield database_1.default.query(`
+            try {
+                const { id_rol } = req.body;
+                const PAGINA_ROL = yield database_1.default.query(`
       SELECT * FROM ero_rol_permisos WHERE id_rol = $1 
       `, [id_rol]);
-            if (PAGINA_ROL.rowCount > 0) {
                 return res.jsonp(PAGINA_ROL.rows);
             }
-            else {
+            catch (error) {
                 return res.status(404).jsonp({ text: 'Registros no encontrados.' });
             }
+            /*
+            const { id_rol } = req.body;
+            const PAGINA_ROL = await pool.query(
+              `
+              SELECT * FROM ero_rol_permisos WHERE id_rol = $1
+              `
+              , [id_rol]);
+            if (PAGINA_ROL.rowCount > 0) {
+              return res.jsonp(PAGINA_ROL.rows)
+            }
+            else {
+              return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+            }
+            */
         });
     }
     // METODO PARA ASIGNAR PERMISOS AL ROL
@@ -119,23 +162,13 @@ class RolPermisosControlador {
     EliminarPaginaRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.body;
-            //console.log(funcion);
-            //console.log(id_rol);
             yield database_1.default.query(`
       DELETE FROM ero_rol_permisos WHERE id = $1
       `, [id]);
             res.jsonp({ message: 'Registro eliminado.' });
         });
     }
-    EliminarPaginaRolSinAccion(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.body;
-            yield database_1.default.query(`
-      DELETE FROM ero_rol_permisos WHERE id = $1 
-      `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
-        });
-    }
+    // METODO PARA GUARDAR TODAS LAS ACCIONES EXISTENTES EN UN OBJETO
     // METODO PARA Buscar las acciones de cada pagina
     ObtenerAccionesPaginas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -147,24 +180,43 @@ class RolPermisosControlador {
                 return res.jsonp(PAGINA_ROL.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+                return res.jsonp([]);
+                // return res.status(404).jsonp({ text: 'Registros no encontrados.' });
             }
         });
     }
-    ObtenerAccionPorId(req, res) {
+    ObtenerAccionesPaginasExistentes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.body;
+            const { id_funcion } = req.body;
             const PAGINA_ROL = yield database_1.default.query(`
-      SELECT * FROM es_acciones_paginas WHERE id = $1 
-      `, [id]);
+          SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
+          `, [id_funcion]);
             if (PAGINA_ROL.rowCount > 0) {
                 return res.jsonp(PAGINA_ROL.rows);
             }
             else {
+                //return res.jsonp([])
                 return res.status(404).jsonp({ text: 'Registros no encontrados.' });
             }
         });
     }
+    /*
+    public async ObtenerAccionPorId(req: Request, res: Response): Promise<any> {
+      const { id } = req.body;
+      const PAGINA_ROL = await pool.query(
+        `
+        SELECT * FROM es_acciones_paginas WHERE id = $1
+        `
+        , [id]);
+      if (PAGINA_ROL.rowCount > 0) {
+        return res.jsonp(PAGINA_ROL.rows)
+      }
+      else {
+        return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+      }
+    }
+  
+    */
     //METODO PARA ENLISTAR ACCIONES 
     ListarAcciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

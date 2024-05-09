@@ -696,6 +696,27 @@ class EmpleadoControlador {
     }
   }
 
+  // METODO PARA ELIMINAR REGISTROS
+
+  public async EliminarEmpleado(req: Request, res: Response) {
+
+
+    try {
+
+      const id = req.params.id;
+      await pool.query(
+        `
+        DELETE FROM eu_empleados WHERE id = $1
+        `
+        , [id]);
+      res.jsonp({ message: 'Registro eliminado.' });
+    }
+    catch (error) {
+      return res.jsonp({ message: 'error' });
+    }
+
+
+  }
 
 
   /** **************************************************************************************** **
@@ -1812,7 +1833,7 @@ class EmpleadoControlador {
         VALUES ($1, $2, $3, $4, $5, $6)
         `
         , [usuario, contrasena, estado_user, id_rol.rows[0]['id'], id_empleado,
-        app_habilita]);
+          app_habilita]);
 
       if (contador === plantilla.length) {
         // Actualización del código
@@ -1820,7 +1841,7 @@ class EmpleadoControlador {
           `
           UPDATE e_codigo SET valor = null WHERE id = 1
           `
-          );
+        );
         return res.jsonp({ message: 'correcto' });
       }
       contador = contador + 1;

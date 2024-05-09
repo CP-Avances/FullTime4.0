@@ -1,6 +1,26 @@
 <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;" *ngIf="listad">
   <div id="titulo">
-    <span>LISTA DE DOCUMENTOS</span>
+
+
+    <div class="d-flex bd-highlight" id="titulo">
+
+
+      <div class="w-100 bd-highlight">
+        <h5>
+          LISTA DE DOCUMENTOS 
+        </h5>
+      </div>
+
+
+      <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+
+        <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+          (click)="ConfirmarDeleteMultiple()">Eliminar </button>
+      </div>
+    </div>
+
+
+
   </div>
   <br>
   <nav aria-label="breadcrumb">
@@ -12,16 +32,17 @@
       <li class="breadcrumb-item active" aria-current="page">{{Dirname}}</li>
     </ol>
   </nav>
-  <div style="width: 100%;" >
+  <div style="width: 100%;">
     <div style="float: left;" *ngIf="Dirname != 'permisos' && Dirname != 'contratos'">
       <mat-form-field id="t-inputs">
         <mat-icon matPrefix>search</mat-icon>
         <input matInput placeholder="Buscar archivo" minlength="2" [formControl]="nombreF"
-        [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'archivo')">
+          [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'archivo')">
       </mat-form-field>
     </div>
 
-    <button  *ngIf="subir" style="float: right;" type="submit" class="btn btn-sm btn-primary" (click)="AbrirVentanaRegistrar()">
+    <button *ngIf="subir" style="float: right;" type="submit" class="btn btn-sm btn-primary"
+      (click)="AbrirVentanaRegistrar()">
       Subir documento
     </button>
   </div>
@@ -30,6 +51,17 @@
     <table class="table table-hover table-sm">
       <thead class="thead-light">
         <tr style="text-align: center;">
+
+          <th>
+            <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix matTooltipPosition="right"
+              matTooltip="Dar clic para activar selección múltiple." id="SelectCheck" (click)="HabilitarSeleccion()">
+              library_add_check
+            </mat-icon>
+            <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+              [checked]="selectionArchivos.hasValue() && isAllSelectedPag()"
+              [indeterminate]="selectionArchivos.hasValue() && !isAllSelectedPag()" [aria-label]="checkboxLabelPag()">
+            </mat-checkbox>
+          </th>
           <th scope="col">Tipo</th>
           <th scope="col">Nombre</th>
           <th scope="col">Descarga</th>
@@ -37,6 +69,14 @@
       </thead>
       <tbody>
         <tr *ngFor="let a of archivosFiltro">
+
+
+          <td>
+            <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+              (change)="$event ? selectionArchivos.toggle(a) : null" [checked]="selectionArchivos.isSelected(a)"
+              [aria-label]="checkboxLabelPag(a)">
+            </mat-checkbox>
+          </td>
           <td style="padding-top: 10px; text-align: center;" *ngIf="a.extencion === 'pdf'">
             <mat-icon style="color: red;">picture_as_pdf</mat-icon>
           </td>
@@ -71,8 +111,8 @@
     <div>
       <mat-form-field id="t-inputs">
         <mat-icon matPrefix>search</mat-icon>
-        <input matInput placeholder="Buscar Carpeta"   minlength="2" [formControl]="nombreF"
-        [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'carpeta')">
+        <input matInput placeholder="Buscar Carpeta" minlength="2" [formControl]="nombreF"
+          [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'carpeta')">
       </mat-form-field>
     </div>
 
@@ -123,7 +163,7 @@
       <mat-form-field id="t-inputs">
         <mat-icon matPrefix>search</mat-icon>
         <input matInput placeholder="Buscar archivo" minlength="2" [formControl]="nombreF"
-        [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'archivo')">
+          [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'archivo')">
       </mat-form-field>
     </div>
     <table class="table table-hover table-sm">

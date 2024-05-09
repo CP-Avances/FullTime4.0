@@ -1,5 +1,5 @@
 
-import { ObtenerRutaLeerPlantillas, ObtenerRutaLeerPlantillas1 } from '../../libs/accesoCarpetas';
+import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import moment from 'moment';
@@ -27,13 +27,21 @@ class FeriadosControlador {
 
     // METODO PARA ELIMINAR UN REGISTRO DE FERIADOS
     public async EliminarFeriado(req: Request, res: Response): Promise<any> {
-        const id = req.params.id;
-        await pool.query(
-            `
-            DELETE FROM ef_cat_feriados WHERE id = $1
-            `
-            , [id]);
-        res.jsonp({ text: 'Registro eliminado.' });
+
+        try {
+
+            const id = req.params.id;
+            await pool.query(
+                `
+                DELETE FROM ef_cat_feriados WHERE id = $1
+                `
+                , [id]);
+            res.jsonp({ text: 'Registro eliminado.' });
+        } catch (error) {
+            return res.jsonp({ message: 'error' });
+
+        }
+
     }
 
     // METODO PARA CREAR REGISTRO DE FERIADO
@@ -210,15 +218,15 @@ class FeriadosControlador {
                 (fecha != undefined) && (fecha != '') &&
                 (descripcion != undefined) && (descripcion != '') &&
                 (fec_recuperacion != undefined) && (fec_recuperacion != '')) {
-                    data.fila = item
-                    data.fecha = fecha;
-                    data.descripcion = descripcion;
-                    data.fec_recuperacion = fec_recuperacion;
-                    data.observacion = 'no registrada'
+                data.fila = item
+                data.fecha = fecha;
+                data.descripcion = descripcion;
+                data.fec_recuperacion = fec_recuperacion;
+                data.observacion = 'no registrada'
 
-                    listFeriados.push(data);
+                listFeriados.push(data);
 
-            }else{
+            } else {
                 data.fila = item
                 data.fecha = fecha;
                 data.descripcion = descripcion;
@@ -229,12 +237,12 @@ class FeriadosControlador {
                     data.fila = 'error';
                     mensaje = 'error'
                 }
-    
+
                 if (data.fecha == undefined || data.descripcion == '') {
                     data.fecha = 'No registrado';
                     data.observacion = 'Fecha ' + data.observacion;
                 }
-    
+
                 if (data.descripcion == undefined || data.descripcion == '') {
                     data.descripcion = 'No registrado';
                     data.observacion = 'Descripción ' + data.observacion;
@@ -243,11 +251,11 @@ class FeriadosControlador {
                 if (data.fecha == 'No registrado' && data.descripcion == 'No registrado') {
                     data.observacion = 'Fecha y descripción no registrada';
                 }
-    
+
                 if (data.fec_recuperacion == undefined) {
                     data.fec_recuperacion = '-';
                 }
-    
+
                 listFeriados.push(data);
             }
 
@@ -379,7 +387,7 @@ class FeriadosControlador {
                     } else {
                         item.observacion = 'Ya existe en el sistema';
                     }
-                } 
+                }
 
             }
 
@@ -531,29 +539,39 @@ class FeriadosControlador {
 
     }
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
-    public async RegistrarFeriado_Ciudad(req: Request, res: Response){
-        try{
-            const plantilla  = req.body
-            console.log('datos manual: ',plantilla);
-    
+    public async RegistrarFeriado_Ciudad(req: Request, res: Response) {
+        try {
+            const plantilla = req.body
+            console.log('datos manual: ', plantilla);
+
             var contador = 1;
             var respuesta: any
 
             plantilla.forEach(async (data: any) => {
                 // Datos que se leen de la plantilla ingresada
-                const { provincia, ciudad, feriado, observacion} = data;
+                const { provincia, ciudad, feriado, observacion } = data;
                 //Obtener id de la ciudad
-                const id_ciudad = await pool.query('SELECT id FROM e_ciudades WHERE UPPER(descripcion) = $1', [ciudad.toUpperCase()]);
-                const id_feriado = await pool.query('SELECT id FROM ef_cat_feriados WHERE UPPER(descripcion) = $1', [feriado.toUpperCase()]);
-                
-                console.log('id_ciudad: ',id_ciudad.rows[0]);
-                console.log('id_feriado: ',id_feriado.rows[0]);
-                
+                const id_ciudad = await pool.query(
+                    `
+                    SELECT id FROM e_ciudades WHERE UPPER(descripcion) = $1
+                    `
+                    , [ciudad.toUpperCase()]);
+                const id_feriado = await pool.query(
+                    `
+                    SELECT id FROM ef_cat_feriados WHERE UPPER(descripcion) = $1
+                    `
+                    , [feriado.toUpperCase()]);
+
+                console.log('id_ciudad: ', id_ciudad.rows[0].id);
+                console.log('id_feriado: ', id_feriado.rows[0].id);
+
                 // Registro de los datos
                 const response: QueryResult = await pool.query(
-                    `INSERT INTO ef_ciudad_feriado (id_feriado, id_ciudad) VALUES ($1, $2) RETURNING *
-                    `,[id_feriado.rows[0].id, id_ciudad.rows[0].id]);
-      
+                    `
+                    INSERT INTO ef_ciudad_feriado (id_feriado, id_ciudad) VALUES ($1, $2) RETURNING *
+                    `
+                    , [id_feriado.rows[0].id, id_ciudad.rows[0].id]);
+
                 const [ciudad_feria] = response.rows;
 
                 if (contador === plantilla.length) {
@@ -563,11 +581,8 @@ class FeriadosControlador {
                         return respuesta = res.status(404).jsonp({ message: 'error' })
                     }
                 }
-
                 contador = contador + 1;
-
             });
-            
 
         } catch (error) {
             return res.status(500).jsonp({ message: error });
@@ -689,7 +704,7 @@ class FeriadosControlador {
         const workbook = excel.readFile(ruta);
         const sheet_name_list = workbook.SheetNames;
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-        
+
         // LECTURA DE DATOS DE LA PLANTILLA
         plantilla.forEach(async (data: any) => {
             const { fecha, descripcion, fec_recuperacion } = data;
@@ -722,6 +737,7 @@ class FeriadosControlador {
                 // ELIMINAR DEL SERVIDOR
                 fs.unlinkSync(ruta);
             }
+   
         });
     }
 

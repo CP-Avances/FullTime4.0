@@ -268,7 +268,6 @@ const routes: Routes = [
 
   // ACCESO A RUTAS DE ROLES
   { path: 'roles', component: VistaRolesComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
-  { path: 'seleccionarPermisos/:id', component: SeleccionarRolPermisoComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
 
   // ACCESO A RUTAS DE REGIMEN LABORAL
   { path: 'listarRegimen', component: ListarRegimenComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },

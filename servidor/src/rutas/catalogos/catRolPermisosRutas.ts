@@ -16,6 +16,14 @@ class RolPermisosRutas {
         // MENU ENLISTAR
         this.router.get('/menu/paginas', TokenValidation, rolPermisosControlador.ListarMenuRoles);
 
+        // MENU ENLISTAR Modulo
+        this.router.get('/menu/modulos', TokenValidation, rolPermisosControlador.ListarMenuModulosRoles);
+
+        //MENU ENLISTAR POR MODULO
+        this.router.post('/menu/paginasmodulos', TokenValidation, rolPermisosControlador.ListarModuloPorNombre);
+
+
+
         // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL
 
         this.router.post('/menu/paginas/ide', TokenValidation, rolPermisosControlador.ObtenerIdPaginas);
@@ -34,20 +42,21 @@ class RolPermisosRutas {
 
         // METODO PARA ELIMINAR LAS PAGINAS  
         this.router.post('/menu/paginas/eliminar', TokenValidation, rolPermisosControlador.EliminarPaginaRol);
-        this.router.post('/menu/paginas/eliminarsinaccion', TokenValidation, rolPermisosControlador.EliminarPaginaRolSinAccion);
 
 
 
         // METODO PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
         this.router.post('/menu/paginas/acciones', TokenValidation, rolPermisosControlador.ObtenerAccionesPaginas);
 
+        this.router.post('/menu/paginas/accionesexistentes', TokenValidation, rolPermisosControlador.ObtenerAccionesPaginasExistentes);
 
-         // METODO PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
-         this.router.post('/menu/paginas/acciones/id', TokenValidation, rolPermisosControlador.ObtenerAccionPorId);
+        /*
+        // METODO PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
+        this.router.post('/menu/paginas/acciones/id', TokenValidation, rolPermisosControlador.ObtenerAccionPorId);
+*/
 
-
-         // METODO PARA OBTENER TODAS LAS ACCIONES
-         this.router.get('/menu/paginas/acciones/todas', TokenValidation, rolPermisosControlador.ListarAcciones);
+        // METODO PARA OBTENER TODAS LAS ACCIONES
+        this.router.get('/menu/paginas/acciones/todas', TokenValidation, rolPermisosControlador.ListarAcciones);
     }
 }
 

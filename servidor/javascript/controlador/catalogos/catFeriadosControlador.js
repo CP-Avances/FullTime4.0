@@ -36,11 +36,16 @@ class FeriadosControlador {
     // METODO PARA ELIMINAR UN REGISTRO DE FERIADOS
     EliminarFeriado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-            DELETE FROM ef_cat_feriados WHERE id = $1
-            `, [id]);
-            res.jsonp({ text: 'Registro eliminado.' });
+            try {
+                const id = req.params.id;
+                yield database_1.default.query(`
+                DELETE FROM ef_cat_feriados WHERE id = $1
+                `, [id]);
+                res.jsonp({ text: 'Registro eliminado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
         });
     }
     // METODO PARA CREAR REGISTRO DE FERIADO
@@ -477,12 +482,17 @@ class FeriadosControlador {
                     // Datos que se leen de la plantilla ingresada
                     const { provincia, ciudad, feriado, observacion } = data;
                     //Obtener id de la ciudad
-                    const id_ciudad = yield database_1.default.query('SELECT id FROM e_ciudades WHERE UPPER(descripcion) = $1', [ciudad.toUpperCase()]);
-                    const id_feriado = yield database_1.default.query('SELECT id FROM ef_cat_feriados WHERE UPPER(descripcion) = $1', [feriado.toUpperCase()]);
-                    console.log('id_ciudad: ', id_ciudad.rows[0]);
-                    console.log('id_feriado: ', id_feriado.rows[0]);
+                    const id_ciudad = yield database_1.default.query(`
+                    SELECT id FROM e_ciudades WHERE UPPER(descripcion) = $1
+                    `, [ciudad.toUpperCase()]);
+                    const id_feriado = yield database_1.default.query(`
+                    SELECT id FROM ef_cat_feriados WHERE UPPER(descripcion) = $1
+                    `, [feriado.toUpperCase()]);
+                    console.log('id_ciudad: ', id_ciudad.rows[0].id);
+                    console.log('id_feriado: ', id_feriado.rows[0].id);
                     // Registro de los datos
-                    const response = yield database_1.default.query(`INSERT INTO ef_ciudad_feriado (id_feriado, id_ciudad) VALUES ($1, $2) RETURNING *
+                    const response = yield database_1.default.query(`
+                    INSERT INTO ef_ciudad_feriado (id_feriado, id_ciudad) VALUES ($1, $2) RETURNING *
                     `, [id_feriado.rows[0].id, id_ciudad.rows[0].id]);
                     const [ciudad_feria] = response.rows;
                     if (contador === plantilla.length) {

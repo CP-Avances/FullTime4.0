@@ -36,9 +36,7 @@ export class ProvinciaService {
 
   // METODO PARA ELIMINAR REGISTRO
   EliminarProvincia(id: any) {
-    return this.http.delete(`${environment.url}/provincia/eliminar/${id}`).pipe(
-      catchError(id)
-    );
+    return this.http.delete(`${environment.url}/provincia/eliminar/${id}`).pipe( catchError(id));
   }
 
   // METODO PARA CREAR ARCHIVO XML

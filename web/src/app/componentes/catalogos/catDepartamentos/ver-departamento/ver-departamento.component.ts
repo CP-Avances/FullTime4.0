@@ -15,6 +15,9 @@ import { PrincipalDepartamentoComponent } from '../listar-departamento/principal
 import { VerSucursalComponent } from '../../catSucursal/ver-sucursal/ver-sucursal.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableNivel } from 'src/app/model/reportes.model';
+
 interface Nivel {
   valor: number;
   nombre: string
@@ -27,6 +30,9 @@ interface Nivel {
 })
 
 export class VerDepartamentoComponent implements OnInit {
+
+  nivelesEliminar: any = [];
+
 
   @Input() id_departamento: number;
   @Input() pagina: string;
@@ -104,10 +110,6 @@ export class VerDepartamentoComponent implements OnInit {
     this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
       this.departamentos = datos;
       console.log('ver data de departamentos ', this.departamentos)
-    }, error => {
-      this.toastr.warning('No se encontraron niveles de aprobación registrados.', '', {
-        timeOut: 1000,
-      });
     })
   }
 
@@ -126,14 +128,9 @@ export class VerDepartamentoComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
-  Eliminar(id_dep: number, datos: any) {
-    this.rest.EliminarRegistroNivelDepa(id_dep).subscribe(res => {
-      this.ActualizarRegistros(datos);
-    });
-  }
 
-// METODO PARA ACTUALIZAR NIVELES DE APROBACION
+
+  // METODO PARA ACTUALIZAR NIVELES DE APROBACION
   ActualizarRegistros(datos: any) {
     var data = { nivel: 0 };
     var arreglo: any = [];
@@ -169,22 +166,9 @@ export class VerDepartamentoComponent implements OnInit {
     });
     if (contador === arreglo.length) {
       this.CargarDatos(this.info);
-      this.CargarDatos(this.info);
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 1000,
-      });
     }
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id, datos);
-        }
-      });
-  }
 
   // ORDENAR LOS DATOS SEGUN EL ID 
   OrdenarDatos(array: any) {
@@ -208,6 +192,12 @@ export class VerDepartamentoComponent implements OnInit {
         this.CargarDatos(this.info);
       }
       );
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionNivel.clear();
+    this.nivelesEliminar = [];
+
   }
 
   // METODO PARA VISUALIZAR LISTA DE USUARIOS QUE AUTORIZAN
@@ -248,5 +238,168 @@ export class VerDepartamentoComponent implements OnInit {
       this.componentes.ListaDepartamentos();
     }
   }
+
+
+
+  // METODOS PARA LA SELECCION MULTIPLE
+
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionNivel = new SelectionModel<ITableNivel>(true, []);
+
+
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionNivel.selected.length;
+    return numSelected === this.departamentos.length
+  }
+
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionNivel.clear() :
+      this.departamentos.forEach((row: any) => this.selectionNivel.select(row));
+  }
+
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableNivel): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.nivelesEliminar = this.selectionNivel.selected;
+    //console.log('paginas para Eliminar',this.paginasEliminar);
+
+    //console.log(this.selectionPaginas.selected)
+    return `${this.selectionNivel.isSelected(row) ? 'deselect' : 'select'} row ${row.nivel + 1}`;
+
+  }
+
+  contador: number = 0;
+  ingresar: boolean = false;
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
+  Eliminar(id_dep: number, datos: any) {
+
+
+    this.rest.EliminarRegistroNivelDepa(id_dep).subscribe(res => {
+
+      if (res.message === 'error') {
+        this.toastr.error('No se puede eliminar.', '', {
+          timeOut: 6000,
+        });
+      } else {
+
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+
+        this.ActualizarRegistros(datos);
+      }
+    });
+  }
+
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id, datos);
+        } else {
+          this.router.navigate(['/departamento']);
+
+        }
+      });
+
+    this.ActualizarRegistros(datos);
+
+  }
+
+
+
+  EliminarMultiple() {
+
+
+    this.ingresar = false;
+    this.contador = 0;
+
+    this.nivelesEliminar = this.selectionNivel.selected;
+    this.nivelesEliminar.forEach((datos: any) => {
+
+      this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
+
+      this.contador = this.contador + 1;
+
+
+      this.rest.EliminarRegistroNivelDepa(datos.id).subscribe(res => {
+
+
+        if (res.message === 'error') {
+
+          this.toastr.error('No se puede eliminar ', datos.nombre, {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ActualizarRegistros(datos);
+          // this.ListaDepartamentos();
+
+        }
+      });
+      this.ActualizarRegistros(datos);
+
+    }
+    )
+  }
+
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+
+          if (this.nivelesEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+            this.nivelesEliminar = [];
+            this.selectionNivel.clear();
+
+          } else {
+            this.toastr.warning('No ha seleccionado NIVEL.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+
+          }
+        } else {
+          this.router.navigate(['/departamento']);
+
+        }
+      });
+  }
+
 
 }

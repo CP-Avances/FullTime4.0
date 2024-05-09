@@ -111,6 +111,8 @@ class EmpleadoRutas {
         this.router.put('/:id_empleado/uploadImage', [verificarToken_1.TokenValidation, upload.single('image')], empleadoControlador_1.default.CrearImagenEmpleado);
         // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO
         this.router.put('/geolocalizacion/:id', verificarToken_1.TokenValidation, empleadoControlador_1.default.GeolocalizacionCrokis);
+        // METODO PARA ELIMINAR EMPLEADOS
+        this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, empleadoControlador_1.default.EliminarEmpleado);
         /** **************************************************************************************** **
          ** **                       MANEJO DE DATOS DE TITULO PROFESIONAL                        ** **
          ** **************************************************************************************** **/
