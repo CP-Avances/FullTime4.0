@@ -1,18 +1,20 @@
 // IMPORTAR LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { environment } from 'src/environments/environment';
+import { ThemePalette } from '@angular/material/core';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
+
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
+import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
 
 // IMPORTAR COMPONENTES
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
@@ -23,12 +25,10 @@ import { RegistrarNivelTitulosComponent } from '../registrar-nivel-titulos/regis
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
-import { ThemePalette } from '@angular/material/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableNivelesEducacion } from 'src/app/model/reportes.model';
-
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-listar-nivel-titulos',
@@ -38,10 +38,8 @@ import { ITableNivelesEducacion } from 'src/app/model/reportes.model';
 
 export class ListarNivelTitulosComponent implements OnInit {
 
-
-  nivelesEliminar: any = [];
-
   // VARIABLES DE ALMACENAMIENTO DE DATOS
+  nivelesEliminar: any = [];
   nivelTitulos: any = [];
   empleado: any = [];
 
@@ -82,6 +80,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     public nivel: NivelTitulosService, // SERVICIO DATOS NIVELES DE TÍTULOS
     public restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
+    public validar: ValidacionesService,
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
     private router: Router, // VARIABLE DE MANEJO DE TUTAS URL
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
@@ -126,7 +125,7 @@ export class ListarNivelTitulosComponent implements OnInit {
   nameFile: string;
   archivoSubido: Array<File>;
   mostrarbtnsubir: boolean = false;
-  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE FERIADOS -----------------------------------------------------------------
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE NIVELES 
   FileChange(element: any) {
     this.archivoSubido = [];
     this.nameFile = '';
@@ -172,7 +171,7 @@ export class ListarNivelTitulosComponent implements OnInit {
 
     this.progreso = true;
 
-    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.nivel.RevisarFormato(formData).subscribe(res => {
       this.DataNivelesProfesionales = res.data;
       this.messajeExcel = res.message;
@@ -221,16 +220,13 @@ export class ListarNivelTitulosComponent implements OnInit {
     var data = {
       nombre: ''
     }
-
     if (this.listNivelesCorrectos.length > 0) {
       var cont = 0;
       this.listNivelesCorrectos.forEach(item => {
         data.nombre = item.nombre;
-
-        // Capitalizar la primera letra de la primera palabra
+        // CAPITALIZAR LA PRIMERA LETRA DE LA PRIMERA PALABRA
         const textoNivel = item.nombre.charAt(0).toUpperCase();
         const restoDelTexto = item.nombre.slice(1);
-
         data.nombre = textoNivel + restoDelTexto;
         this.nivel.RegistrarNivel(data).subscribe(res => {
           cont = cont + 1;
@@ -248,7 +244,6 @@ export class ListarNivelTitulosComponent implements OnInit {
       });
       this.archivoForm.reset();
     }
-
     this.btn_registrar = true;
     this.archivoSubido = [];
     this.nameFile = '';
@@ -321,25 +316,7 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   // METODO PARA VALIDAR INGRESO DE LETRAS
   IngresarSoloLetras(e: any) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACIÓN DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+    return this.validar.IngresarSoloLetras(e);
   }
 
   // METODO PARA EDITAR NIVEL DE TITULO
@@ -349,7 +326,6 @@ export class ListarNivelTitulosComponent implements OnInit {
         this.ObtenerNiveles();
       });
   }
-
 
 
   /** ************************************************************************************************* **
@@ -503,7 +479,6 @@ export class ListarNivelTitulosComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    
 
     const a = document.createElement('a');
     a.href = xmlUrl;
@@ -526,11 +501,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     this.ObtenerNiveles();
   }
 
-
-
-
   // METODOS PARA LA SELECCION MULTIPLE
-
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
 
@@ -547,14 +518,11 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   selectionNiveles = new SelectionModel<ITableNivelesEducacion>(true, []);
 
-
-
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
     const numSelected = this.selectionNiveles.selected.length;
     return numSelected === this.nivelTitulos.length
   }
-
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
@@ -563,26 +531,21 @@ export class ListarNivelTitulosComponent implements OnInit {
       this.nivelTitulos.forEach((row: any) => this.selectionNiveles.select(row));
   }
 
-
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelPag(row?: ITableNivelesEducacion): string {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.nivelesEliminar = this.selectionNiveles.selected;
-    
 
-    
     return `${this.selectionNiveles.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
-
   }
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
   Eliminar(id_nivel: number) {
     this.nivel.EliminarNivel(id_nivel).subscribe(res => {
-
       if (res.message === 'error') {
-        this.toastr.error('No se puede eliminar.', '', {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
         });
       } else {
@@ -616,21 +579,15 @@ export class ListarNivelTitulosComponent implements OnInit {
   ingresar: boolean = false;
 
   EliminarMultiple() {
-
-
     this.ingresar = false;
     this.contador = 0;
-
     this.nivelesEliminar = this.selectionNiveles.selected;
     this.nivelesEliminar.forEach((datos: any) => {
-
       this.nivelTitulos = this.nivelTitulos.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-
       this.nivel.EliminarNivel(datos.id).subscribe(res => {
-
         if (res.message === 'error') {
-          this.toastr.error('No se puede eliminar.', '', {
+          this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
@@ -642,19 +599,16 @@ export class ListarNivelTitulosComponent implements OnInit {
             this.ingresar = true;
           }
           this.ObtenerNiveles();
-
         }
       });
     }
     )
   }
 
-
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-
           if (this.nivelesEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
@@ -673,4 +627,5 @@ export class ListarNivelTitulosComponent implements OnInit {
         }
       });
   }
+
 }

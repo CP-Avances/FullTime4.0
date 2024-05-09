@@ -22,7 +22,6 @@
                     matTooltip="Modificar nombre del título profesional.">
                     help_outline
                 </mat-icon>
-                <mat-error *ngIf="nombre.invalid">{{ObtenerMensajeErrorNombre()}}</mat-error>
             </mat-form-field>
             <mat-form-field>
                 <mat-label>Nivel</mat-label>
@@ -45,7 +44,6 @@
                     matTooltip="Nombre del nuevo nivel del título.">
                     help_outline
                 </mat-icon>
-                <mat-error *ngIf="nombreNivel.invalid">{{ObtenerMensajeErrorNivel()}}</mat-error>
             </mat-form-field>
         </div>
     </div>

@@ -30,6 +30,8 @@ class TituloRutas {
 
         // METODO PARA LISTAR TITULOS
         this.router.get('/', TokenValidation, TITULO_CONTROLADOR.ListarTitulos);
+        // METODO PARA BUSCAR TITULOS POR SU NOMBRE
+        this.router.post('/titulo-nombre', TokenValidation, TITULO_CONTROLADOR.ObtenerTituloNombre);
         // METODO PARA ELIMINAR REGISTRO
         this.router.delete('/eliminar/:id', TokenValidation, TITULO_CONTROLADOR.EliminarRegistros);
         // METODO PARA ACTUALIZAR REGISTRO DE TITULO

@@ -46,6 +46,7 @@ export class ConfigurarCodigoComponent implements OnInit {
 
   // SELECCION DE METODO DE REGISTRO DE CODIGO DE EMPLEADO
   RegistrarConfiguracion(form: any) {
+    this.ver_informacion = false;
     this.rest.ObtenerCodigo().subscribe(datos => {
       if (this.automaticoF === true) {
         this.ActualizarAutomatico(form);
@@ -226,8 +227,29 @@ export class ConfigurarCodigoComponent implements OnInit {
     }
   }
 
-  VisualizarConfiguracion(){
-    
+  // METODO PARA VISUALIZAR LA CONFIGURACION
+  informacion: string = '';
+  ver_informacion: boolean = false;
+  VisualizarConfiguracion() {
+    if (this.ver_informacion === false) {
+      this.ver_informacion = true;
+      this.rest.ObtenerCodigo().subscribe(datos => {
+        if (datos[0].automatico === true) {
+          this.informacion = 'El sistema se encuentra configurado para generar automáticamente el código de enrolamiento de los usuarios.';
+        }
+        else if (datos[0].manual === true) {
+          this.informacion = 'El sistema se encuentra configurado para ingresar de forma manual el código de enrolamiento de los usuarios.';
+        }
+        else if (datos[0].cedula === true) {
+          this.informacion = 'El sistema se encuentra configurado para considerar el número de cédula como código de enrolamiento de los usuarios.';
+        }
+      }, error => {
+        this.informacion = 'El sistema no tienen una configuración de registro de código de enrolamiento.';
+      });
+    }
+    else {
+      this.ver_informacion = false;
+    }
   }
 
 }
