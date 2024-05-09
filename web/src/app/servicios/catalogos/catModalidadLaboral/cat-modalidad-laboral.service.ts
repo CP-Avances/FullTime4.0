@@ -31,7 +31,7 @@ export class CatModalidadLaboralService {
     .pipe(catchError(datos));
   }
   eliminar(id: any){
-    return this.http.delete<any>(`${environment.url}/modalidadLaboral/eliminar/${id}`)
+    return this.http.delete<any>(`${environment.url}/modalidadLaboral/eliminar/${id}`).pipe( catchError(id));
   }
   RevisarFormato(formData) {
     return this.http.post<any>(environment.url + '/modalidadLaboral/upload/revision', formData);
