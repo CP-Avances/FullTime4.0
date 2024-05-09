@@ -21,8 +21,12 @@ export class HorasExtrasService {
     return this.http.get(`${environment.url}/horasExtras`);
   }
 
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/horasExtras/eliminar/${id}`);
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${environment.url}/horasExtras/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   CrearXML(data: any) {

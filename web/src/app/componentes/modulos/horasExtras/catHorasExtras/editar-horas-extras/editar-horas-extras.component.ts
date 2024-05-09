@@ -87,6 +87,10 @@ export class EditarHorasExtrasComponent implements OnInit {
   value = 10;
   habilitarprogress: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private toastr: ToastrService,
     private rest: HorasExtrasService,
@@ -95,6 +99,9 @@ export class EditarHorasExtrasComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.primeroFormGroup = this._formBuilder.group({
       descripcionForm: this.descripcion,
       tipoDescuentoForm: this.tipoDescuento,
@@ -129,7 +136,9 @@ export class EditarHorasExtrasComponent implements OnInit {
       codigo: form2.codigoForm,
       incl_almuerzo: form2.inclAlmuerzoForm,
       tipo_funcion: form2.tipoFuncionForm,
-      id: this.data.id
+      id: this.data.id,
+      user_name: this.user_name,
+      ip: this.ip
     };
 
     this.rest.ActualizarDatos(dataHoraExtra)
