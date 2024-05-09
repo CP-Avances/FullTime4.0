@@ -240,7 +240,6 @@ class FeriadosControlador {
                     data.observacion = 'Descripción ' + data.observacion;
                 }
 
-                data.fec_recuperacion = dato.fec_recuperacion;
                 if (data.fecha == 'No registrado' && data.descripcion == 'No registrado') {
                     data.observacion = 'Fecha y descripción no registrada';
                 }
@@ -328,10 +327,9 @@ class FeriadosControlador {
 
         var filaDuplicada: number = 0;
         listFeriados.forEach(async (item: any) => {
+            console.log('item: ',item);
             //VERIFICA SI EXISTE EN LAs COLUMNA DATOS REGISTRADOS
             if (item.fila != 'error' && item.fecha != 'No registrado' && item.descripcion != 'No registrado') {
-
-                
                 // Verificar si la variable tiene el formato de fecha correcto con moment
                 if (moment(item.fecha, 'YYYY-MM-DD', true).isValid()) {
                     fecha_correcta = true;
@@ -350,46 +348,39 @@ class FeriadosControlador {
                         , [item.fecha]);
 
                     if (VERIFICAR_FECHA.rowCount === 0) {
-                        if (item.fec_recuperacion == undefined) {
-                            item.fec_recuperacion = '-';
-                            fec_recuperacion_correcta = true;
-                            // Discriminación de elementos iguales
-                            if (duplicados.find((p: any) => p.fecha === item.fecha || p.fecha === item.fec_recuperacion) == undefined) {
-                                item.observacion = 'ok';
-                                duplicados.push(item);
-                            }
-
-                        } else {
-                            if (moment(item.fec_recuperacion, 'YYYY-MM-DD', true).isValid()) {
+                        
+                        if (item.fec_recuperacion == '-' || item.fec_recuperacion == undefined) {
                                 fec_recuperacion_correcta = true;
                                 // Discriminación de elementos iguales
-                                if (duplicados.find((p: any) => p.fecha === item.fecha) == undefined) {
-                                    data.observacion = 'ok';
+                                if (duplicados.find((p: any) => p.descripcion == item.descripcion || p.fecha === item.fecha ) == undefined) {
+                                    item.observacion = 'ok';
                                     duplicados.push(item);
+                                }else {
+                                    item.observacion = '1';
                                 }
-
-                            } else {
-                                fec_recuperacion_correcta = false;
-                                item.observacion = 'Formato de fec_recuperacion incorrecto (YYYY-MM-DD)';
-                            }
+    
+                        } else {
+                                if (moment(item.fec_recuperacion, 'YYYY-MM-DD', true).isValid()) {
+                                    fec_recuperacion_correcta = true;
+                                    // Discriminación de elementos iguales
+                                    if (duplicados.find((p: any) => p.descripcion == item.descripcion || p.fecha === item.fecha  || p.fec_recuperacion === item.fec_recuperacion) == undefined) {
+                                        item.observacion = 'ok';
+                                        duplicados.push(item);
+                                    }else {
+                                        item.observacion = '1';
+                                    }
+    
+                                } else {
+                                    fec_recuperacion_correcta = false;
+                                    item.observacion = 'Formato de fec_recuperacion incorrecto (YYYY-MM-DD)';
+                                }
                         }
 
                     } else {
-                        
-                        data.observacion = 'Ya existe en el sistema';
+                        item.observacion = 'Ya existe en el sistema';
                     }
                 } 
 
-            }
-
-            if (item.observacion != undefined && item.observacion != 'no registrada' && item.observacion != '') {
-                fecha_igual.forEach((valor: any) => {
-                    if (valor.fecha == item.fec_recuperacion) {
-                        item.observacion = 'Fecha registrada como valor de otra columna'
-                    }
-                })
-            } else {
-                item.observacion = 'Registro duplicado'
             }
 
             //Valida si los datos de la columna N son numeros.
@@ -403,7 +394,7 @@ class FeriadosControlador {
             }
 
             filaDuplicada = item.fila;
-
+            
         });
 
         var filaDuplicada_fc: number = 0;
@@ -453,7 +444,7 @@ class FeriadosControlador {
 
         setTimeout(() => {
 
-            //console.log('lista feriados: ',listFeriados);
+             //console.log('lista feriados: ',listFeriados);
             fecha_igual = listFeriados;
 
             listFeriados.sort((a: any, b: any) => {
@@ -477,6 +468,22 @@ class FeriadosControlador {
                 }
                 return 0; // Son iguales
             });
+
+            listFeriados.forEach((item: any) =>{
+                console.log('item.observacion: ',item);
+                if(item.fec_recuperacion != '-'){
+                    fecha_igual.forEach((valor: any) => {
+                        console.log(valor.fecha,' == ',item.fec_recuperacion);
+                        if (valor.fecha == item.fec_recuperacion) {
+                            item.observacion = 'Fecha registrada como valor de otra columna'
+                        }
+                    })
+                }
+
+                if (item.observacion == '1') {
+                    item.observacion = 'Registro duplicado'
+                } 
+            })
 
 
             listFeriados_ciudades.forEach((valor: any) => {
@@ -539,8 +546,8 @@ class FeriadosControlador {
                 const id_ciudad = await pool.query('SELECT id FROM e_ciudades WHERE UPPER(descripcion) = $1', [ciudad.toUpperCase()]);
                 const id_feriado = await pool.query('SELECT id FROM ef_cat_feriados WHERE UPPER(descripcion) = $1', [feriado.toUpperCase()]);
                 
-                console.log('id_ciudad: ',id_ciudad.rows[0].id);
-                console.log('id_feriado: ',id_feriado.rows[0].id);
+                console.log('id_ciudad: ',id_ciudad.rows[0]);
+                console.log('id_feriado: ',id_feriado.rows[0]);
                 
                 // Registro de los datos
                 const response: QueryResult = await pool.query(
