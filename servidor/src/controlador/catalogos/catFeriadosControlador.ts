@@ -30,8 +30,6 @@ class FeriadosControlador {
     public async EliminarFeriado(req: Request, res: Response): Promise<Response> {
         try {
             const id = req.params.id;
-            // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
-
             const {user_name, ip} = req.body;
 
             // INICIAR TRANSACCION

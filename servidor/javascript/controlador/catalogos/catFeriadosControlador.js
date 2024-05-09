@@ -40,7 +40,6 @@ class FeriadosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
                 const { user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
