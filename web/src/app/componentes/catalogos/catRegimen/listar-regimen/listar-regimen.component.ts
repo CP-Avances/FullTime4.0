@@ -507,7 +507,7 @@ export class ListarRegimenComponent implements OnInit {
       //AQUI MODIFICAR EL METODO 
       this.rest.EliminarRegistro(datos.id).subscribe(res => {
         if (res.message === 'error') {
-          this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+          this.toastr.error('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;

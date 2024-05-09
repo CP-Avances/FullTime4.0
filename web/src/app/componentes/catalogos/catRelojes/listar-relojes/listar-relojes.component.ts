@@ -565,7 +565,7 @@ export class ListarRelojesComponent implements OnInit {
 
 
         if (res.message === 'error') {
-          this.toastr.error('No se puede eliminar.', '', {
+          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
 

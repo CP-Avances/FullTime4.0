@@ -527,7 +527,7 @@ export class ListarTitulosComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;
@@ -592,9 +592,9 @@ export class ListarTitulosComponent implements OnInit {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.titulosEliminar = this.selectionTitulos.selected;
-    
 
-    
+
+
     return `${this.selectionTitulos.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
 
   }
@@ -645,26 +645,18 @@ export class ListarTitulosComponent implements OnInit {
   ingresar: boolean = false;
 
   EliminarMultiple() {
-
-
-    this.ingresar = false;
+this.ingresar = false;
     this.contador = 0;
-
-    this.titulosEliminar = this.selectionTitulos.selected;
+        this.titulosEliminar = this.selectionTitulos.selected;
     this.titulosEliminar.forEach((datos: any) => {
-
       this.verTitulos = this.verTitulos.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-
-
       this.rest.EliminarRegistro(datos.id).subscribe(res => {
         if (res.message === 'error') {
-          this.toastr.error('No se puede eliminar.', '', {
+          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-
           this.contador = this.contador - 1;
-
         } else {
           if (!this.ingresar) {
             this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
@@ -673,7 +665,6 @@ export class ListarTitulosComponent implements OnInit {
             this.ingresar = true;
           }
           this.ObtenerTitulos();
-
         }
       });
     }
@@ -686,17 +677,13 @@ export class ListarTitulosComponent implements OnInit {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-
           if (this.titulosEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
-
             this.plan_multiple = false;
             this.plan_multiple_ = false;
-
             this.titulosEliminar = [];
             this.selectionTitulos.clear();
-
             this.ObtenerTitulos();
           } else {
             this.toastr.warning('No ha seleccionado TÍTULOS.', 'Ups!!! algo salio mal.', {

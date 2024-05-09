@@ -630,7 +630,7 @@ export class ListarNivelTitulosComponent implements OnInit {
       this.nivel.EliminarNivel(datos.id).subscribe(res => {
 
         if (res.message === 'error') {
-          this.toastr.error('No se puede eliminar.', '', {
+          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
@@ -642,7 +642,6 @@ export class ListarNivelTitulosComponent implements OnInit {
             this.ingresar = true;
           }
           this.ObtenerNiveles();
-
         }
       });
     }

@@ -656,7 +656,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
                 this.rest.EliminarRegistroNivelDepa(item.id).subscribe(
                   res => {
                     if (res.message === 'error') {
-                      this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+                      this.toastr.error('Existen datos relacionados con ' + item.nombre + '.', 'No fue posible eliminar.',  {
                         timeOut: 6000,
                       });
                     } else {
