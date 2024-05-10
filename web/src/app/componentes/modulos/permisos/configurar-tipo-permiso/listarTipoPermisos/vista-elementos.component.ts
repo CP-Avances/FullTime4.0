@@ -41,6 +41,10 @@ export class VistaElementosComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.minLength(2)]);
 
@@ -76,6 +80,9 @@ export class VistaElementosComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
+
       this.ObtenerEmpleados(this.idEmpleado);
       this.ObtenerTipoPermiso();
       this.ObtenerColores();
@@ -83,7 +90,7 @@ export class VistaElementosComponent implements OnInit {
     }
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -99,7 +106,7 @@ export class VistaElementosComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -132,9 +139,14 @@ export class VistaElementosComponent implements OnInit {
     this.ObtenerTipoPermiso();
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_permiso: number) {
-    this.rest.EliminarRegistro(id_permiso).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.rest.EliminarRegistro(id_permiso, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -142,7 +154,7 @@ export class VistaElementosComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -181,7 +193,7 @@ export class VistaElementosComponent implements OnInit {
     this.permiso_id = id;
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                  METODO PARA EXPORTAR A PDF                                  ** **
    ** ************************************************************************************************** **/
   generarPdf(action = 'open') {
@@ -309,7 +321,7 @@ export class VistaElementosComponent implements OnInit {
     };
   }
 
-  /** ************************************************************************************************* ** 
+  /** ************************************************************************************************* **
    ** **                                 METODO PARA EXPORTAR A EXCEL                                ** **
    ** ************************************************************************************************* **/
   exportToExcel() {
@@ -319,7 +331,7 @@ export class VistaElementosComponent implements OnInit {
     xlsx.writeFile(wb, "TipoPermisos" + new Date().getTime() + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                               METODO PARA EXPORTAR A CSV                                     ** **
    ** ************************************************************************************************** **/
 

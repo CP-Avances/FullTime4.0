@@ -34,7 +34,6 @@ class TipoPermisosControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // TODO ANALIZAR COMOOBTENER USER_NAME E IP DESDE EL FRONT
                 const { user_name, ip } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
@@ -162,6 +161,7 @@ class TipoPermisosControlador {
     // METODO PARA CREAR REGISTRO DE TIPO DE PERMISO
     Crear(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log(req.body);
             try {
                 const { descripcion, tipo_descuento, num_dia_maximo, num_dia_anticipo, gene_justificacion, fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados, correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar, fecha_fin, num_dia_anterior, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
@@ -198,6 +198,7 @@ class TipoPermisosControlador {
                 }
             }
             catch (error) {
+                console.log(error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: error });

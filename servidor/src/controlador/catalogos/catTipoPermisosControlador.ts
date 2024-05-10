@@ -23,7 +23,6 @@ class TipoPermisosControlador {
   // METODO PARA ELIMINAR REGISTROS
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      // TODO ANALIZAR COMOOBTENER USER_NAME E IP DESDE EL FRONT
       const { user_name, ip } = req.body;
       const id = req.params.id;
 
@@ -169,6 +168,7 @@ class TipoPermisosControlador {
 
   // METODO PARA CREAR REGISTRO DE TIPO DE PERMISO
   public async Crear(req: Request, res: Response) {
+    console.log(req.body);
     try {
       const { descripcion, tipo_descuento, num_dia_maximo, num_dia_anticipo, gene_justificacion, fec_validar, acce_empleado,
         legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados, correo_crear,
@@ -216,6 +216,7 @@ class TipoPermisosControlador {
       }
     }
     catch (error) {
+      console.log(error);
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: error });
