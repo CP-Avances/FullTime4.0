@@ -1153,6 +1153,7 @@ class UsuarioControlador {
   public async RestablecerFrase(req: Request, res: Response) {
     const correo = req.body.correo;
     const url_page = req.body.url_page;
+    const cedula = req.body.cedula;
 
     var tiempo = fechaHora();
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
@@ -1164,11 +1165,11 @@ class UsuarioControlador {
       `
       SELECT e.id, e.nombre, e.apellido, e.correo, u.usuario, u.contrasena 
       FROM eu_empleados AS e, eu_usuarios AS u 
-      WHERE e.correo = $1 AND u.id_empleado = e.id
+      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.cedula = $2  AND u.frase IS NOT NULL 
       `
-      , [correo]);
+      , [correo, cedula]);
 
-    if (correoValido.rows[0] == undefined) return res.status(401).send('Correo de usuario no válido.');
+    if (correoValido.rows[0] == undefined) return res.status(401).send('Correo o cédula o frase de usuario no válido.');
 
     var datos = await Credenciales(1);
 

@@ -83,7 +83,7 @@ export class ConfirmarContraseniaComponent implements OnInit {
           }
         },
         error: (e) => {
-          this.toastr.error('Verifique codigo empresarial', 'Error 2.', {
+          this.toastr.error('Verifique codigo empresarial', 'Error.', {
             timeOut: 3000,
           });
         },

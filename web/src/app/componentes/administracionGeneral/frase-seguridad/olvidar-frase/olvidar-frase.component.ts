@@ -20,15 +20,17 @@ export class OlvidarFraseComponent implements OnInit {
 
   // VARIABLES DE FORMULARIO
   cadena: string;
-  mensaje: any = [];//Almacenamiento de codigo empresarial
+  mensaje: any = [];//ALMACENAMIENTO DE CODIGO EMPRESARIAL
 
   correo = new FormControl('', [Validators.required, Validators.email]);
   empresa = new FormControl('', [Validators.required]);
+  cedula = new FormControl('', [Validators.required]);
 
   // FORMULARIO
   public formulario = new FormGroup({
     usuarioF: this.correo,
     empresaF: this.empresa,
+    cedulaF: this.cedula
   });
 
   constructor(
@@ -52,22 +54,25 @@ export class OlvidarFraseComponent implements OnInit {
       return 'No es un correo electrónico.';
     }
     if (this.empresa.toString().trim().length === 0) {
-      return 'Ingrese codigo empresarial';
+      return 'Ingrese código empresarial';
+    }
+    if (this.cedula.toString().trim().length === 0) {
+      return 'Ingrese cédula';
     }
   }
 
   // METODO PARA ENVIAR CORREO ELECTRONICO
   respuesta: any = [];
   EnviarCorreoConfirmacion(form: any) {
-    //JSON con codigo empresarial encriptado
+    //JSON CON CODIGO EMPRESARIAL ENCRIPTADO
     let empresas = {
       "codigo_empresa": this.rsaKeysService.encriptarLogin(form.empresaF.toString())
     };
-    //Validacion de codigo empresarial
+    //VALIDACION DE CODIGO EMPRESARIAL
     this.restLogin.getEmpresa(empresas).subscribe(
       {
         next: (v) => {
-          //Almacenamiento de ip dependiendo el resultado de la validacion
+          //ALMACENAMIENTO DE IP DEPENDIENDO EL RESULTADO DE LA VALIDACION
           this.mensaje = v;
           if (this.mensaje.message === 'ok') {
             localStorage.setItem("empresaURL", this.mensaje.empresas[0].empresa_direccion);
@@ -79,13 +84,13 @@ export class OlvidarFraseComponent implements OnInit {
           }
         },
         error: (e) => {
-          this.toastr.error('Verifique codigo empresarial', 'Error 2.', {
+          this.toastr.error('Verifique codigo empresarial', 'Error.', {
             timeOut: 3000,
           });
         },
         complete: () => {
           console.log('CONTINUAR RUTA');
-          //Consulta cadena IP para armar url en correo
+          //CONSULTA CADENA IP PARA ARMAR URL EN CORREO
           this.restE.ConsultarEmpresaCadena().subscribe(
             {
               next: (v) => 
@@ -100,12 +105,13 @@ export class OlvidarFraseComponent implements OnInit {
                 },
               complete: () =>
                 {
-                  //Continua proceso normal
+                  //CONTINUA PROCESO NORMAL
                   console.log('CONTINUAR FRASE');
-                  //Inicio Frase
+                  //INICIO FRASE
                   let dataPass = {
                     correo: form.usuarioF,
-                    url_page: this.cadena
+                    url_page: this.cadena,
+                    cedula: form.cedulaF
                   };
 
                   this.rest.RecuperarFraseSeguridad(dataPass).subscribe(res => {
@@ -121,15 +127,19 @@ export class OlvidarFraseComponent implements OnInit {
                         timeOut: 6000,
                       });
                       this.correo.reset();
+                      this.empresa.reset();
+                      this.cedula.reset();
                       this.router.navigate(['/login']);
                     }
                   }, error => {
-                    this.toastr.error('El correo electrónico ingresado no consta en los registros.', 'Ups!!! algo salio mal.', {
+                    this.toastr.error('El correo electrónico o cédula o frase ingresado no consta en los registros.', 'Ups!!! algo salio mal.', {
                       timeOut: 6000,
                     });
                     this.correo.reset();
+                    this.empresa.reset();
+                    this.cedula.reset();
                   });
-                  //Fin Frase
+                  //FIN FRASE
                 }
             }  
           );
