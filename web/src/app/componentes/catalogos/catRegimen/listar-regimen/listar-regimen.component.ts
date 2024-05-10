@@ -50,6 +50,10 @@ export class ListarRegimenComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string {
     return this.plantillaPDF.color_Secundary;
@@ -76,6 +80,9 @@ export class ListarRegimenComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerRegimen();
   }
@@ -130,7 +137,12 @@ export class ListarRegimenComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_regimen: number) {
-    this.rest.EliminarRegistro(id_regimen).subscribe((res) => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
+    this.rest.EliminarRegistro(id_regimen, datos).subscribe((res) => {
       this.toastr.error("Registro eliminado.", "", {
         timeOut: 6000,
       });

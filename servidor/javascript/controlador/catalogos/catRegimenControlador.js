@@ -107,11 +107,11 @@ class RegimenControlador {
                         datosOriginales: "",
                         datosNuevos: "",
                         ip: ip,
-                        observacion: `Error al actualizar el registro con id: ${id}.`,
+                        observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`,
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query("COMMIT");
-                    return res.status(404).jsonp({ message: "error" });
+                    return res.status(404).jsonp({ message: "Registro no encontrado" });
                 }
                 yield database_1.default.query(`
         UPDATE cg_regimenes SET id_pais = $1, descripcion = $2, mes_periodo = $3, dias_mes = $4, trabajo_minimo_mes = $5, 
@@ -148,22 +148,39 @@ class RegimenControlador {
                     meses_calculo,
                     id,
                 ]);
+                const datosNuevos = {
+                    "id_pais": id_pais,
+                    "descripcion": descripcion,
+                    "mes_periodo": mes_periodo,
+                    "dias_mes": dias_mes,
+                    "trabajo_minimo_mes": trabajo_minimo_mes,
+                    "trabajo_minimo_horas": trabajo_minimo_horas,
+                    "continuidad_laboral": continuidad_laboral,
+                    "vacacion_dias_laboral": vacacion_dias_laboral,
+                    "vacacion_dias_libre": vacacion_dias_libre,
+                    "vacacion_dias_calendario": vacacion_dias_calendario,
+                    "acumular": acumular,
+                    "dias_max_acumulacion": dias_max_acumulacion,
+                    "contar_feriados": contar_feriados,
+                    "vacacion_divisible": vacacion_divisible,
+                    "antiguedad": antiguedad,
+                    "antiguedad_fija": antiguedad_fija,
+                    "anio_antiguedad": anio_antiguedad,
+                    "dias_antiguedad": dias_antiguedad,
+                    "antiguedad_variable": antiguedad_variable,
+                    "vacacion_dias_calendario_mes": vacacion_dias_calendario_mes,
+                    "vacacion_dias_laboral_mes": vacacion_dias_laboral_mes,
+                    "calendario_dias": calendario_dias,
+                    "laboral_dias": laboral_dias,
+                    "meses_calculo": meses_calculo
+                };
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: "cg_regimenes",
                     usuario: user_name,
                     accion: "U",
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `
-                    { "id_pais": "${id_pais}", "descripcion": "${descripcion}", "mes_periodo": "${mes_periodo}", 
-                     "dias_mes": "${dias_mes}", "trabajo_minimo_mes": "${trabajo_minimo_mes}", "trabajo_minimo_horas": "${trabajo_minimo_horas}", 
-                     "continuidad_laboral": "${continuidad_laboral}", "vacacion_dias_laboral": "${vacacion_dias_laboral}", 
-                     "vacacion_dias_libre": "${vacacion_dias_libre}", "vacacion_dias_calendario": "${vacacion_dias_calendario}", 
-                     "acumular": "${acumular}", "dias_max_acumulacion": "${dias_max_acumulacion}", "contar_feriados": "${contar_feriados}", 
-                     "vacacion_divisible": "${vacacion_divisible}", "antiguedad": "${antiguedad}", "antiguedad_fija": "${antiguedad_fija}", 
-                     "anio_antiguedad": "${anio_antiguedad}", "dias_antiguedad": "${dias_antiguedad}", "antiguedad_variable": "${antiguedad_variable}", 
-                     "vacacion_dias_calendario_mes": "${vacacion_dias_calendario_mes}", "vacacion_dias_laboral_mes": "${vacacion_dias_laboral_mes}", 
-                     "calendario_dias": "${calendario_dias}", "laboral_dias": "${laboral_dias}", "meses_calculo": "${meses_calculo}" }`,
+                    datosNuevos: JSON.stringify(datosNuevos),
                     ip: ip,
                     observacion: null,
                 });
@@ -240,7 +257,6 @@ class RegimenControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
                 const { user_name, ip } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION

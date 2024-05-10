@@ -163,12 +163,12 @@ class RegimenControlador {
           datosOriginales: "",
           datosNuevos: "",
           ip: ip,
-          observacion: `Error al actualizar el registro con id: ${id}.`,
+          observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`,
         });
   
         // FINALIZAR TRANSACCION
         await pool.query("COMMIT");
-        return res.status(404).jsonp({ message: "error" });
+        return res.status(404).jsonp({ message: "Registro no encontrado" });
       }
   
       await pool.query(
@@ -210,22 +210,40 @@ class RegimenControlador {
         ]
       );
 
+      const datosNuevos = {
+        "id_pais": id_pais,
+        "descripcion": descripcion,
+        "mes_periodo": mes_periodo,
+        "dias_mes": dias_mes,
+        "trabajo_minimo_mes": trabajo_minimo_mes,
+        "trabajo_minimo_horas": trabajo_minimo_horas,
+        "continuidad_laboral": continuidad_laboral,
+        "vacacion_dias_laboral": vacacion_dias_laboral,
+        "vacacion_dias_libre": vacacion_dias_libre,
+        "vacacion_dias_calendario": vacacion_dias_calendario,
+        "acumular": acumular,
+        "dias_max_acumulacion": dias_max_acumulacion,
+        "contar_feriados": contar_feriados,
+        "vacacion_divisible": vacacion_divisible,
+        "antiguedad": antiguedad,
+        "antiguedad_fija": antiguedad_fija,
+        "anio_antiguedad": anio_antiguedad,
+        "dias_antiguedad": dias_antiguedad,
+        "antiguedad_variable": antiguedad_variable,
+        "vacacion_dias_calendario_mes": vacacion_dias_calendario_mes,
+        "vacacion_dias_laboral_mes": vacacion_dias_laboral_mes,
+        "calendario_dias": calendario_dias,
+        "laboral_dias": laboral_dias,
+        "meses_calculo": meses_calculo
+      };
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: "cg_regimenes",
         usuario: user_name,
         accion: "U",
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `
-                    { "id_pais": "${id_pais}", "descripcion": "${descripcion}", "mes_periodo": "${mes_periodo}", 
-                     "dias_mes": "${dias_mes}", "trabajo_minimo_mes": "${trabajo_minimo_mes}", "trabajo_minimo_horas": "${trabajo_minimo_horas}", 
-                     "continuidad_laboral": "${continuidad_laboral}", "vacacion_dias_laboral": "${vacacion_dias_laboral}", 
-                     "vacacion_dias_libre": "${vacacion_dias_libre}", "vacacion_dias_calendario": "${vacacion_dias_calendario}", 
-                     "acumular": "${acumular}", "dias_max_acumulacion": "${dias_max_acumulacion}", "contar_feriados": "${contar_feriados}", 
-                     "vacacion_divisible": "${vacacion_divisible}", "antiguedad": "${antiguedad}", "antiguedad_fija": "${antiguedad_fija}", 
-                     "anio_antiguedad": "${anio_antiguedad}", "dias_antiguedad": "${dias_antiguedad}", "antiguedad_variable": "${antiguedad_variable}", 
-                     "vacacion_dias_calendario_mes": "${vacacion_dias_calendario_mes}", "vacacion_dias_laboral_mes": "${vacacion_dias_laboral_mes}", 
-                     "calendario_dias": "${calendario_dias}", "laboral_dias": "${laboral_dias}", "meses_calculo": "${meses_calculo}" }`,
+        datosNuevos: JSON.stringify(datosNuevos),
         ip: ip,
         observacion: null,
       });
@@ -304,7 +322,6 @@ class RegimenControlador {
   // ELIMINAR REGISTRO DE REGIMEN LABORAL
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
       const { user_name, ip } = req.body;
       const id = req.params.id;
 

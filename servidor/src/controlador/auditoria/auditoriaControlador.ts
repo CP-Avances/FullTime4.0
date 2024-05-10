@@ -21,6 +21,7 @@ class AuditoriaControlador {
     public async InsertarAuditoria(data: Auditoria) {
         try {
             const { tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion } = data;
+            console.log(data);
             await pool.query('INSERT INTO audit.auditoria (schema_name, table_name, user_name, action_tstamp, ' +
                 'action, original_data, new_data, ip, observacion) VALUES ($1, $2, $3, now(), $4, $5, $6, $7, $8)',
                 ['public', tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion]);
