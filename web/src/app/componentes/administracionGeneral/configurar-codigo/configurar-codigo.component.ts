@@ -226,6 +226,10 @@ export class ConfigurarCodigoComponent implements OnInit {
     }
   }
 
+  VisualizarConfiguracion(){
+    
+  }
+
   //CONTROL BOTONES
   getConfigurar(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
@@ -245,10 +249,6 @@ export class ConfigurarCodigoComponent implements OnInit {
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
-  }
-  
-  VisualizarConfiguracion(){
-    
   }
 
 }

@@ -174,6 +174,7 @@ class LoginControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const correo = req.body.correo;
             const url_page = req.body.url_page;
+            const cedula = req.body.cedula;
             var tiempo = (0, settingsMail_1.fechaHora)();
             var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
@@ -181,10 +182,10 @@ class LoginControlador {
             const correoValido = yield database_1.default.query(`
       SELECT e.id, e.nombre, e.apellido, e.correo, u.usuario, u.contrasena 
       FROM eu_empleados AS e, eu_usuarios AS u 
-      WHERE e.correo = $1 AND u.id_empleado = e.id
-      `, [correo]);
+      WHERE e.correo = $1 AND u.id_empleado = e.id AND e.cedula = $2 
+      `, [correo, cedula]);
             if (correoValido.rows[0] == undefined)
-                return res.status(401).send('Correo de usuario no válido.');
+                return res.status(401).send('Correo o cédula de usuario no válido.');
             var datos = yield (0, settingsMail_1.Credenciales)(1);
             if (datos === 'ok') {
                 const token = jsonwebtoken_1.default.sign({ _id: correoValido.rows[0].id }, process.env.TOKEN_SECRET_MAIL || 'llaveEmail', { expiresIn: 60 * 5, algorithm: 'HS512' });

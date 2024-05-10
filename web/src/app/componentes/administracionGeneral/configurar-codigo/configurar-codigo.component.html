@@ -52,7 +52,7 @@
                 </form>
 
                 <div style="text-align: center; padding-top: 15px;">
-                    <button id="btn-raised" class="btn btn-sm float-left" (click)="VisualizarConfiguracion()">
+                    <button id="btn-raised" class="btn btn-sm float-left" (click)="VisualizarConfiguracion()" *ngIf="getVerConfiguracion()">
                         Visualizar
                     </button>
                     <button id="btn-raised" class="btn btn-sm" (click)="RegistrarConfiguracion(formulario.value)" *ngIf="getConfigurar()"

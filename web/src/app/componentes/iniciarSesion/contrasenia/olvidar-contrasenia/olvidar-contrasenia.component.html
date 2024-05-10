@@ -18,12 +18,21 @@
                                 </mat-form-field>
                                 <br>
                                 <mat-form-field>
+                                    <mat-label>Ingrese cédula</mat-label>
+                                    <input matInput [formControl]="cedula" maxlength="10" required>
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresa cédula.">
+                                        help_outline</mat-icon>
+                                    <mat-error *ngIf="cedula.invalid">{{ObtenerMensajeCampoUsuarioError()}}</mat-error>
+                                </mat-form-field>
+                                <br>
+                                <mat-form-field>
                                     <mat-label>Ingrese código empresarial</mat-label>
                                     <input matInput [formControl]="empresa" required>
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresa el código empresarial.">
                                         help_outline</mat-icon>
-                                    <mat-error *ngIf="correo.invalid">{{ObtenerMensajeCampoUsuarioError()}}</mat-error>
+                                    <mat-error *ngIf="empresa.invalid">{{ObtenerMensajeCampoUsuarioError()}}</mat-error>
                                 </mat-form-field>
                             </form>
                             <br>

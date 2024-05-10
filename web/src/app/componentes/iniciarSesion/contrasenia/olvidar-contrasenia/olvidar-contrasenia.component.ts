@@ -18,11 +18,13 @@ export class OlvidarContraseniaComponent implements OnInit {
   mensaje: any = [];//Almacenamiento de respuesta de validacion de codigo empresarial
 
   correo = new FormControl('', [Validators.required, Validators.email]);
+  cedula = new FormControl('', [Validators.required]);
   empresa = new FormControl('', [Validators.required]);
 
   public formulario = new FormGroup({
     usuarioF: this.correo,
-    empresaF: this.empresa,
+    cedulaF: this.cedula,
+    empresaF: this.empresa
   });
 
   constructor(
@@ -45,44 +47,47 @@ export class OlvidarContraseniaComponent implements OnInit {
       return 'No es un correo electrónico';
     }
     if (this.empresa.toString().trim().length === 0) {
-      return 'Ingrese codigo empresarial';
+      return 'Ingrese código empresarial';
+    }
+    if (this.cedula.toString().trim().length === 0) {
+      return 'Ingrese cédula';
     }
   }
 
   // METODO DE ENVIO DE CORREO ELECTRONICO PARA RECUPERAR CUENTA
   respuesta: any = [];
   EnviarCorreoConfirmacion(form: any) {
-    //Codigo empresarial encriptado, para validar con servicio
+    //CODIGO EMPRESARIAL ENCRIPTADO, PARA VALIDAR CON SERVICIO
     let empresas = {
       "codigo_empresa": this.rsaKeysService.encriptarLogin(form.empresaF.toString())
     };
 
-    //Validacion de codigo empresarial
+    //VALIDACION DE CODIGO EMPRESARIAL
     this.rest.getEmpresa(empresas).subscribe(
       {
         next: (v) => 
           {
-            //Almacenamiento de ip dependiendo el resultado de la validacion
+            //ALMACENAMIENTO DE IP DEPENDIENDO EL RESULTADO DE LA VALIDACION
             this.mensaje = v;
             if (this.mensaje.message === 'ok') {
               localStorage.setItem("empresaURL", this.mensaje.empresas[0].empresa_direccion);
             }
             else if (this.mensaje.message === 'vacio') {
-              this.toastr.error('Verifique codigo empresarial', 'Error', {
+              this.toastr.error('Verifique código empresarial', 'Error', {
                 timeOut: 3000,
               });
             }
           },
         error: (e) => 
           {
-            this.toastr.error('Verifique codigo empresarial', 'Error', {
+            this.toastr.error('Verifique código empresarial', 'Error', {
               timeOut: 3000,
             });
           },
         complete: () => 
           {
-            //Consulta cadena IP para armar url en correo
-            console.log('CONTINUAR RECU - SETEO RUTA');
+            //CONSULTA CADENA IP PARA ARMAR URL ADJUNTADO EN CORREO
+            console.log('CONTINUAR RECUPERACIÓN - SETEO RUTA');
             this.restE.ConsultarEmpresaCadena().subscribe(
               {
                 next: (v) => 
@@ -97,11 +102,12 @@ export class OlvidarContraseniaComponent implements OnInit {
                   },
                 complete: () => 
                   {
-                    //Continua proceso normal envio correo
-                    //inicio recuperacion
+                    //CONTINUA PROCESO NORMAL ENVIO CORREO
+                    //INICIO RECUPERACION
                     let dataPass = {
                       correo: form.usuarioF,
-                      url_page: this.cadena
+                      url_page: this.cadena,
+                      cedula: form.cedulaF
                     };
                     this.rest.EnviarCorreoContrasena(dataPass).subscribe(res => {
                       this.respuesta = res;
@@ -116,15 +122,19 @@ export class OlvidarContraseniaComponent implements OnInit {
                           timeOut: 6000,
                         });
                         this.correo.reset();
+                        this.cedula.reset();
+                        this.empresa.reset();
                         this.router.navigate(['/login']);
                       }
                     }, error => {
-                      this.toastr.error('El correo electrónico ingresado no consta en los registros.', 'Ups!!! algo salio mal.', {
+                      this.toastr.error('El correo electrónico o cédula ingresado no consta en los registros.', 'Ups!!! algo salio mal.', {
                         timeOut: 6000,
                       });
                       this.correo.reset();
+                      this.cedula.reset();
+                      this.empresa.reset();
                     });
-                    //fin recuperacion
+                    //FIN RECUPERACION
                   }
               }
             );

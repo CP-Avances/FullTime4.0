@@ -980,7 +980,7 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const plantilla = req.body;
             console.log('datos automatico: ', plantilla);
-            const VALOR = yield database_1.default.query('SELECT * FROM codigo');
+            const VALOR = yield database_1.default.query('SELECT * FROM e_codigo');
             //TODO Revisar max codigo
             var codigo_dato = VALOR.rows[0].valor;
             var codigo = 0;

@@ -1095,7 +1095,7 @@ class EmpleadoControlador {
     const plantilla = req.body;
     console.log('datos automatico: ', plantilla);
 
-    const VALOR = await pool.query('SELECT * FROM codigo');
+    const VALOR = await pool.query('SELECT * FROM e_codigo');
     //TODO Revisar max codigo
     var codigo_dato = VALOR.rows[0].valor;
     var codigo = 0;
