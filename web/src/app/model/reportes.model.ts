@@ -540,3 +540,7 @@ export interface ITableRoles {
 export interface ITableModalidad {
     descripcion: string,
 }
+
+export interface ITableTipoCargo {
+    cargo: string,
+}

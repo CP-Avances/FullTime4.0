@@ -132,6 +132,11 @@ export class CatModalidaLaboralComponent implements OnInit {
       .afterClosed().subscribe(items => {
         this.ngOnInit();
       });
+      this.activar_seleccion = true;
+      this.plan_multiple = false;
+      this.plan_multiple_ = false;
+      this.selectionModalidad.clear();
+      this.modalidadesEliminar = [];
   }
 
   // METODO PARA EDITAR MODALIDAD LABORAL

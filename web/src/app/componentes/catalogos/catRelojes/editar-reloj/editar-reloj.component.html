@@ -112,7 +112,7 @@
                                         </mat-radio-button>
                                     </div>
                                 </mat-radio-group>
-                                <mat-form-field *ngIf=(activarCampo)>
+                                <mat-form-field  *ngIf=(activarCampo)>
                                     <mat-label>Número de acciones</mat-label>
                                     <input matInput placeholder="Acciones del dispositivo." [formControl]="numeroF"
                                         required (keypress)="IngresarSoloNumeros($event)">
