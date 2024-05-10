@@ -16,6 +16,10 @@ import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service
 
 export class RegistroRolComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // VARIABLE PARA ENVIO DE INFORMACION ENTRE VENTANAS
   salir: boolean = false;
 
@@ -39,6 +43,9 @@ export class RegistroRolComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerRoles();
   }
 
@@ -47,10 +54,12 @@ export class RegistroRolComponent implements OnInit {
   contador: number = 0;
   roles: any = [];
   InsertarRol(form: any) {
-  
+
     this.contador = 0;
     let rol = {
       nombre: form.descripcionForm,
+      user_name: this.user_name,
+      ip: this.ip
     };
     this.data_nueva = rol;
 

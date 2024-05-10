@@ -33,7 +33,6 @@ class RolesControlador {
     EliminarRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // TODO ANALIZAR COMOOBTENER USER_NAME E IP DESDE EL FRONT
                 const { user_name, ip } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION

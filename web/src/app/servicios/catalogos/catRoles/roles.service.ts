@@ -16,8 +16,12 @@ export class RolesService {
   }
 
   // ELIMINAR REGISTRO DE ROL
-  EliminarRoles(id: number) {
-    return this.http.delete(`${environment.url}/rol/eliminar/${id}`);
+  EliminarRoles(id: number, datos:any) {
+    const url = `${environment.url}/rol/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA CREAR ARCHIVO XML
@@ -37,7 +41,7 @@ export class RolesService {
 
 
 
-  
+
 
   // Roles
 

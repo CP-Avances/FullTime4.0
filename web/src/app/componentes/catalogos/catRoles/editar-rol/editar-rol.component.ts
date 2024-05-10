@@ -18,6 +18,10 @@ export class EditarRolComponent implements OnInit {
 
   salir: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CAMPOS DE FORMULARIO
   descripcion = new FormControl('', Validators.required);
 
@@ -35,6 +39,9 @@ export class EditarRolComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.nuevoRolForm.setValue({
       descripcionForm: this.data.datosRol.nombre,
     });
@@ -49,6 +56,8 @@ export class EditarRolComponent implements OnInit {
     let dataRol = {
       id: this.data.datosRol.id,
       nombre: form.descripcionForm,
+      user_name: this.user_name,
+      ip: this.ip
     };
     this.data_nueva = dataRol;
     this.rest.ListarRolesActualiza(this.data.datosRol.id).subscribe(response => {
