@@ -31,7 +31,6 @@ class RelojesControlador {
     // METODO PARA ELIMINAR REGISTROS
     public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
         try {
-            // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
             const { user_name, ip } = req.body;
             const id = req.params.id;
 
@@ -90,7 +89,6 @@ class RelojesControlador {
     // METODO PARA REGISTRAR DISPOSITIVO
     public async CrearRelojes(req: Request, res: Response) {
         try {
-            // TODO PARA ESTE CASO ES USER_IP NO IP LA DIRECCION DEL USUARIO
             const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
                 tien_funciones, id_sucursal, id_departamento, id, numero_accion, user_name, user_ip } = req.body;
 
@@ -133,7 +131,7 @@ class RelojesControlador {
         catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'error' });
+            return res.status(500).jsonp({ message: error });
         }
     }
 

@@ -40,6 +40,10 @@ export class EditarRelojComponent implements OnInit {
   selec1 = false;
   selec2 = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
 
   // PRIMER FORMULARIO
@@ -75,6 +79,9 @@ export class EditarRelojComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.FiltrarSucursales();
     this.ValidarFormulario();
     this.ObtenerDatos();
@@ -200,6 +207,8 @@ export class EditarRelojComponent implements OnInit {
       fabricante: form2.fabricanteForm,
       contrasenia: form2.contraseniaForm,
       id_fabricacion: form2.idFabricacionForm,
+      user_name: this.user_name,
+      user_ip: this.ip,
     };
 
     this.rest.ActualizarDispositivo(datosReloj).subscribe(response => {
@@ -233,7 +242,7 @@ export class EditarRelojComponent implements OnInit {
     }
   }
 
-  // METODO PARA REGISTRAR IP 
+  // METODO PARA REGISTRAR IP
   IngresarIp(evt: any) {
     if (window.event) {
       var keynum = evt.keyCode;

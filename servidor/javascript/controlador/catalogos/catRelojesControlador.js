@@ -41,7 +41,6 @@ class RelojesControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
                 const { user_name, ip } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
@@ -92,7 +91,6 @@ class RelojesControlador {
     CrearRelojes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // TODO PARA ESTE CASO ES USER_IP NO IP LA DIRECCION DEL USUARIO
                 const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, id, numero_accion, user_name, user_ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -126,7 +124,7 @@ class RelojesControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
