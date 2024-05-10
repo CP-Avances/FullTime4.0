@@ -62,16 +62,16 @@ export class ConfirmarContraseniaComponent implements OnInit {
       contrasena: clave
     };
 
-    //JSON con codigo empresarial encriptado
+    //JSON CON CODIGO EMPRESARIAL ENCRIPTADO
     let empresas = {
       "codigo_empresa": this.rsaKeysService.encriptarLogin(form.empresaPass.toString())
     };
 
-    //Validacion de codigo empresarial
+    //VALIDACION DE CODIGO EMPRESARIAL
     this.restLogin.getEmpresa(empresas).subscribe(
       {
         next: (v) => {
-          //Almacenamiento de ip dependiendo el resultado de la validacion
+          //ALMACENAMIENTO DE IP DEPENDIENDO EL RESULTADO DE LA VALIDACION
           this.mensajeURL = v;
           if (this.mensajeURL.message === 'ok') {
             localStorage.setItem("empresaURL", this.mensajeURL.empresas[0].empresa_direccion);
@@ -88,9 +88,9 @@ export class ConfirmarContraseniaComponent implements OnInit {
           });
         },
         complete: () => {
-          //Evento para resultado satisfactorio
+          //EVENTO PARA RESULTADO SATISFACTORIO
           console.log('CONTINUAR RESTAURACION CONTRASENIA');
-          ///confirmar cambio
+          ///CONFIRMAR CAMBIO
           this.restLogin.ActualizarContrasenia(data).subscribe(res => {
             this.mensaje = res;
             if (this.mensaje.expiro === 'si') {
@@ -105,7 +105,7 @@ export class ConfirmarContraseniaComponent implements OnInit {
               });
             }
           });
-          ///fin confirmar cambio
+          //FIN CONFIRMAR CAMBIO
         }
       }
     );
