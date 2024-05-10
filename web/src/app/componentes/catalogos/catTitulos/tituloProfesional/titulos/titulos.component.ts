@@ -31,6 +31,9 @@ export class TitulosComponent implements OnInit {
 
   HabilitarDescrip: boolean = true;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   constructor(
     private rest: TituloService,
@@ -41,6 +44,9 @@ export class TitulosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerNivelesTitulo();
     this.niveles[this.niveles.length] = { nombre: "OTRO" };
   }
@@ -139,7 +145,10 @@ export class TitulosComponent implements OnInit {
     let titulo = {
       nombre: form.tituloNombreForm,
       id_nivel: idNivel,
+      user_name: this.user_name,
+      ip: this.ip
     };
+
     this.rest.RegistrarTitulo(titulo).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,

@@ -24,7 +24,6 @@ class TituloControlador {
   // METODO PARA ELIMINAR REGISTROS
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      // TODO ANALIZAR COMOOBTENER USER_NAME E IP DESDE EL FRONT
       const { user_name, ip } = req.body;
       const id = req.params.id;
 

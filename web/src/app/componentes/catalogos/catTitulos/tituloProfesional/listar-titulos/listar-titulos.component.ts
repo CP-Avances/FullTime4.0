@@ -73,7 +73,11 @@ export class ListarTitulosComponent implements OnInit {
   get logo(): string { return this.plantillaPDF.logoBase64 }
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
-  hipervinculo: string = environment.url
+  hipervinculo: string = environment.url;
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   constructor(
     public ventana: MatDialog, // VARIABLE QUE MANEJA EVENTOS CON VENTANAS
@@ -87,6 +91,9 @@ export class ListarTitulosComponent implements OnInit {
 
   ngOnInit(): void {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerTitulos();
     this.ObtenerNiveles();
@@ -198,7 +205,12 @@ export class ListarTitulosComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_titulo: number) {
-    this.rest.EliminarRegistro(id_titulo).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.rest.EliminarRegistro(id_titulo, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -339,7 +351,9 @@ export class ListarTitulosComponent implements OnInit {
    registrarTitulos(){
     var data: any = {
       nombre: '',
-      id_nivel: ''
+      id_nivel: '',
+      user_name: this.user_name,
+      ip: this.ip
     }
 
     if(this.listTitulosCorrectos.length > 0){
