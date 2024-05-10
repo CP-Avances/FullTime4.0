@@ -97,11 +97,10 @@ class ModalidaLaboralControlador {
                 DELETE FROM e_cat_modalidad_trabajo WHERE id = $1
             `
                 , [id]);
-            res.jsonp({ message: 'Registro eliminado.', code: '200' });
+            res.jsonp({ message: 'Registro eliminado.' });
 
         } catch (error) {
-            console.log('error: ', error.code);
-            return res.status(500).jsonp({ message: error.detail, code: error.code });
+            return res.jsonp({ message: 'error' });
         }
     }
 

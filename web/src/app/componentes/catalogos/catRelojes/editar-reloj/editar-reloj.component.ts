@@ -30,8 +30,8 @@ export class EditarRelojComponent implements OnInit {
 
   // VARIABLES DE ALMACENAMIENTO
   empresas: any = [];
-  datosReloj: any = [];
   sucursales: any = [];
+  datosReloj: any = [];
   departamento: any = [];
   activarCampo: boolean = false;
   ver_editar: boolean = true;
