@@ -376,7 +376,9 @@ export class RegistrarFeriadosComponent implements OnInit {
     this.ciudadesSeleccionadas.map(obj => {
       var buscarCiudad = {
         id_feriado: id,
-        id_ciudad: obj.id
+        id_ciudad: obj.id,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       // BUSCAR ID DE CIUDADES EXISTENTES
       this.ciudadFeriados = [];

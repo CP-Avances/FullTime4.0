@@ -66,6 +66,10 @@ export class AsignarCiudadComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private restF: CiudadFeriadosService,
     private restP: ProvinciaService,
@@ -76,7 +80,9 @@ export class AsignarCiudadComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('pagina ', this.pagina)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerContinentes();
     this.BuscarDatosFeriado(this.id_feriado);
   }
@@ -248,7 +254,9 @@ export class AsignarCiudadComponent implements OnInit {
       this.ciudadesSeleccionadas.map(obj => {
         var buscarCiudad = {
           id_feriado: this.id_feriado,
-          id_ciudad: obj.id
+          id_ciudad: obj.id,
+          user_name: this.user_name,
+          ip: this.ip,
         }
         // BUSCAR ID DE CIUDADES EXISTENTES
         this.ciudadFeriados = [];

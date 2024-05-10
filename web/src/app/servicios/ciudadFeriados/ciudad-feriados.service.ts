@@ -24,8 +24,12 @@ export class CiudadFeriadosService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/ciudadFeriados/eliminar/${id}`);
+  EliminarRegistro(id: number, dato:any) {
+    const url = `${environment.url}/ciudadFeriados/eliminar/${id}`;
+    const httpOptions = {
+      body: dato
+    };
+    return this.http.request('delete', url, httpOptions);
   }
 
   // METODO PARA BUSCAR ID DE CIUDADES
