@@ -25,6 +25,10 @@ export class ListaArchivosComponent implements OnInit {
 
   filtroDescripcion = '';
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.minLength(2)]);
 
@@ -42,6 +46,9 @@ export class ListaArchivosComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.MostrarArchivos();
   }
 
@@ -116,7 +123,12 @@ export class ListaArchivosComponent implements OnInit {
 
   // METODO PARA ELIMINAR ARCHIVOS
   EliminarArchivo(filename: string, id: number) {
-    this.rest.EliminarRegistro(id, filename).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.rest.EliminarRegistro(id, filename, datos).subscribe(res => {
       this.MostrarArchivos();
     })
 
@@ -165,7 +177,7 @@ export class ListaArchivosComponent implements OnInit {
       }else{
         return (o.nombre.indexOf(query) > -1);
       }
-      
+
     })
     this.archivosFiltro = filtro;
   }

@@ -12,8 +12,8 @@ export class DocumentosService {
     private http: HttpClient,
   ) { }
 
-  /** ************************************************************************************* ** 
-   ** **                       MANEJO DE ARCHIVOS DESDE EL SERVIDOR                      ** ** 
+  /** ************************************************************************************* **
+   ** **                       MANEJO DE ARCHIVOS DESDE EL SERVIDOR                      ** **
    ** ************************************************************************************* **/
 
   // METODO PARA LISTAR CARPETAS EXISTENTES EN EL SERVIDOR
@@ -57,7 +57,7 @@ export class DocumentosService {
   }
 
   /** ********************************************************************************************* **
-   ** **                        MANEJO DE ARCHIVOS DOCUMENTACION                                 ** **        
+   ** **                        MANEJO DE ARCHIVOS DOCUMENTACION                                 ** **
    ** ********************************************************************************************* **/
 
   // REGISTRAR DOCUMENTO
@@ -66,8 +66,12 @@ export class DocumentosService {
   }
 
   // ELIMINAR REGISTRO DE DOCUMENTACION
-  EliminarRegistro(id: number, documento: string) {
-    return this.http.delete(`${environment.url}/archivosCargados/eliminar/${id}/${documento}`);
+  EliminarRegistro(id: number, documento: string, datos: any) {
+    const url = `${environment.url}/archivosCargados/eliminar/${id}/${documento}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA LISTAR LOS ARCHIVOS DE CADA CARPETA   --**VERIFICADO

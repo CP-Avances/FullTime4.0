@@ -17,6 +17,10 @@ export class VerDocumentacionComponent implements OnInit {
   hipervinculo: string = environment.url
   subir: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.minLength(2)]);
 
@@ -31,6 +35,9 @@ export class VerDocumentacionComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.MostrarArchivos();
   }
 
@@ -57,9 +64,12 @@ export class VerDocumentacionComponent implements OnInit {
   }
 
   EliminarArchivo(filename: string, id: number) {
-    console.log('llego');
-    this.rest.EliminarRegistro(id, filename).subscribe(res => {
-      console.log(res);
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.rest.EliminarRegistro(id, filename, datos).subscribe(res => {
       this.MostrarArchivos();
     })
   }
@@ -82,7 +92,7 @@ export class VerDocumentacionComponent implements OnInit {
       }else{
         return (o.nombre.indexOf(query) > -1);
       }
-      
+
     })
     this.archivosFiltro = filtro;
   }
