@@ -73,13 +73,17 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public location: Location,
     public rest: RolPermisosService,
     private toastr: ToastrService,
     private rol: RolesService,
 
-  ) { 
+  ) {
     // codigo para obtner el id del rol seleccionado
     var url = this.location.prepareExternalUrl(this.location.path());
     this.idRol = url.split('/')[2];
@@ -90,6 +94,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.limpliarCampos();
     this.obtenerPermisosRolUsuario();
   }
@@ -125,7 +132,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     let dataRol = {
       funcion: form.funcionForm,
       link: form.linkForm,
-      etiqueta: form.etiquetaForm + ' ' + form.linkForm
+      etiqueta: form.etiquetaForm + ' ' + form.linkForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     this.rest.postRolPermisoRest(dataRol).subscribe(res => {
@@ -133,14 +142,16 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       this.toastr.success('Operacion exitosa.', 'Rol Permiso guardado', {
         timeOut: 6000,
       });
-      
+
       // sacar id de la tabla rol permiso
       this.guardarRol = res;
       this.idPermiso = this.guardarRol.id;
 
       let dataPermisoDenegado = {
         id_rol: this.idRol,
-        id_permiso: this.idPermiso
+        id_permiso: this.idPermiso,
+        user_name: this.user_name,
+        ip: this.ip,
       };
 
       // insertar id del cg_roles y cg_rol_permiso a la tabla rol_perm_denegado
