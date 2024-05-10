@@ -157,3 +157,8 @@ td {
     border-radius: 50px;
     float: left;
 }
+
+#SelectCheck {
+    cursor: pointer;
+    margin-left: 10px;
+}

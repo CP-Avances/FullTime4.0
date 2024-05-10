@@ -1068,7 +1068,7 @@ class DatosGeneralesControlador {
                             da.id = e.id) 
                             AND s.id = d.id_sucursal
                             AND co.id_regimen = r.id AND e.estado = $2
-                            AND NOT EXISTS (SELECT eu.id_empl FROM mg_empleado_ubicacion AS eu 
+                            AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
                                 WHERE eu.id_empleado = e.id AND eu.id_ubicacion = $3)
                         ORDER BY name_empleado ASC
                         `, [empl.id_depa, estado, ubicacion])
@@ -1092,7 +1092,7 @@ class DatosGeneralesControlador {
                             da.id = e.id) 
                             AND s.id = d.id_sucursal
                             AND co.id_regimen = r.id AND e.estado = $2
-                            AND NOT EXISTS (SELECT eu.id_empl FROM mg_empleado_ubicacion AS eu 
+                            AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
                                 WHERE eu.id_empleado = e.id AND eu.id_ubicacion = $3)
                         ORDER BY name_empleado ASC
                         `, [empl.id_depa, estado, ubicacion])
@@ -1191,7 +1191,7 @@ class DatosGeneralesControlador {
                         da.id = e.id) 
                         AND s.id = d.id_sucursal
                         AND co.id_regimen = r.id AND e.estado = $2
-                        AND NOT EXISTS (SELECT eu.id_empl FROM mg_empleado_ubicacion AS eu 
+                        AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
                             WHERE eu.id_empleado = e.id AND eu.id_ubicacion = $3)
                     ORDER BY name_empleado ASC
                     `, [empl.id_cargo, estado, ubicacion]).then((result) => { return result.rows; });
@@ -1214,7 +1214,7 @@ class DatosGeneralesControlador {
                         da.id = e.id) 
                         AND s.id = d.id_sucursal
                         AND co.id_regimen = r.id AND e.estado = $2
-                        AND NOT EXISTS (SELECT eu.id_empl FROM mg_empleado_ubicacion AS eu 
+                        AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
                             WHERE eu.id_empleado = e.id AND eu.id_ubicacion = $3)
                     ORDER BY name_empleado ASC
                     `, [empl.id_cargo, estado, ubicacion])

@@ -100,7 +100,25 @@ export class EditarVacunaComponent implements OnInit {
       id_empleado: parseInt(this.idEmploy),
       fecha: form.fechaForm,
     }
-    this.VerificarInformacion(vacuna, form);
+    // VERIFICAR SI EL REGISTRO ES SIMILAR AL EXISTENTE
+    if (vacuna.fecha === this.dvacuna.fecha && vacuna.id_tipo_vacuna === this.dvacuna.id_vacuna) {
+      this.VerificarInformacion(vacuna, form);
+    }
+    else {
+      // VERIIFCAR EXISTENCIA DEL REGISTRO DE VACUNA
+      let verificar = {
+        id_empleado: vacuna.id_empleado,
+        fecha: vacuna.fecha,
+        id_vacuna: vacuna.id_tipo_vacuna
+      }
+      this.restVacuna.BuscarVacunaFechaTipo(verificar).subscribe(response => {
+        this.toastr.warning('Registro de vacunación ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        });
+      }, vacio => {
+        this.VerificarInformacion(vacuna, form);
+      });
+    }
   }
 
   // METODO PARA ACTUALIZAR DATOS DE REGISTRO DE VACUNACION

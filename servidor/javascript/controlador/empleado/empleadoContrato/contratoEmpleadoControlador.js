@@ -242,6 +242,21 @@ class ContratoEmpleadoControlador {
             }
         });
     }
+    // METODO PARA BUSCAR MODALIDAD LABORAL POR NOMBRE
+    BuscarModalidadLaboralNombre(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { nombre } = req.body;
+            const CONTRATOS = yield database_1.default.query(`
+            SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+            `, [nombre]);
+            if (CONTRATOS.rowCount > 0) {
+                return res.jsonp(CONTRATOS.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+        });
+    }
     ListarContratos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const CONTRATOS = yield database_1.default.query(`
@@ -533,7 +548,7 @@ class ContratoEmpleadoControlador {
                 var filaDuplicada = 0;
                 listContratos.forEach((item) => {
                     if (item.observacion == '1') {
-                        item.observacion = 'Registro duplicado - cédula';
+                        item.observacion = 'Registro duplicado (cédula)';
                     }
                     if (item.observacion != undefined) {
                         let arrayObservacion = item.observacion.split(" ");

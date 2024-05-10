@@ -37,7 +37,7 @@ class DiscapacidadControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, carn_conadis, porcentaje, tipo } = req.body;
             yield database_1.default.query(`
-      INSERT INTO eu_empleado_discapacidad (id_empleado, carnet_conadis, porcentaje, tipo) 
+      INSERT INTO eu_empleado_discapacidad (id_empleado, carnet_conadis, porcentaje, id_discapacidad) 
       VALUES ($1, $2, $3, $4)
       `, [id_empleado, carn_conadis, porcentaje, tipo]);
             res.jsonp({ message: 'Registro guardado.' });
@@ -49,7 +49,7 @@ class DiscapacidadControlador {
             const id_empleado = req.params.id_empleado;
             const { carn_conadis, porcentaje, tipo } = req.body;
             yield database_1.default.query(`
-      UPDATE eu_empleado_discapacidad SET carnet_conadis = $1, porcentaje = $2, tipo = $3 
+      UPDATE eu_empleado_discapacidad SET carnet_conadis = $1, porcentaje = $2, id_discapacidad = $3 
       WHERE id_empleado = $4
       `, [carn_conadis, porcentaje, tipo, id_empleado]);
             res.jsonp({ message: 'Registro actualizado.' });
@@ -89,6 +89,21 @@ class DiscapacidadControlador {
             const TIPO_DISCAPACIDAD = yield database_1.default.query(`
       SELECT * FROM e_cat_discapacidad
       `);
+            if (TIPO_DISCAPACIDAD.rowCount > 0) {
+                return res.jsonp(TIPO_DISCAPACIDAD.rows);
+            }
+            else {
+                res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE
+    BuscarDiscapacidadNombre(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { nombre } = req.body;
+            const TIPO_DISCAPACIDAD = yield database_1.default.query(`
+      SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1
+      `, [nombre]);
             if (TIPO_DISCAPACIDAD.rowCount > 0) {
                 return res.jsonp(TIPO_DISCAPACIDAD.rows);
             }

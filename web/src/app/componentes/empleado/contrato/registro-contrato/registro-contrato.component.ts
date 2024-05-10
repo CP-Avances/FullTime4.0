@@ -192,9 +192,19 @@ export class RegistroContratoComponent implements OnInit {
       let tipo_contrato = {
         descripcion: form.contratoForm
       }
-      this.rest.CrearTiposContrato(tipo_contrato).subscribe(res => {
-        datos.id_tipo_contrato = res.id;
-        this.ValidarDuplicidad(datos, form);
+      // VERIFICAR DUPLICIDAD DE MODALIDAD LABORAL
+      let modalidad = {
+        nombre: (tipo_contrato.descripcion).toUpperCase()
+      }
+      this.rest.BuscarModalidadLaboralNombre(modalidad).subscribe(res => {
+        this.toastr.warning('Modalidad Laboral ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        });
+      }, vacio => {
+        this.rest.CrearTiposContrato(tipo_contrato).subscribe(res => {
+          datos.id_tipo_contrato = res.id;
+          this.ValidarDuplicidad(datos, form);
+        });
       });
     }
     else {
@@ -232,14 +242,14 @@ export class RegistroContratoComponent implements OnInit {
       var ingreso = String(moment(datos.fec_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
       // COMPARACION DE CADA REGISTRO
       for (var i = 0; i <= this.revisarFecha.length - 1; i++) {
-        var fecha = String(moment(this.revisarFecha[i].fecha_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
-        if (fecha === ingreso) {
+        var fecha_salida = String(moment(this.revisarFecha[i].fecha_salida, "YYYY/MM/DD").format("YYYY-MM-DD"));
+        if (ingreso < fecha_salida) {
           this.contador = 1;
         }
       }
       // SI EL REGISTRO ESTA DUPLICADO SE INDICA AL USUARIO
       if (this.contador === 1) {
-        this.toastr.warning('La fecha de ingreso de contrato ya se encuentra registrada.', 'Contrato ya existe.', {
+        this.toastr.warning('Existe un contrato vigente en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
           timeOut: 6000,
         })
         this.contador = 0;

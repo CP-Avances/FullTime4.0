@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
 
         const usuario = await pool.query(
             `
-            SELECT codigo FROM empleados WHERE id = $1
+            SELECT codigo FROM eu_empleados WHERE id = $1
             `
             , [id]);
 
@@ -52,8 +52,10 @@ class VacunaRutas {
         this.router.get('/:id_empleado', TokenValidation, VACUNA_CONTROLADOR.ListarUnRegistro);
         // METODO DE BUSQUEDA DE TIPOS DE VACUNA REGISTRADOS
         this.router.get('/lista/tipo_vacuna', TokenValidation, VACUNA_CONTROLADOR.ListarTipoVacuna);
-        // METODO REGISTRO DE VACUNACIÓN
+        // METODO REGISTRO DE VACUNACION
         this.router.post('/', TokenValidation, VACUNA_CONTROLADOR.CrearRegistro);
+        // METODO PARA BUSCAR VACUNA POR FECHA Y TIPO
+        this.router.post('/fecha_nombre/tipo_vacuna', TokenValidation, VACUNA_CONTROLADOR.BuscarVacunaFechaTipo);
         // METODO PARA GUARDAR DOCUMENTO 
         this.router.put('/:id/documento/:id_empleado', [TokenValidation, upload.single('uploads')], VACUNA_CONTROLADOR.GuardarDocumento);
         // METODO ACTUALIZACION DE REGISTROS DE VACUNACION
@@ -66,6 +68,8 @@ class VacunaRutas {
         this.router.delete('/eliminar/:id/:documento', TokenValidation, VACUNA_CONTROLADOR.EliminarRegistro);
         // METODO REGISTRO DE TIPO DE VACUNA
         this.router.post('/tipo_vacuna', TokenValidation, VACUNA_CONTROLADOR.CrearTipoVacuna);
+        // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE
+        this.router.post('/tipo_vacuna/nombre', TokenValidation, VACUNA_CONTROLADOR.BuscarVacunaNombre);
         // METODO PARA BUSCAR UN DOCUMENTO
         this.router.get('/documentos/:docs/:id', VACUNA_CONTROLADOR.ObtenerDocumento);
 

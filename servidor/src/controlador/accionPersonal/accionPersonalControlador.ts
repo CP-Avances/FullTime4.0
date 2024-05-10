@@ -410,10 +410,10 @@ class AccionPersonalControlador {
             `
             WITH RECURSIVE procesos AS 
             ( 
-            SELECT id, nombre, proc_padre, 1 AS numero FROM map_cat_procesos WHERE id = $1 
+            SELECT id, nombre, proceso_padre, 1 AS numero FROM map_cat_procesos WHERE id = $1 
             UNION ALL 
-            SELECT cg.id, cg.nombre, cg.proc_padre, procesos.numero + 1 AS numero FROM map_cat_procesos cg 
-            JOIN procesos ON cg.id = procesos.proc_padre 
+            SELECT cg.id, cg.nombre, cg.proceso_padre, procesos.numero + 1 AS numero FROM map_cat_procesos cg 
+            JOIN procesos ON cg.id = procesos.proceso_padre 
             ) 
             SELECT UPPER(nombre) AS nombre, numero FROM procesos ORDER BY numero DESC
             `

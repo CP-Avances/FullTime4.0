@@ -21,7 +21,7 @@ const generarTimbres = function (codigo, inicio, fin) {
         let horarios = yield database_1.default.query(`
         SELECT pg.fecha_hora_horario::date AS fecha, pg.fecha_hora_horario::time AS hora, pg.tipo_dia, pg.tipo_accion,
             pg.minutos_alimentacion
-        FROM plan_general AS pg
+        FROM eu_asistencia_general AS pg
         WHERE pg.fecha_horario BETWEEN $1 AND $2 AND pg.codigo = $3 AND (tipo_dia = 'N' OR estado_origen = 'HFD' OR estado_origen = 'HL')
         ORDER BY pg.fecha_hora_horario ASC
         `, [inicio, fin, codigo])
@@ -88,7 +88,7 @@ const generarTimbres = function (codigo, inicio, fin) {
             console.log('fecha ', fecha);
             if (fecha) {
                 yield database_1.default.query(`
-                INSERT INTO timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, 
+                INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, 
                     codigo, id_reloj, fecha_hora_timbre_servidor)
                 values($1, $2, $3, $4, $5, $6, $7, $8, $9)         
                 `, [fecha, accion, tecla_funcion, observacion, latitud, longitud, codigo, 3, fecha]);
@@ -96,7 +96,7 @@ const generarTimbres = function (codigo, inicio, fin) {
         }));
         /*
             `
-                INSERT INTO timbres (fecha_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud,
+                INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud,
                     codigo, id_reloj, fecha_hora_timbre_servidor)
                 values($1, $2, $3, $4, $5, $6, $7, $8, $9)
                 `
@@ -170,7 +170,7 @@ function fechaIterada(fechaIterada, horario) {
 }
 const EliminarTimbres = function (id_empleado) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield database_1.default.query('DELETE FROM timbres WHERE codigo = $1', [id_empleado])
+        yield database_1.default.query('DELETE FROM eu_timbres WHERE codigo = $1', [id_empleado])
             .then(result => {
             console.log(result.command);
         });
@@ -179,7 +179,7 @@ const EliminarTimbres = function (id_empleado) {
 exports.EliminarTimbres = EliminarTimbres;
 const ModificarTimbresEntrada = function () {
     return __awaiter(this, void 0, void 0, function* () {
-        let arrayRespuesta = yield database_1.default.query('select id, CAST(fecha_hora_timbre as VARCHAR) from timbres where accion like \'E\' order by fecha_hora_timbre, codigo ASC')
+        let arrayRespuesta = yield database_1.default.query('select id, CAST(fecha_hora_timbre as VARCHAR) FROM eu_timbres WHERE accion like \'E\' ORDER BY fecha_hora_timbre, codigo ASC')
             .then(result => {
             console.log(result.rowCount);
             return result.rows.filter(obj => {
@@ -196,7 +196,7 @@ const ModificarTimbresEntrada = function () {
             f.setUTCHours(hora);
             f.setUTCMinutes(minuto);
             // console.log('Fecha corregidad',f.toJSON());
-            yield database_1.default.query('UPDATE timbres SET fecha_hora_timbre = $1 WHERE id = $2', [f.toJSON(), obj.id]);
+            yield database_1.default.query('UPDATE eu_timbres SET fecha_hora_timbre = $1 WHERE id = $2', [f.toJSON(), obj.id]);
         }));
     });
 };
