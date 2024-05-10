@@ -37,8 +37,12 @@ export class CiudadService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarCiudad(id: number) {
-    return this.http.delete(`${environment.url}/ciudades/eliminar/${id}`);
+  EliminarCiudad(id: number, datos: any) {
+    const url = `${environment.url}/ciudades/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
    // METODO PARA CREAR ARCHIVO XML
