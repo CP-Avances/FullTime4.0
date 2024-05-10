@@ -339,7 +339,6 @@ class TipoComidasControlador {
 
   public async EliminarDetalle(req: Request, res: Response): Promise<Response> {
     try {
-      // TODO ANALIZAR COMO OBTENER USER_NAME E ID DESDE EL FRONT
       const { user_name, ip } = req.body;
       const id = req.params.id;
 
@@ -367,7 +366,7 @@ class TipoComidasControlador {
 
         // FINALIZAR TRANSACCION
         await pool.query("COMMIT");
-        return res.status(404).jsonp({ message: "error" });
+        return res.status(404).jsonp({ message: "Registro no encontrado" });
       }
 
       await pool.query("DELETE FROM detalle_menu WHERE id = $1", [id]);
@@ -382,6 +381,9 @@ class TipoComidasControlador {
         ip,
         observacion: null,
       });
+
+      // FINALIZAR TRANSACCION
+      await pool.query("COMMIT");
       return res.jsonp({ message: "Registro eliminado." });
     } catch (error) {
       // REVERTIR TRANSACCION

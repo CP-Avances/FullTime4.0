@@ -309,7 +309,6 @@ class TipoComidasControlador {
     EliminarDetalle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // TODO ANALIZAR COMO OBTENER USER_NAME E ID DESDE EL FRONT
                 const { user_name, ip } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
@@ -330,7 +329,7 @@ class TipoComidasControlador {
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query("COMMIT");
-                    return res.status(404).jsonp({ message: "error" });
+                    return res.status(404).jsonp({ message: "Registro no encontrado" });
                 }
                 yield database_1.default.query("DELETE FROM detalle_menu WHERE id = $1", [id]);
                 // AUDITORIA
@@ -343,6 +342,8 @@ class TipoComidasControlador {
                     ip,
                     observacion: null,
                 });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query("COMMIT");
                 return res.jsonp({ message: "Registro eliminado." });
             }
             catch (error) {
