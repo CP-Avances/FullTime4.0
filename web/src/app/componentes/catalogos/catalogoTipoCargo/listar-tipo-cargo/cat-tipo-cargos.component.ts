@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ThemePalette } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
@@ -10,6 +10,17 @@ import { PageEvent } from '@angular/material/paginator';
 import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
 import { RegistrarCargoComponent } from '../registrar-cargo/registrar-cargo.component';
 import { EditarTipoCargoComponent } from '../editar-tipo-cargo/editar-tipo-cargo.component';
+
+import * as FileSaver from 'file-saver';
+import * as moment from 'moment';
+import * as xlsx from 'xlsx';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as xml2js from 'xml2js';
+import { PlantillaReportesService } from '../../../reportes/plantilla-reportes.service';
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
 
 @Component({
@@ -39,18 +50,70 @@ export class CatTipoCargosComponent {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
-  listaTipoCargos: any
+  listaTipoCargos: any;
+
+  empleado: any = [];
+  idEmpleado: number;
+
+  filtroNombre = ''; // VARIABLE DE BUSQUEDA DE DATOS
+  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
+  buscarNombre = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
+
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
+  public formulario = new FormGroup({
+    nombreForm: this.buscarNombre,
+  });
+
+  // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
+  get s_color(): string { return this.plantillaPDF.color_Secundary }
+  get p_color(): string { return this.plantillaPDF.color_Primary }
+  get frase(): string { return this.plantillaPDF.marca_Agua }
+  get logo(): string { return this.plantillaPDF.logoBase64 }
 
   constructor(
+    private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
     private _TipoCargos: CatTipoCargosService,
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
-  ){}
+    public parametro: ParametrosService,
+    private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
+  ){
+    this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
+  }
 
   ngOnInit(){
     this.listaTipoCargos = [];
+    this.ObtenerEmpleados(this.idEmpleado);
+    this.BuscarParametro();
+  }
+
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
+  ObtenerEmpleados(idemploy: any) {
+    this.empleado = [];
+    this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
+      this.empleado = data;
+    })
+  }
+
+  formato_fecha: string = 'DD/MM/YYYY';
+
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  BuscarParametro() {
+    // id_tipo_parametro Formato fecha = 25
+    this.parametro.ListarDetalleParametros(25).subscribe(
+      res => {
+        this.formato_fecha = res[0].descripcion;
+        this.obtenerCargos();
+      },
+      vacio => {
+        this.obtenerCargos();
+      });
+  }
+
+  obtenerCargos(){
+    
     this._TipoCargos.listaCargos().subscribe(res =>{
-      console.log('lista> ',res);
+      console.log('lista ',res);
       this.listaTipoCargos = res
     }, error => {
       console.log('Serivicio rest -> metodo RevisarFormato - ', error);
@@ -256,6 +319,206 @@ export class CatTipoCargosComponent {
       this.archivoForm.reset();
       this.nameFile = '';
     }
+  }
+
+  // ORDENAR LOS DATOS SEGUN EL ID
+  OrdenarDatos(array: any) {
+    function compare(a: any, b: any) {
+      if (a.id < b.id) {
+        return -1;
+      }
+      if (a.id > b.id) {
+        return 1;
+      }
+      return 0;
+    }
+    array.sort(compare);
+  }
+
+    /** ************************************************************************************************* **
+   ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
+   ** ************************************************************************************************* **/
+
+   GenerarPdf(action = 'open') {
+    this.OrdenarDatos(this.listaTipoCargos);
+    const documentDefinition = this.GetDocumentDefinicion();
+    console.log('this.listaTipoCargos: ',this.listaTipoCargos)
+    switch (action) {
+      case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+      case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Tipo_Cargos.pdf'); break;
+      default: pdfMake.createPdf(documentDefinition).open(); break;
+    }
+    this.BuscarParametro();
+  }
+
+  GetDocumentDefinicion() {
+    sessionStorage.setItem('tipoCargo', this.listaTipoCargos);
+    return {
+      // ENCABEZADO DE LA PAGINA
+      watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
+      header: { text: 'Impreso por: ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
+      // PIE DE PAGINA
+      footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
+        var f = moment();
+        fecha = f.format('YYYY-MM-DD');
+        hora = f.format('HH:mm:ss');
+        return {
+          margin: 10,
+          columns: [
+            { text: 'Fecha: ' + fecha + ' Hora: ' + hora, opacity: 0.3 },
+            {
+              text: [
+                {
+                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  alignment: 'right', opacity: 0.3
+                }
+              ],
+            }
+          ], fontSize: 10
+        }
+      },
+      content: [
+        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
+        { text: 'Lista de Tipo Cargos', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
+        this.PresentarDataPDFFeriados(),
+      ],
+      styles: {
+        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTable: { fontSize: 10, alignment: 'center' },
+        itemsTableD: { fontSize: 10 }
+      }
+    };
+  }
+
+  PresentarDataPDFFeriados() {
+    return {
+      columns: [
+        { width: '*', text: '' },
+        {
+          width: 'auto',
+          table: {
+            widths: ['auto', 'auto', 'auto', 'auto'],
+            body: [
+              [
+                { text: 'Código', style: 'tableHeader' },
+                { text: 'Descripción', style: 'tableHeader' },
+              ],
+              ...this.listaTipoCargos.map(obj => {
+                return [
+                  { text: obj.id, style: 'itemsTable' },
+                  { text: obj.descripcion, style: 'itemsTableD' },
+                ];
+              })
+            ]
+          },
+          // ESTILO DE COLORES FORMATO ZEBRA
+          layout: {
+            fillColor: function (i: any) {
+              return (i % 2 === 0) ? '#CCD1D1' : null;
+            }
+          }
+        },
+        { width: '*', text: '' },
+      ]
+    };
+  }
+
+  /** ************************************************************************************************* **
+   ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                              ** **
+   ** ************************************************************************************************* **/
+
+  ExportToExcel() {
+    this.OrdenarDatos(this.listaTipoCargos);
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaTipoCargos.map(obj => {
+      return {
+        CODIGO: obj.id,
+        FERIADO: obj.descripcion,
+        FECHA: obj.fecha_,
+        FECHA_RECUPERA: obj.fec_recuperacion_
+      }
+    }));
+    // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
+    const header = Object.keys(this.listaTipoCargos[0]); // NOMBRE DE CABECERAS DE COLUMNAS
+    var wscols: any = [];
+    for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
+      wscols.push({ wpx: 100 })
+    }
+    wsr["!cols"] = wscols;
+    const wb: xlsx.WorkBook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(wb, wsr, 'LISTA FERIADOS');
+    xlsx.writeFile(wb, "FeriadosEXCEL" + '.xlsx');
+    this.BuscarParametro();
+  }
+
+  /** ************************************************************************************************* **
+   ** **                              PARA LA EXPORTACION DE ARCHIVOS XML                            ** **
+   ** ************************************************************************************************* **/
+
+  urlxml: string;
+  data: any = [];
+  ExportToXML() {
+    this.OrdenarDatos(this.listaTipoCargos);
+    var objeto;
+    var arregloFeriados: any = [];
+    this.listaTipoCargos.forEach(obj => {
+      objeto = {
+        "roles": {
+          "$": { "id": obj.id },
+          "descripcion": obj.descripcion,
+        }
+      }
+      arregloFeriados.push(objeto)
+    });
+
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Feriados' });
+    const xml = xmlBuilder.buildObject(arregloFeriados);
+
+    if (xml === undefined) {
+      console.error('Error al construir el objeto XML.');
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // Abrir una nueva pestaña o ventana con el contenido XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
+      newTab.focus(); // Dar foco a la nueva pestaña
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+    // const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'Feriados.xml';
+    // Simular un clic en el enlace para iniciar la descarga
+    a.click();
+
+    this.BuscarParametro();
+  }
+
+  /** ************************************************************************************************** **
+   ** **                                METODO PARA EXPORTAR A CSV                                    ** **
+   ** ************************************************************************************************** **/
+
+  ExportToCVS() {
+    this.OrdenarDatos(this.listaTipoCargos);
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaTipoCargos.map(obj => {
+      return {
+        CODIGO: obj.id,
+        FERIADO: obj.descripcion,
+        FECHA: obj.fecha_,
+        FECHA_RECUPERA: obj.fec_recuperacion_
+      }
+    }));
+    const csvDataC = xlsx.utils.sheet_to_csv(wse);
+    const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
+    FileSaver.saveAs(data, "FeriadosCSV" + '.csv');
+    this.BuscarParametro();
   }
 
 }

@@ -87,10 +87,10 @@
                 <tbody>
                     <tr>
                         <td>
-                            <!--mat-form-field id="t-inputs">
+                            <mat-form-field id="t-inputs">
                                 <input matInput placeholder="Buscar" [formControl]="buscarNombre"
-                                    [(ngModel)]="filtroNombreSuc">
-                            </mat-form-field-->
+                                    [(ngModel)]="filtroNombre">
+                            </mat-form-field>
                         </td>
                         <td>
                             <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
@@ -122,7 +122,7 @@
         </mat-paginator>
         <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
-                matTooltipPosition="right" matTooltip="Descargar Lista de Feriados en formato PDF.">
+                matTooltipPosition="right" matTooltip="Descargar Lista de modalidad laboral en formato PDF.">
                 <p>PDF</p>
             </i>
             <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"

@@ -313,7 +313,7 @@ class DepartamentoControlador {
                     }
                     if (nombre == undefined) {
                         data.nombre = 'No registrado';
-                        data.observacion = 'Nombre ' + data.observacion;
+                        data.observacion = 'Departamento ' + data.observacion;
                     }
                     if (sucursal == undefined) {
                         data.sucursal = 'No registrado';
@@ -349,7 +349,7 @@ class DepartamentoControlador {
                         }
                     }
                     else {
-                        item.observacion = 'No existe la sucursal en el sistema';
+                        item.observacion = 'Sucursal no existe en el sistema';
                     }
                     // Discriminación de elementos iguales
                     if (duplicados.find((p) => p.nombre === item.nombre && p.sucursal === item.sucursal) == undefined) {

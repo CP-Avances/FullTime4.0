@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { MetodosComponent } from '../../administracionGeneral/metodoEliminar/metodos.component';
@@ -53,6 +53,15 @@ export class CatModalidaLaboralComponent implements OnInit{
 
   empleado: any = [];
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
+
+  filtroNombre = ''; // VARIABLE DE BUSQUEDA DE DATOS
+  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
+  buscarNombre = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
+
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
+  public formulario = new FormGroup({
+    nombreForm: this.buscarNombre,
+  });
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
@@ -337,16 +346,20 @@ export class CatModalidaLaboralComponent implements OnInit{
    GenerarPdf(action = 'open') {
     this.OrdenarDatos(this.listaModalida_Laboral);
     const documentDefinition = this.GetDocumentDefinicion();
+    console.log('this.listaModalida_Laboral: ',this.listaModalida_Laboral)
+    console.log('documentDefinition: ',documentDefinition)
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download('Feriados.pdf'); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Modalidas_laboral.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
     this.BuscarParametro();
   }
 
   GetDocumentDefinicion() {
+    console.log('this.empleado: ',this.empleado)
+    console.log('this.frase: ',this.frase)
     sessionStorage.setItem('ModalidadLabo', this.listaModalida_Laboral);
     return {
       // ENCABEZADO DE LA PAGINA
@@ -374,7 +387,7 @@ export class CatModalidaLaboralComponent implements OnInit{
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Feriados', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
+        { text: 'Lista de Modalidad Laboral', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
         this.PresentarDataPDFFeriados(),
       ],
       styles: {
@@ -397,15 +410,11 @@ export class CatModalidaLaboralComponent implements OnInit{
               [
                 { text: 'Código', style: 'tableHeader' },
                 { text: 'Descripción', style: 'tableHeader' },
-                { text: 'Fecha', style: 'tableHeader' },
-                { text: 'Fecha Recuperación', style: 'tableHeader' },
               ],
               ...this.listaModalida_Laboral.map(obj => {
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTableD' },
-                  { text: obj.fecha_, style: 'itemsTable' },
-                  { text: obj.fec_recuperacion_, style: 'itemsTable' },
                 ];
               })
             ]

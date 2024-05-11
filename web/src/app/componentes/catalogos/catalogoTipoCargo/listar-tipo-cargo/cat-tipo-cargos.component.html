@@ -87,10 +87,10 @@
                 <tbody>
                     <tr>
                         <td>
-                            <!--mat-form-field id="t-inputs">
+                            <mat-form-field id="t-inputs">
                                 <input matInput placeholder="Buscar" [formControl]="buscarNombre"
-                                    [(ngModel)]="filtroNombreSuc">
-                            </mat-form-field-->
+                                    [(ngModel)]="filtroNombre">
+                            </mat-form-field>
                         </td>
                         <td>
                             <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
@@ -120,6 +120,28 @@
         <mat-paginator id="pagina" [length]="listaTipoCargos.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+            <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                matTooltipPosition="right" matTooltip="Descargar Lista de tipo cargos en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Feriados en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Feriados en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Feriados en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end"
+            style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de Modalidad Laboral. </p>
+        </div>
     </div>
 </div>
 
@@ -137,16 +159,14 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center; font-size: 13px;">
+                        <th scope="col">Observación</th>
                         <th scope="col">Item</th>
                         <th scope="col">Cargos</th>
-                        <th scope="col">Observación</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
                         *ngFor="let ct of Datos_tipo_cargos | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
-                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{ct.fila}}</td>
-                        <td [style.color]="stiloTextoCelda(ct.tipo_cargo)" style="font-size: 12px;">{{ct.tipo_cargo}}</td>
                         <td style="font-size: 12px;">
                             <div style="width: 270px; margin: auto;">
                                 <div id="t-editar" class="circulo"
@@ -154,6 +174,8 @@
                                 {{ct.observacion}}
                             </div>
                         </td>
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{ct.fila}}</td>
+                        <td [style.color]="stiloTextoCelda(ct.tipo_cargo)" style="font-size: 12px;">{{ct.tipo_cargo}}</td>
                     </tr>
                 </tbody>
             </table>

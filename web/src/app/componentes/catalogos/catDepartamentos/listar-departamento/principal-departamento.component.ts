@@ -350,9 +350,9 @@ export class PrincipalDepartamentoComponent implements OnInit {
       return 'rgb(159, 221, 154)';
     } else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
-    } else if (observacion == 'No existe la sucursal en el sistema') {
+    } else if (observacion == 'Sucursal no existe en el sistema') {
       return 'rgb(255, 192, 203)';
-    } else if (arrayObservacion[0] == 'Nombre' || arrayObservacion[0] == 'Sucursal') {
+    } else if (arrayObservacion[0] == 'Departamento' || arrayObservacion[0] == 'Sucursal') {
       return 'rgb(242, 21, 21)';
     } else {
       return 'white'
