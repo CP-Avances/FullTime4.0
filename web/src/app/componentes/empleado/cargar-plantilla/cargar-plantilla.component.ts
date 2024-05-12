@@ -183,7 +183,7 @@ export class CargarPlantillaComponent {
 
 
 
-  //Metodo para dar color a las celdas y representar las validaciones
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
@@ -197,7 +197,7 @@ export class CargarPlantillaComponent {
       observacion == 'Cargo no existe en el sistema' ||
       observacion == 'Cédula no tiene registrado un contrato') {
       return 'rgb(255, 192, 203)';
-    } else if (observacion == 'Registro duplicado - cédula') {
+    } else if (observacion == 'Registro duplicado (cédula)') {
       return 'rgb(156, 214, 255)';
     } else if (arrayObservacion[0] == 'Formato') {
       return 'rgb(230, 176, 96)';

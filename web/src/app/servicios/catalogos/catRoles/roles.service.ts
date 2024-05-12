@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment'
+import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +17,8 @@ export class RolesService {
   }
 
   // ELIMINAR REGISTRO DE ROL
-  EliminarRoles(id: number) {
-    return this.http.delete(`${environment.url}/rol/eliminar/${id}`);
+  EliminarRoles(id: any) {
+    return this.http.delete(`${environment.url}/rol/eliminar/${id}`).pipe(catchError(id));
   }
 
   // METODO PARA CREAR ARCHIVO XML
@@ -30,21 +31,14 @@ export class RolesService {
     console.log(data);
     return this.http.post(`${environment.url}/rol`, data);
   }
-  
+
   // Roles
-
-
-
   getOneRol(id: number) {
     return this.http.get<any>(`${environment.url}/rol/${id}`);
   }
-
   ListarRolesActualiza(id: number) {
     return this.http.get<any>(`${environment.url}/rol/actualiza/${id}`);
   }
-
-
-
   ActualizarRol(data: any) {
     return this.http.put(`${environment.url}/rol`, data);
   }

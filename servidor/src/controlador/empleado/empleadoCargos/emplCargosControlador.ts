@@ -567,7 +567,7 @@ class EmpleadoCargosControlador {
 
       listCargos.forEach((item: any) => {
         if (item.observacion == '1') {
-          item.observacion = 'Registro duplicado - cédula'
+          item.observacion = 'Registro duplicado (cédula)'
         }
 
         if (item.observacion != undefined) {

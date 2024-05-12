@@ -22,6 +22,8 @@ import { PlantillaReportesService } from '../../../reportes/plantilla-reportes.s
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableTipoCargo } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-cat-tipo-cargos',
@@ -30,6 +32,7 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 })
 export class CatTipoCargosComponent {
 
+  tiposCargoEliminar: any = [];
   archivoForm = new FormControl('', Validators.required);
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
@@ -81,7 +84,7 @@ export class CatTipoCargosComponent {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
-  ngOnInit(){
+  ngOnInit() {
     this.listaTipoCargos = [];
     this.ObtenerEmpleados(this.idEmpleado);
     this.BuscarParametro();
@@ -133,44 +136,57 @@ export class CatTipoCargosComponent {
     this.messajeExcel = '';
   }
 
-  AbrirVentanaRegistrarCargo(): void{
+  AbrirVentanaRegistrarCargo(): void {
     this.ventana.open(RegistrarCargoComponent, { width: '500px' })
       .afterClosed().subscribe(items => {
         this.ngOnInit();
       });
+      this.activar_seleccion = true;
+      this.plan_multiple = false;
+      this.plan_multiple_ = false;
+      this.selectionTipoCargo.clear();
+      this.tiposCargoEliminar = [];
   }
-  AbrirEditar(item_cargo: any): void{
+  AbrirEditar(item_cargo: any): void {
     this.ventana.open(EditarTipoCargoComponent, { width: '450px', data: item_cargo })
       .afterClosed().subscribe(items => {
         this.ngOnInit();
       });
   }
 
-  ConfirmarDelete(cargo: any){
+  ConfirmarDelete(cargo: any) {
     const mensaje = 'eliminar';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this._TipoCargos.eliminar(cargo.id).subscribe(res => {
-            console.log('res eliminado: ',res);
-            this.toastr.error(cargo.cargo+' se elimino', res.message, {
+            console.log('res eliminado: ', res);
+            this.toastr.error('Registro eliminado.', '', {
               timeOut: 4000,
             });
             this.ngOnInit();
           }, error => {
-            if(error.error.code == "23503"){
-              this.toastr.error(cargo.cargo+" todavía es referida desde la tabla «empl_cargos».",'Error al eliminar dato', {
+            if (error.error.code == "23503") {
+              this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
                 timeOut: 4000,
               });
-            }else{
-              this.toastr.error(error.error.message,'Error al eliminar dato', {
+            } else {
+              this.toastr.error(error.error.message, 'Error al eliminar dato', {
                 timeOut: 4000,
               });
             }
           })
+          this.activar_seleccion = true;
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.tiposCargoEliminar = [];
+          this.selectionTipoCargo.clear();
+          this.ngOnInit();
         }
       });
   }
+
+
 
   // CONTROL DE PAGINACION
   ManejarPagina(e: PageEvent) {
@@ -225,7 +241,7 @@ export class CatTipoCargosComponent {
   Datos_tipo_cargos: any
   listaCargosCorrectas: any = [];
   messajeExcel: string = '';
-  Revisarplantilla(){
+  Revisarplantilla() {
     this.listaCargosCorrectas = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
@@ -263,7 +279,7 @@ export class CatTipoCargosComponent {
     });
   }
 
-  //Metodo para dar color a las celdas y representar las validaciones
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
@@ -301,10 +317,10 @@ export class CatTipoCargosComponent {
       });
   }
 
-  subirDatosPlantillaModal(){
+  subirDatosPlantillaModal() {
     if (this.listaCargosCorrectas.length > 0) {
       this._TipoCargos.subirArchivoExcel(this.listaCargosCorrectas).subscribe(response => {
-        console.log('respuesta: ',response);
+        console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de Tipo Cargos importada.', {
           timeOut: 2500,
         });
@@ -312,7 +328,7 @@ export class CatTipoCargosComponent {
         this.archivoForm.reset();
         this.nameFile = '';
       });
-    }else {
+    } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
       });
@@ -398,16 +414,16 @@ export class CatTipoCargosComponent {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto'],
             body: [
               [
-                { text: 'Código', style: 'tableHeader' },
-                { text: 'Descripción', style: 'tableHeader' },
+                { text: 'Item', style: 'tableHeader' },
+                { text: 'Cargos', style: 'tableHeader' },
               ],
               ...this.listaTipoCargos.map(obj => {
                 return [
                   { text: obj.id, style: 'itemsTable' },
-                  { text: obj.descripcion, style: 'itemsTableD' },
+                  { text: obj.cargo, style: 'itemsTableD' },
                 ];
               })
             ]
@@ -520,5 +536,104 @@ export class CatTipoCargosComponent {
     FileSaver.saveAs(data, "FeriadosCSV" + '.csv');
     this.BuscarParametro();
   }
+
+  // METODOS PARA LA SELECCION MULTIPLE
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionTipoCargo = new SelectionModel<ITableTipoCargo>(true, []);
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionTipoCargo.selected.length;
+    return numSelected === this.listaTipoCargos.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionTipoCargo.clear() :
+      this.listaTipoCargos.forEach((row: any) => this.selectionTipoCargo.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableTipoCargo): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.tiposCargoEliminar = this.selectionTipoCargo.selected;
+    return `${this.selectionTipoCargo.isSelected(row) ? 'deselect' : 'select'} row ${row.cargo + 1}`;
+  }
+
+
+
+
+  contador: number = 0;
+  ingresar: boolean = false;
+  EliminarMultiple() {
+    this.ingresar = false;
+    this.contador = 0;
+    this.tiposCargoEliminar = this.selectionTipoCargo.selected;
+    this.tiposCargoEliminar.forEach((datos: any) => {
+      this.listaTipoCargos = this.listaTipoCargos.filter(item => item.id !== datos.id);
+      this.contador = this.contador + 1;
+      this._TipoCargos.eliminar(datos.id).subscribe(res => {
+        console.log('res eliminado: ', res);
+        if (!this.ingresar) {
+          this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+            timeOut: 6000,
+          });
+          this.ingresar = true;
+        }
+        this.ngOnInit();
+      }, error => {
+        if (error.error.code == "23503") {
+          this.toastr.error('Existen datos relacionados con ' + datos.cargo + '.', 'No fue posible eliminar.', {
+            timeOut: 6000,
+          });
+        } else {
+          this.toastr.error(error.error.message, 'Error al eliminar dato', {
+            timeOut: 6000,
+          });
+        }
+        this.contador = this.contador - 1;
+
+      })
+    }
+    );
+  }
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (this.tiposCargoEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+            this.tiposCargoEliminar = [];
+            this.selectionTipoCargo.clear();
+            this.ngOnInit();
+          } else {
+            this.toastr.warning('No ha seleccionado PROVINCIAS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        }
+      });
+  }
+
+
 
 }

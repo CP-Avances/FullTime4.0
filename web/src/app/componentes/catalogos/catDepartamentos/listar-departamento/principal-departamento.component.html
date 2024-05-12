@@ -1,5 +1,8 @@
+<!--  ********************  VER PANTALLA DE NIVELES DE DEPARTAMENTO  **************************  -->
 <app-ver-departamento [id_departamento]="data_id" [pagina]="pagina" *ngIf="ver_nivel">
 </app-ver-departamento>
+
+<!--  ********************  VER PANTALLA DE LISTA DE DEPARTAMENTOS  ***************************  -->
 <div class="div" *ngIf="ver_departamentos">
     <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
         <div class="row">
@@ -9,8 +12,8 @@
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                        <button *ngIf="!DataDepartamentos" id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarDepartamento()"
-                            value="Crear departamento">
+                        <button *ngIf="!DataDepartamentos" id="btn-raised" class="btn btn-sm"
+                            (click)="AbrirVentanaRegistrarDepartamento()" value="Crear departamento">
                             Crear departamento
                         </button>
                         <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
@@ -29,40 +32,43 @@
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="row">
                         <div class="col-md" style="padding-top: 5px;">
-                            <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <div class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
                                 <form method="post" enctype="multipart/form-data" style="width: max-content;">
                                     <input (change)="FileChange($event)" type="file" [formControl]="archivoForm"
                                         id="file"
                                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                    <label for="file" matSuffix matTooltipPosition="right"
-                                        *ngIf="!mostrarbtnsubir" style="height: 64px;  padding-top: 25px;"
+                                    <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                        style="height: 64px;  padding-top: 25px;"
                                         matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
                                         Subir plantilla
                                     </label>
                                     <label for="file" matSuffix matTooltipPosition="right"
-                                        *ngIf="mostrarbtnsubir && messajeExcel != 'error'" style="height: 64px;  padding-top: 25px;"
+                                        *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                        style="height: 64px;  padding-top: 25px;"
                                         matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
                                         Subir nueva plantilla
                                     </label>
                                 </form>
                             </div>
                         </div>
-                        <div class="col-md" *ngIf="!DataDepartamentos" style="padding-top: 5px; padding-bottom: 5px;" >
-                            <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                        <div class="col-md" *ngIf="!DataDepartamentos" style="padding-top: 5px; padding-bottom: 5px;">
+                            <div class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
                                 <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                     matTooltip="Dar click para ver o descargar el documento."
                                     href="{{hipervinculo}}/plantillaD/documento/Feriados.xlsx">
-                                    <!--span class="material-icons">cloud_download</span-->
                                     <br>
                                     Descargar plantilla
                                 </a>
                             </div>
                         </div>
-                        <div class="col-md" *ngIf="mostrarbtnsubir" style="padding-top: 5px; padding-bottom: 5px;" >
-                            <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
-                                <button *ngIf="DataDepartamentos && messajeExcel != 'error'" id="descargar" class="btn btn-sm"
-                                    (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
-                                     matTooltip="Guardar registro multiple.">
+                        <div class="col-md" *ngIf="mostrarbtnsubir" style="padding-top: 5px; padding-bottom: 5px;">
+                            <div class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
+                                <button *ngIf="DataDepartamentos && messajeExcel != 'error'" id="descargar"
+                                    class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
+                                    matTooltipPosition="right" matTooltip="Guardar registro multiple.">
                                     Registrar
                                 </button>
                             </div>
@@ -75,29 +81,23 @@
 
     <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!DataDepartamentos">
         <div class="mat-elevation-z8" style="background: white;">
-
-
             <div class="d-flex bd-highlight" id="titulo">
-
-            
                 <div class="w-100 bd-highlight">
                     <h5>
                         RESULTADO DE BÚSQUEDA
                     </h5>
                 </div>
-                
-    
                 <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                    
                     <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                        (click)="ConfirmarDeleteMultiple()">Eliminar </button>
+                        (click)="ConfirmarDeleteMultiple()">
+                        Eliminar
+                    </button>
                 </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover table-sm">
                     <thead class="thead-light">
                         <tr>
-
                             <th>
                                 <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
                                     matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
@@ -109,9 +109,6 @@
                                     [indeterminate]="selectionDepartamentos.hasValue() && !isAllSelectedPag()"
                                     [aria-label]="checkboxLabelPag()">
                                 </mat-checkbox>
-
-
-
                             </th>
                             <th scope="col">Establecimiento</th>
                             <th scope="col">Departamento</th>
@@ -151,7 +148,6 @@
                         </tr>
                         <tr
                             *ngFor="let departamento of departamentos | filtroDepartamento: filtroNombre | departamentoPadre: filtroDeparPadre | filtroSucursalR: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
-
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionDepartamentos.toggle(departamento) : null"
@@ -159,7 +155,6 @@
                                     [aria-label]="checkboxLabelPag(departamento)">
                                 </mat-checkbox>
                             </td>
-
                             <td>{{departamento.nomsucursal}}</td>
                             <td>{{departamento.nombre | titlecase}}</td>
                             <td>{{departamento.nivel}}</td>
@@ -171,7 +166,6 @@
                                     (click)="VerNiveles(departamento.id)">
                                     <p>Niveles</p>
                                 </i>
-
                                 <i id="t-editar" (click)="AbrirEditarDepartamento(departamento)" matSuffix
                                     matTooltipPosition="right" matTooltip="Modificar datos de este registro"
                                     class="fas fa-edit">
@@ -189,27 +183,30 @@
             <mat-paginator id="pagina" [length]="departamentos.length" [pageSize]="tamanio_pagina"
                 [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
-            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-                <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
-                    matTooltipPosition="right" matTooltip="Descargar Lista de Departamentos en formato PDF.">
-                    <p>PDF</p>
-                </i>
-                <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar Lista de Departamentos en formato EXCEL.">
-                    <p>XLSL</p>
-                </i>
-                <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar Lista de Departamentos en formato CSV.">
-                    <p>CSV</p>
-                </i>
-                <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar Lista de Departamentos en formato XML.">
-                    <p>XML</p>
-                </i>
-            </div>
-            <div class="d-flex justify-content-end"
-                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-                <p> Reporte de departamentos. </p>
+            <!--  ************************  DESCARGA DE REPORTES  ***************************  -->
+            <div>
+                <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                    <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                        matTooltipPosition="right" matTooltip="Descargar Lista de Departamentos en formato PDF.">
+                        <p>PDF</p>
+                    </i>
+                    <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix
+                        matTooltipPosition="right" matTooltip="Descargar Lista de Departamentos en formato EXCEL.">
+                        <p>XLSL</p>
+                    </i>
+                    <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                        matTooltip="Descargar Lista de Departamentos en formato CSV.">
+                        <p>CSV</p>
+                    </i>
+                    <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                        matTooltip="Descargar Lista de Departamentos en formato XML.">
+                        <p>XML</p>
+                    </i>
+                </div>
+                <div class="d-flex justify-content-end"
+                    style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                    <p> Reporte de departamentos. </p>
+                </div>
             </div>
         </div>
     </div>
@@ -220,8 +217,9 @@
         </app-definicion-plantilla>
     </div>
 
-    <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS ------------------------------------------------->
-    <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="DataDepartamentos && messajeExcel != 'error'">
+    <!--  ***************************  TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS *****************************  --->
+    <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;"
+        *ngIf="DataDepartamentos && messajeExcel != 'error'">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="titulo">REGISTRO MULTIPLE</div>
             <div class="table-responsive">
@@ -237,6 +235,11 @@
                     <tbody>
                         <tr
                             *ngFor="let d of DataDepartamentos | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                                {{d.fila}}</td>
+                            <td [style.color]="stiloTextoCelda(d.nombre)" style="font-size: 12px;">{{d.nombre}}</td>
+                            <td [style.color]="stiloTextoCelda(d.sucursal)" id="letras" style="font-size: 12px;">
+                                {{d.sucursal}}</td>
                             <td style="font-size: 12px;">
                                 <div style="width: 270px; margin: auto;">
                                     <div id="t-editar" class="circulo"
@@ -258,5 +261,4 @@
             </mat-paginator>
         </div>
     </div>
-
 </div>

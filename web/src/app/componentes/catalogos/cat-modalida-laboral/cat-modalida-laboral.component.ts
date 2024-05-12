@@ -21,13 +21,17 @@ import * as xml2js from 'xml2js';
 import { PlantillaReportesService } from '../../reportes/plantilla-reportes.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableModalidad } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-cat-modalida-laboral',
   templateUrl: './cat-modalida-laboral.component.html',
   styleUrls: ['./cat-modalida-laboral.component.css']
 })
-export class CatModalidaLaboralComponent implements OnInit{
+export class CatModalidaLaboralComponent implements OnInit {
+
+  modalidadesEliminar: any = [];
 
   archivoForm = new FormControl('', Validators.required);
 
@@ -76,15 +80,15 @@ export class CatModalidaLaboralComponent implements OnInit{
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
     public parametro: ParametrosService,
-  ){
+  ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
-  ngOnInit(){
+  ngOnInit() {
     this.listaModalida_Laboral = [];
     this.ObtenerEmpleados(this.idEmpleado);
     this.BuscarParametro();
-   
+
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -110,9 +114,9 @@ export class CatModalidaLaboralComponent implements OnInit{
       });
   }
 
-  ObtenerModalidaLaboral(){
-    this._ModalidaLaboral.listaModalidad_laboral().subscribe(res =>{
-      console.log('lista> ',res);
+  ObtenerModalidaLaboral() {
+    this._ModalidaLaboral.listaModalidad_laboral().subscribe(res => {
+      console.log('lista> ', res);
       this.listaModalida_Laboral = res
     }, error => {
       console.log('Serivicio rest -> metodo RevisarFormato - ', error);
@@ -132,11 +136,16 @@ export class CatModalidaLaboralComponent implements OnInit{
     this.messajeExcel = '';
   }
 
-  AbrirVentanaRegistrarModalidad(): void{
+  AbrirVentanaRegistrarModalidad(): void {
     this.ventana.open(RegistroModalidadComponent, { width: '500px' })
       .afterClosed().subscribe(items => {
         this.ngOnInit();
       });
+      this.activar_seleccion = true;
+      this.plan_multiple = false;
+      this.plan_multiple_ = false;
+      this.selectionModalidad.clear();
+      this.modalidadesEliminar = [];
   }
 
   // METODO PARA EDITAR MODALIDAD LABORAL
@@ -147,33 +156,7 @@ export class CatModalidaLaboralComponent implements OnInit{
       });
   }
 
-  ConfirmarDelete(modalidad: any){
-    const mensaje = 'eliminar';
-    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this._ModalidaLaboral.eliminar(modalidad.id).subscribe(res => {
-            console.log('res eliminado: ',res);
-            this.toastr.error(modalidad.descripcion+' se elimino', res.message, {
-              timeOut: 4000,
-            });
-            this.ngOnInit();
-          }, error => {
-            console.log('error: ',error);
-            if(error.error.code == "23503"){
-              this.toastr.error(modalidad.descripcion+" todavía es referida desde la tabla «empl_contratos».",'Error al eliminar dato', {
-                timeOut: 4000,
-              });
-            }else{
-              this.toastr.error(error.error.message,'Error al eliminar dato', {
-                timeOut: 4000,
-              });
-            }
-            
-          })
-        }
-      });
-  }
+
 
   // CONTROL DE PAGINACION
   ManejarPagina(e: PageEvent) {
@@ -227,7 +210,7 @@ export class CatModalidaLaboralComponent implements OnInit{
   Datos_modalidad_laboral: any
   listaModalidadCorrectas: any = [];
   messajeExcel: string = '';
-  Revisarplantilla(){
+  Revisarplantilla() {
     this.listaModalidadCorrectas = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
@@ -265,7 +248,7 @@ export class CatModalidaLaboralComponent implements OnInit{
     });
   }
 
-  //Metodo para dar color a las celdas y representar las validaciones
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
@@ -290,7 +273,7 @@ export class CatModalidaLaboralComponent implements OnInit{
       return 'black'
     }
   }
- 
+
 
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
@@ -304,10 +287,10 @@ export class CatModalidaLaboralComponent implements OnInit{
       });
   }
 
-  subirDatosPlantillaModal(){
+  subirDatosPlantillaModal() {
     if (this.listaModalidadCorrectas.length > 0) {
       this._ModalidaLaboral.subirArchivoExcel(this.listaModalidadCorrectas).subscribe(response => {
-        console.log('respuesta: ',response);
+        console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de Modalidad laboral importada.', {
           timeOut: 2500,
         });
@@ -315,7 +298,7 @@ export class CatModalidaLaboralComponent implements OnInit{
         this.archivoForm.reset();
         this.nameFile = '';
       });
-    }else {
+    } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
       });
@@ -343,7 +326,7 @@ export class CatModalidaLaboralComponent implements OnInit{
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
    ** ************************************************************************************************* **/
 
-   GenerarPdf(action = 'open') {
+  GenerarPdf(action = 'open') {
     this.OrdenarDatos(this.listaModalida_Laboral);
     const documentDefinition = this.GetDocumentDefinicion();
     console.log('this.listaModalida_Laboral: ',this.listaModalida_Laboral)
@@ -393,7 +376,7 @@ export class CatModalidaLaboralComponent implements OnInit{
       styles: {
         tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
         itemsTable: { fontSize: 10, alignment: 'center' },
-        itemsTableD: { fontSize: 10 }
+        itemsTableD: { fontSize: 10, alignment: 'center' }
       }
     };
   }
@@ -405,11 +388,11 @@ export class CatModalidaLaboralComponent implements OnInit{
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto'],
             body: [
               [
-                { text: 'Código', style: 'tableHeader' },
-                { text: 'Descripción', style: 'tableHeader' },
+                { text: 'Item', style: 'tableHeader' },
+                { text: 'Modalidad laboral', style: 'tableHeader' },
               ],
               ...this.listaModalida_Laboral.map(obj => {
                 return [
@@ -491,20 +474,20 @@ export class CatModalidaLaboralComponent implements OnInit{
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
-    // Abrir una nueva pestaña o ventana con el contenido XML
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
-      newTab.focus(); // Dar foco a la nueva pestaña
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Feriados.xml';
-    // Simular un clic en el enlace para iniciar la descarga
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
 
     this.BuscarParametro();
@@ -529,6 +512,127 @@ export class CatModalidaLaboralComponent implements OnInit{
     FileSaver.saveAs(data, "FeriadosCSV" + '.csv');
     this.BuscarParametro();
   }
+
+  // METODOS PARA LA SELECCION MULTIPLE
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionModalidad = new SelectionModel<ITableModalidad>(true, []);
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionModalidad.selected.length;
+    return numSelected === this.listaModalida_Laboral.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionModalidad.clear() :
+      this.listaModalida_Laboral.forEach((row: any) => this.selectionModalidad.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableModalidad): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.modalidadesEliminar = this.selectionModalidad.selected;
+    return `${this.selectionModalidad.isSelected(row) ? 'deselect' : 'select'} row ${row.descripcion + 1}`;
+  }
+
+
+
+  ConfirmarDelete(modalidad: any) {
+    const mensaje = 'eliminar';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this._ModalidaLaboral.eliminar(modalidad.id).subscribe(res => {
+            if (res.message === 'error') {
+              this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+                timeOut: 6000,
+              });
+            } else {
+              this.toastr.error('Registro eliminado.', '', {
+                timeOut: 6000,
+              });
+              this.ngOnInit();
+            }
+          })
+          this.activar_seleccion = true;
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.modalidadesEliminar = [];
+          this.selectionModalidad.clear();
+          this.ngOnInit();
+        }
+      });
+  }
+
+  contador: number = 0;
+  ingresar: boolean = false;
+  EliminarMultiple() {
+    this.ingresar = false;
+    this.contador = 0;
+    this.modalidadesEliminar = this.selectionModalidad.selected;
+    this.modalidadesEliminar.forEach((datos: any) => {
+      this.listaModalida_Laboral = this.listaModalida_Laboral.filter(item => item.id !== datos.id);
+      this.contador = this.contador + 1;
+      this._ModalidaLaboral.eliminar(datos.id).subscribe(res => {
+        if (res.message === 'error') {
+          this.toastr.error('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ngOnInit();
+        }
+      });
+    }
+    );
+  }
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (this.modalidadesEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+            this.modalidadesEliminar = [];
+            this.selectionModalidad.clear();
+            this.ngOnInit();
+          } else {
+            this.toastr.warning('No ha seleccionado PROVINCIAS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        }
+      });
+  }
+
+
+
+
 
 
 

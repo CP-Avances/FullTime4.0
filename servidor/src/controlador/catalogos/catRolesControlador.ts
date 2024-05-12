@@ -19,14 +19,20 @@ class RolesControlador {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  public async EliminarRol(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    await pool.query(
-      `
-      DELETE FROM ero_cat_roles WHERE id = $1
-      `
-      , [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+  public async EliminarRol(req: Request, res: Response): Promise<any> {
+    try {
+      const id = req.params.id;
+      await pool.query(
+        `
+        DELETE FROM ero_cat_roles WHERE id = $1
+        `
+        , [id]);
+      res.jsonp({ message: 'Registro eliminado.' });
+
+    } catch (error) {
+      return res.jsonp({ message: 'error' });
+
+    }
   }
 
   // METODO PARA REGISTRAR ROL

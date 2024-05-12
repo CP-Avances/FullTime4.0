@@ -88,7 +88,7 @@ class DepartamentoControlador {
     if (DEPARTAMENTO.rowCount > 0) {
       return res.jsonp(DEPARTAMENTO.rows)
     }
-    res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
+    res.status(404).jsonp({ text: 'Registro no encontrado.' });
   }
 
 
@@ -567,7 +567,7 @@ class DepartamentoControlador {
     if (DEPARTAMENTO.rowCount > 0) {
       return res.jsonp(DEPARTAMENTO.rows);
     }
-    res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
+    res.status(404).jsonp({ text: 'Registro no encontrado.' });
   }
 
   public async ObtenerUnDepartamento(req: Request, res: Response): Promise<any> {
@@ -580,7 +580,7 @@ class DepartamentoControlador {
     if (DEPARTAMENTO.rowCount > 0) {
       return res.jsonp(DEPARTAMENTO.rows[0])
     }
-    res.status(404).jsonp({ text: 'El departamento no ha sido encontrado' });
+    res.status(404).jsonp({ text: 'Registro no encontrado' });
   }
 
 

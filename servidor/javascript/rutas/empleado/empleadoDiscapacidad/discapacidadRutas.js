@@ -27,6 +27,8 @@ class DiscapacidadRutas {
         this.router.post('/buscarTipo', verificarToken_1.TokenValidation, discapacidadControlador_1.default.RegistrarTipo);
         // METODO PARA BUSCAR LISTA DE TIPOS DE DISCAPACIDAD
         this.router.get('/buscarTipo/tipo', verificarToken_1.TokenValidation, discapacidadControlador_1.default.ListarTipo);
+        // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE
+        this.router.post('/buscarTipo/nombre', verificarToken_1.TokenValidation, discapacidadControlador_1.default.BuscarDiscapacidadNombre);
         this.router.get('/', verificarToken_1.TokenValidation, discapacidadControlador_1.default.list);
         // TIPO DISCAPACIDAD
         this.router.get('/buscarTipo/tipo/:id', verificarToken_1.TokenValidation, discapacidadControlador_1.default.ObtenerUnTipoD);

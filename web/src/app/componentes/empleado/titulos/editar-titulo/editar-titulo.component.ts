@@ -42,8 +42,27 @@ export class EditarTituloComponent implements OnInit {
   ActualizarTituloEmpleado(form: any) {
     let titulo = {
       observacion: form.observacionForm,
+      id_empleado: this.titulo.id_empleado,
       id_titulo: form.idTituloForm,
     }
+    // VERIFICAR TITULO SIMILAR AL REGISTRO
+    if (titulo.id_titulo === this.titulo.id_titulo) {
+      this.AlmacenarTitulo(titulo);
+    }
+    else {
+      // VERIFICAR DUPLICADO DE REGISTRO
+      this.rest.BuscarTituloEspecifico(titulo).subscribe(data => {
+        this.toastr.warning('Registro ya se encuentra en el sistema.', 'Ups!!! algo salio mal.', {
+          timeOut: 3000,
+        });
+      }, vacio => {
+        this.AlmacenarTitulo(titulo);
+      });
+    }
+  }
+
+  // METODO PARA ALMACENAR DATOS EN EL SISTEMA
+  AlmacenarTitulo(titulo: any) {
     this.rest.ActualizarTitulo(this.titulo.id, titulo).subscribe(data => {
       this.toastr.success('Actualización Exitosa.', 'Registro actualizado.', {
         timeOut: 6000,

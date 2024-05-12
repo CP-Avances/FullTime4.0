@@ -483,9 +483,26 @@ class EmpleadoControlador {
         SELECT et.id, et.observacion As observaciones, et.id_titulo, 
           et.id_empleado, ct.nombre, nt.nombre as nivel
         FROM eu_empleado_titulos AS et, et_titulos AS ct, et_cat_nivel_titulo AS nt
-        WHERE et.id_empleado = $1 and et.id_titulo = ct.id and ct.id_nivel = nt.id
+        WHERE et.id_empleado = $1 AND et.id_titulo = ct.id AND ct.id_nivel = nt.id
         ORDER BY id
         `, [id_empleado]);
+            if (unEmpleadoTitulo.rowCount > 0) {
+                return res.jsonp(unEmpleadoTitulo.rows);
+            }
+            else {
+                res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR TITULO ESPECIFICO DEL EMPLEADO
+    ObtenerTituloEspecifico(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado, id_titulo } = req.body;
+            const unEmpleadoTitulo = yield database_1.default.query(`
+      SELECT et.id
+      FROM eu_empleado_titulos AS et
+      WHERE et.id_empleado = $1 AND et.id_titulo = $2
+      `, [id_empleado, id_titulo]);
             if (unEmpleadoTitulo.rowCount > 0) {
                 return res.jsonp(unEmpleadoTitulo.rows);
             }
@@ -930,10 +947,10 @@ class EmpleadoControlador {
                 var filaDuplicada = 0;
                 listEmpleados.forEach((item) => {
                     if (item.observacion == '1') {
-                        item.observacion = 'Registro duplicado - cédula';
+                        item.observacion = 'Registro duplicado (cédula)';
                     }
                     else if (item.observacion == '2') {
-                        item.observacion = 'Registro duplicado - usuario';
+                        item.observacion = 'Registro duplicado (usuario)';
                     }
                     if (item.observacion != undefined) {
                         let arrayObservacion = item.observacion.split(" ");
@@ -980,7 +997,9 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const plantilla = req.body;
             console.log('datos automatico: ', plantilla);
-            const VALOR = yield database_1.default.query('SELECT * FROM codigo');
+            const VALOR = yield database_1.default.query(`
+      SELECT * FROM e_codigo
+      `);
             //TODO Revisar max codigo
             var codigo_dato = VALOR.rows[0].valor;
             var codigo = 0;
@@ -1445,13 +1464,13 @@ class EmpleadoControlador {
                 var filaDuplicada = 0;
                 listEmpleadosManual.forEach((item) => {
                     if (item.observacion == '1') {
-                        item.observacion = 'Registro duplicado - cédula';
+                        item.observacion = 'Registro duplicado (cédula)';
                     }
                     else if (item.observacion == '2') {
-                        item.observacion = 'Registro duplicado - usuario';
+                        item.observacion = 'Registro duplicado (usuario)';
                     }
                     else if (item.observacion == '3') {
-                        item.observacion = 'Registro duplicado - codigo';
+                        item.observacion = 'Registro duplicado (código)';
                     }
                     if (item.observacion != undefined) {
                         let arrayObservacion = item.observacion.split(" ");

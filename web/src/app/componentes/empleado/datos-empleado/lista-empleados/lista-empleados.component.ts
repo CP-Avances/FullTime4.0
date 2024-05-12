@@ -542,7 +542,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
 
 
-  //Metodo para dar color a las celdas y representar las validaciones
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
@@ -914,20 +914,20 @@ export class ListaEmpleadosComponent implements OnInit {
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
-    // Abrir una nueva pestaña o ventana con el contenido XML
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
-      newTab.focus(); // Dar foco a la nueva pestaña
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
+    
 
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Empleados.xml';
-    // Simular un clic en el enlace para iniciar la descarga
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
   }
 
@@ -1043,39 +1043,26 @@ export class ListaEmpleadosComponent implements OnInit {
 
               this.rest.EliminarEmpleados(datos.id).subscribe(res => {
                 if (res.message === 'error') {
-                  this.toastr.error('No se puede eliminar.', '', {
+                  this.toastr.error('Existen datos relacionados con ' + datos.empleado + '.', 'No fue posible eliminar.', {
                     timeOut: 6000,
                   });
-
                   this.contador = this.contador - 1;
-
                 } else {
-
                   if (!this.ingresar) {
                     this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
                       timeOut: 6000,
                     });
                     this.ingresar = true;
                   }
-
                   this.GetEmpleados();
                 }
-
               });
-
-              
-
-              //this.GetEmpleados();
             }
             )
-
-
             this.btnCheckHabilitar = false;
             this.empleadosEliminarActivos=[];
             this.selectionUno.clear();
             this.GetEmpleados();
-
-
           } else {
             this.toastr.warning('No ha seleccionado USUARIOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -1097,84 +1084,54 @@ export class ListaEmpleadosComponent implements OnInit {
 
 
   ConfirmarDeleteMultipleInactivos() {
-
     this.ingresar = false;
     this.contador = 0;
-
     let EliminarInactivos = this.selectionDos.selected.map(obj => {
       return {
         id: obj.id,
         empleado: obj.nombre + ' ' + obj.apellido
       }
     })
-
-
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-
-
           if (EliminarInactivos.length != 0) {
-
             EliminarInactivos.forEach((datos: any) => {
-
               this.empleado = this.empleado.filter(item => item.id !== datos.id);
-
               this.contador = this.contador + 1;
-
-
               this.rest.EliminarEmpleados(datos.id).subscribe(res => {
                 if (res.message === 'error') {
-                  this.toastr.error('No se puede eliminar.', '', {
+                  this.toastr.error('Existen datos relacionados con ' + datos.empleado + '.', 'No fue posible eliminar.', {
                     timeOut: 6000,
                   });
-
                   this.contador = this.contador - 1;
-
                 } else {
-
                   if (!this.ingresar) {
                     this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
                       timeOut: 6000,
                     });
                     this.ingresar = true;
                   }
-
                   this.GetEmpleados();
                 }
-
               });
-
-              //this.GetEmpleados();
             }
             )
             this.btnCheckDeshabilitado = false;
-
-
             this.empleadosEliminarActivos=[];
             this.selectionUno.clear();
             this.GetEmpleados();
-
-
           } else {
             this.toastr.warning('No ha seleccionado USUARIOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
-
           this.selectionDos.clear();
-
         } else {
           this.router.navigate(['/empleados']);
-
         }
-
       }
       );
-    //this.GetEmpleados();
-
-
   }
 
 

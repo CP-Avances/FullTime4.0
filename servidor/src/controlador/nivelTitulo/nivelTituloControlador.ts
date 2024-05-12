@@ -81,7 +81,7 @@ class NivelTituloControlador {
     const { nombre } = req.params;
     const unNivelTitulo = await pool.query(
       `
-      SELECT * FROM et_cat_nivel_titulo WHERE nombre = $1
+      SELECT * FROM et_cat_nivel_titulo WHERE UPPER(nombre) = $1
       `
       , [nombre]);
 

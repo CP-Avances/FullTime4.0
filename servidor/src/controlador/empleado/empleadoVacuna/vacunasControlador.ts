@@ -42,6 +42,23 @@ class VacunasControlador {
         }
     }
 
+    // METODO PARA BUSCAR VACUNA POR FECHA Y TIPO
+    public async BuscarVacunaFechaTipo(req: Request, res: Response) {
+        const { id_empleado, id_vacuna, fecha } = req.body;
+        const VACUNA = await pool.query(
+            `
+            SELECT * FROM eu_empleado_vacunas WHERE fecha = $1 AND id_vacuna = $2 AND id_empleado = $3
+            `
+            , [fecha, id_vacuna, id_empleado]
+        );
+        if (VACUNA.rowCount > 0) {
+            return res.jsonp(VACUNA.rows)
+        }
+        else {
+            res.status(404).jsonp({ text: 'Registro no encontrado.' });
+        }
+    }
+
     // CREAR REGISTRO DE VACUNACION
     public async CrearRegistro(req: Request, res: Response): Promise<Response> {
         const { id_empleado, descripcion, fecha, id_tipo_vacuna } = req.body;
@@ -201,6 +218,27 @@ class VacunasControlador {
                 return res.status(404).jsonp({ message: 'error' })
             }
 
+        } catch (error) {
+            return res.jsonp({ message: 'error' });
+        }
+    }
+
+    // CREAR REGISTRO DE TIPO DE VACUNA
+    public async BuscarVacunaNombre(req: Request, res: Response) {
+        try {
+            const { nombre } = req.body;
+            const VACUNA = await pool.query(
+                `
+                SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
+                `
+                , [nombre]);
+
+            if (VACUNA.rowCount > 0) {
+                return res.jsonp({ message: 'ok', info: VACUNA.rows })
+            }
+            else {
+                return res.jsonp({ message: 'vacio' });
+            }
         } catch (error) {
             return res.jsonp({ message: 'error' });
         }

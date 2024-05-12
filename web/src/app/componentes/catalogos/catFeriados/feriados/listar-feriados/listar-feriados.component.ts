@@ -340,10 +340,10 @@ export class ListarFeriadosComponent implements OnInit {
   }
 
   DataFerieados_ciudades: any = [];
-  messajeExcel2: string = ''; 
-  Crear_feriado_ciudad(){
+  messajeExcel2: string = '';
+  Crear_feriado_ciudad() {
     this.rest.Crear_feriados_ciudad(this.listaFerediadCiudadCorrectos).subscribe(res => {
-      console.log('respuesta: ',res);
+      console.log('respuesta: ', res);
     });
   }
 
@@ -371,7 +371,7 @@ export class ListarFeriadosComponent implements OnInit {
       console.log('lista sucursales correctas: ', this.listFeriadosCorrectos);
       var cont = 0;
       this.Crear_feriado_ciudad();
-      
+
       this.listFeriadosCorrectos.forEach(datos => {
         data.fecha = datos.fecha;
         data.descripcion = datos.descripcion;
@@ -397,7 +397,7 @@ export class ListarFeriadosComponent implements OnInit {
         });
 
       })
-      
+
     } else {
       this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
         timeOut: 4000,
@@ -453,7 +453,7 @@ export class ListarFeriadosComponent implements OnInit {
  }*/
 
 
-  //Metodo para dar color a las celdas y representar las validaciones
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
@@ -476,9 +476,9 @@ export class ListarFeriadosComponent implements OnInit {
       || arrayObservacion[0] == 'Feriado'
     ) {
       return 'rgb(242, 21, 21)';
-    }else if(observacion == 'feriado invalido'){
+    } else if (observacion == 'feriado invalido') {
       return 'rgb(238, 34, 207)';
-    }else {
+    } else {
       return 'white'
     }
   }
@@ -645,20 +645,20 @@ export class ListarFeriadosComponent implements OnInit {
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
-    // Abrir una nueva pestaña o ventana con el contenido XML
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
-      newTab.focus(); // Dar foco a la nueva pestaña
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Feriados.xml';
-    // Simular un clic en el enlace para iniciar la descarga
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
 
     this.BuscarParametro();
@@ -727,9 +727,9 @@ export class ListarFeriadosComponent implements OnInit {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.feriadosEliminar = this.selectionFeriados.selected;
-    //console.log('paginas para Eliminar',this.paginasEliminar);
 
-    //console.log(this.selectionPaginas.selected)
+
+
     return `${this.selectionFeriados.isSelected(row) ? 'deselect' : 'select'} row ${row.descripcion + 1}`;
 
   }
@@ -759,65 +759,44 @@ export class ListarFeriadosComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
-
           this.activar_seleccion = true;
-
           this.plan_multiple = false;
           this.plan_multiple_ = false;
           this.feriadosEliminar = [];
           this.selectionFeriados.clear();
-
           this.BuscarParametro();
-
-
         }
       });
 
-
   }
 
-
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
-
-
   contador: number = 0;
   ingresar: boolean = false;
 
   EliminarMultiple() {
-
-
     this.ingresar = false;
     this.contador = 0;
-
     this.feriadosEliminar = this.selectionFeriados.selected;
     this.feriadosEliminar.forEach((datos: any) => {
-
       this.feriados = this.feriados.filter(item => item.id !== datos.id);
-
       this.contador = this.contador + 1;
-
-
       this.rest.EliminarFeriado(datos.id).subscribe(res => {
         if (res.message === 'error') {
-          this.toastr.error('No se puede eliminar.', '', {
+          this.toastr.error('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
-
         } else {
-
           if (!this.ingresar) {
             this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
               timeOut: 6000,
             });
             this.ingresar = true;
           }
-
           this.BuscarParametro();
         }
-
       });
-
     }
     )
   }

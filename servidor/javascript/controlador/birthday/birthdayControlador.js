@@ -42,7 +42,7 @@ class BirthdayControlador {
             INSERT INTO e_message_birthday (id_empresa, asunto, mensaje, link) VALUES ($1, $2, $3, $4)
             `, [id_empresa, titulo, mensaje, link]);
             const oneMessage = yield database_1.default.query(`
-            SELECT id FROM message_birthday WHERE id_empresa = $1
+            SELECT id FROM e_message_birthday WHERE id_empresa = $1
             `, [id_empresa]);
             const idMessageGuardado = oneMessage.rows[0].id;
             res.jsonp([{ message: 'Registro guardado.', id: idMessageGuardado }]);

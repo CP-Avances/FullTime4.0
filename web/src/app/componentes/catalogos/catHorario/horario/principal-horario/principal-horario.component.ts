@@ -204,12 +204,12 @@ export class PrincipalHorarioComponent implements OnInit {
           this.ObtenerHorarios();
         }
       });
-      this.activar_seleccion = true;
-      this.plan_multiple = false;
-      this.plan_multiple_ = false;
-      this.selectionHorarios.clear();
-      this.horariosEliminar = [];
-  
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionHorarios.clear();
+    this.horariosEliminar = [];
+
 
 
   }
@@ -569,7 +569,7 @@ export class PrincipalHorarioComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;
@@ -654,9 +654,9 @@ export class PrincipalHorarioComponent implements OnInit {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.horariosEliminar = this.selectionHorarios.selected;
-    //console.log('paginas para Eliminar',this.paginasEliminar);
 
-    //console.log(this.selectionPaginas.selected)
+
+
     return `${this.selectionHorarios.isSelected(row) ? 'deselect' : 'select'} row ${row.descripcion + 1}`;
 
   }
@@ -664,32 +664,21 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
   EliminarDetalle(id_horario: any) {
-
-
     this.rest.EliminarRegistro(id_horario).subscribe(res => {
-
       if (res.message === 'error') {
         this.toastr.error('No se puede eliminar.', '', {
           timeOut: 6000,
         });
-
       } else {
-
         // METODO PARA AUDITAR CATÁLOGO HORARIOS
         this.validar.Auditar('app-web', 'cg_horarios', id_horario, '', 'DELETE');
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
         this.ObtenerHorarios();
-
       }
-
-
     });
   }
-
-
-
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
@@ -698,16 +687,11 @@ export class PrincipalHorarioComponent implements OnInit {
         if (confirmado) {
           this.EliminarDetalle(datos.id);
           this.activar_seleccion = true;
-
           this.plan_multiple = false;
           this.plan_multiple_ = false;
           this.horariosEliminar = [];
           this.selectionHorarios.clear();
-
           this.ObtenerHorarios();
-
-
-
         }
       });
   }
@@ -717,26 +701,19 @@ export class PrincipalHorarioComponent implements OnInit {
   ingresar: boolean = false;
 
   EliminarMultiple() {
-
     this.ingresar = false;
     this.contador = 0;
     this.horariosEliminar = this.selectionHorarios.selected;
     this.horariosEliminar.forEach((datos: any) => {
-
       this.horarios = this.horarios.filter(item => item.id !== datos.id);
-
       this.contador = this.contador + 1;
-
       this.rest.EliminarRegistro(datos.id).subscribe(res => {
-
         if (res.message === 'error') {
-          this.toastr.error('No se puede eliminar.', '', {
+          this.toastr.error('Existen datos relacionados con ' + datos.codigo + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
-
         } else {
-
           // METODO PARA AUDITAR CATÁLOGO HORARIOS
           this.validar.Auditar('app-web', 'cg_horarios', datos.id, '', 'DELETE');
           if (!this.ingresar) {
@@ -746,7 +723,6 @@ export class PrincipalHorarioComponent implements OnInit {
             this.ingresar = true;
           }
           this.ObtenerHorarios();
-
         }
       });
     }
@@ -762,27 +738,19 @@ export class PrincipalHorarioComponent implements OnInit {
           if (this.horariosEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
-
             this.plan_multiple = false;
             this.plan_multiple_ = false;
-
-            this.horariosEliminar= [];
+            this.horariosEliminar = [];
             this.selectionHorarios.clear();
             this.ObtenerHorarios();
           } else {
             this.toastr.warning('No ha seleccionado HORARIOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
-
-          this.selectionHorarios.clear();
-
         } else {
           this.router.navigate(['/horario']);
         }
-
-
       });
 
   }

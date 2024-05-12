@@ -30,7 +30,6 @@
                 </div>
             </mat-card>
         </div>
-
         <div class="col-md">
             <div id="titulo">
                 <span>REGISTRO MÚLTIPLE DE USUARIOS</span>
@@ -62,7 +61,6 @@
                             <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                 style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
                                 href="{{link}}">
-                                <!--span class="material-icons">cloud_download</span-->
                                 <br>
                                 Descargar plantilla usuarios
                             </a>
@@ -84,7 +82,7 @@
     </div>
 </div>
 
-<!-- LISTA DE EMPLEADOS QUE HAN SIDO INACTIVADOS O QUE YA NO FORMAN PARTE DE LA EMPRESA -->
+<!--  ****  LISTA DE EMPLEADOS QUE HAN SIDO INACTIVADOS O QUE YA NO FORMAN PARTE DE LA EMPRESA  ****  -->
 <div *ngIf="Hab_Deshabilitados && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container"
     style="padding-bottom: 50px; text-align: center;">
     <div class="mat-elevation-z8" style="background: white;">
@@ -104,7 +102,6 @@
             <span class="w-100 bd-highlight">
                 LISTA DE USUARIOS INACTIVOS
             </span>
-
             <button *ngIf="btnCheckDeshabilitado" class="btn btn-info btn-outline-light"
                 style="float: left; margin-right: 10px;" (click)="ConfirmarDeleteMultipleInactivos()">
                 Eliminar
@@ -149,31 +146,35 @@
         <mat-paginator id="pagina" [length]="desactivados.length" [pageSize]="tamanio_paginaDes"
             [pageSizeOptions]="pageSizeOptionsDes" id="pagina" (page)="ManejarPaginaDes($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-            <i (click)="GenerarPdf('download', 2)" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Empleados en formato PDF.">
-                <p>PDF</p>
-            </i>
-            <i (click)="ExportToExcel(2)" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Empleados en formato EXCEL.">
-                <p>XLSL</p>
-            </i>
-            <i (click)="ExportToCVS(2)" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Empleados en formato CSV.">
-                <p>CSV</p>
-            </i>
-            <i (click)="ExportToXML(2)" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Empleados en formato XML.">
-                <p>XML</p>
-            </i>
-        </div>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-            <p> Reporte de usuarios inactivos. </p>
+        <!--  **********************  DESCARGAR REPORTES USUARIOS ACTIVOS  ***************************  -->
+        <div>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                <i (click)="GenerarPdf('download', 2)" id="pdf" class="fas fa-file-pdf" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista de Empleados en formato PDF.">
+                    <p>PDF</p>
+                </i>
+                <i (click)="ExportToExcel(2)" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Empleados en formato EXCEL.">
+                    <p>XLSL</p>
+                </i>
+                <i (click)="ExportToCVS(2)" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Empleados en formato CSV.">
+                    <p>CSV</p>
+                </i>
+                <i (click)="ExportToXML(2)" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Empleados en formato XML.">
+                    <p>XML</p>
+                </i>
+            </div>
+            <div class="d-flex justify-content-end"
+                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                <p> Reporte de usuarios inactivos. </p>
+            </div>
         </div>
     </div>
 </div>
 
-<!-------------------- LISTA DE EMPLEADOS QUE FORMAN PARTE DE LA EMPRESA --------------------------------------->
+<!--  ********************  LISTA DE EMPLEADOS QUE FORMAN PARTE DE LA EMPRESA  ***********************  -->
 <div *ngIf="tabla_activos && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container"
     style="padding-bottom: 50px; text-align: center;">
     <div class="mat-elevation-z8" style="background: white;">
@@ -189,7 +190,6 @@
             <span class="w-100 bd-highlight">
                 LISTA DE USUARIOS ACTIVOS
             </span>
-
             <button *ngIf="btnCheckHabilitar" class="btn btn-primary btn-outline-light"
                 style="float: left; margin-right: 10px;" (click)="ConfirmarDeleteMultipleActivos()">
                 Eliminar
@@ -282,37 +282,41 @@
         <mat-paginator id="pagina" [length]="empleado.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-            <i (click)="GenerarPdf('download', 1)" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Empleados en formato PDF.">
-                <p>PDF</p>
-            </i>
-            <i (click)="ExportToExcel(1)" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Empleados en formato EXCEL.">
-                <p>XLSL</p>
-            </i>
-            <i (click)="ExportToCVS(1)" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Empleados en formato CSV.">
-                <p>CSV</p>
-            </i>
-            <i (click)="ExportToXML(1)" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Empleados en formato XML.">
-                <p>XML</p>
-            </i>
-        </div>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-            <p> Reporte de usuarios activos. </p>
+        <!--  *****************  DESCARGAR REPORTE DE USUARIOS INACTIVOS  *******************  -->
+        <div>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                <i (click)="GenerarPdf('download', 1)" id="pdf" class="fas fa-file-pdf" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista de Empleados en formato PDF.">
+                    <p>PDF</p>
+                </i>
+                <i (click)="ExportToExcel(1)" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Empleados en formato EXCEL.">
+                    <p>XLSL</p>
+                </i>
+                <i (click)="ExportToCVS(1)" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Empleados en formato CSV.">
+                    <p>CSV</p>
+                </i>
+                <i (click)="ExportToXML(1)" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Empleados en formato XML.">
+                    <p>XML</p>
+                </i>
+            </div>
+            <div class="d-flex justify-content-end"
+                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                <p> Reporte de usuarios activos. </p>
+            </div>
         </div>
     </div>
 </div>
 
-<!------------------ INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ------------------------------------------------->
+<!--  ********************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE  *********************  -->
 <div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="DataEmpleados && messajeExcel != 'error'">
     <app-definicion-plantilla>
     </app-definicion-plantilla>
 </div>
 
-<!------------------- LISTA DE EMPLEADOS DEL REGISTRO MULTIPLE ---------------------------------------------->
+<!--  ************************  LISTA DE EMPLEADOS DEL REGISTRO MULTIPLE  *******************************  -->
 <div style="padding-bottom: 50px; text-align: center;" *ngIf="DataEmpleados && messajeExcel != 'error'">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
@@ -358,7 +362,7 @@
                         <td [style.color]="stiloTextoCelda(e.nombre)">{{e.nombre}}</td>
                         <td [style.color]="stiloTextoCelda(e.estado_civil)">{{e.estado_civil}}</td>
                         <td [style.color]="stiloTextoCelda(e.genero)">{{e.genero}}</td>
-                        <td [style.color]="stiloTextoCelda(e.fecha_nacimiento)">{{e.fecha_nacimiento}}</td>
+                        <td [style.color]="stiloTextoCelda(e.fec_nacimiento)">{{e.fec_nacimiento}}</td>
                         <td [style.color]="stiloTextoCelda(e.domicilio)">{{e.domicilio}}</td>
                         <td [style.color]="stiloTextoCelda(e.telefono)">{{e.telefono}}</td>
                         <td [style.color]="stiloTextoCelda(e.nacionalidad)">{{e.nacionalidad}}</td>

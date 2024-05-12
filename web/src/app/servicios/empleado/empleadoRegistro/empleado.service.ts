@@ -139,6 +139,11 @@ export class EmpleadoService {
     return this.http.post(`${environment.url}/empleado/emplTitulos`, data);
   }
 
+  // METODO PARA BUSCAR TITULO ESPECIFICO DEL USUARIO
+  BuscarTituloEspecifico(data: any) {
+    return this.http.post(`${environment.url}/empleado/emplTitulos/usuario`, data);
+  }
+
   ActualizarTitulo(id: number, data: any) {
     return this.http.put(`${environment.url}/empleado/${id}/titulo`, data);
   }
@@ -176,6 +181,11 @@ export class EmpleadoService {
   // REGISTRAR MODALIDAD DE TRABAJO
   CrearTiposContrato(datos: any) {
     return this.http.post<any>(`${environment.url}/contratoEmpleado/modalidad/trabajo`, datos);
+  }
+
+  // REGISTRAR MODALIDAD DE TRABAJO
+  BuscarModalidadLaboralNombre(datos: any) {
+    return this.http.post<any>(`${environment.url}/contratoEmpleado/modalidad/trabajo/nombre`, datos);
   }
 
 

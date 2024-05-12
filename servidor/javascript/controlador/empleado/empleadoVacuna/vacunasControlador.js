@@ -51,6 +51,21 @@ class VacunasControlador {
             }
         });
     }
+    // METODO PARA BUSCAR VACUNA POR FECHA Y TIPO
+    BuscarVacunaFechaTipo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado, id_vacuna, fecha } = req.body;
+            const VACUNA = yield database_1.default.query(`
+            SELECT * FROM eu_empleado_vacunas WHERE fecha = $1 AND id_vacuna = $2 AND id_empleado = $3
+            `, [fecha, id_vacuna, id_empleado]);
+            if (VACUNA.rowCount > 0) {
+                return res.jsonp(VACUNA.rows);
+            }
+            else {
+                res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
     // CREAR REGISTRO DE VACUNACION
     CrearRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -184,6 +199,26 @@ class VacunasControlador {
                 }
                 else {
                     return res.status(404).jsonp({ message: 'error' });
+                }
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
+        });
+    }
+    // CREAR REGISTRO DE TIPO DE VACUNA
+    BuscarVacunaNombre(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { nombre } = req.body;
+                const VACUNA = yield database_1.default.query(`
+                SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
+                `, [nombre]);
+                if (VACUNA.rowCount > 0) {
+                    return res.jsonp({ message: 'ok', info: VACUNA.rows });
+                }
+                else {
+                    return res.jsonp({ message: 'vacio' });
                 }
             }
             catch (error) {

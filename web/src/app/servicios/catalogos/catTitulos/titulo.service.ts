@@ -18,6 +18,11 @@ export class TituloService {
     return this.http.get(`${environment.url}/titulo/`);
   }
 
+  // METODO PARA CREAR ARCHIVO XML
+  BuscarTituloNombre(data: any) {
+    return this.http.post(`${environment.url}/titulo/titulo-nombre`, data);
+  }
+
   // METODO PARA ELIMINAR REGISTRO
   EliminarRegistro(id: any) {
     return this.http.delete(`${environment.url}/titulo/eliminar/${id}`).pipe(catchError(id));

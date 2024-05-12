@@ -90,7 +90,7 @@ class DepartamentoControlador {
             if (DEPARTAMENTO.rowCount > 0) {
                 return res.jsonp(DEPARTAMENTO.rows);
             }
-            res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
+            res.status(404).jsonp({ text: 'Registro no encontrado.' });
         });
     }
     // METODO DE BUSQUEDA DE DEPARTAMENTOS   --**VERIFICAR
@@ -468,7 +468,7 @@ class DepartamentoControlador {
             if (DEPARTAMENTO.rowCount > 0) {
                 return res.jsonp(DEPARTAMENTO.rows);
             }
-            res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
+            res.status(404).jsonp({ text: 'Registro no encontrado.' });
         });
     }
     ObtenerUnDepartamento(req, res) {
@@ -480,7 +480,7 @@ class DepartamentoControlador {
             if (DEPARTAMENTO.rowCount > 0) {
                 return res.jsonp(DEPARTAMENTO.rows[0]);
             }
-            res.status(404).jsonp({ text: 'El departamento no ha sido encontrado' });
+            res.status(404).jsonp({ text: 'Registro no encontrado' });
         });
     }
     BuscarDepartamentoPorCargo(req, res) {

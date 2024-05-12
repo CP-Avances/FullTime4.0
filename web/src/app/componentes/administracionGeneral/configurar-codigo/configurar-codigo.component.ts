@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 
 // IMPORTAR SERVICIOS
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service'
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-configurar-codigo',
@@ -35,6 +36,7 @@ export class ConfigurarCodigoComponent implements OnInit {
   constructor(
     private toastr: ToastrService, // VARIABLE MANEJO DE MENSAJES DE NOTIFICACIONES
     private router: Router, // VARIABLE DE NAVEGACIÓN RUTAS URL
+    public validar: ValidacionesService,
     public rest: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
   ) { }
 
@@ -44,13 +46,14 @@ export class ConfigurarCodigoComponent implements OnInit {
 
   // SELECCION DE METODO DE REGISTRO DE CODIGO DE EMPLEADO
   RegistrarConfiguracion(form: any) {
+    this.ver_informacion = false;
     this.rest.ObtenerCodigo().subscribe(datos => {
       if (this.automaticoF === true) {
         this.ActualizarAutomatico(form);
       }
       else {
         this.ActualizarManualCedula();
-      } 
+      }
     }, error => {
       if (this.automaticoF === true) {
         this.CrearAutomatico(form);
@@ -164,7 +167,7 @@ export class ConfigurarCodigoComponent implements OnInit {
     this.formulario.patchValue({
       inicioForm: this.valor_codigo
     })
-    if (this.valor_codigo=='') {
+    if (this.valor_codigo == '') {
       this.toastr.error('El registro automático solo funciona con valores numéricos', 'Existen códigos no numéricos ', {
         timeOut: 6000,
       })
@@ -198,15 +201,12 @@ export class ConfigurarCodigoComponent implements OnInit {
     this.cedulaF = true;
   }
 
-  
-
   //TODO obtener codigo max
   // METODO PARA BUSCAR EL ULTIMO CODIGO REGISTRADO EN EL SISTEMA
   valor_codigo: any;
   VerUltimoCodigo() {
     this.rest.ObtenerCodigoMAX().subscribe(datosE => {
       this.valor_codigo = parseInt(datosE[0].codigo);
-
     }, error => {
       this.valor_codigo = '';
     })
@@ -214,22 +214,7 @@ export class ConfigurarCodigoComponent implements OnInit {
 
   // METODO DE INGRESO DE SOLO NUMEROS EN EL CAMPO DEL FORMULARIO
   IngresarSoloNumeros(evt: any) {
-    if (window.event) {
-      var keynum = evt.keyCode;
-    }
-    else {
-      keynum = evt.which;
-    }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
-    if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
-      return true;
-    }
-    else {
-      this.toastr.info('No se admite el ingreso de letras', 'Usar solo números', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
   // METODO DE RESETEAR VALORES EN EL FORMULARIO
@@ -239,6 +224,31 @@ export class ConfigurarCodigoComponent implements OnInit {
       this.QuitarCampoCedula();
     } else {
       this.QuitarCampo();
+    }
+  }
+
+  // METODO PARA VISUALIZAR LA CONFIGURACION
+  informacion: string = '';
+  ver_informacion: boolean = false;
+  VisualizarConfiguracion() {
+    if (this.ver_informacion === false) {
+      this.ver_informacion = true;
+      this.rest.ObtenerCodigo().subscribe(datos => {
+        if (datos[0].automatico === true) {
+          this.informacion = 'El sistema se encuentra configurado para generar automáticamente el código de enrolamiento de los usuarios.';
+        }
+        else if (datos[0].manual === true) {
+          this.informacion = 'El sistema se encuentra configurado para ingresar de forma manual el código de enrolamiento de los usuarios.';
+        }
+        else if (datos[0].cedula === true) {
+          this.informacion = 'El sistema se encuentra configurado para considerar el número de cédula como código de enrolamiento de los usuarios.';
+        }
+      }, error => {
+        this.informacion = 'El sistema no tienen una configuración de registro de código de enrolamiento.';
+      });
+    }
+    else {
+      this.ver_informacion = false;
     }
   }
 

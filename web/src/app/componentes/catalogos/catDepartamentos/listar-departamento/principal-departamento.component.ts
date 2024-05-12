@@ -1,20 +1,22 @@
 // IMPORTACION DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { ScriptService } from 'src/app/servicios/empleado/script.service';
+import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
 import * as moment from 'moment';
-import * as FileSaver from 'file-saver';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
@@ -24,8 +26,6 @@ import { RegistroDepartamentoComponent } from 'src/app/componentes/catalogos/cat
 import { EditarDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/editar-departamento/editar-departamento.component';
 import { VerDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/ver-departamento/ver-departamento.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { ThemePalette } from '@angular/material/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableDepartamentos } from 'src/app/model/reportes.model';
@@ -38,17 +38,16 @@ import { ITableDepartamentos } from 'src/app/model/reportes.model';
 
 export class PrincipalDepartamentoComponent implements OnInit {
 
-
-  departamentosEliminar: any = [];
-
-
   // ALMACENAMIENTO DE DATOS CONSULTADOS Y FILTROS DE BUSQUEDA
   filtroNombre = '';
   filtroNombreSuc = '';
   filtroEmpresaSuc = '';
   filtroDeparPadre = '';
+  departamentosEliminar: any = [];
   departamentos: any = [];
   depainfo: any = [];
+  empleado: any = [];
+  idEmpleado: number;
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   departamentoPadreF = new FormControl('');
@@ -77,9 +76,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
   hipervinculo: string = environment.url
-
-  empleado: any = [];
-  idEmpleado: number;
 
   // VARIABLES PROGRESS SPINNER
   progreso: boolean = false;
@@ -158,12 +154,11 @@ export class PrincipalDepartamentoComponent implements OnInit {
       { width: '500px' }).afterClosed().subscribe(item => {
         this.ListaDepartamentos();
       });
-      this.activar_seleccion = true;
-
-      this.plan_multiple = false;
-      this.plan_multiple_ = false;
-      this.selectionDepartamentos.clear();
-      this.departamentosEliminar = [];
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionDepartamentos.clear();
+    this.departamentosEliminar = [];
   }
 
   // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO 
@@ -199,9 +194,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.messajeExcel = '';
   }
 
-
-
-
   // ORDENAR LOS DATOS SEGUN EL ID 
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
@@ -221,7 +213,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.tamanio_paginaMul = e.pageSize;
     this.numero_paginaMul = e.pageIndex + 1
   }
-
 
   // METODO PARA NAVEGAR A PANTALLA DE NIVELES
   data_id: number = 0;
@@ -262,30 +253,25 @@ export class PrincipalDepartamentoComponent implements OnInit {
       });
       this.nameFile = '';
     }
-
     this.archivoForm.reset();
     this.mostrarbtnsubir = true;
-
   }
 
   DataDepartamentos: any;
   listDepartamentosCorrectos: any = [];
   messajeExcel: string = '';
-  Revisarplantilla(){
+  Revisarplantilla() {
     this.listDepartamentosCorrectos = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-
     this.progreso = true;
-
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataDepartamentos = res.data;
       this.messajeExcel = res.message;
       console.log('probando plantilla1 departamentos', this.DataDepartamentos);
-
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -320,10 +306,11 @@ export class PrincipalDepartamentoComponent implements OnInit {
         }
       });
   }
-  registrarDepartamentos(){
+
+  registrarDepartamentos() {
     if (this.listDepartamentosCorrectos.length > 0) {
       this.rest.subirArchivoExcel(this.listDepartamentosCorrectos).subscribe(response => {
-        console.log('respuesta: ',response);
+        console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
           timeOut: 3000,
         });
@@ -331,7 +318,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
         this.archivoForm.reset();
         this.nameFile = '';
       });
-    }else {
+    } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
       });
@@ -340,7 +327,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     }
   }
 
-  //Metodo para dar color a las celdas y representar las validaciones
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
@@ -444,7 +431,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
                 { text: 'Nivel', style: 'tableHeader' },
                 { text: 'Departamento Superior', style: 'tableHeader' }
               ],
-              ...this.departamentos.map(obj => {
+              ...this.departamentos.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.nomempresa, style: 'itemsTable' },
@@ -522,32 +509,26 @@ export class PrincipalDepartamentoComponent implements OnInit {
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
-    // Abrir una nueva pestaña o ventana con el contenido XML
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
-      newTab.focus(); // Dar foco a la nueva pestaña
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
 
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Departamentos.xml';
-    // Simular un clic en el enlace para iniciar la descarga
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
   }
 
 
   // METODOS PARA LA SELECCION MULTIPLE
-
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
-
-
-
-
 
   HabilitarSeleccion() {
     this.plan_multiple = true;
@@ -562,14 +543,11 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   selectionDepartamentos = new SelectionModel<ITableDepartamentos>(true, []);
 
-
-
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
     const numSelected = this.selectionDepartamentos.selected.length;
     return numSelected === this.departamentos.length
   }
-
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
@@ -578,43 +556,29 @@ export class PrincipalDepartamentoComponent implements OnInit {
       this.departamentos.forEach((row: any) => this.selectionDepartamentos.select(row));
   }
 
-
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelPag(row?: ITableDepartamentos): string {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.departamentosEliminar = this.selectionDepartamentos.selected;
-    //console.log('paginas para Eliminar',this.paginasEliminar);
 
-    //console.log(this.selectionPaginas.selected)
     return `${this.selectionDepartamentos.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
 
   }
 
-
-
   contador: number = 0;
   ingresar: boolean = false;
-
   public departamentosNiveles: any = [];
+
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
-
-
-
     this.rest.EliminarRegistro(id_dep).subscribe(res => {
-
-
-
       if (res.message === 'error') {
-        this.toastr.error('No se puede eliminar.', '', {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
         });
-
-
       } else {
-
         this.departamentosNiveles = [];
         var id_departamento = id_dep;
         var id_establecimiento = id_sucursal;
@@ -624,41 +588,31 @@ export class PrincipalDepartamentoComponent implements OnInit {
             this.departamentosNiveles.filter(item => {
               this.rest.EliminarRegistroNivelDepa(item.id).subscribe(
                 res => {
-
                   if (res.message === 'error') {
-                    this.toastr.error('No se puede eliminar.', '', {
+                    this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
                       timeOut: 6000,
                     });
-
-
                   } else {
-                    this.toastr.error('Nivel eliminado de: ' + item.departamento, '', {
+                    this.toastr.error('Nivel eliminado de ' + item.departamento, '', {
                       timeOut: 6000,
                     });
                     this.ListaDepartamentos();
-
                   }
-
                 }
               );
-
             })
           })
           this.ListaDepartamentos();
-
         } else {
           this.ListaDepartamentos();
-
         }
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
-
         this.ListaDepartamentos();
       }
     });
   }
-
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
   ConfirmarDelete(datos: any) {
@@ -666,14 +620,11 @@ export class PrincipalDepartamentoComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
-
           this.activar_seleccion = true;
-
           this.plan_multiple = false;
           this.plan_multiple_ = false;
           this.departamentosEliminar = [];
           this.selectionDepartamentos.clear();
-
           this.ListaDepartamentos();
         } else {
           this.router.navigate(['/departamento']);
@@ -681,25 +632,19 @@ export class PrincipalDepartamentoComponent implements OnInit {
       });
   }
 
-
   EliminarMultiple() {
-
     this.ingresar = false;
     this.contador = 0;
-
     this.departamentosEliminar = this.selectionDepartamentos.selected;
     this.departamentosEliminar.forEach((datos: any) => {
       this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
       this.rest.EliminarRegistro(datos.id).subscribe(res => {
-
         if (res.message === 'error') {
-
-          this.toastr.error('No se puede eliminar.', 'la: ' + datos.nombre, {
+          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
-
         } else {
           this.departamentosNiveles = [];
           var id_departamento = datos.id;
@@ -710,87 +655,60 @@ export class PrincipalDepartamentoComponent implements OnInit {
               this.departamentosNiveles.filter(item => {
                 this.rest.EliminarRegistroNivelDepa(item.id).subscribe(
                   res => {
-
                     if (res.message === 'error') {
-                      this.toastr.error('No se puede eliminar.', '', {
+                      this.toastr.error('Existen datos relacionados con ' + item.nombre + '.', 'No fue posible eliminar.',  {
                         timeOut: 6000,
                       });
-  
-  
                     } else {
-                      this.toastr.error('Nivel eliminado de: ' + item.departamento, '', {
+                      this.toastr.error('Nivel eliminado de ' + item.departamento, '', {
                         timeOut: 6000,
                       });
                       this.ListaDepartamentos();
-  
                     }
-  
                   }
                 )
                 this.ListaDepartamentos();
-
               })
             })
             this.ListaDepartamentos();
-
           } else {
             this.ListaDepartamentos();
-
           }
-
-
           if (!this.ingresar) {
             this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
               timeOut: 6000,
             });
             this.ingresar = true;
-
           }
           this.ListaDepartamentos();
         }
       });
-
-
     }
     )
   }
-
 
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-
           if (this.departamentosEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
-
             this.plan_multiple = false;
             this.plan_multiple_ = false;
-
             this.departamentosEliminar = [];
             this.selectionDepartamentos.clear();
-
             this.ListaDepartamentos();
-
-
           } else {
             this.toastr.warning('No ha seleccionado DEPARTAMENTOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
-
-
         } else {
           this.router.navigate(['/departamento']);
-
         }
       });
-
   }
-
-
 }
 
 
