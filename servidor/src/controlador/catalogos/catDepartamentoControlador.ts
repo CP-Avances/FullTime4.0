@@ -414,13 +414,6 @@ class DepartamentoControlador {
         } else {
           item.observacion = 'Sucursal no existe en el sistema'
         }
-
-        // Discriminación de elementos iguales
-        if (duplicados.find((p: any) => p.nombre === item.nombre && p.sucursal === item.sucursal) == undefined) {
-          duplicados.push(item);
-        } else {
-          item.observacion = '1';
-        }
       }
     });
 
@@ -438,10 +431,16 @@ class DepartamentoControlador {
 
       var filaDuplicada: number = 0;
 
-      listDepartamentos.forEach(async (item: any) => {
-        if (item.observacion == '1') {
-          item.observacion = 'Registro duplicado'
-        }
+      listDepartamentos.forEach((item: any) => {
+
+         // Discriminación de elementos iguales
+         item.nombre.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+         item.sucursal.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+         if (duplicados.find((p: any) => p.nombre.toLowerCase() === item.nombre.toLowerCase() && p.sucursal.toLowerCase() === item.sucursal.toLowerCase()) == undefined) {
+           duplicados.push(item);
+         } else{
+            item.observacion = 'Registro duplicado'
+         }
 
         //Valida si los datos de la columna N son numeros.
         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
@@ -460,8 +459,6 @@ class DepartamentoControlador {
       if (mensaje == 'error') {
         listDepartamentos = undefined;
       }
-
-      console.log('listDepartamentos: ', listDepartamentos);
 
       return res.jsonp({ message: mensaje, data: listDepartamentos });
 

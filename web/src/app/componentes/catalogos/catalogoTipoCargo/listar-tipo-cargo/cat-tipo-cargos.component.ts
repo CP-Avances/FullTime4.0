@@ -292,7 +292,7 @@ export class CatTipoCargosComponent {
     } else if (arrayObservacion[0] == 'Cargo ') {
       return 'rgb(242, 21, 21)';
     } else {
-      return 'white'
+      return 'rgb(242, 21, 21)';
     }
   }
   colorTexto: string = '';
@@ -322,9 +322,10 @@ export class CatTipoCargosComponent {
       this._TipoCargos.subirArchivoExcel(this.listaCargosCorrectas).subscribe(response => {
         console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de Tipo Cargos importada.', {
-          timeOut: 2500,
+          timeOut: 3000,
         });
-        window.location.reload();
+        //window.location.reload();
+        this.LimpiarCampos();
         this.archivoForm.reset();
         this.nameFile = '';
       });
@@ -448,10 +449,8 @@ export class CatTipoCargosComponent {
     this.OrdenarDatos(this.listaTipoCargos);
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaTipoCargos.map(obj => {
       return {
-        CODIGO: obj.id,
-        FERIADO: obj.descripcion,
-        FECHA: obj.fecha_,
-        FECHA_RECUPERA: obj.fec_recuperacion_
+        ITEM: obj.id,
+        CARGO: obj.cargo,
       }
     }));
     // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
@@ -462,8 +461,8 @@ export class CatTipoCargosComponent {
     }
     wsr["!cols"] = wscols;
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'LISTA FERIADOS');
-    xlsx.writeFile(wb, "FeriadosEXCEL" + '.xlsx');
+    xlsx.utils.book_append_sheet(wb, wsr, 'LISTA CARGOS');
+    xlsx.writeFile(wb, "CargosEXCEL" + '.xlsx');
     this.BuscarParametro();
   }
 
@@ -481,13 +480,13 @@ export class CatTipoCargosComponent {
       objeto = {
         "roles": {
           "$": { "id": obj.id },
-          "descripcion": obj.descripcion,
+          "descripcion": obj.cargo,
         }
       }
       arregloFeriados.push(objeto)
     });
 
-    const xmlBuilder = new xml2js.Builder({ rootName: 'Feriados' });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Cargos' });
     const xml = xmlBuilder.buildObject(arregloFeriados);
 
     if (xml === undefined) {
@@ -510,7 +509,7 @@ export class CatTipoCargosComponent {
 
     const a = document.createElement('a');
     a.href = xmlUrl;
-    a.download = 'Feriados.xml';
+    a.download = 'Cargos.xml';
     // Simular un clic en el enlace para iniciar la descarga
     a.click();
 
@@ -525,15 +524,13 @@ export class CatTipoCargosComponent {
     this.OrdenarDatos(this.listaTipoCargos);
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaTipoCargos.map(obj => {
       return {
-        CODIGO: obj.id,
-        FERIADO: obj.descripcion,
-        FECHA: obj.fecha_,
-        FECHA_RECUPERA: obj.fec_recuperacion_
+        ITEM: obj.id,
+        CARGOS: obj.cargos,
       }
     }));
     const csvDataC = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "FeriadosCSV" + '.csv');
+    FileSaver.saveAs(data, "CargosCSV" + '.csv');
     this.BuscarParametro();
   }
 

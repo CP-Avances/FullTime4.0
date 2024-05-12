@@ -62,8 +62,7 @@
                         <div class="d-flex flex-wrap justify-content-around"
                             style="text-align: center; justify-content: center;">
                             <button *ngIf="Datos_tipo_cargos && messajeExcel != 'error'" id="descargar"
-                                class="btn btn-sm" (click)="ConfirmarRegistroMultiple()"
-                                (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
+                                class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
                                 matTooltip="Guardar registro multiple.">
                                 Registrar
                             </button>
@@ -123,7 +122,7 @@
                         </td>
                         <td>
                             <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
-                                matTooltip="Búsqueda de departamentos de acurdo a cada columna de la tabla.">
+                                matTooltip="Búsqueda de cargos de acurdo al nombre de la tabla.">
                                 help_outline
                             </mat-icon>
                         </td>
@@ -202,10 +201,6 @@
                 <tbody>
                     <tr
                         *ngFor="let ct of Datos_tipo_cargos | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
-                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
-                            {{ct.fila}}</td>
-                        <td [style.color]="stiloTextoCelda(ct.tipo_cargo)" style="font-size: 12px;">{{ct.tipo_cargo}}
-                        </td>
                         <td style="font-size: 12px;">
                             <div style="width: 270px; margin: auto;">
                                 <div id="t-editar" class="circulo"
@@ -213,8 +208,10 @@
                                 {{ct.observacion}}
                             </div>
                         </td>
-                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{ct.fila}}</td>
-                        <td [style.color]="stiloTextoCelda(ct.tipo_cargo)" style="font-size: 12px;">{{ct.tipo_cargo}}</td>
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                            {{ct.fila}}</td>
+                        <td [style.color]="stiloTextoCelda(ct.tipo_cargo)" style="font-size: 12px;">{{ct.tipo_cargo}}
+                        </td>
                     </tr>
                 </tbody>
             </table>

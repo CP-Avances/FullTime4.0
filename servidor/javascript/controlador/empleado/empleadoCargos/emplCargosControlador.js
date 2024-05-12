@@ -266,7 +266,7 @@ class EmpleadoCargosControlador {
                 sucursal: '',
                 sueldo: '',
                 cargo: '',
-                hora_traba: '',
+                hora_trabaja: '',
                 jefe: '',
                 observacion: ''
             };
@@ -290,7 +290,7 @@ class EmpleadoCargosControlador {
                     data.sucursal = sucursal;
                     data.sueldo = sueldo;
                     data.cargo = cargo;
-                    data.hora_traba = hora_trabaja;
+                    data.hora_trabaja = hora_trabaja;
                     data.jefe = jefe;
                     data.observacion = 'no registrado';
                     //Valida si los datos de la columna cedula son numeros.
@@ -300,12 +300,6 @@ class EmpleadoCargosControlador {
                             data.observacion = 'La cédula ingresada no es válida';
                         }
                         else {
-                            if (data.hora_trabaja != 'No registrado') {
-                                if ((0, moment_1.default)(hora_trabaja, 'HH:mm:ss', true).isValid()) { }
-                                else {
-                                    data.observacion = 'Formato de horas trabajo incorrecto (HH:mm:ss)';
-                                }
-                            }
                             // Verificar si la variable tiene el formato de fecha correcto con moment
                             if ((0, moment_1.default)(fecha_inicio, 'YYYY-MM-DD', true).isValid()) { }
                             else {
@@ -315,6 +309,16 @@ class EmpleadoCargosControlador {
                             if ((0, moment_1.default)(fecha_final, 'YYYY-MM-DD', true).isValid()) { }
                             else {
                                 data.observacion = 'Formato de fecha salida incorrecto (YYYY-MM-DD)';
+                            }
+                            //Verifica el valor del suelo que sea solo numeros
+                            if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
+                                data.observacion = 'El sueldo es incorrecto';
+                            }
+                            if (data.hora_trabaja != 'No registrado') {
+                                if ((0, moment_1.default)(hora_trabaja, 'HH:mm:ss', true).isValid()) { }
+                                else {
+                                    data.observacion = 'Formato horas invalido  (HH:mm:ss)';
+                                }
                             }
                         }
                     }
@@ -332,7 +336,7 @@ class EmpleadoCargosControlador {
                     data.sucursal = sucursal;
                     data.sueldo = sueldo;
                     data.cargo = cargo;
-                    data.hora_traba = hora_trabaja;
+                    data.hora_trabaja = hora_trabaja;
                     data.jefe = jefe;
                     data.observacion = 'no registrado';
                     if (data.fila == '' || data.fila == undefined) {
@@ -341,59 +345,39 @@ class EmpleadoCargosControlador {
                     }
                     if (departamento == undefined) {
                         data.departamento = 'No registrado';
-                        data.observacion = 'Departamento, ' + data.observacion;
+                        data.observacion = 'Departamento ' + data.observacion;
                     }
                     if (fecha_inicio == undefined) {
                         data.fecha_inicio = 'No registrado';
-                        data.observacion = 'Fecha inicio, ' + data.observacion;
+                        data.observacion = 'Fecha inicio ' + data.observacion;
                     }
                     if (fecha_final == undefined) {
                         data.fecha_final = 'No registrado';
-                        data.observacion = 'Fecha final, ' + data.observacion;
+                        data.observacion = 'Fecha final ' + data.observacion;
                     }
                     if (sucursal == undefined) {
                         data.sucursal = 'No registrado';
-                        data.observacion = 'Sucursal, ' + data.observacion;
+                        data.observacion = 'Sucursal ' + data.observacion;
                     }
                     if (sueldo == undefined) {
                         data.sueldo = 'No registrado';
-                        data.observacion = 'Sueldo, ' + data.observacion;
+                        data.observacion = 'Sueldo ' + data.observacion;
                     }
                     if (cargo == undefined) {
                         data.cargo = 'No registrado';
-                        data.observacion = 'Cargo, ' + data.observacion;
+                        data.observacion = 'Cargo ' + data.observacion;
                     }
                     if (hora_trabaja == undefined) {
                         data.hora_trabaja = 'No registrado';
-                        data.observacion = 'Hora trabaja, ' + data.observacion;
+                        data.observacion = 'Hora trabaja ' + data.observacion;
                     }
                     if (jefe == undefined) {
                         data.jefe = 'No registrado';
-                        data.observacion = 'Jefe, ' + data.observacion;
-                    }
-                    if (data.hora_trabaja != 'No registrado') {
-                        if ((0, moment_1.default)(hora_trabaja, 'HH:mm:ss', true).isValid()) { }
-                        else {
-                            data.observacion = 'Formato de horas trabajo incorrecto (HH:mm:ss)';
-                        }
-                    }
-                    // Verificar si la variable tiene el formato de fecha correcto con moment
-                    if (data.fecha_inicio != 'No registrado') {
-                        if ((0, moment_1.default)(fecha_inicio, 'YYYY-MM-DD', true).isValid()) { }
-                        else {
-                            data.observacion = 'Formato de fecha inicio incorrecto (YYYY-MM-DD)';
-                        }
-                    }
-                    // Verificar si la variable tiene el formato de fecha correcto con moment
-                    if (data.fecha_final != 'No registrado') {
-                        if ((0, moment_1.default)(fecha_final, 'YYYY-MM-DD', true).isValid()) { }
-                        else {
-                            data.observacion = 'Formato de fecha final incorrecto (YYYY-MM-DD)';
-                        }
+                        data.observacion = 'Jefe ' + data.observacion;
                     }
                     if (cedula == undefined) {
                         data.cedula = 'No registrado';
-                        data.observacion = 'Cédula, ' + data.observacion;
+                        data.observacion = 'Cédula ' + data.observacion;
                     }
                     else {
                         //Valida si los datos de la columna cedula son numeros.
@@ -401,6 +385,36 @@ class EmpleadoCargosControlador {
                         if (rege.test(data.cedula)) {
                             if (data.cedula.toString().length != 10) {
                                 data.observacion = 'La cédula ingresada no es válida';
+                            }
+                            else {
+                                // Verificar si la variable tiene el formato de fecha correcto con moment
+                                if (data.fecha_inicio != 'No registrado') {
+                                    if ((0, moment_1.default)(fecha_inicio, 'YYYY-MM-DD', true).isValid()) { }
+                                    else {
+                                        data.observacion = 'Formato de fecha inicio incorrecto (YYYY-MM-DD)';
+                                    }
+                                }
+                                else 
+                                // Verificar si la variable tiene el formato de fecha correcto con moment
+                                if (data.fecha_final != 'No registrado') {
+                                    if ((0, moment_1.default)(fecha_final, 'YYYY-MM-DD', true).isValid()) { }
+                                    else {
+                                        data.observacion = 'Formato de fecha final incorrecto (YYYY-MM-DD)';
+                                    }
+                                }
+                                else 
+                                //Verifica el valor del suelo que sea solo numeros
+                                if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
+                                    data.observacion = 'El sueldo es incorrecto';
+                                }
+                                else 
+                                //Verficar formato de horas
+                                if (data.hora_trabaja != 'No registrado') {
+                                    if ((0, moment_1.default)(hora_trabaja, 'HH:mm:ss', true).isValid()) { }
+                                    else {
+                                        data.observacion = 'Formato horas invalido  (HH:mm:ss)';
+                                    }
+                                }
                             }
                         }
                         else {

@@ -189,6 +189,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       buscarNombreForm: '',
     });
     this.ListaDepartamentos();
+    this.ngOnInit();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
     this.messajeExcel = '';
@@ -314,7 +315,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
         this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
           timeOut: 3000,
         });
-        window.location.reload();
+        //window.location.reload();
+        this.LimpiarCampos();
         this.archivoForm.reset();
         this.nameFile = '';
       });

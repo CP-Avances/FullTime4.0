@@ -135,20 +135,20 @@ class ModalidaLaboralControlador {
                         (modalida_laboral != undefined && modalida_laboral != '')) {
                         data.fila = item;
                         data.modalida_laboral = modalida_laboral;
-                        data.observacion = 'no registrado';
+                        data.observacion = 'no registrada';
                         listModalidad.push(data);
                     }
                     else {
                         data.fila = item;
                         data.modalida_laboral = modalida_laboral;
-                        data.observacion = 'no registrado';
+                        data.observacion = 'no registrada';
                         if (data.fila == '' || data.fila == undefined) {
                             data.fila = 'error';
                             mensaje = 'error';
                         }
                         if (modalida_laboral == undefined) {
                             data.modalida_laboral = 'No registrado';
-                            data.observacion = 'Modalidad laboral ' + data.observacion;
+                            data.observacion = 'Modalidad Laboral ' + data.observacion;
                         }
                         listModalidad.push(data);
                     }
@@ -164,7 +164,7 @@ class ModalidaLaboralControlador {
                     }
                 });
                 listModalidad.forEach((item) => __awaiter(this, void 0, void 0, function* () {
-                    if (item.observacion == 'no registrado') {
+                    if (item.observacion == 'no registrada') {
                         var VERIFICAR_MODALIDAD = yield database_1.default.query(`
                         SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
                         `, [item.modalida_laboral.toUpperCase()]);

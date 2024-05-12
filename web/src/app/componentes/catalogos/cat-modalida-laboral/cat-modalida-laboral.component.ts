@@ -258,10 +258,10 @@ export class CatModalidaLaboralComponent implements OnInit {
       return 'rgb(159, 221, 154)';
     } else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
-    } else if (arrayObservacion[0] == 'Modalidad laboral ') {
+    } else if (arrayObservacion[0] == 'Modalidad Laboral ') {
       return 'rgb(242, 21, 21)';
     } else {
-      return 'white'
+      return 'rgb(242, 21, 21)';
     }
   }
   colorTexto: string = '';
@@ -292,13 +292,15 @@ export class CatModalidaLaboralComponent implements OnInit {
       this._ModalidaLaboral.subirArchivoExcel(this.listaModalidadCorrectas).subscribe(response => {
         console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de Modalidad laboral importada.', {
-          timeOut: 2500,
+          timeOut: 3000,
         });
-        window.location.reload();
+        //window.location.reload();
+        this.LimpiarCampos();
         this.archivoForm.reset();
         this.nameFile = '';
       });
     } else {
+      console.log('entro en salir')
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
       });
@@ -422,10 +424,8 @@ export class CatModalidaLaboralComponent implements OnInit {
     this.OrdenarDatos(this.listaModalida_Laboral);
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaModalida_Laboral.map(obj => {
       return {
-        CODIGO: obj.id,
-        FERIADO: obj.descripcion,
-        FECHA: obj.fecha_,
-        FECHA_RECUPERA: obj.fec_recuperacion_
+        ITEM: obj.id,
+        Modalidad_laboral: obj.descripcion,
       }
     }));
     // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
@@ -436,8 +436,8 @@ export class CatModalidaLaboralComponent implements OnInit {
     }
     wsr["!cols"] = wscols;
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'LISTA FERIADOS');
-    xlsx.writeFile(wb, "FeriadosEXCEL" + '.xlsx');
+    xlsx.utils.book_append_sheet(wb, wsr, 'Modalidad laboral');
+    xlsx.writeFile(wb, "ModalidadLaboralEXCEL" + '.xlsx');
     this.BuscarParametro();
   }
 
@@ -455,15 +455,13 @@ export class CatModalidaLaboralComponent implements OnInit {
       objeto = {
         "roles": {
           "$": { "id": obj.id },
-          "descripcion": obj.descripcion,
-          "fecha": obj.fecha_,
-          "fec_recuperacion": obj.fec_recuperacion_,
+          "modalidad_laboral": obj.descripcion,
         }
       }
       arregloFeriados.push(objeto)
     });
 
-    const xmlBuilder = new xml2js.Builder({ rootName: 'Feriados' });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Modalidad_laboral' });
     const xml = xmlBuilder.buildObject(arregloFeriados);
 
     if (xml === undefined) {
@@ -486,7 +484,7 @@ export class CatModalidaLaboralComponent implements OnInit {
 
     const a = document.createElement('a');
     a.href = xmlUrl;
-    a.download = 'Feriados.xml';
+    a.download = 'Modalidad_laboral.xml';
     // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
 
@@ -501,15 +499,13 @@ export class CatModalidaLaboralComponent implements OnInit {
     this.OrdenarDatos(this.listaModalida_Laboral);
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaModalida_Laboral.map(obj => {
       return {
-        CODIGO: obj.id,
-        FERIADO: obj.descripcion,
-        FECHA: obj.fecha_,
-        FECHA_RECUPERA: obj.fec_recuperacion_
+        ITEM: obj.id,
+        MODALIDAD_LABORAL: obj.descripcion,
       }
     }));
     const csvDataC = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "FeriadosCSV" + '.csv');
+    FileSaver.saveAs(data, "Modalidad_laboralCSV" + '.csv');
     this.BuscarParametro();
   }
 
