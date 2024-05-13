@@ -328,6 +328,11 @@ import { RegistroModalidadComponent } from './componentes/catalogos/cat-modalida
 import { EditarModalidadComponent } from './componentes/catalogos/cat-modalida-laboral/editarModalidad/editar-modalidad/editar-modalidad.component';
 import { RegistrarCargoComponent } from './componentes/catalogos/catalogoTipoCargo/registrar-cargo/registrar-cargo.component';
 import { EditarTipoCargoComponent } from './componentes/catalogos/catalogoTipoCargo/editar-tipo-cargo/editar-tipo-cargo.component';
+import { CatDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/listar-discapacidad/cat-discapacidad.component';
+import { RegistroDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/registrar-discapacidad/registrar-discapacidad.component';
+import { EditarDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/editar-discapacidad/editar-discapacidad.component';
+import { CatVacunasComponent } from './componentes/catalogos/catalogoVacuna/listar-vacuna/cat-vacunas.component';
+
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
 
@@ -585,6 +590,10 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     EditarModalidadComponent,
     RegistrarCargoComponent,
     EditarTipoCargoComponent,
+    CatDiscapacidadComponent,
+    RegistroDiscapacidadComponent,
+    EditarDiscapacidadComponent,
+    CatVacunasComponent
 
   ],
 

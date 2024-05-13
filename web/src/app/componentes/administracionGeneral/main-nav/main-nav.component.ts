@@ -283,6 +283,8 @@ export class MainNavComponent implements OnInit {
           { name: 'Modalida Laboral', url: '/modalidaLaboral', color: true, ver: true },
           { name: 'Tipo Cargos', url: '/tipoCargos', color: true, ver: true },
           { name: 'Asignar Establecimientos', url: '/administrarSucursales', color: true, ver: this.superadmin },
+          { name: 'Discapacidad', url: '/discapacidades', color: true, ver: true },
+          { name: 'Vacunas', url: '/vacunas', color: true, ver: true }
         ]
       },
       {
