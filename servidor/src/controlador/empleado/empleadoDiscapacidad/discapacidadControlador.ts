@@ -114,7 +114,6 @@ class DiscapacidadControlador {
 
   public async EliminarDiscapacidad(req: Request, res: Response): Promise<Response> {
     try {
-      // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
       const { user_name, ip } = req.body;
       const id_empleado = req.params.id_empleado;
 
@@ -157,6 +156,10 @@ class DiscapacidadControlador {
         ip, 
         observacion: null
       });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
       return res.jsonp({ message: 'Registro eliminado.' });
     } catch (error) {
       // REVERTIR TRANSACCION
