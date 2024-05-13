@@ -2563,7 +2563,11 @@ export class VerEmpleadoComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PROCESOS
   EliminarProceso(id_plan: number) {
-    this.restEmpleadoProcesos.EliminarRegistro(id_plan).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.restEmpleadoProcesos.EliminarRegistro(id_plan, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });

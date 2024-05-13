@@ -24,10 +24,14 @@ export class ProcesosEmpleadoComponent implements OnInit {
 
   idEmpleado: string = '';
 
-  // ITEMS DE PAGINACION DE LA TABLA 
+  // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   get habilitarPermiso(): boolean {
     return this.funciones.accionesPersonal;
@@ -62,13 +66,15 @@ export class ProcesosEmpleadoComponent implements OnInit {
       return this.validar.RedireccionarHomeEmpleado(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
       this.BuscarParametro();
     }
 
   }
 
   /** **************************************************************************************** **
-   ** **                       METODOS GENERALES DEL SISTEMA                                ** ** 
+   ** **                       METODOS GENERALES DEL SISTEMA                                ** **
    ** **************************************************************************************** **/
 
   // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
@@ -86,7 +92,7 @@ export class ProcesosEmpleadoComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -112,10 +118,10 @@ export class ProcesosEmpleadoComponent implements OnInit {
   }
 
   /** ******************************************************************************************* **
-   ** **                   METODO DE PRSENTACION DE DATOS DE PROCESOS                          ** ** 
+   ** **                   METODO DE PRSENTACION DE DATOS DE PROCESOS                          ** **
    ** ******************************************************************************************* **/
 
-  // METODO PARA MOSTRAR DATOS DE LOS PROCESOS DEL EMPLEADO 
+  // METODO PARA MOSTRAR DATOS DE LOS PROCESOS DEL EMPLEADO
   empleadoProcesos: any = [];
   ObtenerEmpleadoProcesos(formato_fecha: string) {
     this.empleadoProcesos = [];
@@ -128,7 +134,7 @@ export class ProcesosEmpleadoComponent implements OnInit {
     })
   }
 
-  // VENTANA PARA INGRESAR PROCESOS DEL EMPLEADO 
+  // VENTANA PARA INGRESAR PROCESOS DEL EMPLEADO
   AbrirVentanaProcesos(): void {
     if (this.datoActual.id_cargo != undefined) {
       this.ventana.open(RegistrarEmpleProcesoComponent,
@@ -144,7 +150,7 @@ export class ProcesosEmpleadoComponent implements OnInit {
     }
   }
 
-  // VENTANA PARA EDITAR PROCESOS DEL EMPLEADO 
+  // VENTANA PARA EDITAR PROCESOS DEL EMPLEADO
   AbrirVentanaEditarProceso(datoSeleccionado: any): void {
     this.ventana.open(EditarEmpleadoProcesoComponent,
       { width: '500px', data: { idEmpleado: this.idEmpleado, datosProcesos: datoSeleccionado } })
@@ -155,7 +161,12 @@ export class ProcesosEmpleadoComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PROCESOS
   EliminarProceso(id_plan: number) {
-    this.restEmpleadoProcesos.EliminarRegistro(id_plan).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
+    this.restEmpleadoProcesos.EliminarRegistro(id_plan, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -163,7 +174,7 @@ export class ProcesosEmpleadoComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteProceso(datos: any) {
     console.log(datos);
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
