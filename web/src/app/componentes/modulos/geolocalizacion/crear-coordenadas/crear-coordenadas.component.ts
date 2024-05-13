@@ -18,6 +18,10 @@ import { EmplLeafletComponent } from 'src/app/componentes/modulos/geolocalizacio
 
 export class CrearCoordenadasComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   latitud = new FormControl('', Validators.required);
   longitud = new FormControl('', Validators.required);
@@ -39,6 +43,9 @@ export class CrearCoordenadasComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ConsultarCoordenadas();
     this.BuscarParametro();
   }
@@ -75,6 +82,8 @@ export class CrearCoordenadasComponent implements OnInit {
         latitud: form.latitudForm,
         longitud: form.longitudForm,
         descripcion: form.descripcionForm,
+        user_name: this.user_name,
+        ip: this.ip
       }
       this.rest.RegistrarCoordenadas(datos).subscribe(response => {
         this.toastr.success('Ubicación registrada exitosamente.',

@@ -30,8 +30,12 @@ export class EmpleadoUbicacionService {
     return this.http.get(`${environment.url}/ubicacion/coordenadas-usuarios/general/${id_ubicacion}`);
   }
 
-  EliminarCoordenadasUsuario(id: number) {
-    return this.http.delete<any>(`${environment.url}/ubicacion/eliminar-coordenadas-usuario/${id}`);
+  EliminarCoordenadasUsuario(id: number, datos: any) {
+    const url = `${environment.url}/ubicacion/eliminar-coordenadas-usuario/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
 
@@ -63,8 +67,12 @@ export class EmpleadoUbicacionService {
     return this.http.get(`${environment.url}/ubicacion/ultimo-registro`);
   }
 
-  EliminarCoordenadas(id: number) {
-    return this.http.delete<any>(`${environment.url}/ubicacion/eliminar/${id}`);
+  EliminarCoordenadas(id: number, datos: any) {
+    const url = `${environment.url}/ubicacion/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA CREAR ARCHIVO XML
