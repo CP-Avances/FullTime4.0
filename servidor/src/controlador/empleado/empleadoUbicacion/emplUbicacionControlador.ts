@@ -155,7 +155,6 @@ class UbicacionControlador {
     // ELIMINAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
     public async EliminarCoordenadas(req: Request, res: Response): Promise<Response> {
         try {
-            // TODO ANALIZAE COMO OBTERNER USER_NAME E IP DESDE EL FRONT
             const { user_name, ip } = req.body;
             const { id } = req.params;
 
@@ -281,7 +280,6 @@ class UbicacionControlador {
     // ELIMINAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
     public async EliminarCoordenadasUsuario(req: Request, res: Response): Promise<Response> {
         try {
-            // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
             const { user_name, ip } = req.body;
             const { id } = req.params;
 
