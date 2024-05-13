@@ -35,9 +35,7 @@ class ContratoEmpleadoControlador {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{id_empleado: ${id_empleado}, fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, 
-                    vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, 
-                    id_tipo_contrato: ${id_tipo_contrato}}`,
+                datosNuevos: `{id_empleado: ${id_empleado}, fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
                 ip,
                 observacion: null
             });
@@ -60,7 +58,6 @@ class ContratoEmpleadoControlador {
 
     // METODO PARA GUARDAR DOCUMENTO
     public async GuardarDocumentoContrato(req: Request, res: Response): Promise<Response> {
-
         try {
             // FECHA DEL SISTEMA
             var fecha = moment();
@@ -68,7 +65,6 @@ class ContratoEmpleadoControlador {
             var mes = fecha.format('MM');
             var dia = fecha.format('DD');
     
-            // TODO ANALIZAR COMOOBTENER USER_NAME E IP DESDE EL FRONT
             const { user_name, ip } = req.body;
 
             let id = req.params.id;
@@ -212,8 +208,7 @@ class ContratoEmpleadoControlador {
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: `{fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla},
-                    asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
+                datosNuevos: `{fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
                 ip,
                 observacion: null
             });

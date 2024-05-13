@@ -39,9 +39,7 @@ class ContratoEmpleadoControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{id_empleado: ${id_empleado}, fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, 
-                    vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, 
-                    id_tipo_contrato: ${id_tipo_contrato}}`,
+                    datosNuevos: `{id_empleado: ${id_empleado}, fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
                     ip,
                     observacion: null
                 });
@@ -71,7 +69,6 @@ class ContratoEmpleadoControlador {
                 var anio = fecha.format('YYYY');
                 var mes = fecha.format('MM');
                 var dia = fecha.format('DD');
-                // TODO ANALIZAR COMOOBTENER USER_NAME E IP DESDE EL FRONT
                 const { user_name, ip } = req.body;
                 let id = req.params.id;
                 // INICIAR TRANSACCION
@@ -193,8 +190,7 @@ class ContratoEmpleadoControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla},
-                    asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
+                    datosNuevos: `{fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
                     ip,
                     observacion: null
                 });
