@@ -97,11 +97,12 @@
                 </thead>
                 <tbody>
                     <tr>
+                        <td></td>
                         <td>
-                            <!--mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [formControl]="buscarNombre"
-                                    [(ngModel)]="filtroNombreSuc">
-                            </mat-form-field-->
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [formControl]="nombreF"
+                                    [(ngModel)]="filtradoNombre" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
                         </td>
                         <td></td>
                         <td>
@@ -111,7 +112,8 @@
                             </mat-icon>
                         </td>
                     </tr>
-                    <tr *ngFor="let discapacidad of discapacidades |  paginate:tamanio_pagina:numero_pagina">
+                    <tr
+                        *ngFor="let discapacidad of discapacidades| filtrosNombres: filtradoNombre |  paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionDiscapacidad.toggle(discapacidad) : null"

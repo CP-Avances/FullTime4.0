@@ -184,25 +184,35 @@ class VacunasControlador {
     // CREAR REGISTRO DE TIPO DE VACUNA
     public async CrearTipoVacuna(req: Request, res: Response): Promise<Response> {
         try {
-            const { nombre } = req.body;
-
-            const response: QueryResult = await pool.query(
+            const { vacuna } = req.body;
+            var VERIFICAR_VACUNA = await pool.query(
                 `
-                INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
-                `
-                , [nombre]);
+                SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
+                `, [vacuna.toUpperCase()])
+            console.log('VERIFICAR_VACUNA: ', VERIFICAR_VACUNA.rows[0]);
+            if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
+                // Dar formato a la palabra de vacuna
+                //const vacunaInsertar = vacuna.charAt(0).toUpperCase() + vacuna.slice(1).toLowerCase();
 
-            const [vacunas] = response.rows;
+                const response: QueryResult = await pool.query(
+                    `
+                    INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
+                    `
+                    , [vacuna]);
 
-            if (vacunas) {
-                return res.status(200).jsonp(vacunas)
+                const [vacunaInsertada] = response.rows;
+
+                if (vacunaInsertada) {
+                    return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' })
+                } else {
+                    return res.status(404).jsonp({ message: 'No se pudo guardar', status: '400' })
+                }
+            } else {
+                return res.jsonp({ message: 'Ya existe la vacuna ', status: '300' })
             }
-            else {
-                return res.status(404).jsonp({ message: 'error' })
-            }
-
-        } catch (error) {
-            return res.jsonp({ message: 'error' });
+        }
+        catch (error) {
+            return res.status(500).jsonp({ message: 'error', status: '500' });
         }
     }
 

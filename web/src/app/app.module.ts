@@ -332,6 +332,7 @@ import { CatDiscapacidadComponent } from './componentes/catalogos/catalogoDiscap
 import { RegistroDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/registrar-discapacidad/registrar-discapacidad.component';
 import { EditarDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/editar-discapacidad/editar-discapacidad.component';
 import { CatVacunasComponent } from './componentes/catalogos/catalogoVacuna/listar-vacuna/cat-vacunas.component';
+import { EditarVacunasComponent } from './componentes/catalogos/catalogoVacuna/editar-vacuna/editar-vacuna.component';
 
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
@@ -593,7 +594,8 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     CatDiscapacidadComponent,
     RegistroDiscapacidadComponent,
     EditarDiscapacidadComponent,
-    CatVacunasComponent
+    CatVacunasComponent,
+    EditarVacunasComponent
 
   ],
 

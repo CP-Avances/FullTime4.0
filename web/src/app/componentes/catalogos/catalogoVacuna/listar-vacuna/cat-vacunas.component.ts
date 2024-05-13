@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/metodos.component';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { CatVacunasService } from 'src/app/servicios/catalogos/catVacunas/cat-vacunas.service';
+import { VacunacionService } from 'src/app/servicios/empleado/empleadoVacunas/vacunacion.service';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ThemePalette } from '@angular/material/core';
-//import { RegistroDiscapacidadComponent } from '../registrar-discapacidad/registrar-discapacidad.component';
-//import { Edi } from '../editar-vacuna/editar-vacuna.component';
+import { TipoVacunaComponent } from '../../../empleado/vacunacion/tipo-vacuna/tipo-vacuna.component';
+import { EditarVacunasComponent } from '../editar-vacuna/editar-vacuna.component';
 import * as FileSaver from 'file-saver';
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
@@ -21,7 +22,7 @@ import { PlantillaReportesService } from '../../../reportes/plantilla-reportes.s
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { SelectionModel } from '@angular/cdk/collections';
-import { ITableDiscapacidad } from 'src/app/model/reportes.model';
+import { ITableVacuna } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-cat-discapacidad',
@@ -29,6 +30,16 @@ import { ITableDiscapacidad } from 'src/app/model/reportes.model';
   styleUrls: ['./cat-vacunas.component.css']
 })
 export class CatVacunasComponent implements OnInit {
+  filtradoNombre = ''; // VARIABLE DE BUSQUEDA DE DATOS
+
+  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
+  nombreF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
+
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
+  public formulario = new FormGroup({
+    nombreForm: this.nombreF,
+  });
+
 
   vacunasEliminar: any = [];
 
@@ -77,7 +88,7 @@ export class CatVacunasComponent implements OnInit {
   ngOnInit() {
     this.vacunas = [];
     this.ObtenerEmpleados(this.idEmpleado);
-    this.ObtenerDiscapacidad();
+    this.ObtenerVacuna();
 
   }
 
@@ -93,7 +104,7 @@ export class CatVacunasComponent implements OnInit {
 
 
 
-  ObtenerDiscapacidad() {
+  ObtenerVacuna() {
     this.vacunas = [];
 
     this.rest.listaVacuna().subscribe(res => {
@@ -117,27 +128,26 @@ export class CatVacunasComponent implements OnInit {
   }
 
   AbrirVentanaRegistrarDiscapacidad(): void {
-    /*
-    this.ventana.open(RegistroDiscapacidadComponent, { width: '500px' })
+  
+    this.ventana.open(TipoVacunaComponent, { width: '500px' })
       .afterClosed().subscribe(items => {
         this.ngOnInit();
       });
     this.activar_seleccion = true;
     this.plan_multiple = false;
     this.plan_multiple_ = false;
-    this.selectionDiscapacidad.clear();
+    this.selectionVacuna.clear();
     this.vacunasEliminar = [];
-    */
   }
 
   // METODO PARA EDITAR MODALIDAD LABORAL
   AbrirEditar(item_modalidad: any): void {
-    /*/
-    this.ventana.open(EditarDiscapacidadComponent, { width: '450px', data: item_modalidad })
+    
+    this.ventana.open(EditarVacunasComponent, { width: '450px', data: item_modalidad })
       .afterClosed().subscribe(items => {
         this.ngOnInit();
       });
-      */
+      
   }
 
   // CONTROL DE PAGINACION
@@ -186,10 +196,10 @@ export class CatVacunasComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download('Discapacidad.pdf'); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Vacunas.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
-    this.ObtenerDiscapacidad();
+    this.ObtenerVacuna();
   }
 
   GetDocumentDefinicion() {
@@ -286,9 +296,9 @@ export class CatVacunasComponent implements OnInit {
     }
     wsr["!cols"] = wscols;
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'LISTA vacunas');
-    xlsx.writeFile(wb, "vacunasEXCEL" + '.xlsx');
-    this.ObtenerDiscapacidad();
+    xlsx.utils.book_append_sheet(wb, wsr, 'LISTA VACUNAS');
+    xlsx.writeFile(wb, "VacunasEXCEL" + '.xlsx');
+    this.ObtenerVacuna();
   }
 
   /** ************************************************************************************************* **
@@ -303,7 +313,7 @@ export class CatVacunasComponent implements OnInit {
     var arreglovacunas: any = [];
     this.vacunas.forEach(obj => {
       objeto = {
-        "discapacidad": {
+        "vacuna": {
           "$": { "id": obj.id },
           "nombre": obj.nombre,
         }
@@ -311,7 +321,7 @@ export class CatVacunasComponent implements OnInit {
       arreglovacunas.push(objeto)
     });
 
-    const xmlBuilder = new xml2js.Builder({ rootName: 'Dicapacidades' });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Vacunas' });
     const xml = xmlBuilder.buildObject(arreglovacunas);
 
     if (xml === undefined) {
@@ -334,11 +344,11 @@ export class CatVacunasComponent implements OnInit {
 
     const a = document.createElement('a');
     a.href = xmlUrl;
-    a.download = 'vacunas.xml';
+    a.download = 'Vacunas.xml';
     // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
 
-    this.ObtenerDiscapacidad();
+    this.ObtenerVacuna();
   }
 
   /** ************************************************************************************************** **
@@ -351,7 +361,7 @@ export class CatVacunasComponent implements OnInit {
     const csvDataC = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "vacunasCSV" + '.csv');
-    this.ObtenerDiscapacidad();
+    this.ObtenerVacuna();
   }
 
   // METODOS PARA LA SELECCION MULTIPLE
@@ -368,28 +378,28 @@ export class CatVacunasComponent implements OnInit {
   activar_seleccion: boolean = true;
   seleccion_vacia: boolean = true;
 
-  selectionDiscapacidad = new SelectionModel<ITableDiscapacidad>(true, []);
+  selectionVacuna = new SelectionModel<ITableVacuna>(true, []);
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
-    const numSelected = this.selectionDiscapacidad.selected.length;
+    const numSelected = this.selectionVacuna.selected.length;
     return numSelected === this.vacunas.length
   }
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
     this.isAllSelectedPag() ?
-      this.selectionDiscapacidad.clear() :
-      this.vacunas.forEach((row: any) => this.selectionDiscapacidad.select(row));
+      this.selectionVacuna.clear() :
+      this.vacunas.forEach((row: any) => this.selectionVacuna.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
-  checkboxLabelPag(row?: ITableDiscapacidad): string {
+  checkboxLabelPag(row?: ITableVacuna): string {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
-    this.vacunasEliminar = this.selectionDiscapacidad.selected;
-    return `${this.selectionDiscapacidad.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+    this.vacunasEliminar = this.selectionVacuna.selected;
+    return `${this.selectionVacuna.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
   }
 
 
@@ -416,7 +426,7 @@ export class CatVacunasComponent implements OnInit {
           this.plan_multiple = false;
           this.plan_multiple_ = false;
           this.vacunasEliminar = [];
-          this.selectionDiscapacidad.clear();
+          this.selectionVacuna.clear();
           this.ngOnInit();
         }
       });
@@ -429,7 +439,7 @@ export class CatVacunasComponent implements OnInit {
   EliminarMultiple() {
     this.ingresar = false;
     this.contador = 0;
-    this.vacunasEliminar = this.selectionDiscapacidad.selected;
+    this.vacunasEliminar = this.selectionVacuna.selected;
     this.vacunasEliminar.forEach((datos: any) => {
       this.vacunas = this.vacunas.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
@@ -464,7 +474,7 @@ export class CatVacunasComponent implements OnInit {
             this.plan_multiple = false;
             this.plan_multiple_ = false;
             this.vacunasEliminar = [];
-            this.selectionDiscapacidad.clear();
+            this.selectionVacuna.clear();
             this.ngOnInit();
           } else {
             this.toastr.warning('No ha seleccionado vacunas.', 'Ups!!! algo salio mal.', {

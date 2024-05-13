@@ -548,3 +548,7 @@ export interface ITableTipoCargo {
 export interface ITableDiscapacidad {
     nombre: string,
 }
+
+export interface ITableVacuna {
+    nombre: string,
+}

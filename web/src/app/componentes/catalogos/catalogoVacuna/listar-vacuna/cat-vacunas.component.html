@@ -86,8 +86,8 @@
                                 library_add_check
                             </mat-icon>
                             <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
-                                [checked]="selectionDiscapacidad.hasValue() && isAllSelectedPag()"
-                                [indeterminate]="selectionDiscapacidad.hasValue() && !isAllSelectedPag()"
+                                [checked]="selectionVacuna.hasValue() && isAllSelectedPag()"
+                                [indeterminate]="selectionVacuna.hasValue() && !isAllSelectedPag()"
                                 [aria-label]="checkboxLabelPag()">
                             </mat-checkbox>
                         </th>
@@ -97,13 +97,14 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>
-                            <!--mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [formControl]="buscarNombre"
-                                    [(ngModel)]="filtroNombreSuc">
-                            </mat-form-field-->
-                        </td>
                         <td></td>
+
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [formControl]="nombreF"
+                                    [(ngModel)]="filtradoNombre" >
+                            </mat-form-field>
+                        </td>
                         <td>
                             <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda de departamentos de acurdo a cada columna de la tabla.">
@@ -111,11 +112,11 @@
                             </mat-icon>
                         </td>
                     </tr>
-                    <tr *ngFor="let v of vacunas |  paginate:tamanio_pagina:numero_pagina">
+                    <tr *ngFor="let v of vacunas| filtrosNombres: filtradoNombre |  paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
-                                (change)="$event ? selectionDiscapacidad.toggle(v) : null"
-                                [checked]="selectionDiscapacidad.isSelected(v)"
+                                (change)="$event ? selectionVacuna.toggle(v) : null"
+                                [checked]="selectionVacuna.isSelected(v)"
                                 [aria-label]="checkboxLabelPag(v)">
                             </mat-checkbox>
                         </td>

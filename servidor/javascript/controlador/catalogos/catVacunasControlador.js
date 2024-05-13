@@ -70,11 +70,11 @@ class VacunaControlador {
                 const { id, nombre } = req.body;
                 console.log('id: ', id, 'nombre: ', nombre);
                 // Dar formato a la palabra de vacuna
-                const nombreConFormato = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+                //const nombreConFormato = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
                 const response = yield database_1.default.query(`
                 UPDATE e_cat_vacuna SET nombre = $2
                 WHERE id = $1 RETURNING *
-                `, [id, nombreConFormato]);
+                `, [id, nombre]);
                 const [vacunaEditada] = response.rows;
                 if (vacunaEditada) {
                     return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' });
@@ -94,7 +94,7 @@ class VacunaControlador {
                 const id = req.params.id;
                 console.log('id: ', id);
                 yield database_1.default.query(`
-                DELETE FROM e_cat_vacuna WHEREi d = $1
+                DELETE FROM e_cat_vacuna WHERE id = $1
             `, [id]);
                 res.jsonp({ message: 'Registro eliminado.' });
             }

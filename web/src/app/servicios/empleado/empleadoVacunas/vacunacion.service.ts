@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -54,7 +55,7 @@ export class VacunacionService {
 
   // METODO DE REGISTROS DE TIPO DE VACUNACION
   CrearTipoVacuna(data: any) {
-    return this.http.post<any>(`${environment.url}/vacunas/tipo_vacuna`, data);
+    return this.http.post<any>(`${environment.url}/vacunas/tipo_vacuna`, data).pipe(catchError(data));
   }
 
 

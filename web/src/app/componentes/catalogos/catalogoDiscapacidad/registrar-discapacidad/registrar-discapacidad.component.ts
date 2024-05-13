@@ -53,7 +53,7 @@ export class RegistroDiscapacidadComponent {
       this.toastr.info(error, 'Error', {
         timeOut: 4000,
       })
-    });;
+    });
   }
 
   // METODO PARA VALIDAR INGRESO DE LETRAS

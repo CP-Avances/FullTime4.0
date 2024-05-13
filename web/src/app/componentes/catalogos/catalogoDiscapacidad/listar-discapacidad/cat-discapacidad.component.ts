@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/metodos.component';
@@ -22,6 +22,8 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableDiscapacidad } from 'src/app/model/reportes.model';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+
 
 @Component({
   selector: 'app-cat-discapacidad',
@@ -29,6 +31,22 @@ import { ITableDiscapacidad } from 'src/app/model/reportes.model';
   styleUrls: ['./cat-discapacidad.component.css']
 })
 export class CatDiscapacidadComponent implements OnInit {
+
+
+  filtradoNombre = ''; // VARIABLE DE BUSQUEDA DE DATOS
+
+  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
+  nombreF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
+
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
+  public formulario = new FormGroup({
+    nombreForm: this.nombreF,
+  });
+  // METODO PARA VALIDAR INGRESO DE LETRAS
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
+  }
+
 
   discapacidadesEliminar: any = [];
 
@@ -70,6 +88,8 @@ export class CatDiscapacidadComponent implements OnInit {
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
     public parametro: ParametrosService,
+    public validar: ValidacionesService,
+
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -90,9 +110,6 @@ export class CatDiscapacidadComponent implements OnInit {
   }
 
   formato_fecha: string = 'DD/MM/YYYY';
-
-
-
   ObtenerDiscapacidad() {
     this.discapacidades = [];
 
@@ -283,7 +300,7 @@ export class CatDiscapacidadComponent implements OnInit {
     wsr["!cols"] = wscols;
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'LISTA DISCAPACIDADES');
-    xlsx.writeFile(wb, "DiscapacidadesEXCEL" + '.xlsx');
+    xlsx.writeFile(wb, "DiscapacidadEXCEL" + '.xlsx');
     this.ObtenerDiscapacidad();
   }
 
