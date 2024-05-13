@@ -22,6 +22,10 @@ export class DiscapacidadComponent implements OnInit {
 
   HabilitarDescrip: boolean = true;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   porcentaje = new FormControl('', Validators.required);
   nombreF = new FormControl('', [Validators.minLength(5)])
   carnet = new FormControl('', [Validators.required, Validators.maxLength(8)]);
@@ -43,6 +47,9 @@ export class DiscapacidadComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.editar = this.datos.metodo;
     this.idEmploy = this.datos.idEmpleado;
     this.EditarFormulario();
@@ -115,13 +122,15 @@ export class DiscapacidadComponent implements OnInit {
     }
   }
 
-  // METODO PARA CAPTURAR DATOS 
+  // METODO PARA CAPTURAR DATOS
   RegistarDatos(form: any, idTipoD: number) {
     let carnet = {
       carn_conadis: form.carnetForm,
       id_empleado: parseInt(this.idEmploy),
       porcentaje: form.porcentajeForm,
       tipo: idTipoD,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.rest.RegistroDiscapacidad(carnet).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
@@ -139,6 +148,8 @@ export class DiscapacidadComponent implements OnInit {
       carn_conadis: form.carnetForm,
       porcentaje: form.porcentajeForm,
       tipo: idTipoD,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.rest.ActualizarDiscapacidad(parseInt(this.idEmploy), carnet).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
@@ -152,6 +163,8 @@ export class DiscapacidadComponent implements OnInit {
   GuardarTipoActualizacion(form: any) {
     let tipo = {
       nombre: form.nombreForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.rest.RegistrarTipo(tipo).subscribe(response => {
       this.ActualizarDatos(form, response.id);
@@ -162,6 +175,8 @@ export class DiscapacidadComponent implements OnInit {
   GuardarTipoRegistro(form: any) {
     let tipo = {
       nombre: form.nombreForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.rest.RegistrarTipo(tipo).subscribe(response => {
       this.RegistarDatos(form, response.id);
@@ -201,7 +216,7 @@ export class DiscapacidadComponent implements OnInit {
     this.ventana.close();
   }
 
-  // TIPO DE DESCAPACIDAD 
+  // TIPO DE DESCAPACIDAD
   seleccionarTipo: any;
   ObtenerTiposDiscapacidad() {
     this.rest.ListarTipoDiscapacidad().subscribe(data => {

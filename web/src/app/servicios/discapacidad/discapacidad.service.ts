@@ -28,13 +28,17 @@ export class DiscapacidadService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarDiscapacidad(id: number) {
-    return this.http.delete(`${environment.url}/discapacidad/eliminar/${id}`);
+  EliminarDiscapacidad(id: number, datos: any) {
+    const url = `${environment.url}/discapacidad/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
 
   /** *************************************************************************************** **
-   ** **                METODO PARA MANEJO DE DATOS DE TIPO DISCAPACIDAD                   ** ** 
+   ** **                METODO PARA MANEJO DE DATOS DE TIPO DISCAPACIDAD                   ** **
    ** *************************************************************************************** **/
 
   // METODO PARA REGISTRAR TIPO DE DISCAPACIDAD

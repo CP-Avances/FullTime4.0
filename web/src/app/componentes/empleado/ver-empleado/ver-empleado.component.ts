@@ -590,7 +590,12 @@ export class VerEmpleadoComponent implements OnInit {
 
   // ELIMINAR REGISTRO DE DISCAPACIDAD
   EliminarDiscapacidad(id_discapacidad: number) {
-    this.restDiscapacidad.EliminarDiscapacidad(id_discapacidad).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.restDiscapacidad.EliminarDiscapacidad(id_discapacidad, datos).subscribe(res => {
       this.ObtenerDiscapacidadEmpleado();
       this.btnDisc = 'Añadir';
       this.toastr.error('Registro eliminado.', '', {

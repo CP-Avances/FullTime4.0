@@ -53,12 +53,16 @@ export class DatosEmpleadoComponent implements OnInit {
   btnDisc = 'Añadir';
   editar: string = '';
 
-  // ITEMS DE PAGINACION DE LA TABLA 
+  // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
   hipervinculo: string = environment.url; // VARIABLE DE MANEJO DE RUTAS CON URL
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
 
   constructor(
@@ -89,6 +93,9 @@ export class DatosEmpleadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerLogo();
     this.ObtenerColores();
     this.BuscarParametro();
@@ -98,7 +105,7 @@ export class DatosEmpleadoComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -151,7 +158,7 @@ export class DatosEmpleadoComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -178,7 +185,7 @@ export class DatosEmpleadoComponent implements OnInit {
    ** **                      METODO PARA MOSTRAR DATOS PERFIL DE USUARIO                        ** **                                           *
    ** ********************************************************************************************* **/
 
-  // METODO PARA VER LA INFORMACIÓN DEL USUARIO 
+  // METODO PARA VER LA INFORMACIÓN DEL USUARIO
   urlImagen: any;
   iniciales: any;
   mostrarImagen: boolean = false;
@@ -357,7 +364,7 @@ export class DatosEmpleadoComponent implements OnInit {
       })
   }
 
-  // ELIMINAR REGISTRO DE TITULO 
+  // ELIMINAR REGISTRO DE TITULO
   EliminarTituloEmpleado(id: number) {
     this.restEmpleado.EliminarTitulo(id).subscribe(res => {
       this.ObtenerTituloEmpleado();
@@ -367,7 +374,7 @@ export class DatosEmpleadoComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteTitulo(id: number) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -385,7 +392,7 @@ export class DatosEmpleadoComponent implements OnInit {
    ** **               BUSQUEDA DE DATOS DE ASIGNACIONES: DISCAPACIDAD                           ** **                        *
    ** ********************************************************************************************* **/
 
-  // METODO PARA OBTENER DATOS DE DISCAPACIDAD 
+  // METODO PARA OBTENER DATOS DE DISCAPACIDAD
   ObtenerDiscapacidadEmpleado() {
     this.discapacidadUser = [];
     this.restDiscapacidad.BuscarDiscapacidadUsuario(parseInt(this.idEmpleado)).subscribe(data => {
@@ -394,9 +401,14 @@ export class DatosEmpleadoComponent implements OnInit {
     });
   }
 
-  // ELIMINAR REGISTRO DE DISCAPACIDAD 
+  // ELIMINAR REGISTRO DE DISCAPACIDAD
   EliminarDiscapacidad(id_discapacidad: number) {
-    this.restDiscapacidad.EliminarDiscapacidad(id_discapacidad).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
+    this.restDiscapacidad.EliminarDiscapacidad(id_discapacidad, datos).subscribe(res => {
       this.ObtenerDiscapacidadEmpleado();
       this.btnDisc = 'Añadir';
       this.toastr.error('Registro eliminado.', '', {
@@ -405,7 +417,7 @@ export class DatosEmpleadoComponent implements OnInit {
     })
   };
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteDiscapacidad(id: number) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -437,7 +449,7 @@ export class DatosEmpleadoComponent implements OnInit {
     }
   }
 
-  // LÓGICA DE BOTÓN PARA MOSTRAR COMPONENTE DEL REGISTRO DE DISCAPACIDAD 
+  // LÓGICA DE BOTÓN PARA MOSTRAR COMPONENTE DEL REGISTRO DE DISCAPACIDAD
   MostrarDis() {
     if (this.discapacidadUser.length != 0) {
       this.AbrirVentanaDiscapacidad('editar');
@@ -474,7 +486,7 @@ export class DatosEmpleadoComponent implements OnInit {
       })
   }
 
-  // LÓGICA DE BOTÓN PARA MOSTRAR COMPONENTE DEL REGISTRO DE VACUNACION 
+  // LÓGICA DE BOTÓN PARA MOSTRAR COMPONENTE DEL REGISTRO DE VACUNACION
   MostrarVentanaVacuna() {
     this.ventana.open(CrearVacunaComponent, {
       data: { idEmpleado: this.idEmpleado }, width: '600px'
@@ -494,7 +506,7 @@ export class DatosEmpleadoComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarEliminarVacuna(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -519,7 +531,7 @@ export class DatosEmpleadoComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER EL CONTRATO DE UN EMPLEADO CON SU RESPECTIVO REGIMEN LABORAL 
+  // METODO PARA OBTENER EL CONTRATO DE UN EMPLEADO CON SU RESPECTIVO REGIMEN LABORAL
   ObtenerContratoEmpleado(id_contrato: number, formato_fecha: string) {
     this.restEmpleado.BuscarDatosContrato(id_contrato).subscribe(res => {
       this.contratoEmpleado = res;
@@ -535,7 +547,7 @@ export class DatosEmpleadoComponent implements OnInit {
    ** ******************************************************************************************** **/
 
 
-  // METODO PARA OBTENER LOS DATOS DEL CARGO DEL EMPLEADO 
+  // METODO PARA OBTENER LOS DATOS DEL CARGO DEL EMPLEADO
   cargoEmpleado: any = [];
   ObtenerCargoEmpleado(id_cargo: number, formato_fecha: string) {
     this.cargoEmpleado = [];
@@ -878,7 +890,7 @@ export class DatosEmpleadoComponent implements OnInit {
     FileSaver.saveAs(data, "EmpleadoCSV" + (datos[0])[0].Nombre + "_" + (datos[0])[0].Apellido + "_" + new Date().getTime() + '.csv');
   }
 
-  /** ******************************************************************************************* ** 
+  /** ******************************************************************************************* **
    ** **                             METODO PARA IMPRIMIR EN XML                               ** **
    ** ******************************************************************************************* **/
 
