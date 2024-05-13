@@ -314,6 +314,10 @@ export class DatosEmpleadoComponent implements OnInit {
       console.log(this.archivoSubido[i], this.archivoSubido[i].name)
       formData.append("image", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restEmpleado.SubirImagen(formData, parseInt(this.idEmpleado)).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Imagen registrada.', {
         timeOut: 6000,
@@ -366,7 +370,11 @@ export class DatosEmpleadoComponent implements OnInit {
 
   // ELIMINAR REGISTRO DE TITULO
   EliminarTituloEmpleado(id: number) {
-    this.restEmpleado.EliminarTitulo(id).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+    this.restEmpleado.EliminarTitulo(id, datos).subscribe(res => {
       this.ObtenerTituloEmpleado();
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,

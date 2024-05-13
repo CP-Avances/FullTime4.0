@@ -17,6 +17,10 @@ export class EditarTituloComponent implements OnInit {
 
   cgTitulos: any = [];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   observa = new FormControl('', [Validators.required, Validators.maxLength(255)]);
   idTitulo = new FormControl('', [Validators.required])
 
@@ -35,6 +39,9 @@ export class EditarTituloComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerTitulos();
   }
 
@@ -43,6 +50,8 @@ export class EditarTituloComponent implements OnInit {
     let titulo = {
       observacion: form.observacionForm,
       id_titulo: form.idTituloForm,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.rest.ActualizarTitulo(this.titulo.id, titulo).subscribe(data => {
       this.toastr.success('Actualización Exitosa.', 'Registro actualizado.', {

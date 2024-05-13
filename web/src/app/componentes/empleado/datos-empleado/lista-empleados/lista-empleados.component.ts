@@ -82,6 +82,10 @@ export class ListaEmpleadosComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
     public ventana: MatDialog, // VARIABLE MANEJO DE VENTANAS DE DIÁLOGO
@@ -94,6 +98,9 @@ export class ListaEmpleadosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerNacionalidades();
     this.DescargarPlantilla();
@@ -505,9 +512,15 @@ export class ListaEmpleadosComponent implements OnInit {
 
   registrarUsuariosMultiple() {
     if (this.listUsuariosCorrectas.length > 0) {
+      const datos = {
+        plantilla: this.listUsuariosCorrectas,
+        user_name: this.user_name,
+        ip: this.ip
+      };
+
       if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
-        this.rest.subirArchivoExcel_Automatico(this.listUsuariosCorrectas).subscribe(datos_archivo => {
-          console.log('datos plantilla a enviar: ', this.listUsuariosCorrectas);
+
+        this.rest.subirArchivoExcel_Automatico(datos).subscribe(datos_archivo => {
           this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
             timeOut: 3000,
           });
@@ -517,8 +530,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
         });
       } else {
-        this.rest.subirArchivoExcel_Manual(this.listUsuariosCorrectas).subscribe(datos_archivo => {
-          console.log('datos plantilla a enviar: ', this.listUsuariosCorrectas);
+        this.rest.subirArchivoExcel_Manual(datos).subscribe(datos_archivo => {
           this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
             timeOut: 3000,
           });

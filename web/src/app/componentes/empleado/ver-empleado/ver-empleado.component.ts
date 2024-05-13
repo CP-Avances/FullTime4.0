@@ -432,7 +432,13 @@ export class VerEmpleadoComponent implements OnInit {
       .afterClosed().subscribe((res: any) => {
         if (res.message === true) {
           if (res.latlng != undefined) {
-            this.restEmpleado.ActualizarDomicilio(parseInt(this.idEmpleado), res.latlng).subscribe(respuesta => {
+            const datos = {
+              lat: res.latlng.lat,
+              lng: res.latlng.lng,
+              user_name: this.user_name,
+              ip: this.ip,
+            }
+            this.restEmpleado.ActualizarDomicilio(parseInt(this.idEmpleado), datos).subscribe(respuesta => {
               this.toastr.success(respuesta.message);
               this.MAP.off();
               this.MapGeolocalizar(res.latlng.lat, res.latlng.lng, nombre + ' ' + apellido);
@@ -498,6 +504,9 @@ export class VerEmpleadoComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("image", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restEmpleado.SubirImagen(formData, parseInt(this.idEmpleado)).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Imagen registrada.', {
         timeOut: 6000,
@@ -553,7 +562,11 @@ export class VerEmpleadoComponent implements OnInit {
 
   // ELIMINAR REGISTRO DE TITULO
   EliminarTituloEmpleado(id: number) {
-    this.restEmpleado.EliminarTitulo(id).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.restEmpleado.EliminarTitulo(id, datos).subscribe(res => {
       this.ObtenerTituloEmpleado();
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,

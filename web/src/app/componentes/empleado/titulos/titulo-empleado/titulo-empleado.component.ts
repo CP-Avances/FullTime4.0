@@ -18,6 +18,10 @@ export class TituloEmpleadoComponent implements OnInit {
   cgTitulos: any = [];
   selectTitle: string = '';
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   observa = new FormControl('', [Validators.required, Validators.maxLength(255)]);
   idTitulo = new FormControl('', [Validators.required])
 
@@ -36,6 +40,9 @@ export class TituloEmpleadoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerTitulos();
   }
 
@@ -52,6 +59,8 @@ export class TituloEmpleadoComponent implements OnInit {
       observacion: form.observacionForm,
       id_empleado: this.empleado,
       id_titulo: form.idTituloForm,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restEmpleado.RegistrarTitulo(titulo).subscribe(data => {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {

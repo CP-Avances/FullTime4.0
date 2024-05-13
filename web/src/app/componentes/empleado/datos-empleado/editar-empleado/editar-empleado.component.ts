@@ -36,6 +36,10 @@ export class EditarEmpleadoComponent implements OnInit {
 
   empleado_inicia: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private _formBuilder: FormBuilder,
     private toastr: ToastrService,
@@ -52,6 +56,9 @@ export class EditarEmpleadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.CargarRoles();
     this.VerificarCodigo();
     this.VerificarFormulario();
@@ -212,7 +219,9 @@ export class EditarEmpleadoComponent implements OnInit {
       genero: form2.generoForm,
       correo: form1.emailForm,
       estado: form2.estadoForm,
-      codigo: form1.codigoForm
+      codigo: form1.codigoForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
 
     // CONTADOR 0 EL REGISTRO SE REALIZA UNA SOL VEZ, CONTADOR 1 SE DIO UN ERROR Y SE REALIZA NUEVAMENTE EL PROCESO
@@ -282,7 +291,9 @@ export class EditarEmpleadoComponent implements OnInit {
     if (this.datosCodigo.automatico === true) {
       let dataCodigo = {
         valor: codigo,
-        id: 1
+        id: 1,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.rest.ActualizarCodigo(dataCodigo).subscribe(res => {
       })
