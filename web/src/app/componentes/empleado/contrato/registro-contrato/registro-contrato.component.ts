@@ -222,7 +222,6 @@ export class RegistroContratoComponent implements OnInit {
         timeOut: 6000,
       })
       if (this.isChecked === true && form.documentoForm != '') {
-        console.log('documento',response.id);
         this.CargarContrato(response.id, form);
       }
       this.CerrarVentana();
