@@ -29,6 +29,10 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
   selec1 = false;
   selec2 = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreEmpleadoF = new FormControl('', [Validators.required]);
   descripcionF = new FormControl('', [Validators.required, Validators.minLength(4)]);
@@ -64,11 +68,14 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.data.idEmpleado);
     this.ImprimirDatos();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -130,6 +137,8 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
       dia_perdido: form.diaPerdidoForm,
       horas_vacaciones: form.horaVacacionForm,
       min_vacaciones: form.minVacacionForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.restV.ActualizarPeriodoV(datosPerVacaciones).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Período de Vacaciones actualizado', {

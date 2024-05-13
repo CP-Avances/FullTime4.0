@@ -266,7 +266,6 @@ class PeriodoVacacionControlador {
             const workbook = xlsx_1.default.readFile(filePath);
             const sheet_name_list = workbook.SheetNames; // ARRAY DE HOJAS DE CALCULO
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-            // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
             const { user_name, ip } = req.body;
             /** PERIODO DE VACACIONES */
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {

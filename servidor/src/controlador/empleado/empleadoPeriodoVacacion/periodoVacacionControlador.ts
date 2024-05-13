@@ -308,7 +308,6 @@ class PeriodoVacacionControlador {
       workbook.Sheets[sheet_name_list[0]]
     );
 
-    // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
     const { user_name, ip } = req.body;
 
     /** PERIODO DE VACACIONES */
