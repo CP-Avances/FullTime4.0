@@ -134,13 +134,13 @@ class ModalidaLaboralControlador {
                     (modalida_laboral != undefined && modalida_laboral != '')) {
                     data.fila = item;
                     data.modalida_laboral = modalida_laboral;
-                    data.observacion = 'no registrado';
+                    data.observacion = 'no registrada';
 
                     listModalidad.push(data);
                 } else {
                     data.fila = item;
                     data.modalida_laboral = modalida_laboral;
-                    data.observacion = 'no registrado';
+                    data.observacion = 'no registrada';
 
                     if (data.fila == '' || data.fila == undefined) {
                         data.fila = 'error';
@@ -149,7 +149,7 @@ class ModalidaLaboralControlador {
 
                     if (modalida_laboral == undefined) {
                         data.modalida_laboral = 'No registrado';
-                        data.observacion = 'Modalidad laboral ' + data.observacion;
+                        data.observacion = 'Modalidad Laboral ' + data.observacion;
                     }
 
 
@@ -172,7 +172,7 @@ class ModalidaLaboralControlador {
 
 
             listModalidad.forEach(async (item: any) => {
-                if (item.observacion == 'no registrado') {
+                if (item.observacion == 'no registrada') {
                     var VERIFICAR_MODALIDAD = await pool.query(
                         `
                         SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1

@@ -308,8 +308,6 @@ export class ListarFeriadosComponent implements OnInit {
       this.DataFeriados = res.data;
       this.DataFerieados_ciudades = res.datafc;
       this.messajeExcel = res.message;
-      console.log('probando plantilla1 feriados', res);
-
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -386,10 +384,13 @@ export class ListarFeriadosComponent implements OnInit {
             })
           } else {
             if (this.listFeriadosCorrectos.length == cont) {
-              this.Crear_feriado_ciudad();
               this.toastr.success('Operación exitosa.', 'Plantilla de feriados importada.', {
                 timeOut: 10000,
               });
+              setTimeout(() => {
+                this.Crear_feriado_ciudad();
+              },500);
+              
             }
           }
           this.LimpiarCampos();

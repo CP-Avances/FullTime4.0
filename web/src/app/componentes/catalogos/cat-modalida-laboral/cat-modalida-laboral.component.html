@@ -26,7 +26,7 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="row">
-                    <div class="col-md" style="padding-top: 5px; padding-bottom: 5px;">
+                    <div class="col-12 col-md" style="padding-top: 5px; padding-bottom: 5px;">
                         <div class="d-flex flex-wrap justify-content-around"
                             style="text-align: center; justify-content: center;">
                             <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
@@ -46,7 +46,7 @@
                             </form>
                         </div>
                     </div>
-                    <div class="col-md" *ngIf="!Datos_modalidad_laboral" style="padding-top: 5px; padding-bottom: 5px;">
+                    <div class="col-12 col-md" *ngIf="!Datos_modalidad_laboral" style="padding-top: 5px; padding-bottom: 5px;">
                         <div class="d-flex flex-wrap justify-content-around">
                             <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                 style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
@@ -58,12 +58,11 @@
                             </a>
                         </div>
                     </div>
-                    <div class="col-md" style="padding-top: 5px; padding-bottom: 5px;">
+                    <div class="col-12 col-md" style="padding-top: 5px; padding-bottom: 5px;">
                         <div class="d-flex flex-wrap justify-content-around"
                             style="text-align: center; justify-content: center;">
                             <button *ngIf="Datos_modalidad_laboral && messajeExcel != 'error'" id="descargar"
-                                class="btn btn-sm" (click)="ConfirmarRegistroMultiple()"
-                                (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
+                                class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
                                 matTooltip="Guardar registro multiple.">
                                 Registrar
                             </button>
@@ -114,16 +113,16 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>
-                            <!--mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [formControl]="buscarNombre"
-                                    [(ngModel)]="filtroNombreSuc">
-                            </mat-form-field-->
-                        </td>
                         <td></td>
                         <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [formControl]="buscarNombre"
+                                    [(ngModel)]="filtroNombre">
+                            </mat-form-field>
+                        </td>
+                        <td>
                             <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
-                                matTooltip="Búsqueda de departamentos de acurdo a cada columna de la tabla.">
+                                matTooltip="Búsqueda de Modalidad laboral de acurdo al nombre de la tabla.">
                                 help_outline
                             </mat-icon>
                         </td>
@@ -154,8 +153,8 @@
             [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
         <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-            <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Feriados en formato PDF.">
+            <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                matTooltipPosition="right" matTooltip="Descargar Lista de modalidad laboral en formato PDF.">
                 <p>PDF</p>
             </i>
             <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
@@ -193,18 +192,14 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center; font-size: 13px;">
+                        <th scope="col">Observación</th>
                         <th scope="col">Item</th>
                         <th scope="col">Modalidad laboral</th>
-                        <th scope="col">Observación</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
                         *ngFor="let dm of Datos_modalidad_laboral | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
-                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
-                            {{dm.fila}}</td>
-                        <td [style.color]="stiloTextoCelda(dm.modalida_laboral)" style="font-size: 12px;">
-                            {{dm.modalida_laboral}}</td>
                         <td style="font-size: 12px;">
                             <div style="width: 270px; margin: auto;">
                                 <div id="t-editar" class="circulo"
@@ -212,6 +207,10 @@
                                 {{dm.observacion}}
                             </div>
                         </td>
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                            {{dm.fila}}</td>
+                        <td [style.color]="stiloTextoCelda(dm.modalida_laboral)" style="font-size: 12px;">
+                            {{dm.modalida_laboral}}</td>
                     </tr>
                 </tbody>
             </table>

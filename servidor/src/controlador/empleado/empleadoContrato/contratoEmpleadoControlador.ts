@@ -391,8 +391,6 @@ class ContratoEmpleadoControlador {
             var { item, cedula, pais, regimen_laboral, modalidad_laboral, fecha_ingreso, fecha_salida,
                 controlar_asistencia, controlar_vacaciones, tipo_cargo } = dato;
 
-            console.log('dato: ', dato)
-
             //Verificar que el registo no tenga datos vacios
             if ((item != undefined && item != '') && (cedula != undefined) && (pais != undefined) &&
                 (regimen_laboral != undefined) && (modalidad_laboral != undefined) && (fecha_ingreso != undefined) &&
@@ -443,58 +441,64 @@ class ContratoEmpleadoControlador {
                 }
                 if (pais == undefined) {
                     data.pais = 'No registrado';
-                    data.observacion = 'Pais, ' + data.observacion;
+                    data.observacion = 'Pais ' + data.observacion;
                 }
                 if (regimen_laboral == undefined) {
                     data.regimen_la = 'No registrado';
-                    data.observacion = 'Rigimen laboral, ' + data.observacion;
+                    data.observacion = 'Régimen laboral ' + data.observacion;
                 }
                 if (modalidad_laboral == undefined) {
                     data.modalida_la = 'No registrado';
-                    data.observacion = 'Modalida laboral, ' + data.observacion;
+                    data.observacion = 'Modalida laboral ' + data.observacion;
                 }
                 if (fecha_ingreso == undefined) {
                     data.fecha_ingreso = 'No registrado';
-                    data.observacion = 'Fecha ingreso, ' + data.observacion;
+                    data.observacion = 'Fecha ingreso ' + data.observacion;
                 }
                 if (fecha_salida == undefined) {
                     data.fecha_salida = 'No registrado';
-                    data.observacion = 'Fecha salida, ' + data.observacion;
+                    data.observacion = 'Fecha salida ' + data.observacion;
                 }
                 if (controlar_asistencia == undefined) {
                     data.control_asis = 'No registrado';
-                    data.observacion = 'Control asistencia, ' + data.observacion;
+                    data.observacion = 'Control asistencia ' + data.observacion;
                 }
                 if (controlar_vacaciones == undefined) {
                     data.control_vaca = 'No registrado';
-                    data.observacion = 'Control vacaciones, ' + data.observacion;
+                    data.observacion = 'Control vacaciones ' + data.observacion;
                 }
-
-
-                // Verificar si la variable tiene el formato de fecha correcto con moment
-                if (data.fecha_ingreso != 'No registrado') {
-                    if (moment(fecha_ingreso, 'YYYY-MM-DD', true).isValid()) { } else {
-                        data.observacion = 'Formato de fecha ingreso incorrecto (YYYY-MM-DD)';
-                    }
-                }
-
-                // Verificar si la variable tiene el formato de fecha correcto con moment
-                if (data.fecha_salida != 'No registrado') {
-                    if (moment(fecha_salida, 'YYYY-MM-DD', true).isValid()) { } else {
-                        data.observacion = 'Formato de fecha salida incorrecto (YYYY-MM-DD)';
-                    }
-                }
-
 
                 if (cedula == undefined) {
                     data.cedula = 'No registrado'
-                    data.observacion = 'Cédula, ' + data.observacion;
+                    data.observacion = 'Cédula ' + data.observacion;
                 } else {
                     //Valida si los datos de la columna cedula son numeros.
                     const rege = /^[0-9]+$/;
                     if (rege.test(data.cedula)) {
                         if (data.cedula.toString().length != 10) {
                             data.observacion = 'La cédula ingresada no es válida';
+                        }else{
+                            // Verificar si la variable tiene el formato de fecha correcto con moment
+                            if (data.fecha_ingreso != 'No registrado') {
+                                if (moment(fecha_ingreso, 'YYYY-MM-DD', true).isValid()) { } else {
+                                    data.observacion = 'Formato de fecha ingreso incorrecto (YYYY-MM-DD)';
+                                }
+                            }else if
+                            // Verificar si la variable tiene el formato de fecha correcto con moment
+                            (data.fecha_salida != 'No registrado') {
+                                if (moment(fecha_salida, 'YYYY-MM-DD', true).isValid()) { } else {
+                                    data.observacion = 'Formato de fecha salida incorrecto (YYYY-MM-DD)';
+                                }
+                            }else if(data.control_vaca != 'No registrado'){
+                                if(data.control_vaca.toUpperCase() != 'NO' && data.control_vaca.toUpperCase() != 'SI'){
+                                    data.observacion = 'El control de vacaiones es incorrecto'
+                                }
+                            }else if(data.control_asis != 'No registrado'){
+                                if(data.control_asis.toUpperCase() != 'NO' && data.control_asisdata.toUpperCase() != 'SI'){
+                                    data.observacion = 'El control de asistencias es incorrecto'
+                                }
+                            }
+                            
                         }
                     } else {
                         data.observacion = 'La cédula ingresada no es válida';
@@ -521,78 +525,79 @@ class ContratoEmpleadoControlador {
         });
 
         listContratos.forEach(async (valor: any) => {
-            var VERIFICAR_CEDULA = await pool.query(
-                `
-                SELECT * FROM eu_empleados WHERE cedula = $1
-                `
-                , [valor.cedula]);
-            if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                if (valor.cedula != 'No registrado' && valor.pais != 'No registrado' && valor.pais != '') {
-                    const fechaRango: any = await pool.query(
-                        `
-                        SELECT * FROM eu_empleado_contratos 
-                        WHERE id_empleado = $1 AND 
-                            ($2 BETWEEN fecha_ingreso and fecha_salida OR $3 BETWEEN fecha_ingreso AND fecha_salida OR 
-                            fecha_ingreso BETWEEN $2 AND $3)
-                        `
-                        , [VERIFICAR_CEDULA.rows[0].id, valor.fecha_ingreso, valor.fecha_salida])
-
-                    if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
-                        valor.observacion = 'Existe un contrato vigente en esas fechas'
-                    } else {
-                        var VERIFICAR_PAISES = await pool.query(
+            if(valor.observacion == 'no registrado'){
+                var VERIFICAR_CEDULA = await pool.query(
+                    `
+                    SELECT * FROM eu_empleados WHERE cedula = $1
+                    `
+                    , [valor.cedula]);
+                if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+                    if (valor.cedula != 'No registrado' && valor.pais != 'No registrado' && valor.pais != '') {
+                        const fechaRango: any = await pool.query(
                             `
-                            SELECT * FROM e_cat_paises WHERE UPPER(nombre) = $1
+                            SELECT * FROM eu_empleado_contratos 
+                            WHERE id_empleado = $1 AND 
+                                ($2 BETWEEN fecha_ingreso and fecha_salida OR $3 BETWEEN fecha_ingreso AND fecha_salida OR 
+                                fecha_ingreso BETWEEN $2 AND $3)
                             `
-                            , [valor.pais.toUpperCase()]);
-                        if (VERIFICAR_PAISES.rows[0] != undefined && VERIFICAR_PAISES.rows[0] != '') {
-                            var id_pais = VERIFICAR_PAISES.rows[0].id
-                            if (valor.regimen_la != 'No registrado' && valor.regimen_la != '') {
-                                var VERIFICAR_REGIMENES = await pool.query(
-                                    `
-                                    SELECT * FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
-                                    `
-                                    , [valor.regimen_la.toUpperCase()])
-                                if (VERIFICAR_REGIMENES.rows[0] != undefined && VERIFICAR_REGIMENES.rows[0] != '') {
-                                    if (id_pais == VERIFICAR_REGIMENES.rows[0].id_pais) {
-                                        if (valor.modalida_la != 'No registrado' && valor.modalida_la != '') {
-                                            var VERIFICAR_MODALIDAD = await pool.query(
-                                                `
-                                                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
-                                                `
-                                                , [valor.modalida_la.toUpperCase()])
-                                            if (VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != '') {
-
-                                            } else {
-                                                valor.observacion = 'Modalidad trabajo no se encuentra registrado'
-                                            }
-                                        }
-
-                                    } else {
-                                        valor.observacion = 'Regimen no corresponde al pais'
-                                    }
-
-                                } else {
-                                    valor.observacion = 'Regimen ingresado no se encuentra registrado'
-                                }
-                            }
+                            , [VERIFICAR_CEDULA.rows[0].id, valor.fecha_ingreso, valor.fecha_salida])
+    
+                        if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
+                            valor.observacion = 'Existe un contrato vigente en esas fechas'
                         } else {
-                            valor.observacion = 'Pais ingresado no se encuentra registrado'
+                            var VERIFICAR_PAISES = await pool.query(
+                                `
+                                SELECT * FROM e_cat_paises WHERE UPPER(nombre) = $1
+                                `
+                                , [valor.pais.toUpperCase()]);
+                            if (VERIFICAR_PAISES.rows[0] != undefined && VERIFICAR_PAISES.rows[0] != '') {
+                                var id_pais = VERIFICAR_PAISES.rows[0].id
+                                if (valor.regimen_la != 'No registrado' && valor.regimen_la != '') {
+                                    var VERIFICAR_REGIMENES = await pool.query(
+                                        `
+                                        SELECT * FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
+                                        `
+                                        , [valor.regimen_la.toUpperCase()])
+                                    if (VERIFICAR_REGIMENES.rows[0] != undefined && VERIFICAR_REGIMENES.rows[0] != '') {
+                                        if (id_pais == VERIFICAR_REGIMENES.rows[0].id_pais) {
+                                            if (valor.modalida_la != 'No registrado' && valor.modalida_la != '') {
+                                                var VERIFICAR_MODALIDAD = await pool.query(
+                                                    `
+                                                    SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                                                    `
+                                                    , [valor.modalida_la.toUpperCase()])
+                                                if (VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != '') {
+    
+                                                } else {
+                                                    valor.observacion = 'Modalidad Laboral no existe en el sistema'
+                                                }
+                                            }
+    
+                                        } else {
+                                            valor.observacion = 'País no corresponde con el Régimen Laboral'
+                                        }
+    
+                                    } else {
+                                        valor.observacion = 'Régimen Laboral no existe en el sistema'
+                                    }
+                                }
+                            } else {
+                                valor.observacion = 'Pais ingresado no se encuentra registrado'
+                            }
                         }
                     }
-                }
-
-                // Discriminación de elementos iguales
-                if (duplicados.find((p: any) => p.cedula === valor.cedula) == undefined) {
-                    duplicados.push(valor);
+    
+                    // Discriminación de elementos iguales
+                    if (duplicados.find((p: any) => p.cedula === valor.cedula) == undefined) {
+                        duplicados.push(valor);
+                    } else {
+                        valor.observacion = '1';
+                    }
+    
                 } else {
-                    valor.observacion = '1';
+                    valor.observacion = 'Cédula no existe en el sistema'
                 }
-
-            } else {
-                valor.observacion = 'Cédula no existe en el sistema'
             }
-
         });
 
         setTimeout(() => {
