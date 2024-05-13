@@ -86,6 +86,40 @@ class EmpleadoCargosControlador {
             }
         });
     }
+    // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS
+    BuscarCargosFecha(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado, fecha_verificar } = req.body;
+            const CARGOS = yield database_1.default.query(`
+      SELECT dc.empl_id, ec.id AS id_cargo, ec.fecha_inicio, ec.fecha_final
+      FROM eu_empleado_cargos AS ec, datos_empleado_cargo AS dc
+      WHERE ec.id = dc.cargo_id AND dc.empl_id = $1 AND $2 < ec.fecha_final
+      `, [id_empleado, fecha_verificar]);
+            if (CARGOS.rowCount > 0) {
+                return res.jsonp(CARGOS.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR FECHAS DE CARGOS INTERMEDIOS
+    BuscarCargosFechaEditar(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado, fecha_verificar, id_cargo } = req.body;
+            const CARGOS = yield database_1.default.query(`
+        SELECT dc.empl_id, ec.id AS id_cargo, ec.fecha_inicio, ec.fecha_final
+        FROM eu_empleado_cargos AS ec, datos_empleado_cargo AS dc
+        WHERE ec.id = dc.cargo_id AND dc.empl_id = $1 AND $2 < ec.fecha_final AND NOT ec.id = $3
+        `, [id_empleado, fecha_verificar, id_cargo]);
+            if (CARGOS.rowCount > 0) {
+                return res.jsonp(CARGOS.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
     list(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const Cargos = yield database_1.default.query(`

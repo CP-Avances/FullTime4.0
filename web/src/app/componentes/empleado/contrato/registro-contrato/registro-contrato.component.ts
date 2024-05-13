@@ -34,7 +34,7 @@ export class RegistroContratoComponent implements OnInit {
   controlVacacionesF = new FormControl('', Validators.required);
   controlAsistenciaF = new FormControl('', Validators.required);
   fechaIngresoF = new FormControl('', Validators.required);
-  fechaSalidaF = new FormControl('');
+  fechaSalidaF = new FormControl('', Validators.required);
   archivoForm = new FormControl('');
   nombrePaisF = new FormControl('');
   idRegimenF = new FormControl('', Validators.required);

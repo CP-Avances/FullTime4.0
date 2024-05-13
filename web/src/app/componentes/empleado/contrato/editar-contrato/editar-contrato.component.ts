@@ -41,7 +41,7 @@ export class EditarContratoComponent implements OnInit {
   controlVacacionesF = new FormControl('', Validators.required);
   controlAsistenciaF = new FormControl('', Validators.required);
   fechaIngresoF = new FormControl('', Validators.required);
-  fechaSalidaF = new FormControl('');
+  fechaSalidaF = new FormControl('', Validators.required);
   archivoForm = new FormControl('');
   nombrePaisF = new FormControl('');
   idRegimenF = new FormControl('', Validators.required);
@@ -277,14 +277,14 @@ export class EditarContratoComponent implements OnInit {
       var ingreso = String(moment(datos.fec_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
       // COMPARACION DE CADA REGISTRO
       for (var i = 0; i <= this.revisarFecha.length - 1; i++) {
-        var fecha = String(moment(this.revisarFecha[i].fecha_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
-        if (fecha === ingreso) {
+        var fecha_salida = String(moment(this.revisarFecha[i].fecha_salida, "YYYY/MM/DD").format("YYYY-MM-DD"));
+        if (ingreso < fecha_salida) {
           this.duplicado = 1;
         }
       }
       // SI EL REGISTRO ESTA DUPLICADO SE INDICA AL USUARIO
       if (this.duplicado === 1) {
-        this.toastr.error('La fecha de ingreso de contrato ya se encuentra registrada.', 'Contrato ya existe.', {
+        this.toastr.warning('Existe un contrato vigente en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
           timeOut: 6000,
         })
         this.duplicado = 0;
