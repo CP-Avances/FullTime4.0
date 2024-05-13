@@ -267,7 +267,7 @@ export class EmpleadoService {
     return this.http.post<any>(`${environment.url}/empleado/verificar/datos/automatico/plantillaExcel/`, formData);
   }
 
-  subirArchivoExcel_Automatico(formData) {
+  subirArchivoExcel_Automatico(formData: any) {
     return this.http.post<any>(`${environment.url}/empleado/cargar_automatico/plantillaExcel/`, formData);
   }
 
@@ -276,11 +276,11 @@ export class EmpleadoService {
     return this.http.post<any>(`${environment.url}/empleado/verificar/manual/plantillaExcel/`, formData);
   }
 
-  verificarArchivoExcel_DatosManual(formData) {
+  verificarArchivoExcel_DatosManual(formData: any) {
     return this.http.post<any>(`${environment.url}/empleado/verificar/datos/manual/plantillaExcel/`, formData);
   }
 
-  subirArchivoExcel_Manual(formData) {
+  subirArchivoExcel_Manual(formData: any) {
     return this.http.post<any>(`${environment.url}/empleado/cargar_manual/plantillaExcel/`, formData);
   }
 
