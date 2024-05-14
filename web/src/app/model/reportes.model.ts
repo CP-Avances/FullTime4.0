@@ -544,3 +544,11 @@ export interface ITableModalidad {
 export interface ITableTipoCargo {
     cargo: string,
 }
+
+export interface ITableDiscapacidad {
+    nombre: string,
+}
+
+export interface ITableVacuna {
+    nombre: string,
+}

@@ -19,7 +19,7 @@
             </mat-card>
         </div>
 
-        <!------------------ Registro multiple de Modalidad Laboral ------------------------------------->
+        <!--  *******************************  REGISTRO MULTIPLE DE MODALIDAD LABORAL  *****************************  -->
         <div class="col-md">
             <div id="titulo">
                 <span>REGISTRO MULTIPLE</span>
@@ -46,13 +46,12 @@
                             </form>
                         </div>
                     </div>
-                    <div class="col-12 col-md" *ngIf="!Datos_modalidad_laboral" style="padding-top: 5px; padding-bottom: 5px;">
+                    <div class="col-12 col-md" *ngIf="!Datos_modalidad_laboral"
+                        style="padding-top: 5px; padding-bottom: 5px;">
                         <div class="d-flex flex-wrap justify-content-around">
                             <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                 style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
                                 href="{{hipervinculo}}/plantillaD/documento/Modalidad.xlsx">
-
-                                <span class="material-icons">cloud_download</span>
                                 <br>
                                 Descargar plantilla usuarios
                             </a>
@@ -62,8 +61,8 @@
                         <div class="d-flex flex-wrap justify-content-around"
                             style="text-align: center; justify-content: center;">
                             <button *ngIf="Datos_modalidad_laboral && messajeExcel != 'error'" id="descargar"
-                                class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
-                                matTooltip="Guardar registro multiple.">
+                                class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
+                                matTooltipPosition="right" matTooltip="Guardar registro multiple.">
                                 Registrar
                             </button>
                         </div>
@@ -94,7 +93,6 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr>
-
                         <th>
                             <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
                                 matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
@@ -153,8 +151,8 @@
             [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
         <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-            <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
-                matTooltipPosition="right" matTooltip="Descargar Lista de modalidad laboral en formato PDF.">
+            <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de modalidad laboral en formato PDF.">
                 <p>PDF</p>
             </i>
             <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"

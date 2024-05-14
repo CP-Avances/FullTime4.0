@@ -77,6 +77,8 @@ const parametrosRutas_1 = __importDefault(require("./rutas/parametrosGenerales/p
 const emplUbicacionRutas_1 = __importDefault(require("./rutas/empleado/empleadoUbicacion/emplUbicacionRutas"));
 const catModalidadLaboralRutas_1 = __importDefault(require("./rutas/catalogos/catModalidadLaboralRutas"));
 const catTiposCargosRutas_1 = __importDefault(require("./rutas/catalogos/catTiposCargosRutas"));
+const catDiscapacidadRutas_1 = __importDefault(require("./rutas/catalogos/catDiscapacidadRutas"));
+const catVacunasRutas_1 = __importDefault(require("./rutas/catalogos/catVacunasRutas"));
 const http_1 = require("http");
 var io;
 class Servidor {
@@ -160,6 +162,8 @@ class Servidor {
         this.app.use('/noti-real-time', notificacionesRutas_1.default);
         this.app.use('/modalidadLaboral', catModalidadLaboralRutas_1.default);
         this.app.use('/tipoCargos', catTiposCargosRutas_1.default);
+        this.app.use('/discapacidades', catDiscapacidadRutas_1.default);
+        this.app.use('/vacunasTipos', catVacunasRutas_1.default);
         // Timbres
         this.app.use('/timbres', timbresRutas_1.default);
         this.app.use('/planificacion_general', planGeneralRutas_1.default);

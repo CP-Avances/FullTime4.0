@@ -1,0 +1,161 @@
+<div class="container" style="padding-bottom: 15px; padding-top: 15px;">
+    <div class="row">
+        <div class="col-md">
+            <div id="titulo">
+                <span>VACUNAS</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                    <button *ngIf="!Datos_vacunas" id="btn-raised" class="btn btn-sm"
+                        (click)="AbrirVentanaRegistrarDiscapacidad()">
+                        Crear Vacunas
+                    </button>
+                    <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
+                        matTooltipPosition="right"
+                        matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                        Mostrar lista
+                    </button>
+                </div>
+            </mat-card>
+
+        </div>
+
+        <!--  *******************************  REGISTRO MULTIPLE DE TIPO VACUNAS  ****************************** -->
+        <div class="col-md">
+            <div id="titulo">
+                <span>REGISTRO MULTIPLE</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="row">
+                    <div class="col-md" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around"
+                            style="text-align: center; justify-content: center;">
+                            <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
+                                <input type="file" [formControl]="archivoForm" id="file"
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                    style="height: 65px; padding-top: 25px"
+                                    matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                    Subir plantilla
+                                </label>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md" *ngIf="!Datos_vacunas" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around">
+                            <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
+                                href="{{hipervinculo}}/plantillaD/documento/Modalidad.xlsx">
+                                <br>
+                                Descargar plantilla usuarios
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!Datos_vacunas">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <div class="w-100 bd-highlight">
+                <h5>
+                    RESULTADO DE BÚSQUEDA
+                </h5>
+            </div>
+            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                    (click)="ConfirmarDeleteMultiple()">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr>
+
+                        <th>
+                            <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                                id="SelectCheck" (click)="HabilitarSeleccion()">
+                                library_add_check
+                            </mat-icon>
+                            <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                                [checked]="selectionVacuna.hasValue() && isAllSelectedPag()"
+                                [indeterminate]="selectionVacuna.hasValue() && !isAllSelectedPag()"
+                                [aria-label]="checkboxLabelPag()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Vacunas</th>
+                        <th scope="col">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [formControl]="nombreF"
+                                    [(ngModel)]="filtradoNombre">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de departamentos de acurdo a cada columna de la tabla.">
+                                help_outline
+                            </mat-icon>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngFor="let v of vacunas| filtrosNombres: filtradoNombre |  paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionVacuna.toggle(v) : null"
+                                [checked]="selectionVacuna.isSelected(v)" [aria-label]="checkboxLabelPag(v)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{v.nombre}}</td>
+                        <td class="justify-content-center">
+                            <i id="t-editar" (click)="AbrirEditar(v)" matSuffix matTooltipPosition="right"
+                                matTooltip="Modificar datos de este registro" class="fas fa-edit">
+                                <p>Editar</p>
+                            </i>
+                            <i (click)="ConfirmarDelete(v)" class="far fa-trash-alt" id="t-eliminar" matSuffix
+                                matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                <p>Eliminar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="vacunas.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+            <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Vacunas en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Vacunas en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Vacunas en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Vacunas en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de Vacunas</p>
+        </div>
+    </div>
+</div>
