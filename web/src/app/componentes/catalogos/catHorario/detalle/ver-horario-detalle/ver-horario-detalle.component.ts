@@ -162,7 +162,11 @@ export class VerHorarioDetalleComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACION
   EliminarDetalle(id_detalle: number) {
-    this.restD.EliminarRegistro(id_detalle).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.restD.EliminarRegistro(id_detalle, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });

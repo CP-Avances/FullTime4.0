@@ -203,7 +203,9 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
       hora: form.horaForm,
       min_antes: this.data.detalle.min_antes,
       min_despues: this.data.detalle.min_despues,
-      id: this.data.detalle.id
+      id: this.data.detalle.id,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     if (this.acciones === true) {
       detalle.min_antes = parseInt(form.min_antesForm);

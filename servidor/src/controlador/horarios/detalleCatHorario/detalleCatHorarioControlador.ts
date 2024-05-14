@@ -60,7 +60,6 @@ class DetalleCatalogoHorarioControlador {
         try {
             const id = req.params.id;
 
-            // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
             const { user_name, ip } = req.body;
 
             // INICIAR TRANSACCION
@@ -283,7 +282,6 @@ class DetalleCatalogoHorarioControlador {
         const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
         const plantillaD = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
-        // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
         const { user_name, ip } = req.body;
 
         /** Detalle de Horarios */

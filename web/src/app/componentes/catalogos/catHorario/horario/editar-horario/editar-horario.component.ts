@@ -423,7 +423,11 @@ export class EditarHorarioComponent implements OnInit {
 
   // METODO PARA ELIMINAR DETALLES EN LA BASE DE DATOS
   EliminarDetalle(id_detalle: number) {
-    this.restD.EliminarRegistro(id_detalle).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+    this.restD.EliminarRegistro(id_detalle, datos).subscribe(res => {
     });
   }
 
