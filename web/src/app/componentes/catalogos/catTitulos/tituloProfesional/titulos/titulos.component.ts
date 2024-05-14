@@ -134,6 +134,8 @@ export class TitulosComponent implements OnInit {
   GuardarNivel(form: any) {
     let nivel = {
       nombre: form.nombreNivelForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.nivel_.RegistrarNivel(nivel).subscribe(response => {
       this.GuardarTitulo(form, response.id);

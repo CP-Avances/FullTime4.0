@@ -64,7 +64,11 @@ export class ListarNivelTitulosComponent implements OnInit {
   get logo(): string { return this.plantillaPDF.logoBase64 }
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
-  hipervinculo: string = environment.url
+  hipervinculo: string = environment.url;
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
 
   constructor(
@@ -79,6 +83,9 @@ export class ListarNivelTitulosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerNiveles();
   }
@@ -207,7 +214,9 @@ export class ListarNivelTitulosComponent implements OnInit {
   registrarNiveles() {
     console.log('listNivelesCorrectos', this.listNivelesCorrectos);
     var data = {
-      nombre: ''
+      nombre: '',
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     if (this.listNivelesCorrectos.length > 0) {
@@ -334,7 +343,11 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_nivel: number) {
-    this.nivel.EliminarNivel(id_nivel).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.nivel.EliminarNivel(id_nivel, datos).subscribe(res => {
       this.toastr.error("Registro eliminado.", '', {
         timeOut: 6000,
       });

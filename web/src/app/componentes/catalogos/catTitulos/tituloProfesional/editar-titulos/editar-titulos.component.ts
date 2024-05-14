@@ -81,6 +81,8 @@ export class EditarTitulosComponent implements OnInit {
   GuardarNivel(form: any) {
     let nivel = {
       nombre: form.nombreNivelForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.ntitulo.RegistrarNivel(nivel).subscribe(response => {
       this.ActualizarTitulo(form, response.id);

@@ -38,7 +38,6 @@ class NivelTituloControlador {
     EliminarNivelTitulo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
                 const { user_name, ip } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
@@ -99,10 +98,10 @@ class NivelTituloControlador {
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'nivel_titulo',
                     usuario: user_name,
-                    accion: 'C',
+                    accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{"nombre": "${nombre}"}`,
-                    ip,
+                    datosNuevos: `{nombre: ${nombre}}`,
+                    ip: ip,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -115,6 +114,7 @@ class NivelTituloControlador {
                 }
             }
             catch (error) {
+                console.log(error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'Error al registrar el nivel de título.' });

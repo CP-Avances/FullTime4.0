@@ -29,7 +29,6 @@ class NivelTituloControlador {
   // METODO PARA ELIMINAR REGISTROS
   public async EliminarNivelTitulo(req: Request, res: Response): Promise<Response> {
     try {
-      // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
       const { user_name, ip } = req.body;
       const id = req.params.id;
 
@@ -102,10 +101,10 @@ class NivelTituloControlador {
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'nivel_titulo',
         usuario: user_name,
-        accion: 'C',
+        accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{"nombre": "${nombre}"}`,
-        ip,
+        datosNuevos: `{nombre: ${nombre}}`,
+        ip: ip,
         observacion: null
       });
 
@@ -119,6 +118,7 @@ class NivelTituloControlador {
         return res.status(404).jsonp({ message: 'error' })
       }
     } catch (error) {
+      console.log(error);
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'Error al registrar el nivel de título.' });

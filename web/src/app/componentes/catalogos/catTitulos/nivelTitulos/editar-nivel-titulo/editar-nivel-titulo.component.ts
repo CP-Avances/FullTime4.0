@@ -13,6 +13,10 @@ import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulo
 
 export class EditarNivelTituloComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   nombre = new FormControl('', Validators.required)
 
   public formulario = new FormGroup({
@@ -27,6 +31,9 @@ export class EditarNivelTituloComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ImprimirDatos();
   }
 
@@ -35,6 +42,8 @@ export class EditarNivelTituloComponent implements OnInit {
     let nivel = {
       id: this.data.id,
       nombre: form.nombreForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.nivel.ActualizarNivelTitulo(nivel).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {

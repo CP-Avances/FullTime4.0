@@ -294,7 +294,7 @@ class DetalleCatalogoHorarioControlador {
                         datosOriginales: '',
                         datosNuevos: `{orden: ${orden}, hora: ${hora}, minu_espera: ${minutos_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion.split("=")[0]}}`,
                         ip,
-                        observacion: ''
+                        observacion: null
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
