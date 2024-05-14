@@ -62,21 +62,34 @@ class VacunaControlador {
     public async EditarVacuna(req: Request, res: Response): Promise<Response> {
         try {
             const { id, nombre } = req.body;
-            console.log('id: ', id, 'nombre: ', nombre);
-            // Dar formato a la palabra de vacuna
-            //const nombreConFormato = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
-            const response: QueryResult = await pool.query(
+
+            var VERIFICAR_VACUNA = await pool.query(
                 `
+                SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1 
+                `
+                , [nombre.toUpperCase()])
+
+
+            if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
+                const vacunaEditar = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
+                const response: QueryResult = await pool.query(
+                    `
                 UPDATE e_cat_vacuna SET nombre = $2
                 WHERE id = $1 RETURNING *
                 `
-                , [id, nombre]);
-            const [vacunaEditada] = response.rows;
-            if (vacunaEditada) {
-                return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' })
+                    , [id, vacunaEditar]);
+
+                const [vacunaInsertada] = response.rows;
+                if (vacunaInsertada) {
+                    return res.status(200).jsonp({ message: 'Registro editado.', status: '200' })
+                } else {
+                    return res.status(404).jsonp({ message: 'Ups!!! algo salio mal.', status: '400' })
+                }
             } else {
-                return res.status(404).jsonp({ message: 'No se pudo actualizar', status: '400' })
+                return res.jsonp({ message: 'Tipo vacuna registrada ya existe en el sistema.', status: '300' })
             }
+
         }
         catch (error) {
             return res.status(500).jsonp({ message: 'error', status: '500' });
