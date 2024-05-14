@@ -128,7 +128,11 @@ export class CatDiscapacidadComponent implements OnInit {
     this.Datos_modalidad_laboral = null;
     this.archivoSubido = [];
     this.nameFile = '';
-    this.ngOnInit();
+
+    this.formulario.setValue({
+      nombreForm: '',
+    });
+    this.ObtenerDiscapacidad();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
   }

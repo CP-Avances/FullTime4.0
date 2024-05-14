@@ -122,7 +122,10 @@ export class CatVacunasComponent implements OnInit {
     this.Datos_vacunas = null;
     this.archivoSubido = [];
     this.nameFile = '';
-    this.ngOnInit();
+    this.formulario.setValue({
+      nombreForm: '',
+    });
+    this.ObtenerVacuna();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
   }

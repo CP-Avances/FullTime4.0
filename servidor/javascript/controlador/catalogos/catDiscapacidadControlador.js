@@ -69,17 +69,25 @@ class DiscapacidadControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id, nombre } = req.body;
-                const nombreConFormato = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
-                const response = yield database_1.default.query(`
-                UPDATE e_cat_discapacidad SET nombre = $2
-                WHERE id = $1 RETURNING *
-                `, [id, nombreConFormato]);
-                const [discapacidadEditada] = response.rows;
-                if (discapacidadEditada) {
-                    return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' });
+                var VERIFICAR_DISCAPACIDAD = yield database_1.default.query(`
+                SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1 
+                `, [nombre.toUpperCase()]);
+                if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
+                    const nombreConFormato = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+                    const response = yield database_1.default.query(`
+                    UPDATE e_cat_discapacidad SET nombre = $2
+                    WHERE id = $1 RETURNING *
+                    `, [id, nombreConFormato]);
+                    const [discapacidadEditada] = response.rows;
+                    if (discapacidadEditada) {
+                        return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' });
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'Ups!!! algo salio mal.', status: '400' });
+                    }
                 }
                 else {
-                    return res.status(404).jsonp({ message: 'Ups!!! algo salio mal.', status: '400' });
+                    return res.jsonp({ message: 'Tipo discapacidad registrada ya existe en el sistema.', status: '300' });
                 }
             }
             catch (error) {
