@@ -24,11 +24,11 @@ import { RegistrarNivelTitulosComponent } from '../registrar-nivel-titulos/regis
 // IMPORTAR SERVICIOS
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableNivelesEducacion } from 'src/app/model/reportes.model';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-listar-nivel-titulos',
@@ -144,14 +144,12 @@ export class ListarNivelTitulosComponent implements OnInit {
         this.toastr.error('Seleccione plantilla con nombre Niveles_profesionales', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
-
         this.nameFile = '';
       }
     } else {
       this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
         timeOut: 6000,
       });
-
       this.nameFile = '';
     }
     this.archivoForm.reset();
@@ -168,16 +166,11 @@ export class ListarNivelTitulosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-
     this.progreso = true;
-
     // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.nivel.RevisarFormato(formData).subscribe(res => {
       this.DataNivelesProfesionales = res.data;
       this.messajeExcel = res.message;
-
-      console.log('probando plantilla1', this.DataNivelesProfesionales);
-
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -190,9 +183,7 @@ export class ListarNivelTitulosComponent implements OnInit {
           }
         });
       }
-
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
@@ -200,7 +191,6 @@ export class ListarNivelTitulosComponent implements OnInit {
     }, () => {
       this.progreso = false;
     });
-
   }
 
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
@@ -216,7 +206,6 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   btn_registrar: boolean = true;
   registrarNiveles() {
-    console.log('listNivelesCorrectos', this.listNivelesCorrectos);
     var data = {
       nombre: ''
     }
@@ -294,7 +283,6 @@ export class ListarNivelTitulosComponent implements OnInit {
       .afterClosed().subscribe(items => {
         this.ObtenerNiveles();
       });
-
     this.activar_seleccion = true;
     this.plan_multiple = false;
     this.plan_multiple_ = false;

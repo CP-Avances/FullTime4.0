@@ -17,7 +17,7 @@ class DiscapacidadRutas {
         // METODO PARA EDITAR UN TIPO DE DISCAPACIDAD
         this.router.put('/', TokenValidation, DISCPACIDAD_CONTROLADOR.EditarDiscapacidad);
         // METODO PARA ELIMINAR UN TIPO DE DISCAPACIDAD
-        this.router.delete('/eliminar/:id', TokenValidation, DISCPACIDAD_CONTROLADOR.eliminarRegistro);
+        this.router.delete('/eliminar/:id', TokenValidation, DISCPACIDAD_CONTROLADOR.EliminarRegistro);
     }
 }
 

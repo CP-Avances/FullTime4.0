@@ -1,28 +1,30 @@
-import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { Component, OnInit } from '@angular/core';
+import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
+import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
-import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/metodos.component';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { CatDiscapacidadService } from 'src/app/servicios/catalogos/catDiscapacidad/cat-discapacidad.service';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { ThemePalette } from '@angular/material/core';
-import { RegistroDiscapacidadComponent } from '../registrar-discapacidad/registrar-discapacidad.component';
-import { EditarDiscapacidadComponent } from '../editar-discapacidad/editar-discapacidad.component';
-import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
+
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
+import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
+
 import { PlantillaReportesService } from '../../../reportes/plantilla-reportes.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { SelectionModel } from '@angular/cdk/collections';
-import { ITableDiscapacidad } from 'src/app/model/reportes.model';
+import { CatDiscapacidadService } from 'src/app/servicios/catalogos/catDiscapacidad/cat-discapacidad.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ITableDiscapacidad } from 'src/app/model/reportes.model';
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+
+import { RegistroDiscapacidadComponent } from '../registrar-discapacidad/registrar-discapacidad.component';
+import { EditarDiscapacidadComponent } from '../editar-discapacidad/editar-discapacidad.component';
+import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/metodos.component';
 
 
 @Component({
@@ -30,10 +32,8 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
   templateUrl: './cat-discapacidad.component.html',
   styleUrls: ['./cat-discapacidad.component.css']
 })
+
 export class CatDiscapacidadComponent implements OnInit {
-
-
-  filtradoNombre = ''; // VARIABLE DE BUSQUEDA DE DATOS
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
@@ -42,14 +42,13 @@ export class CatDiscapacidadComponent implements OnInit {
   public formulario = new FormGroup({
     nombreForm: this.nombreF,
   });
+
   // METODO PARA VALIDAR INGRESO DE LETRAS
   IngresarSoloLetras(e: any) {
     return this.validar.IngresarSoloLetras(e);
   }
 
-
-  discapacidadesEliminar: any = [];
-
+  filtradoNombre = ''; // VARIABLE DE BUSQUEDA DE DATOS
   archivoForm = new FormControl('', Validators.required);
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
@@ -70,10 +69,10 @@ export class CatDiscapacidadComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  discapacidadesEliminar: any = [];
   discapacidades: any;
-
-  empleado: any = [];
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
+  empleado: any = [];
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
@@ -83,13 +82,11 @@ export class CatDiscapacidadComponent implements OnInit {
 
   constructor(
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
-    private rest: CatDiscapacidadService,
-    private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
-    public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
-    public parametro: ParametrosService,
+    private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
+    private rest: CatDiscapacidadService,
+    public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     public validar: ValidacionesService,
-
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -109,21 +106,19 @@ export class CatDiscapacidadComponent implements OnInit {
     })
   }
 
-  formato_fecha: string = 'DD/MM/YYYY';
+  // METODO PARA LISTAR TIPOS DE DISCAPACIDAD
   ObtenerDiscapacidad() {
     this.discapacidades = [];
-
-    this.rest.listaDiscapacidad().subscribe(res => {
+    this.rest.ListarDiscapacidad().subscribe(res => {
       this.discapacidades = res
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
-      this.toastr.error('Error al cargar los datos', 'Listado de Discapacidad', {
+      this.toastr.error('Error al cargar los datos.', '', {
         timeOut: 4000,
       });
     });
-
   }
 
+  // METODO PARA LIMPIAR FOMULARIO
   LimpiarCampos() {
     this.Datos_modalidad_laboral = null;
     this.archivoSubido = [];
@@ -133,6 +128,7 @@ export class CatDiscapacidadComponent implements OnInit {
     this.mostrarbtnsubir = false;
   }
 
+  // METODO PARA ABRI VENTANA DE REGISTRO
   AbrirVentanaRegistrarDiscapacidad(): void {
     this.ventana.open(RegistroDiscapacidadComponent, { width: '500px' })
       .afterClosed().subscribe(items => {
@@ -172,7 +168,6 @@ export class CatDiscapacidadComponent implements OnInit {
 
   Datos_modalidad_laboral: any
 
-
   // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
@@ -186,8 +181,6 @@ export class CatDiscapacidadComponent implements OnInit {
     }
     array.sort(compare);
   }
-
-
 
   /** ************************************************************************************************* **
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
@@ -233,7 +226,7 @@ export class CatDiscapacidadComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Discapacidades', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
+        { text: 'Lista de Tipo Discapacidades', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
         this.PresentarDataPDFDiscapacidades(),
       ],
       styles: {
@@ -299,7 +292,7 @@ export class CatDiscapacidadComponent implements OnInit {
     }
     wsr["!cols"] = wscols;
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'LISTA DISCAPACIDADES');
+    xlsx.utils.book_append_sheet(wb, wsr, 'LISTA TIPO DISCAPACIDADES');
     xlsx.writeFile(wb, "DiscapacidadEXCEL" + '.xlsx');
     this.ObtenerDiscapacidad();
   }
@@ -405,15 +398,13 @@ export class CatDiscapacidadComponent implements OnInit {
     return `${this.selectionDiscapacidad.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
   }
 
-
-
+  // METODO PARA CONFIRMAR ELIMINACION
   ConfirmarDelete(discapacidad: any) {
-
     const mensaje = 'eliminar';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.rest.eliminar(discapacidad.id).subscribe(res => {
+          this.rest.Eliminar(discapacidad.id).subscribe(res => {
             if (res.message === 'error') {
               this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
                 timeOut: 6000,
@@ -433,10 +424,9 @@ export class CatDiscapacidadComponent implements OnInit {
           this.ngOnInit();
         }
       });
-
-
   }
 
+  // METODO PARA ELIMINAR DATOS
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
@@ -446,7 +436,7 @@ export class CatDiscapacidadComponent implements OnInit {
     this.discapacidadesEliminar.forEach((datos: any) => {
       this.discapacidades = this.discapacidades.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.rest.eliminar(datos.id).subscribe(res => {
+      this.rest.Eliminar(datos.id).subscribe(res => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -464,9 +454,9 @@ export class CatDiscapacidadComponent implements OnInit {
       });
     }
     );
-
   }
 
+  // METODO PARA CONFIRMAR ELIMINACIÓN MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -487,11 +477,5 @@ export class CatDiscapacidadComponent implements OnInit {
         }
       });
   }
-
-
-
-
-
-
 
 }

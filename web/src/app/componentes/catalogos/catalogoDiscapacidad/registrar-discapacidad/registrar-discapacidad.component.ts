@@ -1,14 +1,17 @@
-import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialogRef } from '@angular/material/dialog';
+import { Component } from '@angular/core';
+
 import { CatDiscapacidadService } from 'src/app/servicios/catalogos/catDiscapacidad/cat-discapacidad.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registrar-discapacidad',
   templateUrl: './registrar-discapacidad.component.html',
   styleUrls: ['./registrar-discapacidad.component.css']
 })
+
 export class RegistroDiscapacidadComponent {
 
   discapacidad = new FormControl('', Validators.required)
@@ -21,6 +24,7 @@ export class RegistroDiscapacidadComponent {
     private toastr: ToastrService,
     private rest: CatDiscapacidadService,
     public ventana: MatDialogRef<RegistroDiscapacidadComponent>,
+    public validar: ValidacionesService,
   ) { }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -34,7 +38,6 @@ export class RegistroDiscapacidadComponent {
       discapacidad: form.discapacidad,
     };
     this.rest.CrearDiscapacidad(discapacidad).subscribe(response => {
-      console.log('response: ', response);
       if (response.status == '200') {
         this.toastr.success(response.message, 'Operación exitosa.', {
           timeOut: 4000,
@@ -58,25 +61,7 @@ export class RegistroDiscapacidadComponent {
 
   // METODO PARA VALIDAR INGRESO DE LETRAS
   IngresarSoloLetras(e: any) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACIÓN DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+    return this.validar.IngresarSoloLetras(e);
   }
 
 

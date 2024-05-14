@@ -19,7 +19,7 @@ class DiscapacidadRutas {
         // METODO PARA EDITAR UN TIPO DE DISCAPACIDAD
         this.router.put('/', verificarToken_1.TokenValidation, catDiscapacidadControlador_1.default.EditarDiscapacidad);
         // METODO PARA ELIMINAR UN TIPO DE DISCAPACIDAD
-        this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catDiscapacidadControlador_1.default.eliminarRegistro);
+        this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catDiscapacidadControlador_1.default.EliminarRegistro);
     }
 }
 const DISCAPACIDADES_RUTAS = new DiscapacidadRutas();

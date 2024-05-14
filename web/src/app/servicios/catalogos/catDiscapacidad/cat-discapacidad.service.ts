@@ -12,25 +12,28 @@ export class CatDiscapacidadService {
     private http: HttpClient,
   ) { }
 
-  
-
-  listaDiscapacidad(){
+  // METODO PARA LISTAR TIPOS DE DISCAPACIDAD
+  ListarDiscapacidad() {
     return this.http.get<any>(environment.url + '/discapacidades');
   }
-  CrearDiscapacidad(discapacidad: any){
-    console.log('discapacidad: ',discapacidad)
+
+  // METODO PARA CREAR UN TIPO DE DISCAPACIDAD
+  CrearDiscapacidad(discapacidad: any) {
     return this.http.post(`${environment.url}/discapacidades/crearDiscapacidad`, discapacidad).pipe(
       catchError(discapacidad)
     );
   }
+
   // METODO PARA ACTUALIZAR REGISTRO
   ActualizarDiscapacidad(datos: any) {
     return this.http.put(`${environment.url}/discapacidades`, datos)
-    .pipe(catchError(datos));
+      .pipe(catchError(datos));
   }
-  eliminar(id: any){
-    return this.http.delete<any>(`${environment.url}/discapacidades/eliminar/${id}`).pipe( catchError(id));
+
+  // METODO PARA ELIMINAR UN TIPO DE DISCAPACIDAD
+  Eliminar(id: any) {
+    return this.http.delete<any>(`${environment.url}/discapacidades/eliminar/${id}`).pipe(catchError(id));
   }
- 
+
 
 }

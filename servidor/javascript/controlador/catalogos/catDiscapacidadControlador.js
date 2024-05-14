@@ -88,7 +88,7 @@ class DiscapacidadControlador {
         });
     }
     // METODO PARA ELIMINAR UN TIPO DE DISCAPACIDAD
-    eliminarRegistro(req, res) {
+    EliminarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;

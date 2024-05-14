@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-md">
             <div id="titulo">
-                <span>VACUNAS</span>
+                <span>TIPO VACUNAS</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
@@ -76,7 +76,6 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr>
-
                         <th>
                             <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
                                 matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
@@ -96,7 +95,6 @@
                 <tbody>
                     <tr>
                         <td></td>
-
                         <td>
                             <mat-form-field id="t-inputs">
                                 <input matInput placeholder="Buscar" [formControl]="nombreF"
@@ -136,26 +134,30 @@
         <mat-paginator id="pagina" [length]="vacunas.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-            <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Vacunas en formato PDF.">
-                <p>PDF</p>
-            </i>
-            <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Vacunas en formato EXCEL.">
-                <p>XLSL</p>
-            </i>
-            <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Vacunas en formato CSV.">
-                <p>CSV</p>
-            </i>
-            <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Vacunas en formato XML.">
-                <p>XML</p>
-            </i>
-        </div>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-            <p> Reporte de Vacunas</p>
+        <!--  **********************  DESCARGAR REPORTES  ***********************  -->
+        <div>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista de Vacunas en formato PDF.">
+                    <p>PDF</p>
+                </i>
+                <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Vacunas en formato EXCEL.">
+                    <p>XLSL</p>
+                </i>
+                <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Vacunas en formato CSV.">
+                    <p>CSV</p>
+                </i>
+                <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Vacunas en formato XML.">
+                    <p>XML</p>
+                </i>
+            </div>
+            <div class="d-flex justify-content-end"
+                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                <p> Reportes Tipo Vacunas</p>
+            </div>
         </div>
     </div>
 </div>

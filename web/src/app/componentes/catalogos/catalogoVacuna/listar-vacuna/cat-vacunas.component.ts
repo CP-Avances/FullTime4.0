@@ -1,36 +1,41 @@
-import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
-import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/metodos.component';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { CatVacunasService } from 'src/app/servicios/catalogos/catVacunas/cat-vacunas.service';
-import { VacunacionService } from 'src/app/servicios/empleado/empleadoVacunas/vacunacion.service';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ThemePalette } from '@angular/material/core';
-import { TipoVacunaComponent } from '../../../empleado/vacunacion/tipo-vacuna/tipo-vacuna.component';
-import { EditarVacunasComponent } from '../editar-vacuna/editar-vacuna.component';
-import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
+
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
+import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
-import { PlantillaReportesService } from '../../../reportes/plantilla-reportes.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { SelectionModel } from '@angular/cdk/collections';
+
 import { ITableVacuna } from 'src/app/model/reportes.model';
+import { SelectionModel } from '@angular/cdk/collections';
+
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { CatVacunasService } from 'src/app/servicios/catalogos/catVacunas/cat-vacunas.service';
+import { PlantillaReportesService } from '../../../reportes/plantilla-reportes.service';
+
+import { EditarVacunasComponent } from '../editar-vacuna/editar-vacuna.component';
+import { TipoVacunaComponent } from '../../../empleado/vacunacion/tipo-vacuna/tipo-vacuna.component';
+import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/metodos.component';
 
 @Component({
   selector: 'app-cat-discapacidad',
   templateUrl: './cat-vacunas.component.html',
   styleUrls: ['./cat-vacunas.component.css']
 })
+
 export class CatVacunasComponent implements OnInit {
+
   filtradoNombre = ''; // VARIABLE DE BUSQUEDA DE DATOS
+  vacunasEliminar: any = [];
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
@@ -39,9 +44,6 @@ export class CatVacunasComponent implements OnInit {
   public formulario = new FormGroup({
     nombreForm: this.nombreF,
   });
-
-
-  vacunasEliminar: any = [];
 
   archivoForm = new FormControl('', Validators.required);
 
@@ -64,7 +66,6 @@ export class CatVacunasComponent implements OnInit {
   value = 10;
 
   vacunas: any;
-
   empleado: any = [];
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
 
@@ -80,7 +81,6 @@ export class CatVacunasComponent implements OnInit {
     private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
-    public parametro: ParametrosService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -128,7 +128,7 @@ export class CatVacunasComponent implements OnInit {
   }
 
   AbrirVentanaRegistrarDiscapacidad(): void {
-  
+
     this.ventana.open(TipoVacunaComponent, { width: '500px' })
       .afterClosed().subscribe(items => {
         this.ngOnInit();
@@ -142,12 +142,12 @@ export class CatVacunasComponent implements OnInit {
 
   // METODO PARA EDITAR MODALIDAD LABORAL
   AbrirEditar(item_modalidad: any): void {
-    
+
     this.ventana.open(EditarVacunasComponent, { width: '450px', data: item_modalidad })
       .afterClosed().subscribe(items => {
         this.ngOnInit();
       });
-      
+
   }
 
   // CONTROL DE PAGINACION
@@ -169,7 +169,6 @@ export class CatVacunasComponent implements OnInit {
 
   Datos_vacunas: any
 
-
   // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
@@ -183,7 +182,6 @@ export class CatVacunasComponent implements OnInit {
     }
     array.sort(compare);
   }
-
 
 
   /** ************************************************************************************************* **
@@ -230,7 +228,7 @@ export class CatVacunasComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de vacunas', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
+        { text: 'Lista Tipo Vacunas', bold: true, fontSize: 20, alignment: 'center', margin: [0, -10, 0, 10] },
         this.PresentarDataPDFvacunas(),
       ],
       styles: {
@@ -255,7 +253,7 @@ export class CatVacunasComponent implements OnInit {
                 { text: 'Nombre', style: 'tableHeader' },
 
               ],
-              ...this.vacunas.map(obj => {
+              ...this.vacunas.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableD' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -309,9 +307,9 @@ export class CatVacunasComponent implements OnInit {
   data: any = [];
   ExportToXML() {
     this.OrdenarDatos(this.vacunas);
-    var objeto;
+    var objeto: any;
     var arreglovacunas: any = [];
-    this.vacunas.forEach(obj => {
+    this.vacunas.forEach((obj: any) => {
       objeto = {
         "vacuna": {
           "$": { "id": obj.id },
@@ -340,7 +338,6 @@ export class CatVacunasComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-
 
     const a = document.createElement('a');
     a.href = xmlUrl;
@@ -403,9 +400,7 @@ export class CatVacunasComponent implements OnInit {
   }
 
 
-
   ConfirmarDelete(discapacidad: any) {
-
     const mensaje = 'eliminar';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -430,8 +425,6 @@ export class CatVacunasComponent implements OnInit {
           this.ngOnInit();
         }
       });
-
-
   }
 
   contador: number = 0;
@@ -441,7 +434,7 @@ export class CatVacunasComponent implements OnInit {
     this.contador = 0;
     this.vacunasEliminar = this.selectionVacuna.selected;
     this.vacunasEliminar.forEach((datos: any) => {
-      this.vacunas = this.vacunas.filter(item => item.id !== datos.id);
+      this.vacunas = this.vacunas.filter((item: any) => item.id !== datos.id);
       this.contador = this.contador + 1;
       this.rest.eliminar(datos.id).subscribe(res => {
         if (res.message === 'error') {
@@ -484,11 +477,5 @@ export class CatVacunasComponent implements OnInit {
         }
       });
   }
-
-
-
-
-
-
 
 }

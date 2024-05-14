@@ -80,7 +80,7 @@ class DiscapacidadControlador {
     }
 
     // METODO PARA ELIMINAR UN TIPO DE DISCAPACIDAD
-    public async eliminarRegistro(req: Request, res: Response) {
+    public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
             await pool.query(

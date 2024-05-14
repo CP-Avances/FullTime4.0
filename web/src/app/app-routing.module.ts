@@ -140,7 +140,7 @@ import { ReporteTiempoAlimentacionComponent } from './componentes/reportes/asist
 import { AnalisisDatosComponent } from './componentes/reportes/analisis-datos/analisis-datos.component';
 import { PrincipalSucursalUsuarioComponent } from './componentes/empleado/sucursal-usuario/principal-sucursal-usuario/principal-sucursal-usuario.component';
 import { CargarPlantillaComponent } from './componentes/empleado/cargar-plantilla/cargar-plantilla.component';
-import { CatModalidaLaboralComponent } from './componentes/catalogos/cat-modalida-laboral/cat-modalida-laboral.component';
+import { CatModalidaLaboralComponent } from './componentes/catalogos/catalogoModalidadLaboral/cat-modalida-laboral/cat-modalida-laboral.component';
 import { CatDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/listar-discapacidad/cat-discapacidad.component';
 import { CatTipoCargosComponent } from './componentes/catalogos/catalogoTipoCargo/listar-tipo-cargo/cat-tipo-cargos.component';
 import { CatVacunasComponent } from './componentes/catalogos/catalogoVacuna/listar-vacuna/cat-vacunas.component';
