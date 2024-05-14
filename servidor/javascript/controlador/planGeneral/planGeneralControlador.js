@@ -38,7 +38,7 @@ class PlanGeneralControlador {
                     req.body[i].min_alimentacion], (error) => {
                     iterar = iterar + 1;
                     try {
-                        console.log('if ', error);
+                        console.log('if error --> ', error);
                         if (error) {
                             errores = errores + 1;
                             if (iterar === req.body.length && errores > 0) {

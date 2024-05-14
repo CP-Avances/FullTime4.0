@@ -197,7 +197,7 @@ class ContratoEmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
             const FECHA = yield database_1.default.query(`
-            SELECT ca.id_contrato, ec.fecha_ingreso
+            SELECT ca.id_contrato, ec.fecha_ingreso, ec.fecha_salida
             FROM datos_contrato_actual AS ca, eu_empleado_contratos AS ec
             WHERE ca.id = $1 AND ec.id = ca.id_contrato
             `, [id_empleado]);

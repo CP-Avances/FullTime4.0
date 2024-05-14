@@ -71,7 +71,7 @@ export class EditarPlanificacionComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    //console.log('ver rotativo ', this.datos_horarios)
+    //--console.log('ver rotativo ', this.datos_horarios)
     this.BuscarHora();
     this.BuscarFeriados();
   }
@@ -136,15 +136,17 @@ export class EditarPlanificacionComponent implements OnInit {
     this.horarios = [];
     this.vista_horarios = [];
     this.vista_descanso = [];
+    let contar = 0;
     // BUSQUEDA DE HORARIOS
     this.restH.BuscarListaHorarios().subscribe(datos => {
       this.horarios = datos;
-      this.horarios.map(hor => {
+      this.horarios.map((hor: any) => {
         // BUSQUEDA DE DETALLES DE ACUERDO AL ID DE HORARIO
         this.restD.ConsultarUnDetalleHorario(hor.id).subscribe(res => {
+          contar = contar + 1;
           this.detalles_horarios = res;
           //console.log('detalles ', this.detalles_horarios)
-          this.detalles_horarios.map(det => {
+          this.detalles_horarios.map((det: any) => {
             if (det.tipo_accion === 'E') {
               this.hora_entrada = det.hora.slice(0, 5);
             }
@@ -153,7 +155,6 @@ export class EditarPlanificacionComponent implements OnInit {
               this.segundo_dia = det.segundo_dia;
               this.tercer_dia = det.tercer_dia;
             }
-
           })
           let datos_horario = [{
             id: hor.id,
@@ -171,11 +172,14 @@ export class EditarPlanificacionComponent implements OnInit {
           else {
             this.vista_horarios = this.vista_horarios.concat(datos_horario);
           }
+          // VERIFICAR LECTURA DE TODA LA DATA
+          //--console.log('ver contador cont ', contar, ' horarios ', this.horarios.length)
+          if (contar === this.horarios.length) {
+            this.ListarHorariosSeleccionados();
+            contar = 0;
+          }
         })
       })
-
-      this.ListarHorariosSeleccionados();
-
     })
   }
 
@@ -186,15 +190,14 @@ export class EditarPlanificacionComponent implements OnInit {
   seleccionar_horario: boolean = true;
   seleccionar_libre: boolean = true;
   ListarHorariosSeleccionados() {
+    //--console.log('ingresa aqui')
     this.tipo_dia_verificar = '';
     this.horas = [];
     this.lista_libres = [];
     let total = this.datos_horarios.datosPlan.split(',').length;
-
     let fecha = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
     let fecha_ = moment(fecha, 'YYYY-MM-D').format('YYYY/MM/DD');
     this.dia_fecha = (moment(fecha_, 'YYYY/MM/DD').format('MMMM, ddd DD, YYYY')).toUpperCase();
-
     for (var i = 0; i < total; i++) {
       // HORARIOS LIBRE Y FERIADO PROPIOS DEL SISTEMA
       if ((this.datos_horarios.datosPlan.split(',')[i]).trim() === 'L' ||
@@ -203,7 +206,7 @@ export class EditarPlanificacionComponent implements OnInit {
         break;
       }
       else {
-        this.horarios.forEach(o => {
+        this.horarios.forEach((o: any) => {
           // COMPARAR HORARIOS (SE RETIRA ESPACIOS)
           if (o.codigo === (this.datos_horarios.datosPlan.split(',')[i]).trim()) {
             let data = {
@@ -218,7 +221,6 @@ export class EditarPlanificacionComponent implements OnInit {
         })
       }
     }
-
     if (this.feriados.length) {
       //console.log('existen feriados', this.feriados);
       this.seleccionar_libre = false;
@@ -227,9 +229,7 @@ export class EditarPlanificacionComponent implements OnInit {
       this.notas1 = 'DÍA CONFIGURADO EN EL SISTEMA COMO FERIADO.';
       this.nota_ = 'feriado';
     }
-
     //console.log('ver horarios asignados ', this.horas)
-
     this.BuscarPlanificacionAntes();
     this.BuscarPlanificacionDespues();
   }
@@ -286,6 +286,7 @@ export class EditarPlanificacionComponent implements OnInit {
   // METODO PARA BUSCAR PLANIFICACION DIA ANTES
   antes: any = [];
   BuscarPlanificacionAntes() {
+    console.log('ver horraios ', this.horarios)
     let formato = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
     var restar = moment(formato, 'YYYY-MM-DD').subtract(1, 'days');
     var fecha = moment(restar, 'YYYY-MM-DD').format('YYYY-MM-DD');
@@ -297,7 +298,7 @@ export class EditarPlanificacionComponent implements OnInit {
       codigo: '\'' + this.datos_horarios.codigo + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
-      //console.log('ver datos horarios antes', datos)
+      console.log('ver datos horarios antes', datos)
       if (datos.message === 'OK') {
         for (var j = 0; j < this.horarios.length; j++) {
           for (var k = 0; k < datos.data.length; k++) {
@@ -663,7 +664,6 @@ export class EditarPlanificacionComponent implements OnInit {
   // METODO PARA AGREGAR DIAS LIBRES
   asignado_libre: any = [];
   AgregarLibre() {
-
     if (this.horas.length != 0) {
       this.toastr.warning('Este día ya tiene configurado horarios. No puede ser libre.', 'Ups!!! VERIFICAR.', {
         timeOut: 6000,
@@ -679,9 +679,9 @@ export class EditarPlanificacionComponent implements OnInit {
         this.notas2 = '';
       }
       else {
-        //console.log('ver horarios ', this.horarios)
-        const [obj_res] = this.horarios.filter(o => {
-          return o.default_ === 'DL'
+        console.log('ver horarios ', this.horarios)
+        const [obj_res] = this.horarios.filter((o: any) => {
+          return o.default_ === 'DL';
         })
 
         this.asignado_libre = [];
