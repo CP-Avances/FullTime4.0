@@ -289,7 +289,6 @@ class VacunasControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let separador = path_1.default.sep;
-                // TODO ANALIZAR COMO OBTENER USER_NAME, IP DESDE EL FRONT
                 const { user_name, ip } = req.body;
                 const { id, documento } = req.params;
                 // INICIAR TRANSACCION

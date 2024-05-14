@@ -314,7 +314,7 @@ class VacunasControlador {
     public async EliminarRegistro(req: Request, res: Response): Promise<Response> {
         try {
             let separador = path.sep;
-            // TODO ANALIZAR COMO OBTENER USER_NAME, IP DESDE EL FRONT
+            
             const { user_name, ip } = req.body;
             const { id, documento } = req.params;
 
