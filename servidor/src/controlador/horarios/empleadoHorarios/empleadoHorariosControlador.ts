@@ -606,7 +606,6 @@ class EmpleadoHorariosControlador {
         const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
-        // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
         const { user_name, ip } = req.body;
 
         plantilla.forEach(async (data: any) => {
@@ -670,7 +669,6 @@ class EmpleadoHorariosControlador {
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
         var arrayDetalles: any = [];
 
-        // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
         const { user_name, ip } = req.body;
 
         //Leer la plantilla para llenar un array con los datos cedula y usuario para verificar que no sean duplicados
@@ -781,7 +779,6 @@ class EmpleadoHorariosControlador {
         const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
-        // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
         const { user_name, ip } = req.body;
 
         plantilla.forEach(async (data: any) => {
@@ -834,7 +831,6 @@ class EmpleadoHorariosControlador {
     public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
         try {
             const id = req.params.id;
-            // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
             const { user_name, ip } = req.body;
 
             // INICIAR TRANSACCION

@@ -554,7 +554,6 @@ class EmpleadoHorariosControlador {
             const workbook = xlsx_1.default.readFile(filePath);
             const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-            // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
             const { user_name, ip } = req.body;
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                 try {
@@ -613,7 +612,6 @@ class EmpleadoHorariosControlador {
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             var arrayDetalles = [];
-            // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
             const { user_name, ip } = req.body;
             //Leer la plantilla para llenar un array con los datos cedula y usuario para verificar que no sean duplicados
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
@@ -713,7 +711,6 @@ class EmpleadoHorariosControlador {
             const workbook = xlsx_1.default.readFile(filePath);
             const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-            // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
             const { user_name, ip } = req.body;
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                 try {
@@ -762,7 +759,6 @@ class EmpleadoHorariosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
                 const { user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');

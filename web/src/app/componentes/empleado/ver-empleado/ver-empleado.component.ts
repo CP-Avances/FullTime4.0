@@ -1257,6 +1257,10 @@ export class VerEmpleadoComponent implements OnInit {
       formData.append("uploads[]", this.archivoSubidoHorario[i], this.archivoSubidoHorario[i].name);
       console.log("toda la data", this.archivoSubidoHorario[i])
     }
+
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restEmpleHorario.VerificarDatos_EmpleadoHorario(formData, parseInt(this.idEmpleado)).subscribe(res => {
       console.log('entra')
       if (res.message === 'error') {
