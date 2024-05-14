@@ -98,7 +98,6 @@ class VacunasControlador {
             var mes = fecha.format('MM');
             var dia = fecha.format('DD');
     
-            // TODO ANALIZAR COMO OBTENER USER_NAME, IP DESDE EL FRONT
             const { user_name, ip } = req.body;
             let id = req.params.id;
             let id_empleado = req.params.id_empleado;

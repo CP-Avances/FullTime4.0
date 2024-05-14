@@ -48,8 +48,12 @@ export class VacunacionService {
   }
 
   // METODO PARA ELIMINAR REGISTRO VACUNA EMPLEADO
-  EliminarRegistroVacuna(id: number, documento: string) {
-    return this.http.delete(`${environment.url}/vacunas/eliminar/${id}/${documento}`);
+  EliminarRegistroVacuna(id: number, documento: string, datos: any) {
+    const url = `${environment.url}/vacunas/eliminar/${id}/${documento}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
   }
 
   // METODO DE REGISTROS DE TIPO DE VACUNACION

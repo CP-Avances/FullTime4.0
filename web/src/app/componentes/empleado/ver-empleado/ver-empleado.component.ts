@@ -697,7 +697,12 @@ export class VerEmpleadoComponent implements OnInit {
 
   // ELIMINAR REGISTRO DE VACUNA
   EliminarVacuna(datos: any) {
-    this.restVacuna.EliminarRegistroVacuna(datos.id, datos.carnet).subscribe(res => {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.restVacuna.EliminarRegistroVacuna(datos.id, datos.carnet, data).subscribe(res => {
       this.ObtenerDatosVacunas(this.formato_fecha);
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,

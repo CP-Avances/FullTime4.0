@@ -15,6 +15,10 @@ import { VacunacionService } from 'src/app/servicios/empleado/empleadoVacunas/va
 
 export class TipoVacunaComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public ventana: MatDialogRef<TipoVacunaComponent>, // VARIABLE DE MANEJO DE VENTANAS
     public restVacuna: VacunacionService, // VARIABLE DE CONSULTA DE DATOS DE VACUNAS
@@ -22,6 +26,8 @@ export class TipoVacunaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   // VALIDACIONES DE CAMPOS DE FORMULARIO
@@ -36,6 +42,8 @@ export class TipoVacunaComponent implements OnInit {
   GuardarTipoVacuna(form: any) {
     let tipoVacunas = {
       nombre: form.nombreForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restVacuna.CrearTipoVacuna(tipoVacunas).subscribe(response => {
       if (response.message === 'error') {
