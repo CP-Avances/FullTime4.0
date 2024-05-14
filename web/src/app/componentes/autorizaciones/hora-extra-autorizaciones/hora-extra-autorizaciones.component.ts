@@ -8,6 +8,7 @@ import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { use } from 'echarts';
 
 interface Orden {
   valor: number
@@ -444,8 +445,10 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
       estado: estado_hora,
       id_hora_extra: id_hora,
       id_departamento: id_departamento,
+      user_name: this.user_name,
+      ip: this.ip,
     }
-    console.log('datos', datosHorasExtras);
+
     this.restH.ActualizarEstado(id_hora, datosHorasExtras).subscribe(res => {
       this.resEstado = [res];
       console.log('estado', this.resEstado);

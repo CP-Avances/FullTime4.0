@@ -77,6 +77,10 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
 
   inicioFor = 0;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // VARIABLES USADAS EN BUSQUEDA DE FILTRO DE DATOS
   Depata: any = new FormControl('');
   Usuario: any = new FormControl('');
@@ -114,7 +118,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     private funciones: MainNavService,
     public restAutoriza: AutorizaDepartamentoService,
     public usuarioDepa: UsuarioService,
-  ) { 
+  ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
@@ -129,11 +133,14 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
+
       this.BuscarParametro();
       this.ObtenerEmpleados(this.idEmpleado);
       this.calcularHoraPaginacion();
       this.calcularHoraPaginacionObservacion();
-    }  
+    }
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -145,7 +152,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -224,7 +231,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
           break;
         }
       }
-     
+
     }, err => {
       return this.validar.RedireccionarHomeAdmin(err.error)
     });
@@ -330,7 +337,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     return numSelected === numRows;
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
@@ -460,7 +467,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       if (Object.keys(this.listaHorasExtrasObservaFiltradas).length == 0) {
         this.validarMensaje2 = true;
       }
-      
+
     }, err => {
       this.validarMensaje2 = true;
       return this.validar.RedireccionarHomeAdmin(err.error)
@@ -526,14 +533,14 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   }
 
   selectionUnoObserva = new SelectionModel<HoraExtraElemento>(true, []);
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedObserva() {
     const numSelected = this.selectionUnoObserva.selected.length;
     const numRows = this.listaHorasExtrasObservaFiltradas.length;
     return numSelected === numRows;
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleObserva() {
     this.isAllSelectedObserva() ?
       this.selectionUnoObserva.clear() :
@@ -561,7 +568,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   }
 
   /** ************************************************************************************* **
-   ** **                       LISTAS DE HORAS EXTRAS AUTORIZADAS                        ** ** 
+   ** **                       LISTAS DE HORAS EXTRAS AUTORIZADAS                        ** **
    ** ************************************************************************************* **/
 
   pedido_hora_autoriza: any = [];
@@ -665,7 +672,9 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     })
     for (var i = 0; i <= EmpleadosSeleccionados.length - 1; i++) {
       let h = {
-        hora: EmpleadosSeleccionados[i].num_hora
+        hora: EmpleadosSeleccionados[i].num_hora,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.restHE.AutorizarTiempoHoraExtra(EmpleadosSeleccionados[i].id, h).subscribe(res => {
         console.log(res);
@@ -891,7 +900,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     xlsx.writeFile(wb, `${opcion}EXCEL` + new Date().getTime() + '.xlsx');
   }
 
-   /** ************************************************************************************************** ** 
+   /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A CSV                               ** **
    ** ************************************************************************************************** **/
 

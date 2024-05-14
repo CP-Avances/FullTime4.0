@@ -18,6 +18,10 @@ interface Estados {
 })
 export class EstadoHoraExtraComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   estadoF = new FormControl('');
 
   public HoraExtraForm = new FormGroup({
@@ -44,7 +48,9 @@ export class EstadoHoraExtraComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log(this.data);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.tiempo();
     this.llenarForm();
   }
@@ -53,7 +59,7 @@ export class EstadoHoraExtraComponent implements OnInit {
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
     console.log('fecha Actual', this.FechaActual);
-    this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string); 
+    this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
   }
 
   llenarForm(){
@@ -66,8 +72,10 @@ export class EstadoHoraExtraComponent implements OnInit {
   EditarEstadoHoraExtra(form: any) {
     let datosHorasExtras = {
       estado: form.estadoForm,
-      id_hora_extra: this.data.id, 
+      id_hora_extra: this.data.id,
       id_departamento: this.data.id_departamento,
+      user_name: this.user_name,
+      ip: this.ip
     }
 
     this.restH.ActualizarEstado(this.data.id, datosHorasExtras).subscribe(res => {
@@ -81,19 +89,19 @@ export class EstadoHoraExtraComponent implements OnInit {
       //     nomEstado = obj.nombre
       //   }
       // })
-      let notificacion = { 
+      let notificacion = {
         id: null,
         id_send_empl: this.id_empleado_loggin,
         id_receives_empl: this.data.id_usua_solicita,
         id_receives_depa: this.data.id_departamento,
-        estado: this.resEstado[0].realtime[0].estado, 
-        create_at: `${this.FechaActual}T${f.toLocaleTimeString()}.000Z`, 
+        estado: this.resEstado[0].realtime[0].estado,
+        create_at: `${this.FechaActual}T${f.toLocaleTimeString()}.000Z`,
         id_permiso: null,
         id_vacaciones: null,
         id_hora_extra: this.data.id
       }
       console.log(notificacion);
-      
+
       this.realTime.IngresarNotificacionEmpleado(notificacion).subscribe(res1 => {
         console.log(res1);
         this.NotifiRes = res1;

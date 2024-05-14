@@ -242,7 +242,9 @@ export class PedidoHoraExtraComponent implements OnInit {
       observacion: false,
       tipo_funcion: 0,
       depa_user_loggin: parseInt(localStorage.getItem('departamento') as string),
-      codigo: this.empleados[0].codigo
+      codigo: this.empleados[0].codigo,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.GuardarInformacion(form1, dataPedirHoraExtra);
   }
@@ -478,6 +480,10 @@ export class PedidoHoraExtraComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restHE.SubirArchivoRespaldo(formData, id, form.respaldoForm).subscribe(res => {
       this.archivoForm.reset();
       this.nameFile = '';

@@ -412,7 +412,6 @@ class HorasExtrasPedidasControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_hora_extra, documento } = req.params;
-                // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
                 const { user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -749,7 +748,6 @@ class HorasExtrasPedidasControlador {
                 let doc = list.uploads[0].path.split("\\")[1];
                 let { nombre } = req.params;
                 let id = req.params.id;
-                // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
                 const { user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');

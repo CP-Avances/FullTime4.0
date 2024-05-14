@@ -49,8 +49,12 @@ export class PedHoraExtraService {
     return this.http.get(`${environment.url}/horas-extras-pedidas/datosAutorizacion/${id_hora}`);
   }
 
-  EliminarHoraExtra(id_hora_extra: number, documento: string) {
-    return this.http.delete(`${environment.url}/horas-extras-pedidas/eliminar/${id_hora_extra}/${documento}`);
+  EliminarHoraExtra(id_hora_extra: number, documento: string, datos: any) {
+    const url = `${environment.url}/horas-extras-pedidas/eliminar/${id_hora_extra}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
   }
 
   HorarioEmpleadoSemanal(id_cargo: number) {

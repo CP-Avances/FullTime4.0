@@ -22,6 +22,10 @@ export class CancelarHoraExtraComponent implements OnInit {
   nota = 'su solicitud';
   user = '';
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private informacion: DatosGeneralesService,
     private realTime: RealTimeService,
@@ -37,14 +41,16 @@ export class CancelarHoraExtraComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('hora extra ... ', this.data);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.obtenerInformacionEmpleado();
     this.BuscarParametro();
     this.BuscarHora();
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -96,7 +102,11 @@ export class CancelarHoraExtraComponent implements OnInit {
   }
 
   aceptarAdvertencia() {
-    this.restHE.EliminarHoraExtra(this.data.id, this.data.documento).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+    this.restHE.EliminarHoraExtra(this.data.id, this.data.documento, datos).subscribe(res => {
       console.log('advertencia', res);
       var datos = {
         depa_user_loggin: this.solInfo.id_dep,

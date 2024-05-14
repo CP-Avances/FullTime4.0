@@ -37,6 +37,10 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
   ArrayAutorizacionTipos: any = [];
   gerencia: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private restA: AutorizacionService,
     private toastr: ToastrService,
@@ -50,7 +54,9 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.data.empl);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     if (this.data.autorizacion[0].estado === 1) {
       this.toastr.info('Solicitud pendiente de aprobación.', '', {
         timeOut: 6000,
@@ -135,6 +141,8 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
       estado: form.estadoF,
       id_hora_extra: this.data.autorizacion[0].id_hora_extra,
       id_departamento: this.data.autorizacion[0].id_departamento,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restPH.ActualizarEstado(this.data.autorizacion[0].id_hora_extra, datosHorasExtras).subscribe(res => {
       this.resEstado = [res];

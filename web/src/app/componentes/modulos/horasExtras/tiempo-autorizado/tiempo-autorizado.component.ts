@@ -11,6 +11,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.serv
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-tiempo-autorizado',
@@ -195,7 +196,9 @@ export class TiempoAutorizadoComponent implements OnInit {
   // ACTUALIZAR TIEMPO APROBADO EN SOLIICTUD
   TiempoAprobado(estado: number, valor: any) {
     let h = {
-      hora: valor
+      hora: valor,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     // GUARDAR HORAS EXTRAS REALIZADAS POR EL USUARIO
     this.restPH.AutorizarTiempoHoraExtra(this.data.horaExtra.id, h).subscribe(res => {
@@ -221,6 +224,8 @@ export class TiempoAutorizadoComponent implements OnInit {
   EditarEstadoHoraExtra(estado: number) {
     let datosHorasExtras = {
       estado: estado,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restPH.ActualizarEstado(this.data.horaExtra.id, datosHorasExtras).subscribe(horaExtra => {
     })
@@ -265,7 +270,9 @@ export class TiempoAutorizadoComponent implements OnInit {
   // METODO PARA CAMBIAR DE ESTADO EL CAMPO OBSERVACION DE SOLICITUD DE HORAS EXTRAS Y ENVIAR NOTIFICACIONES
   EnviarMensaje(form: any) {
     var datos = {
-      observacion: true
+      observacion: true,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restPH.EditarObservacionPedido(this.data.horaExtra.id, datos).subscribe(res => {
     });

@@ -441,7 +441,6 @@ class HorasExtrasPedidasControlador {
   public async EliminarHoraExtra(req: Request, res: Response): Promise<Response> {
     try {
       const { id_hora_extra, documento } = req.params;
-      // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
       const { user_name, ip } = req.body;
 
       // INICIAR TRANSACCION
@@ -836,7 +835,6 @@ class HorasExtrasPedidasControlador {
       let { nombre } = req.params;
       let id = req.params.id;
 
-      // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
       const { user_name, ip } = req.body;
 
       // INICIAR TRANSACCION
