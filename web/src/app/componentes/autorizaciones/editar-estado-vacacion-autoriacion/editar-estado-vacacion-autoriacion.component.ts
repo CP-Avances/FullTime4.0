@@ -388,6 +388,8 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
         this.solInfo.fullname + ' desde ' +
         desde + ' ' + moment(vacaciones.fec_inicio).format('DD/MM/YYYY') + ' hasta ' +
         hasta + ' ' + moment(vacaciones.fec_final).format('DD/MM/YYYY'),
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     //Listado para eliminar el usuario duplicado

@@ -27,6 +27,10 @@ export class ButtonNotificacionComponent implements OnInit {
   noti_real_time: any = [];
   idEmpleadoIngresa: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public loginService: LoginService,
     public parametro: ParametrosService,
@@ -77,13 +81,15 @@ export class ButtonNotificacionComponent implements OnInit {
 
   ngOnInit(): void {
     this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleado') as string);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.BuscarParametro();
     this.VerificarConfiguracion(this.idEmpleadoIngresa);
 
   }
 
   /** **************************************************************************************** **
-  ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+  ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
   ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -174,7 +180,9 @@ export class ButtonNotificacionComponent implements OnInit {
   }
 
   CambiarVistaNotificacion(data: any) {
-    this.realTime.PutVistaNotificacion(data.id).subscribe(res => {
+    data.append('user_name', this.user_name);
+    data.append('ip', this.ip);
+    this.realTime.PutVistaNotificacion(data.id, data).subscribe(res => {
       this.LlamarNotificaciones(this.formato_fecha, this.formato_hora);
     });
 

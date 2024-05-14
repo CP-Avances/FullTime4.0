@@ -16,6 +16,10 @@ export class SettingsComponent implements OnInit {
   btnActualizar: boolean = false;
   btnCrear: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   formGroup: FormGroup;
 
   constructor(
@@ -40,6 +44,9 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.avisos.ObtenerConfiguracionEmpleado(this.data.id_empleado).subscribe(res => {
       this.btnActualizar = true;
       this.formGroup.patchValue({
@@ -72,7 +79,9 @@ export class SettingsComponent implements OnInit {
       comida_mail: form.comidaMail,
       comida_noti: form.comidaNoti,
       comunicado_mail: form.comunicadoMail,
-      comunicado_noti: form.comunicadoNoti
+      comunicado_noti: form.comunicadoNoti,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.avisos.IngresarConfigNotiEmpleado(data).subscribe(res => {
       this.ventana.close();
@@ -94,7 +103,9 @@ export class SettingsComponent implements OnInit {
       comida_mail: form.comidaMail,
       comida_noti: form.comidaNoti,
       comunicado_mail: form.comunicadoMail,
-      comunicado_noti: form.comunicadoNoti
+      comunicado_noti: form.comunicadoNoti,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.avisos.ActualizarConfigNotiEmpl(this.data.id_empleado, data).subscribe(res => {
       this.ventana.close();

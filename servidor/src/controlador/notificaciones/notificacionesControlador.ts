@@ -17,8 +17,6 @@ class NotificacionTiempoRealControlador {
     const {arregloNotificaciones, user_name, ip} = req.body;
     let contador: number = 0;
 
-    console.log('VER IDS', arregloNotificaciones);
-
     if (arregloNotificaciones.length > 0) {
       contador = 0;
       arregloNotificaciones.forEach(async (obj: number) => {

@@ -38,6 +38,10 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
   calcular = false;
   habilitarCalculados: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   dialaborableF = new FormControl(0, [Validators.required]);
   fechaIngreso = new FormControl(Validators.required);
   fechaInicio = new FormControl('', Validators.required);
@@ -74,7 +78,9 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('vacacion', this.dato);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.formulario.patchValue({
       fechaIngresoForm: this.dato.info.fec_ingreso,
       dialaborableForm: this.dato.info.dia_laborable,
@@ -88,7 +94,7 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -412,6 +418,8 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
       tipo: 1,
       mensaje: 'Ha actualizado ' + this.nota + ' de vacaciones ' + this.user + ' desde ' +
         desde + ' hasta ' + hasta,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     // LISTADO PARA ELIMINAR EL USUARIO DUPLICADO

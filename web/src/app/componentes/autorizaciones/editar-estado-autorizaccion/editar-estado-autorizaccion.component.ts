@@ -455,6 +455,8 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
         this.solInfo.fullname + ' desde ' +
         desde + ' ' + h_inicio + ' hasta ' +
         hasta + ' ' + h_fin,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     //ForEach para enviar la notificacion a cada usuario dentro de la nueva lista filtrada

@@ -402,7 +402,9 @@ export class VacacionAutorizacionesComponent implements OnInit {
         estado: estado_letras,
         create_at: `${this.FechaActual}T${f.toLocaleTimeString()}.000Z`,
         id_vacaciones: id_vacacion,
-        id_permiso: null
+        id_permiso: null,
+        user_name: this.user_name,
+        ip: this.ip
       }
       this.realTime.IngresarNotificacionEmpleado(notificacion).subscribe(res => {
         this.NotifiRes = res;

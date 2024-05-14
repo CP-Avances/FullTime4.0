@@ -23,7 +23,6 @@ class NotificacionTiempoRealControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { arregloNotificaciones, user_name, ip } = req.body;
             let contador = 0;
-            console.log('VER IDS', arregloNotificaciones);
             if (arregloNotificaciones.length > 0) {
                 contador = 0;
                 arregloNotificaciones.forEach((obj) => __awaiter(this, void 0, void 0, function* () {

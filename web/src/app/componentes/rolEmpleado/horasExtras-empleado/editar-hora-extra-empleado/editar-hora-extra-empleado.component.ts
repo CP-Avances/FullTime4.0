@@ -348,6 +348,8 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
       mensaje: 'Ha actualizado su solicitud de horas extras desde ' +
         desde + ' hasta ' +
         hasta + ' horario de ' + h_inicio + ' a ' + h_final,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     //Listado para eliminar el usuario duplicado

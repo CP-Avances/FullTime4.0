@@ -21,6 +21,7 @@ import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-ge
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
+import { use } from 'echarts';
 
 interface opcionesDiasHoras {
   valor: string;
@@ -2172,6 +2173,8 @@ export class PermisosMultiplesComponent implements OnInit {
         id_empl_recive: valor.id_empl_recive,
         mensaje: 'Se ha realizado un solicitud múltiple de permisos. Por favor revisar solicitudes pendientes de aprobación. Para mayor información revisar su correo.',
         tipo: 7,  // ES EL TIPO DE NOTIFICACION - PERMISOS MULTIPLES
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.realTime.EnviarMensajeGeneral(mensaje).subscribe(res => {
         this.realTime.RecibirNuevosAvisos(res.respuesta);

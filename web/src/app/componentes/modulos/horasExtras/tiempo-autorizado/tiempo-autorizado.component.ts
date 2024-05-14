@@ -475,6 +475,8 @@ export class TiempoAutorizadoComponent implements OnInit {
         ' horario de ' + h_inicio + ' a ' + h_final +
         ' estado ' + estado_n + ' horas ' + moment(valor, 'HH:mm').format('HH:mm'),
       tipo: 12,  // APROBACIONES DE SOLICITUD DE HORAS EXTRAS
+      user_name: this.user_name,
+      ip: this.ip
     }
 
     //Listado para eliminar el usuario duplicado
@@ -601,6 +603,8 @@ export class TiempoAutorizadoComponent implements OnInit {
         ' horario de ' + h_inicio + ' a ' + h_final +
         ' horas ' + moment(valor, 'HH:mm').format('HH:mm'),
       tipo: 11,  // JUSTIFICACION DE SOLICITUD DE HORAS EXTRAS
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.realTime.EnviarMensajeGeneral(mensaje).subscribe(res => {
       this.realTime.RecibirNuevosAvisos(res.respuesta);

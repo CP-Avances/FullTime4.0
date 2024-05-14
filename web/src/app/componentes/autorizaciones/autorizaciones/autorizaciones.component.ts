@@ -586,7 +586,9 @@ export class AutorizacionesComponent implements OnInit {
         create_at: `${this.FechaActual}T${f.toLocaleTimeString()}.000Z`,
         id_permiso: id_permiso,
         id_vacaciones: null,
-        id_hora_extra: null
+        id_hora_extra: null,
+        user_name: this.user_name,
+        ip: this.ip,
       }
 
       // Enviar la respectiva notificación de cambio de estado del permiso

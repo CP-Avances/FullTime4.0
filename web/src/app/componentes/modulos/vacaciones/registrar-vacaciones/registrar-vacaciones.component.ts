@@ -446,6 +446,8 @@ export class RegistrarVacacionesComponent implements OnInit {
       estado: 'Pendiente',
       mensaje: 'Ha realizado ' + this.nota + ' de vacaciones ' + this.user + ' desde ' +
         desde + ' hasta ' + hasta,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
 

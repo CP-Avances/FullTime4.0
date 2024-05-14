@@ -156,7 +156,9 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
         create_at: `${this.FechaActual}T${f.toLocaleTimeString()}.000Z`,
         id_permiso: null,
         id_vacaciones: null,
-        id_hora_extra: this.data.autorizacion[0].id_hora_extra
+        id_hora_extra: this.data.autorizacion[0].id_hora_extra,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.realTime.IngresarNotificacionEmpleado(notificacion).subscribe(res1 => {
         this.NotifiRes = res1;

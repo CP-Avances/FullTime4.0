@@ -21,6 +21,10 @@ export class CancelarPermisoComponent implements OnInit {
   nota = 'su solicitud';
   user = '';
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private restP: PermisosService,
     private toastr: ToastrService,
@@ -36,7 +40,9 @@ export class CancelarPermisoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.data);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerInformacionEmpleado();
     this.ObtenerTiposPermiso();
     this.BuscarParametro();
@@ -44,7 +50,7 @@ export class CancelarPermisoComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -67,7 +73,7 @@ export class CancelarPermisoComponent implements OnInit {
       });
   }
 
-  // METODO PARA MOSTRAR LISTA DE PERMISOS DE ACUERDO AL ROL 
+  // METODO PARA MOSTRAR LISTA DE PERMISOS DE ACUERDO AL ROL
   tipoPermisos: any = [];
   ObtenerTiposPermiso() {
     this.tipoPermisos = [];
@@ -281,6 +287,8 @@ export class CancelarPermisoComponent implements OnInit {
       mensaje: 'Ha eliminado ' + this.nota + ' de permiso ' + this.user + ' desde ' +
         desde + ' ' + h_inicio + ' hasta ' +
         hasta + ' ' + h_fin,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     //Listado para eliminar el usuario duplicado

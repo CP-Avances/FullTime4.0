@@ -98,7 +98,9 @@ export class EstadoHoraExtraComponent implements OnInit {
         create_at: `${this.FechaActual}T${f.toLocaleTimeString()}.000Z`,
         id_permiso: null,
         id_vacaciones: null,
-        id_hora_extra: this.data.id
+        id_hora_extra: this.data.id,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       console.log(notificacion);
 

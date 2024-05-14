@@ -403,6 +403,8 @@ export class PedidoHoraExtraComponent implements OnInit {
         desde + ' hasta ' +
         hasta +
         ' horario de ' + h_inicio + ' a ' + h_final,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     //Listado para eliminar el usuario duplicado

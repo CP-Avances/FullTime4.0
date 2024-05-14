@@ -1784,6 +1784,8 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       mensaje: 'Ha realizado ' + this.nota + ' de permiso ' + this.user + ' desde ' +
         desde + ' ' + h_inicio + ' hasta ' +
         hasta + ' ' + h_fin,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     // LISTADO PARA ELIMINAR EL USUARIO DUPLICADO
