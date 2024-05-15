@@ -48,6 +48,10 @@ export class PlanificacionMultipleComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public componentem: HorarioMultipleEmpleadoComponent,
     public componenteb: BuscarPlanificacionComponent,
@@ -64,6 +68,8 @@ export class PlanificacionMultipleComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.BuscarHorarios();
     this.BuscarHora();
     this.InicialiciarDatos();
@@ -1179,6 +1185,12 @@ export class PlanificacionMultipleComponent implements OnInit {
     //console.log('eliminar ', this.eliminar_lista)
     let contador = 0;
 
+    let datos = {
+      id_plan: this.plan_general,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
     if (this.eliminar_lista.length === 0) {
       this.RegistrarPlanificacionMultiple();
     }
@@ -1192,9 +1204,11 @@ export class PlanificacionMultipleComponent implements OnInit {
           fec_inicio: h.fec_inicio,
           id_horario: h.id_horario,
         };
-        this.restP.BuscarFechas(plan_fecha).subscribe(res => {
+
+        this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
+          datos.id_plan = res;
           // METODO PARA ELIMINAR DE LA BASE DE DATOS
-          this.restP.EliminarRegistro(res).subscribe(datos => {
+          this.restP.EliminarRegistro(datos).subscribe(datos => {
             contador = contador + 1;
             //console.log('ver contador ', contador, ' tamaño ', this.eliminar_lista.length)
             if (contador === this.eliminar_lista.length) {
@@ -1219,9 +1233,14 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   // METODO PARA GUARDAR REGISTRO DE HORARIOS
   RegistrarPlanificacionMultiple() {
-    console.log('ver plan ', this.plan_general);
 
-    this.restP.CrearPlanGeneral(this.plan_general).subscribe(res => {
+    const datos = {
+      plan_general: this.plan_general,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
+    this.restP.CrearPlanGeneral(datos).subscribe(res => {
       if (res.message === 'OK') {
         this.progreso = false;
         this.toastr.success('Operación exitosa.', 'Registro guardado.', {

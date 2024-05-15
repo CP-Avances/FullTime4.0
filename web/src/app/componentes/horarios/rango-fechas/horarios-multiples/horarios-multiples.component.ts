@@ -52,6 +52,10 @@ export class HorariosMultiplesComponent implements OnInit {
   horarios: any = [];
   feriados: any = [];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CAMPOS DE FORMULARIO
   fechaInicioF = new FormControl('', Validators.required);
   fechaFinalF = new FormControl('', Validators.required);
@@ -94,6 +98,8 @@ export class HorariosMultiplesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.BuscarHorarios();
     this.LeerDatos();
   }
@@ -359,7 +365,7 @@ export class HorariosMultiplesComponent implements OnInit {
     })
   }
 
-  // METODO PARA VERIFICAR FECHAS DE CONTRATO 
+  // METODO PARA VERIFICAR FECHAS DE CONTRATO
   cont2: number = 0;
   VerificarContrato(form: any, correctos: any) {
     this.cont2 = 0;
@@ -733,7 +739,7 @@ export class HorariosMultiplesComponent implements OnInit {
     const { default_ } = obj_res;
 
     //console.log('dh  --------------------------------- ', dh)
-    this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO 
+    this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
     this.inicioDate = moment(form.fechaInicioForm).format('YYYY-MM-DD');
     this.finDate = moment(form.fechaFinalForm).format('YYYY-MM-DD');
 
@@ -811,7 +817,7 @@ export class HorariosMultiplesComponent implements OnInit {
         origen = 'H' + default_;
       }
       else {
-        // BUSCAR FERIADOS 
+        // BUSCAR FERIADOS
         if (this.feriados.length != 0) {
           for (let i = 0; i < this.feriados.length; i++) {
             if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
@@ -881,6 +887,11 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA ELIMINAR HORARIOS Y REGISTRAR LIBRES
   EliminarRegistrosH(existe: any, obj: any, dh: any) {
+    let datos = {
+      id_plan: [],
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     existe.forEach(h => {
       //console.log(' ver valor h ..... ', h)
       if (h.default_ === 'N' || h.default_ === 'DHA' || h.default_ === 'L' || h.default_ === 'FD') {
@@ -891,9 +902,10 @@ export class HorariosMultiplesComponent implements OnInit {
           id_horario: h.id_horario,
         };
         //console.log(' ingresa eliminar  ..... ', plan_fecha)
-        this.restP.BuscarFechas(plan_fecha).subscribe(res => {
+        this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
+          datos.id_plan = res;
           // METODO PARA ELIMINAR DE LA BASE DE DATOS
-          this.restP.EliminarRegistro(res).subscribe(datos => {
+          this.restP.EliminarRegistro(datos).subscribe(datos => {
           })
         })
       }
@@ -1032,7 +1044,12 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA ELIMINAR DESCANSOS - FERIADOS
   BorrarDescanso() {
-    this.restP.EliminarRegistro(this.eliminar).subscribe(datos_ => {
+    let datos = {
+      id_plan: this.eliminar,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+    this.restP.EliminarRegistro(datos).subscribe(datos_ => {
       if (datos_.message === 'OK') {
         this.GuardarInformacion();
       }
@@ -1052,8 +1069,12 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA REGISTRAR PLANIFICACION
   GuardarInformacion() {
-    //console.log('plan general ', this.plan_general)
-    this.restP.CrearPlanGeneral(this.plan_general).subscribe(res => {
+    const datos = {
+      plan_general: this.plan_general,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+    this.restP.CrearPlanGeneral(datos).subscribe(res => {
       //console.log('respuesta ****** ', res)
       if (res.message === 'OK') {
         this.progreso = false;
@@ -1273,8 +1294,13 @@ export class HorariosMultiplesComponent implements OnInit {
   // METODO PARA BORRAR REGISTROS DE LA BASE DE DATOS
   BorrarDatos(opcion: number) {
     this.progreso = true;
+    let datos = {
+      id_plan: this.eliminar,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     // METODO PARA ELIMINAR DE LA BASE DE DATOS
-    this.restP.EliminarRegistro(this.eliminar).subscribe(datos_ => {
+    this.restP.EliminarRegistro(datos).subscribe(datos_ => {
       if (datos_.message === 'OK') {
         this.progreso = false;
         this.toastr.error('Operación exitosa.', 'Registros eliminados.', {
@@ -1299,7 +1325,7 @@ export class HorariosMultiplesComponent implements OnInit {
     })
   }
 
-  // METODO PARA LLAMAR A FUNCIONES DE ELIMINACION 
+  // METODO PARA LLAMAR A FUNCIONES DE ELIMINACION
   EliminarRegistros(form: any, opcion: number) {
     if (form.horarioForm) {
       this.eliminar_horarios = [];

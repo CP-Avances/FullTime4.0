@@ -15,9 +15,9 @@ class PlanGeneralControlador {
         iterar = 0;
         cont = 0;
 
-        const {user_name, ip } = req.body;
+        const {user_name, ip, plan_general } = req.body;
 
-        for (var i = 0; i < req.body.length; i++) {
+        for (var i = 0; i < plan_general.length; i++) {
 
             try {
 
@@ -31,11 +31,11 @@ class PlanGeneralControlador {
                         min_antes, min_despues, estado_origen, min_alimentacion) 
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
                     `,
-                    [req.body[i].fec_hora_horario, req.body[i].tolerancia, req.body[i].estado_timbre,
-                    req.body[i].id_det_horario, req.body[i].fec_horario, req.body[i].id_empl_cargo,
-                    req.body[i].tipo_entr_salida, req.body[i].codigo, req.body[i].id_horario, req.body[i].tipo_dia,
-                    req.body[i].salida_otro_dia, req.body[i].min_antes, req.body[i].min_despues, req.body[i].estado_origen,
-                    req.body[i].min_alimentacion]
+                    [plan_general[i].fec_hora_horario, plan_general[i].tolerancia, plan_general[i].estado_timbre,
+                    plan_general[i].id_det_horario, plan_general[i].fec_horario, plan_general[i].id_empl_cargo,
+                    plan_general[i].tipo_entr_salida, plan_general[i].codigo, plan_general[i].id_horario, plan_general[i].tipo_dia,
+                    plan_general[i].salida_otro_dia, plan_general[i].min_antes, plan_general[i].min_despues, plan_general[i].estado_origen,
+                    plan_general[i].min_alimentacion]
                     , async (error, results) => {
     
                         iterar = iterar + 1;
@@ -58,15 +58,15 @@ class PlanGeneralControlador {
                             console.log('if ', error)
                             if (error) {
                                 errores = errores + 1;
-                                if (iterar === req.body.length && errores > 0) {
+                                if (iterar === plan_general.length && errores > 0) {
                                     return res.status(200).jsonp({ message: 'error' });
                                 }
                             } else {
                                 cont = cont + 1;
-                                if (iterar === req.body.length && cont === req.body.length) {
+                                if (iterar === plan_general.length && cont === plan_general.length) {
                                     return res.status(200).jsonp({ message: 'OK' });
                                 }
-                                else if (iterar === req.body.length && cont != req.body.length) {
+                                else if (iterar === plan_general.length && cont != plan_general.length) {
                                     return res.status(200).jsonp({ message: 'error' });
                                 }
                             }
@@ -112,16 +112,16 @@ class PlanGeneralControlador {
         iterar = 0;
         cont = 0;
 
-        const {user_name, ip } = req.body;
+        const {user_name, ip, id_plan } = req.body;
 
-        for (var i = 0; i < req.body.length; i++) {
+        for (var i = 0; i < id_plan.length; i++) {
 
             try {
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
 
                 // CONSULTAR DATOSORIGINALES
-                const consulta = await pool.query(`SELECT * FROM plan_general WHERE id = $1`, [req.body[i].id]);
+                const consulta = await pool.query(`SELECT * FROM plan_general WHERE id = $1`, [id_plan[i].id]);
                 const [datosOriginales] = consulta.rows;
 
                 if (!datosOriginales) {
@@ -132,7 +132,7 @@ class PlanGeneralControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al eliminar el registro con id ${req.body[i].id}. Registro no encontrado.`
+                        observacion: `Error al eliminar el registro con id ${id_plan[i].id}. Registro no encontrado.`
                     });
 
                     // FINALIZAR TRANSACCION
@@ -144,7 +144,7 @@ class PlanGeneralControlador {
                     `
                     DELETE FROM plan_general WHERE id = $1
                     `,
-                    [req.body[i].id]
+                    [id_plan[i].id]
                     , async (error) => {
     
                         iterar = iterar + 1;
@@ -166,15 +166,15 @@ class PlanGeneralControlador {
                         try {
                             if (error) {
                                 errores = errores + 1;
-                                if (iterar === req.body.length && errores > 0) {
+                                if (iterar === id_plan.length && errores > 0) {
                                     return res.status(200).jsonp({ message: 'error' });
                                 }
                             } else {
                                 cont = cont + 1;
-                                if (iterar === req.body.length && cont === req.body.length) {
+                                if (iterar === id_plan.length && cont === id_plan.length) {
                                     return res.status(200).jsonp({ message: 'OK' });
                                 }
-                                else if (iterar === req.body.length && cont != req.body.length) {
+                                else if (iterar === id_plan.length && cont != id_plan.length) {
                                     return res.status(200).jsonp({ message: 'error' });
                                 }
                             }

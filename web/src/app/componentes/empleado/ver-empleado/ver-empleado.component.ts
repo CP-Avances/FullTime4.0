@@ -1361,8 +1361,14 @@ export class VerEmpleadoComponent implements OnInit {
     };
     this.restPlanGeneral.BuscarFechas(plan_fecha).subscribe(res => {
       this.id_planificacion_general = res;
+      let datos = {
+        user_name: this.user_name,
+        ip: this.ip,
+        id_plan: '',
+      }
       this.id_planificacion_general.map(obj => {
-        this.restPlanGeneral.EliminarRegistro(obj.id).subscribe(res => {
+        datos.id_plan = obj.id;
+        this.restPlanGeneral.EliminarRegistro(datos).subscribe(res => {
         })
       })
     })
