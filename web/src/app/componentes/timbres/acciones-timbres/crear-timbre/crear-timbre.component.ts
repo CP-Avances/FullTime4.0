@@ -41,6 +41,10 @@ export class CrearTimbreComponent implements OnInit {
     { value: 'F/P', name: 'Fin permiso' },
   ]
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // AGREGAR CAMPOS DE FORMULARIO A UN GRUPO
   public formulario = new FormGroup({
     horaForm: this.HoraF,
@@ -68,6 +72,9 @@ export class CrearTimbreComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     if (this.data.length === undefined) {
       this.nombre = this.data.name_empleado;
     }
@@ -151,6 +158,8 @@ export class CrearTimbreComponent implements OnInit {
       latitud: this.latitud,
       accion: form.accionForm,
       tipo: 'admin',
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     if (this.data.length === undefined) {

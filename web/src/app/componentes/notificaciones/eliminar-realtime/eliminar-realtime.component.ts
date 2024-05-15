@@ -67,9 +67,15 @@ export class EliminarRealtimeComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip
     }
+
+    const datosAvisos = {
+      arregloAvisos: this.ids,
+      user_name: this.user_name,
+      ip: this.ip
+    }
     // ELIMINACION DE NOTIFICACIONES DE AVISOS
     if (this.Notificaciones.opcion === 1) {
-      this.restAvisos.EliminarAvisos(this.ids).subscribe(res => {
+      this.restAvisos.EliminarAvisos(datosAvisos).subscribe(res => {
         console.log(res);
         if (res.message === 'OK') {
           this.progreso = false;

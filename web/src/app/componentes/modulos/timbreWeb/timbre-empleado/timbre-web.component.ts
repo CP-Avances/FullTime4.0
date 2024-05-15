@@ -41,6 +41,10 @@ export class TimbreWebComponent implements OnInit {
   filtroFechaTimbre = '';
   idEmpleado: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   get habilitarTimbre(): boolean { return this.funciones.timbre_web; }
 
   constructor(
@@ -66,13 +70,16 @@ export class TimbreWebComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
+
       this.BuscarParametro();
       this.ObtenerUsuario();
     }
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -141,6 +148,9 @@ export class TimbreWebComponent implements OnInit {
     this.ventana.open(RegistrarTimbreComponent, { width: '550px' }).afterClosed().subscribe(data => {
       if (data !== undefined) {
         if (!data.close) {
+          data.append('user_name', this.user_name as string);
+          data.append('ip', this.ip as string);
+
           this.restTimbres.RegistrarTimbreWeb(data).subscribe(res => {
             // METODO PARA AUDITAR TIMBRES
             data.id_empleado = this.idEmpleado;

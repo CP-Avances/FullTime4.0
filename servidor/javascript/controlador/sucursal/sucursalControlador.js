@@ -156,7 +156,6 @@ class SucursalControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
                 const { user_name, ip } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
