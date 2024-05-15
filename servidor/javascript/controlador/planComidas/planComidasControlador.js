@@ -556,7 +556,6 @@ class PlanComidasControlador {
     EliminarSolicitudComida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
                 const { user_name, ip } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
@@ -707,7 +706,6 @@ class PlanComidasControlador {
                 const id = req.params.id;
                 const fecha = req.params.fecha;
                 const id_empleado = req.params.id_empleado;
-                // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
                 const { user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
@@ -765,7 +763,6 @@ class PlanComidasControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
                 const { user_name, ip } = req.body;
                 const id = req.params.id;
                 // INICIAR TRANSACCION
@@ -815,7 +812,6 @@ class PlanComidasControlador {
     EliminarPlanComidaEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
                 const { user_name, ip } = req.body;
                 const id = req.params.id;
                 const id_empleado = req.params.id_empleado;

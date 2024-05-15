@@ -14,6 +14,7 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-solicita-comida',
@@ -64,6 +65,10 @@ export class SolicitaComidaComponent implements OnInit {
   departamento: any;
   FechaActual: any;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private informacion: DatosGeneralesService,
     private toastr: ToastrService,
@@ -82,7 +87,9 @@ export class SolicitaComidaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('datos', this.data, 'departamento', this.departamento)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
     this.obtenerInformacionEmpleado();
@@ -93,7 +100,7 @@ export class SolicitaComidaComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -188,7 +195,7 @@ export class SolicitaComidaComponent implements OnInit {
     })
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -215,6 +222,8 @@ export class SolicitaComidaComponent implements OnInit {
       hora_fin: form.horaFinForm,
       fecha: form.fechaForm,
       extra: form.extraForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     // VERIFICAR SI EXISTE UNA SOLICITUD O PLANIFICACION REGISTRADA
     let datosDuplicados = {
@@ -259,7 +268,9 @@ export class SolicitaComidaComponent implements OnInit {
       mensaje: 'Ha solicitado ' + this.nota + ' de alimentación ' + this.user + ' desde ' +
         desde +
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
-      id_comida: alimentacion.id_comida
+      id_comida: alimentacion.id_comida,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     alimentacion.EmpleadosSendNotiEmail.forEach(e => {

@@ -594,7 +594,6 @@ class PlanComidasControlador {
   public async EliminarSolicitudComida(req: Request, res: Response): Promise<Response> {
 
     try {
-      // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
       const { user_name, ip } = req.body;
       const id = req.params.id;
   
@@ -772,7 +771,6 @@ class PlanComidasControlador {
       const fecha = req.params.fecha;
       const id_empleado = req.params.id_empleado;
       
-      // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
       const { user_name, ip } = req.body;
 
       // INICIAR TRANSACCION
@@ -841,7 +839,6 @@ class PlanComidasControlador {
   // ELIMINAR REGISTRO DE ALIMENTACION
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
       const { user_name, ip } = req.body;
       const id = req.params.id;
 
@@ -898,7 +895,6 @@ class PlanComidasControlador {
   // ELIMINAR PLANIFICACION DE UN USUARIO ESPECIFICO
   public async EliminarPlanComidaEmpleado(req: Request, res: Response): Promise<Response> {
     try {
-      // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
       const { user_name, ip } = req.body;
 
       const id = req.params.id;

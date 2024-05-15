@@ -74,7 +74,7 @@ export class PlanComidasService {
 
 
 
-  // SERVICIO PARA OBTENER DATOS DE LA TABLA TIPO_COMIDA 
+  // SERVICIO PARA OBTENER DATOS DE LA TABLA TIPO_COMIDA
   CrearTipoComidas(datos: any) {
     return this.http.post<any>(`${environment.url}/planComidas/tipo_comida`, datos);
   }
@@ -112,13 +112,17 @@ export class PlanComidasService {
     return this.http.put(`${environment.url}/planComidas/solicitud-comida/estado`, datos);
   }
   // ELIMINAR REGISTRO DE SOLICITUD DE SERVICIO DE ALIMENTACION
-  EliminarSolicitud(id: number) {
-    return this.http.delete(`${environment.url}/planComidas/eliminar/sol-comida/${id}`);
+  EliminarSolicitud(id: number, datos: any) {
+    const url = `${environment.url}/planComidas/eliminar/sol-comida/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
 
   /** ********************************************************************************************** **
-   ** **               METODO DE MANEJO DE PLANIFICACIONES DE ALIMENTACION                        ** ** 
+   ** **               METODO DE MANEJO DE PLANIFICACIONES DE ALIMENTACION                        ** **
    ** ********************************************************************************************** **/
 
   // CREAR PLANIIFCACIÓN DE SERVICIO DE ALIMENTACION
@@ -130,16 +134,32 @@ export class PlanComidasService {
     return this.http.post(`${environment.url}/planComidas/empleado/solicitud`, datos);
   }
   // ELIMINAR PLANIFICACION DE ALIMENTACION
-  EliminarComidaAprobada(id: number, fecha: any, id_empleado: number) {
-    return this.http.delete(`${environment.url}/planComidas/eliminar/plan-solicitud/${id}/${fecha}/${id_empleado}`);
+  EliminarComidaAprobada(id: number, fecha: any, id_empleado: number, datos: any) {
+    const {user_name, ip} = datos;
+
+    const data = { user_name, ip,};
+
+    const url = `${environment.url}/planComidas/eliminar/plan-comida/${id}/${fecha}/${id_empleado}`;
+    const httpOtions = {
+      body: data
+    };
+    return this.http.request('delete', url, httpOtions);
   }
   // ELIMINAR REGISTRO DE PLANIFICACION
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/planComidas/eliminar/${id}`);
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${environment.url}/planComidas/eliminar/registro/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
   // ELIMINAR PLANIFICACIÓN DE ALIMENTACIÓN DE UN USUARIO
-  EliminarPlanComida(id: number, id_empleado: number) {
-    return this.http.delete(`${environment.url}/planComidas/eliminar/plan-comida/${id}/${id_empleado}`);
+  EliminarPlanComida(id: number, id_empleado: number, datos: any) {
+    const url = `${environment.url}/planComidas/eliminar/plan-comida/${id}/${id_empleado}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
   // CREAR PLANIFICACION DE SERVICIO DE ALIMENTACION PARA EMPLEADO
   CrearPlanComidasEmpleado(datos: any) {

@@ -146,7 +146,9 @@ export class EditarTipoComidasComponent implements OnInit {
   RegistrarServicio(form: any, datos: any) {
     if (form.servicioForm != '') {
       let tipo_servicio = {
-        nombre: form.servicioForm
+        nombre: form.servicioForm,
+        user_name: this.user_name,
+        ip: this.ip
       }
       this.restPlan.CrearTipoComidas(tipo_servicio).subscribe(res => {
         datos.tipo_comida = res.id;

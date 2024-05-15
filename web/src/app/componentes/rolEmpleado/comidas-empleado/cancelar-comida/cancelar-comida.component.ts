@@ -7,6 +7,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-cancelar-comida',
@@ -20,6 +21,10 @@ export class CancelarComidaComponent implements OnInit {
   idEmpleadoIngresa: number = 0;
   nota = 'su solicitud';
   user = '';
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   constructor(
     private toastr: ToastrService, // VARIABLE PARA MOSTRAR NOTIFICACIONES
@@ -39,14 +44,16 @@ export class CancelarComidaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('datos comida ... ', this.data)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.obtenerInformacionEmpleado();
     this.BuscarParametro();
     this.BuscarHora();
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -98,8 +105,11 @@ export class CancelarComidaComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO -- SOLICITUD DE ALIMENTACIÓN
   EliminarSolicitaComida() {
-    this.restP.EliminarSolicitud(this.data.id).subscribe(res => {
-      console.log(res);
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+    this.restP.EliminarSolicitud(this.data.id, datos).subscribe(res => {
       var datos = {
         depa_user_loggin: this.solInfo.id_dep,
         objeto: res,
@@ -202,7 +212,9 @@ export class CancelarComidaComponent implements OnInit {
       mensaje: 'Ha eliminado ' + this.nota + ' de alimentación ' + this.user + ' desde ' +
         desde +
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
-      id_comida: alimentacion.id_comida
+      id_comida: alimentacion.id_comida,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     alimentacion.EmpleadosSendNotiEmail.forEach((e: any) => {

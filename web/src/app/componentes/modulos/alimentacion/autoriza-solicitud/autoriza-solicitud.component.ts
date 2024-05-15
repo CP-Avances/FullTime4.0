@@ -7,6 +7,7 @@ import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.s
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-autoriza-solicitud',
@@ -18,6 +19,10 @@ export class AutorizaSolicitudComponent implements OnInit {
 
   // DATOS DEL EMPLEADO QUE INICIA SESION
   idEmpleadoIngresa: number;
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   constructor(
     public parametro: ParametrosService,
@@ -38,14 +43,15 @@ export class AutorizaSolicitudComponent implements OnInit {
   boton_negar: boolean = true;
 
   ngOnInit(): void {
-    console.log('datos', this.data)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
 
     this.obtenerInformacionEmpleado();
     this.BuscarParametro();
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -130,7 +136,9 @@ export class AutorizaSolicitudComponent implements OnInit {
     let datosEstado = {
       verificar: 'Si',
       aprobada: estado,
-      id: datos.id
+      id: datos.id,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restPlan.AprobarComida(datosEstado).subscribe(alimentacion => {
       if (estado === true) {
@@ -140,7 +148,7 @@ export class AutorizaSolicitudComponent implements OnInit {
           this.AprobarComida(alimentacion, estado);
         }
         else {
-          this.restPlan.EliminarComidaAprobada(datos.id, datos.fec_comida.split('T')[0], datos.id_empleado)
+          this.restPlan.EliminarComidaAprobada(datos.id, datos.fec_comida.split('T')[0], datos.id_empleado, datos)
             .subscribe(res => {
               this.AprobarComida(alimentacion, estado);
             })
@@ -159,6 +167,8 @@ export class AutorizaSolicitudComponent implements OnInit {
       hora_fin: this.data.datosMultiple.hora_fin,
       codigo: this.data.datosMultiple.codigo,
       fecha: this.data.datosMultiple.fec_comida,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restPlan.CrearComidaAprobada(datosPlanEmpleado).subscribe(res => {
       this.NotificarAprobacion(estado, alimentacion);
@@ -173,7 +183,9 @@ export class AutorizaSolicitudComponent implements OnInit {
       let datosEstado = {
         aprobada: estado,
         verificar: 'Si',
-        id: obj.id
+        id: obj.id,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.restPlan.AprobarComida(datosEstado).subscribe(alimentacion => {
         contador = contador + 1;
@@ -186,7 +198,9 @@ export class AutorizaSolicitudComponent implements OnInit {
             fecha: obj.fecha,
             hora_inicio: obj.hora_inicio,
             hora_fin: obj.hora_fin,
-            consumido: false
+            consumido: false,
+            user_name: this.user_name,
+            ip: this.ip,
           }
           this.restPlan.CrearComidaAprobada(datosPlanEmpleado).subscribe(res => {
             contador_plan = contador_plan + 1;
@@ -327,7 +341,9 @@ export class AutorizaSolicitudComponent implements OnInit {
         this.solInfo.fullname + ' desde ' +
         desde +
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
-      id_comida: alimentacion.id_comida
+      id_comida: alimentacion.id_comida,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     //Listado para eliminar el usuario duplicado

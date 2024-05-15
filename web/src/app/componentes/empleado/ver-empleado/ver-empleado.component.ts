@@ -2448,7 +2448,13 @@ export class VerEmpleadoComponent implements OnInit {
     let h_inicio = this.validar.FormatearHora(datos.hora_inicio, this.formato_hora);
     let h_fin = this.validar.FormatearHora(datos.hora_fin, this.formato_hora);
 
-    this.restPlanComidas.EliminarPlanComida(id_plan, id_empleado).subscribe(res => {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
+
+    this.restPlanComidas.EliminarPlanComida(id_plan, id_empleado, data).subscribe(res => {
       this.NotificarPlanificacion(datos, desde, hasta, h_inicio, h_fin, id_empleado);
       this.EnviarCorreo(datos, cuenta_correo, usuario, desde, hasta, h_inicio, h_fin);
       this.toastr.error('Registro eliminado.', '', {
@@ -2501,6 +2507,8 @@ export class VerEmpleadoComponent implements OnInit {
         desde + ' hasta ' +
         hasta +
         ' horario de ' + h_inicio + ' a ' + h_fin + ' servicio ',
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restPlanComidas.EnviarMensajePlanComida(mensaje).subscribe(res => {
     })

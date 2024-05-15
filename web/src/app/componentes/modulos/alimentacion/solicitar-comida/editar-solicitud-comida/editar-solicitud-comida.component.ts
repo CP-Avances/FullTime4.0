@@ -17,6 +17,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.serv
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-editar-solicitud-comida',
@@ -65,6 +66,10 @@ export class EditarSolicitudComidaComponent implements OnInit {
   nota = 'su solicitud';
   user = '';
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restUsuario: UsuarioService, // SERVICIO DE DATOS DE USUARIO
     public parametro: ParametrosService,
@@ -83,7 +88,9 @@ export class EditarSolicitudComidaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('ver data de actualizacion soliictud', this.data)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.data.solicitud.id_empleado);
     this.obtenerInformacionEmpleado();
     this.ObtenerServicios();
@@ -92,7 +99,7 @@ export class EditarSolicitudComidaComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -143,7 +150,7 @@ export class EditarSolicitudComidaComponent implements OnInit {
       })
   }
 
-  // METODO PARA MOSTRAR LA INFORMACIÓN DEL EMPLEADO 
+  // METODO PARA MOSTRAR LA INFORMACIÓN DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
     var f = moment();
@@ -298,6 +305,8 @@ export class EditarSolicitudComidaComponent implements OnInit {
       fecha: form.fechaForm,
       extra: form.extraForm,
       id_departamento: this.solInfo.id_dep,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.restPlan.ActualizarSolicitudComida(datosPlanComida).subscribe(alimentacion => {
 
@@ -399,7 +408,9 @@ export class EditarSolicitudComidaComponent implements OnInit {
       mensaje: 'Ha actualizado ' + this.nota + ' de alimentación ' + this.user + ' desde ' +
         desde +
         ' horario de ' + inicio + ' a ' + final + ' servicio ',
-      id_comida: alimentacion.id_comida
+      id_comida: alimentacion.id_comida,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     alimentacion.EmpleadosSendNotiEmail.forEach(e => {
