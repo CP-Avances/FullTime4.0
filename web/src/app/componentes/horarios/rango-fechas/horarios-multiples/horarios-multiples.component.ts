@@ -94,6 +94,7 @@ export class HorariosMultiplesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    //--console.log('ver seleccionados ', this.seleccionados)
     this.BuscarHorarios();
     this.LeerDatos();
   }
@@ -324,7 +325,7 @@ export class HorariosMultiplesComponent implements OnInit {
     let duplicados = [];
     this.usuarios_invalidos = [];
 
-    this.datos.map(dh => {
+    this.datos.map((dh: any) => {
       // METODO PARA BUSCAR DATOS DUPLICADOS DE HORARIOS
       this.rest.VerificarDuplicidadHorarios(dh.codigo, fechas).subscribe(response => {
         this.contador = this.contador + 1;
@@ -366,7 +367,7 @@ export class HorariosMultiplesComponent implements OnInit {
     let contrato = [];
     let sin_contrato = [];
 
-    correctos.map(dh => {
+    correctos.map((dh: any) => {
       let datosBusqueda = {
         id_cargo: dh.id_cargo,
         id_empleado: dh.id
@@ -424,8 +425,8 @@ export class HorariosMultiplesComponent implements OnInit {
     const { hora_trabajo } = obj_res;
     this.cont3 = 0;
 
-    correctos.map(dh => {
-      //console.log('dh ************************* ', dh)
+    correctos.map((dh: any) => {
+      console.log('dh ************************* ', dh)
       // METODO PARA LECTURA DE HORARIOS DE EMPLEADO
       this.horariosEmpleado = [];
       let fechas = {
@@ -441,7 +442,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
         this.horariosEmpleado = existe;
 
-        this.horariosEmpleado.map(h => {
+        this.horariosEmpleado.map((h: any) => {
           // SUMA DE HORAS DE CADA UNO DE LOS HORARIOS DEL EMPLEADO
           if (h.default_ != 'DL' && h.default_ != 'DFD') {
             this.suma = this.SumarHoras(this.suma, h.hora_trabajo);
@@ -542,6 +543,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA COMPARAR HORAS DE TRABAJO CON HORAS DE CONTRATO
   IndicarNotificacionHoras(horas: any, dh: any) {
+    console.log('horas', horas, ' dh ', dh.hora_trabaja)
     if (this.StringTimeToSegundosTime(horas) <= this.StringTimeToSegundosTime(dh.hora_trabaja)) {
       dh.observacion = 'OK';
       dh.nota = '';
@@ -621,6 +623,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA SUMAR HORAS
   StringTimeToSegundosTime(stringTime: string) {
+    console.log('ver horas ... ', stringTime)
     const h = parseInt(stringTime.split(':')[0]) * 3600;
     const m = parseInt(stringTime.split(':')[1]) * 60;
     const s = parseInt(stringTime.split(':')[2]);

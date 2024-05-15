@@ -71,14 +71,14 @@ export class EditarTimbreComponent implements OnInit {
     this.parametro.ListarDetalleParametros(25).subscribe(
       res => {
         this.formato_fecha = res[0].descripcion;
-        this.BuscarHora(this.formato_fecha)
+        this.BuscarHora()
       },
       vacio => {
-        this.BuscarHora(this.formato_fecha)
+        this.BuscarHora()
       });
   }
 
-  BuscarHora(fecha: string) {
+  BuscarHora() {
     // id_tipo_parametro Formato hora = 26
     this.parametro.ListarDetalleParametros(26).subscribe(
       res => {
@@ -91,18 +91,45 @@ export class EditarTimbreComponent implements OnInit {
   }
 
   // METODO PARA LEER DATOS DEL TIMBRE
+  observacion: string = '';
+  simbolo_: string = '';
   LeerDatosTimbre() {
     this.datosTimbre = [];
     this.datosTimbre = this.data.timbre;
-    console.log('ver timbre ', this.datosTimbre)
-    this.datosTimbre.fecha = this.validar.FormatearFecha(this.datosTimbre.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
-    this.datosTimbre.hora = this.validar.FormatearHora(this.datosTimbre.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
+    //--console.log('ver timbre ', this.datosTimbre)
+    this.datosTimbre.fecha_ = this.validar.FormatearFecha(this.datosTimbre.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
+    this.datosTimbre.hora_ = this.validar.FormatearHora(this.datosTimbre.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
+    this.ValidarObservacion();
 
     this.EditartimbreForm = this.formBuilder.group({
       accionTimbre: [this.datosTimbre.accion, Validators.required],
       teclaFunTimbre: [this.datosTimbre.tecla_funcion, Validators.required],
-      ObservacionForm: [this.datosTimbre.observacion, Validators.required]
+      ObservacionForm: [this.observacion, Validators.required]
     });
+  }
+
+  // METODO PARA VALIDAR LA INFORMACION
+  ValidarObservacion() {
+    const cadena = this.datosTimbre.observacion;
+    const patron = /Timbre creado por/;
+    const simbolo = "/";
+    this.simbolo_ = '';
+    if (patron.test(cadena) && cadena.includes(simbolo)) {
+      //--console.log('ingresa 1')
+      this.observacion = cadena.slice(cadena.indexOf(simbolo) + 1);
+      const indice = cadena.indexOf(simbolo);
+      this.simbolo_ = cadena.substring(0, indice) + ' / ';
+    }
+    else if (patron.test(cadena)) {
+      //--console.log('ingresa 2')
+      this.observacion = '';
+      this.simbolo_ = cadena + ' / ';
+    }
+    else {
+      //--console.log('ingresa 3')
+      this.observacion = this.datosTimbre.observacion
+    }
+
   }
 
   // METODO PARA SELECCIONAR ACCIONES DEL TIMBRE
@@ -111,7 +138,7 @@ export class EditarTimbreComponent implements OnInit {
   teclaFun: any;
   SelectedAccion(item: any) {
     this.seleccion = item.value;
-    this.acciones.forEach(elementAccion => {
+    this.acciones.forEach((elementAccion: any) => {
       if (elementAccion.item == this.seleccion) {
         this.SeleccionTecla = elementAccion.value;
       }
@@ -121,7 +148,7 @@ export class EditarTimbreComponent implements OnInit {
   // METODO PARA SELECCIONAR TECLA DE FUNCION
   SelectedTecla(item: any) {
     this.SeleccionTecla = item.value;
-    this.acciones.forEach(elementAccion => {
+    this.acciones.forEach((elementAccion: any) => {
       if (elementAccion.value == this.SeleccionTecla) {
         this.seleccion = elementAccion.item;
       }
@@ -136,12 +163,10 @@ export class EditarTimbreComponent implements OnInit {
       codigo: this.datosTimbre.codigo,
       accion: formTimbre.accionTimbre,
       tecla: formTimbre.teclaFunTimbre,
-      observacion: formTimbre.ObservacionForm,
+      observacion: this.simbolo_ + formTimbre.ObservacionForm,
       fecha: this.datosTimbre.fecha_hora_timbre_servidor,
     }
-
-    console.log('data: ', data);
-
+    //--console.log('data: ', data);
     this.timbreServicio.EditarTimbreEmpleado(data).subscribe(res => {
       const mensaje: any = res
       this.ventana.close(2);
