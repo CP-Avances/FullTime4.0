@@ -15,6 +15,10 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 
 export class CrearDetalleParametroComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   descripcion = new FormControl('', [Validators.required]);
 
@@ -33,6 +37,9 @@ export class CrearDetalleParametroComponent implements OnInit {
   nota: string = '';
   especificacion: string = '';
   ngOnInit(): void {
+
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
 
     if (this.data.parametros.id === 22) {
       this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
@@ -55,7 +62,9 @@ export class CrearDetalleParametroComponent implements OnInit {
   GuardarDatos(form: any) {
     let datos = {
       id_tipo: this.data.parametros.id,
-      descripcion: form.descripcionForm
+      descripcion: form.descripcionForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.rest.IngresarDetalleParametro(datos).subscribe(response => {
       this.toastr.success('Detalle registrado exitosamente.',

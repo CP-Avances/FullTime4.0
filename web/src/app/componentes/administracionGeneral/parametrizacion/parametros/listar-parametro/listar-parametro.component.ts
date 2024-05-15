@@ -42,6 +42,10 @@ export class ListarParametroComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   descripcionF = new FormControl('', [Validators.minLength(2)]);
 
@@ -63,13 +67,16 @@ export class ListarParametroComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerParametros();
     this.ObtenerColores();
     this.ObtenerLogo();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -85,7 +92,7 @@ export class ListarParametroComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -144,9 +151,14 @@ export class ListarParametroComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id: number) {
-    this.restP.EliminarTipoParametro(id).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+
+    this.restP.EliminarTipoParametro(id, datos).subscribe((res: any) => {
       if (res.message === 'false') {
         this.toastr.error('No es posible eliminar registro.', 'Verificar dependencias.', {
           timeOut: 6000,
@@ -161,7 +173,7 @@ export class ListarParametroComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -185,7 +197,7 @@ export class ListarParametroComponent implements OnInit {
 
 
   // revisar
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************** **/
   generarPdf(action = 'open') {
@@ -277,7 +289,7 @@ export class ListarParametroComponent implements OnInit {
     };
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   exportToExcel() {
@@ -287,7 +299,7 @@ export class ListarParametroComponent implements OnInit {
     xlsx.writeFile(wb, "ParametrosGeneralesEXCEL" + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
    ** ************************************************************************************************** **/
 
@@ -313,7 +325,7 @@ export class ListarParametroComponent implements OnInit {
           "$": { "id": obj.id },
           "descripcion": obj.descripcion,
         }
-        
+
       }
       arregloParametrosGenerales.push(objeto)
     });

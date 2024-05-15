@@ -15,6 +15,10 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 
 export class CrearParametroComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   descripcion = new FormControl('', Validators.required);
 
@@ -29,12 +33,17 @@ export class CrearParametroComponent implements OnInit {
     public ventana: MatDialogRef<CrearParametroComponent>
   ) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+   }
 
   // METODO PARA REGISTRAR NUEVO PARÁMETRO
   GuardarDatos(form: any) {
     let datos = {
-      descripcion: form.descripcionForm
+      descripcion: form.descripcionForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.rest.IngresarTipoParametro(datos).subscribe(response => {
       this.toastr.success('Registro guardado exitosamente.',
