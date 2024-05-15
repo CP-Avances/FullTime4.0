@@ -154,13 +154,13 @@ export class CrearTimbreComponent implements OnInit {
     }
 
     if (this.data.length === undefined) {
-      console.log(' id' + this.data.id);
+      //-console.log(' id' + this.data.id);
       timbre.id_empleado = this.data.id;
       this.ventana.close(timbre);
     }
     else {
       this.contador = 0;
-      this.data.map(obj => {
+      this.data.map((obj: any) => {
         timbre.id_empleado = obj.id;
         // LIMPIAR VARIABLE Y ALMACENAR DATOS
         this.data_nueva = [];
