@@ -346,7 +346,6 @@ class PermisosControlador {
             let id = req.params.id
             let { archivo, codigo } = req.params;
 
-            // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
             const { user_name, ip } = req.body;
 
             // INICIAR TRANSACCION
@@ -536,7 +535,6 @@ class PermisosControlador {
     // METODO PARA ELIMINAR PERMISO
     public async EliminarPermiso(req: Request, res: Response): Promise<Response> {
         try {
-            // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
             const { user_name, ip } = req.body;
             let { id_permiso, doc, codigo } = req.params;
             let separador = path.sep;

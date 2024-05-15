@@ -223,6 +223,8 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
   EditarEstadoPermiso(id_permiso: number, estado_permiso: any) {
     let datosPermiso = {
       estado: estado_permiso,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restP.ActualizarEstado(id_permiso, datosPermiso).subscribe(res => {
     });

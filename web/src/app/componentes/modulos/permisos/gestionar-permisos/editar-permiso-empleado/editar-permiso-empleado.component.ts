@@ -1613,6 +1613,8 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       dia: parseInt(form.diasForm),
       id_peri_vacacion: this.periodo_vacaciones,
       fec_edicion: this.FechaActual,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     if (this.info.id_tipo_permiso != datosPermiso.id_tipo_permiso) {
@@ -1748,6 +1750,10 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restP.SubirArchivoRespaldo(formData, id, codigo, this.info.documento).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Documento registrado.', {
         timeOut: 6000,
@@ -1798,6 +1804,8 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       archivo: this.info.documento,
       id: this.info.id,
       codigo: this.empleado.codigo,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restP.EliminarDocumentoPermiso(datos).subscribe(res => {
     });

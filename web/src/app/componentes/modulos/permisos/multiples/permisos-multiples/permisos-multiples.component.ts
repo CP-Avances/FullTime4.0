@@ -1747,6 +1747,10 @@ export class PermisosMultiplesComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restP.SubirArchivoRespaldo(formData, id, codigo, null).subscribe(res => {
       this.archivoForm.reset();
       this.nameFile = '';
@@ -1841,6 +1845,8 @@ export class PermisosMultiplesComponent implements OnInit {
         dia_libre: 0,
         hora_numero: 0,
         id_peri_vacacion: 0,
+        user_name: this.user_name,
+        ip: this.ip,
       }
 
       this.CambiarValoresDiasHoras(form, datosPermiso);

@@ -179,7 +179,6 @@ class ParametrosControlador {
     // METODO PARA ELIMINAR DETALLE TIPO PARAMETRO GENERAL
     public async EliminarDetalleParametro(req: Request, res: Response): Promise<Response> {
         try {
-            // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
             const { user_name, ip } = req.body;
             const id = req.params.id;
 

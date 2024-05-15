@@ -559,7 +559,9 @@ export class AutorizacionesComponent implements OnInit {
       estado: estado_permiso,
       id_permiso: id_permiso,
       id_departamento: id_departamento,
-      id_empleado: id_empleado
+      id_empleado: id_empleado,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     // Actualizar estado del permiso
     var estado_letras: string = '';
