@@ -116,8 +116,8 @@
                         <td></td>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [formControl]="buscarNombre"
-                                    [(ngModel)]="filtroNombre">
+                                <input matInput placeholder="Buscar" [formControl]="buscarModalidad"
+                                    [(ngModel)]="filtroModalidad">
                             </mat-form-field>
                         </td>
                         <td>
@@ -127,20 +127,20 @@
                             </mat-icon>
                         </td>
                     </tr>
-                    <tr *ngFor="let Modal of listaModalida_Laboral |  paginate:tamanio_pagina:numero_pagina">
+                    <tr *ngFor="let modalidad of listaModalida_Laboral | modalidadLaboral: filtroModalidad |  paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
-                                (change)="$event ? selectionModalidad.toggle(Modal) : null"
-                                [checked]="selectionModalidad.isSelected(Modal)" [aria-label]="checkboxLabelPag(Modal)">
+                                (change)="$event ? selectionModalidad.toggle(modalidad) : null"
+                                [checked]="selectionModalidad.isSelected(modalidad)" [aria-label]="checkboxLabelPag(modalidad)">
                             </mat-checkbox>
                         </td>
-                        <td>{{Modal.descripcion}}</td>
+                        <td>{{modalidad.descripcion}}</td>
                         <td class="justify-content-center">
-                            <i (click)="ConfirmarDelete(Modal)" class="far fa-trash-alt" id="t-eliminar" matSuffix
+                            <i (click)="ConfirmarDelete(modalidad)" class="far fa-trash-alt" id="t-eliminar" matSuffix
                                 matTooltipPosition="right" matTooltip="Eliminar este registro.">
                                 <p>Eliminar</p>
                             </i>
-                            <i id="t-editar" (click)="AbrirEditar(Modal)" matSuffix matTooltipPosition="right"
+                            <i id="t-editar" (click)="AbrirEditar(modalidad)" matSuffix matTooltipPosition="right"
                                 matTooltip="Modificar datos de este registro" class="fas fa-edit">
                                 <p>Editar</p>
                             </i>

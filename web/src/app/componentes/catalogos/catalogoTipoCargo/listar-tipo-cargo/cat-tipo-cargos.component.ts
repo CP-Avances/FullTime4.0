@@ -58,13 +58,13 @@ export class CatTipoCargosComponent {
   empleado: any = [];
   idEmpleado: number;
 
-  filtroNombre = ''; // VARIABLE DE BUSQUEDA DE DATOS
+  filtroCargo = ''; // VARIABLE DE BUSQUEDA DE DATOS
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
-  buscarNombre = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
+  buscarCargo = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({
-    nombreForm: this.buscarNombre,
+    nombreForm: this.buscarCargo,
   });
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA

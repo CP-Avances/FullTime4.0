@@ -116,8 +116,8 @@
                         <td></td>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [formControl]="buscarNombre"
-                                    [(ngModel)]="filtroNombre">
+                                <input matInput placeholder="Buscar" [formControl]="buscarCargo"
+                                    [(ngModel)]="filtroCargo">
                             </mat-form-field>
                         </td>
                         <td>
@@ -127,7 +127,7 @@
                             </mat-icon>
                         </td>
                     </tr>
-                    <tr *ngFor="let cargo of listaTipoCargos |  paginate:tamanio_pagina:numero_pagina">
+                    <tr *ngFor="let cargo of listaTipoCargos | emplCargo: filtroCargo |  paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionTipoCargo.toggle(cargo) : null"
