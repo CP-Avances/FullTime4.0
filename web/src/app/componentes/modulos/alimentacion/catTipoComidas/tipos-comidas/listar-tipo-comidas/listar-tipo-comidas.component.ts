@@ -171,6 +171,8 @@ export class ListarTipoComidasComponent implements OnInit {
           }
         }
       });
+      this.BuscarHora();
+
   }
 
   // METODO PARA ABRIR FORMULARIO MENU
@@ -198,10 +200,19 @@ export class ListarTipoComidasComponent implements OnInit {
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
   Eliminar(id_tipo: number) {
     this.rest.EliminarRegistro(id_tipo).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.BuscarHora();
+
+      if (res.message === 'error') {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+          timeOut: 6000,
+        });
+
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.BuscarHora();
+      }
+
     });
   }
 

@@ -323,12 +323,12 @@ export class ListaHorasExtrasComponent implements OnInit {
                 { text: 'Incluir Almuerzo', style: 'tableHeader' },
               ],
               ...this.horasExtras.map(obj => {
-                var incluirAlmuerzo = this.Almuerzo[obj.incl_almuerzo - 1];
+                var incluirAlmuerzo = this.Almuerzo[obj.minutos_comida - 1];
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTable' },
                   { text: obj.tipo_descuento, style: 'itemsTable' },
-                  { text: obj.reca_porcentaje, style: 'itemsTable' },
+                  { text: obj.recargo_porcentaje, style: 'itemsTable' },
                   { text: obj.hora_inicio, style: 'itemsTable' },
                   { text: obj.hora_final, style: 'itemsTable' },
                   { text: obj.hora_jornada, style: 'itemsTable' },
@@ -392,13 +392,13 @@ export class ListaHorasExtrasComponent implements OnInit {
       var objeto;
       var arreglohorasExtras: any = [];
       this.horasExtras.forEach(obj => {
-        var incluirAlmuerzo = this.Almuerzo[obj.incl_almuerzo - 1];
+        var incluirAlmuerzo = this.Almuerzo[obj.minutos_comida - 1];
         objeto = {
           "horas_extras": {
             '@id': obj.id,
             "descripcion": obj.descripcion,
             "tipo_descuento": obj.tipo_descuento,
-            "reca_porcentaje": obj.reca_porcentaje,
+            "reca_porcentaje": obj.recargo_porcentaje,
             "hora_inicio": obj.hora_inicio,
             "hora_final": obj.hora_final,
             "hora_jornada": obj.hora_jornada,

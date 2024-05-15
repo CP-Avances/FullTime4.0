@@ -85,6 +85,7 @@ export class EditarTipoComidasComponent implements OnInit {
     else {
       this.GuardarDatos(datosTipoComida);
     }
+    this.ObtenerServicios();
   }
 
   // METODO PARA LIMPIAR FORMULARIO

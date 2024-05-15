@@ -157,7 +157,7 @@ export class EditarHorasExtrasComponent implements OnInit {
       this.primeroFormGroup.patchValue({
         descripcionForm: this.datosHoraExtra[0].descripcion,
         tipoDescuentoForm: this.datosHoraExtra[0].tipo_descuento,
-        recaPorcentajeForm: this.datosHoraExtra[0].reca_porcentaje,
+        recaPorcentajeForm: this.datosHoraExtra[0].recargo_porcentaje,
         horaInicioForm: this.datosHoraExtra[0].hora_inicio,
         horaFinalForm: this.datosHoraExtra[0].hora_final,
         horaJornadaForm: this.datosHoraExtra[0].hora_jornada,
@@ -165,11 +165,11 @@ export class EditarHorasExtrasComponent implements OnInit {
       this.segundoFormGroup.patchValue({
         tipoDiaForm: this.datosHoraExtra[0].tipo_dia,
         codigoForm: parseInt(this.datosHoraExtra[0].codigo),
-        inclAlmuerzoForm: this.datosHoraExtra[0].incl_almuerzo,
+        inclAlmuerzoForm: this.datosHoraExtra[0].minutos_comida,
         tipoFuncionForm: this.datosHoraExtra[0].tipo_funcion
       })
 
-      if (this.datosHoraExtra[0].incl_almuerzo === true) {
+      if (this.datosHoraExtra[0].minutos_comida === true) {
         this.selec1 = true;
       }
       else {
