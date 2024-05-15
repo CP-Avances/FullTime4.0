@@ -237,6 +237,8 @@ export class RegistroComponent implements OnInit {
       usuario: form3.userForm,
       id_rol: form3.rolForm,
       estado: true,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.user.RegistrarUsuario(dataUser).subscribe(data => {
       if (data.message === 'error') {

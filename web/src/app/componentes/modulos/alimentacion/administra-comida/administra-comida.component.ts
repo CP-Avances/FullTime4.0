@@ -19,6 +19,10 @@ export class AdministraComidaComponent implements OnInit {
   selec1: boolean = false;
   selec2: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // VARIABLES DE FORMULARIO
   comidaF = new FormControl('', Validators.required);
 
@@ -36,11 +40,14 @@ export class AdministraComidaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
     this.MostrarDatos();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   nombre: string = '';
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
@@ -73,7 +80,9 @@ export class AdministraComidaComponent implements OnInit {
   InsertarAutorizacion(form: any) {
     let control = {
       admin_comida: form.comidaForm,
-      id_empleado: this.datoEmpleado.idEmpleado
+      id_empleado: this.datoEmpleado.idEmpleado,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restU.RegistrarAdminComida(control).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {

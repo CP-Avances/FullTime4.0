@@ -78,8 +78,12 @@ export class UsuarioService {
   }
 
   // METODO PARA ELIMINAR REGISTROS DISPOSITIVOS
-  EliminarDispositivoMovil(data: any) {
-    return this.http.delete(`${environment.url}/usuarios/delete-registro-dispositivos/${data}`);
+  EliminarDispositivoMovil(data: any, datos: any) {
+    const url = `${environment.url}/usuarios/delete-registro-dispositivos/${data}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
   }
 
   // METODO PARA ENVIAR CORREO CAMBIAR FRASE SEGURIDAD
@@ -94,7 +98,7 @@ export class UsuarioService {
 
 
   /** *********************************************************************************************** **
-   ** **                       SERVICIOS USUARIOS QUE USAN TIMBRE WEB                              ** **           
+   ** **                       SERVICIOS USUARIOS QUE USAN TIMBRE WEB                              ** **
    ** *********************************************************************************************** */
 
   // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB SUPERADMINISTRADOR
@@ -131,7 +135,7 @@ export class UsuarioService {
 
 
   /** *********************************************************************************************** **
-   ** **                       SERVICIOS DE TABLA USUARIO - SUCURSAL                               ** **           
+   ** **                       SERVICIOS DE TABLA USUARIO - SUCURSAL                               ** **
    ** *********************************************************************************************** */
 
   // METODO DE BUSQUEDA DE DATOS DE USUARIO

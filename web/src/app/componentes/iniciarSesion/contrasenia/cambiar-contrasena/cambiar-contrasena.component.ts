@@ -25,6 +25,10 @@ export class CambiarContrasenaComponent implements OnInit {
   NuevaContrasenia = new FormControl('', Validators.maxLength(12));
   ConfirmarContrasenia = new FormControl('', Validators.maxLength(12));
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   public formulario = new FormGroup({
     nPass: this.NuevaContrasenia,
     cPass: this.ConfirmarContrasenia,
@@ -42,6 +46,8 @@ export class CambiarContrasenaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   CompararContrasenia(form: any) {
@@ -76,7 +82,9 @@ export class CambiarContrasenaComponent implements OnInit {
     let clave = md5.appendStr(form.cPass).end();
     let datos = {
       id_empleado: parseInt(this.usuario),
-      contrasena: clave
+      contrasena: clave,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restUser.ActualizarPassword(datos).subscribe(data => {
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {

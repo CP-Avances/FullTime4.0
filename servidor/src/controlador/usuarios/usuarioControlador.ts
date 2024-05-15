@@ -1386,7 +1386,6 @@ class UsuarioControlador {
   // METODO PARA ELIMINAR REGISTROS DE DISPOSITIVOS MOVILES
   public async EliminarDispositivoMovil(req: Request, res: Response) {
     try {
-      // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
       const { user_name, ip } = req.body;
 
       const array = req.params.dispositivo;
@@ -1770,7 +1769,6 @@ class UsuarioControlador {
   // METODO PARA ELIMINAR REGISTROS
   public async EliminarUsuarioSucursal(req: Request, res: Response): Promise<Response> {
     try {
-      // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
       const { user_name, ip } = req.body;
       const id = req.params.id;
 

@@ -251,6 +251,8 @@ export class EditarEmpleadoComponent implements OnInit {
       contrasena: this.usuario[0].contrasena,
       usuario: form3.userForm,
       id_rol: form3.rolForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.user.ActualizarDatos(dataUser).subscribe(data => {
       if (data.message === 'error') {
