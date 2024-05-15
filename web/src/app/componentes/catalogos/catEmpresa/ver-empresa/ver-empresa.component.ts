@@ -211,7 +211,11 @@ export class VerEmpresaComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_sucursal: number) {
-    this.restS.EliminarRegistro(id_sucursal).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.restS.EliminarRegistro(id_sucursal, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });

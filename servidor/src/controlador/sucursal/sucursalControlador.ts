@@ -164,7 +164,6 @@ class SucursalControlador {
   // METODO PARA ELIMINAR REGISTRO
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
       const { user_name, ip } = req.body;
 
       const id = req.params.id;

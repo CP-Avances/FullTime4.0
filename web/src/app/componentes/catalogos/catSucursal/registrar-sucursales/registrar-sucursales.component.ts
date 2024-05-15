@@ -35,6 +35,10 @@ export class RegistrarSucursalesComponent implements OnInit {
   ver_pais: boolean = true;
   sucursal: boolean = true;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   nombreContinenteF = new FormControl('', Validators.required);
   idProvinciaF = new FormControl('', [Validators.required]);
   nombrePaisF = new FormControl('', Validators.required);
@@ -67,6 +71,9 @@ export class RegistrarSucursalesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerContinentes();
   }
 
@@ -222,7 +229,9 @@ export class RegistrarSucursalesComponent implements OnInit {
         let sucursal = {
           nombre: form.sucursalNombreForm,
           id_ciudad: ciudad_id,
-          id_empresa: empresa_id
+          id_empresa: empresa_id,
+          user_name: this.user_name,
+          ip: this.ip,
         };
         this.restSucursal.RegistrarSucursal(sucursal).subscribe(info => {
           this.habilitarprogress = false;

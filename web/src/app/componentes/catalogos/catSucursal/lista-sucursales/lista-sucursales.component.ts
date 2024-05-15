@@ -26,6 +26,7 @@ import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { environment } from 'src/environments/environment';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-lista-sucursales',
@@ -68,6 +69,11 @@ export class ListaSucursalesComponent implements OnInit {
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
   hipervinculo: string = environment.url
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
+
   // // VARIABLES PROGRESS SPINNER
   // progreso: boolean = false;
   // color: ThemePalette = 'primary';
@@ -88,6 +94,9 @@ export class ListaSucursalesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerSucursal();
     this.ObtenerColores();
@@ -190,7 +199,11 @@ export class ListaSucursalesComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_sucursal: number) {
-    this.rest.EliminarRegistro(id_sucursal).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.rest.EliminarRegistro(id_sucursal, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -503,7 +516,9 @@ export class ListaSucursalesComponent implements OnInit {
     var data = {
       nombre: '',
       id_ciudad: '',
-      id_empresa: ''
+      id_empresa: '',
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     if (this.listSucursalesCorrectas.length > 0) {

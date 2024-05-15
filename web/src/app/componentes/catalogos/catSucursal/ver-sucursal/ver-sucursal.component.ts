@@ -33,6 +33,10 @@ export class VerSucursalComponent implements OnInit {
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public componentes: ListaSucursalesComponent,
     public componentee: VerEmpresaComponent,
@@ -44,6 +48,9 @@ export class VerSucursalComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.CargarDatosSucursal();
     this.ListaDepartamentos();
   }
@@ -71,7 +78,7 @@ export class VerSucursalComponent implements OnInit {
     })
   }
 
-  // ORDENAR LOS DATOS SEGÚN EL ID 
+  // ORDENAR LOS DATOS SEGÚN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
       if (a.nombre < b.nombre) {
@@ -85,7 +92,7 @@ export class VerSucursalComponent implements OnInit {
     array.sort(compare);
   }
 
-  // VENTANA PARA EDITAR DATOS DE REGISTRO SELECCIONADO 
+  // VENTANA PARA EDITAR DATOS DE REGISTRO SELECCIONADO
   EditarDatosSucursal(datosSeleccionados: any): void {
     console.log(datosSeleccionados);
     this.ventana.open(EditarSucursalComponent, { width: '650px', data: datosSeleccionados })
@@ -98,7 +105,7 @@ export class VerSucursalComponent implements OnInit {
       });
   }
 
-  // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO 
+  // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO
   AbrirVentanaEditarDepartamento(departamento: any): void {
     this.ventana.open(EditarDepartamentoComponent,
       { width: '400px', data: { data: departamento, establecimiento: true } })
@@ -107,7 +114,7 @@ export class VerSucursalComponent implements OnInit {
       });
   }
 
-  // VENTANA PARA REGISTRO DE DEPARTAMENTO 
+  // VENTANA PARA REGISTRO DE DEPARTAMENTO
   AbrirVentanaRegistrarDepartamento(): void {
     this.ventana.open(RegistroDepartamentoComponent,
       { width: '350px', data: this.idSucursal }).
@@ -116,9 +123,13 @@ export class VerSucursalComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_dep: number) {
-    this.rest.EliminarRegistro(id_dep).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.rest.EliminarRegistro(id_dep, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
