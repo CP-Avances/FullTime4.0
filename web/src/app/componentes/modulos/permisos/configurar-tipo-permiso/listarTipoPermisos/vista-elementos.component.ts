@@ -119,6 +119,7 @@ export class VistaElementosComponent implements OnInit {
 
   // METODO DE BUSQUEDA DE TIPOS DE PERMISOS
   ObtenerTipoPermiso() {
+    this.tipoPermiso=[];
     this.rest.BuscarTipoPermiso().subscribe(datos => {
       this.tipoPermiso = datos;
     });

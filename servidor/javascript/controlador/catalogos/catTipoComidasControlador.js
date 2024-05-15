@@ -53,7 +53,7 @@ class TipoComidasControlador {
             const { id } = req.params;
             const TIPO_COMIDAS = yield database_1.default.query(`
             SELECT ctc.id, ctc.nombre, ctc.id_comida, ctc.hora_inicio, ctc.hora_fin, tc.nombre AS tipo 
-            FROM ma_horario_comidas AS ctc, ma_cat_comidas AS tc +
+            FROM ma_horario_comidas AS ctc, ma_cat_comidas AS tc 
             WHERE ctc.id_comida = tc.id AND ctc.id = $1
             `, [id]);
             if (TIPO_COMIDAS.rowCount > 0) {
