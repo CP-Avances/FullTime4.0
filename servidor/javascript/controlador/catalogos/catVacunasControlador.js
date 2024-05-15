@@ -69,8 +69,8 @@ class VacunaControlador {
             try {
                 const { id, nombre } = req.body;
                 var VERIFICAR_VACUNA = yield database_1.default.query(`
-                SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1 
-                `, [nombre.toUpperCase()]);
+                SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1 AND NOT id = $2
+                `, [nombre.toUpperCase(), id]);
                 if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
                     const vacunaEditar = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
                     const response = yield database_1.default.query(`

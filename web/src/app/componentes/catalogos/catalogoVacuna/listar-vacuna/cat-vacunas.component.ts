@@ -100,24 +100,19 @@ export class CatVacunasComponent implements OnInit {
     })
   }
 
-  formato_fecha: string = 'DD/MM/YYYY';
-
-
-
+  // METODO PARA LISTAR TIPO VACUNAS
   ObtenerVacuna() {
     this.vacunas = [];
-
     this.rest.listaVacuna().subscribe(res => {
       this.vacunas = res
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Listado de Vacunas', {
         timeOut: 4000,
       });
     });
-
   }
 
+  // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
     this.Datos_vacunas = null;
     this.archivoSubido = [];
@@ -130,8 +125,8 @@ export class CatVacunasComponent implements OnInit {
     this.mostrarbtnsubir = false;
   }
 
-  AbrirVentanaRegistrarDiscapacidad(): void {
-
+  // METODO PARA ABRI VENTANA VACUNA
+  AbrirVentanaRegistrarVacuna(): void {
     this.ventana.open(TipoVacunaComponent, { width: '500px' })
       .afterClosed().subscribe(items => {
         this.ngOnInit();
@@ -143,14 +138,12 @@ export class CatVacunasComponent implements OnInit {
     this.vacunasEliminar = [];
   }
 
-  // METODO PARA EDITAR MODALIDAD LABORAL
+  // METODO PARA EDITAR TIPO VACUNA
   AbrirEditar(item_modalidad: any): void {
-
     this.ventana.open(EditarVacunasComponent, { width: '450px', data: item_modalidad })
       .afterClosed().subscribe(items => {
         this.ngOnInit();
       });
-
   }
 
   // CONTROL DE PAGINACION
@@ -402,13 +395,13 @@ export class CatVacunasComponent implements OnInit {
     return `${this.selectionVacuna.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
   }
 
-
-  ConfirmarDelete(discapacidad: any) {
+  // METODO PARA CONFIRMAR ELIMINAR REGISTRO
+  ConfirmarDelete(vacuna: any) {
     const mensaje = 'eliminar';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.rest.eliminar(discapacidad.id).subscribe(res => {
+          this.rest.eliminar(vacuna.id).subscribe(res => {
             if (res.message === 'error') {
               this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
                 timeOut: 6000,
@@ -430,6 +423,7 @@ export class CatVacunasComponent implements OnInit {
       });
   }
 
+  // METODO PARA REALIZAR UNA ELIMINACION MULTIPLE
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
@@ -457,9 +451,9 @@ export class CatVacunasComponent implements OnInit {
       });
     }
     );
-
   }
 
+  // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {

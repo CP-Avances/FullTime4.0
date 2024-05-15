@@ -474,7 +474,7 @@ export class CatTipoCargosComponent {
   data: any = [];
   ExportToXML() {
     this.OrdenarDatos(this.listaTipoCargos);
-    var objeto;
+    var objeto: any;
     var arregloFeriados: any = [];
     this.listaTipoCargos.forEach(obj => {
       objeto = {

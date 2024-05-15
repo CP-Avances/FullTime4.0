@@ -7,7 +7,8 @@
             </button>
             <span>{{h.nombre.toUpperCase()}}</span>
             <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                (click)="AbrirVentanaEditar(h)">
+                (click)="AbrirVentanaEditar(h)"
+                *ngIf="h.default_ != 'DL' && h.default_ != 'DFD' && h.default_ != 'DHA'">
                 Editar
             </button>
         </div>
@@ -55,7 +56,8 @@
                 </div>
                 <div style="text-align: right;">
                     <mat-icon (click)="CalcularHorasTrabaja()" style="margin: 0px 10px; cursor: pointer; color: blue;"
-                        matTooltip="Verificar que detalle de horario se encuentre acorde a los datos de horario registrados.">
+                        matTooltip="Verificar que detalle de horario se encuentre acorde a los datos de horario registrados."
+                        *ngIf="h.default_ != 'DL' && h.default_ != 'DFD' && h.default_ != 'DHA'">
                         calculate
                     </mat-icon>
                 </div>
@@ -66,7 +68,8 @@
                     <div id="titulo">
                         <span>DETALLES DE HORARIO</span>
                         <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="AbrirVentanaDetalles(h)">
+                            (click)="AbrirVentanaDetalles(h)"
+                            *ngIf="h.default_ != 'DL' && h.default_ != 'DFD' && h.default_ != 'DHA'">
                             Registrar detalle
                         </button>
                     </div>
@@ -76,11 +79,14 @@
                                 <tr style="text-align: center;">
                                     <th scope="col" rowspan="2">Orden</th>
                                     <th scope="col" rowspan="2">Hora</th>
-                                    <th scope="col" rowspan="2">Minutos espera</th>
+                                    <th scope="col" rowspan="2">Tolerancia</th>
                                     <th scope="col" rowspan="2">Acción</th>
                                     <th scope="col" rowspan="2">Otro día</th>
                                     <th scope="col" colspan="2">APROXIMACIÓN</th>
-                                    <th scope="col" rowspan="2">Acciones</th>
+                                    <th scope="col" rowspan="2"
+                                        *ngIf="h.default_ != 'DL' && h.default_ != 'DFD' && h.default_ != 'DHA'">
+                                        Acciones
+                                    </th>
                                 </tr>
                                 <tr style="text-align: center;">
                                     <th scope="col">Minutos antes</th>
@@ -99,7 +105,7 @@
                                     <td *ngIf="dh.tercer_dia === true">SI</td>
                                     <td>{{dh.minutos_antes}}</td>
                                     <td>{{dh.minutos_despues}}</td>
-                                    <td>
+                                    <td *ngIf="h.default_ != 'DL' && h.default_ != 'DFD' && h.default_ != 'DHA'">
                                         <i id="editarI" (click)="AbrirVentanaEditarDetalle(dh)" matSuffix
                                             matTooltipPosition="right" matTooltip="Modificar datos de este registro."
                                             class="fas fa-edit">

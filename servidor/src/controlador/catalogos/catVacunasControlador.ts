@@ -65,9 +65,9 @@ class VacunaControlador {
 
             var VERIFICAR_VACUNA = await pool.query(
                 `
-                SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1 
+                SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1 AND NOT id = $2
                 `
-                , [nombre.toUpperCase()])
+                , [nombre.toUpperCase(), id])
 
 
             if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {

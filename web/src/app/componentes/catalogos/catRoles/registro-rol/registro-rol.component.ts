@@ -115,7 +115,6 @@ export class RegistroRolComponent implements OnInit {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
-      this.validar.Auditar('app-web', 'cg_roles', '', this.data_nueva, 'INSERT');
       this.salir = true;
       this.CerrarVentana();
     });

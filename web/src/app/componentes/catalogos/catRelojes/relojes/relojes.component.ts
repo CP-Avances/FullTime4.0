@@ -34,7 +34,7 @@ export class RelojesComponent implements OnInit {
   // PRIMER FORMULARIO
   ipF = new FormControl('', [Validators.required, Validators.pattern("[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}")]);
   nombreF = new FormControl('', [Validators.required, Validators.minLength(4)]);
-  puertoF = new FormControl('', [Validators.required, Validators.pattern('[0-9]{4}')]);
+  puertoF = new FormControl('', [Validators.required]);
   codigoF = new FormControl('', Validators.required);
   numeroF = new FormControl('', [Validators.required]);
   funcionesF = new FormControl('', [Validators.required]);
@@ -47,7 +47,7 @@ export class RelojesComponent implements OnInit {
   serieF = new FormControl('', Validators.minLength(4));
   modeloF = new FormControl('', [Validators.minLength(3)]);
   fabricanteF = new FormControl('', [Validators.minLength(4)]);
-  contraseniaF = new FormControl('', [Validators.minLength(4)]);
+  contraseniaF = new FormControl('', [Validators.minLength(1)]);
   idFabricacionF = new FormControl('', [Validators.minLength(4)]);
 
   constructor(
@@ -120,7 +120,7 @@ export class RelojesComponent implements OnInit {
 
       // PRIMER FORMULARIO
       ip: form1.ipForm,
-      id: form1.codigoForm,
+      codigo: form1.codigoForm,
       nombre: form1.nombreForm,
       puerto: form1.puertoForm,
       id_sucursal: form1.idSucursalForm,
@@ -138,6 +138,7 @@ export class RelojesComponent implements OnInit {
       id_fabricacion: form2.idFabricacionForm,
     };
     this.rest.CrearNuevoReloj(reloj).subscribe(response => {
+      //--console.log('ver response', response)
       if (response.message === 'guardado') {
         this.LimpiarCampos();
         this.VerDatosReloj(response.reloj.id);
@@ -145,9 +146,15 @@ export class RelojesComponent implements OnInit {
           timeOut: 6000,
         })
       }
-      else {
-        this.toastr.error('Verificar que el código de reloj y la ip del dispositivo no se encuentren registrados.',
-          'Ups!!! algo salio mal..', {
+      else if (response.message === 'existe') {
+        this.toastr.warning('Código ingresado ya existe en el sistema.',
+          'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        })
+      }
+      else if (response.message === 'error') {
+        this.toastr.warning('IP ingresada ya existe en el sistema.',
+          'Ups!!! algo salio mal.', {
           timeOut: 6000,
         })
       }
@@ -158,13 +165,6 @@ export class RelojesComponent implements OnInit {
   ObtenerMensajeErrorIp() {
     if (this.ipF.hasError('pattern')) {
       return 'Ingresar IP Ej: 0.0.0.0';
-    }
-  }
-
-  // MENSAJES DE ERRORES
-  ObtenerMensajeErrorPuerto() {
-    if (this.puertoF.hasError('pattern')) {
-      return 'Ingresar 4 números.';
     }
   }
 

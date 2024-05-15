@@ -53,16 +53,25 @@ class FeriadosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fecha, descripcion, fec_recuperacion } = req.body;
-                const response = yield database_1.default.query(`
-                INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
-                VALUES ($1, $2, $3) RETURNING *
-                `, [fecha, descripcion, fec_recuperacion]);
-                const [feriado] = response.rows;
-                if (feriado) {
-                    return res.status(200).jsonp(feriado);
+                const busqueda = yield database_1.default.query(`
+                SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1
+                `, [descripcion.toUpperCase()]);
+                const [nombres] = busqueda.rows;
+                if (nombres) {
+                    return res.jsonp({ message: 'existe', status: '300' });
                 }
                 else {
-                    return res.status(404).jsonp({ message: 'error' });
+                    const response = yield database_1.default.query(`
+                    INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
+                    VALUES ($1, $2, $3) RETURNING *
+                    `, [fecha, descripcion, fec_recuperacion]);
+                    const [feriado] = response.rows;
+                    if (feriado) {
+                        return res.status(200).jsonp(feriado);
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'error' });
+                    }
                 }
             }
             catch (error) {
@@ -90,11 +99,20 @@ class FeriadosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fecha, descripcion, fec_recuperacion, id } = req.body;
-                yield database_1.default.query(`
-                UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
-                WHERE id = $4
-                `, [fecha, descripcion, fec_recuperacion, id]);
-                res.jsonp({ message: 'Registro actualizado.' });
+                const busqueda = yield database_1.default.query(`
+                SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1 AND NOT id = $2
+                `, [descripcion.toUpperCase(), id]);
+                const [nombres] = busqueda.rows;
+                if (nombres) {
+                    return res.jsonp({ message: 'existe', status: '300' });
+                }
+                else {
+                    yield database_1.default.query(`
+                    UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
+                    WHERE id = $4
+                    `, [fecha, descripcion, fec_recuperacion, id]);
+                    return res.jsonp({ message: 'ok' });
+                }
             }
             catch (error) {
                 return res.jsonp({ message: 'error' });

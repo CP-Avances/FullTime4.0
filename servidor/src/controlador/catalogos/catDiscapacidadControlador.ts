@@ -48,7 +48,7 @@ class DiscapacidadControlador {
                     return res.status(404).jsonp({ message: 'Ups!!! algo salio mal.', status: '400' })
                 }
             } else {
-                return res.jsonp({ message: 'Tipo discapacidad registrada ya existe en el sistema.', status: '300' })
+                return res.jsonp({ message: 'Tipo discapacidad ya existe en el sistema.', status: '300' })
             }
         }
         catch (error) {
@@ -62,10 +62,9 @@ class DiscapacidadControlador {
             const { id, nombre } = req.body;
             var VERIFICAR_DISCAPACIDAD = await pool.query(
                 `
-                SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1 
+                SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1 AND NOT id = $2
                 `
-                , [nombre.toUpperCase()])
-
+                , [nombre.toUpperCase(), id])
 
             if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
                 const nombreConFormato = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
@@ -82,7 +81,7 @@ class DiscapacidadControlador {
                     return res.status(404).jsonp({ message: 'Ups!!! algo salio mal.', status: '400' })
                 }
             } else {
-                return res.jsonp({ message: 'Tipo discapacidad registrada ya existe en el sistema.', status: '300' })
+                return res.jsonp({ message: 'Tipo discapacidad ya existe en el sistema.', status: '300' })
             }
         }
         catch (error) {

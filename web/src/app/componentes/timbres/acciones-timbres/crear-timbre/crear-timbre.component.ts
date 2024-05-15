@@ -144,13 +144,13 @@ export class CrearTimbreComponent implements OnInit {
     let timbre = {
       fec_hora_timbre: form.fechaForm.toJSON().split('T')[0] + 'T' + form.horaForm + ':00',
       tecl_funcion: this.TeclaFuncion(form.accionForm),
-      observacion: 'Timbre creado por Admin. ' + this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido,
+      observacion: 'Timbre creado por ' + this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido,
       id_empleado: '',
       id_reloj: 98,
       longitud: this.longitud,
       latitud: this.latitud,
       accion: form.accionForm,
-      tipo: 'admin',
+      tipo: 'administrar',
     }
 
     if (this.data.length === undefined) {
@@ -169,7 +169,6 @@ export class CrearTimbreComponent implements OnInit {
         this.restTimbres.RegistrarTimbreAdmin(timbre).subscribe(res => {
           // METODO PARA AUDITAR TIMBRES
           this.data_nueva.id_empleado = obj.id;
-          this.validar.Auditar('app-web', 'timbres', '', this.data_nueva, 'INSERT');
           this.contador = this.contador + 1;
           if (this.contador === this.data.length) {
             this.ventana.close();

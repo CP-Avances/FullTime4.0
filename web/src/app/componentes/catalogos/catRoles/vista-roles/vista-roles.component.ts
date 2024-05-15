@@ -395,7 +395,6 @@ export class VistaRolesComponent implements OnInit {
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
-        this.validar.Auditar('app-web', 'cg_roles', rol, '', 'DELETE');
         this.ObtenerRoles();
       }
     });
