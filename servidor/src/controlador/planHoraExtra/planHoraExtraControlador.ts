@@ -397,7 +397,6 @@ class PlanHoraExtraControlador {
   // ELIMINAR REGISTRO DE PLANIFICACION HORAS EXTRAS
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
       const { user_name, ip } = req.body;
       const id = req.params.id;
 
@@ -454,7 +453,6 @@ class PlanHoraExtraControlador {
   // ELIMINAR PLANIFICACION DE UN USUARIO ESPECIFICO
   public async EliminarPlanEmpleado(req: Request, res: Response): Promise<Response> {
     try {
-      // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
       const { user_name, ip } = req.body;
       const id = req.params.id;
       const id_empleado = req.params.id_empleado;

@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
 import { PlanHoraExtraService } from 'src/app/servicios/planHoraExtra/plan-hora-extra.service';
+import { use } from 'echarts';
 
 interface Orden {
   valor: number
@@ -182,6 +183,8 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
   EditarEstadoPlan(id_hora, id_departamento, usuario_solicita, estado_hora) {
     let datosHorasExtras = {
       estado: estado_hora,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restPlanH.EditarEstado(id_hora, datosHorasExtras).subscribe(res => {
       this.resEstado = [res];

@@ -2236,6 +2236,11 @@ export class VerEmpleadoComponent implements OnInit {
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO DE PLANIFICACIÓN
   EliminarPlanEmpleado(id_plan: number, id_empleado: number, datos: any) {
 
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
     // LECTURA DE DATOS DE USUARIO
     let usuario = '<tr><th>' + datos.nombre +
       '</th><th>' + datos.cedula + '</th></tr>';
@@ -2247,7 +2252,7 @@ export class VerEmpleadoComponent implements OnInit {
     let h_inicio = this.validar.FormatearHora(datos.hora_inicio, this.formato_hora);
     let h_fin = this.validar.FormatearHora(datos.hora_fin, this.formato_hora);
 
-    this.plan_hora.EliminarPlanEmpleado(id_plan, id_empleado).subscribe(res => {
+    this.plan_hora.EliminarPlanEmpleado(id_plan, id_empleado, data).subscribe(res => {
       this.NotificarPlanHora(desde, hasta, h_inicio, h_fin, id_empleado);
       this.EnviarCorreoPlanH(datos, cuenta_correo, usuario, desde, hasta, h_inicio, h_fin);
       this.toastr.error('Registro eliminado.', '', {
@@ -2266,6 +2271,8 @@ export class VerEmpleadoComponent implements OnInit {
       mensaje: 'Planificación de horas extras eliminada desde ' +
         desde + ' hasta ' +
         hasta + ' horario de ' + h_inicio + ' a ' + h_fin,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.plan_hora.EnviarNotiPlanificacion(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);
