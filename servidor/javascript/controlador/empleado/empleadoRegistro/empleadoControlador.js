@@ -1574,6 +1574,7 @@ class EmpleadoControlador {
                 //const md5 = new Md5();
                 //const contrasena = md5.appendStr(data.contrasena).end();
                 const contrasena = rsa_keys_service_1.default.encriptarLogin(data.contrasena.toString());
+                console.log('data1: ', rsa_keys_service_1.default.desencriptarDatos('pRWG5vWQFKor0xyavP1kIQ=='));
                 // Datos que se leen de la plantilla ingresada
                 const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, longitud, latitud, telefono, nacionalidad, usuario, rol } = data;
                 //Obtener id del estado_civil

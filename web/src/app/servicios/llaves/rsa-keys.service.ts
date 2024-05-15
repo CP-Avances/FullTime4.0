@@ -26,7 +26,7 @@ export class RsaKeysService {
 
     public desencriptarDatos(passwordEncrypted: string): string{
         //Desencriptacion sin key encriptada, mas eficiente para datos que no sean passwords
-        return CryptoJS.AES.decrypt(passwordEncrypted, this.key, { iv: this.iv }).toString(CryptoJS.enc.Utf8);
+        return CryptoJS.AES.decrypt(passwordEncrypted, frasecontrasenia, { iv: this.iv }).toString(CryptoJS.enc.Utf8);
     }
 
     public encriptarLogin(password: string): string{

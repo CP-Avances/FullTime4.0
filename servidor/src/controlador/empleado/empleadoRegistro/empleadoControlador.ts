@@ -3,7 +3,6 @@ import { ObtenerRutaUsuario, ObtenerRutaVacuna, ObtenerRutaPermisos, ObtenerRuta
 import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import { Md5 } from 'ts-md5';
 import moment from 'moment';
 import excel from 'xlsx';
 import pool from '../../../database';
@@ -1132,7 +1131,6 @@ class EmpleadoControlador {
       }
 
       // Encriptar contraseña
-      //var contrasena = md5.appendStr(data.contrasena).end()?.toString();
       var contrasena = FUNCIONES_LLAVES.encriptarLogin(data.contrasena.toString());
 
       // Datos que se leen de la plantilla ingresada
@@ -1744,9 +1742,9 @@ class EmpleadoControlador {
       }
 
       // Encriptar contraseña
-      //const md5 = new Md5();
-      //const contrasena = md5.appendStr(data.contrasena).end();
       const contrasena = FUNCIONES_LLAVES.encriptarLogin(data.contrasena.toString());
+
+      console.log('data1: ', FUNCIONES_LLAVES.desencriptarDatos('pRWG5vWQFKor0xyavP1kIQ=='));
 
       // Datos que se leen de la plantilla ingresada
       const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, longitud, latitud,
