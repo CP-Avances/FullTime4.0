@@ -68,20 +68,32 @@ class ModalidaLaboralControlador {
             console.log('id: ', id, 'descripcion: ', modalidad);
             // Dar formato a la palabra de modalidad
             const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
-            const response: QueryResult = await pool.query(
+            const modalExiste = await pool.query(
                 `
-                UPDATE e_cat_modalidad_trabajo SET descripcion = $2
-                WHERE id = $1 RETURNING *
+                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
                 `
-                , [id, modali]);
+                , [modali.toUpperCase()]);
 
-            const [modalidadLaboral] = response.rows;
+            console.log('modalidad: ',modalExiste.rows[0]);
+            if(modalExiste.rows[0] != undefined && modalExiste.rows[0].descripcion != '' && modalExiste.rows[0].descripcion != null){
+                return res.status(200).jsonp({ message: 'Ya existe la modalidad laboral', status: '300' })
+            }else{
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE e_cat_modalidad_trabajo SET descripcion = $2
+                    WHERE id = $1 RETURNING *
+                    `
+                    , [id, modali]);
+    
+                const [modalidadLaboral] = response.rows;
 
-            if (modalidadLaboral) {
-                return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' })
-            } else {
-                return res.status(404).jsonp({ message: 'No se pudo actualizar', status: '400' })
+                if (modalidadLaboral) {
+                    return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' })
+                } else {
+                    return res.status(404).jsonp({ message: 'No se pudo actualizar', status: '400' })
+                }
             }
+
         }
         catch (error) {
             return res.status(500).jsonp({ message: 'error', status: '500' });

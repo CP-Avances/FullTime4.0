@@ -515,6 +515,9 @@ class ContratoEmpleadoControlador {
                                                     SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
                                                     `, [valor.modalida_la.toUpperCase()]);
                                                     if (VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != '') {
+                                                        if ((0, moment_1.default)(valor.fecha_ingreso).format('YYYY-MM-DD') >= (0, moment_1.default)(valor.fecha_salida).format('YYYY-MM-DD')) {
+                                                            valor.observacion = 'La fecha de ingreso no puede ser menor o igual a la fecha salida';
+                                                        }
                                                     }
                                                     else {
                                                         valor.observacion = 'Modalidad Laboral no existe en el sistema';
@@ -594,7 +597,7 @@ class ContratoEmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const plantilla = req.body;
             console.log('datos contrato: ', plantilla);
-            var contador = 0;
+            var contador = 1;
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                 console.log('data: ', data);
                 // Datos que se guardaran de la plantilla ingresada
@@ -629,6 +632,10 @@ class ContratoEmpleadoControlador {
                 console.log('id_empleado: ', id_empleado);
                 console.log('id_regimen: ', id_regimen);
                 console.log('id_tipo_contrato: ', id_tipo_contrato);
+                console.log('fecha ingreso: ', fecha_ingreso);
+                console.log('fecha final: ', fecha_salida);
+                console.log('vacaciones: ', vaca_controla);
+                console.log('asistencias: ', asis_controla);
                 // Registro de los datos de contratos
                 const response = yield database_1.default.query(`
                 INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
@@ -637,6 +644,7 @@ class ContratoEmpleadoControlador {
                 `, [id_empleado, fecha_ingreso, fecha_salida, vaca_controla, asis_controla, id_regimen,
                     id_tipo_contrato]);
                 const [contrato] = response.rows;
+                console.log(contador, ' == ', plantilla.length);
                 if (contador === plantilla.length) {
                     if (contrato) {
                         return res.status(200).jsonp({ message: 'ok' });

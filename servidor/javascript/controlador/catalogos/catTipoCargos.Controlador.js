@@ -90,16 +90,25 @@ class TiposCargosControlador {
                 console.log('id: ', id, 'cargo: ', cargo);
                 // Dar formato a la palabra de cargo
                 const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
-                const response = yield database_1.default.query(`
+                const tipoCargoExiste = yield database_1.default.query(`
+                SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+                `, [cargo.toUpperCase()]);
+                console.log('modalidad: ', tipoCargoExiste.rows[0]);
+                if (tipoCargoExiste.rows[0] != undefined && tipoCargoExiste.rows[0].cargo != '' && tipoCargoExiste.rows[0].cargo != null) {
+                    return res.status(200).jsonp({ message: 'Ya existe el cargo', status: '300' });
+                }
+                else {
+                    const response = yield database_1.default.query(`
                 UPDATE e_cat_tipo_cargo SET cargo = $2
                 WHERE id = $1 RETURNING *
                 `, [id, tipoCargo]);
-                const [TipoCargos] = response.rows;
-                if (TipoCargos) {
-                    return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' });
-                }
-                else {
-                    return res.status(404).jsonp({ message: 'No se pudo actualizar', status: '400' });
+                    const [TipoCargos] = response.rows;
+                    if (TipoCargos) {
+                        return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' });
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'No se pudo actualizar', status: '400' });
+                    }
                 }
             }
             catch (error) {

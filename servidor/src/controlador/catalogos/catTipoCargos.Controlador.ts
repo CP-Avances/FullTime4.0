@@ -84,19 +84,30 @@ class TiposCargosControlador {
             console.log('id: ', id, 'cargo: ', cargo);
             // Dar formato a la palabra de cargo
             const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
-            const response: QueryResult = await pool.query(
+            const tipoCargoExiste = await pool.query(
+                `
+                SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+                `
+                , [cargo.toUpperCase()]);
+
+            console.log('modalidad: ',tipoCargoExiste.rows[0]);
+            if(tipoCargoExiste.rows[0] != undefined && tipoCargoExiste.rows[0].cargo != '' && tipoCargoExiste.rows[0].cargo != null){
+                return res.status(200).jsonp({ message: 'Ya existe el cargo', status: '300' })
+            }else{
+                const response: QueryResult = await pool.query(
                 `
                 UPDATE e_cat_tipo_cargo SET cargo = $2
                 WHERE id = $1 RETURNING *
                 `
-                , [id, tipoCargo]);
+                    , [id, tipoCargo]);
 
-            const [TipoCargos] = response.rows;
+                const [TipoCargos] = response.rows;
 
-            if (TipoCargos) {
-                return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' })
-            } else {
-                return res.status(404).jsonp({ message: 'No se pudo actualizar', status: '400' })
+                if (TipoCargos) {
+                    return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' })
+                } else {
+                    return res.status(404).jsonp({ message: 'No se pudo actualizar', status: '400' })
+                }
             }
         }
         catch (error) {

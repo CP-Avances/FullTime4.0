@@ -528,7 +528,7 @@ class EmpleadoCargosControlador {
         if (valor.observacion == 'no registrado') {
           var VERIFICAR_CEDULA = await pool.query(
             `
-            SELECT * FROM datos_actuales_empleado WHERE cedula = $1
+            SELECT * FROM eu_empleados WHERE cedula = $1
             `
             , [valor.cedula]);
           if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
@@ -547,7 +547,7 @@ class EmpleadoCargosControlador {
                 ($2  BETWEEN fecha_inicio and fecha_final or $3 BETWEEN fecha_inicio and fecha_final or 
                 fecha_inicio BETWEEN $2 AND $3)
                 `
-                , [VERIFICAR_CEDULA.rows[0].id_contrato, valor.fecha_inicio, valor.fecha_final])
+                , [ID_CONTRATO.rows[0].id_contrato, valor.fecha_inicio, valor.fecha_final])
 
               if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
                 valor.observacion = 'Existe un cargo vigente en esas fechas'
@@ -570,7 +570,9 @@ class EmpleadoCargosControlador {
                       `
                       , [valor.cargo.toUpperCase()])
                     if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-
+                      if(moment(valor.fecha_inicio).format('YYYY-MM-DD') >= moment(valor.fecha_final).format('YYYY-MM-DD')){
+                        valor.observacion = 'La fecha de inicio no puede ser menor o igual a la fecha salida'
+                      }
                     } else {
                       valor.observacion = 'Cargo no existe en el sistema'
                     }
@@ -659,14 +661,13 @@ class EmpleadoCargosControlador {
 
   public async CargarPlantilla_cargos(req: Request, res: Response): Promise<void> {
     const plantilla = req.body;
-    console.log('datos contrato: ', plantilla);
     var contador = 1;
     plantilla.forEach(async (data: any) => {
       console.log('data: ', data);
 
       // Datos que se guardaran de la plantilla ingresada
       const { item, cedula, departamento, fecha_inicio, fecha_final, sucursal, sueldo,
-        cargo, hora_traba, jefe } = data;
+        cargo, hora_trabaja, jefe } = data;
 
       const ID_EMPLEADO: any = await pool.query(
         `
@@ -675,9 +676,9 @@ class EmpleadoCargosControlador {
         , [cedula]);
       const ID_CONTRATO: any = await pool.query(
         `
-        SELECT id FROM eu_empleado_contratos WHERE id_empleado = $1
+        SELECT id_contrato FROM datos_contrato_actual WHERE cedula = $1
         `
-        , [ID_EMPLEADO.rows[0].id]);
+        , [cedula]);
       const ID_DEPARTAMENTO: any = await pool.query(
         `
         SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
@@ -702,19 +703,19 @@ class EmpleadoCargosControlador {
       }
 
       var id_empleado = ID_EMPLEADO.rows[0].id;
-      var id_contrato = ID_CONTRATO.rows[0].id;
+      var id_contrato = ID_CONTRATO.rows[0].id_contrato;
       var id_departamento = ID_DEPARTAMENTO.rows[0].id;
       var id_sucursal = ID_SUCURSAL.rows[0].id;
       var id_cargo = ID_TIPO_CARGO.rows[0].id
 
       console.log('id_empleado: ', ID_EMPLEADO.rows[0].id);
-      console.log('id_empleado: ', ID_CONTRATO.rows[0].id);
+      console.log('id_empleado: ', ID_CONTRATO.rows[0].id_contrato);
       console.log('fecha inicio: ', fecha_inicio);
       console.log('fecha final: ', fecha_final);
       console.log('departamento: ', ID_DEPARTAMENTO.rows[0].id);
       console.log('sucursal: ', ID_SUCURSAL.rows[0].id);
       console.log('sueldo: ', sueldo);
-      console.log('hora_trabaja: ', hora_traba);
+      console.log('hora_trabaja: ', hora_trabaja);
       console.log('tipo cargo: ', ID_TIPO_CARGO.rows[0].id);
       console.log('Jefe: ', Jefe);
 
@@ -726,10 +727,11 @@ class EmpleadoCargosControlador {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
         `
         , [id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal, sueldo, id_cargo,
-          hora_traba, Jefe]);
+          hora_trabaja, Jefe]);
 
       const [cargos] = response.rows;
 
+      console.log(contador,' == ', plantilla.length);
       if (contador === plantilla.length) {
         if (cargos) {
           return res.status(200).jsonp({ message: 'ok' })

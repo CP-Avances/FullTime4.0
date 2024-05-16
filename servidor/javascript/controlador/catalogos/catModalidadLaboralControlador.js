@@ -75,16 +75,25 @@ class ModalidaLaboralControlador {
                 console.log('id: ', id, 'descripcion: ', modalidad);
                 // Dar formato a la palabra de modalidad
                 const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
-                const response = yield database_1.default.query(`
-                UPDATE e_cat_modalidad_trabajo SET descripcion = $2
-                WHERE id = $1 RETURNING *
-                `, [id, modali]);
-                const [modalidadLaboral] = response.rows;
-                if (modalidadLaboral) {
-                    return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' });
+                const modalExiste = yield database_1.default.query(`
+                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                `, [modali.toUpperCase()]);
+                console.log('modalidad: ', modalExiste.rows[0]);
+                if (modalExiste.rows[0] != undefined && modalExiste.rows[0].descripcion != '' && modalExiste.rows[0].descripcion != null) {
+                    return res.status(200).jsonp({ message: 'Ya existe la modalidad laboral', status: '300' });
                 }
                 else {
-                    return res.status(404).jsonp({ message: 'No se pudo actualizar', status: '400' });
+                    const response = yield database_1.default.query(`
+                    UPDATE e_cat_modalidad_trabajo SET descripcion = $2
+                    WHERE id = $1 RETURNING *
+                    `, [id, modali]);
+                    const [modalidadLaboral] = response.rows;
+                    if (modalidadLaboral) {
+                        return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' });
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'No se pudo actualizar', status: '400' });
+                    }
                 }
             }
             catch (error) {

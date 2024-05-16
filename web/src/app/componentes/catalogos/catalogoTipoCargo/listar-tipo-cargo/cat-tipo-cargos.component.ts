@@ -134,6 +134,7 @@ export class CatTipoCargosComponent {
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
     this.messajeExcel = '';
+    this.filtroCargo = '';
   }
 
   AbrirVentanaRegistrarCargo(): void {

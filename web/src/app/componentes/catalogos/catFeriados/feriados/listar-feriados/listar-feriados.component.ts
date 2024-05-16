@@ -232,6 +232,11 @@ export class ListarFeriadosComponent implements OnInit {
     this.numero_paginaMul = e.pageIndex + 1
   }
 
+  ManejarPaginaMulti2(e: PageEvent) {
+    this.tamanio_paginaMul2 = e.pageSize;
+    this.numero_paginaMul2 = e.pageIndex + 1
+  }
+
   // METODO PARA VISUALIZAR PANTALLA ASIGNAR CIUDAD FERIADO
   ver_lista: boolean = true;
   ver_asignar: boolean = false;
@@ -308,6 +313,9 @@ export class ListarFeriadosComponent implements OnInit {
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataFeriados = res.data;
       this.DataFerieados_ciudades = res.datafc;
+
+      console.log('Feriados ciudades: ',this.DataFerieados_ciudades);
+
       this.messajeExcel = res.message;
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {

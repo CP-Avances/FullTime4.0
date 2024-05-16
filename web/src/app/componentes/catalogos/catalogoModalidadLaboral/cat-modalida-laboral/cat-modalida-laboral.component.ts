@@ -134,6 +134,7 @@ export class CatModalidaLaboralComponent implements OnInit {
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
     this.messajeExcel = '';
+    this.filtroModalidad = '';
   }
 
   AbrirVentanaRegistrarModalidad(): void {
