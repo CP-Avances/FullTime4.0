@@ -1,22 +1,15 @@
-import { Router } from 'express';
-import MODALIDADLABORAL_CONTROLADOR from '../../controlador/catalogos/catModalidadLaboralControlador'
-import { TokenValidation } from '../../libs/verificarToken';
-import multer from 'multer';
+import MODALIDADLABORAL_CONTROLADOR from '../../controlador/catalogos/catModalidadLaboralControlador';
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import { TokenValidation } from '../../libs/verificarToken';
+import { Router } from 'express';
+import multer from 'multer';
 
 const storage = multer.diskStorage({
-
     destination: function (req, file, cb) {
         cb(null, ObtenerRutaLeerPlantillas())
     },
     filename: function (req, file, cb) {
-        // FECHA DEL SISTEMA
-        //var fecha = moment();
-        //var anio = fecha.format('YYYY');
-        //var mes = fecha.format('MM');
-        //var dia = fecha.format('DD');
         let documento = file.originalname;
-
         cb(null, documento);
     }
 })
@@ -31,13 +24,19 @@ class ModalidaLaboralRutas {
     }
 
     configuracion(): void {
-        this.router.get('/', TokenValidation, MODALIDADLABORAL_CONTROLADOR.listaModalidadLaboral);
+        // METODO PARA LISTAR MODALIDAD LABORAL
+        this.router.get('/', TokenValidation, MODALIDADLABORAL_CONTROLADOR.ListaModalidadLaboral);
+        // METODO PARA REGISTRAR MODALIDAD LABORAL
         this.router.post('/crearModalidad', TokenValidation, MODALIDADLABORAL_CONTROLADOR.CrearMadalidadLaboral);
+        // METODO PARA EDITAR MODALIDAD LABORAL
         this.router.put('/', TokenValidation, MODALIDADLABORAL_CONTROLADOR.EditarModalidadLaboral);
-        this.router.delete('/eliminar/:id', TokenValidation, MODALIDADLABORAL_CONTROLADOR.eliminarRegistro);
+        // METODO PARA ELIMINAR REGISTRO
+        this.router.delete('/eliminar/:id', TokenValidation, MODALIDADLABORAL_CONTROLADOR.EliminarRegistro);
+        // METODO PARA LEER DATOS DE PLANTILLA
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], MODALIDADLABORAL_CONTROLADOR.VerfificarPlantillaModalidadLaboral);
+        // METODO PARA GUARDAR DATOS DE PLANTILLA
         this.router.post('/cargar_plantilla/', TokenValidation, MODALIDADLABORAL_CONTROLADOR.CargarPlantilla);
-    
+
     }
 }
 

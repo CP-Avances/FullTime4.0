@@ -274,7 +274,7 @@ export class AlimentosInvitadosComponent implements OnInit {
 
   presentarTotales(arreglo: any) {
     var t_cantida = 0, t_costo = 0, t_total = 0;
-    arreglo.forEach(obj => {
+    arreglo.forEach((obj: any) => {
       t_cantida = t_cantida + parseInt(obj.cantidad),
         t_costo = t_costo + parseFloat(obj.valor),
         t_total = t_total + parseFloat(obj.total)

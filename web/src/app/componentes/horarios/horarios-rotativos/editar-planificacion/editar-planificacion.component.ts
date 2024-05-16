@@ -358,7 +358,7 @@ export class EditarPlanificacionComponent implements OnInit {
   // METODO PARA VALIDAR SELECCION DE HORARIO
   ValidarHorario() {
 
-    const [obj_res] = this.horarios.filter(o => {
+    const [obj_res] = this.horarios.filter((o: any) => {
       return o.codigo === this.horarioF.value
     })
 
@@ -407,7 +407,7 @@ export class EditarPlanificacionComponent implements OnInit {
       this.detalle_acciones = [];
       this.detalles = res;
 
-      this.detalles.forEach(obj => {
+      this.detalles.forEach((obj: any) => {
         this.ValidarAcciones(obj);
       })
 
@@ -423,7 +423,7 @@ export class EditarPlanificacionComponent implements OnInit {
 
       this.detalle_acciones = this.detalle_acciones.concat(tipos);
 
-      this.detalle_acciones.forEach(detalle => {
+      this.detalle_acciones.forEach((detalle: any) => {
         detalle.entrada_ = this.validar.FormatearHora(detalle.entrada, this.formato_hora);
         if (detalle.inicio_comida != '') {
           detalle.inicio_comida = this.validar.FormatearHora(detalle.inicio_comida, this.formato_hora);
@@ -454,7 +454,7 @@ export class EditarPlanificacionComponent implements OnInit {
 
   // METODO PARA AGREGAR UN NUEVO HORARIO
   AgregarHorario() {
-    const [obj_res] = this.horarios.filter(o => {
+    const [obj_res] = this.horarios.filter((o: any) => {
       return o.codigo === this.horarioF.value
     })
 
@@ -859,7 +859,7 @@ export class EditarPlanificacionComponent implements OnInit {
     let fecha = moment(this.dia_fecha, 'MMMM, ddd DD, YYYY').format('YYYY-MM-DD');
     let cont1 = 0;
     // CONTAR HORARIOS ASIGNADOS
-    lista.forEach(h => {
+    lista.forEach((h: any) => {
       if (h.asignado === true) {
         cont1 = cont1 + 1;
       }
@@ -871,7 +871,7 @@ export class EditarPlanificacionComponent implements OnInit {
       let origen = '';
       var laborar = 0;
       // SELECCIONADOS CON HORARIOS
-      lista.forEach(h => {
+      lista.forEach((h: any) => {
         //console.log('ver asignado ', h)
         if (h.asignado === true) {
           this.restD.ConsultarUnDetalleHorario(h.horarios.id).subscribe(res => {
@@ -1009,7 +1009,7 @@ export class EditarPlanificacionComponent implements OnInit {
   ver_feriado: boolean = false;
   asignado_feriados: any = [];
   RegistrarFeriado() {
-    const [obj_res] = this.horarios.filter(o => {
+    const [obj_res] = this.horarios.filter((o: any) => {
       return o.default_ === 'FD'
     })
 

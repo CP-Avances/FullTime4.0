@@ -288,7 +288,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     this.suma = '00:00:00';
     this.sumHoras = '';
     // RETORNAR DATOS DE HORARIO SELECCIONADO
-    const [obj_res] = this.horarios.filter(o => {
+    const [obj_res] = this.horarios.filter((o: any) => {
       return o.id === parseInt(form.horarioForm)
     })
     if (!obj_res) return this.toastr.warning('Horario no válido.');
@@ -815,7 +815,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     this.eliminar_horarios = this.eliminar_horarios.concat(data_eliminar);
     // SI EXISTENTE SOLO UN HORARIO SE ELIMINA HORARIOS DE DESCANSO
     if (sumaN === 1 && sumaO > 0) {
-      this.lista_descanso.forEach(obj => {
+      this.lista_descanso.forEach((obj: any) => {
         data_eliminar = {
           id: obj.id_horario,
         }

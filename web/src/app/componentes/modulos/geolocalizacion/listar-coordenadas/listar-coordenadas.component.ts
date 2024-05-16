@@ -318,7 +318,7 @@ export class ListarCoordenadasComponent implements OnInit {
   exportToXML() {
     var objeto: any;
     var arregloCoordenadas: any = [];
-    this.coordenadas.forEach(obj => {
+    this.coordenadas.forEach((obj: any) => {
       objeto = {
         "tipo_permiso": {
           '@id': obj.id,

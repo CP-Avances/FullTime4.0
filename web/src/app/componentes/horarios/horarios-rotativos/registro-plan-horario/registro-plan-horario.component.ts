@@ -313,7 +313,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
             obj.observacion = 'FERIADO*';
             obj.tipo_dia_origen = 'DFD';
             this.hora_feriado = true;
-            const [datoHorario] = this.horarios.filter(o => {
+            const [datoHorario] = this.horarios.filter((o: any) => {
               return o.default_ === 'DFD';
             })
             let data = [{
@@ -449,7 +449,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
       this.ver_acciones = true;
       this.detalle_acciones = [];
       this.detalles = res;
-      this.detalles.forEach(obj => {
+      this.detalles.forEach((obj: any) => {
         this.ValidarAcciones(obj);
       })
       // AL FINALIZAR EL CICLO CONCATENAR VALORES
@@ -707,7 +707,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     let verificador = 0;
     this.data_horarios = [];
     //---console.log('ver fechas origen ', this.fechas_mes, ' form ', this.horarioF.value);
-    this.fechas_mes.forEach(obj => {
+    this.fechas_mes.forEach((obj: any) => {
       if (obj.estado === true) {
         verificador = verificador + 1;
         this.data_horarios = this.data_horarios.concat(obj);

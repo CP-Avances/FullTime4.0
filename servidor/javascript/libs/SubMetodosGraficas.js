@@ -85,9 +85,9 @@ const HoraExtra_ModelarDatos = function (fec_desde, fec_hasta) {
         });
         // console.log('Lista de array ===', array);
         let nuevo = [];
-        array.forEach(obj => {
+        array.forEach((obj) => {
             let respuesta = DiasIterados(obj.fec_inicio, obj.fec_final, obj.tiempo_autorizado, obj.id_empl_cargo, obj.codigo);
-            respuesta.forEach(ele => {
+            respuesta.forEach((ele) => {
                 nuevo.push(ele);
             });
         });
@@ -244,9 +244,9 @@ const Empleado_HoraExtra_ModelarDatos = function (codigo, fec_desde, fec_hasta) 
         });
         // console.log('Lista de array ===', array);
         let nuevo = [];
-        array.forEach(obj => {
+        array.forEach((obj) => {
             let respuesta = DiasIterados(obj.fec_inicio, obj.fec_final, obj.tiempo_autorizado, obj.id_empl_cargo, obj.codigo);
-            respuesta.forEach(ele => {
+            respuesta.forEach((ele) => {
                 nuevo.push(ele);
             });
         });
@@ -356,7 +356,7 @@ const Empleado_Vacaciones_ModelarDatos = function (codigo, fec_desde, fec_hasta)
         `, [codigo, fec_desde, fec_hasta]).then(result => { return result.rows; });
         // console.log('Lista de vacaciones ===', vacaciones);
         let aux_array = [];
-        vacaciones.forEach(obj => {
+        vacaciones.forEach((obj) => {
             var fec_aux = new Date(obj.fec_inicio);
             var fecha1 = (0, moment_1.default)(obj.fec_inicio.split(" ")[0]);
             var fecha2 = (0, moment_1.default)(obj.fec_final.split(" ")[0]);
@@ -383,7 +383,7 @@ const Empleado_Permisos_ModelarDatos = function (codigo, fec_desde, fec_hasta) {
         `, [codigo, fec_desde, fec_hasta]).then(result => { return result.rows; });
         // console.log('Lista de permisos ===', permisos);
         let aux_array = [];
-        permisos.forEach(obj => {
+        permisos.forEach((obj) => {
             var fec_aux = new Date(obj.fec_inicio);
             var fecha1 = (0, moment_1.default)(obj.fec_inicio.split(" ")[0]);
             var fecha2 = (0, moment_1.default)(obj.fec_final.split(" ")[0]);

@@ -298,7 +298,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
     this.nombreF.setValue(this.data.descripcion);
     this.continuidadF.setValue(this.data.continuidad_laboral);
     // OBTENER NOMBRE DEL PAIS REGISTRADO
-    this.paises.forEach(obj => {
+    this.paises.forEach((obj: any) => {
       if (obj.id === this.data.id_pais) {
         this.nombrePaisF.setValue(obj.nombre);
       }
@@ -1335,7 +1335,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
 
     else {
       var nombre = 0;
-      this.regimen.forEach(obj => {
+      this.regimen.forEach((obj: any) => {
         if (obj.descripcion.toUpperCase() === form1.nombreForm.toUpperCase()) {
           nombre = 1;
         }
@@ -1368,7 +1368,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
 
     // OBTENER ID DEL PAIS SELECCIONADO
     let pais: number = 0;
-    this.paises.forEach(obj => {
+    this.paises.forEach((obj: any) => {
       if (obj.nombre === form1.nombrePaisForm.toUpperCase()) {
         pais = obj.id
       }

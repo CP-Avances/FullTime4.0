@@ -874,7 +874,7 @@ export class ListaEmpleadosComponent implements OnInit {
     }
     var objeto: any;
     var arregloEmpleado: any = [];
-    arreglo.forEach(obj => {
+    arreglo.forEach((obj: any) => {
       var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
       var genero = this.GeneroSelect[obj.genero - 1];
       var estado = this.EstadoSelect[obj.estado - 1];

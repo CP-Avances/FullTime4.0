@@ -165,7 +165,9 @@ export class RegistroDispositivosComponent implements OnInit {
   ObtenerDispositivosRegistrados() {
     this.usuariosService.BuscarDispositivoMovill().subscribe(res => {
       this.dispositivosRegistrados = res;
+      console.log('ver res ', res)
     }, err => {
+      console.log('ver res ', err)
       this.toastr.info(err.error.message)
     })
   }
@@ -208,10 +210,10 @@ export class RegistroDispositivosComponent implements OnInit {
             this.toastr.error(err.error.message)
           })
         }
-      }, () =>{
+      }, () => {
         this.individual = true;
         this.multiple = false;
-      } )
+      })
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
@@ -381,7 +383,7 @@ export class RegistroDispositivosComponent implements OnInit {
     var objeto: any;
     var cont: number = 1;
     var ListaDispositivosRegistrados: any = [];
-    this.dispositivosRegistrados.forEach(obj => {
+    this.dispositivosRegistrados.forEach((obj: any) => {
       objeto = {
         'N#': cont++,
         "CODIGO": obj.codigo,
@@ -406,7 +408,7 @@ export class RegistroDispositivosComponent implements OnInit {
     var objeto: any;
     var cont: number = 1;
     var ListaDispositivosRegistrados: any = [];
-    this.dispositivosRegistrados.forEach(obj => {
+    this.dispositivosRegistrados.forEach((obj: any) => {
       objeto = {
         'N#': cont++,
         "CODIGO": obj.codigo,
@@ -433,7 +435,7 @@ export class RegistroDispositivosComponent implements OnInit {
     var objeto: any;
     var count: number = 1;
     var arregloDispositivos: any = [];
-    this.dispositivosRegistrados.forEach(obj => {
+    this.dispositivosRegistrados.forEach((obj: any) => {
       objeto = {
         "dispositivo_moviles": {
           '@id': count++,

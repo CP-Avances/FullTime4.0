@@ -280,7 +280,7 @@ export class VistaRolesComponent implements OnInit {
     this.OrdenarDatos(this.roles);
     var objeto: any;
     var arregloRoles: any = [];
-    this.roles.forEach(obj => {
+    this.roles.forEach((obj: any) => {
       objeto = {
         "rol": {
           "$": { "id": obj.id },

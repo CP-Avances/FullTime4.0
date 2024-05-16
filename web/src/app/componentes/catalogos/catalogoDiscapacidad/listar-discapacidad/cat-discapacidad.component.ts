@@ -311,7 +311,7 @@ export class CatDiscapacidadComponent implements OnInit {
     this.OrdenarDatos(this.discapacidades);
     var objeto;
     var arregloDiscapacidades: any = [];
-    this.discapacidades.forEach(obj => {
+    this.discapacidades.forEach((obj: any) => {
       objeto = {
         "discapacidad": {
           "$": { "id": obj.id },

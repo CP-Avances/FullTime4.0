@@ -258,15 +258,15 @@ export class VerCoordenadasComponent implements OnInit {
     this.informacion.ObtenerInformacionUbicacion(1, ubicacion).subscribe((res: any[]) => {
       this.origen = JSON.stringify(res);
 
-      res.forEach(obj => {
+      res.forEach((obj: any) => {
         this.sucursales.push({
           id: obj.id_suc,
           nombre: obj.name_suc
         })
       })
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
+      res.forEach((obj: any) => {
+        obj.departamentos.forEach((ele: any) => {
           this.departamentos.push({
             id: ele.id_depa,
             departamento: ele.name_dep,
@@ -275,8 +275,8 @@ export class VerCoordenadasComponent implements OnInit {
         })
       })
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
+      res.forEach((obj: any) => {
+        obj.departamentos.forEach((ele: any) => {
           ele.empleado.forEach(r => {
             let elemento = {
               id: r.id,
@@ -292,9 +292,9 @@ export class VerCoordenadasComponent implements OnInit {
         })
       })
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          ele.empleado.forEach(reg => {
+      res.forEach((obj: any) => {
+        obj.departamentos.forEach((ele: any) => {
+          ele.empleado.forEach((reg: any) => {
             reg.regimen.forEach(r => {
               this.regimen.push({
                 id: r.id_regimen,
@@ -326,14 +326,14 @@ export class VerCoordenadasComponent implements OnInit {
     this.informacion.ObtenerInformacionCargosUbicacion(1, ubicacion).subscribe((res: any[]) => {
       this.origen_cargo = JSON.stringify(res);
 
-      res.forEach(obj => {
+      res.forEach((obj: any) => {
         this.cargos.push({
           id: obj.id_cargo,
           nombre: obj.name_cargo,
         })
       })
 
-      res.forEach(obj => {
+      res.forEach((obj: any) => {
         obj.empleados.forEach(r => {
           this.empleados_cargos.push({
             id: r.id,

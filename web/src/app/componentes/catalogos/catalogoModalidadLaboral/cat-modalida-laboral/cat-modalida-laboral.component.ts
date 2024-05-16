@@ -134,6 +134,7 @@ export class CatModalidaLaboralComponent implements OnInit {
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
     this.messajeExcel = '';
+    this.filtroModalidad = '';
   }
 
   AbrirVentanaRegistrarModalidad(): void {
@@ -451,7 +452,7 @@ export class CatModalidaLaboralComponent implements OnInit {
     this.OrdenarDatos(this.listaModalida_Laboral);
     var objeto;
     var arregloFeriados: any = [];
-    this.listaModalida_Laboral.forEach(obj => {
+    this.listaModalida_Laboral.forEach((obj: any) => {
       objeto = {
         "roles": {
           "$": { "id": obj.id },

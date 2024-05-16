@@ -85,7 +85,7 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
   ngOnInit(): void {
     console.log(this.datos);
 
-    this.estados.forEach(obj => {
+    this.estados.forEach((obj: any) => {
       if (this.datos.estado === obj.nombre) {
         this.PedirHoraExtraForm.patchValue({ estadoForm: obj.id });
       }

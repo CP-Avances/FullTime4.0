@@ -496,7 +496,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
         })
       });
     })
-    respuesta.forEach(obj => {
+    respuesta.forEach((obj: any) => {
       obj.departamentos = obj.departamentos.filter((e: any) => {
         return e.empleado.length > 0
       })

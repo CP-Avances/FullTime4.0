@@ -142,7 +142,7 @@ export class VerPedidoHoraExtraComponent implements OnInit {
       }
       this.id_usua_solicita = this.hora_extra[0].id_usua_solicita;
 
-      this.hora_extra.forEach(h => {
+      this.hora_extra.forEach((h: any) => {
 
         h.fecha_inicio_ = this.validar.FormatearFecha(moment(h.fec_inicio).format('YYYY-MM-DD'), formato_fecha, this.validar.dia_completo);
         h.hora_inicio_ = this.validar.FormatearHora(moment(h.fec_inicio).format('HH:mm:ss'), formato_hora);

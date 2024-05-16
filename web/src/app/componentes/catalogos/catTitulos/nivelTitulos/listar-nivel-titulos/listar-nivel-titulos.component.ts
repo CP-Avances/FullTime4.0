@@ -439,7 +439,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     this.OrdenarDatos(this.nivelTitulos);
     var objeto: any;
     var arregloTitulos: any = [];
-    this.nivelTitulos.forEach(obj => {
+    this.nivelTitulos.forEach((obj: any) => {
       objeto = {
         "titulos": {
           "$": { "id": obj.id },

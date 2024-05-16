@@ -155,7 +155,7 @@ export class VacacionAutorizacionesComponent implements OnInit {
   departamentoChange: any = [];
   ChangeDepa(e: any) {
     if (e != null && e != undefined) {
-      const [departamento] = this.ArrayAutorizacionTipos.filter(o => {
+      const [departamento] = this.ArrayAutorizacionTipos.filter((o: any) => {
         return o.id_depa_confi === e
       })
       this.departamentoChange = departamento;

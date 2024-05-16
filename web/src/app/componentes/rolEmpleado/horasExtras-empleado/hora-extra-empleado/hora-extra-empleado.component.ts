@@ -110,7 +110,7 @@ export class HoraExtraEmpleadoComponent implements OnInit {
     this.hora_extra = [];
     this.restHE.ObtenerListaEmpleado(this.idEmpleado).subscribe(res => {
       this.hora_extra = res;
-      this.hora_extra.forEach(h => {
+      this.hora_extra.forEach((h: any) => {
         if (h.estado === 1) {
           h.estado = 'Pendiente';
         }

@@ -4,7 +4,7 @@ p {
 
 mat-form-field.input-tables {
     background: transparent;
-    font-size: 14px;
+    font-size: 12px;
     text-align: center;
     outline: none;
     fill: none;
@@ -36,5 +36,5 @@ mat-panel-description {
 
 table {
     width: 100%;
-    font-size: 14px;
+    font-size: 12px;
 }

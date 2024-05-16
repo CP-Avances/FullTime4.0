@@ -487,7 +487,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   exportToXML() {
     var objeto;
     var arregloDepartamentos: any = [];
-    this.departamentos.forEach(obj => {
+    this.departamentos.forEach((obj: any) => {
       objeto = {
         "departamento": {
           "$": { "id": obj.id },

@@ -308,7 +308,7 @@ export class ListarTipoAccionComponent implements OnInit {
   exportToXML() {
     var objeto;
     var arregloTipoAcciones: any = [];
-    this.tipo_acciones.forEach(obj => {
+    this.tipo_acciones.forEach((obj: any) => {
       objeto = {
         "tipo_accion_personal": {
           '@id': obj.id,

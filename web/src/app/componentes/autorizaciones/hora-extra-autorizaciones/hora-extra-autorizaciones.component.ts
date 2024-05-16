@@ -152,7 +152,7 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
   departamentoChange: any = [];
   ChangeDepa(e: any) {
     if (e != null && e != undefined) {
-      const [departamento] = this.ArrayAutorizacionTipos.filter(o => {
+      const [departamento] = this.ArrayAutorizacionTipos.filter((o: any) => {
         return o.id_depa_confi === e
       })
       this.departamentoChange = departamento;
@@ -443,7 +443,7 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
       console.log(this.resEstado[0].realtime[0].estado);
       var f = new Date();
       // let nomEstado = '';
-      // this.estados.forEach(obj => {
+      // this.estados.forEach((obj: any) => {
       //   if(obj.valor = form.estadoForm) {
       //     nomEstado = obj.nombre
       //   }

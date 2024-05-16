@@ -3,7 +3,7 @@
 
     <mat-card class="example-card mat-elevation-z9">
 
-        <!-------------------------------------------- LISTA DE USUARIOS HABILITADOS ------------------------------------------------>
+        <!--  *********************************  LISTA DE USUARIOS HABILITADOS  ************************************  -->
         <div style="padding-top: 20px;" *ngIf="activar_habilitados">
             <mat-card-content>
                 <div id="resultados">
@@ -512,7 +512,7 @@
             </mat-card-content>
         </div>
 
-        <!---------------------------------------- LISTA DE USUARIOS DESHABILITADOS --------------------------------------------------->
+        <!--  ********************************  LISTA DE USUARIOS DESHABILITADOS  *******************************  -->
         <div style="padding-top: 20px;" *ngIf="activar_deshabilitados">
             <mat-card-content>
                 <div id="resultados_dh">
@@ -1054,7 +1054,7 @@
                     <div class="col-md">
                         <br>
                         <div (click)="VerTablas(2)" style="padding-top: 20px; padding-bottom: 10px;" *ngIf="inactivar">
-                            <!--LISTAR USUARIOS INACTIVOS-->
+                            <!--  ********************  LISTAR USUARIOS INACTIVOS  **************************  -->
                             <mat-card [ngClass]="'mat-elevation-z8 card-dos'" style="color: antiquewhite;">
                                 <mat-card-content>
                                     <div style="padding-top: 20px; padding-bottom: 20px;">
@@ -1071,7 +1071,7 @@
                             </mat-card>
                         </div>
                         <div (click)="VerTablas(1)" style="padding-top: 10px; padding-bottom: 10px;" *ngIf="activar">
-                            <!--LISTAR USUARIOS ACTIVO-->
+                            <!--  ************************  LISTAR USUARIOS ACTIVO  *******************  -->
                             <mat-card [ngClass]="'mat-elevation-z8 card-uno'" style="color: antiquewhite;">
                                 <mat-card-content>
                                     <div style="padding-top: 20px; padding-bottom: 20px;">

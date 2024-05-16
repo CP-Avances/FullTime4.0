@@ -82,7 +82,7 @@ export class EditarTituloComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS EN FORMULARIO
   LlenarFormulario() {
     const { observaciones, nombre } = this.titulo;
-    const [id_titulo] = this.cgTitulos.filter(o => { return o.nombre === nombre }).map(o => { return o.id });
+    const [id_titulo] = this.cgTitulos.filter((o: any) => { return o.nombre === nombre }).map(o => { return o.id });
     this.formulario.patchValue({
       observacionForm: observaciones,
       idTituloForm: id_titulo

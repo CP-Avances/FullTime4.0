@@ -337,7 +337,7 @@ export class ListaSucursalesComponent implements OnInit {
   exportToXML() {
     var objeto;
     var arregloSucursales: any = [];
-    this.sucursales.forEach(obj => {
+    this.sucursales.forEach((obj: any) => {
       objeto = {
         "establecimiento": {
           "$": { "id": obj.id },

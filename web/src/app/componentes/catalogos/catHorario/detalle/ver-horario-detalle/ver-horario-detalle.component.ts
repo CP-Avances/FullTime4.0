@@ -91,7 +91,7 @@ export class VerHorarioDetalleComponent implements OnInit {
 
   // METODO PARA COLOCAR TIPO DE HORARIO
   ColocarTipo() {
-    this.datosHorario.forEach(obj => {
+    this.datosHorario.forEach((obj: any) => {
       if (obj.default_ === 'N') {
         obj.default_tipo = 'Laborable';
       }

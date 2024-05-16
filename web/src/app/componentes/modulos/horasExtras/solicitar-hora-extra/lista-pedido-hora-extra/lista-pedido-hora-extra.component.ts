@@ -203,7 +203,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       this.sumaHoras = res;
 
       //Filtra la lista de Horas Extras para descartar las solicitudes del mismo usuario y almacena en una nueva lista
-      this.sumaHorasfiltro = this.sumaHoras.filter(o => {
+      this.sumaHorasfiltro = this.sumaHoras.filter((o: any) => {
         if(this.idEmpleado !== o.id_usua_solicita){
           return this.sumaHorasfiltro.push(o);
         }
@@ -245,7 +245,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       this.horas_extras = res;
 
       //Filtra la lista de Horas Extras para descartar las solicitudes del mismo usuario y almacena en una nueva lista
-      this.lista_pedidosFiltradas = this.horas_extras.filter(o => {
+      this.lista_pedidosFiltradas = this.horas_extras.filter((o: any) => {
         if(this.idEmpleado !== o.id_usua_solicita){
           return this.lista_pedidosFiltradas.push(o);
         }
@@ -381,7 +381,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       this.solicitudes_observacion = res;
 
       //Filtra la lista de Horas Extras Autorizadas para descartar las solicitudes del mismo usuario y almacena en una nueva lista
-      this.listaHorasExtrasObservaFiltradas = this.solicitudes_observacion.filter(o => {
+      this.listaHorasExtrasObservaFiltradas = this.solicitudes_observacion.filter((o: any) => {
         if(this.idEmpleado !== o.id_usua_solicita){
           return this.listaHorasExtrasObservaFiltradas.push(o);
         }
@@ -498,7 +498,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       this.sumaHoras_observacion = res;
 
       //Filtra la lista de Horas Extras Autorizadas para descartar las solicitudes del mismo usuario y almacena en una nueva lista
-      this.susmaHoras_observacionFiltada = this.sumaHoras_observacion.filter(o => {
+      this.susmaHoras_observacionFiltada = this.sumaHoras_observacion.filter((o: any) => {
         if(this.idEmpleado !== o.id_usua_solicita){
           return this.susmaHoras_observacionFiltada.push(o);
         }
@@ -577,7 +577,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       console.log('this.pedido_hora_autoriza: ',this.pedido_hora_autoriza);
 
       //Filtra la lista de Horas Extras Autorizadas para descartar las solicitudes del mismo usuario y almacena en una nueva lista
-      this.pedido_hora_autoriza.filter(o => {
+      this.pedido_hora_autoriza.filter((o: any) => {
         if(this.idEmpleado !== o.id_usua_solicita){
           return this.listaHorasExtrasAutorizadasFiltradas.push(o);
         }
@@ -924,7 +924,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     var arregloSolicitudes: any = [];
     (opcion == "Solicitudes de horas extras con observaciones"?this.lista_pedidosFiltradas:(
       opcion=="Solicitudes de horas extras con observaciones"?this.listaHorasExtrasObservaFiltradas:this.listaHorasExtrasAutorizadasFiltradas
-      )).forEach(obj => {
+      )).forEach((obj: any) => {
       objeto = {
         "lista_solicitudes_horas_extras": {
         '@id': obj.id,

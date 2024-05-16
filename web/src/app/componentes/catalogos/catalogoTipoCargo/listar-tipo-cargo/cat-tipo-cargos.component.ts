@@ -134,6 +134,7 @@ export class CatTipoCargosComponent {
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
     this.messajeExcel = '';
+    this.filtroCargo = '';
   }
 
   AbrirVentanaRegistrarCargo(): void {
@@ -476,7 +477,7 @@ export class CatTipoCargosComponent {
     this.OrdenarDatos(this.listaTipoCargos);
     var objeto: any;
     var arregloFeriados: any = [];
-    this.listaTipoCargos.forEach(obj => {
+    this.listaTipoCargos.forEach((obj: any) => {
       objeto = {
         "roles": {
           "$": { "id": obj.id },

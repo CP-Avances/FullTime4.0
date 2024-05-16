@@ -1,8 +1,8 @@
-import { Router } from 'express';
-import TIPOCARGOS_CONTROLADOR from '../../controlador/catalogos/catTipoCargos.Controlador'
-import { TokenValidation } from '../../libs/verificarToken';
-import multer from 'multer';
+import TIPOSCARGOSCONTROLADOR from '../../controlador/catalogos/catTipoCargos.Controlador';
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import { TokenValidation } from '../../libs/verificarToken';
+import { Router } from 'express';
+import multer from 'multer';
 
 const storage = multer.diskStorage({
 
@@ -10,13 +10,7 @@ const storage = multer.diskStorage({
         cb(null, ObtenerRutaLeerPlantillas())
     },
     filename: function (req, file, cb) {
-        // FECHA DEL SISTEMA
-        //var fecha = moment();
-        //var anio = fecha.format('YYYY');
-        //var mes = fecha.format('MM');
-        //var dia = fecha.format('DD');
         let documento = file.originalname;
-
         cb(null, documento);
     }
 })
@@ -33,16 +27,22 @@ class TiposCargosRutas {
     configuracion(): void {
 
         // METODO PARA BUSCAR TIPO CARGO POR SU NOMBRE
-        this.router.post('/buscar/tipo_cargo/nombre', TokenValidation, TIPOCARGOS_CONTROLADOR.BuscarTipoCargoNombre);
-
-        this.router.get('/', TokenValidation, TIPOCARGOS_CONTROLADOR.listaTipoCargos);
-        this.router.post('/crearCargo', TokenValidation, TIPOCARGOS_CONTROLADOR.CrearCargo);
-        this.router.put('/', TokenValidation, TIPOCARGOS_CONTROLADOR.EditarCargo);
-        this.router.delete('/eliminar/:id', TokenValidation, TIPOCARGOS_CONTROLADOR.eliminarRegistro);
-        this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], TIPOCARGOS_CONTROLADOR.VerfificarPlantillaTipoCargos);
-        this.router.post('/cargar_plantilla/', TokenValidation, TIPOCARGOS_CONTROLADOR.CargarPlantilla);
+        this.router.post('/buscar/tipo_cargo/nombre', TokenValidation, TIPOSCARGOSCONTROLADOR.BuscarTipoCargoNombre);
+        // METODO PARA LISTAR TIPO CARGOS
+        this.router.get('/', TokenValidation, TIPOSCARGOSCONTROLADOR.ListaTipoCargos);
+        // METODO PARA REGISTRAR TIPO CARGO
+        this.router.post('/crearCargo', TokenValidation, TIPOSCARGOSCONTROLADOR.CrearCargo);
+        // METODO PARA EDITAR TIPO CARGO
+        this.router.put('/', TokenValidation, TIPOSCARGOSCONTROLADOR.EditarCargo);
+        // METODO PARA ELIMINAR TIPO CARGO
+        this.router.delete('/eliminar/:id', TokenValidation, TIPOSCARGOSCONTROLADOR.EliminarRegistro);
+        // METODO PARA LEER DATOS DE PLANTILLA
+        this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], TIPOSCARGOSCONTROLADOR.VerfificarPlantillaTipoCargos);
+        // METODO PARA GUARDAR DATOS DE PLANTILLA
+        this.router.post('/cargar_plantilla/', TokenValidation, TIPOSCARGOSCONTROLADOR.CargarPlantilla);
     }
 }
 
 const TIPOS_CARGOS_RUTAS = new TiposCargosRutas();
+
 export default TIPOS_CARGOS_RUTAS.router;

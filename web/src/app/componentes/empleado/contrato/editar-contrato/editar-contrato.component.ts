@@ -111,7 +111,7 @@ export class EditarContratoComponent implements OnInit {
     this.restRegimen.ConsultarUnRegimen(this.contrato.id_regimen).subscribe(datos => {
       this.regimen = datos;
       // OBTENER NOMBRE DEL PAIS REGISTRADO
-      this.paises.forEach(obj => {
+      this.paises.forEach((obj: any) => {
         if (obj.id === this.regimen.id_pais) {
           pais_ = obj.nombre;
           this.nombrePaisF.setValue(obj.nombre);

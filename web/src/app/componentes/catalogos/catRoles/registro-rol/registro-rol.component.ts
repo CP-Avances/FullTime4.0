@@ -57,7 +57,7 @@ export class RegistroRolComponent implements OnInit {
     // VERIFICAR SI HAY REGISTROS DE ROLES
     if (this.roles.length != 0) {
       // VALIDAR REGISTROS DUPLICADOS
-      this.roles.forEach(obj => {
+      this.roles.forEach((obj: any) => {
         if (obj.nombre.toUpperCase() === rol.nombre.toUpperCase()) {
           this.contador = 1;
         }

@@ -265,20 +265,16 @@
                 <table class="table table-hover table-sm">
                     <thead class="thead-light">
                         <tr style="text-align: center; font-size: 13px;">
+                            <th scope="col">Observación</th>
                             <th scope="col">Item</th>
                             <th scope="col">Provincia</th>
                             <th scope="col">Ciudad</th>
                             <th scope="col">Fereiado</th>
-                            <th scope="col">Observación</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr
-                            *ngFor="let fc of DataFerieados_ciudades | paginate:tamanio_paginaMul2: numero_paginaMul2; let i = index">
-                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{fc.fila}}</td>
-                            <td [style.color]="stiloTextoCelda(fc.provincia)" style="font-size: 12px;">{{fc.provincia}}</td>
-                            <td [style.color]="stiloTextoCelda(fc.ciudad)" id="letras" style="font-size: 12px;"> {{fc.ciudad}}</td>
-                            <td [style.color]="stiloTextoCelda(fc.feriado)" id="letras" style="font-size: 12px;"> {{fc.feriado}}</td>
+                            *ngFor="let fc of DataFerieados_ciudades | paginate:tamanio_paginaMul2:numero_paginaMul2; let i = index">
                             <td style="font-size: 12px;">
                                 <div style="width: 270px; margin: auto;">
                                     <div id="t-editar" class="circulo"
@@ -286,12 +282,16 @@
                                     {{fc.observacion}}
                                 </div>
                             </td>
+                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{fc.fila}}</td>
+                            <td [style.color]="stiloTextoCelda(fc.provincia)" style="font-size: 12px;">{{fc.provincia}}</td>
+                            <td [style.color]="stiloTextoCelda(fc.ciudad)" id="letras" style="font-size: 12px;"> {{fc.ciudad}}</td>
+                            <td [style.color]="stiloTextoCelda(fc.feriado)" id="letras" style="font-size: 12px;"> {{fc.feriado}}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             <mat-paginator [length]="DataFerieados_ciudades.length" [pageSize]="tamanio_paginaMul2"
-                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti2($event)"
                 showFirstLastButtons>
             </mat-paginator>
         </div>

@@ -461,7 +461,7 @@ export class ListarTitulosComponent implements OnInit {
     this.OrdenarDatos(this.verTitulos);
     var objeto: any;
     var arregloTitulos: any = [];
-    this.verTitulos.forEach(obj => {
+    this.verTitulos.forEach((obj: any) => {
       objeto = {
         "titulos": {
           "$": { "id": obj.id },

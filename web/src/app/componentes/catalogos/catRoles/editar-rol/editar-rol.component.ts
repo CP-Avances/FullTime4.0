@@ -53,7 +53,7 @@ export class EditarRolComponent implements OnInit {
     this.data_nueva = dataRol;
     this.rest.ListarRolesActualiza(this.data.datosRol.id).subscribe(response => {
       this.roles = response;
-      this.roles.forEach(obj => {
+      this.roles.forEach((obj: any) => {
         if (obj.nombre.toUpperCase() === dataRol.nombre.toUpperCase()) {
           this.contador = this.contador + 1;
         }

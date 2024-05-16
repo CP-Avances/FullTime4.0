@@ -167,7 +167,7 @@ export class AsignarUsuarioComponent implements OnInit {
     this.ver_seleccion = true;
     //console.log('ver datos ', this.sucursalForm.value)
     // RETORNAR DATOS DE SUCURSAL SELECCIONADA
-    const [elemento] = this.sucursales.filter(o => {
+    const [elemento] = this.sucursales.filter((o: any) => {
       return o.nombre === this.sucursalForm.value
     })
     //console.log('ver elementos ', elemento)
@@ -179,7 +179,7 @@ export class AsignarUsuarioComponent implements OnInit {
     this.general.ObtenerAdminJefes(data).subscribe(datos => {
       let respuesta: any = [];
       respuesta = datos;
-      respuesta.forEach(obj => {
+      respuesta.forEach((obj: any) => {
         if (obj.jefe === false) {
           this.administradores.push(obj);
         }
@@ -393,7 +393,7 @@ export class AsignarUsuarioComponent implements OnInit {
       }
     })
     // PROCESO PARA ELIMINAR LOS REGISTROS SELECCIONADOS
-    lista_eliminar.forEach(obj => {
+    lista_eliminar.forEach((obj: any) => {
       this.usuario.EliminarUsuarioSucursal(obj.id_usucursal).subscribe(res => {
         cont = cont + 1;
 

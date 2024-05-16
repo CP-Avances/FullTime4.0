@@ -328,12 +328,12 @@ export class PrincipalHorarioComponent implements OnInit {
     //--console.log("formdata", formData);
     this.rest.VerificarDatosHorario(formData).subscribe(res => {
       this.dataHorarios = res;
-      this.dataHorarios.plantillaHorarios.forEach(obj => {
+      this.dataHorarios.plantillaHorarios.forEach((obj: any) => {
         if (obj.OBSERVACION == 'Ok') {
           this.listaHorariosCorrectos.push(obj);
         }
       });
-      this.dataHorarios.plantillaDetalles.forEach(obj => {
+      this.dataHorarios.plantillaDetalles.forEach((obj: any) => {
         if (obj.OBSERVACION == 'Ok') {
           this.listaDetalleCorrectos.push(obj);
         }
@@ -526,7 +526,7 @@ export class PrincipalHorarioComponent implements OnInit {
   ExportToXML() {
     var objeto: any;
     var arregloHorarios: any = [];
-    this.horarios.forEach(obj => {
+    this.horarios.forEach((obj: any) => {
       objeto = {
         "horario": {
           "$": { "id": obj.id },

@@ -207,7 +207,10 @@ export class CargarPlantillaComponent {
     }else if(observacion == 'Existe un cargo vigente en esas fechas' || 
     observacion == 'Existe un contrato vigente en esas fechas'){
       return 'rgb(239, 203, 106)';
-    }else if (observacion == 'País no corresponde con el Régimen Laboral'){
+    }else if (observacion == 'País no corresponde con el Régimen Laboral' ||
+      observacion == 'La fecha de ingreso no puede ser menor o igual a la fecha salida' ||
+      observacion == 'La fecha de inicio no puede ser menor o igual a la fecha salida'
+    ){
       return 'rgb(238, 34, 207)';
     }else if (arrayObservacion[1]+' '+arrayObservacion[2] == 'no registrado'){
       return 'rgb(242, 21, 21)';

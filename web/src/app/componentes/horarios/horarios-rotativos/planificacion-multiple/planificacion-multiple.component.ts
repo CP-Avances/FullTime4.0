@@ -64,6 +64,7 @@ export class PlanificacionMultipleComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    //--console.log('datos ', this.datosSeleccionados)
     this.BuscarHorarios();
     this.BuscarHora();
     this.InicialiciarDatos();
@@ -72,7 +73,7 @@ export class PlanificacionMultipleComponent implements OnInit {
   // METODO PARA INCIALIZAR VARIABLES
   InicialiciarDatos() {
     let index = 0;
-    this.datosSeleccionados.usuarios.forEach(obj => {
+    this.datosSeleccionados.usuarios.forEach((obj: any) => {
       obj.asignado = [];
       obj.existencias = [];
       obj.totalizador = [];
@@ -195,7 +196,7 @@ export class PlanificacionMultipleComponent implements OnInit {
         // BUSQUEDA DE DETALLES DE ACUERDO AL ID DE HORARIO
         this.restD.ConsultarUnDetalleHorario(hor.id).subscribe(res => {
           this.detalles_horarios = res;
-          this.detalles_horarios.map(det => {
+          this.detalles_horarios.map((det: any) => {
             if (det.tipo_accion === 'E') {
               this.hora_entrada = det.hora.slice(0, 5);
             }
@@ -237,7 +238,7 @@ export class PlanificacionMultipleComponent implements OnInit {
   // METODO PARA VALIDAR SELECCION DE HORARIO
   ver_informacion: boolean = false
   ValidarHorario() {
-    const [obj_res] = this.horarios.filter(o => {
+    const [obj_res] = this.horarios.filter((o: any) => {
       return o.codigo === this.horarioF.value
     })
     if (!obj_res) return this.toastr.warning('Horario no válido.');
@@ -270,7 +271,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     const h = parseInt(stringTime.split(':')[0]) * 3600;
     const m = parseInt(stringTime.split(':')[1]) * 60;
     const s = parseInt(stringTime.split(':')[2]);
-    return h + m + s
+    return h + m + s;
   }
 
   // METODO PARA VER DETALLE DE HORARIO
@@ -297,7 +298,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       this.detalle_acciones = [];
       this.detalles = res;
 
-      this.detalles.forEach(obj => {
+      this.detalles.forEach((obj: any) => {
         this.ValidarAcciones(obj);
       })
 
@@ -313,7 +314,7 @@ export class PlanificacionMultipleComponent implements OnInit {
 
       this.detalle_acciones = this.detalle_acciones.concat(tipos);
 
-      this.detalle_acciones.forEach(detalle => {
+      this.detalle_acciones.forEach((detalle: any) => {
         detalle.entrada_ = this.validar.FormatearHora(detalle.entrada, this.formato_hora);
         if (detalle.inicio_comida != '') {
           detalle.inicio_comida = this.validar.FormatearHora(detalle.inicio_comida, this.formato_hora);
@@ -358,7 +359,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     //console.log('verificar existencias ', this.fechas_mes[index].registrados)
     let verificador = 0;
 
-    const [datoHorario] = this.horarios.filter(o => {
+    const [datoHorario] = this.horarios.filter((o: any) => {
       return o.codigo === this.horarioF.value
     })
 
@@ -645,7 +646,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     let similar = 0;
     this.ControlarBotones(true, false);
 
-    const [datoHorario] = this.horarios.filter(o => {
+    const [datoHorario] = this.horarios.filter((o: any) => {
       return o.default_ === 'DL';
     })
 
@@ -875,7 +876,7 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   // METODO PARA ASIGNAR FERIADO
   AsignarFeriado(feriado: any, usuario: any) {
-    const [datoHorario] = this.horarios.filter(o => {
+    const [datoHorario] = this.horarios.filter((o: any) => {
       return o.default_ === 'DFD';
     })
 
@@ -884,7 +885,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     //console.log('ver datos de usuarios ', usuario.asignado)
     //console.log('ver datos de usuarios codigo ', usuario.codigo)
 
-    feriado.forEach(d => {
+    feriado.forEach((d: any) => {
       let dia = moment(d.fecha).format('D');
       let mes = moment(this.fechaInicialF.value).format('MM-YYYY');
       let fecha = dia + '-' + mes;
@@ -928,9 +929,10 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   // METODO PARA VERIFICAR HORARIOS ASIGNADOS
   VerificarAsignados() {
+    this.progreso = true;
     let usuarios: any = [];
     console.log('usuarios entrantes ', this.datosSeleccionados.usuarios);
-    this.datosSeleccionados.usuarios.forEach(usu => {
+    this.datosSeleccionados.usuarios.forEach((usu: any) => {
       if (usu.asignado.length != 0) {
         usuarios = usuarios.concat(usu);
       }
@@ -938,6 +940,7 @@ export class PlanificacionMultipleComponent implements OnInit {
 
     //console.log('usuarios salientes ', this.datosSeleccionados.usuarios);
     if (usuarios.length === 0) {
+      this.progreso = false;
       this.toastr.warning('No ha registrado horarios.', 'Ups!!! VERIFICAR.', {
         timeOut: 6000,
       });
@@ -950,7 +953,7 @@ export class PlanificacionMultipleComponent implements OnInit {
   BuscarFeriados(inicio: any, fin: any, validos: any, verificar: boolean) {
     //console.log('ver validos feriados . ', validos)
     let cont = 0;
-    validos.forEach(val => {
+    validos.forEach((val: any) => {
       let datos = {
         fecha_inicio: inicio,
         fecha_final: fin,
@@ -961,7 +964,7 @@ export class PlanificacionMultipleComponent implements OnInit {
         let feriado: any = [];
         feriado = fer;
         //console.log('feriados ', fer)
-        feriado.forEach(f => {
+        feriado.forEach((f: any) => {
           //console.log('ver val ', val.asignado)
           for (var a = 0; a < val.asignado.length; a++) {
             //console.log('ver datos dia ', val.asignado[a].dia, ' dia fecha ', moment(f.fecha).format('D'))
@@ -1006,7 +1009,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     var contador = 0;
     var asignados = 0;
 
-    lista.forEach(li => {
+    lista.forEach((li: any) => {
       asignados = asignados + li.asignado.length;
     })
 
@@ -1014,9 +1017,9 @@ export class PlanificacionMultipleComponent implements OnInit {
 
     if (lista.length != 0) {
 
-      lista.forEach(li => {
+      lista.forEach((li: any) => {
 
-        li.asignado.forEach(asig => {
+        li.asignado.forEach((asig: any) => {
           asig.rango = '';
           let dia_tipo = '';
           let origen = '';
@@ -1052,7 +1055,7 @@ export class PlanificacionMultipleComponent implements OnInit {
           this.restD.ConsultarUnDetalleHorario(asig.id_horario).subscribe(det => {
             contador = contador + 1;
             // COLOCAR DETALLE DE DIA SEGUN HORARIO
-            det.map(element => {
+            det.map((element: any) => {
               //console.log('ver detalle ', element)
               var accion = 0;
               var nocturno: number = 0;
@@ -1114,7 +1117,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     var datos_o: any = [];
     var datos: any = [];
     var contador = 0;
-    lista.forEach(obj => {
+    lista.forEach((obj: any) => {
       if (obj.salida_otro_dia === 1) {
         datos = datos.concat(obj)
       }
@@ -1123,7 +1126,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       }
     })
 
-    datos.forEach(ele => {
+    datos.forEach((ele: any) => {
 
       for (var i = 0; i < datos_o.length; i++) {
 
@@ -1135,9 +1138,9 @@ export class PlanificacionMultipleComponent implements OnInit {
             if (moment(datos_o[i].fec_hora_horario).format('HH:mm:ss') <= moment(ele.fec_hora_horario).format('HH:mm:ss')) {
               contador = 1;
               //console.log('existen horarios en rangos de tiempo similares ', contador)
-              this.datosSeleccionados.usuario.forEach(li => {
+              this.datosSeleccionados.usuario.forEach((li: any) => {
                 if (li.codigo === ele.codigo) {
-                  li.asignado.forEach(asig => {
+                  li.asignado.forEach((asig: any) => {
                     if (asig.fecha === moment(ele.fec_hora_horario).format('YYYY-MM-DD')) {
                       asig.rango = 'RANGOS DE TIEMPO SIMILARES'
                     }
@@ -1160,9 +1163,11 @@ export class PlanificacionMultipleComponent implements OnInit {
     })
     //console.log('validos ', this.datosSeleccionados.usuario)
     if (contador === 0) {
+      this.progreso = false;
       this.ControlarBotones(false, true);
     }
     else {
+      this.progreso = false;
       this.ControlarBotones(true, false);
     }
   }
@@ -1184,7 +1189,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     }
     else {
       // METODO PARA ELIMINAR HORARIOS
-      this.eliminar_lista.forEach(h => {
+      this.eliminar_lista.forEach((h: any) => {
         //console.log('ingresa a eliminar horarios')
         let plan_fecha = {
           codigo: h.codigo,
@@ -1252,7 +1257,7 @@ export class PlanificacionMultipleComponent implements OnInit {
   CargarTimbres() {
     //console.log('ver datos seleccionados ', this.datosSeleccionados.usuario)
     var codigos = '';
-    this.datosSeleccionados.usuario.forEach(obj => {
+    this.datosSeleccionados.usuario.forEach((obj: any) => {
       if (codigos === '') {
         codigos = '\'' + obj.codigo + '\''
       }
@@ -1304,16 +1309,13 @@ export class PlanificacionMultipleComponent implements OnInit {
     let sumah = parseInt(suma.split(':')[0]) + parseInt(tiempo.split(':')[0]);
     let sumam = parseInt(suma.split(':')[1]) + parseInt(tiempo.split(':')[1]);
     let sumas = parseInt(suma.split(':')[2]) + parseInt(tiempo.split(':')[2]);
-
     if (sumam === 60) {
       sumam = 0;
       sumah = sumah + 1;
     }
-
     let h = '00';
     let m = '00';
     let s = '00';
-
     if (sumah < 10) {
       h = '0' + sumah;
     }
@@ -1332,9 +1334,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     else {
       s = String(sumas)
     }
-
-    return h + ':' + m + ':' + s
-
+    return h + ':' + m + ':' + s;
   }
 
   // EVENTO PARA LA PAGINACION

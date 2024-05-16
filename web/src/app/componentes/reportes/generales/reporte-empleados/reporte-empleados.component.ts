@@ -253,7 +253,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
     this.origen = JSON.stringify(informacion);
-    informacion.forEach(obj => {
+    informacion.forEach((obj: any) => {
       this.sucursales.push({
         id: obj.id_suc,
         sucursal: obj.name_suc,
@@ -261,8 +261,8 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((obj: any) => {
         this.regimen.push({
           id: obj.id_regimen,
           nombre: obj.name_regimen,
@@ -272,9 +272,9 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(dep => {
-        dep.departamentos.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((dep: any) => {
+        dep.departamentos.forEach((obj: any) => {
           this.departamentos.push({
             id: obj.id_depa,
             departamento: obj.name_dep,
@@ -286,10 +286,10 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(dep => {
-        dep.departamentos.forEach(car => {
-          car.cargos.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((dep: any) => {
+        dep.departamentos.forEach((car: any) => {
+          car.cargos.forEach((obj: any) => {
             this.cargos.push({
               id: obj.id_cargo_,
               nombre: obj.name_cargo,
@@ -301,11 +301,11 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(dep => {
-        dep.departamentos.forEach(car => {
-          car.cargos.forEach(empl => {
-            empl.empleado.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((dep: any) => {
+        dep.departamentos.forEach((car: any) => {
+          car.cargos.forEach((empl: any) => {
+            empl.empleado.forEach((obj: any) => {
               let elemento = {
                 id: obj.id,
                 nombre: obj.nombre,
@@ -596,7 +596,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         });
       })
     })
-    respuesta.forEach(obj => {
+    respuesta.forEach((obj: any) => {
       obj.regimenes.forEach((regimen: any) => {
         regimen.departamentos.forEach((departamento: any) => {
           departamento.cargos = departamento.cargos.filter((e: any) => {
@@ -1056,8 +1056,8 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     array.forEach((suc: any) => {
       suc.regimenes.forEach(depa => {
         depa.departamentos.forEach((car: any) => {
-          car.cargos.forEach(empl => {
-            empl.empleado.forEach(usu => {
+          car.cargos.forEach((empl: any) => {
+            empl.empleado.forEach((usu: any) => {
               let ele = {
                 'Cédula': usu.cedula,
                 'Apellido': usu.apellido,

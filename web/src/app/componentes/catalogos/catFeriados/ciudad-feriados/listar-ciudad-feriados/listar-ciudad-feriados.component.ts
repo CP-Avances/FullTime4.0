@@ -137,7 +137,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
     }
     else {
       this.habilitarprogress = true;
-      datos.forEach(obj => {
+      datos.forEach((obj: any) => {
         this.restF.EliminarRegistro(obj.idciudad_asignada).subscribe(res => {
           this.eliminar = this.eliminar + 1;
           if (this.eliminar === datos.length) {

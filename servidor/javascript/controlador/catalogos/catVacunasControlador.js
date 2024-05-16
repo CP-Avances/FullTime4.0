@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.vacunaControlador = void 0;
+exports.TIPO_VACUNAS_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
 class VacunaControlador {
-    listaVacuna(req, res) {
+    // METODO PARA LISTAR TIPO VACUNAS
+    ListaVacuna(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const VACUNA = yield database_1.default.query(`
@@ -33,6 +34,7 @@ class VacunaControlador {
             }
         });
     }
+    // METODO PARA REGISTRAR TIPO VACUNA
     CrearVacuna(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -40,9 +42,7 @@ class VacunaControlador {
                 var VERIFICAR_VACUNA = yield database_1.default.query(`
                 SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
                 `, [vacuna.toUpperCase()]);
-                console.log('VERIFICAR_VACUNA: ', VERIFICAR_VACUNA.rows[0]);
                 if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
-                    // Dar formato a la palabra de vacuna
                     const vacunaInsertar = vacuna.charAt(0).toUpperCase() + vacuna.slice(1).toLowerCase();
                     const response = yield database_1.default.query(`
                     INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
@@ -56,7 +56,7 @@ class VacunaControlador {
                     }
                 }
                 else {
-                    return res.jsonp({ message: 'Ya existe la vacuna ', status: '300' });
+                    return res.jsonp({ message: 'Tipo vacuna ya existe en el sistema.', status: '300' });
                 }
             }
             catch (error) {
@@ -64,6 +64,7 @@ class VacunaControlador {
             }
         });
     }
+    // METODO PARA EDITAR VACUNA
     EditarVacuna(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -86,7 +87,7 @@ class VacunaControlador {
                     }
                 }
                 else {
-                    return res.jsonp({ message: 'Tipo vacuna registrada ya existe en el sistema.', status: '300' });
+                    return res.jsonp({ message: 'Tipo vacuna ya existe en el sistema.', status: '300' });
                 }
             }
             catch (error) {
@@ -94,14 +95,14 @@ class VacunaControlador {
             }
         });
     }
-    eliminarRegistro(req, res) {
+    // METODO PARA ELIMINAR REGISTRO
+    EliminarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                console.log('id: ', id);
                 yield database_1.default.query(`
                 DELETE FROM e_cat_vacuna WHERE id = $1
-            `, [id]);
+                `, [id]);
                 res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
@@ -110,5 +111,5 @@ class VacunaControlador {
         });
     }
 }
-exports.vacunaControlador = new VacunaControlador();
-exports.default = exports.vacunaControlador;
+exports.TIPO_VACUNAS_CONTROLADOR = new VacunaControlador();
+exports.default = exports.TIPO_VACUNAS_CONTROLADOR;

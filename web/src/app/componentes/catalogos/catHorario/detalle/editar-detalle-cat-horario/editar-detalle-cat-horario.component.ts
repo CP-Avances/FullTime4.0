@@ -106,7 +106,7 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
 
   // METODO PARA MOSTRAR DATOS EN FORMULARIO
   CargarDatos() {
-    const [obj] = this.options.filter(o => {
+    const [obj] = this.options.filter((o: any) => {
       return o.orden === this.data.detalle.orden
     })
     this.formulario.patchValue({

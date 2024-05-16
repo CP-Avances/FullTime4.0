@@ -305,7 +305,7 @@ export class PrincipalProcesoComponent implements OnInit {
   exportToXML() {
     var objeto;
     var arregloProcesos: any = [];
-    this.procesos.forEach(obj => {
+    this.procesos.forEach((obj: any) => {
       objeto = {
         "proceso": {
           '@id': obj.id,

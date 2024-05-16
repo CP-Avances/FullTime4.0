@@ -738,7 +738,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   exportToXML(opcion: String) {
     var objeto: any;
     var arregloPermisos: any = [];
-    (opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).forEach(obj => {
+    (opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).forEach((obj: any) => {
       objeto = {
         "lista_permisos": {
         "@id": obj.id,

@@ -914,7 +914,7 @@ export class ListarPlanificacionComponent implements OnInit {
   exportToXML() {
     var objeto: any;
     var arregloPlanificacion: any = [];
-    this.planificaciones.forEach(obj => {
+    this.planificaciones.forEach((obj: any) => {
       objeto = {
         "lista_planificaciones": {
         '@id': obj.id,

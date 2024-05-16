@@ -124,7 +124,7 @@ export class EditarEmpleadoComponent implements OnInit {
     });
 
     this.segundoFormGroup.setValue({
-      nacionalidadForm: this.nacionalidades.filter(o => { return id_nacionalidad === o.id }).map(o => { return o.nombre }),
+      nacionalidadForm: this.nacionalidades.filter((o: any) => { return id_nacionalidad === o.id }).map(o => { return o.nombre }),
       estadoCivilForm: estado_civil,
       domicilioForm: domicilio,
       telefonoForm: telefono,
@@ -167,7 +167,7 @@ export class EditarEmpleadoComponent implements OnInit {
   // METODO PARA ACTUALIZAR REGISTRO DE EMPLEADO
   ActualizarEmpleado(form1: any, form2: any, form3: any) {
     // BUSCA EL ID DE LA NACIONALIDAD ELEGIDA EN EL AUTOCOMPLETADO
-    this.nacionalidades.forEach(obj => {
+    this.nacionalidades.forEach((obj: any) => {
       if (form2.nacionalidadForm == obj.nombre) {
         console.log(obj);
         this.idNacionalidad = obj.id;

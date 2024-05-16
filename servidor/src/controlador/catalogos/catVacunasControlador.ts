@@ -1,14 +1,11 @@
-import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import fs from 'fs';
-import path from 'path';
 import pool from '../../database';
-import excel from 'xlsx';
 
 class VacunaControlador {
 
-    public async listaVacuna(req: Request, res: Response) {
+    // METODO PARA LISTAR TIPO VACUNAS
+    public async ListaVacuna(req: Request, res: Response) {
         try {
             const VACUNA = await pool.query(
                 `
@@ -25,6 +22,7 @@ class VacunaControlador {
         }
     }
 
+    // METODO PARA REGISTRAR TIPO VACUNA
     public async CrearVacuna(req: Request, res: Response): Promise<Response> {
         try {
             const { vacuna } = req.body;
@@ -32,9 +30,9 @@ class VacunaControlador {
                 `
                 SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
                 `, [vacuna.toUpperCase()])
-            console.log('VERIFICAR_VACUNA: ', VERIFICAR_VACUNA.rows[0]);
+
             if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
-                // Dar formato a la palabra de vacuna
+
                 const vacunaInsertar = vacuna.charAt(0).toUpperCase() + vacuna.slice(1).toLowerCase();
 
                 const response: QueryResult = await pool.query(
@@ -51,7 +49,7 @@ class VacunaControlador {
                     return res.status(404).jsonp({ message: 'No se pudo guardar', status: '400' })
                 }
             } else {
-                return res.jsonp({ message: 'Ya existe la vacuna ', status: '300' })
+                return res.jsonp({ message: 'Tipo vacuna ya existe en el sistema.', status: '300' })
             }
         }
         catch (error) {
@@ -59,6 +57,7 @@ class VacunaControlador {
         }
     }
 
+    // METODO PARA EDITAR VACUNA
     public async EditarVacuna(req: Request, res: Response): Promise<Response> {
         try {
             const { id, nombre } = req.body;
@@ -87,7 +86,7 @@ class VacunaControlador {
                     return res.status(404).jsonp({ message: 'Ups!!! algo salio mal.', status: '400' })
                 }
             } else {
-                return res.jsonp({ message: 'Tipo vacuna registrada ya existe en el sistema.', status: '300' })
+                return res.jsonp({ message: 'Tipo vacuna ya existe en el sistema.', status: '300' })
             }
 
         }
@@ -96,14 +95,14 @@ class VacunaControlador {
         }
     }
 
-    public async eliminarRegistro(req: Request, res: Response) {
+    // METODO PARA ELIMINAR REGISTRO
+    public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
-            console.log('id: ', id)
             await pool.query(
                 `
                 DELETE FROM e_cat_vacuna WHERE id = $1
-            `
+                `
                 , [id]);
             res.jsonp({ message: 'Registro eliminado.' });
 
@@ -114,6 +113,6 @@ class VacunaControlador {
 
 }
 
-export const vacunaControlador = new VacunaControlador();
+export const TIPO_VACUNAS_CONTROLADOR = new VacunaControlador();
 
-export default vacunaControlador;
+export default TIPO_VACUNAS_CONTROLADOR;

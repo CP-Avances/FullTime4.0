@@ -158,7 +158,7 @@ const GraficaMarcaciones = function (id_empresa, fec_inicio, fec_final) {
             noviembre: [],
             diciembre: []
         };
-        timbres.forEach(obj => {
+        timbres.forEach((obj) => {
             let fecha = obj.fec_hora_timbre;
             // console.log(fecha.getMonth());
             switch (fecha.getMonth()) {

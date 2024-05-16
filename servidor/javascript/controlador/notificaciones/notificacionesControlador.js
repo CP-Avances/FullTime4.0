@@ -198,7 +198,7 @@ class NotificacionTiempoRealControlador {
             const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti } = req.body;
             const id_empleado = req.params.id;
             yield database_1.default.query(`
-      UPDATE eu_configurar_alertas SET vacacion_mail = $1, vacacion_noti = $2, permiso_mail = $3,
+      UPDATE eu_configurar_alertas SET vacacion_mail = $1, vacacion_notificacion = $2, permiso_mail = $3,
         permiso_notificacion = $4, hora_extra_mail = $5, hora_extra_notificacion = $6, comida_mail = $7, 
         comida_notificacion = $8, comunicado_mail = $9, comunicado_notificacion = $10 
       WHERE id_empleado = $11

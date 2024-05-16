@@ -9,7 +9,7 @@ p {
 
 .caja {
     padding: 0 5px 0 5px;
-    font-size: 90%;
+    font-size: 60%;
 }
 
 mat-slide-toggle {
@@ -24,7 +24,6 @@ mat-slide-toggle {
 
 .scrollbar {
     float: left;
-    height: 500px;
     width: 100%;
     background: #fff;
     overflow-y: scroll;

@@ -77,8 +77,8 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
         }
       });
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
+      res.forEach((obj: any) => {
+        obj.departamentos.forEach((ele: any) => {
           this.departamentos.push({
             id: ele.id_depa,
             nombre: ele.name_dep
@@ -86,8 +86,8 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
         })
       })
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
+      res.forEach((obj: any) => {
+        obj.departamentos.forEach((ele: any) => {
           ele.empleado.forEach(r => {
             this.empleados.push({
               id: r.id,
@@ -157,7 +157,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_puntualidad') as any)
 
-    let suc = respuesta.filter(o => {
+    let suc = respuesta.filter((o: any) => {
       var bool =  this.selectionSuc.selected.find(obj1 => {
         return obj1.id === o.id_suc
       })
@@ -183,7 +183,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_puntualidad') as any)
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos =  obj.departamentos.filter(o => {
+      obj.departamentos =  obj.departamentos.filter((o: any) => {
         var bool =  this.selectionDep.selected.find(obj1 => {
           return obj1.id === o.id_depa
         })
@@ -214,7 +214,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach(element => {
-        element.empleado = element.empleado.filter(o => {
+        element.empleado = element.empleado.filter((o: any) => {
           var bool =  this.selectionEmp.selected.find(obj1 => {
             return obj1.id === o.id
           })
@@ -222,7 +222,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
         })
       });
     })
-    respuesta.forEach(obj => {
+    respuesta.forEach((obj: any) => {
       obj.departamentos = obj.departamentos.filter(e => {
         return e.empleado.length > 0
       })

@@ -898,7 +898,7 @@ export class DatosEmpleadoComponent implements OnInit {
   ExportToXML() {
     let objeto: any;
     let arregloEmpleado: any = [];
-    this.empleadoUno.forEach(obj => {
+    this.empleadoUno.forEach((obj: any) => {
       let estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
