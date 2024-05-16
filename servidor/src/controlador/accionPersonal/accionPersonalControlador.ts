@@ -204,7 +204,7 @@ class AccionPersonalControlador {
         const { id } = req.params;
         const ACCION = await pool.query(
             `
-            SELECT * FROM map_detalle_tipo_accion_personal WHERE NOT id_tipo = $1
+            SELECT * FROM map_detalle_tipo_accion_personal WHERE NOT id_tipo_accion_personal = $1
             `
             , [id]);
         if (ACCION.rowCount > 0) {
@@ -244,14 +244,18 @@ class AccionPersonalControlador {
         res.jsonp({ message: 'Registro exitoso.' });
     }
 
-    public async EliminarTipoAccionPersonal(req: Request, res: Response): Promise<void> {
-        const id = req.params.id;
-        await pool.query(
-            `
-            DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
-            `
-            , [id]);
-        res.jsonp({ message: 'Registro eliminado.' });
+    public async EliminarTipoAccionPersonal(req: Request, res: Response) {
+        try {
+            const id = req.params.id;
+            await pool.query(
+                `
+                DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
+                `
+                , [id]);
+            res.jsonp({ message: 'Registro eliminado.' });
+        } catch (error) {
+            return res.jsonp({ message: 'error' });
+        }
     }
 
     // TABLA ACCION_PERSONAL_EMPLEADO

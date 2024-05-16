@@ -39,7 +39,7 @@ export class PrincipalProcesoComponent implements OnInit {
   filtroNombre = '';
   filtroNivel: number;
   filtroProPadre = '';
-  
+
   procesos: any = [];
   empleado: any = [];
   idEmpleado: number;
@@ -121,6 +121,7 @@ export class PrincipalProcesoComponent implements OnInit {
     this.buscarNombre.reset();
     this.buscarNivel.reset();
     this.buscarPadre.reset();
+    this.ObtenerProcesos();
   }
 
   // METODO PARA LISTAR PROCESOS
@@ -143,16 +144,28 @@ export class PrincipalProcesoComponent implements OnInit {
   AbrirVentanaEditar(datosSeleccionados: any): void {
     console.log(datosSeleccionados);
     this.ventana.open(EditarCatProcesosComponent,
-      { width: '450px', data: { datosP: datosSeleccionados, lista: true } }).disableClose = true;
+      {
+        width: '450px', data: { datosP: datosSeleccionados, lista: true }
+
+      }).disableClose = true;
   }
 
   // FUNCION PARA ELIMINAR REGISTROS
   Eliminar(id_proceso: number) {
+
+
     this.rest.deleteProcesoRest(id_proceso).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerProcesos();
+
+      if (res.message === 'error') {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerProcesos();
+      }
     });
   }
 

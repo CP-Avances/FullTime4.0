@@ -99,6 +99,7 @@ export class EditarCatProcesosComponent implements OnInit {
         nivel: form.procesoNivelForm,
       };
       this.ActualizarDatos(dataProceso);
+      this.ObtenerProcesos();
     } else {
       this.rest.getIdProcesoPadre(procesoPadreNombre).subscribe(data => {
         procesoPadreId = data[0].id;
@@ -109,8 +110,13 @@ export class EditarCatProcesosComponent implements OnInit {
           proc_padre: procesoPadreId
         };
         this.ActualizarDatos(dataProceso);
+        this.ObtenerProcesos();
+
       });
     }
+    this.LimpiarCampos();
+    this.ObtenerProcesos();
+
   }
 
   // METODO PARA ACTUALIZAR DATOS EN BASE DE DATOS
@@ -120,13 +126,18 @@ export class EditarCatProcesosComponent implements OnInit {
       this.toastr.success('Operacion exitosa.', 'Proceso actualizado', {
         timeOut: 6000,
       });
+      this.LimpiarCampos();
       this.CerrarVentana();
+      this.ObtenerProcesos();
+
     }, error => { });
+    this.LimpiarCampos();
   }
 
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
     this.nuevoProcesoForm.reset();
+    this.ObtenerProcesos();
   }
 
   // METODO PARA BUSCAR PROCESOS
@@ -139,10 +150,11 @@ export class EditarCatProcesosComponent implements OnInit {
 
   // METODO PARA CERRRA PROCESOS
   CerrarVentana() {
-    this.ObtenerProcesos();
     this.LimpiarCampos();
     this.ImprimirDatos();
     this.ventana.close();
+    this.ObtenerProcesos();
+
   }
 
   // METODO PARA SALIR DEL REGISTRO

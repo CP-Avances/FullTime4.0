@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment'
+import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -41,8 +42,8 @@ export class TipoComidasService {
     return this.http.post(`${environment.url}/tipoComidas/xmlDownload`, data);
   }
 
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/tipoComidas/eliminar/${id}`);
+  EliminarRegistro(id: any) {
+    return this.http.delete(`${environment.url}/tipoComidas/eliminar/${id}`).pipe(catchError(id));
   }
 
   ObtenerUltimoId() {

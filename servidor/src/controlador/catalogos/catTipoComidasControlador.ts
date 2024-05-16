@@ -102,20 +102,27 @@ class TipoComidasControlador {
         await pool.query(
             `
             UPDATE ma_horario_comidas SET nombre = $1, id_comida = $2, hora_inicio = $3, hora_fin = $4
-            WHERE id = $5'
+            WHERE id = $5
             `
             , [nombre, tipo_comida, hora_inicio, hora_fin, id]);
         res.jsonp({ message: 'Registro actualizado exitosamente.' });
     }
 
-    public async EliminarRegistros(req: Request, res: Response): Promise<void> {
-        const id = req.params.id;
-        await pool.query(
-            `
+    public async EliminarRegistros(req: Request, res: Response) {
+
+        try {
+            const id = req.params.id;
+            await pool.query(
+                `
             DELETE FROM ma_horario_comidas WHERE id = $1
             `
-            , [id]);
-        res.jsonp({ message: 'Registro eliminado.' });
+                , [id]);
+            res.jsonp({ message: 'Registro eliminado.' });
+
+        } catch (error) {
+            return res.jsonp({ message: 'error' });
+        }
+
     }
 
     public async VerUltimoRegistro(req: Request, res: Response) {

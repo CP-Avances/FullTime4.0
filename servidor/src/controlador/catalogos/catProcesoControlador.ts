@@ -72,14 +72,20 @@ class ProcesoControlador {
     res.jsonp({ message: 'Proceso actualizado exitosamente.' });
   }
 
-  public async EliminarProceso(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    await pool.query(
-      `
-      DELETE FROM map_cat_procesos WHERE id = $1
-      `
-      , [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+  public async EliminarProceso(req: Request, res: Response) {
+
+    try {
+      const id = req.params.id;
+      await pool.query(
+        `
+        DELETE FROM map_cat_procesos WHERE id = $1
+        `
+        , [id]);
+      res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      return res.jsonp({ message: 'error' });
+    }
+
   }
 
 

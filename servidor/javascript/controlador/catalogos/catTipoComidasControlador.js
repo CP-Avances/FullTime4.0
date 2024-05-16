@@ -103,18 +103,23 @@ class TipoComidasControlador {
             const { nombre, tipo_comida, hora_inicio, hora_fin, id } = req.body;
             yield database_1.default.query(`
             UPDATE ma_horario_comidas SET nombre = $1, id_comida = $2, hora_inicio = $3, hora_fin = $4
-            WHERE id = $5'
+            WHERE id = $5
             `, [nombre, tipo_comida, hora_inicio, hora_fin, id]);
             res.jsonp({ message: 'Registro actualizado exitosamente.' });
         });
     }
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
+            try {
+                const id = req.params.id;
+                yield database_1.default.query(`
             DELETE FROM ma_horario_comidas WHERE id = $1
             `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+                res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
         });
     }
     VerUltimoRegistro(req, res) {

@@ -126,10 +126,16 @@ export class ListarTipoAccionComponent implements OnInit {
   // FUNCION PARA ELIMINAR REGISTROS
   Eliminar(id_accion: number) {
     this.rest.EliminarRegistro(id_accion).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerTipoAccionesPersonal();
+      if (res.message === 'error') {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerTipoAccionesPersonal();
+      }
     });
   }
 
