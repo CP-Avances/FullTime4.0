@@ -1825,7 +1825,6 @@ class UsuarioControlador {
   //ACCESOS AL SISTEMA
   public async AuditarAcceso(req: Request, res: Response) {
     try {
-      // TODO: VER SI EL USER_NAME Y EL IP_ADDRES SON LOS DATOSQUE NECESITA LA AUDITORIA
       const { modulo, user_name, fecha, hora, acceso, ip_address} = req.body;
 
       // INICIAR TRANSACCION

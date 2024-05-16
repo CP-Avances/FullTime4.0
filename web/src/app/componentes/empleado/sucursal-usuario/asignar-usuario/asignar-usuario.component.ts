@@ -14,6 +14,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { PrincipalSucursalUsuarioComponent } from '../principal-sucursal-usuario/principal-sucursal-usuario.component';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-asignar-usuario',
@@ -39,6 +40,10 @@ export class AsignarUsuarioComponent implements OnInit {
   tamanio_pagina_a: number = 5;
   pageSizeOptions_a = [5, 10, 20, 50];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public ventanasu: PrincipalSucursalUsuarioComponent,
     public sucursal: SucursalService,
@@ -52,7 +57,9 @@ export class AsignarUsuarioComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //console.log('ver data ', this.data.nombre)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.name_sucursal = this.data.nombre.toUpperCase();
     this.BuscarAdministradoresJefes();
     this.ObtenerSucursales();
@@ -299,7 +306,9 @@ export class AsignarUsuarioComponent implements OnInit {
     let datos = {
       id_empleado: '',
       id_sucursal: this.data.id,
-      principal: false
+      principal: false,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.adminSeleccionados.forEach(objeto => {
       datos.id_empleado = objeto.id;
@@ -331,13 +340,13 @@ export class AsignarUsuarioComponent implements OnInit {
   // METODO DE GUARDADO EN UNA LISTA LOS ELEMENTOS SELECCIONADOS
   selectionAsignados = new SelectionModel<ITableEmpleados>(true, []);
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedDep() {
     const numSelected = this.selectionAsignados.selected.length;
     return numSelected === this.asignados.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionAsignados.clear() :
@@ -374,7 +383,7 @@ export class AsignarUsuarioComponent implements OnInit {
   }
 
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteProceso() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -387,6 +396,11 @@ export class AsignarUsuarioComponent implements OnInit {
   // METODO PARA ELIMINAR DATOS ASIGNADOS
   MetodoEliminar() {
     let cont = 0;
+
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
     let lista_eliminar = this.selectionAsignados.selected.map(obj => {
       return {
         id_usucursal: obj.id_usucursal
@@ -394,7 +408,7 @@ export class AsignarUsuarioComponent implements OnInit {
     })
     // PROCESO PARA ELIMINAR LOS REGISTROS SELECCIONADOS
     lista_eliminar.forEach(obj => {
-      this.usuario.EliminarUsuarioSucursal(obj.id_usucursal).subscribe(res => {
+      this.usuario.EliminarUsuarioSucursal(obj.id_usucursal, datos).subscribe(res => {
         cont = cont + 1;
 
         if (cont === lista_eliminar.length) {

@@ -163,8 +163,12 @@ export class UsuarioService {
   }
 
   // METODO PARA ELIMINAR REGISTROS DE USUARIO - SUCURSAL
-  EliminarUsuarioSucursal(id_usucursal: any) {
-    return this.http.delete(`${environment.url}/usuarios/eliminar-usuario-sucursal/${id_usucursal}`);
+  EliminarUsuarioSucursal(id_usucursal: any, datos: any) {
+    const url = `${environment.url}/usuarios/eliminar-usuario-sucursal/${id_usucursal}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
   }
 
 

@@ -334,7 +334,9 @@ export class EditarCargoComponent implements OnInit {
     let datos = {
       id_empleado: parseInt(this.idEmpleado),
       id_sucursal: form.idSucursalForm,
-      principal: true
+      principal: true,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.usuario.RegistrarUsuarioSucursal(datos).subscribe(res => {
     });
@@ -362,6 +364,8 @@ export class EditarCargoComponent implements OnInit {
     let datos = {
       id_sucursal: form.idSucursalForm,
       id_empleado: parseInt(this.idEmpleado),
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.usuario.ActualizarUsuarioSucursalPrincipal(datos).subscribe(res => {
     });
