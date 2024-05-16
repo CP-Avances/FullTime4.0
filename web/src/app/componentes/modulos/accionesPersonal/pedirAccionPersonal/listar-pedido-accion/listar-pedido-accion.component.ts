@@ -190,35 +190,35 @@ export class ListarPedidoAccionComponent implements OnInit {
   FormatearDatos(lista: any, formato_fecha: string, formato_hora: string) {
     lista.forEach((data) => {
       data.fecCreacion_ = this.validar.FormatearFecha(
-        data.fec_creacion,
+        data.fecha_creacion,
         formato_fecha,
         this.validar.dia_abreviado
       );
       data.fecDesde_ = this.validar.FormatearFecha(
-        data.fec_rige_desde,
+        data.fecha_rige_desde,
         formato_fecha,
         this.validar.dia_abreviado
       );
       data.fecHasta_ =
-        data.fec_rige_hasta !== null
+        data.fecha_rige_hasta !== null
           ? this.validar.FormatearFecha(
-            data.fec_rige_hasta,
+            data.fecha_rige_hasta,
             formato_fecha,
             this.validar.dia_abreviado
           )
           : "";
       data.fechaActa_ =
-        data.fec_act_final_concurso !== null
+        data.fecha_acta_final_concurso !== null
           ? this.validar.FormatearFecha(
-            data.fec_act_final_concurso,
+            data.fecha_acta_final_concurso,
             formato_fecha,
             this.validar.dia_abreviado
           )
           : "";
       data.fechaReemp_ =
-        data.primera_fecha_reemp !== null
+        data.primera_fecha_reemplazo !== null
           ? this.validar.FormatearFecha(
-            data.primera_fecha_reemp,
+            data.primera_fecha_reemplazo,
             formato_fecha,
             this.validar.dia_abreviado
           )
@@ -352,16 +352,16 @@ export class ListarPedidoAccionComponent implements OnInit {
   // METODO PARA BUSCAR INFORMACIÓN DE LOS EMPLEADOS RESPONSABLES / FIRMAS 
   BusquedaInformacion(tipo: string) {
     this.restAccion
-      .BuscarDatosPedidoEmpleados(parseInt(this.datosPedido[0].firma_empl_uno))
+      .BuscarDatosPedidoEmpleados(parseInt(this.datosPedido[0].firma_empleado_uno))
       .subscribe((data2) => {
         this.empleado_2 = data2;
         this.restAccion
           .BuscarDatosPedidoEmpleados(
-            parseInt(this.datosPedido[0].firma_empl_dos)
+            parseInt(this.datosPedido[0].titulo_empleado_dos)
           )
           .subscribe((data3) => {
             this.empleado_3 = data3;
-            this.restAccion.BuscarDatosPedidoEmpleados(parseInt(this.datosPedido[0].id_empl_responsable))
+            this.restAccion.BuscarDatosPedidoEmpleados(parseInt(this.datosPedido[0].id_empleado_responsable))
               .subscribe((data4) => {
                 this.empleado_4 = data4;
                 this.VerificarDatos(tipo);
@@ -373,22 +373,22 @@ export class ListarPedidoAccionComponent implements OnInit {
   // METODO PARA VERIFICAR DATOS INGRESADO Y NO INGRESADO
   VerificarDatos(tipo: string) {
     if (
-      this.datosPedido[0].proceso_propuesto === null &&
-      this.datosPedido[0].cargo_propuesto === null
+      this.datosPedido[0].id_proceso_propuesto === null &&
+      this.datosPedido[0].id_cargo_propuesto === null
     ) {
       this.DefinirColor(this.datosPedido, "");
       tipo === "pdf" ? this.generarPdf("download") : this.generarExcel();
     } else if (
-      this.datosPedido[0].proceso_propuesto != null &&
-      this.datosPedido[0].cargo_propuesto != null
+      this.datosPedido[0].id_proceso_propuesto != null &&
+      this.datosPedido[0].id_cargo_propuesto != null
     ) {
       this.restAccion
-        .Buscarprocesos(this.datosPedido[0].proceso_propuesto)
+        .Buscarprocesos(this.datosPedido[0].id_proceso_propuesto)
         .subscribe((proc1) => {
           this.procesoPropuesto = proc1;
           this.EscribirProcesosPropuestos(this.procesoPropuesto);
           this.restAccion
-            .ConsultarUnCargoPropuesto(this.datosPedido[0].cargo_propuesto)
+            .ConsultarUnCargoPropuesto(this.datosPedido[0].id_cargo_propuesto)
             .subscribe((carg) => {
               this.DefinirColor(
                 this.datosPedido,
@@ -398,11 +398,11 @@ export class ListarPedidoAccionComponent implements OnInit {
             });
         });
     } else if (
-      this.datosPedido[0].proceso_propuesto != null &&
-      this.datosPedido[0].cargo_propuesto === null
+      this.datosPedido[0].id_proceso_propuesto != null &&
+      this.datosPedido[0].id_cargo_propuesto === null
     ) {
       this.restAccion
-        .Buscarprocesos(this.datosPedido[0].proceso_propuesto)
+        .Buscarprocesos(this.datosPedido[0].id_proceso_propuesto)
         .subscribe((proc) => {
           this.procesoPropuesto = proc;
           this.EscribirProcesosPropuestos(this.procesoPropuesto);
@@ -410,11 +410,11 @@ export class ListarPedidoAccionComponent implements OnInit {
           tipo === "pdf" ? this.generarPdf("download") : this.generarExcel();
         });
     } else if (
-      this.datosPedido[0].proceso_propuesto === null &&
-      this.datosPedido[0].cargo_propuesto != null
+      this.datosPedido[0].id_proceso_propuesto === null &&
+      this.datosPedido[0].id_cargo_propuesto != null
     ) {
       this.restAccion
-        .ConsultarUnCargoPropuesto(this.datosPedido[0].cargo_propuesto)
+        .ConsultarUnCargoPropuesto(this.datosPedido[0].id_cargo_propuesto)
         .subscribe((carg) => {
           this.DefinirColor(
             this.datosPedido,
@@ -570,10 +570,10 @@ export class ListarPedidoAccionComponent implements OnInit {
   ObtenerDecreto() {
     this.decreto = ["", "", "", "_______________", "", "white"];
     let decretoTexto: string = "";
-    if (this.datosPedido[0].decre_acue_resol !== null) {
+    if (this.datosPedido[0].id_contexto_legal !== null) {
       try {
         this.restAccion
-          .ConsultarUnDecreto(this.datosPedido[0].decre_acue_resol)
+          .ConsultarUnDecreto(this.datosPedido[0].id_contexto_legal)
           .subscribe((data8) => {
             decretoTexto = data8[0].descripcion;
             let texto: string = decretoTexto.toUpperCase();
@@ -4102,10 +4102,10 @@ export class ListarPedidoAccionComponent implements OnInit {
                     text: obj.apellido + " " + obj.nombre,
                     style: "itemsTable",
                   },
-                  { text: obj.fecCreacion_, style: "itemsTable" },
-                  { text: obj.fecDesde_, style: "itemsTable" },
-                  { text: obj.fecHasta_, style: "itemsTable" },
-                  { text: obj.num_partida, style: "itemsTable" },
+                  { text: obj.fecha_creacion, style: "itemsTable" },
+                  { text: obj.fecha_rige_desde, style: "itemsTable" },
+                  { text: obj.fecha_rige_hasta, style: "itemsTable" },
+                  { text: obj.numero_partida_empresa, style: "itemsTable" },
                 ];
               }),
             ],
