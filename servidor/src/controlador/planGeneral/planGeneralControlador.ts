@@ -33,7 +33,7 @@ class PlanGeneralControlador {
                     iterar = iterar + 1;
 
                     try {
-                        console.log('if ', error)
+                        console.log('if error --> ', error)
                         if (error) {
                             errores = errores + 1;
                             if (iterar === req.body.length && errores > 0) {

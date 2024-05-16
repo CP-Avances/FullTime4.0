@@ -95,7 +95,7 @@
                                 <mat-form-field style="width: 140px;">
                                     <mat-label>Fecha de salida</mat-label>
                                     <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
-                                        [formControl]="fechaSalidaF">
+                                        [formControl]="fechaSalidaF" required>
                                     <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
                                         matTooltipPosition="right"
                                         matTooltip="Ingresar la fecha estimada de salida del empleado, en caso de conocerla. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">

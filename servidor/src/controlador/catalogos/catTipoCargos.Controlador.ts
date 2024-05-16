@@ -8,6 +8,23 @@ import excel from 'xlsx';
 
 class TiposCargosControlador {
 
+    // METODO PARA BUSCAR TIPO DE CARGOS POR EL NOMBRE
+    public async BuscarTipoCargoNombre(req: Request, res: Response) {
+        const { nombre } = req.body;
+        const CARGOS = await pool.query(
+            `
+            SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+            `
+            , [nombre]
+        );
+        if (CARGOS.rowCount > 0) {
+            return res.jsonp(CARGOS.rows)
+        }
+        else {
+            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+        }
+    }
+
     public async listaTipoCargos(req: Request, res: Response) {
         try {
             const TIPO_CARGO = await pool.query(
@@ -54,8 +71,6 @@ class TiposCargosControlador {
             } else {
                 return res.jsonp({ message: 'Ya existe un cargo laboral', status: '300' })
             }
-
-
         }
         catch (error) {
             return res.status(500).jsonp({ message: 'error', status: '500' });

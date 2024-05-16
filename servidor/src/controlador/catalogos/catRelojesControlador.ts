@@ -10,7 +10,7 @@ class RelojesControlador {
     public async ListarRelojes(req: Request, res: Response) {
         const RELOJES = await pool.query(
             `
-            SELECT cr.id, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
+            SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
                 cr.id_fabricacion, cr.fabricante, cr.mac, cr.tiene_funciones, cr.id_sucursal, 
                 cr.id_departamento, cr.numero_accion, cd.nombre AS nomdepar, s.nombre AS nomsucursal, 
                 e.nombre AS nomempresa, c.descripcion AS nomciudad
@@ -29,10 +29,7 @@ class RelojesControlador {
 
     // METODO PARA ELIMINAR REGISTROS
     public async EliminarRegistros(req: Request, res: Response) {
-
-
         try {
-
             const id = req.params.id;
             await pool.query(
                 `
@@ -40,37 +37,45 @@ class RelojesControlador {
                 `
                 , [id]);
             res.jsonp({ message: 'Registro eliminado.' });
-
         } catch (error) {
             return res.jsonp({ message: 'error' });
-
         }
-
     }
 
     // METODO PARA REGISTRAR DISPOSITIVO
     public async CrearRelojes(req: Request, res: Response) {
         try {
             const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                tien_funciones, id_sucursal, id_departamento, id, numero_accion } = req.body;
+                tien_funciones, id_sucursal, id_departamento, codigo, numero_accion } = req.body;
 
-            const response: QueryResult = await pool.query(
+            var VERIFICAR_CODIGO = await pool.query(
                 `
-                INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                    id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, id, 
-                    numero_accion )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1
                 `
-                , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                    tien_funciones, id_sucursal, id_departamento, id, numero_accion]);
+                , [codigo.toUpperCase()])
 
-            const [reloj] = response.rows;
+            if (VERIFICAR_CODIGO.rows[0] == undefined || VERIFICAR_CODIGO.rows[0] == '') {
+                const response: QueryResult = await pool.query(
+                    `
+                    INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
+                        id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, codigo, 
+                        numero_accion )
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                    `
+                    , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                        tien_funciones, id_sucursal, id_departamento, codigo, numero_accion]);
 
-            if (reloj) {
-                return res.status(200).jsonp({ message: 'guardado', reloj: reloj })
+                const [reloj] = response.rows;
+
+                if (reloj) {
+                    return res.status(200).jsonp({ message: 'guardado', reloj: reloj })
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'mal_registro' })
+                }
             }
             else {
-                return res.status(404).jsonp({ message: 'mal_registro' })
+                return res.jsonp({ message: 'existe' })
             }
         }
         catch (error) {
@@ -98,18 +103,31 @@ class RelojesControlador {
     public async ActualizarReloj(req: Request, res: Response) {
         try {
             const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                tien_funciones, id_sucursal, id_departamento, id, numero_accion, id_real } = req.body;
-            await pool.query(
+                tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, id_real } = req.body;
+
+            var VERIFICAR_DISCAPACIDAD = await pool.query(
                 `
-                UPDATE ed_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
-                    modelo = $6, serie = $7, id_fabricacion = $8, fabricante = $9, mac = $10, 
-                    tiene_funciones = $11, id_sucursal = $12, id_departamento = $13, id = $14, 
-                    numero_accion = $15 
-                WHERE id = $16
+                SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1 AND NOT id = $2
                 `
-                , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                    tien_funciones, id_sucursal, id_departamento, id, numero_accion, id_real]);
-            return res.jsonp({ message: 'actualizado' });
+                , [codigo.toUpperCase(), id_real])
+
+            if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
+                await pool.query(
+                    `
+                    UPDATE ed_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
+                        modelo = $6, serie = $7, id_fabricacion = $8, fabricante = $9, mac = $10, 
+                        tiene_funciones = $11, id_sucursal = $12, id_departamento = $13, codigo = $14, 
+                        numero_accion = $15 
+                    WHERE id = $16
+                    `
+                    , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                        tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, id_real]);
+
+                return res.jsonp({ message: 'actualizado' });
+            }
+            else {
+                return res.jsonp({ message: 'existe' });
+            }
         }
         catch (error) {
             return res.jsonp({ message: 'error' });
@@ -121,7 +139,7 @@ class RelojesControlador {
         const { id } = req.params;
         const RELOJES = await pool.query(
             `
-            SELECT cr.id, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
+            SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
                 cr.id_fabricacion, cr.fabricante, cr.mac, cr.tiene_funciones, cr.id_sucursal, 
                 cr.id_departamento, cr.numero_accion, cd.nombre AS nomdepar, s.nombre AS nomsucursal,
                 e.nombre AS nomempresa, c.descripcion AS nomciudad

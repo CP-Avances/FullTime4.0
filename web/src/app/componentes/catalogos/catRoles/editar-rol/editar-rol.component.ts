@@ -63,7 +63,6 @@ export class EditarRolComponent implements OnInit {
           this.toastr.success('Operacion exitosa.', 'Rol actualizado', {
             timeOut: 6000,
           });
-          this.validar.Auditar('app-web', 'cg_roles', this.data.datosRol, this.data_nueva, 'UPDATE');
           this.LimpiarCampos();
           this.salir = true;
           this.ventana.close(this.salir);

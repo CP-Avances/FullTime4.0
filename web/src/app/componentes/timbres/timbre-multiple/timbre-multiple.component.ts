@@ -742,8 +742,6 @@ export class TimbreMultipleComponent implements OnInit {
           if (!dataT.close) {
             this.restTimbres.RegistrarTimbreAdmin(dataT).subscribe(res => {
               this.toastr.success(res.message)
-              // METODO PARA AUDITORIA DE TIMBRES
-              this.validar.Auditar('app-web', 'timbres', '', dataT, 'INSERT');
             }, err => {
               this.toastr.error(err)
             })

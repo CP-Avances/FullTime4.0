@@ -19,6 +19,21 @@ const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
 class TiposCargosControlador {
+    // METODO PARA BUSCAR TIPO DE CARGOS POR EL NOMBRE
+    BuscarTipoCargoNombre(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { nombre } = req.body;
+            const CARGOS = yield database_1.default.query(`
+            SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+            `, [nombre]);
+            if (CARGOS.rowCount > 0) {
+                return res.jsonp(CARGOS.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+        });
+    }
     listaTipoCargos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

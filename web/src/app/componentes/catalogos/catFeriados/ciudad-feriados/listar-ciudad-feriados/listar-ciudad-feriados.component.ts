@@ -205,6 +205,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
   CerrarPantalla() {
     this.componentef.ver_asignar = false;
     this.componentef.ver_ciudades = false;
+    this.componentef.BuscarParametro();
     this.componentef.ver_lista = true;
   }
 

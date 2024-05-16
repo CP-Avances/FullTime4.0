@@ -68,8 +68,6 @@ class VacunaRutas {
         this.router.delete('/eliminar/:id/:documento', TokenValidation, VACUNA_CONTROLADOR.EliminarRegistro);
         // METODO REGISTRO DE TIPO DE VACUNA
         this.router.post('/tipo_vacuna', TokenValidation, VACUNA_CONTROLADOR.CrearTipoVacuna);
-        // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE
-        this.router.post('/tipo_vacuna/nombre', TokenValidation, VACUNA_CONTROLADOR.BuscarVacunaNombre);
         // METODO PARA BUSCAR UN DOCUMENTO
         this.router.get('/documentos/:docs/:id', VACUNA_CONTROLADOR.ObtenerDocumento);
 

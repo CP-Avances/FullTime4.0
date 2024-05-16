@@ -1,6 +1,5 @@
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
-import moment from 'moment';
 
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
@@ -29,16 +28,12 @@ export class VerTimbreComponent implements OnInit {
     { item: 'D', text: 'Desconocido' }
   ]
 
-  rolEmpleado: any;
-
   constructor(
     public ventana: MatDialogRef<VerTimbreComponent>,
     private validar: ValidacionesService,
     public parametro: ParametrosService,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {
-    this.rolEmpleado = localStorage.getItem('rol');
-  }
+  ) { }
 
   accion: string = ''
   ngOnInit() {
@@ -46,7 +41,7 @@ export class VerTimbreComponent implements OnInit {
     this.accion = '';
     this.timbre = this.data.timbre
     this.accion = this.data.timbre.accion
-    this.acciones.filter(elemento => {
+    this.acciones.filter((elemento: any) => {
       if (elemento.item == this.timbre.accion) {
         this.accion = elemento.text
       }
@@ -85,7 +80,5 @@ export class VerTimbreComponent implements OnInit {
         this.ObtenerTimbre(fecha, this.formato_hora);
       });
   }
-
-
 
 }

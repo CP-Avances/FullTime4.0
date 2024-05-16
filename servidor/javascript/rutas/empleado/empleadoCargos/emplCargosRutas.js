@@ -32,6 +32,10 @@ class EmpleadosCargpsRutas {
         this.router.put('/:id_empl_contrato/:id/actualizar', verificarToken_1.TokenValidation, emplCargosControlador_1.default.EditarCargo);
         // METODO DE CONSULTA DE DATOS DE CARGO POR ID CONTRATO
         this.router.get('/cargoInfo/:id_empl_contrato', verificarToken_1.TokenValidation, emplCargosControlador_1.default.EncontrarCargoIDContrato);
+        // METODO PARA BUSCAR CARGOS POR FECHA
+        this.router.post('/fecha_cargo', verificarToken_1.TokenValidation, emplCargosControlador_1.default.BuscarCargosFecha);
+        // METODO PARA BUSCAR CARGOS POR FECHA EDICION
+        this.router.post('/fecha_cargo/editar', verificarToken_1.TokenValidation, emplCargosControlador_1.default.BuscarCargosFechaEditar);
         this.router.get('/', verificarToken_1.TokenValidation, emplCargosControlador_1.default.list);
         this.router.get('/lista-empleados/', verificarToken_1.TokenValidation, emplCargosControlador_1.default.ListarCargoEmpleado);
         this.router.get('/buscar/:id_empleado', verificarToken_1.TokenValidation, emplCargosControlador_1.default.EncontrarIdCargo);

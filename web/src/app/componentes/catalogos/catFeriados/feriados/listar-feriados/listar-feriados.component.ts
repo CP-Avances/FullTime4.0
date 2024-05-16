@@ -7,13 +7,14 @@ import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
-import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
+
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
+import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
 
 // IMPORTACION DE COMPONENTES
 import { EditarFeriadosComponent } from 'src/app/componentes/catalogos/catFeriados/feriados/editar-feriados/editar-feriados.component';
@@ -148,7 +149,7 @@ export class ListarFeriadosComponent implements OnInit {
     this.feriados = [];
     this.rest.ConsultarFeriado().subscribe(datos => {
       this.feriados = datos;
-      this.feriados.forEach(data => {
+      this.feriados.forEach((data: any) => {
         data.fecha_ = this.validar.FormatearFecha(data.fecha, formato, this.validar.dia_abreviado);
         if (data.fecha_recuperacion != null) {
           data.fec_recuperacion_ = this.validar.FormatearFecha(data.fecha_recuperacion, formato, this.validar.dia_abreviado);
@@ -314,13 +315,13 @@ export class ListarFeriadosComponent implements OnInit {
         });
         this.mostrarbtnsubir = false;
       } else {
-        this.DataFeriados.forEach(item => {
+        this.DataFeriados.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listFeriadosCorrectos.push(item);
           }
         });
 
-        this.DataFerieados_ciudades.forEach(item => {
+        this.DataFerieados_ciudades.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaFerediadCiudadCorrectos.push(item);
           }
@@ -389,8 +390,8 @@ export class ListarFeriadosComponent implements OnInit {
               });
               setTimeout(() => {
                 this.Crear_feriado_ciudad();
-              },500);
-              
+              }, 500);
+
             }
           }
           this.LimpiarCampos();
@@ -563,7 +564,7 @@ export class ListarFeriadosComponent implements OnInit {
                 { text: 'Fecha', style: 'tableHeader' },
                 { text: 'Fecha Recuperación', style: 'tableHeader' },
               ],
-              ...this.feriados.map(obj => {
+              ...this.feriados.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTableD' },
@@ -620,11 +621,11 @@ export class ListarFeriadosComponent implements OnInit {
   data: any = [];
   ExportToXML() {
     this.OrdenarDatos(this.feriados);
-    var objeto;
+    var objeto: any;
     var arregloFeriados: any = [];
-    this.feriados.forEach(obj => {
+    this.feriados.forEach((obj: any) => {
       objeto = {
-        "roles": {
+        "feriados": {
           "$": { "id": obj.id },
           "descripcion": obj.descripcion,
           "fecha": obj.fecha_,
@@ -653,7 +654,6 @@ export class ListarFeriadosComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-
 
     const a = document.createElement('a');
     a.href = xmlUrl;
@@ -684,8 +684,7 @@ export class ListarFeriadosComponent implements OnInit {
     this.BuscarParametro();
   }
 
-
-
+  
   // METODOS PARA LA SELECCION MULTIPLE
 
   plan_multiple: boolean = false;

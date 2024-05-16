@@ -56,9 +56,9 @@ export class EditarRelojComponent implements OnInit {
   marcaF = new FormControl('', [Validators.minLength(2)]);
   serieF = new FormControl('', Validators.minLength(4));
   modeloF = new FormControl('', [Validators.minLength(3)]);
-  puertoF = new FormControl('', [Validators.required, Validators.pattern('[0-9]{4}')]);
+  puertoF = new FormControl('', [Validators.required]);
   fabricanteF = new FormControl('', [Validators.minLength(4)]);
-  contraseniaF = new FormControl('', [Validators.minLength(4)]);
+  contraseniaF = new FormControl('', [Validators.minLength(1)]);
   idFabricacionF = new FormControl('', [Validators.minLength(4)]);
 
   constructor(
@@ -127,7 +127,7 @@ export class EditarRelojComponent implements OnInit {
         ipForm: this.datosReloj.ip,
         nombreForm: this.datosReloj.nombre,
         puertoForm: this.datosReloj.puerto,
-        codigoForm: this.datosReloj.id,
+        codigoForm: this.datosReloj.codigo,
         funcionesForm: this.datosReloj.tiene_funciones,
         idSucursalForm: this.datosReloj.id_sucursal,
         idDepartamentoForm: this.datosReloj.id_departamento,
@@ -182,7 +182,7 @@ export class EditarRelojComponent implements OnInit {
   InsertarReloj(form1: any, form2: any) {
     let datosReloj = {
       // PRIMER FORMULARIO
-      id: form1.codigoForm,
+      codigo: form1.codigoForm,
       ip: form1.ipForm,
       id_real: this.idReloj,
       nombre: form1.nombreForm,
@@ -209,9 +209,14 @@ export class EditarRelojComponent implements OnInit {
         });
         this.CerrarVentana();
       }
-      else {
-        this.toastr.error(
-          'Verificar que el código de reloj y la ip del dispositivo no se encuentren registrados.',
+      else if (response.message === 'existe') {
+        this.toastr.warning('Código ingresado ya existe en el sistema.',
+          'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        })
+      }
+      else if (response.message === 'error') {
+        this.toastr.warning('IP ingresada ya existe en el sistema.',
           'Ups!!! algo salio mal.', {
           timeOut: 6000,
         })
@@ -223,13 +228,6 @@ export class EditarRelojComponent implements OnInit {
   ObtenerMensajeErrorIp() {
     if (this.ipF.hasError('pattern')) {
       return 'Ingresar IP Ej: 0.0.0.0';
-    }
-  }
-
-  // MENSAJE DE ERROR
-  ObtenerMensajeErrorPuerto() {
-    if (this.puertoF.hasError('pattern')) {
-      return 'Ingresar 4 números.';
     }
   }
 

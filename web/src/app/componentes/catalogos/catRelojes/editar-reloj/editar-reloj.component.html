@@ -87,13 +87,13 @@
 
                                 <mat-form-field>
                                     <mat-label>Puerto</mat-label>
-                                    <input matInput placeholder="Ingresar puerto" [formControl]="puertoF"
+                                    <input matInput placeholder="Ingresar puerto" [formControl]="puertoF" maxlength="6"
+                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                         (keypress)="IngresarSoloNumeros($event)" required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar puerto que usa el dispositivo.">
                                         help_outline
                                     </mat-icon>
-                                    <mat-error *ngIf="puertoF.invalid">{{ObtenerMensajeErrorPuerto()}}</mat-error>
                                 </mat-form-field>
 
                                 <mat-radio-group aria-label="Select an option" formControlName="funcionesForm" required>
@@ -101,7 +101,7 @@
                                         <span style="margin-left: 10px;">Tiene acciones *</span>
                                     </label>
                                     <div class="d-flex justify-content-around">
-                                        <mat-radio-button ngDefaultControl [(ngModel)]="selec1" [checked]="selec1"
+                                        <mat-radio-button [(ngModel)]="selec1" [checked]="selec1"
                                             [ngModelOptions]="{standalone: true}" value="true" (click)="ActivarVista()">
                                             Si
                                         </mat-radio-button>
@@ -112,7 +112,7 @@
                                         </mat-radio-button>
                                     </div>
                                 </mat-radio-group>
-                                <mat-form-field  *ngIf=(activarCampo)>
+                                <mat-form-field *ngIf=(activarCampo)>
                                     <mat-label>Número de acciones</mat-label>
                                     <input matInput placeholder="Acciones del dispositivo." [formControl]="numeroF"
                                         required (keypress)="IngresarSoloNumeros($event)">

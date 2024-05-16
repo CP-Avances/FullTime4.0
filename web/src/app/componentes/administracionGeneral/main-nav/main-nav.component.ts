@@ -278,6 +278,8 @@ export class MainNavComponent implements OnInit {
           { name: 'Configurar Código', url: '/codigo', color: true, ver: true },
           { name: 'Nivel de Educación', url: '/nivelTitulos', color: true, ver: true },
           { name: 'Título Profesional', url: '/titulos', color: true, ver: true },
+          { name: 'Tipo Discapacidad', url: '/discapacidades', color: true, ver: true },
+          { name: 'Tipo Vacunas', url: '/vacunas', color: true, ver: true },
           { name: 'Empleados', url: '/empleado', color: true, ver: true },
           { name: 'Cargar Plantillas', url: '/cargarPlantilla', color: true, ver: true },
           { name: 'Modalida Laboral', url: '/modalidaLaboral', color: true, ver: true },

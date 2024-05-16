@@ -46,7 +46,6 @@
                                     style="margin: 2% 0% 3% 0%;"
                                     matTooltip="Dar click para ver o descargar el documento."
                                     href="{{hipervinculo}}/plantillaD/documento/Dispositivos.xlsx">
-                                    <span class="material-icons">cloud_download</span>
                                     <br>
                                     Descargar plantilla dispositivos
                                 </a>
@@ -59,29 +58,23 @@
     </div>
     <div class="container" style="padding-bottom: 50px; text-align: center;">
         <div class="mat-elevation-z8" style="background: white;">
-
-
             <div class="d-flex bd-highlight" id="titulo">
-
-
                 <div class="w-100 bd-highlight">
                     <h5>
                         LISTA DE DISPOSITIVOS
                     </h5>
                 </div>
-
-
                 <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-
                     <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                        (click)="ConfirmarDeleteMultiple()">Eliminar </button>
+                        (click)="ConfirmarDeleteMultiple()">
+                        Eliminar
+                    </button>
                 </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover table-sm">
                     <thead class="thead-light">
                         <tr style="text-align: center;">
-
                             <th>
                                 <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
                                     matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
@@ -149,8 +142,7 @@
                                     [aria-label]="checkboxLabelPag(reloj)">
                                 </mat-checkbox>
                             </td>
-                            <th style="padding-top: 10px; text-align: center;" scope="row">{{reloj.id}}</th>
-
+                            <th style="padding-top: 10px; text-align: center;" scope="row">{{reloj.codigo}}</th>
                             <td>{{reloj.nomsucursal}}</td>
                             <td>{{reloj.nomciudad}}</td>
                             <td>{{reloj.nomdepar}}</td>
@@ -180,27 +172,30 @@
             <mat-paginator id="pagina" [length]="relojes.length" [pageSize]="tamanio_pagina"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
-            <div class="d-flex justify-content-end" style="margin-right: 2%; margin: 10px;">
-                <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
-                    matTooltipPosition="right" matTooltip="Descargar Lista de Dispositivos en formato PDF.">
-                    <p>PDF</p>
-                </i>
-                <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar Lista de Dispositivos en formato EXCEL.">
-                    <p>XLSL</p>
-                </i>
-                <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar Lista de Dispositivos en formato CSV.">
-                    <p>CSV</p>
-                </i>
-                <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar Lista de Dispositivos en formato XML.">
-                    <p>XML</p>
-                </i>
-            </div>
-            <div class="d-flex justify-content-end"
-                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-                <p> Reporte de dispositivos registrados. </p>
+            <!--  **********************  DESCARGA DE REPORTES  ***************************  -->
+            <div>
+                <div class="d-flex justify-content-end" style="margin-right: 2%; margin: 10px;">
+                    <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                        matTooltipPosition="right" matTooltip="Descargar Lista de Dispositivos en formato PDF.">
+                        <p>PDF</p>
+                    </i>
+                    <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix
+                        matTooltipPosition="right" matTooltip="Descargar Lista de Dispositivos en formato EXCEL.">
+                        <p>XLSL</p>
+                    </i>
+                    <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                        matTooltip="Descargar Lista de Dispositivos en formato CSV.">
+                        <p>CSV</p>
+                    </i>
+                    <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                        matTooltip="Descargar Lista de Dispositivos en formato XML.">
+                        <p>XML</p>
+                    </i>
+                </div>
+                <div class="d-flex justify-content-end"
+                    style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                    <p> Reporte de dispositivos. </p>
+                </div>
             </div>
         </div>
     </div>

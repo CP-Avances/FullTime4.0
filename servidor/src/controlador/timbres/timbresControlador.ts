@@ -310,7 +310,7 @@ class TimbresControlador {
             let f = new Date();
             let servidor: any;
 
-            if (tipo === 'admin') {
+            if (tipo === 'administrar') {
                 servidor = fec_hora_timbre;
             }
             else {

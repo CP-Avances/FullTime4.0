@@ -12,14 +12,14 @@ class HorarioControlador {
 
   // REGISTRAR HORARIO
   public async CrearHorario(req: Request, res: Response): Promise<Response> {
-    const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_ } = req.body;
+    const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_ } = req.body;
     try {
       const response: QueryResult = await pool.query(
         `
       INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
-        nocturno, detalle, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+        nocturno, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
       `
-        , [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_]);
+        , [nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_]);
 
       const [horario] = response.rows;
 
@@ -95,16 +95,16 @@ class HorarioControlador {
   // METODO PARA ACTUALIZAR DATOS DE HORARIO
   public async EditarHorario(req: Request, res: Response): Promise<any> {
     const id = req.params.id;
-    const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_ } = req.body;
+    const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_ } = req.body;
 
     try {
       const respuesta = await pool.query(
         `
         UPDATE eh_cat_horarios SET nombre = $1, minutos_comida = $2, hora_trabajo = $3,  
-          nocturno = $4, detalle = $5, codigo = $6, default_ = $7
-        WHERE id = $8 RETURNING *
+          nocturno = $4, codigo = $5, default_ = $6
+        WHERE id = $7 RETURNING *
         `
-        , [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_, id,])
+        , [nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, id,])
         .then((result: any) => { return result.rows })
 
       if (respuesta.length === 0) return res.status(400).jsonp({ message: 'error' });
@@ -182,7 +182,7 @@ class HorarioControlador {
     try {
       const HORARIOS = await pool.query(
         `
-        SELECT * FROM eh_cat_horarios WHERE NOT id = $1 AND UPPER(codigo) = $2)
+        SELECT * FROM eh_cat_horarios WHERE NOT id = $1 AND UPPER(codigo) = $2
         `,
         [parseInt(id), codigo.toUpperCase()]);
 
@@ -314,9 +314,9 @@ class HorarioControlador {
           const response: QueryResult = await pool.query(
             `
             INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
-              nocturno, detalle, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+              nocturno, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
             `
-            , [DESCRIPCION, MIN_ALIMENTACION, HORAS_TOTALES, HORARIO_NOCTURNO, true, CODIGO_HORARIO, TIPO_HORARIO]);
+            , [DESCRIPCION, MIN_ALIMENTACION, HORAS_TOTALES, HORARIO_NOCTURNO, CODIGO_HORARIO, TIPO_HORARIO]);
 
           const [correcto] = response.rows;
 

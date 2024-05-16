@@ -288,7 +288,8 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
                 id_suc: obj.id_suc,
                 id_regimen: obj.id_regimen,
                 id_depa: obj.id_depa,
-                id_cargo_: obj.id_cargo_ // TIPO DE CARGO
+                id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+                hora_trabaja: obj.hora_trabaja,
               }
               this.empleados.push(elemento)
             })

@@ -4,7 +4,6 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
-import { Router } from '@angular/router';
 import * as moment from 'moment';
 
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
@@ -95,7 +94,7 @@ export class EditarFeriadosComponent implements OnInit {
   // METODO PARA VALIDAR REGISTRO SIN FECHA DE RECUPERACION
   ValidarSinRecuperacion(feriado: any) {
     if (this.feriados.length != 0) {
-      this.feriados.forEach(obj => {
+      this.feriados.forEach((obj: any) => {
         if (moment(obj.fecha_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
           this.contador = 1;
         }
@@ -119,7 +118,7 @@ export class EditarFeriadosComponent implements OnInit {
   // METODO PARA VALIDAR REGISTRO CON FECHA DE RECUPERACION
   ValidarRecuperacion(feriado: any, form: any) {
     if (this.feriados.length != 0) {
-      this.feriados.forEach(obj => {
+      this.feriados.forEach((obj: any) => {
         if (obj.fecha.split('T')[0] === moment(feriado.fecha_recuperacion).format('YYYY-MM-DD') ||
           moment(obj.fecha_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
           this.contador = 1;
@@ -159,6 +158,11 @@ export class EditarFeriadosComponent implements OnInit {
         this.toastr.error(
           'La fecha del feriado o la fecha de recuperación se encuentran dentro de otro registro.',
           'Verificar las fechas', {
+          timeOut: 6000,
+        })
+      }
+      else if (response.message === 'existe') {
+        this.toastr.warning('Nombre de feriado ya existe en el sistema.', 'Upss!!! algo salio mal.', {
           timeOut: 6000,
         })
       }
