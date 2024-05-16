@@ -120,6 +120,7 @@ export class EditarCatProcesosComponent implements OnInit {
       this.toastr.success('Operacion exitosa.', 'Proceso actualizado', {
         timeOut: 6000,
       });
+      this.LimpiarCampos();
       this.CerrarVentana();
     }, error => { });
   }
@@ -127,6 +128,7 @@ export class EditarCatProcesosComponent implements OnInit {
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
     this.nuevoProcesoForm.reset();
+    this.ObtenerProcesos();
   }
 
   // METODO PARA BUSCAR PROCESOS
@@ -139,10 +141,11 @@ export class EditarCatProcesosComponent implements OnInit {
 
   // METODO PARA CERRRA PROCESOS
   CerrarVentana() {
-    this.ObtenerProcesos();
     this.LimpiarCampos();
     this.ImprimirDatos();
     this.ventana.close();
+    this.ObtenerProcesos();
+
   }
 
   // METODO PARA SALIR DEL REGISTRO

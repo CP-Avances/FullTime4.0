@@ -22,6 +22,8 @@ table {
     font-size: 14px;
 }
 
+
+
 #regresar {
     color: rgb(65, 112, 205);
     cursor: pointer;
@@ -31,4 +33,9 @@ table {
 #folder {
     color: rgb(120, 120, 120);
     cursor: pointer;
+}
+
+
+#check {
+    text-align: center;
 }

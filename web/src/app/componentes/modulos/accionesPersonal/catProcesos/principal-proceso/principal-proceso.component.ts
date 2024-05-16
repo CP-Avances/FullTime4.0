@@ -121,6 +121,7 @@ export class PrincipalProcesoComponent implements OnInit {
     this.buscarNombre.reset();
     this.buscarNivel.reset();
     this.buscarPadre.reset();
+    this.ObtenerProcesos();
   }
 
   // METODO PARA LISTAR PROCESOS
@@ -143,7 +144,9 @@ export class PrincipalProcesoComponent implements OnInit {
   AbrirVentanaEditar(datosSeleccionados: any): void {
     console.log(datosSeleccionados);
     this.ventana.open(EditarCatProcesosComponent,
-      { width: '450px', data: { datosP: datosSeleccionados, lista: true } }).disableClose = true;
+      { width: '450px', data: { datosP: datosSeleccionados, lista: true } 
+    
+    }).disableClose = true;
   }
 
   // FUNCION PARA ELIMINAR REGISTROS
