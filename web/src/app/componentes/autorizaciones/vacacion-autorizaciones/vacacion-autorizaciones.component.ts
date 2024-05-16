@@ -375,7 +375,9 @@ export class VacacionAutorizacionesComponent implements OnInit {
       estado: form.estadoF,
       id_vacacion: id_vacacion,
       id_rece_emp: id_empleado,
-      id_depa_send: id_departamento
+      id_depa_send: id_departamento,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restV.ActualizarEstado(id_vacacion, datosVacacion).subscribe(respon => {
       this.resVacacion = respon

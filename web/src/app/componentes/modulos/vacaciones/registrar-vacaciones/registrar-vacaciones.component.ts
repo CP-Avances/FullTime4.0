@@ -13,6 +13,7 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-registrar-vacaciones',
@@ -307,6 +308,8 @@ export class RegistrarVacacionesComponent implements OnInit {
       fec_final: form.fecFinalForm,
       codigo: this.empleados[0].codigo,
       estado: 1,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     console.log(datosVacaciones);
     this.restV.RegistrarVacaciones(datosVacaciones).subscribe(vacacion => {

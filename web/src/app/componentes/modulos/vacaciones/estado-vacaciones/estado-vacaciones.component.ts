@@ -5,6 +5,7 @@ import * as moment from 'moment';
 
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
+import { use } from 'echarts';
 
 interface Estados {
   valor: number;
@@ -68,7 +69,9 @@ export class EstadoVacacionesComponent implements OnInit {
       estado: form.estadoForm,
       id_vacacion: this.data.vacacion.id,
       id_rece_emp: this.data.vacacion.id_empleado,
-      id_depa_send: this.data.depa[0].id
+      id_depa_send: this.data.depa[0].id,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     this.restV.ActualizarEstado(this.data.vacacion.id, datosVacacion).subscribe(respon => {

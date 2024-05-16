@@ -89,7 +89,12 @@ export class CancelarVacacionesComponent implements OnInit {
   }
 
   aceptarAdvertencia() {
-    this.restV.EliminarVacacion(this.data.id).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
+    this.restV.EliminarVacacion(this.data.id, datos).subscribe(res => {
       console.log(res);
       var datos = {
         depa_user_loggin: this.solInfo.id_dep,

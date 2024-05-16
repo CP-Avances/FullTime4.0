@@ -172,6 +172,8 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   EditarEstadoVacacion(id_vacacion: number, estado_vacacion: any) {
     let datosVacacion = {
       estado: estado_vacacion,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restV.ActualizarEstado(id_vacacion, datosVacacion).subscribe(respon => {
     });

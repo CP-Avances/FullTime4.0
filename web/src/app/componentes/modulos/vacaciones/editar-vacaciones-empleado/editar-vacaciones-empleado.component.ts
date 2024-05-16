@@ -295,6 +295,8 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
       fec_inicio: form.fecInicioForm,
       fec_final: form.fecFinalForm,
       dia_libre: form.diaLibreForm + form.diasTForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     console.log(datosVacaciones);
     this.restV.EditarVacacion(this.dato.info.id, datosVacaciones).subscribe(vacaciones => {
