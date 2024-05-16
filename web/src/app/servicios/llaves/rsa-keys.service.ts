@@ -14,7 +14,7 @@ export class RsaKeysService {
     private iv = CryptoJS.enc.Utf8.parse(ivcontrasenia);
     private salt = CryptoJS.enc.Utf8.parse(saltcontrasenia);
     //Generacion de key de derivacion encriptada para passwords
-    private keyLogin = CryptoJS.enc.Utf8.parse(CryptoJS.PBKDF2(this.key, this.salt, { keySize: 8, iterations: 1000 }));
+    private keyLogin = CryptoJS.enc.Utf8.parse(CryptoJS.PBKDF2(this.key, this.salt, { keySize: 8, iterations: 1000 }).toString());
 
     constructor() {
     }

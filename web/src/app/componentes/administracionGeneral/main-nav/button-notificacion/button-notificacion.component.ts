@@ -130,7 +130,7 @@ export class ButtonNotificacionComponent implements OnInit {
       this.avisos = res;
       if (!this.avisos.text) {
         if (this.avisos.length > 0) {
-          this.avisos.forEach(obj => {
+          this.avisos.forEach((obj: any) => {
             obj.fecha_ = this.validar.FormatearFecha(moment(obj.create_at).format('YYYY-MM-DD'), formato_fecha, this.validar.dia_abreviado);
             obj.hora_ = this.validar.FormatearHora(moment(obj.create_at).format('HH:mm:ss'), formato_hora);
             if (obj.visto === false) {

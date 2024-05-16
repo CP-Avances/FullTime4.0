@@ -96,7 +96,21 @@ class DiscapacidadControlador {
     }
   }
 
-
+  // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE
+  public async BuscarDiscapacidadNombre(req: Request, res: Response) {
+    const { nombre } = req.body;
+    const TIPO_DISCAPACIDAD = await pool.query(
+      `
+      SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1
+      `
+      , [nombre])
+    if (TIPO_DISCAPACIDAD.rowCount > 0) {
+      return res.jsonp(TIPO_DISCAPACIDAD.rows)
+    }
+    else {
+      res.status(404).jsonp({ text: 'Registro no encontrado.' });
+    }
+  }
 
 
 

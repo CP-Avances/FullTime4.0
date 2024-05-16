@@ -55,7 +55,6 @@ export class CargarPlantillaComponent {
 
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
-    console.log('entro en limpiar')
     //CONTRATOS
     this.DatosContrato = [];
     this.archivoSubido = [];
@@ -113,6 +112,7 @@ export class CargarPlantillaComponent {
   messajeExcel: string = '';
   Revisarplantilla(){
     this.listaContratosCorrectas = [];
+    this.DatosContrato = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
@@ -126,6 +126,7 @@ export class CargarPlantillaComponent {
       this.messajeExcel = res.message;
 
       if (this.messajeExcel == 'error') {
+        this.DatosContrato = [];
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
@@ -191,30 +192,34 @@ export class CargarPlantillaComponent {
       return 'rgb(170, 129, 236)';
     } else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Cédula no existe en el sistema' || 
-      observacion == 'Sucursal no existe en el sistema' ||
-      observacion == 'Departamento no existe en el sistema' ||
-      observacion == 'Cargo no existe en el sistema' ||
+    } else if (observacion == 'Cédula no existe en el sistema' ||
       observacion == 'Cédula no tiene registrado un contrato') {
       return 'rgb(255, 192, 203)';
-    } else if (observacion == 'Registro duplicado - cédula') {
+    } else if (observacion == 'Registro duplicado (cédula)') {
       return 'rgb(156, 214, 255)';
     } else if (arrayObservacion[0] == 'Formato') {
       return 'rgb(230, 176, 96)';
     } else if (observacion == 'Pais ingresado no se encuentra registrado' ||
-      observacion == 'Regimen ingresado no se encuentra registrado' ||
-      observacion == 'Modalidad trabajo no se encuentra registrado' 
+      observacion == 'Régimen Laboral no existe en el sistema' ||
+      observacion == 'Modalidad Laboral no existe en el sistema' 
     ) {
-      return 'rgb(242, 21, 21)';
+      return 'rgb(255, 192, 203)';
     }else if(observacion == 'Existe un cargo vigente en esas fechas' || 
     observacion == 'Existe un contrato vigente en esas fechas'){
       return 'rgb(239, 203, 106)';
-    }else if (observacion == 'Regimen no corresponde al pais'){
+    }else if (observacion == 'País no corresponde con el Régimen Laboral' ||
+      observacion == 'La fecha de ingreso no puede ser menor o igual a la fecha salida' ||
+      observacion == 'La fecha de inicio no puede ser menor o igual a la fecha salida'
+    ){
       return 'rgb(238, 34, 207)';
     }else if (arrayObservacion[1]+' '+arrayObservacion[2] == 'no registrado'){
       return 'rgb(242, 21, 21)';
+    }else if(observacion == 'Regimen laboral no registrado' ||
+    observacion == 'Modalidad laboral no registrado'
+    ){
+      return 'rgb(242, 21, 21)';
     }else {
-      return 'white'
+      return 'rgb(242, 21, 21)';
     }
   }
 
@@ -282,7 +287,8 @@ export class CargarPlantillaComponent {
   }
 
   RevisarplantillaCargo(){
-    this.listaContratosCorrectas = [];
+    this.listaCargosCorrectas = [];
+    this.DatosCargos = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubidoCargo.length; i++) {
       formData.append("uploads", this.archivoSubidoCargo[i], this.archivoSubidoCargo[i].name);
@@ -296,6 +302,7 @@ export class CargarPlantillaComponent {
       this.messajeExcelCargos = res.message;
 
       if (this.messajeExcelCargos == 'error') {
+        this.DatosCargos = [];
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });

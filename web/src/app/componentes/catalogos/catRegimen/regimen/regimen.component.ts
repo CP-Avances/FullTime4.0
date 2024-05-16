@@ -1174,7 +1174,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   // VERIFICAR NOMBRES DUPLICADOS
   VerificarRegistro(form1: any, form2: any, form3: any) {
     var nombre = 0;
-    this.regimen.forEach(obj => {
+    this.regimen.forEach((obj: any) => {
       if (obj.descripcion.toUpperCase() === form1.nombreForm.toUpperCase()) {
         nombre = 1;
       }
@@ -1207,7 +1207,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
 
     // OBTENER ID DEL PAIS SELECCIONADO
     let pais: number = 0;
-    this.paises.forEach(obj => {
+    this.paises.forEach((obj: any) => {
       if (obj.nombre === form1.nombrePaisForm.toUpperCase()) {
         pais = obj.id;
       }

@@ -29,7 +29,7 @@ const storage = multer_1.default.diskStorage({
         return __awaiter(this, void 0, void 0, function* () {
             let id = req.params.id;
             const usuario = yield database_1.default.query(`
-            SELECT e.id FROM eu_empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+            SELECT e.id FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
             `, [id]);
             var ruta = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(usuario.rows[0].id);
             cb(null, ruta);
@@ -45,7 +45,7 @@ const storage = multer_1.default.diskStorage({
             // DATOS DOCUMENTO
             let id = req.params.id;
             const usuario = yield database_1.default.query(`
-            SELECT codigo FROM eu_empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+            SELECT codigo FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
             `, [id]);
             let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
             cb(null, documento);
@@ -99,6 +99,8 @@ class DepartamentoRutas {
         this.router.post('/modalidad/trabajo', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.CrearTipoContrato);
         // BUSCAR LISTA DE MODALIDAD DE TRABAJO
         this.router.get('/modalidad/trabajo', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.ListarTiposContratos);
+        // BUSCAR MODALIDAD LABORAL POR SU NOMBRE
+        this.router.post('/modalidad/trabajo/nombre', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.BuscarModalidadLaboralNombre);
         this.router.get('/', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.ListarContratos);
         this.router.get('/:id/get', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.ObtenerUnContrato);
         this.router.get('/:id_empleado', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EncontrarIdContrato);

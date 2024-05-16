@@ -80,7 +80,7 @@ class NivelTituloControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.params;
             const unNivelTitulo = yield database_1.default.query(`
-      SELECT * FROM et_cat_nivel_titulo WHERE nombre = $1
+      SELECT * FROM et_cat_nivel_titulo WHERE UPPER(nombre) = $1
       `, [nombre]);
             if (unNivelTitulo.rowCount > 0) {
                 return res.jsonp(unNivelTitulo.rows);

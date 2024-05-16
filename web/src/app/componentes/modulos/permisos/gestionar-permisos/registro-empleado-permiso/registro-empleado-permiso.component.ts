@@ -1671,7 +1671,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
     // LEYENDO DATOS DE TIPO DE PERMISO
     var tipo_permiso = '';
-    this.tipoPermisos.filter(o => {
+    this.tipoPermisos.filter((o: any) => {
       if (o.id === permiso.id_tipo_permiso) {
         tipo_permiso = o.descripcion
       }

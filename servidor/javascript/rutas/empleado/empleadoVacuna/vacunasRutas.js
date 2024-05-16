@@ -56,8 +56,10 @@ class VacunaRutas {
         this.router.get('/:id_empleado', verificarToken_1.TokenValidation, vacunasControlador_1.default.ListarUnRegistro);
         // METODO DE BUSQUEDA DE TIPOS DE VACUNA REGISTRADOS
         this.router.get('/lista/tipo_vacuna', verificarToken_1.TokenValidation, vacunasControlador_1.default.ListarTipoVacuna);
-        // METODO REGISTRO DE VACUNACIÓN
+        // METODO REGISTRO DE VACUNACION
         this.router.post('/', verificarToken_1.TokenValidation, vacunasControlador_1.default.CrearRegistro);
+        // METODO PARA BUSCAR VACUNA POR FECHA Y TIPO
+        this.router.post('/fecha_nombre/tipo_vacuna', verificarToken_1.TokenValidation, vacunasControlador_1.default.BuscarVacunaFechaTipo);
         // METODO PARA GUARDAR DOCUMENTO 
         this.router.put('/:id/documento/:id_empleado', [verificarToken_1.TokenValidation, upload.single('uploads')], vacunasControlador_1.default.GuardarDocumento);
         // METODO ACTUALIZACION DE REGISTROS DE VACUNACION

@@ -1,22 +1,25 @@
 // IMPORTAR LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
+
 import * as xlsx from 'xlsx';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as xml2js from 'xml2js';
+import * as moment from 'moment';
+import * as FileSaver from 'file-saver';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
-import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { SpinnerService } from '../../../../../servicios/spinner/spinner.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
@@ -26,12 +29,10 @@ import { DetalleCatHorarioComponent } from 'src/app/componentes/catalogos/catHor
 import { RegistroHorarioComponent } from 'src/app/componentes/catalogos/catHorario/horario/registro-horario/registro-horario.component';
 import { EditarHorarioComponent } from '../editar-horario/editar-horario.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { ThemePalette } from '@angular/material/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { SpinnerService } from '../../../../../servicios/spinner/spinner.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableHorarios } from 'src/app/model/reportes.model';
+
 @Component({
   selector: 'app-principal-horario',
   templateUrl: './principal-horario.component.html',
@@ -41,11 +42,10 @@ import { ITableHorarios } from 'src/app/model/reportes.model';
 export class PrincipalHorarioComponent implements OnInit {
 
 
-  horariosEliminar: any = [];
-
   // ALMACENAMIENTO DE DATOS Y BUSQUEDA
   horarios: any = [];
   ver_horarios: boolean = true;
+  horariosEliminar: any = [];
 
   // FILTROS
   filtroNombreHorario = '';
@@ -110,7 +110,6 @@ export class PrincipalHorarioComponent implements OnInit {
     public router: Router, // VARIABLE DE MANEJO DE RUTAS
     public restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     private rest: HorarioService, // SERVICIO DATOS DE HORARIO
-    private restD: DetalleCatHorariosService, // SERVICIO DE DATOS DE DETALLES DE HORARIOS
     private toastr: ToastrService, // VARIABLE DE MANEJO DE NOTIFICACIONES
     private spinnerService: SpinnerService
   ) {
@@ -176,7 +175,7 @@ export class PrincipalHorarioComponent implements OnInit {
     this.horarios = [];
     this.rest.BuscarListaHorarios().subscribe(datos => {
       this.horarios = datos;
-      this.horarios.forEach(obj => {
+      this.horarios.forEach((obj: any) => {
         if (obj.default_ === 'N') {
           obj.default_tipo = 'Laborable';
         }
@@ -204,14 +203,11 @@ export class PrincipalHorarioComponent implements OnInit {
           this.ObtenerHorarios();
         }
       });
-      this.activar_seleccion = true;
-      this.plan_multiple = false;
-      this.plan_multiple_ = false;
-      this.selectionHorarios.clear();
-      this.horariosEliminar = [];
-  
-
-
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionHorarios.clear();
+    this.horariosEliminar = [];
   }
 
   // METODO PARA ABRIR VENTANA REGISTRAR DETALLE DE HORARIO
@@ -255,8 +251,6 @@ export class PrincipalHorarioComponent implements OnInit {
         }
       });
   }
-
-
 
   // METODO PARA VISUALIZAR PANTALLA DE HORARIOS Y DETALLES
   ver_detalles: boolean = false;
@@ -331,16 +325,15 @@ export class PrincipalHorarioComponent implements OnInit {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
 
     }
-    console.log("formdata", formData);
+    //--console.log("formdata", formData);
     this.rest.VerificarDatosHorario(formData).subscribe(res => {
       this.dataHorarios = res;
-      this.dataHorarios.plantillaHorarios.forEach(obj => {
+      this.dataHorarios.plantillaHorarios.forEach((obj: any) => {
         if (obj.OBSERVACION == 'Ok') {
           this.listaHorariosCorrectos.push(obj);
         }
       });
-
-      this.dataHorarios.plantillaDetalles.forEach(obj => {
+      this.dataHorarios.plantillaDetalles.forEach((obj: any) => {
         if (obj.OBSERVACION == 'Ok') {
           this.listaDetalleCorrectos.push(obj);
         }
@@ -467,7 +460,7 @@ export class PrincipalHorarioComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
             body: [
               [
                 { text: 'Código', style: 'tableHeader' },
@@ -475,17 +468,15 @@ export class PrincipalHorarioComponent implements OnInit {
                 { text: 'Minutos de almuerzo', style: 'tableHeader' },
                 { text: 'Horas de trabajo', style: 'tableHeader' },
                 { text: 'Horario noturno', style: 'tableHeader' },
-                { text: 'Requiere detalle', style: 'tableHeader' },
                 { text: 'Documento', style: 'tableHeader' },
               ],
-              ...this.horarios.map(obj => {
+              ...this.horarios.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.minutos_comida, style: 'itemsTableC' },
                   { text: obj.hora_trabajo, style: 'itemsTableC' },
                   { text: obj.noturno == true ? 'Sí' : 'No', style: 'itemsTableC' },
-                  { text: obj.detalle == true ? 'Sí' : 'No', style: 'itemsTableC' },
                   { text: obj.documento, style: 'itemsTableC' },
                 ];
               })
@@ -535,7 +526,7 @@ export class PrincipalHorarioComponent implements OnInit {
   ExportToXML() {
     var objeto: any;
     var arregloHorarios: any = [];
-    this.horarios.forEach(obj => {
+    this.horarios.forEach((obj: any) => {
       objeto = {
         "horario": {
           "$": { "id": obj.id },
@@ -543,7 +534,6 @@ export class PrincipalHorarioComponent implements OnInit {
           "min_almuerzo": obj.minutos_comida,
           "hora_trabajo": obj.hora_trabajo,
           "noturno": obj.nocturno,
-          "requiere_detalle": obj.detalle,
           "documento": obj.documento,
         }
       }
@@ -569,7 +559,6 @@ export class PrincipalHorarioComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    
 
     const a = document.createElement('a');
     a.href = xmlUrl;
@@ -712,14 +701,11 @@ export class PrincipalHorarioComponent implements OnInit {
 
   selectionHorarios = new SelectionModel<ITableHorarios>(true, []);
 
-
-
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
     const numSelected = this.selectionHorarios.selected.length;
     return numSelected === this.horarios.length
   }
-
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
@@ -728,49 +714,31 @@ export class PrincipalHorarioComponent implements OnInit {
       this.horarios.forEach((row: any) => this.selectionHorarios.select(row));
   }
 
-
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelPag(row?: ITableHorarios): string {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.horariosEliminar = this.selectionHorarios.selected;
-    
 
-    
     return `${this.selectionHorarios.isSelected(row) ? 'deselect' : 'select'} row ${row.descripcion + 1}`;
-
   }
-
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
   EliminarDetalle(id_horario: any) {
-
-
     this.rest.EliminarRegistro(id_horario).subscribe(res => {
-
       if (res.message === 'error') {
-        this.toastr.error('No se puede eliminar.', '', {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
         });
-
       } else {
-
-        // METODO PARA AUDITAR CATÁLOGO HORARIOS
-        this.validar.Auditar('app-web', 'cg_horarios', id_horario, '', 'DELETE');
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
         this.ObtenerHorarios();
-
       }
-
-
     });
   }
-
-
-
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
@@ -779,47 +747,32 @@ export class PrincipalHorarioComponent implements OnInit {
         if (confirmado) {
           this.EliminarDetalle(datos.id);
           this.activar_seleccion = true;
-
           this.plan_multiple = false;
           this.plan_multiple_ = false;
           this.horariosEliminar = [];
           this.selectionHorarios.clear();
-
           this.ObtenerHorarios();
-
-
-
         }
       });
   }
 
-
+// METODO PARA ELIMINAR REGISTROS
   contador: number = 0;
   ingresar: boolean = false;
-
   EliminarMultiple() {
-
     this.ingresar = false;
     this.contador = 0;
     this.horariosEliminar = this.selectionHorarios.selected;
     this.horariosEliminar.forEach((datos: any) => {
-
       this.horarios = this.horarios.filter(item => item.id !== datos.id);
-
       this.contador = this.contador + 1;
-
       this.rest.EliminarRegistro(datos.id).subscribe(res => {
-
         if (res.message === 'error') {
-          this.toastr.error('No se puede eliminar.', '', {
+          this.toastr.error('Existen datos relacionados con ' + datos.codigo + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
-
         } else {
-
-          // METODO PARA AUDITAR CATÁLOGO HORARIOS
-          this.validar.Auditar('app-web', 'cg_horarios', datos.id, '', 'DELETE');
           if (!this.ingresar) {
             this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
               timeOut: 6000,
@@ -827,46 +780,35 @@ export class PrincipalHorarioComponent implements OnInit {
             this.ingresar = true;
           }
           this.ObtenerHorarios();
-
         }
       });
     }
     )
   }
 
-
+// METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-
           if (this.horariosEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
-
             this.plan_multiple = false;
             this.plan_multiple_ = false;
-
-            this.horariosEliminar= [];
+            this.horariosEliminar = [];
             this.selectionHorarios.clear();
             this.ObtenerHorarios();
           } else {
             this.toastr.warning('No ha seleccionado HORARIOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
-
-          this.selectionHorarios.clear();
-
         } else {
           this.router.navigate(['/horario']);
         }
-
-
       });
 
   }
-
 
 }

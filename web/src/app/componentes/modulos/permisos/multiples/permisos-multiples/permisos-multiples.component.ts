@@ -921,7 +921,7 @@ export class PermisosMultiplesComponent implements OnInit {
           }
           else {
             this.ciclo_final = 0;
-            this.sin_permisos.forEach(obj => {
+            this.sin_permisos.forEach((obj: any) => {
               this.ciclo_final = this.ciclo_final + 1;
               this.BuscarFeriados(form, obj);
             })
@@ -940,7 +940,7 @@ export class PermisosMultiplesComponent implements OnInit {
         if (this.contar_permisos === tamaño) {
           this.ciclo_final = 0;
           //console.log('ver datos sin permisos ', this.sin_permisos)
-          this.sin_permisos.forEach(obj => {
+          this.sin_permisos.forEach((obj: any) => {
             this.ciclo_final = this.ciclo_final + 1;
             this.BuscarFeriados(form, obj);
           })
@@ -2043,7 +2043,7 @@ export class PermisosMultiplesComponent implements OnInit {
   LeerDatosMail(datos: any, form: any) {
     // LEYENDO DATOS DE TIPO DE PERMISO
     var tipo_permiso = '';
-    this.tipoPermisos.filter(o => {
+    this.tipoPermisos.filter((o: any) => {
       if (o.id === datos.id_tipo_permiso) {
         tipo_permiso = o.descripcion
       }

@@ -31,6 +31,21 @@ class TituloControlador {
             res.jsonp(titulo.rows);
         });
     }
+    // METODO PARA BUSCAR UN TITULO POR SU NOMBRE
+    ObtenerTituloNombre(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { nombre, nivel } = req.body;
+            const TITULO = yield database_1.default.query(`
+      SELECT * FROM et_titulos WHERE UPPER(nombre) = $1 AND id_nivel = $2
+      `, [nombre, nivel]);
+            if (TITULO.rowCount > 0) {
+                return res.jsonp(TITULO.rows);
+            }
+            else {
+                res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
     // METODO PARA ELIMINAR REGISTROS
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

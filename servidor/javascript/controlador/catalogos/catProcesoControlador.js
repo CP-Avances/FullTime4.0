@@ -65,7 +65,7 @@ class ProcesoControlador {
             if (unIdProceso != null) {
                 return res.jsonp(unIdProceso.rows);
             }
-            res.status(404).jsonp({ text: 'El proceso no ha sido encontrado.' });
+            res.status(404).jsonp({ text: 'Registro no encontrado.' });
         });
     }
     ActualizarProceso(req, res) {

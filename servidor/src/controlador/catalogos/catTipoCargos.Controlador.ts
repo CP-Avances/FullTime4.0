@@ -8,7 +8,25 @@ import excel from 'xlsx';
 
 class TiposCargosControlador {
 
-    public async listaTipoCargos(req: Request, res: Response) {
+    // METODO PARA BUSCAR TIPO DE CARGOS POR EL NOMBRE
+    public async BuscarTipoCargoNombre(req: Request, res: Response) {
+        const { nombre } = req.body;
+        const CARGOS = await pool.query(
+            `
+            SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+            `
+            , [nombre]
+        );
+        if (CARGOS.rowCount > 0) {
+            return res.jsonp(CARGOS.rows)
+        }
+        else {
+            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+        }
+    }
+
+    // METODO PARA LISTAR TIPO CARGOS
+    public async ListaTipoCargos(req: Request, res: Response) {
         try {
             const TIPO_CARGO = await pool.query(
                 `
@@ -25,6 +43,7 @@ class TiposCargosControlador {
         }
     }
 
+    // METODO PARA REGISTRAR TIPO CARGO
     public async CrearCargo(req: Request, res: Response): Promise<Response> {
         try {
             const { cargo } = req.body;
@@ -33,9 +52,9 @@ class TiposCargosControlador {
                 SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
                 `
                 , [cargo.toUpperCase()])
-            console.log('VERIFICAR_MODALIDAD: ', VERIFICAR_CARGO.rows[0]);
+
             if (VERIFICAR_CARGO.rows[0] == undefined || VERIFICAR_CARGO.rows[0] == '') {
-                // Dar formato a la palabra de modalidad
+
                 const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
 
                 const response: QueryResult = await pool.query(
@@ -49,39 +68,47 @@ class TiposCargosControlador {
                 if (TipoCargos) {
                     return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' })
                 } else {
-                    return res.status(404).jsonp({ message: 'No se pudo guardar', status: '400' })
+                    return res.status(404).jsonp({ message: 'Ups!!! algo slaio mal.', status: '400' })
                 }
             } else {
-                return res.jsonp({ message: 'Ya existe un cargo laboral', status: '300' })
+                return res.jsonp({ message: 'Tipo cargo ya existe en el sistema.', status: '300' })
             }
-
-
         }
         catch (error) {
             return res.status(500).jsonp({ message: 'error', status: '500' });
         }
-
     }
 
+    // METODO PARA EDITAR TIPO CARGO
     public async EditarCargo(req: Request, res: Response): Promise<Response> {
         try {
             const { id, cargo } = req.body;
-            console.log('id: ', id, 'cargo: ', cargo);
-            // Dar formato a la palabra de cargo
+            // DAR FORMATO A LA PALABRA CARGO
             const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
-            const response: QueryResult = await pool.query(
+            const tipoCargoExiste = await pool.query(
                 `
-                UPDATE e_cat_tipo_cargo SET cargo = $2
-                WHERE id = $1 RETURNING *
+                SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
                 `
-                , [id, tipoCargo]);
+                , [cargo.toUpperCase()]);
 
-            const [TipoCargos] = response.rows;
 
-            if (TipoCargos) {
-                return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' })
+            if (tipoCargoExiste.rows[0] != undefined && tipoCargoExiste.rows[0].cargo != '' && tipoCargoExiste.rows[0].cargo != null) {
+                return res.status(200).jsonp({ message: 'Ya existe el cargo', status: '300' })
             } else {
-                return res.status(404).jsonp({ message: 'No se pudo actualizar', status: '400' })
+                const response: QueryResult = await pool.query(
+                    `
+                    UPDATE e_cat_tipo_cargo SET cargo = $2
+                    WHERE id = $1 RETURNING *
+                    `
+                    , [id, tipoCargo]);
+
+                const [TipoCargos] = response.rows;
+
+                if (TipoCargos) {
+                    return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' })
+                } else {
+                    return res.status(404).jsonp({ message: 'Ups!!! algo salio mal.', status: '400' })
+                }
             }
         }
         catch (error) {
@@ -89,10 +116,10 @@ class TiposCargosControlador {
         }
     }
 
-    public async eliminarRegistro(req: Request, res: Response) {
+    // METODO PARA ELIMINAR REGISTRO
+    public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
-            console.log('id: ', id)
             await pool.query(
                 `
                 DELETE FROM e_cat_tipo_cargo WHERE id = $1
@@ -105,7 +132,7 @@ class TiposCargosControlador {
         }
     }
 
-    /** Lectura de los datos de la platilla Modalidad_cargo */
+    // LECTURA DE LOS DATOS DE LA PLATILLA TIPO CARGO
     public async VerfificarPlantillaTipoCargos(req: Request, res: Response) {
         try {
             const documento = req.file?.originalname;
@@ -129,7 +156,7 @@ class TiposCargosControlador {
             // LECTURA DE LOS DATOS DE LA PLANTILLA
             plantilla_cargo.forEach(async (dato: any, indice: any, array: any) => {
                 var { item, cargo } = dato;
-                //Verificar que el registo no tenga datos vacios
+                // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                 if ((item != undefined && item != '') &&
                     (cargo != undefined && cargo != '')) {
                     data.fila = item;
@@ -180,7 +207,7 @@ class TiposCargosControlador {
                         item.observacion = 'Ya existe en el sistema'
                     }
 
-                    // Discriminación de elementos iguales
+                    // DISCRIMINACION DE ELEMENTOS IGUALES
                     if (duplicados.find((p: any) => p.tipo_cargo.toLowerCase() === item.tipo_cargo.toLowerCase()) == undefined) {
                         duplicados.push(item);
                     } else {
@@ -193,14 +220,14 @@ class TiposCargosControlador {
 
             setTimeout(() => {
                 listCargos.sort((a: any, b: any) => {
-                    // Compara los números de los objetos
+                    // COMPARA LOS NUMEROS DE LOS OBJETOS
                     if (a.fila < b.fila) {
                         return -1;
                     }
                     if (a.fila > b.fila) {
                         return 1;
                     }
-                    return 0; // Son iguales
+                    return 0; // SON IGUALES
                 });
 
                 var filaDuplicada: number = 0;
@@ -210,9 +237,9 @@ class TiposCargosControlador {
                         item.observacion = 'Registro duplicado'
                     }
 
-                    //Valida si los datos de la columna N son numeros.
+                    // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                     if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                        //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                        // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                         if (item.fila == filaDuplicada) {
                             mensaje = 'error';
                         }
@@ -237,20 +264,19 @@ class TiposCargosControlador {
         }
     }
 
-    /** Registrar plantilla Modalidad_cargo **/
+    // REGISTRAR PLANTILLA TIPO CARGO 
     public async CargarPlantilla(req: Request, res: Response) {
         try {
             const plantilla = req.body;
-            console.log('datos Tipo Cargos: ', plantilla);
             var contador = 1;
             var respuesta: any
 
             plantilla.forEach(async (data: any) => {
-                // Datos que se guardaran de la plantilla ingresada
+                // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                 const { item, tipo_cargo, observacion } = data;
                 const cargo = tipo_cargo.charAt(0).toUpperCase() + tipo_cargo.slice(1).toLowerCase();
 
-                // Registro de los datos de contratos
+                // REGISTRO DE LOS DATOS DE TIPO CARGO
                 const response: QueryResult = await pool.query(
                     `
                     INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
@@ -266,18 +292,14 @@ class TiposCargosControlador {
                         return respuesta = res.status(404).jsonp({ message: 'error' })
                     }
                 }
-
                 contador = contador + 1;
-
             });
-
-
         } catch (error) {
             return res.status(500).jsonp({ message: error });
         }
     }
 }
 
-export const tiposCargosControlador = new TiposCargosControlador();
+export const TIPOSCARGOSCONTROLADOR = new TiposCargosControlador();
 
-export default tiposCargosControlador;
+export default TIPOSCARGOSCONTROLADOR;

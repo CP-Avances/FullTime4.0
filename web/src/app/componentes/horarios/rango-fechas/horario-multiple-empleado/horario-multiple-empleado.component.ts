@@ -179,6 +179,9 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       //console.log('ver sucursales ', codigos);
 
       // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
+      this.usua_sucursales = { id_sucursal: codigos };
+      this.BuscarInformacionAdministrador(this.usua_sucursales);
+/*
       if (usuario.id_rol === 1 && usuario.jefe === false) {
         this.usua_sucursales = { id_sucursal: codigos };
         this.BuscarInformacionAdministrador(this.usua_sucursales);
@@ -189,7 +192,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       }
       else if (usuario.id_rol === 3) {
         this.BuscarInformacionSuperAdministrador();
-      }
+      }*/
     });
   }
 
@@ -223,7 +226,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
     //console.log('ver original ', this.origen)
-    informacion.forEach(obj => {
+    informacion.forEach((obj: any) => {
       //console.log('ver obj ', obj)
       this.sucursales.push({
         id: obj.id_suc,
@@ -231,8 +234,8 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((obj: any) => {
         this.regimen.push({
           id: obj.id_regimen,
           nombre: obj.name_regimen,
@@ -242,9 +245,9 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(dep => {
-        dep.departamentos.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((dep: any) => {
+        dep.departamentos.forEach((obj: any) => {
           this.departamentos.push({
             id: obj.id_depa,
             departamento: obj.name_dep,
@@ -256,10 +259,10 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(dep => {
-        dep.departamentos.forEach(car => {
-          car.cargos.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((dep: any) => {
+        dep.departamentos.forEach((car: any) => {
+          car.cargos.forEach((obj: any) => {
             this.cargos.push({
               id: obj.id_cargo_,
               nombre: obj.name_cargo,
@@ -271,14 +274,14 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(dep => {
-        dep.departamentos.forEach(car => {
-          car.cargos.forEach(empl => {
-            empl.empleado.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((dep: any) => {
+        dep.departamentos.forEach((car: any) => {
+          car.cargos.forEach((empl: any) => {
+            empl.empleado.forEach((obj: any) => {
               let elemento = {
                 id: obj.id,
-                nombre: obj.nombre + ' ' + obj.apellido,
+                nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
                 codigo: obj.codigo,
                 cedula: obj.cedula,
                 correo: obj.correo,
@@ -288,7 +291,8 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
                 id_suc: obj.id_suc,
                 id_regimen: obj.id_regimen,
                 id_depa: obj.id_depa,
-                id_cargo_: obj.id_cargo_ // TIPO DE CARGO
+                id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+                hora_trabaja: obj.hora_trabaja,
               }
               this.empleados.push(elemento)
             })
@@ -961,7 +965,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
         // CONTROL DE ASIGNACION DE TIMBRES A LA ASISTENCIA
         var codigos = '';
-        data.forEach(obj => {
+        data.forEach((obj: any) => {
           if (codigos === '') {
             codigos = '\'' + obj.codigo + '\''
           }
@@ -1021,78 +1025,42 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   //Control Botones
   getAsignarTimbres(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Asignar Timbres');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Asignar Timbres');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getEliminarPlanificaciones(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Eliminar Planificaciones');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Eliminar Planificación Horaria');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getBuscarPlanificaciones(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Buscar Planificaciones');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Buscar Planificación Horaria');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
   getPlanificacionMultiple(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Planificación Multiple');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Planificación Múltiple');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
@@ -1116,21 +1084,12 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   }
 
   getCargarPlantilla(){
-    var datosRecuperados = sessionStorage.getItem('paginaRol');
-    if(datosRecuperados){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      var encontrado = false;
-      const index = datos.findIndex(item => item.accion === 'Cargar Plantilla');
-      if (index !== -1) {
-        encontrado = true;
-      }
-      return encontrado;
+      return datos.some(item => item.accion === 'Cargar Plantilla Planificación Horaria');
     }else{
-      if(parseInt(localStorage.getItem('rol') as string) != 3){
-        return false;
-      }else{
-        return true;
-      }
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 

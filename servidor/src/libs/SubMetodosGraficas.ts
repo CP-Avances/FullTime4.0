@@ -74,9 +74,9 @@ export const HoraExtra_ModelarDatos = async function (fec_desde: Date, fec_hasta
     // console.log('Lista de array ===', array);
     let nuevo: any = [];
 
-    array.forEach(obj => {
+    array.forEach((obj: any) => {
         let respuesta = DiasIterados(obj.fec_inicio, obj.fec_final, obj.tiempo_autorizado, obj.id_empl_cargo, obj.codigo)
-        respuesta.forEach(ele => {
+        respuesta.forEach((ele: any) => {
             nuevo.push(ele);
         })
     });
@@ -237,9 +237,9 @@ export const Empleado_HoraExtra_ModelarDatos = async function (codigo: string | 
     // console.log('Lista de array ===', array);
     let nuevo: any = [];
 
-    array.forEach(obj => {
+    array.forEach((obj: any) => {
         let respuesta = DiasIterados(obj.fec_inicio, obj.fec_final, obj.tiempo_autorizado, obj.id_empl_cargo, obj.codigo)
-        respuesta.forEach(ele => {
+        respuesta.forEach((ele: any) => {
             nuevo.push(ele);
         })
     });
@@ -351,7 +351,7 @@ export const Empleado_Vacaciones_ModelarDatos = async function (codigo: string |
         , [codigo, fec_desde, fec_hasta]).then(result => { return result.rows })
     // console.log('Lista de vacaciones ===', vacaciones);
     let aux_array: any = [];
-    vacaciones.forEach(obj => {
+    vacaciones.forEach((obj: any) => {
         var fec_aux = new Date(obj.fec_inicio)
         var fecha1 = moment(obj.fec_inicio.split(" ")[0]);
         var fecha2 = moment(obj.fec_final.split(" ")[0]);
@@ -379,7 +379,7 @@ export const Empleado_Permisos_ModelarDatos = async function (codigo: string | n
         , [codigo, fec_desde, fec_hasta]).then(result => { return result.rows })
     // console.log('Lista de permisos ===', permisos);
     let aux_array: any = [];
-    permisos.forEach(obj => {
+    permisos.forEach((obj: any) => {
         var fec_aux = new Date(obj.fec_inicio)
         var fecha1 = moment(obj.fec_inicio.split(" ")[0]);
         var fecha2 = moment(obj.fec_final.split(" ")[0]);

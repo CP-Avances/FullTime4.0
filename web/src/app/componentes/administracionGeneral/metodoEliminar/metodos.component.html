@@ -16,7 +16,7 @@
     <mat-card-content *ngIf="!eliminar">
         <div style="padding: 2%;">
             <p>
-                Para planificaciones horarias múltiples
+                Para planificaciones horarios múltiples
                 <b>
                     existe la posibilidad que todos los
                     timbres realizados en la fecha indica se desconfiguren.
@@ -58,7 +58,11 @@
     </div>
     <mat-card-content *ngIf="eliminar">
         <div style="padding: 2%;">
-            <p id="mensaje">¿ESTA SEGURO DE ELIMINAR EL REGITRO SELECIONADO?</p>
+            <p>Se le recuerda que al eliminar este registro automáticamente se eliminarán <b>TODOS</b> los registro con los
+                que guarde alguna relación.
+                <b>Podría afectar al buen funcionamiento del sistema.</b>
+            </p>
+            <p id="mensaje">¿ESTÁ SEGURO DE ELIMINAR ESTE REGISTRO?</p>
         </div>
     </mat-card-content>
 </ng-container>

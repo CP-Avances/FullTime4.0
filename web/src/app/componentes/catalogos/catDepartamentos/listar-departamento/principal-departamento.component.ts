@@ -189,6 +189,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       buscarNombreForm: '',
     });
     this.ListaDepartamentos();
+    this.ngOnInit();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
     this.messajeExcel = '';
@@ -314,7 +315,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
         this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
           timeOut: 3000,
         });
-        window.location.reload();
+        //window.location.reload();
+        this.LimpiarCampos();
         this.archivoForm.reset();
         this.nameFile = '';
       });
@@ -337,9 +339,9 @@ export class PrincipalDepartamentoComponent implements OnInit {
       return 'rgb(159, 221, 154)';
     } else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
-    } else if (observacion == 'No existe la sucursal en el sistema') {
+    } else if (observacion == 'Sucursal no existe en el sistema') {
       return 'rgb(255, 192, 203)';
-    } else if (arrayObservacion[0] == 'Nombre' || arrayObservacion[0] == 'Sucursal') {
+    } else if (arrayObservacion[0] == 'Departamento' || arrayObservacion[0] == 'Sucursal') {
       return 'rgb(242, 21, 21)';
     } else {
       return 'white'
@@ -485,7 +487,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   exportToXML() {
     var objeto;
     var arregloDepartamentos: any = [];
-    this.departamentos.forEach(obj => {
+    this.departamentos.forEach((obj: any) => {
       objeto = {
         "departamento": {
           "$": { "id": obj.id },
@@ -707,7 +709,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
                 this.rest.EliminarRegistroNivelDepa(item.id).subscribe(
                   res => {
                     if (res.message === 'error') {
-                      this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+                      this.toastr.error('Existen datos relacionados con ' + item.nombre + '.', 'No fue posible eliminar.',  {
                         timeOut: 6000,
                       });
                     } else {

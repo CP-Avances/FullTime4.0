@@ -391,7 +391,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     } else {
       var objeto;
       var arreglohorasExtras: any = [];
-      this.horasExtras.forEach(obj => {
+      this.horasExtras.forEach((obj: any) => {
         var incluirAlmuerzo = this.Almuerzo[obj.incl_almuerzo - 1];
         objeto = {
           "horas_extras": {

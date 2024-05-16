@@ -445,7 +445,7 @@ export class ReportePermisosComponent implements OnInit {
   presentarDatosGenerales(codigo) {
     var ciudad, nombre, apellido, cedula, codigo, regimen, sucursal, departamento, cargo, totalDias = 0, totalHoras = 0, formatoHoras = '0', formatoMinutos;
     var horas_decimal, dias_decimal, horas_horario, minutosHoras, tDias, horasDias, horaT, horaTDecimalH;
-    this.datosEmpleado.forEach(obj => {
+    this.datosEmpleado.forEach((obj: any) => {
       if (obj.codigo === codigo) {
         nombre = obj.nombre;
         apellido = obj.apellido;
@@ -458,7 +458,7 @@ export class ReportePermisosComponent implements OnInit {
         regimen = obj.regimen;
       }
     })
-    this.totalPermisos.forEach(obj => {
+    this.totalPermisos.forEach((obj: any) => {
       if (String(obj.hora_trabaja).length != 1) {
         horas_horario = obj.hora_trabaja + ':00:00'
       }
@@ -738,7 +738,7 @@ export class ReportePermisosComponent implements OnInit {
     // INICIALIZACIÓN DE VARIBLES
     var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;
     // BUSQUEDA DE LOS DATOS DEL EMPLEADO DEL CUAL SE OBTIENE EL REPORTE
-    this.datosEmpleado.forEach(obj => {
+    this.datosEmpleado.forEach((obj: any) => {
       if (obj.codigo === codigo) {
         nombre = obj.nombre;
         apellido = obj.apellido;
@@ -813,7 +813,7 @@ export class ReportePermisosComponent implements OnInit {
     var totalDias = 0, totalHoras = 0, formatoHoras = '0', formatoMinutos;
     var horas_decimal, dias_decimal, horas_horario, minutosHoras, tDias, horasDias, horaT, horaTDecimalH;
 
-    this.totalPermisos.forEach(obj => {
+    this.totalPermisos.forEach((obj: any) => {
           if (obj.estado === 'Autorizado') {
             var hora1 = (obj.hora_numero).split(":");
             var t1 = new Date();

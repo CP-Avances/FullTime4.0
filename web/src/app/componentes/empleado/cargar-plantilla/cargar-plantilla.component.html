@@ -74,6 +74,7 @@
                         <table class="table table-hover table-sm">
                             <thead class="thead-light">
                                 <tr style="text-align: center; font-size: 13px;">
+                                    <th scope="col">Observación</th>
                                     <th scope="col">Item</th>
                                     <th scope="col">Cédula</th>
                                     <th scope="col">Pais</th>
@@ -83,12 +84,18 @@
                                     <th scope="col">Fecha salida</th>
                                     <th scope="col">Control asistencias</th>
                                     <th scope="col">Control vacaciones</th>
-                                    <th scope="col">Observación</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr
                                     *ngFor="let contrato of DatosContrato | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                                    <td style="font-size: 12px;">
+                                        <div style="width: 270px; margin: auto;">
+                                            <div id="t-editar" class="circulo"
+                                                [style.background-color]="stiloCelda(contrato.observacion)"></div>
+                                            {{contrato.observacion}}
+                                        </div>
+                                    </td>
                                     <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{contrato.fila}}</td>
                                     <td [style.color]="stiloTextoCelda(contrato.cedula)" style="font-size: 12px;">{{contrato.cedula}}</td>
                                     <td [style.color]="stiloTextoCelda(contrato.pais)" style="font-size: 12px;">{{contrato.pais}}</td>
@@ -98,13 +105,7 @@
                                     <td [style.color]="stiloTextoCelda(contrato.fecha_salida)" style="font-size: 12px;">{{contrato.fecha_salida}}</td>
                                     <td [style.color]="stiloTextoCelda(contrato.control_asis)" id="letras" style="font-size: 12px;">{{contrato.control_asis}}</td>
                                     <td [style.color]="stiloTextoCelda(contrato.control_vaca)" id="letras" style="font-size: 12px;">{{contrato.control_vaca}}</td>
-                                    <td style="font-size: 12px;">
-                                        <div style="width: 270px; margin: auto;">
-                                            <div id="t-editar" class="circulo"
-                                                [style.background-color]="stiloCelda(contrato.observacion)"></div>
-                                            {{contrato.observacion}}
-                                        </div>
-                                    </td>
+                                    
                                 </tr>
                             </tbody>
                         </table>
@@ -191,6 +192,7 @@
                         <table class="table table-hover table-sm">
                             <thead class="thead-light">
                                 <tr style="text-align: center; font-size: 13px;">
+                                    <th scope="col">Observación</th>
                                     <th scope="col">Item</th>
                                     <th scope="col">Cédula</th>
                                     <th scope="col">Departamento</th>
@@ -201,12 +203,18 @@
                                     <th scope="col">Cargo</th>
                                     <th scope="col">Hora de trabajo</th>
                                     <th scope="col">Jefé</th>
-                                    <th scope="col">Observación</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr
                                     *ngFor="let cargo of DatosCargos | paginate:tamanio_paginaMulCargo:numero_paginaMulCargo; let i = index">
+                                    <td style="font-size: 12px;">
+                                        <div style="width: 270px; margin: auto;">
+                                            <div id="t-editar" class="circulo"
+                                                [style.background-color]="stiloCelda(cargo.observacion)"></div>
+                                            {{cargo.observacion}}
+                                        </div>
+                                    </td>
                                     <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{cargo.fila}}</td>
                                     <td [style.color]="stiloTextoCelda(cargo.cedula)" style="font-size: 12px;">{{cargo.cedula}}</td>
                                     <td [style.color]="stiloTextoCelda(cargo.departamento)" style="font-size: 12px;">{{cargo.departamento}}</td>
@@ -215,15 +223,8 @@
                                     <td [style.color]="stiloTextoCelda(cargo.sucursal)" style="font-size: 12px;">{{cargo.sucursal}}</td>
                                     <td [style.color]="stiloTextoCelda(cargo.sueldo)" style="font-size: 12px;">{{cargo.sueldo}}</td>
                                     <td [style.color]="stiloTextoCelda(cargo.cargo)" id="letras" style="font-size: 12px;">{{cargo.cargo}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.hora_traba)" id="letras" style="font-size: 12px;">{{cargo.hora_traba}}</td>
+                                    <td [style.color]="stiloTextoCelda(cargo.hora_trabaja)" id="letras" style="font-size: 12px;">{{cargo.hora_trabaja}}</td>
                                     <td [style.color]="stiloTextoCelda(cargo.jefe)" style="font-size: 12px;">{{cargo.jefe}}</td>
-                                    <td style="font-size: 12px;">
-                                        <div style="width: 270px; margin: auto;">
-                                            <div id="t-editar" class="circulo"
-                                                [style.background-color]="stiloCelda(cargo.observacion)"></div>
-                                            {{cargo.observacion}}
-                                        </div>
-                                    </td>
                                 </tr>
                             </tbody>
                         </table>

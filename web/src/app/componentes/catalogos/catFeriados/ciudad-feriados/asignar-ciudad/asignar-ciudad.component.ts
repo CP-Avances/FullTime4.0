@@ -154,7 +154,7 @@ export class AsignarCiudadComponent implements OnInit {
   // METODO PARA MOSTRAR LISTA EN FORMULARIO
   FiltrarProvincias(form: any) {
     let idPais = 0;
-    this.paises.forEach(obj => {
+    this.paises.forEach((obj: any) => {
       if (obj.nombre === form.nombrePaisForm) {
         idPais = obj.id
       }

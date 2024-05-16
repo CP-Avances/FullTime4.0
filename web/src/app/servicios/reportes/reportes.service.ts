@@ -90,7 +90,7 @@ export class ReportesService {
 
   checkOptions(num_items: any): checkOptions[] {
     let valores: any = []
-    this._check.forEach(obj => {
+    this._check.forEach((obj: any) => {
       num_items.forEach(a => {
         if (obj.opcion === a.opcion) {
           valores = valores.concat(obj)

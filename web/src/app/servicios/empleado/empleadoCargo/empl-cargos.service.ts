@@ -49,6 +49,18 @@ export class EmplCargosService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/cargoInfo/${id_empl_contrato}`);
   }
 
+  // METODO PARA BUSCAR CARGOS POR FECHA
+  BuscarCargoFecha(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/fecha_cargo`, data);
+  }
+
+  // METODO PARA BUSCAR CARGOS POR FECHA EDITAR
+  BuscarCargoFechaEditar(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/fecha_cargo/editar`, data);
+  }
+
+
+
 
 
 

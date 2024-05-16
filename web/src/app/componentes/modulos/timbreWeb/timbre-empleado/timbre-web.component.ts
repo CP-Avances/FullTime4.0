@@ -146,7 +146,6 @@ export class TimbreWebComponent implements OnInit {
           this.restTimbres.RegistrarTimbreWeb(data).subscribe(res => {
             // METODO PARA AUDITAR TIMBRES
             data.id_empleado = this.idEmpleado;
-            this.validar.Auditar('app-web', 'timbres', '', data, 'INSERT');
             this.BuscarParametro();
             this.toastr.success(res.message)
           }, err => {

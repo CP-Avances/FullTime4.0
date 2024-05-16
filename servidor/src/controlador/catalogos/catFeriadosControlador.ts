@@ -49,20 +49,33 @@ class FeriadosControlador {
         try {
             const { fecha, descripcion, fec_recuperacion } = req.body;
 
-            const response: QueryResult = await pool.query(
+            const busqueda: QueryResult = await pool.query(
                 `
-                INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
-                VALUES ($1, $2, $3) RETURNING *
+                SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1
                 `
-                , [fecha, descripcion, fec_recuperacion]);
+                , [descripcion.toUpperCase()]);
 
-            const [feriado] = response.rows;
+            const [nombres] = busqueda.rows;
 
-            if (feriado) {
-                return res.status(200).jsonp(feriado)
+            if (nombres) {
+                return res.jsonp({ message: 'existe', status: '300' });
             }
             else {
-                return res.status(404).jsonp({ message: 'error' })
+                const response: QueryResult = await pool.query(
+                    `
+                    INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
+                    VALUES ($1, $2, $3) RETURNING *
+                    `
+                    , [fecha, descripcion, fec_recuperacion]);
+
+                const [feriado] = response.rows;
+
+                if (feriado) {
+                    return res.status(200).jsonp(feriado);
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
             }
         }
         catch (error) {
@@ -90,13 +103,27 @@ class FeriadosControlador {
     public async ActualizarFeriado(req: Request, res: Response) {
         try {
             const { fecha, descripcion, fec_recuperacion, id } = req.body;
-            await pool.query(
+
+            const busqueda: QueryResult = await pool.query(
                 `
-                UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
-                WHERE id = $4
+                SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1 AND NOT id = $2
                 `
-                , [fecha, descripcion, fec_recuperacion, id]);
-            res.jsonp({ message: 'Registro actualizado.' });
+                , [descripcion.toUpperCase(), id]);
+
+            const [nombres] = busqueda.rows;
+
+            if (nombres) {
+                return res.jsonp({ message: 'existe', status: '300' });
+            }
+            else {
+                await pool.query(
+                    `
+                    UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
+                    WHERE id = $4
+                    `
+                    , [fecha, descripcion, fec_recuperacion, id]);
+                return res.jsonp({ message: 'ok' });
+            }
         }
         catch (error) {
             return res.jsonp({ message: 'error' });
@@ -248,7 +275,6 @@ class FeriadosControlador {
                     data.observacion = 'Descripción ' + data.observacion;
                 }
 
-                data.fec_recuperacion = dato.fec_recuperacion;
                 if (data.fecha == 'No registrado' && data.descripcion == 'No registrado') {
                     data.observacion = 'Fecha y descripción no registrada';
                 }
@@ -336,10 +362,9 @@ class FeriadosControlador {
 
         var filaDuplicada: number = 0;
         listFeriados.forEach(async (item: any) => {
+            console.log('item: ', item);
             //VERIFICA SI EXISTE EN LAs COLUMNA DATOS REGISTRADOS
             if (item.fila != 'error' && item.fecha != 'No registrado' && item.descripcion != 'No registrado') {
-
-
                 // Verificar si la variable tiene el formato de fecha correcto con moment
                 if (moment(item.fecha, 'YYYY-MM-DD', true).isValid()) {
                     fecha_correcta = true;
@@ -358,22 +383,26 @@ class FeriadosControlador {
                         , [item.fecha]);
 
                     if (VERIFICAR_FECHA.rowCount === 0) {
-                        if (item.fec_recuperacion == undefined) {
-                            item.fec_recuperacion = '-';
+
+                        if (item.fec_recuperacion == '-' || item.fec_recuperacion == undefined) {
                             fec_recuperacion_correcta = true;
                             // Discriminación de elementos iguales
-                            if (duplicados.find((p: any) => p.fecha === item.fecha || p.fecha === item.fec_recuperacion) == undefined) {
+                            if (duplicados.find((p: any) => p.descripcion == item.descripcion || p.fecha === item.fecha) == undefined) {
                                 item.observacion = 'ok';
                                 duplicados.push(item);
+                            } else {
+                                item.observacion = '1';
                             }
 
                         } else {
                             if (moment(item.fec_recuperacion, 'YYYY-MM-DD', true).isValid()) {
                                 fec_recuperacion_correcta = true;
                                 // Discriminación de elementos iguales
-                                if (duplicados.find((p: any) => p.fecha === item.fecha) == undefined) {
-                                    data.observacion = 'ok';
+                                if (duplicados.find((p: any) => p.descripcion == item.descripcion || p.fecha === item.fecha || p.fec_recuperacion === item.fec_recuperacion) == undefined) {
+                                    item.observacion = 'ok';
                                     duplicados.push(item);
+                                } else {
+                                    item.observacion = '1';
                                 }
 
                             } else {
@@ -383,21 +412,10 @@ class FeriadosControlador {
                         }
 
                     } else {
-
-                        data.observacion = 'Ya existe en el sistema';
+                        item.observacion = 'Ya existe en el sistema';
                     }
                 }
 
-            }
-
-            if (item.observacion != undefined && item.observacion != 'no registrada' && item.observacion != '') {
-                fecha_igual.forEach((valor: any) => {
-                    if (valor.fecha == item.fec_recuperacion) {
-                        item.observacion = 'Fecha registrada como valor de otra columna'
-                    }
-                })
-            } else {
-                item.observacion = 'Registro duplicado'
             }
 
             //Valida si los datos de la columna N son numeros.
@@ -485,6 +503,22 @@ class FeriadosControlador {
                 }
                 return 0; // Son iguales
             });
+
+            listFeriados.forEach((item: any) => {
+                console.log('item.observacion: ', item);
+                if (item.fec_recuperacion != '-') {
+                    fecha_igual.forEach((valor: any) => {
+                        console.log(valor.fecha, ' == ', item.fec_recuperacion);
+                        if (valor.fecha == item.fec_recuperacion) {
+                            item.observacion = 'Fecha registrada como valor de otra columna'
+                        }
+                    })
+                }
+
+                if (item.observacion == '1') {
+                    item.observacion = 'Registro duplicado'
+                }
+            })
 
 
             listFeriados_ciudades.forEach((valor: any) => {
@@ -730,6 +764,7 @@ class FeriadosControlador {
                 // ELIMINAR DEL SERVIDOR
                 fs.unlinkSync(ruta);
             }
+
         });
     }
 

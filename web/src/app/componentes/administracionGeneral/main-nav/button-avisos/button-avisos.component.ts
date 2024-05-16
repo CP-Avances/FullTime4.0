@@ -116,7 +116,7 @@ export class ButtonAvisosComponent implements OnInit {
       this.avisos = res;
       if (!this.avisos.message) {
         if (this.avisos.length > 0) {
-          this.avisos.forEach(obj => {
+          this.avisos.forEach((obj: any) => {
 
             if (obj.visto === false) {
               this.num_timbre_false = this.num_timbre_false + 1;

@@ -199,7 +199,7 @@ export class ListarVacacionesComponent implements OnInit {
       this.vacaciones = res;
 
       //Filtra la lista de Vacaciones para descartar las solicitudes del mismo usuario y almacena en una nueva lista
-      this.listaVacacionesFiltrada = this.vacaciones.filter(o => {
+      this.listaVacacionesFiltrada = this.vacaciones.filter((o: any) => {
         if(this.idEmpleado !== o.id_empl_solicita){
           return this.listaVacacionesFiltrada.push(o);
         }
@@ -277,7 +277,7 @@ export class ListarVacacionesComponent implements OnInit {
       console.log('vacaciones_autorizadas: ', this.vacaciones_autorizadas)
 
       // FILTRA LA LISTA DE VACACIONES PARA DESCARTAR LAS SOLICITUDES DEL MISMO USUARIO Y ALMACENA EN UNA NUEVA LISTA
-      this.listaVacacionesFiltradaAutorizada = this.vacaciones_autorizadas.filter(o => {
+      this.listaVacacionesFiltradaAutorizada = this.vacaciones_autorizadas.filter((o: any) => {
         if (this.idEmpleado !== o.id_empl_solicita) {
           return this.listaVacacionesFiltradaAutorizada.push(o);
         }
@@ -677,7 +677,7 @@ export class ListarVacacionesComponent implements OnInit {
   exportToXML(opcion: String) {
     var objeto: any;
     var arregloVacaciones: any = [];
-    (opcion == "Vacaciones solicitadas" ? this.listaVacacionDeparta : this.listaVacacionesFiltradaAutorizada).forEach(obj => {
+    (opcion == "Vacaciones solicitadas" ? this.listaVacacionDeparta : this.listaVacacionesFiltradaAutorizada).forEach((obj: any) => {
       objeto = {
         "lista_permisos": {
           '@id': obj.id,

@@ -143,6 +143,11 @@ export class EmpleadoService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleado/emplTitulos`, data);
   }
 
+  // METODO PARA BUSCAR TITULO ESPECIFICO DEL USUARIO
+  BuscarTituloEspecifico(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleado/emplTitulos/usuario`, data);
+  }
+
   ActualizarTitulo(id: number, data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/empleado/${id}/titulo`, data);
   }
@@ -180,6 +185,11 @@ export class EmpleadoService {
   // REGISTRAR MODALIDAD DE TRABAJO
   CrearTiposContrato(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/modalidad/trabajo`, datos);
+  }
+
+  // REGISTRAR MODALIDAD DE TRABAJO
+  BuscarModalidadLaboralNombre(datos: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/contratoEmpleado/modalidad/trabajo/nombre`, datos);
   }
 
 

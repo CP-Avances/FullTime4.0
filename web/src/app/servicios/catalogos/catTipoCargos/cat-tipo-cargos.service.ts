@@ -12,28 +12,35 @@ export class CatTipoCargosService {
     private http: HttpClient,
   ) { }
 
-  listaCargos(){
+  // METODO PARA BUSCAR TIPO DE CARGO POR SU NOMBRE
+  BuscarTipoCargoNombre(datos: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/tipoCargos/buscar/tipo_cargo/nombre`, datos);
+  }
+
+  listaCargos() {
     return this.http.get<any>((localStorage.getItem('empresaURL') as string) + '/tipoCargos');
   }
-  
-  CrearCargo(cargo: any){
-    console.log('cargo: ',cargo)
+
+  CrearCargo(cargo: any) {
+    console.log('cargo: ', cargo)
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/tipoCargos/crearCargo`, cargo)
-    .pipe(catchError(cargo));
+      .pipe(catchError(cargo));
   }
 
   ActualizarCargo(datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/tipoCargos`, datos)
-    .pipe(catchError(datos));
-  }
-  eliminar(id: any){
-    return this.http.delete<any>(`${(localStorage.getItem('empresaURL') as string)}/tipoCargos/eliminar/${id}`)
+      .pipe(catchError(datos));
   }
 
-  RevisarFormato(formData) {
+  eliminar(id: any) {
+    return this.http.delete<any>((localStorage.getItem('empresaURL') as string) + `/tipoCargos/eliminar/${id}`)
+  }
+
+  RevisarFormato(formData: any) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/tipoCargos/upload/revision', formData);
   }
-  subirArchivoExcel(formData) {
+
+  subirArchivoExcel(formData: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/tipoCargos/cargar_plantilla`, formData);
   }
 

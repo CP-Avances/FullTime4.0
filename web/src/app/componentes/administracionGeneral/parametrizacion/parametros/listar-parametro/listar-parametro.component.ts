@@ -263,7 +263,7 @@ export class ListarParametroComponent implements OnInit {
   exportToXML() {
     let objeto: any;
     let arregloParametrosGenerales: any = [];
-    this.parametros.forEach(obj => {
+    this.parametros.forEach((obj: any) => {
       objeto = {
         "tipo_parametro": {
           "$": { "id": obj.id },

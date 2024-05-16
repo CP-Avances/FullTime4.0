@@ -66,7 +66,7 @@ export const CalcularHoraExtra = async function (id_empleado: number, fec_desde:
 
 function SumaValorPagoEmpleado(horas_extras: any[]) {
     let sumador: number = 0;
-    horas_extras.forEach(obj => {
+    horas_extras.forEach((obj: any) => {
         console.log('Valor pago', obj.calculos[0].valor_pago);
         sumador = sumador + obj.calculos[0].valor_pago
     });

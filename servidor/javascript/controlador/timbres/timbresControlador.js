@@ -276,7 +276,7 @@ class TimbresControlador {
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj, tipo } = req.body;
                 let f = new Date();
                 let servidor;
-                if (tipo === 'admin') {
+                if (tipo === 'administrar') {
                     servidor = fec_hora_timbre;
                 }
                 else {

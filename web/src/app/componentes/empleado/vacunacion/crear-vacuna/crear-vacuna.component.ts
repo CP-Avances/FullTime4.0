@@ -115,7 +115,7 @@ export class CrearVacunaComponent implements OnInit {
       });
   }
 
-  // METODO PARA GUARDAR DATOS DE REGISTRO DE VACUNACIÓN 
+  // METODO PARA GUARDAR DATOS DE REGISTRO DE VACUNACION 
   GuardarDatosCarnet(form: any) {
     let dataCarnet = {
       id_tipo_vacuna: form.vacunaForm,
@@ -123,13 +123,25 @@ export class CrearVacunaComponent implements OnInit {
       id_empleado: parseInt(this.idEmploy),
       fecha: form.fechaForm,
     }
-    this.GuardarDatosSistema(dataCarnet, form);
+    // VERIIFCAR EXISTENCIA DEL REGISTRO DE VACUNA
+    let vacuna = {
+      id_empleado: dataCarnet.id_empleado,
+      fecha: dataCarnet.fecha,
+      id_vacuna: dataCarnet.id_tipo_vacuna
+    }
+    this.restVacuna.BuscarVacunaFechaTipo(vacuna).subscribe(response => {
+      this.toastr.warning('Registro de vacunación ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
+      });
+    }, vacio => {
+      this.GuardarDatosSistema(dataCarnet, form);
+    });
   }
 
   // METODO PARA REGISTRAR DATOS EN EL SISTEMA
   GuardarDatosSistema(datos: any, form: any) {
     if (form.certificadoForm != '' && form.certificadoForm != null && form.certificadoForm != undefined) {
-      this.VerificarArchivo(datos, form);
+      this.VerificarArchivo(datos);
     }
     else {
       this.Registrar_sinCarnet(datos);
@@ -146,9 +158,9 @@ export class CrearVacunaComponent implements OnInit {
   }
 
   // METODO PARA GUARDAR DATOS DE REGISTROS SI EL ARCHIVO CUMPLE CON LOS REQUISITOS
-  VerificarArchivo(datos: any, form: any) {
+  VerificarArchivo(datos: any) {
     if (this.archivoSubido[0].size <= 2e+6) {
-      this.CargarDocumento(datos, form);
+      this.CargarDocumento(datos);
       this.CerrarRegistro();
     }
     else {
@@ -159,7 +171,7 @@ export class CrearVacunaComponent implements OnInit {
   }
 
   // METODO PARA GUARDAR ARCHIVO SELECCIONADO
-  CargarDocumento(datos: any, form: any) {
+  CargarDocumento(datos: any) {
     this.restVacuna.RegistrarVacunacion(datos).subscribe(vacuna => {
       let formData = new FormData();
       for (var i = 0; i < this.archivoSubido.length; i++) {

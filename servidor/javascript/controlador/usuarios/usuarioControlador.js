@@ -948,7 +948,7 @@ class UsuarioControlador {
                 const DISPOSITIVOS = yield database_1.default.query(`
         SELECT e.codigo, (e.nombre || \' \' || e.apellido) AS nombre, e.cedula, d.id_dispositivo, d.modelo_dispositivo
         FROM mrv_dispositivos AS d 
-        INNER JOIN eu_empleados AS e ON d.id_empleado = e.codigo
+        INNER JOIN eu_empleados AS e ON d.codigo_empleado = e.codigo
         ORDER BY nombre
         `).then((result) => { return result.rows; });
                 if (DISPOSITIVOS.length === 0)

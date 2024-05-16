@@ -47,7 +47,10 @@ export class DiscapacidadService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/discapacidad/buscarTipo/tipo`);
   }
 
-
+  // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE
+  BuscarDiscapacidadNombre(data: any) {
+    return this.http.post<any>(`${environment.url}/discapacidad/buscarTipo/nombre`, data);
+  }
 
 
 

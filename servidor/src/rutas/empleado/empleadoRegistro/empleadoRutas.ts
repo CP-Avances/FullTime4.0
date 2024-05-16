@@ -135,6 +135,8 @@ class EmpleadoRutas {
         this.router.get('/emplTitulos/:id_empleado', TokenValidation, EMPLEADO_CONTROLADOR.ObtenerTitulosEmpleado);
         // METODO PARA REGISTRAR TITULO PROFESIONAL
         this.router.post('/emplTitulos/', TokenValidation, EMPLEADO_CONTROLADOR.CrearEmpleadoTitulos);
+        // METODO PARA BUSCAR TITULO ESPECIFICO DEL EMPLEADO
+        this.router.post('/emplTitulos/usuario', TokenValidation, EMPLEADO_CONTROLADOR.ObtenerTituloEspecifico);
         // METODO PARA ACTUALIZAR REGISTRO
         this.router.put('/:id_empleado_titulo/titulo', TokenValidation, EMPLEADO_CONTROLADOR.EditarTituloEmpleado);
         // METODO PARA ELIMINAR TITULO 

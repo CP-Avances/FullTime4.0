@@ -18,7 +18,7 @@
                 </div>
             </mat-card>
         </div>
-        <!------------------ Registro multiple de establecimientos ------------------------------------->
+        <!--  ********************************  REGISTRO MULTIPLE DE NIVELES  *******************************  -->
         <div class="col-md">
             <div id="titulo">
                 <span>REGISTRO MULTIPLE</span>
@@ -51,7 +51,6 @@
                             style="text-align: center; justify-content: center;">
                             <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                 matTooltip="Dar click para ver o descargar el documento.">
-                                <!--span class="material-icons">cloud_download</span-->
                                 <br>
                                 Descargar plantilla
                             </a>
@@ -77,28 +76,23 @@
 <div class="container" style="padding-top: 15px; padding-bottom: 50px; text-align: center;"
     *ngIf="!DataNivelesProfesionales && (messajeExcel == 'error' || messajeExcel == '')">
     <div class="mat-elevation-z8" style="background: white;">
-
         <div class="d-flex bd-highlight" id="titulo">
-
-
             <div class="w-100 bd-highlight">
                 <h5>
                     RESULTADO DE BÚSQUEDA
                 </h5>
             </div>
-
-
             <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-
                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                    (click)="ConfirmarDeleteMultiple()">Eliminar </button>
+                    (click)="ConfirmarDeleteMultiple()">
+                    Eliminar
+                </button>
             </div>
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-
                         <th>
                             <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
                                 matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
@@ -118,7 +112,6 @@
                 <tbody>
                     <tr>
                         <td></td>
-
                         <td>
                             <mat-form-field id="t-inputs">
                                 <input matInput placeholder="Buscar" [formControl]="nombreF"
@@ -133,7 +126,6 @@
                     </tr>
                     <tr
                         *ngFor="let t of nivelTitulos | filtrosNombres: filtradoNombre |  paginate:tamanio_pagina:numero_pagina">
-
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionNiveles.toggle(t) : null"
@@ -158,31 +150,35 @@
         <mat-paginator id="pagina" [length]="nivelTitulos.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;" *ngIf="getDescargarReportes()">
-            <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Niveles de Títulos en formato PDF.">
-                <p>PDF</p>
-            </i>
-            <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Niveles de Títulos en formato EXCEL.">
-                <p>XLSL</p>
-            </i>
-            <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Niveles de Títulos en formato CSV.">
-                <p>CSV</p>
-            </i>
-            <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Niveles de Títulos en formato XML.">
-                <p>XML</p>
-            </i>
-        </div>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-            <p> Reporte de niveles de títulos profesionales. </p>
+        <!--  *********************  DESCARGA DE REPORTES  **************************  -->
+        <div *ngIf="getDescargarReportes()">
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista de Niveles de Títulos en formato PDF.">
+                    <p>PDF</p>
+                </i>
+                <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Niveles de Títulos en formato EXCEL.">
+                    <p>XLSL</p>
+                </i>
+                <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Niveles de Títulos en formato CSV.">
+                    <p>CSV</p>
+                </i>
+                <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Niveles de Títulos en formato XML.">
+                    <p>XML</p>
+                </i>
+            </div>
+            <div class="d-flex justify-content-end"
+                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                <p> Reporte de niveles de títulos profesionales. </p>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- ********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE  *************************************** -->
+<!-- ***************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE  **************************** -->
 <div class="container" style="padding-top: 10px; margin-bottom: 25px;"
     *ngIf="DataNivelesProfesionales && messajeExcel != 'error'">
     <app-definicion-plantilla>
@@ -200,17 +196,15 @@
             <table class="table table-hover table-sm ">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
+                        <th scope="col">Observación</th>
                         <th scope="col">Item</th>
                         <th scope="col">Nivel</th>
-
-                        <th scope="col">Observación</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
                     <tr
                         *ngFor="let data of DataNivelesProfesionales | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
-                        <td style="font-size: 12px; width: 50px;" align="center">{{data.fila}}</td>
-                        <td style="font-size: 12px;" [style.color]="stiloTextoCelda(data.nombre)">{{ data.nombre}}</td>
                         <td style="font-size: 12px;">
                             <div style="width: 270px; margin: auto;">
                                 <div id="t-editar" class="circulo"
@@ -218,6 +212,9 @@
                                 {{ data.observacion}}
                             </div>
                         </td>
+                        <td style="font-size: 12px; width: 50px;" align="center">{{data.fila}}</td>
+                        <td style="font-size: 12px;" [style.color]="stiloTextoCelda(data.nombre)">{{ data.nombre}}</td>
+                        
                     </tr>
                 </tbody>
             </table>

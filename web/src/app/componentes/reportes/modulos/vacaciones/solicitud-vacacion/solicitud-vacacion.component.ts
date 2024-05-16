@@ -101,8 +101,8 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
       });
 
       // BUSQUEDA DE DEPARTAMENTOS
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
+      res.forEach((obj: any) => {
+        obj.departamentos.forEach((ele: any) => {
           this.departamentos.push({
             id: ele.id_depa,
             nombre: ele.name_dep
@@ -111,8 +111,8 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
       })
 
       // BUSQUEDA DE DEPARTAMENTO - EMPLEADOS
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
+      res.forEach((obj: any) => {
+        obj.departamentos.forEach((ele: any) => {
           ele.empleado.forEach(r => {
             let elemento = {
               id: r.id,
@@ -164,7 +164,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
   // MODELAMIENTO DE DATOS DE ACUERDO A LAS SUCURSALES
   ModelarSucursal(accion) {
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_vacunas_multiples') as any)
-    let suc = respuesta.filter(o => {
+    let suc = respuesta.filter((o: any) => {
       var bool = this.selectionSuc.selected.find(obj1 => {
         return obj1.id === o.id_suc
       })
@@ -186,7 +186,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
   ModelarDepartamento(accion) {
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_vacunas_multiples') as any)
     respuesta.forEach((obj: any) => {
-      obj.departamentos = obj.departamentos.filter(o => {
+      obj.departamentos = obj.departamentos.filter((o: any) => {
         var bool = this.selectionDep.selected.find(obj1 => {
           return obj1.id === o.id_depa
         })
@@ -213,7 +213,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_vacunas_multiples') as any)
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach(element => {
-        element.empleado = element.empleado.filter(o => {
+        element.empleado = element.empleado.filter((o: any) => {
           var bool = this.selectionEmp.selected.find(obj1 => {
             return obj1.id === o.id
           })
@@ -221,7 +221,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
         })
       });
     })
-    respuesta.forEach(obj => {
+    respuesta.forEach((obj: any) => {
       obj.departamentos = obj.departamentos.filter(e => {
         return e.empleado.length > 0
       })

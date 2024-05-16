@@ -8,10 +8,11 @@ import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
 import * as moment from 'moment';
-import * as FileSaver from 'file-saver';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { RelojesComponent } from 'src/app/componentes/catalogos/catRelojes/relojes/relojes.component';
@@ -32,8 +33,6 @@ import { ITableDispositivos } from 'src/app/model/reportes.model';
 
 export class ListarRelojesComponent implements OnInit {
 
-  dispositivosEliminar: any = [];
-
   // ALMACENAMIENTO DE DATOS Y BUSQUEDA
   filtroDepartamentoReloj = '';
   filtroSucursalReloj = '';
@@ -45,6 +44,7 @@ export class ListarRelojesComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
   listar_relojes: boolean = true;
+  dispositivosEliminar: any = [];
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   ipF = new FormControl('');
@@ -161,11 +161,10 @@ export class ListarRelojesComponent implements OnInit {
     this.ObtenerReloj();
   }
 
+
   /** ********************************************************************************* **
    ** **           VENTANAS PARA REGISTRAR Y EDITAR DATOS DE UN DISPOSITIVO          ** **
    ** ********************************************************************************* **/
-
-
 
   // VENTANA PARA REGISTRAR DATOS DE UN NUEVO DISPOSITIVO
   AbrirVentanaRegistrarReloj(): void {
@@ -290,7 +289,6 @@ export class ListarRelojesComponent implements OnInit {
       case 'download': pdfMake.createPdf(documentDefinition).download(); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
-
   }
 
   getDocumentDefinicion() {
@@ -345,37 +343,37 @@ export class ListarRelojesComponent implements OnInit {
             widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
             body: [
               [
-                { text: 'ID', style: 'tableHeader' },
+                { text: 'Código', style: 'tableHeader' },
+                { text: 'Empresa', style: 'tableHeader' },
+                { text: 'Ciudad', style: 'tableHeader' },
+                { text: 'Establecimiento', style: 'tableHeader' },
+                { text: 'Departamento', style: 'tableHeader' },
                 { text: 'Nombre', style: 'tableHeader' },
                 { text: 'IP', style: 'tableHeader' },
                 { text: 'Puerto', style: 'tableHeader' },
                 { text: 'Marca', style: 'tableHeader' },
                 { text: 'Modelo', style: 'tableHeader' },
                 { text: 'Serie', style: 'tableHeader' },
+                { text: 'Mac', style: 'tableHeader' },
                 { text: 'ID Fabricanción', style: 'tableHeader' },
                 { text: 'Fabricante', style: 'tableHeader' },
-                { text: 'Mac', style: 'tableHeader' },
-                { text: 'Departamento', style: 'tableHeader' },
-                { text: 'Establecimiento', style: 'tableHeader' },
-                { text: 'Empresa', style: 'tableHeader' },
-                { text: 'Ciudad', style: 'tableHeader' }
               ],
-              ...this.relojes.map(obj => {
+              ...this.relojes.map((obj: any) => {
                 return [
-                  { text: obj.id, style: 'itemsTableC' },
+                  { text: obj.codigo, style: 'itemsTableC' },
+                  { text: obj.nomempresa, style: 'itemsTable' },
+                  { text: obj.nomciudad, style: 'itemsTable' },
+                  { text: obj.nomsucursal, style: 'itemsTable' },
+                  { text: obj.nomdepar, style: 'itemsTable' },
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.ip, style: 'itemsTableC' },
                   { text: obj.puerto, style: 'itemsTableC' },
                   { text: obj.marca, style: 'itemsTable' },
                   { text: obj.modelo, style: 'itemsTable' },
                   { text: obj.serie, style: 'itemsTable' },
+                  { text: obj.mac, style: 'itemsTable' },
                   { text: obj.id_fabricacion, style: 'itemsTable' },
                   { text: obj.fabricante, style: 'itemsTable' },
-                  { text: obj.mac, style: 'itemsTable' },
-                  { text: obj.nomdepar, style: 'itemsTable' },
-                  { text: obj.nomsucursal, style: 'itemsTable' },
-                  { text: obj.nomempresa, style: 'itemsTable' },
-                  { text: obj.nomciudad, style: 'itemsTable' }
                 ];
               })
             ]
@@ -417,39 +415,75 @@ export class ListarRelojesComponent implements OnInit {
   /** ********************************************************************************************** **
    ** **                          PARA LA EXPORTACION DE ARCHIVOS XML                             ** **
    ** ********************************************************************************************** **/
+  // ORDENAR LOS DATOS SEGUN EL ID
+  OrdenarDatos(array: any) {
+    function compare(a: any, b: any) {
+      if (a.id < b.id) {
+        return -1;
+      }
+      if (a.id > b.id) {
+        return 1;
+      }
+      return 0;
+    }
+    array.sort(compare);
+  }
 
   urlxml: string;
   data: any = [];
-  exportToXML() {
+
+  ExportToXML() {
+    this.OrdenarDatos(this.relojes);
     var objeto: any;
-    var arregloDispositivos: any = [];
-    this.relojes.forEach(obj => {
+    var arregloRelojes: any = [];
+    this.relojes.forEach((obj: any) => {
       objeto = {
         "reloj": {
-          '@id': obj.id,
+          "$": { "id": obj.id },
+          "codigo": obj.codigo,
+          "nombre_empresa": obj.nomempresa,
+          "nombre_ciudad": obj.nomciudad,
+          "nombre_sucursal": obj.nomsucursal,
+          "nombre_departamento": obj.nomdepar,
           "nombre": obj.nombre,
           "ip": obj.ip,
           "puerto": obj.puerto,
           "marca": obj.marca,
           "modelo": obj.modelo,
           "serie": obj.serie,
+          "mac": obj.mac,
           "id_fabricacion": obj.id_fabricacion,
           "fabricante": obj.fabricante,
-          "mac": obj.mac,
-          "nombre_departamento": obj.nomdepar,
-          "nombre_sucursal": obj.nomsucursal,
-          "nombre_empresa": obj.nomempresa,
-          "nombre_ciudad": obj.nomciudad,
         }
       }
-      arregloDispositivos.push(objeto)
+      arregloRelojes.push(objeto)
     });
 
-    this.rest.CrearXML(arregloDispositivos).subscribe(res => {
-      this.data = res;
-      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/relojes/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Relojes' });
+    const xml = xmlBuilder.buildObject(arregloRelojes);
+
+    if (xml === undefined) {
+      console.error('Error al construir el objeto XML.');
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'Relojes.xml';
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
+    a.click();
   }
 
   //CONTROL BOTONES
@@ -514,9 +548,7 @@ export class ListarRelojesComponent implements OnInit {
   }
 
 
-
   // METODOS PARA LA SELECCION MULTIPLE
-
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
 
@@ -533,14 +565,11 @@ export class ListarRelojesComponent implements OnInit {
 
   selectionDispositivos = new SelectionModel<ITableDispositivos>(true, []);
 
-
-
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
     const numSelected = this.selectionDispositivos.selected.length;
     return numSelected === this.relojes.length
   }
-
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
@@ -549,25 +578,19 @@ export class ListarRelojesComponent implements OnInit {
       this.relojes.forEach((row: any) => this.selectionDispositivos.select(row));
   }
 
-
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelPag(row?: ITableDispositivos): string {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.dispositivosEliminar = this.selectionDispositivos.selected;
-    
 
-    
     return `${this.selectionDispositivos.isSelected(row) ? 'deselect' : 'select'} row ${row.codigo + 1}`;
 
   }
 
 
-
-
-
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACION
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   EliminarRelojes(id_reloj: number) {
     this.rest.EliminarRegistro(id_reloj).subscribe(res => {
       if (res.message === 'error') {
@@ -590,12 +613,10 @@ export class ListarRelojesComponent implements OnInit {
         if (confirmado) {
           this.EliminarRelojes(datos.id);
           this.activar_seleccion = true;
-
           this.plan_multiple = false;
           this.plan_multiple_ = false;
           this.dispositivosEliminar = [];
           this.selectionDispositivos.clear();
-
           this.ObtenerReloj();
         } else {
           this.router.navigate(['/listarRelojes/']);
@@ -603,43 +624,30 @@ export class ListarRelojesComponent implements OnInit {
       });
   }
 
-
+  // METODO PARA ELIMINAR REGISTROS
   contador: number = 0;
   ingresar: boolean = false;
-
   EliminarMultiple() {
-
-
     this.ingresar = false;
     this.contador = 0;
-
     this.dispositivosEliminar = this.selectionDispositivos.selected;
     this.dispositivosEliminar.forEach((datos: any) => {
-
-      this.relojes = this.relojes.filter(item => item.id !== datos.id);
+      this.relojes = this.relojes.filter((item: any) => item.id !== datos.id);
       //AQUI MODIFICAR EL METODO 
-
       this.contador = this.contador + 1;
-
       this.rest.EliminarRegistro(datos.id).subscribe(res => {
-
-
         if (res.message === 'error') {
-          this.toastr.error('No se puede eliminar.', '', {
+          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
-
           this.contador = this.contador - 1;
-
         } else {
-
           if (!this.ingresar) {
             this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
               timeOut: 6000,
             });
             this.ingresar = true;
           }
-
           this.ObtenerReloj();
         }
       });
@@ -647,39 +655,30 @@ export class ListarRelojesComponent implements OnInit {
     )
   }
 
-
+  // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-
           if (this.dispositivosEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
-
             this.plan_multiple = false;
             this.plan_multiple_ = false;
-
             this.dispositivosEliminar = [];
             this.selectionDispositivos.clear();
-
             this.ObtenerReloj();
-
-
           } else {
             this.toastr.warning('No ha seleccionado DISPOSITIVOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
-
-
         } else {
           this.router.navigate(['/listarRelojes/']);
         }
       });
-
   }
+
 }
 
 

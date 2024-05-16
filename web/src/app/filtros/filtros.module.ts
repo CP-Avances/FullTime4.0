@@ -52,6 +52,7 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
 import { FiltroProvinciaPipe } from './catProvincias/filtro-provincia/filtro-provincia.pipe';
 import { FiltroCodigoPipe } from './catHorarios/filtro-codigo/filtro-codigo.pipe';
 import { FiltroDescripcionPipe } from './catHorarios/filtro-descripcion/filtro-descripcion.pipe';
+import { ModalidadLaboralPipe } from './catModalidadLaboral/modalidad-laboral.pipe';
 
 @NgModule({
   declarations: [
@@ -108,6 +109,7 @@ import { FiltroDescripcionPipe } from './catHorarios/filtro-descripcion/filtro-d
     FiltroProvinciaPipe,
     FiltroCodigoPipe,
     FiltroDescripcionPipe,
+    ModalidadLaboralPipe,
   ],
   exports: [
     DepartamentoPipe,
@@ -163,6 +165,7 @@ import { FiltroDescripcionPipe } from './catHorarios/filtro-descripcion/filtro-d
     TipoPipe,
     NombreApellidoPipe,
     FiltroProvinciaPipe,
+    ModalidadLaboralPipe,
   ],
   providers: [
     { provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl },

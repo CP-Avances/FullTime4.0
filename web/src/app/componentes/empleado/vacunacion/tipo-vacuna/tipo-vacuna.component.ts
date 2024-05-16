@@ -13,47 +13,59 @@ import { VacunacionService } from 'src/app/servicios/empleado/empleadoVacunas/va
   styleUrls: ['./tipo-vacuna.component.css']
 })
 
-export class TipoVacunaComponent implements OnInit {
+export class TipoVacunaComponent {
+
+
+  vacuna = new FormControl('', Validators.required);
+  // FORMULARIO DENTRO DE UN GRUPO
+  public formulario = new FormGroup({
+    vacuna: this.vacuna,
+  });
 
   constructor(
-    public ventana: MatDialogRef<TipoVacunaComponent>, // VARIABLE DE MANEJO DE VENTANAS
     public restVacuna: VacunacionService, // VARIABLE DE CONSULTA DE DATOS DE VACUNAS
+    public ventana: MatDialogRef<TipoVacunaComponent>, // VARIABLE DE MANEJO DE VENTANAS
     public toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES,
   ) { }
 
-  ngOnInit(): void {
+
+  LimpiarCampos() {
+    this.formulario.reset();
   }
-
-  // VALIDACIONES DE CAMPOS DE FORMULARIO
-  nombreF = new FormControl('', Validators.required);
-
-  // FORMULARIO DENTRO DE UN GRUPO
-  public formulario = new FormGroup({
-    nombreForm: this.nombreF,
-  });
 
   // METODO PARA REGISTRAR TIPO DE VACUNA
   GuardarTipoVacuna(form: any) {
-    let tipoVacunas = {
-      nombre: form.nombreForm,
+    let vacuna = {
+      vacuna: form.vacuna,
     }
-    this.restVacuna.CrearTipoVacuna(tipoVacunas).subscribe(response => {
-      if (response.message === 'error') {
-        this.toastr.error('El nombre ingresado ya se encuentra registrado.', '', {
-          timeOut: 2000,
-        })
-      }
-      else {
-        this.toastr.success('Registro guardado correctamente.', '', {
-          timeOut: 2000,
+    this.restVacuna.CrearTipoVacuna(vacuna).subscribe(response => {
+      //---console.log('response: ', response);
+      if (response.status == '200') {
+        this.toastr.success(response.message, 'Operación exitosa.', {
+          timeOut: 4000,
         });
-        this.ventana.close();
+        this.CerrarVentana();
+      } else if (response.status == '300') {
+        this.toastr.warning(response.message, 'Operación fallida.', {
+          timeOut: 4000,
+        });
+      } else {
+        this.toastr.error(response.message, 'Error.', {
+          timeOut: 4000,
+        });
       }
+    }, error => {
+      this.toastr.info(error, 'Error', {
+        timeOut: 4000,
+      })
     });
   }
 
+
   // METODO PARA CERRAR VENTANA
   CerrarVentana() {
+    this.LimpiarCampos();
+
     this.ventana.close();
   }
 

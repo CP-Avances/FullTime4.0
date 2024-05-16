@@ -23,12 +23,12 @@ class HorarioControlador {
     // REGISTRAR HORARIO
     CrearHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_ } = req.body;
+            const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_ } = req.body;
             try {
                 const response = yield database_1.default.query(`
       INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
-        nocturno, detalle, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-      `, [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_]);
+        nocturno, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
+      `, [nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_]);
                 const [horario] = response.rows;
                 if (horario) {
                     return res.status(200).jsonp(horario);
@@ -98,13 +98,13 @@ class HorarioControlador {
     EditarHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_ } = req.body;
+            const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_ } = req.body;
             try {
                 const respuesta = yield database_1.default.query(`
         UPDATE eh_cat_horarios SET nombre = $1, minutos_comida = $2, hora_trabajo = $3,  
-          nocturno = $4, detalle = $5, codigo = $6, default_ = $7
-        WHERE id = $8 RETURNING *
-        `, [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_, id,])
+          nocturno = $4, codigo = $5, default_ = $6
+        WHERE id = $7 RETURNING *
+        `, [nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, id,])
                     .then((result) => { return result.rows; });
                 if (respuesta.length === 0)
                     return res.status(400).jsonp({ message: 'error' });
@@ -178,7 +178,7 @@ class HorarioControlador {
             const { id, codigo } = req.body;
             try {
                 const HORARIOS = yield database_1.default.query(`
-        SELECT * FROM eh_cat_horarios WHERE NOT id = $1 AND UPPER(codigo) = $2)
+        SELECT * FROM eh_cat_horarios WHERE NOT id = $1 AND UPPER(codigo) = $2
         `, [parseInt(id), codigo.toUpperCase()]);
                 if (HORARIOS.rowCount > 0)
                     return res.status(200).jsonp({
@@ -299,8 +299,8 @@ class HorarioControlador {
                         // INSERTAR EN LA BASE DE DATOS
                         const response = yield database_1.default.query(`
             INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
-              nocturno, detalle, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-            `, [DESCRIPCION, MIN_ALIMENTACION, HORAS_TOTALES, HORARIO_NOCTURNO, true, CODIGO_HORARIO, TIPO_HORARIO]);
+              nocturno, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+            `, [DESCRIPCION, MIN_ALIMENTACION, HORAS_TOTALES, HORARIO_NOCTURNO, CODIGO_HORARIO, TIPO_HORARIO]);
                         const [correcto] = response.rows;
                         if (correcto) {
                             horariosCargados = true;

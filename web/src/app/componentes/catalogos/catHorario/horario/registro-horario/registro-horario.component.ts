@@ -22,7 +22,6 @@ import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.
 export class RegistroHorarioComponent implements OnInit {
 
   // VARIABLES DE OPCIONES DE REGISTRO DE HORARIO
-  detalle = false;
   nocturno = false;
   isChecked: boolean = false;
 
@@ -76,7 +75,6 @@ export class RegistroHorarioComponent implements OnInit {
       min_almuerzo: form.horarioMinAlmuerzoForm,
       hora_trabajo: form.horarioHoraTrabajoForm,
       nocturno: form.tipoForm,
-      detalle: true,
       nombre: form.nombreForm,
       codigo: form.codigoForm,
       default_: form.tipoHForm,
@@ -120,7 +118,7 @@ export class RegistroHorarioComponent implements OnInit {
   // VERIFICAR DUPLICIDAD DE NOMBRES Y CODIGOS
   VerificarDuplicidad(form: any, horario: any) {
     let data = {
-      codigo: form.codigoForm
+      codigo: form.codigoForm,
     }
     this.rest.BuscarHorarioNombre(data).subscribe(response => {
       this.toastr.warning('Código de horario ya existe.', 'Verificar datos.', {
@@ -151,29 +149,19 @@ export class RegistroHorarioComponent implements OnInit {
     }
   }
 
-
   // METODO PARA REGISTRAR DATOS DEL HORARIO
   GuardarDatos(datos: any, form: any) {
-    console.log('datos ', datos)
+    //--console.log('datos ', datos)
     this.rest.RegistrarHorario(datos).subscribe(response => {
-      this.RegistrarAuditoria(datos);
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
-
       if (this.isChecked === true && form.documentoForm != '') {
         this.SubirRespaldo(response.id, response.codigo);
       }
-
       this.LimpiarCampos();
-
-      if (datos.detalle === true) {
-        this.ventana.close(response.id);
-      }
-      else {
-        this.ventana.close(0);
-      }
-
+      // VER PANTALLA DE DETALLE
+      this.ventana.close(response.id);
     }, error => {
       this.habilitarprogress = false;
       this.toastr.error('Limite de horas superado.', 'Ups!!! algo salio mal.', {
@@ -181,7 +169,6 @@ export class RegistroHorarioComponent implements OnInit {
       })
     });
   }
-
 
 
   /** ********************************************************************************************* **
@@ -280,13 +267,6 @@ export class RegistroHorarioComponent implements OnInit {
   CerrarVentana() {
     this.LimpiarCampos();
     this.ventana.close('cv');
-  }
-
-  // METODO PARA AUDITAR CATÁLOGO HORARIOS
-  RegistrarAuditoria(dataHorario: any) {
-    this.data_nueva = [];
-    this.data_nueva = dataHorario;
-    this.validar.Auditar('app-web', 'cg_horarios', '', this.data_nueva, 'INSERT');
   }
 
   // METODO PARA VER FORMULARIO DE ARCHIVO

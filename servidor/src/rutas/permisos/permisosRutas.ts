@@ -28,7 +28,7 @@ const storage = multer.diskStorage({
 
         const permiso = await pool.query(
             `
-            SELECT num_permiso FROM permisos WHERE id = $1
+            SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1
             `
             , [id]);
 

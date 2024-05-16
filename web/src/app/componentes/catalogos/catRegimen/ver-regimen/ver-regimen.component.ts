@@ -34,7 +34,7 @@ export class VerRegimenComponent implements OnInit {
       this.regimen = datos;
       this.regimen.descripcion = this.regimen.descripcion.toUpperCase();
       // OBTENER NOMBRE DEL PAIS REGISTRADO
-      this.paises.forEach(obj => {
+      this.paises.forEach((obj: any) => {
         if (obj.id === this.regimen.id_pais) {
           this.regimen.pais = obj.nombre;
         }

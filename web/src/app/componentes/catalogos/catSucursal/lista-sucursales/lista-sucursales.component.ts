@@ -337,7 +337,7 @@ export class ListaSucursalesComponent implements OnInit {
   exportToXML() {
     var objeto;
     var arregloSucursales: any = [];
-    this.sucursales.forEach(obj => {
+    this.sucursales.forEach((obj: any) => {
       objeto = {
         "establecimiento": {
           "$": { "id": obj.id },
@@ -505,7 +505,7 @@ export class ListaSucursalesComponent implements OnInit {
             data.id_ciudad = valor.id;
             data.id_empresa = '1';
 
-            // Capitalizar la primera letra de la primera palabra
+            // CAPITALIZAR LA PRIMERA LETRA DE LA PRIMERA PALABRA
             const textonombre = data.nombre.charAt(0).toUpperCase();
             const restoDelTexto = data.nombre.slice(1);
 

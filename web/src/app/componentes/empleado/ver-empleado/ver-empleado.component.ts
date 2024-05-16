@@ -977,7 +977,7 @@ export class VerEmpleadoComponent implements OnInit {
         this.ver_activar_editar = true;
         this.editar_activar = false;
 
-        this.horariosEmpleado.forEach(obj => {
+        this.horariosEmpleado.forEach((obj: any) => {
           obj.index = index;
           index = index + 1;
         })
@@ -1026,7 +1026,7 @@ export class VerEmpleadoComponent implements OnInit {
         this.detalle_acciones = [];
         this.detalles = datos.data;
 
-        datos.data.forEach(obj => {
+        datos.data.forEach((obj: any) => {
           if (aux_h === '') {
             accion = obj.tipo_accion + ': ' + obj.hora;
             this.ValidarAcciones(obj);
@@ -1073,7 +1073,7 @@ export class VerEmpleadoComponent implements OnInit {
         }]
         this.detalle_acciones = this.detalle_acciones.concat(tipos);
 
-        this.detalle_acciones.forEach(detalle => {
+        this.detalle_acciones.forEach((detalle: any) => {
           detalle.entrada_ = this.validar.FormatearHora(detalle.entrada, this.formato_hora);
           if (detalle.inicio_comida != '') {
             detalle.inicio_comida = this.validar.FormatearHora(detalle.inicio_comida, this.formato_hora);
@@ -2064,7 +2064,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.hora_extra = [];
     this.restHE.ObtenerListaEmpleado(parseInt(this.idEmpleado)).subscribe(res => {
       this.hora_extra = res;
-      this.hora_extra.forEach(h => {
+      this.hora_extra.forEach((h: any) => {
         if (h.estado === 1) {
           h.estado = 'Pendiente';
         }
@@ -2111,7 +2111,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.hora_extra_plan = [];
     this.plan_hora.ListarPlanificacionUsuario(parseInt(this.idEmpleado)).subscribe(res => {
       this.hora_extra_plan = res;
-      this.hora_extra_plan.forEach(h => {
+      this.hora_extra_plan.forEach((h: any) => {
         if (h.estado === 1) {
           h.estado = 'Pendiente';
         }
@@ -3091,7 +3091,7 @@ export class VerEmpleadoComponent implements OnInit {
   ExportToXML() {
     let objeto: any;
     let arregloEmpleado: any = [];
-    this.empleadoUno.forEach(obj => {
+    this.empleadoUno.forEach((obj: any) => {
       let estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];

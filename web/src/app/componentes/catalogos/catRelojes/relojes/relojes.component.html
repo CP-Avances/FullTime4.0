@@ -66,7 +66,7 @@
                                 <mat-form-field>
                                     <mat-label id="letras">Código</mat-label>
                                     <input matInput placeholder="Código del dispositivo" [formControl]="codigoF"
-                                        required (keypress)="IngresarSoloNumeros($event)">
+                                        required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar el código que tiene el dispositivo.">
                                         help_outline
@@ -89,13 +89,13 @@
 
                                 <mat-form-field>
                                     <mat-label id="letras">Puerto</mat-label>
-                                    <input matInput placeholder="Ingresar puerto" [formControl]="puertoF"
+                                    <input matInput placeholder="Ingresar puerto" [formControl]="puertoF" maxlength="6"
+                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                         (keypress)="IngresarSoloNumeros($event)" required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar puerto que usa el dispositivo.">
                                         help_outline
                                     </mat-icon>
-                                    <mat-error *ngIf="puertoF.invalid">{{ObtenerMensajeErrorPuerto()}}</mat-error>
                                 </mat-form-field>
 
                                 <mat-radio-group aria-label="Select an option" formControlName="funcionesForm" required>
@@ -223,8 +223,7 @@
                         [disabled]="!segundoFormulario.valid">
                         Guardar
                     </button>
-                    <button mat-raised-button id="btn-raised" (click)="CerrarVentana()"
-                        class="float-right">
+                    <button mat-raised-button id="btn-raised" (click)="CerrarVentana()" class="float-right">
                         Cancelar
                     </button>
                 </div>

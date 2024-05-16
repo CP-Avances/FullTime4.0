@@ -132,7 +132,7 @@ export class RegistrarCiudadComponent implements OnInit {
   // METODO PARA MOSTRAR LISTA DE PROVINCIAS
   FiltrarProvincias(form: any) {
     let idPais = 0;
-    this.paises.forEach(obj => {
+    this.paises.forEach((obj: any) => {
       if (obj.nombre.toUpperCase() === form.nombrePaisForm.toUpperCase()) {
         idPais = obj.id
       }
@@ -151,7 +151,7 @@ export class RegistrarCiudadComponent implements OnInit {
   // METODO PARA MOSTRAR LISTA DE CIUDADES
   FiltrarCiudades(form: any) {
     let id_provincia = 0;
-    this.provincias.forEach(obj => {
+    this.provincias.forEach((obj: any) => {
       if (obj.nombre.toUpperCase() === form.idProvinciaForm.toUpperCase()) {
         id_provincia = obj.id
       }
@@ -166,7 +166,7 @@ export class RegistrarCiudadComponent implements OnInit {
   InsertarCiudad(form: any) {
     let provinciaId = 0;
     //  BUSCAR ID DE PROVINCIA
-    this.provincias.forEach(obj => {
+    this.provincias.forEach((obj: any) => {
       if (obj.nombre.toUpperCase() === form.idProvinciaForm.toUpperCase()) {
         provinciaId = obj.id
       }
@@ -188,7 +188,7 @@ export class RegistrarCiudadComponent implements OnInit {
       }
       else {
         var contador = 0;
-        this.ciudades.forEach(obj => {
+        this.ciudades.forEach((obj: any) => {
           if (ciudad.descripcion.toUpperCase() === obj.descripcion.toUpperCase()) {
             contador = 1;
           }

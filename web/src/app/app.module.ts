@@ -324,12 +324,18 @@ import { SpinnerModule } from './componentes/spinner/spinner.module';
 import { SpinnerComponent } from './componentes/spinner/spinner.component';
 import { SpinnerInterceptor } from './componentes/spinner/Interceptor/spinner.interceptor';
 import { CargarPlantillaComponent } from './componentes/empleado/cargar-plantilla/cargar-plantilla.component';
-import { CatModalidaLaboralComponent } from './componentes/catalogos/cat-modalida-laboral/cat-modalida-laboral.component';
+import { CatModalidaLaboralComponent } from './componentes/catalogos/catalogoModalidadLaboral/cat-modalida-laboral/cat-modalida-laboral.component';
 import { CatTipoCargosComponent } from './componentes/catalogos/catalogoTipoCargo/listar-tipo-cargo/cat-tipo-cargos.component';
-import { RegistroModalidadComponent } from './componentes/catalogos/cat-modalida-laboral/registroModalidad/registro-modalidad/registro-modalidad.component';
-import { EditarModalidadComponent } from './componentes/catalogos/cat-modalida-laboral/editarModalidad/editar-modalidad/editar-modalidad.component';
+import { RegistroModalidadComponent } from './componentes/catalogos/catalogoModalidadLaboral/registro-modalidad/registro-modalidad.component';
+import { EditarModalidadComponent } from './componentes/catalogos/catalogoModalidadLaboral/editar-modalidad/editar-modalidad.component';
 import { RegistrarCargoComponent } from './componentes/catalogos/catalogoTipoCargo/registrar-cargo/registrar-cargo.component';
 import { EditarTipoCargoComponent } from './componentes/catalogos/catalogoTipoCargo/editar-tipo-cargo/editar-tipo-cargo.component';
+import { CatDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/listar-discapacidad/cat-discapacidad.component';
+import { RegistroDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/registrar-discapacidad/registrar-discapacidad.component';
+import { EditarDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/editar-discapacidad/editar-discapacidad.component';
+import { CatVacunasComponent } from './componentes/catalogos/catalogoVacuna/listar-vacuna/cat-vacunas.component';
+import { EditarVacunasComponent } from './componentes/catalogos/catalogoVacuna/editar-vacuna/editar-vacuna.component';
+
 
 //Seteo de ruta por defecto al iniciar front
 let url: string | null = localStorage.getItem('empresaURL');
@@ -594,6 +600,11 @@ const config: SocketIoConfig = { url: String(url), options: {} };
     EditarModalidadComponent,
     RegistrarCargoComponent,
     EditarTipoCargoComponent,
+    CatDiscapacidadComponent,
+    RegistroDiscapacidadComponent,
+    EditarDiscapacidadComponent,
+    CatVacunasComponent,
+    EditarVacunasComponent
 
   ],
 

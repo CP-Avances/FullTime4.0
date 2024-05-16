@@ -55,14 +55,14 @@
                 </div>
 
                 <div class="d-flex flex-wrap justify-content-center">
-                    <button id="btn-raised" class="btn btn-sm" (click)="VerPlanificacion()">
+                    <button id="btn-raised" class="btn btn-sm" (click)="VerPlanificacion()" *ngIf="getBuscarPlanificaciones()">
                         Cargar Planificacion
                     </button>
-                    <button *ngIf="multiple" id="btn-raised" class="btn btn-sm"
+                    <button *ngIf="multiple && getPlanificacionFija()" id="btn-raised" class="btn btn-sm"
                         style="float: right; margin-right: 10px;" (click)="PlanificarFija()">
                         Planificación Fija
                     </button>
-                    <button *ngIf="multiple" id="btn-raised" class="btn btn-sm"
+                    <button *ngIf="multiple && getPlanificacionMultiple()" id="btn-raised" class="btn btn-sm"
                         style="float: right; margin-right: 10px;" (click)="PlanificarMultiple()">
                         Planificación Múltiple
                     </button>
@@ -606,7 +606,7 @@
                                     </div>
                                 </td>
                                 <td *ngIf="columnAccion" class="sticky-5 colum_1" id="td_horarios">
-                                    <i (click)="PlanificarIndividual(e)" id="plan" *ngIf="auto_individual"
+                                    <i (click)="PlanificarIndividual(e)" id="plan" *ngIf="auto_individual && getPlanificacionFija()"
                                         class="fa fa-calendar" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de horarios.">
                                         <p>Planificar</p>

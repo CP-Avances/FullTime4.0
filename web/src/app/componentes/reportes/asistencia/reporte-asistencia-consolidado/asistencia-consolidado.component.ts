@@ -491,7 +491,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
             if (configuracion.atraso === false) {
               cont = 0; index = 0;
-              array.forEach(ele => {
+              array.forEach((ele: any) => {
                 if (ele.text.split('.')[0] === '16') { index = cont; }
                 cont = cont + 1
               })
@@ -500,7 +500,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
             if (configuracion.salida_antes === false) {
               cont = 0; index = 0;
-              array.forEach(ele => {
+              array.forEach((ele: any) => {
                 if (ele.text.split('.')[0] === '17') { index = cont; }
                 cont = cont + 1
               })
@@ -509,7 +509,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
             if (configuracion.almuerzo === false) {
               cont = 0; index = 0;
-              array.forEach(ele => {
+              array.forEach((ele: any) => {
                 if (ele.text.split('.')[0] === '18') { index = cont; }
                 cont = cont + 1
               })
@@ -518,7 +518,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
             if (configuracion.h_trab === false) {
               cont = 0; index = 0;
-              array.forEach(ele => {
+              array.forEach((ele: any) => {
                 if (ele.text.split('.')[0] === '19') { index = cont; }
                 cont = cont + 1
               })
@@ -527,7 +527,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
             if (configuracion.h_supl === false) {
               cont = 0; index = 0;
-              array.forEach(ele => {
+              array.forEach((ele: any) => {
                 if (ele.text.split('.')[0] === '20') { index = cont; }
                 cont = cont + 1
               })
@@ -536,7 +536,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
             if (configuracion.h_ex_LV === false) {
               cont = 0; index = 0;
-              array.forEach(ele => {
+              array.forEach((ele: any) => {
                 if (ele.text.split('.')[0] === '21') { index = cont; }
                 cont = cont + 1
               })
@@ -545,7 +545,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
             if (configuracion.h_ex_SD === false) {
               cont = 0; index = 0;
-              array.forEach(ele => {
+              array.forEach((ele: any) => {
                 if (ele.text.split('.')[0] === '22') { index = cont; }
                 cont = cont + 1
               })
@@ -633,7 +633,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.atraso === false) {
       contador = 0;
-      arrayTitulos.forEach(obj => {
+      arrayTitulos.forEach((obj: any) => {
         if (obj.text === 'TOTAL ATRASO') { index = contador; }
         contador = contador + 1
       })
@@ -644,7 +644,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.salida_antes === false) {
       contador = 0;
-      arrayTitulos.forEach(obj => {
+      arrayTitulos.forEach((obj: any) => {
         if (obj.text === 'TOTAL SALIDA ANTES') { index = contador; }
         contador = contador + 1
       })
@@ -655,7 +655,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.almuerzo === false) {
       contador = 0;
-      arrayTitulos.forEach(obj => {
+      arrayTitulos.forEach((obj: any) => {
         if (obj.text === 'TOTAL ALIM') { index = contador; }
         contador = contador + 1
       })
@@ -666,7 +666,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_trab === false) {
       contador = 0;
-      arrayTitulos.forEach(obj => {
+      arrayTitulos.forEach((obj: any) => {
         if (obj.text === 'TOTAL HORA TRAB') { index = contador; }
         contador = contador + 1
       })
@@ -677,7 +677,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_supl === false) {
       contador = 0;
-      arrayTitulos.forEach(obj => {
+      arrayTitulos.forEach((obj: any) => {
         if (obj.text === 'TOTAL HORA SUPL') { index = contador; }
         contador = contador + 1
       })
@@ -688,7 +688,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_ex_LV === false) {
       contador = 0;
-      arrayTitulos.forEach(obj => {
+      arrayTitulos.forEach((obj: any) => {
         if (obj.text === 'TOTAL HORA EX. L-V') { index = contador; }
         contador = contador + 1
       })
@@ -699,7 +699,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_ex_SD === false) {
       contador = 0;
-      arrayTitulos.forEach(obj => {
+      arrayTitulos.forEach((obj: any) => {
         if (obj.text === 'TOTAL HORA EXTRAS S-D') { index = contador; }
         contador = contador + 1
       })
@@ -767,7 +767,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
     let contador = 0;
     if (configuracion.atraso === false) {
       contador = 0;
-      arrayTitulos.forEach(obj => {
+      arrayTitulos.forEach((obj: any) => {
         if (obj.text === 'TOTAL ATRASOS') { index = contador; }
         contador = contador + 1
       })
@@ -776,7 +776,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.salida_antes === false) {
       contador = 0;
-      arrayTitulos.forEach(obj => {
+      arrayTitulos.forEach((obj: any) => {
         if (obj.text === 'TOTAL SALIDA ANTES') { index = contador; }
         contador = contador + 1
       })
@@ -785,7 +785,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.almuerzo === false) {
       contador = 0;
-      arrayTitulos.forEach(obj => {
+      arrayTitulos.forEach((obj: any) => {
         if (obj.text === 'TOTAL ALIM') { index = contador; }
         contador = contador + 1
       })
@@ -794,7 +794,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_trab === false) {
       contador = 0;
-      arrayTitulos.forEach(obj => {
+      arrayTitulos.forEach((obj: any) => {
         if (obj.text === 'TOTAL HORAS TRAB') { index = contador; }
         contador = contador + 1
       })
@@ -803,7 +803,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_supl === false) {
       contador = 0;
-      arrayTitulos.forEach(obj => {
+      arrayTitulos.forEach((obj: any) => {
         if (obj.text === 'TOTAL HORAS SUPL') { index = contador; }
         contador = contador + 1
       })
@@ -812,7 +812,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_ex_LV === false) {
       contador = 0;
-      arrayTitulos.forEach(obj => {
+      arrayTitulos.forEach((obj: any) => {
         if (obj.text === 'TOTAL HORAS EX. L-V') { index = contador; }
         contador = contador + 1
       })
@@ -821,7 +821,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_ex_SD === false) {
       contador = 0;
-      arrayTitulos.forEach(obj => {
+      arrayTitulos.forEach((obj: any) => {
         if (obj.text === 'TOTAL HORAS EX. S-D') { index = contador; }
         contador = contador + 1
       })
@@ -850,7 +850,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
     let cont = 0;
     if (configuracion.atraso === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('.')[0] === '16') { index = cont; }
         cont = cont + 1
       })
@@ -859,7 +859,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.salida_antes === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('.')[0] === '17') { index = cont; }
         cont = cont + 1
       })
@@ -868,7 +868,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.almuerzo === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('.')[0] === '18') { index = cont; }
         cont = cont + 1
       })
@@ -877,7 +877,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_trab === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('.')[0] === '19') { index = cont; }
         cont = cont + 1
       })
@@ -886,7 +886,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_supl === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('.')[0] === '20') { index = cont; }
         cont = cont + 1
       })
@@ -895,7 +895,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_ex_LV === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('.')[0] === '21') { index = cont; }
         cont = cont + 1
       })
@@ -904,7 +904,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_ex_SD === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('.')[0] === '22') { index = cont; }
         cont = cont + 1
       })
@@ -935,7 +935,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
     let cont = 0;
     if (configuracion.atraso === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('.')[0] === '16') { index = cont; }
         cont = cont + 1
       })
@@ -944,7 +944,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.salida_antes === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('.')[0] === '17') { index = cont; }
         cont = cont + 1
       })
@@ -953,7 +953,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.almuerzo === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('.')[0] === '18') { index = cont; }
         cont = cont + 1
       })
@@ -962,7 +962,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_trab === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('.')[0] === '19') { index = cont; }
         cont = cont + 1
       })
@@ -971,7 +971,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_supl === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('.')[0] === '20') { index = cont; }
         cont = cont + 1
       })
@@ -980,7 +980,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_ex_LV === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('.')[0] === '21') { index = cont; }
         cont = cont + 1
       })
@@ -989,7 +989,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_ex_SD === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('.')[0] === '22') { index = cont; }
         cont = cont + 1
       })
@@ -1022,7 +1022,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
     let cont = 0;
     if (configuracion.atraso === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('-')[0] === '16') { index = cont; }
         cont = cont + 1
       })
@@ -1031,7 +1031,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.salida_antes === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('-')[0] === '17') { index = cont; }
         cont = cont + 1
       })
@@ -1040,7 +1040,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.almuerzo === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('-')[0] === '18') { index = cont; }
         cont = cont + 1
       })
@@ -1049,7 +1049,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_trab === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('-')[0] === '19') { index = cont; }
         cont = cont + 1
       })
@@ -1058,7 +1058,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_supl === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('-')[0] === '20') { index = cont; }
         cont = cont + 1
       })
@@ -1067,7 +1067,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_ex_LV === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('-')[0] === '21') { index = cont; }
         cont = cont + 1
       })
@@ -1076,7 +1076,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
 
     if (configuracion.h_ex_SD === false) {
       cont = 0;
-      array.forEach(ele => {
+      array.forEach((ele: any) => {
         if (ele.text.split('-')[0] === '22') { index = cont; }
         cont = cont + 1
       })

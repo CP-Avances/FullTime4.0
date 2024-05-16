@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { VerEmpleadoComponent } from '../../ver-empleado/ver-empleado.component';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
+import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
@@ -63,6 +64,7 @@ export class EditarCargoComponent implements OnInit {
     private validar: ValidacionesService,
     private toastr: ToastrService,
     public usuario: UsuarioService,
+    public tipocargo: CatTipoCargosService,
   ) { }
 
   ngOnInit(): void {
@@ -118,9 +120,10 @@ export class EditarCargoComponent implements OnInit {
   id_empl_contrato: number;
   ObtenerCargoEmpleado() {
     this.restEmplCargos.BuscarCargoID(this.idSelectCargo).subscribe(res => {
+      console.log('res ', res)
       this.cargo = res;
       this.id_empl_contrato = this.cargo[0].id_contrato;
-      this.cargo.forEach(obj => {
+      this.cargo.forEach((obj: any) => {
         this.ObtenerDepartamentosImprimir(obj.id_sucursal);
         // FORMATEAR HORAS
         if (obj.hora_trabaja.split(':').length === 3) {
@@ -136,11 +139,11 @@ export class EditarCargoComponent implements OnInit {
         }
         this.formulario.patchValue({
           idSucursalForm: obj.id_sucursal,
-          fecInicioForm: obj.fec_inicio,
-          fecFinalForm: obj.fec_final,
+          fecInicioForm: obj.fecha_inicio,
+          fecFinalForm: obj.fecha_final,
           idDeparForm: obj.id_departamento,
           sueldoForm: obj.sueldo.split('.')[0],
-          tipoForm: obj.cargo,
+          tipoForm: obj.id_tipo_cargo,
           jefeForm: obj.jefe,
         })
       });
@@ -211,22 +214,43 @@ export class EditarCargoComponent implements OnInit {
         cargo.hora_trabaja = '0' + parseInt(cargo.hora_trabaja.split(':')[0]) + ':' + cargo.hora_trabaja.split(':')[1] + ':00'
       }
     }
-    if (form.tipoForm === undefined) {
-      this.IngresarTipoCargo(form, cargo);
-    }
-    else {
-      this.restEmplCargos.ActualizarContratoEmpleado(this.idSelectCargo, this.id_empl_contrato, cargo).subscribe(res => {
-        this.verEmpleado.ObtenerCargoEmpleado(this.idSelectCargo, this.verEmpleado.formato_fecha);
-        this.BuscarUsuarioSucursal(form);
-        this.Cancelar();
-        this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
-          timeOut: 6000,
-        });
-      });
-    }
-
+    // VERIFICAR DUPLICIDAD DE CONTRATOS
+    this.ValidarFechasCargo(form, cargo);
   }
 
+
+  // METODO PARA VALIDAR REGISTRO DE FECHAS DE CARGO
+  ValidarFechasCargo(form: any, datos: any) {
+    let verficar = {
+      id_cargo: this.idSelectCargo,
+      id_empleado: this.idEmpleado,
+      fecha_verificar: datos.fec_inicio
+    }
+    this.restEmplCargos.BuscarCargoFechaEditar(verficar).subscribe(res => {
+      this.toastr.warning('Existe un cargo vigente en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
+      });
+    }, vacio => {
+      if (form.tipoForm === undefined) {
+        this.VerificarTipoCargo(form, datos);
+      }
+      else {
+        this.AlmacenarDatos(form, datos);
+      }
+    });
+  }
+
+  // METODO DE ALMACENAMIENTO DE DATOS EN EL SISTEMA
+  AlmacenarDatos(form: any, datos: any) {
+    this.restEmplCargos.ActualizarContratoEmpleado(this.idSelectCargo, this.id_empl_contrato, datos).subscribe(res => {
+      this.verEmpleado.ObtenerCargoEmpleado(this.idSelectCargo, this.verEmpleado.formato_fecha);
+      this.BuscarUsuarioSucursal(form);
+      this.Cancelar();
+      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
+        timeOut: 6000,
+      });
+    });
+  }
 
   // METODO PARA MOSTRAR INGRESO DE CARGO
   habilitarCargo: boolean = false;
@@ -261,14 +285,7 @@ export class EditarCargoComponent implements OnInit {
       }
       this.restEmplCargos.CrearTipoCargo(tipo_cargo).subscribe(res => {
         datos.cargo = res.id;
-        this.restEmplCargos.ActualizarContratoEmpleado(this.idSelectCargo, this.id_empl_contrato, datos).subscribe(res => {
-          this.verEmpleado.ObtenerCargoEmpleado(this.idSelectCargo, this.verEmpleado.formato_fecha);
-          this.BuscarUsuarioSucursal(form);
-          this.Cancelar();
-          this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
-            timeOut: 6000,
-          });
-        });
+        this.AlmacenarDatos(form, datos);
       });
     }
     else {
@@ -276,6 +293,21 @@ export class EditarCargoComponent implements OnInit {
         timeOut: 6000,
       });
     }
+  }
+
+  // VERIFICAR DUPLICIDAD TIPO DE CARGO
+  VerificarTipoCargo(form: any, datos: any) {
+    let verificar = {
+      nombre: (form.cargoForm).toUpperCase()
+    }
+    //if (verificar.nombre === )
+    this.tipocargo.BuscarTipoCargoNombre(verificar).subscribe(res => {
+      this.toastr.warning('El tipo de cargo registrado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
+      });
+    }, vacio => {
+      this.IngresarTipoCargo(form, datos);
+    });
   }
 
   // METODO PARA INGRESAR SOLO NUMEROS

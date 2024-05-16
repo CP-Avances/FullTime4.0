@@ -212,7 +212,7 @@ export class HoraExtraRealComponent implements OnInit {
   VerificarTimbres(listaPedidos: any, listaTimbres: any) {
     console.log('pedidos', listaPedidos);
     console.log('timbres', listaTimbres);
-    listaPedidos.forEach(obj => {
+    listaPedidos.forEach((obj: any) => {
       listaTimbres.forEach(element => {
         if (obj.fec_inicio.split('T')[0] === element.fecha_inicio.split('T')[0]) {
           if (element.fecha_inicio.split('T')[1] <= obj.fec_inicio.split('T')[1]) {
@@ -240,7 +240,7 @@ export class HoraExtraRealComponent implements OnInit {
   VerificarTimbresTodos(listaPedidos: any, listaTimbres: any) {
     console.log('pedidos', listaPedidos);
     console.log('timbres', listaTimbres);
-    listaPedidos.forEach(obj => {
+    listaPedidos.forEach((obj: any) => {
       listaTimbres.forEach(element => {
         if (obj.fec_inicio.split('T')[0] === element.fecha_inicio.split('T')[0] && obj.id_usua_solicita === element.id_empleado) {
           if (element.fecha_inicio.split('T')[1] <= obj.fec_inicio.split('T')[1]) {
@@ -515,7 +515,7 @@ export class HoraExtraRealComponent implements OnInit {
   exportToXML() {
     var objeto;
     var arregloEmpleado: any = [];
-    this.empleado.forEach(obj => {
+    this.empleado.forEach((obj: any) => {
       var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
       var genero = this.GeneroSelect[obj.genero - 1];
       var estado = this.EstadoSelect[obj.estado - 1];

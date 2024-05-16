@@ -1,7 +1,7 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        REGISTRAR MODALIDAD LABORAL
+        REGISTRAR DISCAPACIDAD
     </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
 </div>
@@ -15,18 +15,18 @@
         </div>
         <div class="d-flex flex-wrap justify-content-center">
             <mat-form-field>
-                <mat-label>Modalidad laboral</mat-label>
-                <input matInput placeholder="Indefinido" [formControl]="modalidad" (keypress)="IngresarSoloLetras($event)"
+                <mat-label>Discapacidad</mat-label>
+                <input matInput placeholder="Indefinido" [formControl]="discapacidad" (keypress)="IngresarSoloLetras($event)"
                     required>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                    matTooltip="Ingresar la modalidad laboral.">
+                    matTooltip="Ingresar la discapacidad.">
                     help_outline
                 </mat-icon>
             </mat-form-field>
         </div>
     </div>
     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 10px; margin-bottom: 2%;">
-        <button id="btn-raised" class="btn btn-sm" (click)="InsertarModalidadLaboral(formulario.value)"
+        <button id="btn-raised" class="btn btn-sm" (click)="InsertarDiscapacidad(formulario.value)"
             [disabled]="!formulario.valid" value="Guardar">
             Guardar
         </button>

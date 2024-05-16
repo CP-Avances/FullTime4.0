@@ -73,7 +73,7 @@ const CalcularHoraExtra = function (id_empleado, fec_desde, fec_hasta) {
 exports.CalcularHoraExtra = CalcularHoraExtra;
 function SumaValorPagoEmpleado(horas_extras) {
     let sumador = 0;
-    horas_extras.forEach(obj => {
+    horas_extras.forEach((obj) => {
         console.log('Valor pago', obj.calculos[0].valor_pago);
         sumador = sumador + obj.calculos[0].valor_pago;
     });

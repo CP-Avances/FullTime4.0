@@ -226,7 +226,7 @@ export class AutorizacionesComponent implements OnInit {
     if (e != null && e != undefined) {
       select.value = null;
       select.defaultTabIndex = 0;
-      const [departamento] = this.ArrayAutorizacionTipos.filter(o => {
+      const [departamento] = this.ArrayAutorizacionTipos.filter((o: any) => {
         return o.id_departamento === e
       })
       this.listafiltrada = [];

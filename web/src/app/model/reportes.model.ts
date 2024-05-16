@@ -278,9 +278,9 @@ export interface tim_tabulado {
 }
 
 export interface TimbreMrl {
-  cedula: string,
-  fecha_hora: string,
-  accion: string
+    cedula: string,
+    fecha_hora: string,
+    accion: string
 }
 
 /**
@@ -453,9 +453,9 @@ export interface hora {
 // PAGINAS ROLES
 
 export interface ITableFuncionesRoles {
-    
+
     funcion: string,
-    
+
 }
 
 //CREAR AQUI LAS NUEVAS INTERFACES
@@ -464,86 +464,91 @@ export interface ITableFuncionesRoles {
 
 export interface ITableSucursales {
     nombre: string,
-    
+
 }
 
 
 export interface ITableDepartamentos {
     nombre: string,
-    
+
 }
 
 
 export interface ITableRegimen {
     nombre: string,
-    
+
 }
 
 
 export interface ITableProvincias {
     nombre: string,
-    
 }
 
 
 export interface ITableCiudades {
     nombre: string,
-    
+
 }
 
 export interface ITableSucursales {
     nombre: string,
-    
+
 }
 
 export interface ITableDepartamentos {
     nombre: string,
-    
+
 }
-
-
 
 export interface ITableNivelesEducacion {
     nombre: string,
-    
+
 }
 
 export interface ITableTitulos {
     nombre: string,
-    
+
 }
 
 export interface ITableFeriados {
-    
+
     descripcion: string,
-    
+
 }
 
-
 export interface ITableHorarios {
-    
     descripcion: string,
-    
 }
 
 export interface ITableDispositivos {
-    
     codigo: string,
-    
 }
 
-export interface ITableArchivos{
-
+export interface ITableArchivos {
     nombre: string,
 }
 
-
 export interface ITableNivel {
     nivel: string,
-    
+
 }
 
 export interface ITableRoles {
     nombre: string,
-    
+}
+
+export interface ITableModalidad {
+    descripcion: string,
+}
+
+export interface ITableTipoCargo {
+    cargo: string,
+}
+
+export interface ITableDiscapacidad {
+    nombre: string,
+}
+
+export interface ITableVacuna {
+    nombre: string,
 }

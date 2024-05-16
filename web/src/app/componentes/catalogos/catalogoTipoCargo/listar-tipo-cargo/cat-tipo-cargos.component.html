@@ -19,7 +19,7 @@
             </mat-card>
         </div>
 
-        <!------------------ Registro multiple de Modalidad Laboral ------------------------------------->
+        <!--  ***************************  REGISTRO MULTIPLE DE TIPO CARGOS ************************* -->
         <div class="col-md">
             <div id="titulo">
                 <span>REGISTRO MULTIPLE</span>
@@ -27,16 +27,17 @@
             <mat-card class="example-card mat-elevation-z9">
                 <div class="row" *ngIf="getCargarPlantillaTipoCargo()">
                     <div class="col-md" style="padding-top: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                        <div class="d-flex flex-wrap justify-content-around"
+                            style="text-align: center; justify-content: center;">
                             <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
                                 <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" matSuffix matTooltipPosition="right"
-                                    *ngIf="!mostrarbtnsubir" style="height: 65px; padding-top: 25px;"
+                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                    style="height: 65px; padding-top: 25px;"
                                     matTooltip="Dar click para selecionar plantilla y cargar registros.">
                                     Subir plantilla
                                 </label>
-                                <label for="file"  matSuffix matTooltipPosition="right"
+                                <label for="file" matSuffix matTooltipPosition="right"
                                     *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
                                     style="height: 64px; padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre Modalidad.">
@@ -50,23 +51,22 @@
                             <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                 style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
                                 href="{{hipervinculo}}/plantillaD/documento/Modalidad.xlsx">
-                                
-                                <span class="material-icons">cloud_download</span>
                                 <br>
                                 Descargar plantilla usuarios
                             </a>
                         </div>
                     </div>
-                    <div class="col-md"  style="padding-top: 5px; padding-bottom: 5px;" >
-                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
-                            <button *ngIf="Datos_tipo_cargos && messajeExcel != 'error'" id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()"
-                                (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
-                                 matTooltip="Guardar registro multiple.">
+                    <div class="col-md" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around"
+                            style="text-align: center; justify-content: center;">
+                            <button *ngIf="Datos_tipo_cargos && messajeExcel != 'error'" id="descargar"
+                                class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
+                                matTooltipPosition="right" matTooltip="Guardar registro multiple.">
                                 Registrar
                             </button>
                         </div>
                     </div>
-                </div>    
+                </div>
             </mat-card>
         </div>
     </div>
@@ -74,42 +74,71 @@
 
 <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!Datos_tipo_cargos">
     <div class="mat-elevation-z8" style="background: white;">
-        <div id="resultados">RESULTADO DE BÚSQUEDA</div>
+        <div class="d-flex bd-highlight" id="titulo">
+            <div class="w-100 bd-highlight">
+                <h5>
+                    RESULTADO DE BÚSQUEDA
+                </h5>
+            </div>
+            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                    (click)="ConfirmarDeleteMultiple()">
+                    Eliminar
+                </button>
+            </div>
+        </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr>
+                        <th>
+                            <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                                id="SelectCheck" (click)="HabilitarSeleccion()">
+                                library_add_check
+                            </mat-icon>
+                            <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                                [checked]="selectionTipoCargo.hasValue() && isAllSelectedPag()"
+                                [indeterminate]="selectionTipoCargo.hasValue() && !isAllSelectedPag()"
+                                [aria-label]="checkboxLabelPag()">
+                            </mat-checkbox>
+                        </th>
                         <th scope="col">Cargos</th>
                         <th scope="col">Acción</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
+                        <td></td>
                         <td>
-                            <!--mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [formControl]="buscarNombre"
-                                    [(ngModel)]="filtroNombreSuc">
-                            </mat-form-field-->
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [formControl]="buscarCargo"
+                                    [(ngModel)]="filtroCargo">
+                            </mat-form-field>
                         </td>
                         <td>
                             <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
-                                matTooltip="Búsqueda de departamentos de acurdo a cada columna de la tabla.">
+                                matTooltip="Búsqueda de cargos de acuerdo a la columna de la tabla.">
                                 help_outline
                             </mat-icon>
                         </td>
                     </tr>
-                    <tr
-                        *ngFor="let cargo of listaTipoCargos |  paginate:tamanio_pagina:numero_pagina">
+                    <tr *ngFor="let cargo of listaTipoCargos | emplCargo: filtroCargo |  paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionTipoCargo.toggle(cargo) : null"
+                                [checked]="selectionTipoCargo.isSelected(cargo)" [aria-label]="checkboxLabelPag(cargo)">
+                            </mat-checkbox>
+                        </td>
                         <td>{{cargo.cargo}}</td>
                         <td class="justify-content-center">
-                            <i (click)="ConfirmarDelete(cargo)" class="far fa-trash-alt" id="t-eliminar"
-                                matSuffix matTooltipPosition="right" matTooltip="Eliminar este registro." *ngIf="getEliminarTipoCargo()">
-                                <p>Eliminar</p>
-                            </i>
-                            <i id="t-editar" (click)="AbrirEditar(cargo)" matSuffix
-                                matTooltipPosition="right" matTooltip="Modificar datos de este registro"
-                                class="fas fa-edit" *ngIf="getEditarTipoCargo()">
+                            <i id="t-editar" (click)="AbrirEditar(cargo)" matSuffix matTooltipPosition="right"
+                                matTooltip="Modificar datos de este registro" class="fas fa-edit" *ngIf="getEditarTipoCargo()">
                                 <p>Editar</p>
+                            </i>
+                            <i (click)="ConfirmarDelete(cargo)" class="far fa-trash-alt" id="t-eliminar" matSuffix *ngIf="getEliminarTipoCargo()"
+                                matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                <p>Eliminar</p>
                             </i>
                         </td>
                     </tr>
@@ -119,33 +148,58 @@
         <mat-paginator id="pagina" [length]="listaTipoCargos.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <!--  *************************  DESCARGA DE REPORTES  *****************************  -->
+        <div>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista de Tipo Cargos en formato PDF.">
+                    <p>PDF</p>
+                </i>
+                <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Tipo Cargos en formato EXCEL.">
+                    <p>XLSL</p>
+                </i>
+                <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Tipo Cargos en formato CSV.">
+                    <p>CSV</p>
+                </i>
+                <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Tipo Cargos en formato XML.">
+                    <p>XML</p>
+                </i>
+            </div>
+            <div class="d-flex justify-content-end"
+                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                <p> Reportes Tipo Cargos. </p>
+            </div>
+        </div>
     </div>
 </div>
 
-<!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
-<div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="Datos_tipo_cargos && messajeExcel != 'error'">
+<!--  ************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE *************************** -->
+<div class="container" style="padding-top: 10px; margin-bottom: 25px;"
+    *ngIf="Datos_tipo_cargos && messajeExcel != 'error'">
     <app-definicion-plantilla>
     </app-definicion-plantilla>
 </div>
 
-<!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE MODALIDAD LABORAL ------------------------------------------------->
-<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="Datos_tipo_cargos && messajeExcel != 'error'">
+<!--  *************************  TABLA DE DATOS DE LA CARGA MULTIPLE DE TIPO CARGOS  *******************************  -->
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;"
+    *ngIf="Datos_tipo_cargos && messajeExcel != 'error'">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="titulo">REGISTRO MULTIPLE</div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center; font-size: 13px;">
+                        <th scope="col">Observación</th>
                         <th scope="col">Item</th>
                         <th scope="col">Cargos</th>
-                        <th scope="col">Observación</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
                         *ngFor="let ct of Datos_tipo_cargos | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
-                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{ct.fila}}</td>
-                        <td [style.color]="stiloTextoCelda(ct.tipo_cargo)" style="font-size: 12px;">{{ct.tipo_cargo}}</td>
                         <td style="font-size: 12px;">
                             <div style="width: 270px; margin: auto;">
                                 <div id="t-editar" class="circulo"
@@ -153,13 +207,16 @@
                                 {{ct.observacion}}
                             </div>
                         </td>
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                            {{ct.fila}}</td>
+                        <td [style.color]="stiloTextoCelda(ct.tipo_cargo)" style="font-size: 12px;">{{ct.tipo_cargo}}
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
         <mat-paginator [length]="Datos_tipo_cargos.length" [pageSize]="tamanio_paginaMul"
-            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
-            showFirstLastButtons>
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
         </mat-paginator>
     </div>
 </div>

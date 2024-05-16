@@ -19,7 +19,8 @@ const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
 class ModalidaLaboralControlador {
-    listaModalidadLaboral(req, res) {
+    // METODO PARA LISTAR MODALIDAD LABORAL
+    ListaModalidadLaboral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const MODALIDAL_LABORAL = yield database_1.default.query(`
@@ -37,6 +38,7 @@ class ModalidaLaboralControlador {
             }
         });
     }
+    // METODO PARA REGISTRAR MODALIDAD LABORAL
     CrearMadalidadLaboral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -44,9 +46,7 @@ class ModalidaLaboralControlador {
                 var VERIFICAR_MODALIDAD = yield database_1.default.query(`
                 SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
                 `, [modalidad.toUpperCase()]);
-                console.log('VERIFICAR_MODALIDAD: ', VERIFICAR_MODALIDAD.rows[0]);
                 if (VERIFICAR_MODALIDAD.rows[0] == undefined || VERIFICAR_MODALIDAD.rows[0] == '') {
-                    // Dar formato a la palabra de modalidad
                     const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
                     const response = yield database_1.default.query(`
                     INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1) RETURNING *
@@ -60,7 +60,7 @@ class ModalidaLaboralControlador {
                     }
                 }
                 else {
-                    return res.jsonp({ message: 'Ya existe la modalidad laboral', status: '300' });
+                    return res.jsonp({ message: 'Modalidad Laboral ya existe en el sistema.', status: '300' });
                 }
             }
             catch (error) {
@@ -68,23 +68,30 @@ class ModalidaLaboralControlador {
             }
         });
     }
+    // METODO PARA EDITAR MODALIDAD LABORAL
     EditarModalidadLaboral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id, modalidad } = req.body;
-                console.log('id: ', id, 'descripcion: ', modalidad);
-                // Dar formato a la palabra de modalidad
                 const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
-                const response = yield database_1.default.query(`
-                UPDATE e_cat_modalidad_trabajo SET descripcion = $2
-                WHERE id = $1 RETURNING *
-                `, [id, modali]);
-                const [modalidadLaboral] = response.rows;
-                if (modalidadLaboral) {
-                    return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' });
+                const modalExiste = yield database_1.default.query(`
+                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                `, [modali.toUpperCase()]);
+                if (modalExiste.rows[0] != undefined && modalExiste.rows[0].descripcion != '' && modalExiste.rows[0].descripcion != null) {
+                    return res.status(200).jsonp({ message: 'Modalidad Laboral ya esiste en el sistema.', status: '300' });
                 }
                 else {
-                    return res.status(404).jsonp({ message: 'No se pudo actualizar', status: '400' });
+                    const response = yield database_1.default.query(`
+                    UPDATE e_cat_modalidad_trabajo SET descripcion = $2
+                    WHERE id = $1 RETURNING *
+                    `, [id, modali]);
+                    const [modalidadLaboral] = response.rows;
+                    if (modalidadLaboral) {
+                        return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' });
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'Ups!!! algo slaio mal.', status: '400' });
+                    }
                 }
             }
             catch (error) {
@@ -92,23 +99,22 @@ class ModalidaLaboralControlador {
             }
         });
     }
-    eliminarRegistro(req, res) {
+    // METODO PARA ELIMINAR REGISTRO
+    EliminarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                console.log('id: ', id);
                 yield database_1.default.query(`
                 DELETE FROM e_cat_modalidad_trabajo WHERE id = $1
-            `, [id]);
-                res.jsonp({ message: 'Registro eliminado.', code: '200' });
+                `, [id]);
+                res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
-                console.log('error: ', error.code);
-                return res.status(500).jsonp({ message: error.detail, code: error.code });
+                return res.jsonp({ message: 'error' });
             }
         });
     }
-    /** Lectura de los datos de la platilla Modalidad_cargo */
+    // LECTURA DE LOS DATOS DE LA PLATILLA MODALIDAD_CARGO 
     VerfificarPlantillaModalidadLaboral(req, res) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
@@ -119,7 +125,6 @@ class ModalidaLaboralControlador {
                 const workbook = xlsx_1.default.readFile(ruta);
                 const sheet_name_list = workbook.SheetNames;
                 const plantilla_modalidad_laboral = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-                //const plantilla_cargo = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[1]]);
                 let data = {
                     fila: '',
                     modalida_laboral: '',
@@ -131,25 +136,25 @@ class ModalidaLaboralControlador {
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
                 plantilla_modalidad_laboral.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
                     var { item, modalida_laboral } = dato;
-                    //Verificar que el registo no tenga datos vacios
+                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                     if ((item != undefined && item != '') &&
                         (modalida_laboral != undefined && modalida_laboral != '')) {
                         data.fila = item;
                         data.modalida_laboral = modalida_laboral;
-                        data.observacion = 'no registrado';
+                        data.observacion = 'no registrada';
                         listModalidad.push(data);
                     }
                     else {
                         data.fila = item;
                         data.modalida_laboral = modalida_laboral;
-                        data.observacion = 'no registrado';
+                        data.observacion = 'no registrada';
                         if (data.fila == '' || data.fila == undefined) {
                             data.fila = 'error';
                             mensaje = 'error';
                         }
                         if (modalida_laboral == undefined) {
                             data.modalida_laboral = 'No registrado';
-                            data.observacion = 'Modalidad laboral ' + data.observacion;
+                            data.observacion = 'Modalidad Laboral ' + data.observacion;
                         }
                         listModalidad.push(data);
                     }
@@ -165,7 +170,7 @@ class ModalidaLaboralControlador {
                     }
                 });
                 listModalidad.forEach((item) => __awaiter(this, void 0, void 0, function* () {
-                    if (item.observacion == 'no registrado') {
+                    if (item.observacion == 'no registrada') {
                         var VERIFICAR_MODALIDAD = yield database_1.default.query(`
                         SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
                         `, [item.modalida_laboral.toUpperCase()]);
@@ -186,23 +191,23 @@ class ModalidaLaboralControlador {
                 }));
                 setTimeout(() => {
                     listModalidad.sort((a, b) => {
-                        // Compara los números de los objetos
+                        // COMPARA LOS NUMEROS DE LOS OBJETOS
                         if (a.fila < b.fila) {
                             return -1;
                         }
                         if (a.fila > b.fila) {
                             return 1;
                         }
-                        return 0; // Son iguales
+                        return 0; // SON IGUALES
                     });
                     var filaDuplicada = 0;
                     listModalidad.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                         if (item.observacion == '1') {
                             item.observacion = 'Registro duplicado';
                         }
-                        //Valida si los datos de la columna N son numeros.
+                        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                             if (item.fila == filaDuplicada) {
                                 mensaje = 'error';
                             }
@@ -223,7 +228,7 @@ class ModalidaLaboralControlador {
             }
         });
     }
-    /** Registrar plantilla Modalidad_cargo **/
+    // REGISTRAR PLANTILLA MODALIDAD_CARGO 
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -232,10 +237,10 @@ class ModalidaLaboralControlador {
                 var contador = 1;
                 var respuesta;
                 plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                    // Datos que se guardaran de la plantilla ingresada
+                    // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                     const { item, modalida_laboral, observacion } = data;
                     const modalidad = modalida_laboral.charAt(0).toUpperCase() + modalida_laboral.slice(1).toLowerCase();
-                    // Registro de los datos de contratos
+                    // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
                     const response = yield database_1.default.query(`
                     INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1) RETURNING *
                     `, [modalidad]);

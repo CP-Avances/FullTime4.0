@@ -109,7 +109,7 @@ export class EliminarIndividualComponent implements OnInit {
       fecha_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
       codigo: ''
     }
-    this.datosEliminar.usuario.forEach(obj => {
+    this.datosEliminar.usuario.forEach((obj: any) => {
       if (this.codigo_usuario === '') {
         this.codigo_usuario = '\'' + obj.codigo + '\''
       }
@@ -198,8 +198,8 @@ export class EliminarIndividualComponent implements OnInit {
     let contador = 0;
     this.progreso = true;
 
-    this.horariosSeleccionados.forEach(obj => {
-      this.datosEliminar.usuario.forEach(usu => {
+    this.horariosSeleccionados.forEach((obj: any) => {
+      this.datosEliminar.usuario.forEach((usu: any) => {
         let plan_fecha = {
           codigo: usu.codigo,
           fec_final: final,

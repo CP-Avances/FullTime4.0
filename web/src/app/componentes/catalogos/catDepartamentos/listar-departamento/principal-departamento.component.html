@@ -141,7 +141,7 @@
                             </td>
                             <td>
                                 <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
-                                    matTooltip="Búsqueda de departamentos de acurdo a cada columna de la tabla.">
+                                    matTooltip="Búsqueda de departamentos de acuerdo a cada columna de la tabla.">
                                     help_outline
                                 </mat-icon>
                             </td>
@@ -226,20 +226,15 @@
                 <table class="table table-hover table-sm">
                     <thead class="thead-light">
                         <tr style="text-align: center; font-size: 13px;">
-                            <th scope="col">Item</th>
-                            <th scope="col">Nombre</th>
-                            <th scope="col">Sucursal</th>
                             <th scope="col">Observación</th>
+                            <th scope="col">Item</th>
+                            <th scope="col">Departamento</th>
+                            <th scope="col">Sucursal</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr
                             *ngFor="let d of DataDepartamentos | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
-                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
-                                {{d.fila}}</td>
-                            <td [style.color]="stiloTextoCelda(d.nombre)" style="font-size: 12px;">{{d.nombre}}</td>
-                            <td [style.color]="stiloTextoCelda(d.sucursal)" id="letras" style="font-size: 12px;">
-                                {{d.sucursal}}</td>
                             <td style="font-size: 12px;">
                                 <div style="width: 270px; margin: auto;">
                                     <div id="t-editar" class="circulo"
@@ -247,6 +242,11 @@
                                     {{d.observacion}}
                                 </div>
                             </td>
+                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                                {{d.fila}}</td>
+                            <td [style.color]="stiloTextoCelda(d.nombre)" style="font-size: 12px;">{{d.nombre}}</td>
+                            <td [style.color]="stiloTextoCelda(d.sucursal)" id="letras" style="font-size: 12px;">
+                                {{d.sucursal}}</td>
                         </tr>
                     </tbody>
                 </table>

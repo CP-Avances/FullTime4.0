@@ -53,16 +53,25 @@ class FeriadosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fecha, descripcion, fec_recuperacion } = req.body;
-                const response = yield database_1.default.query(`
-                INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
-                VALUES ($1, $2, $3) RETURNING *
-                `, [fecha, descripcion, fec_recuperacion]);
-                const [feriado] = response.rows;
-                if (feriado) {
-                    return res.status(200).jsonp(feriado);
+                const busqueda = yield database_1.default.query(`
+                SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1
+                `, [descripcion.toUpperCase()]);
+                const [nombres] = busqueda.rows;
+                if (nombres) {
+                    return res.jsonp({ message: 'existe', status: '300' });
                 }
                 else {
-                    return res.status(404).jsonp({ message: 'error' });
+                    const response = yield database_1.default.query(`
+                    INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
+                    VALUES ($1, $2, $3) RETURNING *
+                    `, [fecha, descripcion, fec_recuperacion]);
+                    const [feriado] = response.rows;
+                    if (feriado) {
+                        return res.status(200).jsonp(feriado);
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'error' });
+                    }
                 }
             }
             catch (error) {
@@ -90,11 +99,20 @@ class FeriadosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fecha, descripcion, fec_recuperacion, id } = req.body;
-                yield database_1.default.query(`
-                UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
-                WHERE id = $4
-                `, [fecha, descripcion, fec_recuperacion, id]);
-                res.jsonp({ message: 'Registro actualizado.' });
+                const busqueda = yield database_1.default.query(`
+                SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1 AND NOT id = $2
+                `, [descripcion.toUpperCase(), id]);
+                const [nombres] = busqueda.rows;
+                if (nombres) {
+                    return res.jsonp({ message: 'existe', status: '300' });
+                }
+                else {
+                    yield database_1.default.query(`
+                    UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
+                    WHERE id = $4
+                    `, [fecha, descripcion, fec_recuperacion, id]);
+                    return res.jsonp({ message: 'ok' });
+                }
             }
             catch (error) {
                 return res.jsonp({ message: 'error' });
@@ -223,7 +241,6 @@ class FeriadosControlador {
                         data.descripcion = 'No registrado';
                         data.observacion = 'Descripción ' + data.observacion;
                     }
-                    data.fec_recuperacion = dato.fec_recuperacion;
                     if (data.fecha == 'No registrado' && data.descripcion == 'No registrado') {
                         data.observacion = 'Fecha y descripción no registrada';
                     }
@@ -295,6 +312,7 @@ class FeriadosControlador {
             });
             var filaDuplicada = 0;
             listFeriados.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                console.log('item: ', item);
                 //VERIFICA SI EXISTE EN LAs COLUMNA DATOS REGISTRADOS
                 if (item.fila != 'error' && item.fecha != 'No registrado' && item.descripcion != 'No registrado') {
                     // Verificar si la variable tiene el formato de fecha correcto con moment
@@ -312,22 +330,27 @@ class FeriadosControlador {
                         WHERE fecha = $1 OR fecha_recuperacion = $1
                         `, [item.fecha]);
                         if (VERIFICAR_FECHA.rowCount === 0) {
-                            if (item.fec_recuperacion == undefined) {
-                                item.fec_recuperacion = '-';
+                            if (item.fec_recuperacion == '-' || item.fec_recuperacion == undefined) {
                                 fec_recuperacion_correcta = true;
                                 // Discriminación de elementos iguales
-                                if (duplicados.find((p) => p.fecha === item.fecha || p.fecha === item.fec_recuperacion) == undefined) {
+                                if (duplicados.find((p) => p.descripcion == item.descripcion || p.fecha === item.fecha) == undefined) {
                                     item.observacion = 'ok';
                                     duplicados.push(item);
+                                }
+                                else {
+                                    item.observacion = '1';
                                 }
                             }
                             else {
                                 if ((0, moment_1.default)(item.fec_recuperacion, 'YYYY-MM-DD', true).isValid()) {
                                     fec_recuperacion_correcta = true;
                                     // Discriminación de elementos iguales
-                                    if (duplicados.find((p) => p.fecha === item.fecha) == undefined) {
-                                        data.observacion = 'ok';
+                                    if (duplicados.find((p) => p.descripcion == item.descripcion || p.fecha === item.fecha || p.fec_recuperacion === item.fec_recuperacion) == undefined) {
+                                        item.observacion = 'ok';
                                         duplicados.push(item);
+                                    }
+                                    else {
+                                        item.observacion = '1';
                                     }
                                 }
                                 else {
@@ -337,19 +360,9 @@ class FeriadosControlador {
                             }
                         }
                         else {
-                            data.observacion = 'Ya existe en el sistema';
+                            item.observacion = 'Ya existe en el sistema';
                         }
                     }
-                }
-                if (item.observacion != undefined && item.observacion != 'no registrada' && item.observacion != '') {
-                    fecha_igual.forEach((valor) => {
-                        if (valor.fecha == item.fec_recuperacion) {
-                            item.observacion = 'Fecha registrada como valor de otra columna';
-                        }
-                    });
-                }
-                else {
-                    item.observacion = 'Registro duplicado';
                 }
                 //Valida si los datos de la columna N son numeros.
                 if (typeof item.fila === 'number' && !isNaN(item.fila)) {
@@ -422,6 +435,20 @@ class FeriadosControlador {
                         return 1;
                     }
                     return 0; // Son iguales
+                });
+                listFeriados.forEach((item) => {
+                    console.log('item.observacion: ', item);
+                    if (item.fec_recuperacion != '-') {
+                        fecha_igual.forEach((valor) => {
+                            console.log(valor.fecha, ' == ', item.fec_recuperacion);
+                            if (valor.fecha == item.fec_recuperacion) {
+                                item.observacion = 'Fecha registrada como valor de otra columna';
+                            }
+                        });
+                    }
+                    if (item.observacion == '1') {
+                        item.observacion = 'Registro duplicado';
+                    }
                 });
                 listFeriados_ciudades.forEach((valor) => {
                     if (valor.provincia != 'No registrado' && valor.ciudad != 'No registrado' && valor.feriado != 'No registrado') {

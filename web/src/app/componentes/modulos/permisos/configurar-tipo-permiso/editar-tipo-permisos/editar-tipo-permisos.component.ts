@@ -180,7 +180,7 @@ export class EditarTipoPermisosComponent implements OnInit {
     });
     // DESCUENTO DE PERMISO
     let j = 0;
-    this.descuentos.forEach(obj => {
+    this.descuentos.forEach((obj: any) => {
       if (this.tipoPermiso.tipo_descuento === obj.value) {
         this.selectTipoDescuento = this.descuentos[j].value;
       }
@@ -357,7 +357,7 @@ export class EditarTipoPermisosComponent implements OnInit {
       this.VerificarIngresoFecha(permiso);
     }
     else {
-      this.permisos.forEach(obj => {
+      this.permisos.forEach((obj: any) => {
         if (obj.descripcion.toUpperCase() === permiso.descripcion.toUpperCase()) {
           this.contador = 1;
         }

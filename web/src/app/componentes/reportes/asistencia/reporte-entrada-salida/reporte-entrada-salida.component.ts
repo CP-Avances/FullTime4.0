@@ -207,7 +207,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
         this.restCF.BuscarFeriados(obj.id_ciudad).subscribe(data => {
           this.ciudadFeriados = data;
           this.ciudadFeriados.map(datos => {
-            this.feriados.map(element => {
+            this.feriados.map((element: any) => {
               let datosF = [
                 {
                   id: datos.id_feriado,
@@ -479,7 +479,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
   // Estructura de los datos generales del empleado
   presentarDatosGenerales(id_seleccionado, form, fechasTotales) {
     var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;
-    this.datosEmpleado.forEach(obj => {
+    this.datosEmpleado.forEach((obj: any) => {
       if (obj.codigo === id_seleccionado) {
         nombre = obj.nombre;
         apellido = obj.apellido;
@@ -896,7 +896,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     // Inicialización de varibles
     var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;
     // BUSQUEDA de los datos del empleado del cual se obtiene el reporte
-    this.datosEmpleado.forEach(obj => {
+    this.datosEmpleado.forEach((obj: any) => {
       if (obj.codigo === id_seleccionado) {
         nombre = obj.nombre;
         apellido = obj.apellido;

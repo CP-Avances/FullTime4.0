@@ -90,7 +90,7 @@ class RolPermisosControlador {
       const { id_rol } = req.body;
       const PAGINA_ROL = await pool.query(
         `
-      SELECT * FROM ero_rol_permisos WHERE id_rol = $1 ORDER BY 3, 5
+      SELECT * FROM ero_rol_permisos WHERE id_rol = $1 order by 3,5
       `, [id_rol]);
       return res.jsonp(PAGINA_ROL.rows)
     } catch (error) {

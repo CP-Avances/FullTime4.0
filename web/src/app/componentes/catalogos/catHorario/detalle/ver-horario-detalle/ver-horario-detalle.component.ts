@@ -11,11 +11,11 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 
 import { EditarDetalleCatHorarioComponent } from 'src/app/componentes/catalogos/catHorario/detalle/editar-detalle-cat-horario/editar-detalle-cat-horario.component';
+import { HorarioMultipleEmpleadoComponent } from 'src/app/componentes/horarios/rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 import { DetalleCatHorarioComponent } from 'src/app/componentes/catalogos/catHorario/detalle/detalle-cat-horario/detalle-cat-horario.component';
 import { PrincipalHorarioComponent } from '../../horario/principal-horario/principal-horario.component';
 import { EditarHorarioComponent } from 'src/app/componentes/catalogos/catHorario/horario/editar-horario/editar-horario.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { HorarioMultipleEmpleadoComponent } from 'src/app/componentes/horarios/rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 
 @Component({
   selector: 'app-ver-horario-detalle',
@@ -91,7 +91,7 @@ export class VerHorarioDetalleComponent implements OnInit {
 
   // METODO PARA COLOCAR TIPO DE HORARIO
   ColocarTipo() {
-    this.datosHorario.forEach(obj => {
+    this.datosHorario.forEach((obj: any) => {
       if (obj.default_ === 'N') {
         obj.default_tipo = 'Laborable';
       }
@@ -118,7 +118,7 @@ export class VerHorarioDetalleComponent implements OnInit {
       this.datosDetalle.forEach(data => {
         data.hora_ = this.validar.FormatearHora(data.hora, formato_hora);
       });
-      console.log('ver detales ', this.datosDetalle)
+      //--console.log('ver detales ', this.datosDetalle)
     })
   }
 
@@ -316,8 +316,9 @@ export class VerHorarioDetalleComponent implements OnInit {
     }
   }
 
+  // METODO PARA CALCULAR EL TIEMPO DE LAS HORAS
   CalcularMetodoNocturno(id: number, min_almuerzo: any) {
-    const detalleNocturno = this.datosDetalle.map(o => {
+    const detalleNocturno = this.datosDetalle.map((o: any) => {
       if ((o.orden === 4 || o.orden === 3) && o.hora === '00:00:00') {
         o.hora = '24:00:00';
       }

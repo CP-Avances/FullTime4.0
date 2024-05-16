@@ -280,7 +280,7 @@ export class VistaRolesComponent implements OnInit {
     this.OrdenarDatos(this.roles);
     var objeto: any;
     var arregloRoles: any = [];
-    this.roles.forEach(obj => {
+    this.roles.forEach((obj: any) => {
       objeto = {
         "rol": {
           "$": { "id": obj.id },
@@ -491,7 +491,6 @@ export class VistaRolesComponent implements OnInit {
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
-        this.validar.Auditar('app-web', 'cg_roles', rol, '', 'DELETE');
         this.ObtenerRoles();
       }
     });
@@ -528,7 +527,7 @@ export class VistaRolesComponent implements OnInit {
       this.contador = this.contador + 1;
       this.rest.EliminarRoles(datos.id).subscribe(res => {
         if (res.message === 'error') {
-          this.toastr.error('No se puede eliminar.', '', {
+          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;

@@ -12,14 +12,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.tiposCargosControlador = void 0;
+exports.TIPOSCARGOSCONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
 class TiposCargosControlador {
-    listaTipoCargos(req, res) {
+    // METODO PARA BUSCAR TIPO DE CARGOS POR EL NOMBRE
+    BuscarTipoCargoNombre(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { nombre } = req.body;
+            const CARGOS = yield database_1.default.query(`
+            SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+            `, [nombre]);
+            if (CARGOS.rowCount > 0) {
+                return res.jsonp(CARGOS.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+        });
+    }
+    // METODO PARA LISTAR TIPO CARGOS
+    ListaTipoCargos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const TIPO_CARGO = yield database_1.default.query(`
@@ -37,6 +53,7 @@ class TiposCargosControlador {
             }
         });
     }
+    // METODO PARA REGISTRAR TIPO CARGO
     CrearCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -44,9 +61,7 @@ class TiposCargosControlador {
                 var VERIFICAR_CARGO = yield database_1.default.query(`
                 SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
                 `, [cargo.toUpperCase()]);
-                console.log('VERIFICAR_MODALIDAD: ', VERIFICAR_CARGO.rows[0]);
                 if (VERIFICAR_CARGO.rows[0] == undefined || VERIFICAR_CARGO.rows[0] == '') {
-                    // Dar formato a la palabra de modalidad
                     const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
                     const response = yield database_1.default.query(`
                     INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
@@ -56,11 +71,11 @@ class TiposCargosControlador {
                         return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' });
                     }
                     else {
-                        return res.status(404).jsonp({ message: 'No se pudo guardar', status: '400' });
+                        return res.status(404).jsonp({ message: 'Ups!!! algo slaio mal.', status: '400' });
                     }
                 }
                 else {
-                    return res.jsonp({ message: 'Ya existe un cargo laboral', status: '300' });
+                    return res.jsonp({ message: 'Tipo cargo ya existe en el sistema.', status: '300' });
                 }
             }
             catch (error) {
@@ -68,23 +83,31 @@ class TiposCargosControlador {
             }
         });
     }
+    // METODO PARA EDITAR TIPO CARGO
     EditarCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id, cargo } = req.body;
-                console.log('id: ', id, 'cargo: ', cargo);
-                // Dar formato a la palabra de cargo
+                // DAR FORMATO A LA PALABRA CARGO
                 const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
-                const response = yield database_1.default.query(`
-                UPDATE e_cat_tipo_cargo SET cargo = $2
-                WHERE id = $1 RETURNING *
-                `, [id, tipoCargo]);
-                const [TipoCargos] = response.rows;
-                if (TipoCargos) {
-                    return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' });
+                const tipoCargoExiste = yield database_1.default.query(`
+                SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+                `, [cargo.toUpperCase()]);
+                if (tipoCargoExiste.rows[0] != undefined && tipoCargoExiste.rows[0].cargo != '' && tipoCargoExiste.rows[0].cargo != null) {
+                    return res.status(200).jsonp({ message: 'Ya existe el cargo', status: '300' });
                 }
                 else {
-                    return res.status(404).jsonp({ message: 'No se pudo actualizar', status: '400' });
+                    const response = yield database_1.default.query(`
+                    UPDATE e_cat_tipo_cargo SET cargo = $2
+                    WHERE id = $1 RETURNING *
+                    `, [id, tipoCargo]);
+                    const [TipoCargos] = response.rows;
+                    if (TipoCargos) {
+                        return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' });
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'Ups!!! algo salio mal.', status: '400' });
+                    }
                 }
             }
             catch (error) {
@@ -92,11 +115,11 @@ class TiposCargosControlador {
             }
         });
     }
-    eliminarRegistro(req, res) {
+    // METODO PARA ELIMINAR REGISTRO
+    EliminarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                console.log('id: ', id);
                 yield database_1.default.query(`
                 DELETE FROM e_cat_tipo_cargo WHERE id = $1
                 `, [id]);
@@ -107,7 +130,7 @@ class TiposCargosControlador {
             }
         });
     }
-    /** Lectura de los datos de la platilla Modalidad_cargo */
+    // LECTURA DE LOS DATOS DE LA PLATILLA TIPO CARGO
     VerfificarPlantillaTipoCargos(req, res) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
@@ -129,7 +152,7 @@ class TiposCargosControlador {
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
                 plantilla_cargo.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
                     var { item, cargo } = dato;
-                    //Verificar que el registo no tenga datos vacios
+                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                     if ((item != undefined && item != '') &&
                         (cargo != undefined && cargo != '')) {
                         data.fila = item;
@@ -173,7 +196,7 @@ class TiposCargosControlador {
                         else {
                             item.observacion = 'Ya existe en el sistema';
                         }
-                        // Discriminación de elementos iguales
+                        // DISCRIMINACION DE ELEMENTOS IGUALES
                         if (duplicados.find((p) => p.tipo_cargo.toLowerCase() === item.tipo_cargo.toLowerCase()) == undefined) {
                             duplicados.push(item);
                         }
@@ -184,23 +207,23 @@ class TiposCargosControlador {
                 }));
                 setTimeout(() => {
                     listCargos.sort((a, b) => {
-                        // Compara los números de los objetos
+                        // COMPARA LOS NUMEROS DE LOS OBJETOS
                         if (a.fila < b.fila) {
                             return -1;
                         }
                         if (a.fila > b.fila) {
                             return 1;
                         }
-                        return 0; // Son iguales
+                        return 0; // SON IGUALES
                     });
                     var filaDuplicada = 0;
                     listCargos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                         if (item.observacion == '1') {
                             item.observacion = 'Registro duplicado';
                         }
-                        //Valida si los datos de la columna N son numeros.
+                        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                             if (item.fila == filaDuplicada) {
                                 mensaje = 'error';
                             }
@@ -221,19 +244,18 @@ class TiposCargosControlador {
             }
         });
     }
-    /** Registrar plantilla Modalidad_cargo **/
+    // REGISTRAR PLANTILLA TIPO CARGO 
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const plantilla = req.body;
-                console.log('datos Tipo Cargos: ', plantilla);
                 var contador = 1;
                 var respuesta;
                 plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                    // Datos que se guardaran de la plantilla ingresada
+                    // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                     const { item, tipo_cargo, observacion } = data;
                     const cargo = tipo_cargo.charAt(0).toUpperCase() + tipo_cargo.slice(1).toLowerCase();
-                    // Registro de los datos de contratos
+                    // REGISTRO DE LOS DATOS DE TIPO CARGO
                     const response = yield database_1.default.query(`
                     INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
                     `, [cargo]);
@@ -255,5 +277,5 @@ class TiposCargosControlador {
         });
     }
 }
-exports.tiposCargosControlador = new TiposCargosControlador();
-exports.default = exports.tiposCargosControlador;
+exports.TIPOSCARGOSCONTROLADOR = new TiposCargosControlador();
+exports.default = exports.TIPOSCARGOSCONTROLADOR;

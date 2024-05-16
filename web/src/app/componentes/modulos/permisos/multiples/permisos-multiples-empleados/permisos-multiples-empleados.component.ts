@@ -237,7 +237,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
 
-    informacion.forEach(obj => {
+    informacion.forEach((obj: any) => {
       //console.log('ver obj ', obj)
       this.sucursales.push({
         id: obj.id_suc,
@@ -245,8 +245,8 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((obj: any) => {
         this.regimen.push({
           id: obj.id_regimen,
           nombre: obj.name_regimen,
@@ -256,9 +256,9 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(dep => {
-        dep.departamentos.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((dep: any) => {
+        dep.departamentos.forEach((obj: any) => {
           this.departamentos.push({
             id: obj.id_depa,
             departamento: obj.name_dep,
@@ -270,10 +270,10 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(dep => {
-        dep.departamentos.forEach(car => {
-          car.cargos.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((dep: any) => {
+        dep.departamentos.forEach((car: any) => {
+          car.cargos.forEach((obj: any) => {
             this.cargos.push({
               id: obj.id_cargo_,
               nombre: obj.name_cargo,
@@ -285,11 +285,11 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(dep => {
-        dep.departamentos.forEach(car => {
-          car.cargos.forEach(empl => {
-            empl.empleado.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((dep: any) => {
+        dep.departamentos.forEach((car: any) => {
+          car.cargos.forEach((empl: any) => {
+            empl.empleado.forEach((obj: any) => {
               let elemento = {
                 id: obj.id,
                 nombre: obj.nombre + ' ' + obj.apellido,

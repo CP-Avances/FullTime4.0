@@ -24,7 +24,6 @@ export class EditarHorarioComponent implements OnInit {
 
   // OPCIONES DE REGISTRO DE HORARIO
   nocturno = false;
-  detalle = false;
 
   // VALIDACIONES PARA EL FORMULARIO
   horaTrabajo = new FormControl('', [Validators.required, Validators.pattern("^[0-9]*(:[0-9][0-9])?$")]);
@@ -69,14 +68,13 @@ export class EditarHorarioComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('data ', this.data)
+    //--console.log('data ', this.data)
     this.ImprimirDatos();
   }
 
   // MOSTRAR DATOS EN FORMULARIO
   establecido: boolean = false;
   ImprimirDatos() {
-
     // FORMATEAR HORAS
     if (this.data.horario.hora_trabajo.split(':').length === 3) {
       this.horaTrabajo.setValue(this.data.horario.hora_trabajo.split(':')[0] + ':' + this.data.horario.hora_trabajo.split(':')[1]);
@@ -120,13 +118,6 @@ export class EditarHorarioComponent implements OnInit {
     else {
       this.nocturno = false;
     }
-
-    if (this.data.horario.detalle === true) {
-      this.detalle = true;
-    }
-    else {
-      this.detalle = false;
-    }
   }
 
   // METODO PARA REGISTRAR DATOS DE HORARIO
@@ -148,7 +139,6 @@ export class EditarHorarioComponent implements OnInit {
       min_almuerzo: form.horarioMinAlmuerzoForm,
       hora_trabajo: form.horarioHoraTrabajoForm,
       nocturno: form.tipoForm,
-      detalle: true,
       nombre: form.nombreForm,
       codigo: form.codigoForm,
       default_: tipo,
@@ -185,6 +175,7 @@ export class EditarHorarioComponent implements OnInit {
     }
 
     // SI EL CODIGO DE HORARIO ES IGUAL NO VERIFICA DUPLICADOS
+    console.log('verificar nombres ', form.codigoForm, ' data ', this.data.horario.codigo)
     if (form.codigoForm === this.data.horario.codigo) {
       this.VerificarInformacion(dataHorario, form);
     }
@@ -201,7 +192,7 @@ export class EditarHorarioComponent implements OnInit {
       codigo: form.codigoForm
     }
     this.rest.BuscarHorarioNombre_(data).subscribe(response => {
-      this.toastr.info('Código de horario ya se encuentra registrado.', 'Verificar Datos.', {
+      this.toastr.warning('Código de horario ya se encuentra registrado.', 'Verificar Datos.', {
         timeOut: 6000,
       });
       this.habilitarprogress = false;
@@ -252,7 +243,6 @@ export class EditarHorarioComponent implements OnInit {
     this.habilitarprogress = true;
     this.EliminarDocumentoServidor();
     this.rest.ActualizarHorario(this.data.horario.id, datos).subscribe(response => {
-      this.RegistrarAuditoria(datos);
       this.SubirRespaldo(this.data.horario.id);
       this.habilitarprogress = false;
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
@@ -274,7 +264,6 @@ export class EditarHorarioComponent implements OnInit {
   // METODO PARA GUARDAR DATOS SIN UN ARCHIVO SELECCIONADO
   GuardarDatos(datos: any) {
     this.rest.ActualizarHorario(this.data.horario.id, datos).subscribe(response => {
-      this.RegistrarAuditoria(datos);
       this.habilitarprogress = false;
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
@@ -394,7 +383,7 @@ export class EditarHorarioComponent implements OnInit {
   EliminarDetallesComida() {
     this.restD.ConsultarUnDetalleHorario(this.data.horario.id).subscribe(res => {
       this.detalles_horarios = res;
-      this.detalles_horarios.map(det => {
+      this.detalles_horarios.map((det: any) => {
         if (det.tipo_accion === 'F/A') {
           this.EliminarDetalle(det.id);
         }
@@ -402,23 +391,13 @@ export class EditarHorarioComponent implements OnInit {
           this.EliminarDetalle(det.id);
         }
       })
-    }, error => { })
+    });
   }
-
-
 
   // METODO PARA ELIMINAR DETALLES EN LA BASE DE DATOS
   EliminarDetalle(id_detalle: number) {
     this.restD.EliminarRegistro(id_detalle).subscribe(res => {
     });
-  }
-
-  // METODO PARA AUDITAR CATALOGO HORARIOS
-  data_nueva: any = [];
-  RegistrarAuditoria(dataHorario: any) {
-    this.data_nueva = [];
-    this.data_nueva = dataHorario;
-    this.validar.Auditar('app-web', 'cg_horarios', this.data.horario, this.data_nueva, 'UPDATE');
   }
 
   // METODO PARA INGRESAR SOLO NUMEROS Y CARACTERES

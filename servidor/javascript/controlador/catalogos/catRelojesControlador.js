@@ -20,7 +20,7 @@ class RelojesControlador {
     ListarRelojes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const RELOJES = yield database_1.default.query(`
-            SELECT cr.id, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
+            SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
                 cr.id_fabricacion, cr.fabricante, cr.mac, cr.tiene_funciones, cr.id_sucursal, 
                 cr.id_departamento, cr.numero_accion, cd.nombre AS nomdepar, s.nombre AS nomsucursal, 
                 e.nombre AS nomempresa, c.descripcion AS nomciudad
@@ -55,20 +55,28 @@ class RelojesControlador {
     CrearRelojes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, id, numero_accion } = req.body;
-                const response = yield database_1.default.query(`
-                INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                    id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, id, 
-                    numero_accion )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                    tien_funciones, id_sucursal, id_departamento, id, numero_accion]);
-                const [reloj] = response.rows;
-                if (reloj) {
-                    return res.status(200).jsonp({ message: 'guardado', reloj: reloj });
+                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, codigo, numero_accion } = req.body;
+                var VERIFICAR_CODIGO = yield database_1.default.query(`
+                SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1
+                `, [codigo.toUpperCase()]);
+                if (VERIFICAR_CODIGO.rows[0] == undefined || VERIFICAR_CODIGO.rows[0] == '') {
+                    const response = yield database_1.default.query(`
+                    INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
+                        id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, codigo, 
+                        numero_accion )
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                    `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                        tien_funciones, id_sucursal, id_departamento, codigo, numero_accion]);
+                    const [reloj] = response.rows;
+                    if (reloj) {
+                        return res.status(200).jsonp({ message: 'guardado', reloj: reloj });
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'mal_registro' });
+                    }
                 }
                 else {
-                    return res.status(404).jsonp({ message: 'mal_registro' });
+                    return res.jsonp({ message: 'existe' });
                 }
             }
             catch (error) {
@@ -95,16 +103,24 @@ class RelojesControlador {
     ActualizarReloj(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, id, numero_accion, id_real } = req.body;
-                yield database_1.default.query(`
-                UPDATE ed_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
-                    modelo = $6, serie = $7, id_fabricacion = $8, fabricante = $9, mac = $10, 
-                    tiene_funciones = $11, id_sucursal = $12, id_departamento = $13, id = $14, 
-                    numero_accion = $15 
-                WHERE id = $16
-                `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                    tien_funciones, id_sucursal, id_departamento, id, numero_accion, id_real]);
-                return res.jsonp({ message: 'actualizado' });
+                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, id_real } = req.body;
+                var VERIFICAR_DISCAPACIDAD = yield database_1.default.query(`
+                SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1 AND NOT id = $2
+                `, [codigo.toUpperCase(), id_real]);
+                if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
+                    yield database_1.default.query(`
+                    UPDATE ed_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
+                        modelo = $6, serie = $7, id_fabricacion = $8, fabricante = $9, mac = $10, 
+                        tiene_funciones = $11, id_sucursal = $12, id_departamento = $13, codigo = $14, 
+                        numero_accion = $15 
+                    WHERE id = $16
+                    `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                        tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, id_real]);
+                    return res.jsonp({ message: 'actualizado' });
+                }
+                else {
+                    return res.jsonp({ message: 'existe' });
+                }
             }
             catch (error) {
                 return res.jsonp({ message: 'error' });
@@ -116,7 +132,7 @@ class RelojesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const RELOJES = yield database_1.default.query(`
-            SELECT cr.id, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
+            SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
                 cr.id_fabricacion, cr.fabricante, cr.mac, cr.tiene_funciones, cr.id_sucursal, 
                 cr.id_departamento, cr.numero_accion, cd.nombre AS nomdepar, s.nombre AS nomsucursal,
                 e.nombre AS nomempresa, c.descripcion AS nomciudad

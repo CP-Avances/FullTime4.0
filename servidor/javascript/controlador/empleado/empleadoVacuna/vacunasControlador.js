@@ -51,6 +51,21 @@ class VacunasControlador {
             }
         });
     }
+    // METODO PARA BUSCAR VACUNA POR FECHA Y TIPO
+    BuscarVacunaFechaTipo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado, id_vacuna, fecha } = req.body;
+            const VACUNA = yield database_1.default.query(`
+            SELECT * FROM eu_empleado_vacunas WHERE fecha = $1 AND id_vacuna = $2 AND id_empleado = $3
+            `, [fecha, id_vacuna, id_empleado]);
+            if (VACUNA.rowCount > 0) {
+                return res.jsonp(VACUNA.rows);
+            }
+            else {
+                res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
     // CREAR REGISTRO DE VACUNACION
     CrearRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -174,20 +189,28 @@ class VacunasControlador {
     CrearTipoVacuna(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre } = req.body;
-                const response = yield database_1.default.query(`
-                INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
-                `, [nombre]);
-                const [vacunas] = response.rows;
-                if (vacunas) {
-                    return res.status(200).jsonp(vacunas);
+                const { vacuna } = req.body;
+                var VERIFICAR_VACUNA = yield database_1.default.query(`
+                SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
+                `, [vacuna.toUpperCase()]);
+                if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
+                    const response = yield database_1.default.query(`
+                    INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
+                    `, [vacuna]);
+                    const [vacunaInsertada] = response.rows;
+                    if (vacunaInsertada) {
+                        return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' });
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'Ups!!! algo slaio mal.', status: '400' });
+                    }
                 }
                 else {
-                    return res.status(404).jsonp({ message: 'error' });
+                    return res.jsonp({ message: 'Registro de tipo de vacuna ya existe en el sistema.', status: '300' });
                 }
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: 'error', status: '500' });
             }
         });
     }

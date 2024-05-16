@@ -125,20 +125,7 @@ export class ValidacionesService {
     }
   }
 
-  Auditar(esquema: string, tabla: string, old: string, nueva: string, accion: string) {
-    let data = {
-      esquema: esquema,
-      tabla: tabla,
-      user: localStorage.getItem('usuario'),
-      old_data: old,
-      new_data: nueva,
-      ip: localStorage.getItem('ip'),
-      accion: accion
-    }
-    this.audit.Auditar(data).subscribe(res => {
-    });
-  }
-
+  // METODO PARA FORMATEAR FECHA
   dia_abreviado: string = 'ddd';
   dia_completo: string = 'dddd';
 

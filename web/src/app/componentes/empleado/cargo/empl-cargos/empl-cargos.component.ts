@@ -10,6 +10,7 @@ import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
 
 @Component({
   selector: 'app-empl-cargos',
@@ -64,6 +65,7 @@ export class EmplCargosComponent implements OnInit {
     public usuario: UsuarioService,
     public ventana: MatDialogRef<EmplCargosComponent>,
     public validar: ValidacionesService,
+    public tipocargo: CatTipoCargosService,
     @Inject(MAT_DIALOG_DATA) public datoEmpleado: any,
   ) {
     this.idEmpleado = datoEmpleado.idEmpleado;
@@ -191,18 +193,40 @@ export class EmplCargosComponent implements OnInit {
       }
     }
 
-    if (form.tipoForm === undefined) {
-      this.IngresarTipoCargo(form, cargo);
+    // VALIDAR DUPLICIDAD EN LOS REGISTROS DE CARGOS
+    this.ValidarFechasCargo(form, cargo);
+
+  }
+
+  // METODO PARA VALIDAR REGISTRO DE FECHAS DE CARGO
+  ValidarFechasCargo(form: any, datos: any) {
+    let verficar = {
+      id_empleado: this.idEmpleado,
+      fecha_verificar: datos.fec_inicio
     }
-    else {
-      this.cargos.RegistrarCargo(cargo).subscribe(res => {
-        this.toastr.success('Operación exitosa.', 'Registro guardado.', {
-          timeOut: 6000,
-        });
-        this.BuscarUsuarioSucursal(form);
-        this.CerrarVentana();
+    this.cargos.BuscarCargoFecha(verficar).subscribe(res => {
+      this.toastr.warning('Existe un cargo vigente en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
       });
-    }
+    }, vacio => {
+      if (form.tipoForm === undefined) {
+        this.VerificarTipoCargo(form, datos);
+      }
+      else {
+        this.AlmacenarDatos(form, datos);
+      }
+    });
+  }
+
+  // METODO PARA ALMACENAR DATOS DE CARGO EN EL SISTEMA
+  AlmacenarDatos(form: any, cargo: any) {
+    this.cargos.RegistrarCargo(cargo).subscribe(res => {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
+        timeOut: 6000,
+      });
+      this.BuscarUsuarioSucursal(form);
+      this.CerrarVentana();
+    });
   }
 
   // METODO PARA REGISTRAR TIPO CARGO
@@ -213,13 +237,7 @@ export class EmplCargosComponent implements OnInit {
       }
       this.cargos.CrearTipoCargo(tipo_cargo).subscribe(res => {
         datos.cargo = res.id;
-        this.cargos.RegistrarCargo(datos).subscribe(res => {
-          this.toastr.success('Operación exitosa.', 'Registro guardado.', {
-            timeOut: 6000,
-          });
-          this.BuscarUsuarioSucursal(form);
-          this.CerrarVentana();
-        });
+        this.AlmacenarDatos(form, datos);
       });
     }
     else {
@@ -227,6 +245,20 @@ export class EmplCargosComponent implements OnInit {
         timeOut: 6000,
       });
     }
+  }
+
+  // VERIFICAR DUPLICIDAD TIPO DE CARGO
+  VerificarTipoCargo(form: any, datos: any) {
+    let verificar = {
+      nombre: (form.cargoForm).toUpperCase()
+    }
+    this.tipocargo.BuscarTipoCargoNombre(verificar).subscribe(res => {
+      this.toastr.warning('El tipo de cargo registrado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
+      });
+    }, vacio => {
+      this.IngresarTipoCargo(form, datos);
+    });
   }
 
   // METODO PARA VALIDAR INGRESO DE NUMEROS
@@ -295,7 +327,6 @@ export class EmplCargosComponent implements OnInit {
         id_empleado: this.idEmpleado,
       }
       this.usuario.BuscarUsuarioSucursalPrincipal(datos).subscribe(res => {
-        //console.log('ver datos ', res[0])
         if (res[0].id_sucursal != form.idSucursalForm) {
           this.ActualizarUsuarioSucursal(form);
         }

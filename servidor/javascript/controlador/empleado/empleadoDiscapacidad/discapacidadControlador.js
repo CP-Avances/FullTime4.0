@@ -97,6 +97,21 @@ class DiscapacidadControlador {
             }
         });
     }
+    // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE
+    BuscarDiscapacidadNombre(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { nombre } = req.body;
+            const TIPO_DISCAPACIDAD = yield database_1.default.query(`
+      SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1
+      `, [nombre]);
+            if (TIPO_DISCAPACIDAD.rowCount > 0) {
+                return res.jsonp(TIPO_DISCAPACIDAD.rows);
+            }
+            else {
+                res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
     list(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const DISCAPACIDAD = yield database_1.default.query(`

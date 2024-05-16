@@ -874,7 +874,7 @@ export class ListaEmpleadosComponent implements OnInit {
     }
     var objeto: any;
     var arregloEmpleado: any = [];
-    arreglo.forEach(obj => {
+    arreglo.forEach((obj: any) => {
       var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
       var genero = this.GeneroSelect[obj.genero - 1];
       var estado = this.EstadoSelect[obj.estado - 1];
@@ -1094,39 +1094,26 @@ export class ListaEmpleadosComponent implements OnInit {
 
               this.rest.EliminarEmpleados(datos.id).subscribe(res => {
                 if (res.message === 'error') {
-                  this.toastr.error('No se puede eliminar.', '', {
+                  this.toastr.error('Existen datos relacionados con ' + datos.empleado + '.', 'No fue posible eliminar.', {
                     timeOut: 6000,
                   });
-
                   this.contador = this.contador - 1;
-
                 } else {
-
                   if (!this.ingresar) {
                     this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
                       timeOut: 6000,
                     });
                     this.ingresar = true;
                   }
-
                   this.GetEmpleados();
                 }
-
               });
-
-              
-
-              //this.GetEmpleados();
             }
             )
-
-
             this.btnCheckHabilitar = false;
             this.empleadosEliminarActivos=[];
             this.selectionUno.clear();
             this.GetEmpleados();
-
-
           } else {
             this.toastr.warning('No ha seleccionado USUARIOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -1148,84 +1135,54 @@ export class ListaEmpleadosComponent implements OnInit {
 
 
   ConfirmarDeleteMultipleInactivos() {
-
     this.ingresar = false;
     this.contador = 0;
-
     let EliminarInactivos = this.selectionDos.selected.map(obj => {
       return {
         id: obj.id,
         empleado: obj.nombre + ' ' + obj.apellido
       }
     })
-
-
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-
-
           if (EliminarInactivos.length != 0) {
-
             EliminarInactivos.forEach((datos: any) => {
-
               this.empleado = this.empleado.filter(item => item.id !== datos.id);
-
               this.contador = this.contador + 1;
-
-
               this.rest.EliminarEmpleados(datos.id).subscribe(res => {
                 if (res.message === 'error') {
-                  this.toastr.error('No se puede eliminar.', '', {
+                  this.toastr.error('Existen datos relacionados con ' + datos.empleado + '.', 'No fue posible eliminar.', {
                     timeOut: 6000,
                   });
-
                   this.contador = this.contador - 1;
-
                 } else {
-
                   if (!this.ingresar) {
                     this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
                       timeOut: 6000,
                     });
                     this.ingresar = true;
                   }
-
                   this.GetEmpleados();
                 }
-
               });
-
-              //this.GetEmpleados();
             }
             )
             this.btnCheckDeshabilitado = false;
-
-
             this.empleadosEliminarActivos=[];
             this.selectionUno.clear();
             this.GetEmpleados();
-
-
           } else {
             this.toastr.warning('No ha seleccionado USUARIOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
-
           this.selectionDos.clear();
-
         } else {
           this.router.navigate(['/empleados']);
-
         }
-
       }
       );
-    //this.GetEmpleados();
-
-
   }
 
 
