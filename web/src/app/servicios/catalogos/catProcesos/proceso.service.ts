@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment'
+import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -25,8 +26,8 @@ export class ProcesoService {
     return this.http.post(`${environment.url}/proceso`, data);
   }
 
-  deleteProcesoRest(id: number){
-    return this.http.delete(`${environment.url}/proceso/eliminar/${id}`);
+  deleteProcesoRest(id: any){
+    return this.http.delete(`${environment.url}/proceso/eliminar/${id}`).pipe(catchError(id));
   }
 
   getIdProcesoPadre(procesoPadre: string) {

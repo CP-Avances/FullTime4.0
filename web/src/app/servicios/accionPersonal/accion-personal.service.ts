@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -28,8 +29,8 @@ export class AccionPersonalService {
     return this.http.put(`${environment.url}/accionPersonal`, datos);
   }
 
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/accionPersonal/eliminar/${id}`);
+  EliminarRegistro(id: any) {
+    return this.http.delete(`${environment.url}/accionPersonal/eliminar/${id}`).pipe(catchError(id));
   }
 
   BuscarDatosTipoEdicion(id: any) {

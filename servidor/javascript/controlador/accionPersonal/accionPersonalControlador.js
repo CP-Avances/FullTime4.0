@@ -194,7 +194,7 @@ class AccionPersonalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const ACCION = yield database_1.default.query(`
-            SELECT * FROM map_detalle_tipo_accion_personal WHERE NOT id_tipo = $1
+            SELECT * FROM map_detalle_tipo_accion_personal WHERE NOT id_tipo_accion_personal = $1
             `, [id]);
             if (ACCION.rowCount > 0) {
                 return res.jsonp(ACCION.rows);
@@ -233,11 +233,16 @@ class AccionPersonalControlador {
     }
     EliminarTipoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-            DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
-            `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                const id = req.params.id;
+                yield database_1.default.query(`
+                DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
+                `, [id]);
+                res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
         });
     }
     // TABLA ACCION_PERSONAL_EMPLEADO
