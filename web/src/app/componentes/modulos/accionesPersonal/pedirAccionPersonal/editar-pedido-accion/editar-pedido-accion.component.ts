@@ -234,11 +234,11 @@ export class EditarPedidoAccionComponent implements OnInit {
         console.log("datos", this.datosPedido);
         this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empleado)
           .subscribe((data1) => {
-            this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empl_uno)
+            this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empleado_uno)
               .subscribe((data2) => {
-                this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empl_dos)
+                this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empleado_dos)
                   .subscribe((data3) => {
-                    this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empl_responsable)
+                    this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empleado_responsable)
                       .subscribe((data4) => {
                         this.restAccion.BuscarDatosPedidoCiudades(this.datosPedido[0].id_ciudad)
                           .subscribe((data5) => {
@@ -261,8 +261,8 @@ export class EditarPedidoAccionComponent implements OnInit {
                               numPartidaIForm: this.datosPedido[0].numero_partida_individual,
                             });
                             this.thirdFormGroup.patchValue({
-                              actaForm: this.datosPedido[0].act_final_concurso,
-                              fechaActaForm: this.datosPedido[0].acta_final_concurso,
+                              actaForm: this.datosPedido[0].acta_final_concurso,
+                              fechaActaForm: this.datosPedido[0].fecha_acta_final_concurso,
                               idEmpleadoHForm: data2[0].apellido + " " + data2[0].nombre,
                               idEmpleadoGForm: data3[0].apellido + " " + data3[0].nombre,
                               idEmpleadoRForm: data4[0].apellido + " " + data4[0].nombre,
