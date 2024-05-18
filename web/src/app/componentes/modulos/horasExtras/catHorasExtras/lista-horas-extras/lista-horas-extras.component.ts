@@ -92,6 +92,7 @@ export class ListaHorasExtrasComponent implements OnInit {
   formato_hora: string = 'HH:mm:ss';
 
   BuscarHora() {
+    this.horasExtras = [];
     // id_tipo_parametro Formato hora = 26
     this.parametro.ListarDetalleParametros(26).subscribe(
       res => {
@@ -139,6 +140,7 @@ export class ListaHorasExtrasComponent implements OnInit {
 
   // METODO PARA CONSULTAR CONFIGURACION HORAS EXTRAS
   ObtenerHorasExtras(formato_hora: string) {
+    this.horasExtras = [];
     this.rest.ListarHorasExtras().subscribe(datos => {
       this.horasExtras = datos;
 

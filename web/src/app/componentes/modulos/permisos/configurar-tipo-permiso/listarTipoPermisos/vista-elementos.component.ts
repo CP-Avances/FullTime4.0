@@ -277,22 +277,22 @@ export class VistaElementosComponent implements OnInit {
               ],
               ...this.tipoPermiso.map(obj => {
                 var descuento = this.DescuentoSelect[obj.tipo_descuento - 1];
-                var acceso = this.AccesoEmpleadoSelect[obj.acce_empleado - 1];
-                var fecha = this.obtenerFecha(obj.fecha);
+                var acceso = this.AccesoEmpleadoSelect[obj.solicita_empleado - 1];
+                var fecha = this.obtenerFecha(obj.fecha_fin);
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTable' },
-                  { text: obj.num_dia_maximo, style: 'itemsTable' },
-                  { text: obj.num_hora_maximo, style: 'itemsTable' },
+                  { text: obj.dias_maximo_permiso, style: 'itemsTable' },
+                  { text: obj.horas_maximo_permiso, style: 'itemsTable' },
                   { text: acceso, style: 'itemsTable' },
-                  { text: obj.num_dia_ingreso, style: 'itemsTable' },
+                  { text: obj.dias_anticipar_permiso, style: 'itemsTable' },
                   { text: descuento, style: 'itemsTable' },
-                  { text: obj.almu_incluir == true ? 'Sí' : 'No', style: 'itemsTable' },
+                  { text: obj.incluir_minutos_comida == true ? 'Sí' : 'No', style: 'itemsTable' },
                   { text: obj.legalizar == true ? 'Sí' : 'No', style: 'itemsTable' },
-                  { text: obj.gene_justificacion == true ? 'Sí' : 'No', style: 'itemsTable' },
-                  { text: obj.num_dia_justifica, style: 'itemsTable' },
+                  { text: obj.justificar == true ? 'Sí' : 'No', style: 'itemsTable' },
+                  { text: obj.dias_justificar, style: 'itemsTable' },
                   { text: obj.documento == true ? 'Sí' : 'No', style: 'itemsTable' },
-                  { text: obj.fec_validar == true ? 'Sí' : 'No', style: 'itemsTable' },
+                  { text: obj.fecha_restriccion == true ? 'Sí' : 'No', style: 'itemsTable' },
                   { text: fecha, style: 'itemsTable' },
                 ];
               })
@@ -342,23 +342,23 @@ export class VistaElementosComponent implements OnInit {
     var arregloTipoPermisos: any = [];
     this.tipoPermiso.forEach((obj: any) => {
       var descuento = this.DescuentoSelect[obj.tipo_descuento - 1];
-      var acceso = this.AccesoEmpleadoSelect[obj.acce_empleado - 1];
-      var fecha = this.obtenerFecha(obj.fecha);
+      var acceso = this.AccesoEmpleadoSelect[obj.solicita_empleado - 1];
+      var fecha = this.obtenerFecha(obj.fecha_fin);
       objeto = {
         "tipo_permiso": {
           '@id': obj.id,
           "descripcion": obj.descripcion,
-          "numfecha_dia_maximo": obj.num_dia_maximo,
-          "num_hora_maximo": obj.num_hora_maximo,
+          "numfecha_dia_maximo": obj.dias_maximo_permiso,
+          "num_hora_maximo": obj.horas_maximo_permiso,
           "acce_empleado": acceso,
-          "num_dia_ingreso": obj.num_dia_ingreso,
+          "num_dia_ingreso": obj.dias_anticipar_permiso,
           "tipo_descuento": descuento,
-          "almu_incluir": obj.almu_incluir,
+          "almu_incluir": obj.incluir_minutos_comida,
           "legalizar": obj.legalizar,
-          "gene_justificacion": obj.gene_justificacion,
-          "num_dia_justifica": obj.num_dia_justifica,
+          "gene_justificacion": obj.justificar,
+          "num_dia_justifica": obj.dias_justificar,
           "documento": obj.documento,
-          "fec_validar": obj.fec_validar,
+          "fec_validar": obj.fecha_restriccion,
           "fecha": fecha,
         }
       }
