@@ -18,13 +18,13 @@ class ProcesoControlador {
     list(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const Sin_proc_padre = yield database_1.default.query(`
-      SELECT * FROM map_cat_procesos AS p 
+      SELECT p.id, p.nombre, p.nivel FROM map_cat_procesos AS p 
       WHERE p.proceso_padre IS NULL 
       ORDER BY p.nombre ASC
       `);
             const Con_proc_padre = yield database_1.default.query(`
       SELECT p.id, p.nombre, p.nivel, nom_p.nombre AS proc_padre 
-      FROM map_cat_procesos AS p, NombreProcesos AS nom_p 
+      FROM map_cat_procesos AS p, nombreprocesos AS nom_p 
       WHERE p.proceso_padre = nom_p.id 
       ORDER BY p.nombre ASC
       `);

@@ -147,7 +147,9 @@ export class PrincipalProcesoComponent implements OnInit {
       {
         width: '450px', data: { datosP: datosSeleccionados, lista: true }
 
-      }).disableClose = true;
+      }).afterClosed().subscribe(items => {
+        this.ObtenerProcesos();
+      });
   }
 
   // FUNCION PARA ELIMINAR REGISTROS

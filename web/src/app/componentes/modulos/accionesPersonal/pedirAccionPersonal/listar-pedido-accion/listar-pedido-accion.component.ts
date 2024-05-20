@@ -4102,9 +4102,9 @@ export class ListarPedidoAccionComponent implements OnInit {
                     text: obj.apellido + " " + obj.nombre,
                     style: "itemsTable",
                   },
-                  { text: obj.fecha_creacion, style: "itemsTable" },
-                  { text: obj.fecha_rige_desde, style: "itemsTable" },
-                  { text: obj.fecha_rige_hasta, style: "itemsTable" },
+                  { text: obj.fecCreacion_, style: "itemsTable" },
+                  { text: obj.fecDesde_, style: "itemsTable" },
+                  { text: obj.fecHasta_, style: "itemsTable" },
                   { text: obj.numero_partida_empresa, style: "itemsTable" },
                 ];
               }),
@@ -4136,7 +4136,7 @@ export class ListarPedidoAccionComponent implements OnInit {
           Fecha_creacion: obj.fecCreacion_,
           Rige_desde: obj.fecDesde_,
           Rige_hasta: obj.fecHasta_,
-          Numero_partida: obj.num_partida,
+          Numero_partida: obj.numero_partida_empresa,
         };
       })
     );
@@ -4174,7 +4174,7 @@ export class ListarPedidoAccionComponent implements OnInit {
           fecha_creacion: obj.fecCreacion_,
           rige_desde: obj.fecDesde_,
           rige_hasta: obj.fecHasta_,
-          numero_partida: obj.num_partida,
+          numero_partida: obj.numero_partida_empresa,
         },
       };
       arregloPedidos.push(objeto);
@@ -4202,7 +4202,7 @@ export class ListarPedidoAccionComponent implements OnInit {
           Fecha_creacion: obj.fecCreacion_,
           Rige_desde: obj.fecDesde_,
           Rige_hasta: obj.fecHasta_,
-          Numero_partida: obj.num_partida,
+          Numero_partida: obj.numero_partida_empresa,
         };
       })
     );
