@@ -6,7 +6,7 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button *ngIf="!Datos_modalidad_laboral" id="btn-raised" class="btn btn-sm"
+                    <button *ngIf="!Datos_discapacidad" id="btn-raised" class="btn btn-sm"
                         (click)="AbrirVentanaRegistrarDiscapacidad()">
                         Crear Discapacidad
                     </button>
@@ -30,17 +30,23 @@
                         <div class="d-flex flex-wrap justify-content-around"
                             style="text-align: center; justify-content: center;">
                             <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
-                                <input type="file" [formControl]="archivoForm" id="file"
+                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                 <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
                                     style="height: 65px; padding-top: 25px"
                                     matTooltip="Dar click para selecionar plantilla y cargar registros.">
                                     Subir plantilla
                                 </label>
+                                <label for="file" matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                    style="height: 64px; padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre Modalidad.">
+                                    Subir nueva plantilla
+                                </label>
                             </form>
                         </div>
                     </div>
-                    <div class="col-md" *ngIf="!Datos_modalidad_laboral" style="padding-top: 5px; padding-bottom: 5px;">
+                    <div class="col-md" *ngIf="!Datos_discapacidad" style="padding-top: 5px; padding-bottom: 5px;">
                         <div class="d-flex flex-wrap justify-content-around">
                             <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                 style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
@@ -50,13 +56,23 @@
                             </a>
                         </div>
                     </div>
+                    <div class="col-12 col-md" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around"
+                            style="text-align: center; justify-content: center;">
+                            <button *ngIf="Datos_discapacidad && messajeExcel != 'error'" id="descargar"
+                                class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
+                                matTooltipPosition="right" matTooltip="Guardar registro multiple.">
+                                Registrar
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </mat-card>
         </div>
     </div>
 </div>
 
-<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!Datos_modalidad_laboral">
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!Datos_discapacidad">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <div class="w-100 bd-highlight">
@@ -97,7 +113,7 @@
                         <td>
                             <mat-form-field id="t-inputs">
                                 <input matInput placeholder="Buscar" [formControl]="nombreF"
-                                    [(ngModel)]="filtradoNombre" (keypress)="IngresarSoloLetras($event)">
+                                    [(ngModel)]="filtradoDiscapacidad" (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
@@ -108,7 +124,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let discapacidad of discapacidades| filtrosNombres: filtradoNombre |  paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let discapacidad of discapacidades| filtrosNombres: filtradoDiscapacidad |  paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionDiscapacidad.toggle(discapacidad) : null"
@@ -159,5 +175,50 @@
                 <p> Reportes Tipo Discapacidad</p>
             </div>
         </div>
+    </div>
+</div>
+
+<!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+<div class="container" style="padding-top: 10px; margin-bottom: 25px;"
+    *ngIf="Datos_discapacidad && messajeExcel != 'error'">
+    <app-definicion-plantilla>
+    </app-definicion-plantilla>
+</div>
+
+<!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE DISCAPACIDAD ------------------------------------------------->
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;"
+    *ngIf="Datos_discapacidad && messajeExcel != 'error'">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">REGISTRO MULTIPLE</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center; font-size: 13px;">
+                        <th scope="col">Observación</th>
+                        <th scope="col">Item</th>
+                        <th scope="col">Discapacidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let dis of Datos_discapacidad | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                        <td style="font-size: 12px;">
+                            <div style="width: 270px; margin: auto;">
+                                <div id="t-editar" class="circulo"
+                                    [style.background-color]="stiloCelda(dis.observacion)"></div>
+                                {{dis.observacion}}
+                            </div>
+                        </td>
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                            {{dis.fila}}</td>
+                        <td [style.color]="stiloTextoCelda(dis.discapacidad)" style="font-size: 12px;">
+                            {{dis.discapacidad}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator [length]="Datos_discapacidad.length" [pageSize]="tamanio_paginaMul"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
+        </mat-paginator>
     </div>
 </div>

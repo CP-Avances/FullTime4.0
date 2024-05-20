@@ -35,5 +35,15 @@ export class CatDiscapacidadService {
     return this.http.delete<any>(`${environment.url}/discapacidades/eliminar/${id}`).pipe(catchError(id));
   }
 
+  // METODO PARA LEER LOS DATOS DE LA PLANTILLA DE EXCEL
+  RevisarFormato(formData) {
+    return this.http.post<any>(environment.url + '/discapacidades/upload/revision', formData);
+  }
+
+  // METODO PARA INGRESAR O GUARDAR LOS DATOS OK EN LA BASE DE DATOS
+  subirArchivoExcel(formData) {
+    return this.http.post<any>(`${environment.url}/discapacidades/cargar_plantilla`, formData);
+  }
+
 
 }

@@ -34,7 +34,7 @@ import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/
 
 export class CatVacunasComponent implements OnInit {
 
-  filtradoNombre = ''; // VARIABLE DE BUSQUEDA DE DATOS
+  filtradoVacunas = ''; // VARIABLE DE BUSQUEDA DE DATOS
   vacunasEliminar: any = [];
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
@@ -121,6 +121,7 @@ export class CatVacunasComponent implements OnInit {
       nombreForm: '',
     });
     this.ObtenerVacuna();
+    this.filtradoVacunas = '';
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
   }
@@ -158,13 +159,7 @@ export class CatVacunasComponent implements OnInit {
     this.numero_paginaMul = e.pageIndex + 1
   }
 
-  // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
-  nameFile: string;
-  archivoSubido: Array<File>;
-  mostrarbtnsubir: boolean = false;
-
-  Datos_vacunas: any
-
+  
   // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
@@ -177,6 +172,144 @@ export class CatVacunasComponent implements OnInit {
       return 0;
     }
     array.sort(compare);
+  }
+
+   // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
+   nameFile: string;
+   archivoSubido: Array<File>;
+   mostrarbtnsubir: boolean = false;
+   // METODO PARA SELECCIONAR PLANTILLA DE DATOS -----------------------------------------------------------------
+   FileChange(element: any) {
+     this.archivoSubido = [];
+     this.nameFile = '';
+     this.archivoSubido = element.target.files;
+     this.nameFile = this.archivoSubido[0].name;
+     let arrayItems = this.nameFile.split(".");
+     let itemExtencion = arrayItems[arrayItems.length - 1];
+     let itemName = arrayItems[0].slice(0, 25);
+     console.log('itemName: ', itemName);
+     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
+       if (itemName.toLowerCase() == 'discapacidad_vacunas') {
+         this.numero_paginaMul = 1;
+         this.tamanio_paginaMul = 5;
+         this.Revisarplantilla();
+       } else {
+         this.toastr.error('Seleccione plantilla con nombre discapacidad_vacunas', 'Plantilla seleccionada incorrecta', {
+           timeOut: 6000,
+         });
+ 
+         this.nameFile = '';
+       }
+     } else {
+       this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+         timeOut: 6000,
+       });
+ 
+       this.nameFile = '';
+     }
+     this.archivoForm.reset();
+     this.mostrarbtnsubir = true;
+   }
+
+  Datos_vacunas: any
+  listaVacunasCorrectas: any = [];
+  messajeExcel: string = '';
+  Revisarplantilla() {
+    this.listaVacunasCorrectas = [];
+    let formData = new FormData();
+    for (var i = 0; i < this.archivoSubido.length; i++) {
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+    }
+
+    this.progreso = true;
+
+     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+     this.rest.RevisarFormato(formData).subscribe(res => {
+      this.Datos_vacunas = res.data;
+      this.messajeExcel = res.message;
+      console.log('probando plantilla vacunas', this.Datos_vacunas, ' -  ',this.messajeExcel);
+
+      if (this.messajeExcel == 'error') {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      } else {
+        this.Datos_vacunas.forEach(item => {
+          if (item.observacion.toLowerCase() == 'ok') {
+            this.listaVacunasCorrectas.push(item);
+          }
+        });
+      }
+    }, error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+      this.progreso = false;
+    }, () => {
+      this.progreso = false;
+    });
+  }
+
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
+  colorCelda: string = ''
+  stiloCelda(observacion: string): string {
+    let arrayObservacion = observacion.split(" ");
+    if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya existe en el sistema') {
+      return 'rgb(239, 203, 106)';
+    } else if (arrayObservacion[0] == 'Vacunas ') {
+      return 'rgb(242, 21, 21)';
+    } else {
+      return 'rgb(242, 21, 21)';
+    }
+  }
+  colorTexto: string = '';
+  stiloTextoCelda(texto: string): string {
+    let arrayObservacion = texto.split(" ");
+    if (arrayObservacion[0] == 'No') {
+      return 'rgb(255, 80, 80)';
+    } else {
+      return 'black'
+    }
+  }
+
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    console.log('listaContratosCorrectas: ', this.listaVacunasCorrectas.length);
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.subirDatosPlantilla();
+        }
+      });
+  }
+
+  subirDatosPlantilla() {
+    if (this.listaVacunasCorrectas.length > 0) {
+      this.rest.subirArchivoExcel(this.listaVacunasCorrectas).subscribe(response => {
+        console.log('respuesta: ', response);
+        this.toastr.success('Operación exitosa.', 'Plantilla de vacunas importada.', {
+          timeOut: 3000,
+        });
+        //window.location.reload();
+        this.LimpiarCampos();
+        this.archivoForm.reset();
+        this.nameFile = '';
+      });
+    } else {
+      console.log('entro en salir')
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+      this.nameFile = '';
+    }
   }
 
 

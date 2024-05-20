@@ -374,8 +374,8 @@ class ContratoEmpleadoControlador {
             pais: '',
             regimen_la: '',
             modalida_la: '',
-            fecha_ingreso: '',
-            fecha_salida: '',
+            fecha_inicio: '',
+            fecha_final: '',
             control_asis: '',
             control_vaca: '',
             observacion: ''
@@ -388,18 +388,18 @@ class ContratoEmpleadoControlador {
 
         // LECTURA DE LOS DATOS DE LA PLANTILLA
         plantilla.forEach(async (dato: any, indice: any, array: any) => {
-            var { item, cedula, pais, regimen_laboral, modalidad_laboral, fecha_ingreso, fecha_salida,
+            var { item, cedula, pais, regimen_laboral, modalidad_laboral, fecha_inicio, fecha_final,
                 controlar_asistencia, controlar_vacaciones, tipo_cargo } = dato;
 
             //Verificar que el registo no tenga datos vacios
             if ((item != undefined && item != '') && (cedula != undefined) && (pais != undefined) &&
-                (regimen_laboral != undefined) && (modalidad_laboral != undefined) && (fecha_ingreso != undefined) &&
-                (fecha_salida != undefined) && (controlar_asistencia != undefined) && (controlar_vacaciones != undefined) &&
+                (regimen_laboral != undefined) && (modalidad_laboral != undefined) && (fecha_inicio != undefined) &&
+                (fecha_final != undefined) && (controlar_asistencia != undefined) && (controlar_vacaciones != undefined) &&
                 (tipo_cargo != undefined)) {
                 data.fila = item;
                 data.cedula = cedula; data.pais = pais;
                 data.regimen_la = regimen_laboral; data.modalida_la = modalidad_laboral;
-                data.fecha_ingreso = fecha_ingreso; data.fecha_salida = fecha_salida;
+                data.fecha_inicio = fecha_inicio; data.fecha_final = fecha_final;
                 data.control_asis = controlar_asistencia; data.control_vaca = controlar_vacaciones;
 
                 data.observacion = 'no registrado';
@@ -411,13 +411,13 @@ class ContratoEmpleadoControlador {
                         data.observacion = 'La cédula ingresada no es válida';
                     } else {
                         // Verificar si la variable tiene el formato de fecha correcto con moment
-                        if (moment(fecha_ingreso, 'YYYY-MM-DD', true).isValid()) { } else {
-                            data.observacion = 'Formato de fecha ingreso incorrecto (YYYY-MM-DD)';
+                        if (moment(fecha_inicio, 'YYYY-MM-DD', true).isValid()) { } else {
+                            data.observacion = 'Formato de fecha inicio incorrecta (YYYY-MM-DD)';
                         }
 
                         // Verificar si la variable tiene el formato de fecha correcto con moment
-                        if (moment(fecha_salida, 'YYYY-MM-DD', true).isValid()) { } else {
-                            data.observacion = 'Formato de fecha salida incorrecto (YYYY-MM-DD)';
+                        if (moment(fecha_final, 'YYYY-MM-DD', true).isValid()) { } else {
+                            data.observacion = 'Formato de fecha final incorrecta (YYYY-MM-DD)';
                         }
                     }
                 } else {
@@ -430,7 +430,7 @@ class ContratoEmpleadoControlador {
                 data.fila = item;
                 data.cedula = cedula; data.pais = pais;
                 data.regimen_la = regimen_laboral; data.modalida_la = modalidad_laboral;
-                data.fecha_ingreso = fecha_ingreso; data.fecha_salida = fecha_salida;
+                data.fecha_inicio = fecha_inicio; data.fecha_final = fecha_final;
                 data.control_asis = controlar_asistencia; data.control_vaca = controlar_vacaciones;
 
                 data.observacion = 'no registrado';
@@ -451,13 +451,13 @@ class ContratoEmpleadoControlador {
                     data.modalida_la = 'No registrado';
                     data.observacion = 'Modalida laboral ' + data.observacion;
                 }
-                if (fecha_ingreso == undefined) {
-                    data.fecha_ingreso = 'No registrado';
-                    data.observacion = 'Fecha ingreso ' + data.observacion;
+                if (fecha_inicio == undefined) {
+                    data.fecha_inicio = 'No registrado';
+                    data.observacion = 'Fecha inicio ' + data.observacion;
                 }
-                if (fecha_salida == undefined) {
-                    data.fecha_salida = 'No registrado';
-                    data.observacion = 'Fecha salida ' + data.observacion;
+                if (fecha_final == undefined) {
+                    data.fecha_final = 'No registrado';
+                    data.observacion = 'Fecha final ' + data.observacion;
                 }
                 if (controlar_asistencia == undefined) {
                     data.control_asis = 'No registrado';
@@ -479,15 +479,15 @@ class ContratoEmpleadoControlador {
                             data.observacion = 'La cédula ingresada no es válida';
                         } else {
                             // Verificar si la variable tiene el formato de fecha correcto con moment
-                            if (data.fecha_ingreso != 'No registrado') {
-                                if (moment(fecha_ingreso, 'YYYY-MM-DD', true).isValid()) { } else {
-                                    data.observacion = 'Formato de fecha ingreso incorrecto (YYYY-MM-DD)';
+                            if (data.fecha_inicio != 'No registrado') {
+                                if (moment(fecha_inicio, 'YYYY-MM-DD', true).isValid()) { } else {
+                                    data.observacion = 'Formato de fecha inicio incorrecta (YYYY-MM-DD)';
                                 }
                             } else if
                                 // Verificar si la variable tiene el formato de fecha correcto con moment
-                                (data.fecha_salida != 'No registrado') {
-                                if (moment(fecha_salida, 'YYYY-MM-DD', true).isValid()) { } else {
-                                    data.observacion = 'Formato de fecha salida incorrecto (YYYY-MM-DD)';
+                                (data.fecha_final != 'No registrado') {
+                                if (moment(fecha_final, 'YYYY-MM-DD', true).isValid()) { } else {
+                                    data.observacion = 'Formato de fecha final incorrecto (YYYY-MM-DD)';
                                 }
                             } else if (data.control_vaca != 'No registrado') {
                                 if (data.control_vaca.toUpperCase() != 'NO' && data.control_vaca.toUpperCase() != 'SI') {
@@ -540,7 +540,7 @@ class ContratoEmpleadoControlador {
                                 ($2 BETWEEN fecha_ingreso and fecha_salida OR $3 BETWEEN fecha_ingreso AND fecha_salida OR 
                                 fecha_ingreso BETWEEN $2 AND $3)
                             `
-                            , [VERIFICAR_CEDULA.rows[0].id, valor.fecha_ingreso, valor.fecha_salida])
+                            , [VERIFICAR_CEDULA.rows[0].id, valor.fecha_inicio, valor.fecha_final])
 
                         if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
                             valor.observacion = 'Existe un contrato vigente en esas fechas'
@@ -567,8 +567,8 @@ class ContratoEmpleadoControlador {
                                                     `
                                                     , [valor.modalida_la.toUpperCase()])
                                                 if (VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != '') {
-                                                    if(moment(valor.fecha_ingreso).format('YYYY-MM-DD') >= moment(valor.fecha_salida).format('YYYY-MM-DD')){
-                                                        valor.observacion = 'La fecha de ingreso no puede ser menor o igual a la fecha salida'
+                                                    if(moment(valor.fecha_inicio).format('YYYY-MM-DD') >= moment(valor.fecha_final).format('YYYY-MM-DD')){
+                                                        valor.observacion = 'La fecha de ingreso no puede ser menor o igual a la fecha '
                                                     }
                                                 } else {
                                                     valor.observacion = 'Modalidad Laboral no existe en el sistema'
@@ -662,7 +662,7 @@ class ContratoEmpleadoControlador {
         plantilla.forEach(async (data: any) => {
             console.log('data: ', data);
             // Datos que se guardaran de la plantilla ingresada
-            const { item, cedula, pais, regimen_la, modalida_la, fecha_ingreso, fecha_salida,
+            const { item, cedula, pais, regimen_la, modalida_la, fecha_inicio, fecha_final,
                 control_asis, control_vaca } = data;
 
             const ID_EMPLEADO: any = await pool.query(
@@ -703,8 +703,8 @@ class ContratoEmpleadoControlador {
             console.log('id_empleado: ', id_empleado);
             console.log('id_regimen: ', id_regimen);
             console.log('id_tipo_contrato: ', id_tipo_contrato);
-            console.log('fecha ingreso: ', fecha_ingreso);
-            console.log('fecha final: ', fecha_salida);
+            console.log('fecha inicio: ', fecha_inicio);
+            console.log('fecha final: ', fecha_final);
             console.log('vacaciones: ', vaca_controla);
             console.log('asistencias: ', asis_controla);
 
@@ -717,7 +717,7 @@ class ContratoEmpleadoControlador {
                     controlar_asistencia, id_regimen, id_modalidad_laboral) 
                 VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
                 `
-                , [id_empleado, fecha_ingreso, fecha_salida, vaca_controla, asis_controla, id_regimen,
+                , [id_empleado, fecha_inicio, fecha_final, vaca_controla, asis_controla, id_regimen,
                     id_tipo_contrato]);
 
             const [contrato] = response.rows;

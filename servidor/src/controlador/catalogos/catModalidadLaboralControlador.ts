@@ -234,6 +234,7 @@ class ModalidaLaboralControlador {
                 }
                 return res.jsonp({ message: mensaje, data: listModalidad });
             }, 1000)
+            
         } catch (error) {
             return res.status(500).jsonp({ message: error });
         }

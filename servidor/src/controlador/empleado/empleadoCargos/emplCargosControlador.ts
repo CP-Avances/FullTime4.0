@@ -393,11 +393,11 @@ class EmpleadoCargosControlador {
           } else {
             // Verificar si la variable tiene el formato de fecha correcto con moment
             if (moment(fecha_inicio, 'YYYY-MM-DD', true).isValid()) { } else {
-              data.observacion = 'Formato de fecha ingreso incorrecto (YYYY-MM-DD)';
+              data.observacion = 'Formato de fecha inicio incorrecto (YYYY-MM-DD)';
             }
             // Verificar si la variable tiene el formato de fecha correcto con moment
             if (moment(fecha_final, 'YYYY-MM-DD', true).isValid()) { } else {
-              data.observacion = 'Formato de fecha salida incorrecto (YYYY-MM-DD)';
+              data.observacion = 'Formato de fecha final incorrecto (YYYY-MM-DD)';
             }
 
             //Verifica el valor del suelo que sea solo numeros

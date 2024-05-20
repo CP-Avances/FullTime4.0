@@ -32,5 +32,14 @@ export class CatVacunasService {
     return this.http.delete<any>(`${environment.url}/vacunasTipos/eliminar/${id}`).pipe( catchError(id));
   }
  
+   // METODO PARA LEER LOS DATOS DE LA PLANTILLA DE EXCEL
+   RevisarFormato(formData) {
+    return this.http.post<any>(environment.url + '/vacunasTipos/upload/revision', formData);
+  }
+
+  // METODO PARA INGRESAR O GUARDAR LOS DATOS OK EN LA BASE DE DATOS
+  subirArchivoExcel(formData) {
+    return this.http.post<any>(`${environment.url}/vacunasTipos/cargar_plantilla`, formData);
+  }
 
 }
