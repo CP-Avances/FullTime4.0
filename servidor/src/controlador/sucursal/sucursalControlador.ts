@@ -1,13 +1,13 @@
+import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 
 import pool from '../../database';
 import excel from 'xlsx';
-import fs from 'fs';
 import path from 'path';
-
+import fs from 'fs';
 
 class SucursalControlador {
 
@@ -16,7 +16,7 @@ class SucursalControlador {
     const { nombre } = req.body;
     const SUCURSAL = await pool.query(
       `
-      SELECT * FROM sucursales WHERE UPPER(nombre) = $1
+      SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
       `
       , [nombre]);
 
@@ -24,7 +24,7 @@ class SucursalControlador {
       return res.jsonp(SUCURSAL.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
@@ -39,7 +39,7 @@ class SucursalControlador {
   
       const response: QueryResult = await pool.query(
         `
-        INSERT INTO sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
+        INSERT INTO e_sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
         `
         , [nombre, id_ciudad, id_empresa]);
   
@@ -47,7 +47,7 @@ class SucursalControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'sucursales',
+        tabla: 'e_sucursales',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
@@ -81,12 +81,12 @@ class SucursalControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM sucursales WHERE id = $1', [id]);
+      const consulta = await pool.query('SELECT * FROM e_sucursales WHERE id = $1', [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'sucursales',
+          tabla: 'e_sucursales',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -102,13 +102,13 @@ class SucursalControlador {
 
       await pool.query(
         `
-        UPDATE sucursales SET nombre = $1, id_ciudad = $2 WHERE id = $3
+        UPDATE e_sucursales SET nombre = $1, id_ciudad = $2 WHERE id = $3
         `
         , [nombre, id_ciudad, id]);
   
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'sucursales',
+        tabla: 'e_sucursales',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -132,7 +132,7 @@ class SucursalControlador {
     const { id_empresa } = req.params;
     const SUCURSAL = await pool.query(
       `
-      SELECT * FROM sucursales WHERE id_empresa = $1
+      SELECT * FROM e_sucursales WHERE id_empresa = $1
       `
       , [id_empresa]);
     if (SUCURSAL.rowCount > 0) {
@@ -148,7 +148,7 @@ class SucursalControlador {
     const SUCURSAL = await pool.query(
       `
       SELECT s.id, s.nombre, s.id_ciudad, c.descripcion, s.id_empresa, ce.nombre AS nomempresa
-      FROM sucursales s, ciudades c, cg_empresa ce
+      FROM e_sucursales s, e_ciudades c, e_empresa ce
       WHERE s.id_ciudad = c.id AND s.id_empresa = ce.id
       ORDER BY s.id
       `
@@ -172,12 +172,12 @@ class SucursalControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM sucursales WHERE id = $1', [id]);
+      const consulta = await pool.query('SELECT * FROM e_sucursales WHERE id = $1', [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'sucursales',
+          tabla: 'e_sucursales',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
@@ -193,13 +193,13 @@ class SucursalControlador {
 
       await pool.query(
         `
-        DELETE FROM sucursales WHERE id = $1
+        DELETE FROM e_sucursales WHERE id = $1
         `
         , [id]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'sucursales',
+        tabla: 'e_sucursales',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -224,7 +224,7 @@ class SucursalControlador {
     const SUCURSAL = await pool.query(
       `
       SELECT s.id, s.nombre, s.id_ciudad, c.descripcion, s.id_empresa, ce.nombre AS nomempresa
-      FROM sucursales s, ciudades c, cg_empresa ce
+      FROM e_sucursales s, e_ciudades c, e_empresa ce
       WHERE s.id_ciudad = c.id AND s.id_empresa = ce.id AND s.id = $1
       `
       , [id]);
@@ -262,35 +262,42 @@ class SucursalControlador {
 
     // LECTURA DE LOS DATOS DE LA PLANTILLA
     plantilla.forEach(async (dato: any, indice: any, array: any) => {
-      var {item, nombre, ciudad} = dato;
+      var { item, nombre, ciudad } = dato;
 
       data.fila = dato.item
       data.nom_sucursal = dato.nombre;
       data.ciudad = dato.ciudad;
 
-      if((data.fila != undefined && data.fila != '') &&
-        (data.nom_sucursal != undefined && data.nom_sucursal != '') && 
-        (data.ciudad != undefined && data.ciudad != '')){
+      if ((data.fila != undefined && data.fila != '') &&
+        (data.nom_sucursal != undefined && data.nom_sucursal != '') &&
+        (data.ciudad != undefined && data.ciudad != '')) {
 
         //Validar primero que exista la ciudad en la tabla ciudades
-        const existe_ciudad = await pool.query('SELECT id FROM ciudades WHERE UPPER(descripcion) = UPPER($1)', [ciudad]);
+        const existe_ciudad = await pool.query(
+          `
+          SELECT id FROM e_ciudades WHERE UPPER(descripcion) = UPPER($1)
+          `
+          , [ciudad]);
         var id_ciudad = existe_ciudad.rows[0];
-        if(id_ciudad != undefined && id_ciudad != ''){
+        if (id_ciudad != undefined && id_ciudad != '') {
           // VERIFICACIÓN SI LA SUCURSAL NO ESTE REGISTRADA EN EL SISTEMA
-          const VERIFICAR_SUCURSAL = await  pool.query('SELECT * FROM sucursales ' +
-          'WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2', [nombre, id_ciudad.id]);
+          const VERIFICAR_SUCURSAL = await pool.query(
+            `
+            SELECT * FROM e_sucursales 
+            WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2
+            `
+            , [nombre, id_ciudad.id]);
           if (VERIFICAR_SUCURSAL.rowCount === 0) {
-              data.fila = item
-              data.nom_sucursal = nombre;
-              data.ciudad = ciudad;
-              // Discriminación de elementos iguales
-              if(duplicados.find((p: any)=> p.nombre.toLowerCase() === dato.nombre.toLowerCase() && 
-                p.ciudad.toLowerCase() === dato.ciudad.toLowerCase()) == undefined)
-              {
-                data.observacion = 'ok';
-                duplicados.push(dato);
-              }
-            
+            data.fila = item
+            data.nom_sucursal = nombre;
+            data.ciudad = ciudad;
+            // Discriminación de elementos iguales
+            if (duplicados.find((p: any) => p.nombre.toLowerCase() === dato.nombre.toLowerCase() &&
+              p.ciudad.toLowerCase() === dato.ciudad.toLowerCase()) == undefined) {
+              data.observacion = 'ok';
+              duplicados.push(dato);
+            }
+
             listSucursales.push(data);
 
           } else {
@@ -302,57 +309,57 @@ class SucursalControlador {
             listSucursales.push(data);
           }
 
-        }else{
+        } else {
           data.fila = item
           data.nom_sucursal = dato.nombre;
           data.ciudad = dato.ciudad;
 
-          if(data.ciudad == '' || data.ciudad == undefined){
+          if (data.ciudad == '' || data.ciudad == undefined) {
             data.ciudad = 'No registrado';
           }
 
           data.observacion = 'Ciudad no existe en el sistema';
-  
+
           listSucursales.push(data);
         }
 
-      }else{
+      } else {
         data.fila = item
         data.nom_sucursal = dato.nombre;
         data.ciudad = dato.ciudad;
 
-        if(data.fila == '' || data.fila == undefined){
+        if (data.fila == '' || data.fila == undefined) {
           data.fila = 'error';
           mensaje = 'error'
         }
 
-        if(data.nom_sucursal == '' || data.nom_sucursal == undefined){
+        if (data.nom_sucursal == '' || data.nom_sucursal == undefined) {
           data.nom_sucursal = 'No registrado';
           data.observacion = 'Sucursal no registrada';
         }
 
-        if(data.ciudad == '' || data.ciudad == undefined){
+        if (data.ciudad == '' || data.ciudad == undefined) {
           data.ciudad = 'No registrado';
           data.observacion = 'Ciudad no registrada';
         }
 
-        if((data.nom_sucursal == '' || data.nom_sucursal == undefined) && (data.ciudad == '' || data.ciudad == undefined)){
+        if ((data.nom_sucursal == '' || data.nom_sucursal == undefined) && (data.ciudad == '' || data.ciudad == undefined)) {
           data.observacion = 'Sucursal y ciudad no registrado';
         }
 
         listSucursales.push(data);
       }
-      
+
       data = {};
-      
+
     });
-    
+
     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
     fs.access(ruta, fs.constants.F_OK, (err) => {
       if (err) {
       } else {
-          // ELIMINAR DEL SERVIDOR
-          fs.unlinkSync(ruta);
+        // ELIMINAR DEL SERVIDOR
+        fs.unlinkSync(ruta);
       }
     });
 
@@ -361,40 +368,40 @@ class SucursalControlador {
       listSucursales.sort((a: any, b: any) => {
         // Compara los números de los objetos
         if (a.fila < b.fila) {
-            return -1;
+          return -1;
         }
         if (a.fila > b.fila) {
-            return 1;
+          return 1;
         }
         return 0; // Son iguales
       });
 
       var filaDuplicada: number = 0;
 
-      listSucursales.forEach((item:any) => {
-        if(item.observacion == undefined || item.observacion == null || item.observacion == ''){
+      listSucursales.forEach((item: any) => {
+        if (item.observacion == undefined || item.observacion == null || item.observacion == '') {
           item.observacion = 'Registro duplicado'
         }
 
         //Valida si los datos de la columna N son numeros.
         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
           //Condicion para validar si en la numeracion existe un numero que se repite dara error.
-          if(item.fila == filaDuplicada){
+          if (item.fila == filaDuplicada) {
             mensaje = 'error';
           }
-        }else{
+        } else {
           return mensaje = 'error';
-        } 
+        }
 
         filaDuplicada = item.fila;
 
       });
 
-      if(mensaje == 'error'){
+      if (mensaje == 'error') {
         listSucursales = undefined;
       }
 
-      return res.jsonp({ message: mensaje, data:  listSucursales});
+      return res.jsonp({ message: mensaje, data: listSucursales });
 
     }, 1500)
   }

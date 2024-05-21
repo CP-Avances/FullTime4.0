@@ -14,159 +14,83 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TITULO_CONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
-const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
-const database_1 = __importDefault(require("../../database"));
-const fs_1 = __importDefault(require("fs"));
 const xlsx_1 = __importDefault(require("xlsx"));
+const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 class TituloControlador {
     // METODO PARA LISTAR TITULOS
     ListarTitulos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const titulo = yield database_1.default.query(`
       SELECT ct.id, ct.nombre, nt.nombre as nivel 
-      FROM cg_titulos AS ct, nivel_titulo AS nt 
+      FROM et_titulos AS ct, et_cat_nivel_titulo AS nt 
       WHERE ct.id_nivel = nt.id 
       ORDER BY ct.nombre ASC
       `);
             res.jsonp(titulo.rows);
         });
     }
+    // METODO PARA BUSCAR UN TITULO POR SU NOMBRE
+    ObtenerTituloNombre(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { nombre, nivel } = req.body;
+            const TITULO = yield database_1.default.query(`
+      SELECT * FROM et_titulos WHERE UPPER(nombre) = $1 AND id_nivel = $2
+      `, [nombre, nivel]);
+            if (TITULO.rowCount > 0) {
+                return res.jsonp(TITULO.rows);
+            }
+            else {
+                res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
     // METODO PARA ELIMINAR REGISTROS
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
                 const id = req.params.id;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const rol = yield database_1.default.query('SELECT * FROM cg_titulos WHERE id = $1', [id]);
-                const [datosOriginales] = rol.rows;
-                if (!datosOriginales) {
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'cg_titulos',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al eliminar el título con id ${id}`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
-                }
                 yield database_1.default.query(`
-        DELETE FROM cg_titulos WHERE id = $1
+        DELETE FROM et_titulos WHERE id = $1
         `, [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'cg_titulos',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
+                res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+                return res.jsonp({ message: 'error' });
             }
         });
     }
     // METODO PARA ACTUALIZAR REGISTRO
     ActualizarTitulo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { nombre, id_nivel, id, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const rol = yield database_1.default.query('SELECT * FROM cg_titulos WHERE id = $1', [id]);
-                const [datosOriginales] = rol.rows;
-                if (!datosOriginales) {
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'cg_titulos',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al actualizar el título con id ${id}`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
-                }
-                yield database_1.default.query(`
-        UPDATE cg_titulos SET nombre = $1, id_nivel = $2 WHERE id = $3
-        `, [nombre, id_nivel, id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'cg_titulos',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{nombre: ${nombre}, id_nivel: ${id_nivel}}`,
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro actualizado.' });
-            }
-            catch (error) {
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
-            }
+            const { nombre, id_nivel, id } = req.body;
+            yield database_1.default.query(`
+      UPDATE et_titulos SET nombre = $1, id_nivel = $2 WHERE id = $3
+      `, [nombre, id_nivel, id]);
+            res.jsonp({ message: 'Registro actualizado.' });
         });
     }
     getOne(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const unTitulo = yield database_1.default.query('SELECT * FROM cg_titulos WHERE id = $1', [id]);
+            const unTitulo = yield database_1.default.query(`
+      SELECT * FROM et_titulos WHERE id = $1
+      `, [id]);
             if (unTitulo.rowCount > 0) {
                 return res.jsonp(unTitulo.rows);
             }
-            res.status(404).jsonp({ text: 'El empleado no ha sido encontrado' });
+            res.status(404).jsonp({ text: 'Registro no encontrado.' });
         });
     }
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { nombre, id_nivel, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                yield database_1.default.query('INSERT INTO cg_titulos ( nombre, id_nivel ) VALUES ($1, $2)', [nombre, id_nivel]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'cg_titulos',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{nombre: ${nombre}, id_nivel: ${id_nivel}}`,
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                res.jsonp({ message: 'Título guardado' });
-            }
-            catch (error) {
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                res.status(500).jsonp({ message: 'Error al guardar el título.' });
-            }
+            const { nombre, id_nivel } = req.body;
+            yield database_1.default.query(`
+      INSERT INTO et_titulos (nombre, id_nivel) VALUES ($1, $2)
+      `, [nombre, id_nivel]);
+            console.log(req.body);
+            res.jsonp({ message: 'Registro guardado.' });
         });
     }
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
@@ -178,7 +102,7 @@ class TituloControlador {
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
             const workbook = xlsx_1.default.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
-            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[1]]);
+            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             let data = {
                 fila: '',
                 titulo: '',
@@ -197,13 +121,17 @@ class TituloControlador {
                 if ((data.fila != undefined && data.fila != '') &&
                     (data.titulo != undefined && data.titulo != '') &&
                     (data.nivel != undefined && data.nivel != '')) {
-                    // VALIDAR PRIMERO QUE EXISTA NIVELES EN LA TABLA NIVELES
-                    const existe_nivel = yield database_1.default.query('SELECT id FROM nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [nivel]);
+                    //Validar primero que exista niveles en la tabla niveles
+                    const existe_nivel = yield database_1.default.query(`
+          SELECT id FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
+          `, [nivel]);
                     var id_nivel = existe_nivel.rows[0];
                     if (id_nivel != undefined && id_nivel != '') {
                         // VERIFICACIÓN SI LA SUCURSAL NO ESTE REGISTRADA EN EL SISTEMA
-                        const VERIFICAR_Titulos = yield database_1.default.query('SELECT * FROM cg_titulos ' +
-                            'WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2', [nombre, id_nivel.id]);
+                        const VERIFICAR_Titulos = yield database_1.default.query(`
+            SELECT * FROM et_titulos
+            WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2
+            `, [nombre, id_nivel.id]);
                         if (VERIFICAR_Titulos.rowCount == 0) {
                             data.fila = dato.item;
                             data.titulo = dato.nombre;
@@ -268,23 +196,23 @@ class TituloControlador {
             });
             setTimeout(() => {
                 listTitulosProfesionales.sort((a, b) => {
-                    // COMPARA LOS NÚMEROS DE LOS OBJETOS
+                    // Compara los números de los objetos
                     if (a.fila < b.fila) {
                         return -1;
                     }
                     if (a.fila > b.fila) {
                         return 1;
                     }
-                    return 0; // SON IGUALES
+                    return 0; // Son iguales
                 });
                 var filaDuplicada = 0;
                 listTitulosProfesionales.forEach((item) => {
                     if (item.observacion == undefined || item.observacion == null || item.observacion == '') {
                         item.observacion = 'Registro duplicado';
                     }
-                    // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+                    //Valida si los datos de la columna N son numeros.
                     if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                        // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+                        //Condicion para validar si en la numeracion existe un numero que se repite dara error.
                         if (item.fila == filaDuplicada) {
                             mensaje = 'error';
                         }

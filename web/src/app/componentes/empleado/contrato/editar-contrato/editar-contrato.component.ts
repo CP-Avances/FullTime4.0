@@ -45,7 +45,7 @@ export class EditarContratoComponent implements OnInit {
   controlVacacionesF = new FormControl('', Validators.required);
   controlAsistenciaF = new FormControl('', Validators.required);
   fechaIngresoF = new FormControl('', Validators.required);
-  fechaSalidaF = new FormControl('');
+  fechaSalidaF = new FormControl('', Validators.required);
   archivoForm = new FormControl('');
   nombrePaisF = new FormControl('');
   idRegimenF = new FormControl('', Validators.required);
@@ -118,7 +118,7 @@ export class EditarContratoComponent implements OnInit {
     this.restRegimen.ConsultarUnRegimen(this.contrato.id_regimen).subscribe(datos => {
       this.regimen = datos;
       // OBTENER NOMBRE DEL PAIS REGISTRADO
-      this.paises.forEach(obj => {
+      this.paises.forEach((obj: any) => {
         if (obj.id === this.regimen.id_pais) {
           pais_ = obj.nombre;
           this.nombrePaisF.setValue(obj.nombre);
@@ -198,14 +198,14 @@ export class EditarContratoComponent implements OnInit {
 
   // METODO PARA MOSTRAR DATOS DEL FORMULARIO
   ImprimirDatos() {
-    const { fec_ingreso, fec_salida, vaca_controla, asis_controla,
-      id_tipo_contrato } = this.contrato;
+    const { fecha_ingreso, fecha_salida, controlar_vacacion, controlar_asistencia,
+      id_modalidad_laboral } = this.contrato;
     this.ContratoForm.patchValue({
-      controlVacacionesForm: vaca_controla,
-      controlAsistenciaForm: asis_controla,
-      fechaIngresoForm: fec_ingreso,
-      fechaSalidaForm: fec_salida,
-      tipoForm: id_tipo_contrato
+      controlVacacionesForm: controlar_vacacion,
+      controlAsistenciaForm: controlar_asistencia,
+      fechaIngresoForm: fecha_ingreso,
+      fechaSalidaForm: fecha_salida,
+      tipoForm: id_modalidad_laboral
     });
   }
 
@@ -248,7 +248,7 @@ export class EditarContratoComponent implements OnInit {
 
   // METODO PARA VERIFICAR SI EL REGISTRO ENTRA O NO A VERIFICACION DE DUPLICIDAD
   VerificarDatos(datos: any, form: any) {
-    if (datos.fec_ingreso === this.contrato.fec_ingreso) {
+    if (datos.fec_ingreso === this.contrato.fecha_ingreso) {
       this.VerificarInformacion(datos, form);
     }
     else {
@@ -288,14 +288,14 @@ export class EditarContratoComponent implements OnInit {
       var ingreso = String(moment(datos.fec_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
       // COMPARACION DE CADA REGISTRO
       for (var i = 0; i <= this.revisarFecha.length - 1; i++) {
-        var fecha = String(moment(this.revisarFecha[i].fec_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
-        if (fecha === ingreso) {
+        var fecha_salida = String(moment(this.revisarFecha[i].fecha_salida, "YYYY/MM/DD").format("YYYY-MM-DD"));
+        if (ingreso < fecha_salida) {
           this.duplicado = 1;
         }
       }
       // SI EL REGISTRO ESTA DUPLICADO SE INDICA AL USUARIO
       if (this.duplicado === 1) {
-        this.toastr.error('La fecha de ingreso de contrato ya se encuentra registrada.', 'Contrato ya existe.', {
+        this.toastr.warning('Existe un contrato vigente en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
           timeOut: 6000,
         })
         this.duplicado = 0;

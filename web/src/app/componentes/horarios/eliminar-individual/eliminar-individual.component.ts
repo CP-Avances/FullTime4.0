@@ -114,7 +114,7 @@ export class EliminarIndividualComponent implements OnInit {
       fecha_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
       codigo: ''
     }
-    this.datosEliminar.usuario.forEach(obj => {
+    this.datosEliminar.usuario.forEach((obj: any) => {
       if (this.codigo_usuario === '') {
         this.codigo_usuario = '\'' + obj.codigo + '\''
       }

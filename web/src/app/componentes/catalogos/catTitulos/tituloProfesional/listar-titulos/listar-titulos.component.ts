@@ -1,19 +1,21 @@
 // IMPORTACION DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit } from '@angular/core';
+import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { environment } from 'src/environments/environment';
+import { ThemePalette } from '@angular/material/core';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
 import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
 
 // IMPORTAR COMPONENTES
 import { EditarTitulosComponent } from '../editar-titulos/editar-titulos.component'
@@ -24,9 +26,11 @@ import { TitulosComponent } from '../titulos/titulos.component'
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
+
+import { ITableProvincias } from 'src/app/model/reportes.model';
 import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { ThemePalette } from '@angular/material/core';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-listar-titulos',
@@ -37,14 +41,14 @@ import { ThemePalette } from '@angular/material/core';
 export class ListarTitulosComponent implements OnInit {
 
   // VARIABLES USADAS PARA ALMACENAMIENTO DE DATOS
+  titulosEliminar: any = [];
   verTitulos: any = [];
   empleado: any = [];
+  idEmpleado: number; // VARIABLE QUE ALMACENA ID DE EMPLEADO QUE INICIO SESION
 
   // VARIABLES USADAS PARA FILTROS DE BUSQUEDA
   filtradoNombre = '';
   filtradoNivel = '';
-
-  idEmpleado: number; // VARIABLE QUE ALMACENA ID DE EMPLEADO QUE INICIO SESIÓN
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
@@ -83,10 +87,11 @@ export class ListarTitulosComponent implements OnInit {
     public ventana: MatDialog, // VARIABLE QUE MANEJA EVENTOS CON VENTANAS
     public router: Router, // VARIABLE USADA PARA MANEJO DE PÁGINAS CON URL
     public restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
+    public nivel: NivelTitulosService,
     public rest: TituloService, // SERVICIO DATOS DE TITULOS
+    public validar: ValidacionesService,
     private toastr: ToastrService, // VARIABLE DE MANEJO DE MENSAJES DE NOTIFICACIONES
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
-    public nivel: NivelTitulosService,
   ) { }
 
   ngOnInit(): void {
@@ -121,19 +126,18 @@ export class ListarTitulosComponent implements OnInit {
 
   // METODO PARA LISTAR TITULOS
   ObtenerTitulos() {
+    this.verTitulos = [];
     this.rest.ListarTitulos().subscribe(data => {
       this.verTitulos = data;
-      console.log('titulos: ',this.verTitulos);
     });
   }
 
-  nivelTitulos: any = [];
   // METODO DE BUSQUEDA DE DATOS DE NIVELES
+  nivelTitulos: any = [];
   ObtenerNiveles() {
     this.nivelTitulos = [];
     this.nivel.ListarNiveles().subscribe(res => {
       this.nivelTitulos = res;
-      console.log('this.nivelTitulos: ',this.nivelTitulos);
     });
   }
 
@@ -157,6 +161,11 @@ export class ListarTitulosComponent implements OnInit {
       .afterClosed().subscribe(items => {
         this.ObtenerTitulos();
       });
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionTitulos.clear();
+    this.titulosEliminar = [];
   }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -174,25 +183,7 @@ export class ListarTitulosComponent implements OnInit {
 
   // METODO PARA VALIDAR INGRESO DE LETRAS
   IngresarSoloLetras(e: any) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACIÓN DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+    return this.validar.IngresarSoloLetras(e);
   }
 
   // METODO PARA EDITAR TITULO
@@ -203,39 +194,11 @@ export class ListarTitulosComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
-  Eliminar(id_titulo: number) {
-    const datos = {
-      user_name: this.user_name,
-      ip: this.ip
-    };
-
-    this.rest.EliminarRegistro(id_titulo, datos).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerTitulos();
-    });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id);
-        } else {
-          this.router.navigate(['/titulos']);
-        }
-      });
-  }
-
-
   // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
   nameFile: string;
   archivoSubido: Array<File>;
   mostrarbtnsubir: boolean = false;
-  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE FERIADOS -----------------------------------------------------------------
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE TITULOS
   FileChange(element: any) {
     this.archivoSubido = [];
     this.nameFile = '';
@@ -243,8 +206,7 @@ export class ListarTitulosComponent implements OnInit {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0];
-    console.log('itemName: ',itemName);
+    let itemName = arrayItems[0].slice(0, 25);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
@@ -272,7 +234,7 @@ export class ListarTitulosComponent implements OnInit {
   listTitulosCorrectos: any = [];
   messajeExcel: string = '';
   // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
-  Revisarplantilla(){
+  Revisarplantilla() {
     this.listTitulosCorrectos = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
@@ -284,15 +246,14 @@ export class ListarTitulosComponent implements OnInit {
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataTitulosProfesionales = res.data;
       this.messajeExcel = res.message;
-
-      if(this.messajeExcel == 'error'){
+      if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      }else{
+      } else {
         this.DataTitulosProfesionales.forEach(item => {
-          if( item.observacion.toLowerCase() === 'ok'){
+          if (item.observacion.toLowerCase() === 'ok') {
             this.listTitulosCorrectos.push(item);
           }
         });
@@ -310,16 +271,16 @@ export class ListarTitulosComponent implements OnInit {
 
   }
 
-   //Metodo para dar color a las celdas y representar las validaciones
-   colorCelda: string = ''
-   stiloCelda(observacion: string): string{
-     if(observacion == 'ok'){
-       return 'rgb(159, 221, 154)';
-     }else if(observacion == 'Ya esta registrado en base'){
-       return 'rgb(239, 203, 106)';
-     }else if(observacion == 'Registro duplicado'){
-       return 'rgb(156, 214, 255)';
-     }else if(observacion == 'Nivel no existe en el sistema'){
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
+  colorCelda: string = '';
+  stiloCelda(observacion: string): string {
+    if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya esta registrado en base') {
+      return 'rgb(239, 203, 106)';
+    } else if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'Nivel no existe en el sistema') {
       return 'rgb(255, 192, 203)';
      }else{
        return 'rgb(251, 73, 18)';
@@ -348,46 +309,42 @@ export class ListarTitulosComponent implements OnInit {
       });
   }
 
-   registrarTitulos(){
+  registrarTitulos() {
     var data: any = {
       nombre: '',
       id_nivel: '',
       user_name: this.user_name,
       ip: this.ip
     }
-
-    if(this.listTitulosCorrectos.length > 0){
-      console.log('listTitulosCorrectos', this.listTitulosCorrectos);
+    if (this.listTitulosCorrectos.length > 0) {
       var cont = 0;
       this.listTitulosCorrectos.forEach(item => {
         this.nivelTitulos.forEach(valor => {
-          if(item.nivel.toLowerCase() == valor.nombre.toLowerCase()){
+          if (item.nivel.toLowerCase() == valor.nombre.toLowerCase()) {
             data.nombre = item.titulo;
             data.id_nivel = valor.id;
             this.rest.RegistrarTitulo(data).subscribe(res => {
               cont = cont + 1;
-              if(this.listTitulosCorrectos.length  == cont){
+              if (this.listTitulosCorrectos.length == cont) {
                 this.toastr.success('Operación exitosa.', 'Plantilla de Titulos profesionales importada.', {
                   timeOut: 1500,
                 });
                 this.LimpiarCampos();
               }
             })
-
             data = {}
           }
         })
       })
-    }else{
+    } else {
       this.toastr.error('No exiten datos para registrar ingrese otra', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
       this.archivoForm.reset();
     }
-
     this.archivoSubido = [];
     this.nameFile = '';
-   }
+  }
 
 
   /** ************************************************************************************************* **
@@ -516,7 +473,7 @@ export class ListarTitulosComponent implements OnInit {
     this.OrdenarDatos(this.verTitulos);
     var objeto: any;
     var arregloTitulos: any = [];
-    this.verTitulos.forEach(obj => {
+    this.verTitulos.forEach((obj: any) => {
       objeto = {
         "titulos": {
           "$": { "id": obj.id },
@@ -538,20 +495,20 @@ export class ListarTitulosComponent implements OnInit {
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
-    // Abrir una nueva pestaña o ventana con el contenido XML
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
-      newTab.focus(); // Dar foco a la nueva pestaña
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Titulos.xml';
-    // Simular un clic en el enlace para iniciar la descarga
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
     this.ObtenerTitulos();
   }
@@ -567,6 +524,145 @@ export class ListarTitulosComponent implements OnInit {
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "TitulosCSV" + '.csv');
     this.ObtenerTitulos();
+  }
+
+
+  // METODOS PARA LA SELECCION MULTIPLE
+
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionTitulos = new SelectionModel<ITableProvincias>(true, []);
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionTitulos.selected.length;
+    return numSelected === this.verTitulos.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionTitulos.clear() :
+      this.verTitulos.forEach((row: any) => this.selectionTitulos.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableProvincias): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.titulosEliminar = this.selectionTitulos.selected;
+
+    return `${this.selectionTitulos.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+
+  }
+
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
+  Eliminar(id_titulo: number) {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistro(id_titulo, data).subscribe((res: any) => {
+      if (res.message === 'error') {
+        this.toastr.error('No se puede eliminar.', '', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerTitulos();
+      }
+    });
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+          this.activar_seleccion = true;
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.titulosEliminar = [];
+          this.selectionTitulos.clear();
+          this.ObtenerTitulos();
+        } else {
+          this.router.navigate(['/titulos']);
+        }
+      });
+  }
+
+
+  contador: number = 0;
+  ingresar: boolean = false;
+  EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.ingresar = false;
+    this.contador = 0;
+    this.titulosEliminar = this.selectionTitulos.selected;
+    this.titulosEliminar.forEach((datos: any) => {
+      this.verTitulos = this.verTitulos.filter(item => item.id !== datos.id);
+      this.contador = this.contador + 1;
+      this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
+        if (res.message === 'error') {
+          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ObtenerTitulos();
+        }
+      });
+    }
+    )
+  }
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (this.titulosEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+            this.titulosEliminar = [];
+            this.selectionTitulos.clear();
+            this.ObtenerTitulos();
+          } else {
+            this.toastr.warning('No ha seleccionado TÍTULOS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        } else {
+          this.router.navigate(['/titulos']);
+        }
+      });
   }
 
 }

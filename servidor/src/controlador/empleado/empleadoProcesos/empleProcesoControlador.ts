@@ -4,7 +4,6 @@ import pool from '../../../database';
 
 class EmpleadoProcesoControlador {
 
-
   public async CrearEmpleProcesos(req: Request, res: Response): Promise<void> {
     try {
       const { id, id_empleado, id_empl_cargo, fec_inicio, fec_final, user_name, ip } = req.body;
@@ -14,18 +13,18 @@ class EmpleadoProcesoControlador {
 
       await pool.query(
         `
-        INSERT INTO empl_procesos (id, id_empleado, id_empl_cargo, fec_inicio, fec_final) 
+        INSERT INTO map_empleado_procesos (id_proceso, id_empleado, id_empleado_cargo, fecha_inicio, fecha_final) 
         VALUES ($1, $2, $3, $4, $5)
         `
         , [id, id_empleado, id_empl_cargo, fec_inicio, fec_final]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'empl_procesos',
+        tabla: 'map_empleado_procesos',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos:`{id: ${id}, id_empleado: ${id_empleado}, id_empl_cargo: ${id_empl_cargo}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}}`,
+        datosNuevos:`{id: ${id}, id_empleado: ${id_empleado}, id_empleado_cargo: ${id_empl_cargo}, fecha_inicio: ${fec_inicio}, fecha_final: ${fec_final}}`,
         ip, 
         observacion: null
       });
@@ -48,12 +47,12 @@ class EmpleadoProcesoControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const proceso = await pool.query('SELECT * FROM empl_procesos WHERE id_p = $1', [id_p]);
+      const proceso = await pool.query('SELECT * FROM map_empleado_procesos WHERE id_p = $1', [id_p]);
       const [datosOriginales] = proceso.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'empl_procesos',
+          tabla: 'map_empleado_procesos',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -69,18 +68,18 @@ class EmpleadoProcesoControlador {
 
       await pool.query(
         `
-        UPDATE empl_procesos SET id = $1, id_empl_cargo = $2, fec_inicio = $3, fec_final = $4 
-        WHERE id_p = $5
+        UPDATE map_empleado_procesos SET id = $1, id_empleado_cargo = $2, fecha_inicio = $3, fecha_final = $4 
+        WHERE id = $5
         `
         , [id, id_empl_cargo, fec_inicio, fec_final, id_p]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'empl_procesos',
+        tabla: 'map_empleado_procesos',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{id: ${id}, id_empl_cargo: ${id_empl_cargo}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}}`,
+        datosNuevos: `{id: ${id}, id_empleado_cargo: ${id_empl_cargo}, fecha_inicio: ${fec_inicio}, fecha_final: ${fec_final}}`,
         ip, 
         observacion: null
       });
@@ -99,34 +98,33 @@ class EmpleadoProcesoControlador {
     const { id_empleado } = req.params;
     const HORARIO_CARGO = await pool.query(
       `
-      SELECT ep.id_p, ep.id, ep.id_empl_cargo, ep.fec_inicio, ep.fec_final, cp.nombre AS proceso 
-      FROM empl_procesos AS ep, cg_procesos AS cp 
-      WHERE ep.id_empleado = $1 AND ep.id = cp.id
+      SELECT ep.id, ep.id_proceso, ep.id_empleado_cargo, ep.fecha_inicio, ep.fecha_final, cp.nombre AS proceso 
+      FROM map_empleado_procesos AS ep, map_cat_procesos AS cp 
+      WHERE ep.id_empleado = $1 AND ep.id_proceso = cp.id
       `
       , [id_empleado]);
     if (HORARIO_CARGO.rowCount > 0) {
       return res.jsonp(HORARIO_CARGO.rows)
     }
-    res.status(404).jsonp({ text: 'Registro no encontrado' });
+    res.status(404).jsonp({ text: 'Registro no encontrado.' });
   }
 
   public async ListarEmpleProcesos(req: Request, res: Response) {
     const PROCESOS = await pool.query(
       `
-      SELECT *FROM empl_procesos
+      SELECT * FROM map_empleado_procesos
       `
     );
     if (PROCESOS.rowCount > 0) {
       return res.jsonp(PROCESOS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-      // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDEEL FRONT
       const { user_name, ip } = req.body;
       const id = req.params.id;
 
@@ -134,12 +132,12 @@ class EmpleadoProcesoControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const proceso = await pool.query('SELECT * FROM empl_procesos WHERE id = $1', [id]);
+      const proceso = await pool.query('SELECT * FROM map_empleado_procesos WHERE id = $1', [id]);
       const [datosOriginales] = proceso.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'empl_procesos',
+          tabla: 'map_empleado_procesos',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
@@ -155,12 +153,12 @@ class EmpleadoProcesoControlador {
 
       await pool.query(
         `
-        DELETE FROM empl_procesos WHERE id = $1
+        DELETE FROM map_empleado_procesos WHERE id = $1
         `, [id]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'empl_procesos',
+        tabla: 'map_empleado_procesos',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),

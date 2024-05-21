@@ -379,7 +379,7 @@ export class ListarTipoComidasComponent implements OnInit {
   ExportToXML() {
     var objeto: any;
     var arregloComidas: any = [];
-    this.tipoComidas.forEach(obj => {
+    this.tipoComidas.forEach((obj: any) => {
       objeto = {
         "tipo_comida": {
           '@id': obj.id,

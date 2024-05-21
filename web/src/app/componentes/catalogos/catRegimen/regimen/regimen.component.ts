@@ -55,7 +55,6 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   periodoUnoF = new FormControl('');
   periodoDosF = new FormControl('');
   diasLibresF = new FormControl('');
-  feriadosF = new FormControl(false);
   periodosF = new FormControl(false);
   acumularF = new FormControl(false);
 
@@ -131,7 +130,6 @@ export class RegimenComponent implements AfterViewInit, OnInit {
       periodoUnoForm: this.periodoUnoF,
       periodoDosForm: this.periodoDosF,
       diasLibresForm: this.diasLibresF,
-      feriadosForm: this.feriadosF,
       periodosForm: this.periodosF,
       acumularForm: this.acumularF,
     });
@@ -1183,7 +1181,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   // VERIFICAR NOMBRES DUPLICADOS
   VerificarRegistro(form1: any, form2: any, form3: any) {
     var nombre = 0;
-    this.regimen.forEach(obj => {
+    this.regimen.forEach((obj: any) => {
       if (obj.descripcion.toUpperCase() === form1.nombreForm.toUpperCase()) {
         nombre = 1;
       }
@@ -1216,7 +1214,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
 
     // OBTENER ID DEL PAIS SELECCIONADO
     let pais: number = 0;
-    this.paises.forEach(obj => {
+    this.paises.forEach((obj: any) => {
       if (obj.nombre === form1.nombrePaisForm.toUpperCase()) {
         pais = obj.id;
       }
@@ -1243,7 +1241,6 @@ export class RegimenComponent implements AfterViewInit, OnInit {
         vacacion_dias_calendario: parseFloat(form2.diasCalendarioForm),
         acumular: form2.acumularForm,
         dias_max_acumulacion: 0,
-        contar_feriados: form2.feriadosForm,
         vacacion_divisible: form2.periodosForm,
 
         antiguedad: form3.antiguedadActivaForm,
@@ -1288,7 +1285,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
       regimen.vacacion_dias_calendario = 0;
     }
     if (regimen.acumular === true) {
-      regimen.dias_max_acumulacion = parseFloat(form2.diasAcumulacionForm);
+      regimen.dias_maximo_acumulacion = parseFloat(form2.diasAcumulacionForm);
     }
 
     if (this.fija === true) {

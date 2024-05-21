@@ -126,8 +126,8 @@ export class AlimentosGeneralComponent implements OnInit {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.empresa = res[0].nombre;
       this.frase = res[0].marca_agua;
     });
@@ -435,7 +435,7 @@ export class AlimentosGeneralComponent implements OnInit {
 
   presentarTotales(arreglo: any) {
     var t_cantida = 0, t_costo = 0, t_total = 0;
-    arreglo.forEach(obj => {
+    arreglo.forEach((obj: any) => {
       t_cantida = t_cantida + parseInt(obj.cantidad),
         t_costo = t_costo + parseFloat(obj.valor),
         t_total = t_total + parseFloat(obj.total)

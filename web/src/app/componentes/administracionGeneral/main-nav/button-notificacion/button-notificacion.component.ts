@@ -47,7 +47,7 @@ export class ButtonNotificacionComponent implements OnInit {
       // METODO DE ESCUCHA DE EVENTOS DE NOTIFICACIONES
       this.socket.on('recibir_notificacion', (data) => {
         // VERIFICACION DE USUARIO QUE RECIBE NOTIFICACION
-        if (parseInt(data.id_receives_empl) === this.idEmpleadoIngresa) {
+        if (parseInt(data.id_empleado_recibe) === this.idEmpleadoIngresa) {
           // BUSQUEDA DE LOS DATOS DE LA NOTIFICACION RECIBIDA
           this.realTime.ObtenerUnaNotificacion(data.id).subscribe(res => {
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION
@@ -136,7 +136,7 @@ export class ButtonNotificacionComponent implements OnInit {
       this.avisos = res;
       if (!this.avisos.text) {
         if (this.avisos.length > 0) {
-          this.avisos.forEach(obj => {
+          this.avisos.forEach((obj: any) => {
             obj.fecha_ = this.validar.FormatearFecha(moment(obj.create_at).format('YYYY-MM-DD'), formato_fecha, this.validar.dia_abreviado);
             obj.hora_ = this.validar.FormatearHora(moment(obj.create_at).format('HH:mm:ss'), formato_hora);
             if (obj.visto === false) {
@@ -161,7 +161,7 @@ export class ButtonNotificacionComponent implements OnInit {
   VerificarConfiguracion(id: number) {
     this.realTime.ObtenerConfiguracionEmpleado(id).subscribe(res => {
       if (!res.text) {
-        if (res[0].vaca_noti === false || res[0].permiso_noti === false || res[0].hora_extra_noti === false) {
+        if (res[0].vacacion_notificacion === false || res[0].permiso_notificacion === false || res[0].hora_extra_notificacion === false) {
           this.num_noti_false = 0;
           this.estadoNotificacion = true
         }

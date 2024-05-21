@@ -15,6 +15,9 @@ import { PrincipalDepartamentoComponent } from '../listar-departamento/principal
 import { VerSucursalComponent } from '../../catSucursal/ver-sucursal/ver-sucursal.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableNivel } from 'src/app/model/reportes.model';
+
 interface Nivel {
   valor: number;
   nombre: string
@@ -40,6 +43,7 @@ export class VerDepartamentoComponent implements OnInit {
   // DATOS DEPARTAMENTO
   sucursales: any = [];
   departamentos: any = [];
+  nivelesEliminar: any = [];
   Habilitar: boolean = false;
 
   // ITEMS DE PAGINACION DE LA TABLA
@@ -110,11 +114,6 @@ export class VerDepartamentoComponent implements OnInit {
     var id_establecimiento = info.id_sucursal;
     this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
       this.departamentos = datos;
-      console.log('ver data de departamentos ', this.departamentos)
-    }, error => {
-      this.toastr.warning('No se encontraron niveles de aprobación registrados.', '', {
-        timeOut: 1000,
-      });
     })
   }
 
@@ -133,18 +132,7 @@ export class VerDepartamentoComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
-  Eliminar(id_dep: number, datos: any) {
-    const data = {
-      user_name: this.user_name,
-      ip: this.ip
-    };
-    this.rest.EliminarRegistroNivelDepa(id_dep, data).subscribe(res => {
-      this.ActualizarRegistros(datos);
-    });
-  }
-
-// METODO PARA ACTUALIZAR NIVELES DE APROBACION
+  // METODO PARA ACTUALIZAR NIVELES DE APROBACION
   ActualizarRegistros(datos: any) {
     var data = {
       nivel: 0,
@@ -155,7 +143,7 @@ export class VerDepartamentoComponent implements OnInit {
     var contador = 0;
     var actualiza = 0;
     arreglo = this.departamentos;
-    arreglo.forEach(item => {
+    arreglo.forEach((item: any) => {
       contador = contador + 1;
       if (datos.nivel < item.nivel) {
         data.nivel = item.nivel - 1;
@@ -184,22 +172,9 @@ export class VerDepartamentoComponent implements OnInit {
     });
     if (contador === arreglo.length) {
       this.CargarDatos(this.info);
-      this.CargarDatos(this.info);
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 1000,
-      });
     }
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id, datos);
-        }
-      });
-  }
 
   // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
@@ -223,6 +198,11 @@ export class VerDepartamentoComponent implements OnInit {
         this.CargarDatos(this.info);
       }
       );
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionNivel.clear();
+    this.nivelesEliminar = [];
   }
 
   // METODO PARA VISUALIZAR LISTA DE USUARIOS QUE AUTORIZAN
@@ -230,8 +210,8 @@ export class VerDepartamentoComponent implements OnInit {
   depa: string;
   AbrirVentanaVerListadoEmpleados(departamento: any) {
     this.habilitarprogress = true;
-    var id_depa = departamento.id_dep_nivel;
-    this.depa = departamento.dep_nivel_nombre;
+    var id_depa = departamento.id_departamento_nivel;
+    this.depa = departamento.departamento_nombre_nivel;
     this.auto.BuscarListaEmpleadosAutorizan(id_depa).subscribe(datos => {
       this.empleados = datos;
       this.habilitarprogress = false;
@@ -262,6 +242,139 @@ export class VerDepartamentoComponent implements OnInit {
       this.componentes.ver_sucursal = true;
       this.componentes.ListaDepartamentos();
     }
+  }
+
+  // METODOS PARA LA SELECCION MULTIPLE
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionNivel = new SelectionModel<ITableNivel>(true, []);
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionNivel.selected.length;
+    return numSelected === this.departamentos.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionNivel.clear() :
+      this.departamentos.forEach((row: any) => this.selectionNivel.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableNivel): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.nivelesEliminar = this.selectionNivel.selected;
+
+    return `${this.selectionNivel.isSelected(row) ? 'deselect' : 'select'} row ${row.nivel + 1}`;
+
+  }
+
+  contador: number = 0;
+  ingresar: boolean = false;
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
+  Eliminar(id_dep: number, datos: any) {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistroNivelDepa(id_dep, data).subscribe((res: any) => {
+      if (res.message === 'error') {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ActualizarRegistros(datos);
+      }
+    });
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id, datos);
+        } else {
+          this.router.navigate(['/departamento']);
+
+        }
+      });
+    this.ActualizarRegistros(datos);
+  }
+
+  EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.ingresar = false;
+    this.contador = 0;
+    this.nivelesEliminar = this.selectionNivel.selected;
+    this.nivelesEliminar.forEach((datos: any) => {
+      this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
+      this.contador = this.contador + 1;
+      this.rest.EliminarRegistroNivelDepa(datos.id, data).subscribe((res: any) => {
+        if (res.message === 'error') {
+          this.toastr.error('Existen datos relacionados con ' + datos.nivel + '.', 'No fue posible eliminar.', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ActualizarRegistros(datos);
+        }
+      });
+      this.ActualizarRegistros(datos);
+    }
+    )
+  }
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (this.nivelesEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+            this.nivelesEliminar = [];
+            this.selectionNivel.clear();
+
+          } else {
+            this.toastr.warning('No ha seleccionado NIVEL.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        } else {
+          this.router.navigate(['/departamento']);
+        }
+      });
   }
 
 }

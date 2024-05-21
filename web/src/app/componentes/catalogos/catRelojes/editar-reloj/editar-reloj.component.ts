@@ -30,8 +30,8 @@ export class EditarRelojComponent implements OnInit {
 
   // VARIABLES DE ALMACENAMIENTO
   empresas: any = [];
-  datosReloj: any = [];
   sucursales: any = [];
+  datosReloj: any = [];
   departamento: any = [];
   activarCampo: boolean = false;
   ver_editar: boolean = true;
@@ -60,9 +60,9 @@ export class EditarRelojComponent implements OnInit {
   marcaF = new FormControl('', [Validators.minLength(2)]);
   serieF = new FormControl('', Validators.minLength(4));
   modeloF = new FormControl('', [Validators.minLength(3)]);
-  puertoF = new FormControl('', [Validators.required, Validators.pattern('[0-9]{4}')]);
+  puertoF = new FormControl('', [Validators.required]);
   fabricanteF = new FormControl('', [Validators.minLength(4)]);
-  contraseniaF = new FormControl('', [Validators.minLength(4)]);
+  contraseniaF = new FormControl('', [Validators.minLength(1)]);
   idFabricacionF = new FormControl('', [Validators.minLength(4)]);
 
   constructor(
@@ -116,7 +116,7 @@ export class EditarRelojComponent implements OnInit {
     this.rest.ConsultarUnReloj(this.idReloj).subscribe(datos => {
       this.datosReloj = datos[0];
       this.BuscarDatos(this.datosReloj.id_sucursal);
-      if (this.datosReloj.tien_funciones === true) {
+      if (this.datosReloj.tiene_funciones === true) {
         this.selec1 = true;
         this.activarCampo = true;
         this.primerFormulario.patchValue({
@@ -134,8 +134,8 @@ export class EditarRelojComponent implements OnInit {
         ipForm: this.datosReloj.ip,
         nombreForm: this.datosReloj.nombre,
         puertoForm: this.datosReloj.puerto,
-        codigoForm: this.datosReloj.id,
-        funcionesForm: this.datosReloj.tien_funciones,
+        codigoForm: this.datosReloj.codigo,
+        funcionesForm: this.datosReloj.tiene_funciones,
         idSucursalForm: this.datosReloj.id_sucursal,
         idDepartamentoForm: this.datosReloj.id_departamento,
       })
@@ -189,7 +189,7 @@ export class EditarRelojComponent implements OnInit {
   InsertarReloj(form1: any, form2: any) {
     let datosReloj = {
       // PRIMER FORMULARIO
-      id: form1.codigoForm,
+      codigo: form1.codigoForm,
       ip: form1.ipForm,
       id_real: this.idReloj,
       nombre: form1.nombreForm,
@@ -218,9 +218,14 @@ export class EditarRelojComponent implements OnInit {
         });
         this.CerrarVentana();
       }
-      else {
-        this.toastr.error(
-          'Verificar que el código de reloj y la ip del dispositivo no se encuentren registrados.',
+      else if (response.message === 'existe') {
+        this.toastr.warning('Código ingresado ya existe en el sistema.',
+          'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        })
+      }
+      else if (response.message === 'error') {
+        this.toastr.warning('IP ingresada ya existe en el sistema.',
           'Ups!!! algo salio mal.', {
           timeOut: 6000,
         })
@@ -232,13 +237,6 @@ export class EditarRelojComponent implements OnInit {
   ObtenerMensajeErrorIp() {
     if (this.ipF.hasError('pattern')) {
       return 'Ingresar IP Ej: 0.0.0.0';
-    }
-  }
-
-  // MENSAJE DE ERROR
-  ObtenerMensajeErrorPuerto() {
-    if (this.puertoF.hasError('pattern')) {
-      return 'Ingresar 4 números.';
     }
   }
 

@@ -12,7 +12,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
 const fs_1 = __importDefault(require("fs"));
@@ -21,11 +20,11 @@ class RelojesControlador {
     ListarRelojes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const RELOJES = yield database_1.default.query(`
-            SELECT cr.id, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
-                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tien_funciones, cr.id_sucursal, 
+            SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
+                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tiene_funciones, cr.id_sucursal, 
                 cr.id_departamento, cr.numero_accion, cd.nombre AS nomdepar, s.nombre AS nomsucursal, 
                 e.nombre AS nomempresa, c.descripcion AS nomciudad
-            FROM cg_relojes cr, cg_departamentos cd, sucursales s, ciudades c, cg_empresa e
+            FROM ed_relojes cr, ed_departamentos cd, e_sucursales s, e_ciudades c, e_empresa e
             WHERE cr.id_departamento = cd.id AND cd.id_sucursal = cr.id_sucursal AND 
                 cr.id_sucursal = s.id AND s.id_empresa = e.id AND s.id_ciudad = c.id;
             `);
@@ -41,49 +40,14 @@ class RelojesControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
                 const id = req.params.id;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const reloj = yield database_1.default.query('SELECT * FROM cg_relojes WHERE id = $1', [id]);
-                const [datosOriginales] = reloj.rows;
-                if (!datosOriginales) {
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'cg_relojes',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        observacion: null
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.jsonp({ message: 'Registro eliminado.' });
-                }
                 yield database_1.default.query(`
-                DELETE FROM cg_relojes WHERE id = $1
+                DELETE FROM ed_relojes WHERE id = $1
                 `, [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'cg_relojes',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip: ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
+                res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
+                return res.jsonp({ message: 'error' });
             }
         });
     }
@@ -91,40 +55,32 @@ class RelojesControlador {
     CrearRelojes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, id, numero_accion, user_name, user_ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const response = yield database_1.default.query(`
-                INSERT INTO cg_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                    id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, id, 
-                    numero_accion )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                    tien_funciones, id_sucursal, id_departamento, id, numero_accion]);
-                const [reloj] = response.rows;
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'cg_relojes',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: JSON.stringify(reloj),
-                    ip: user_ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                if (reloj) {
-                    return res.status(200).jsonp({ message: 'guardado', reloj: reloj });
+                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, codigo, numero_accion } = req.body;
+                var VERIFICAR_CODIGO = yield database_1.default.query(`
+                SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1
+                `, [codigo.toUpperCase()]);
+                if (VERIFICAR_CODIGO.rows[0] == undefined || VERIFICAR_CODIGO.rows[0] == '') {
+                    const response = yield database_1.default.query(`
+                    INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
+                        id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, codigo, 
+                        numero_accion )
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                    `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                        tien_funciones, id_sucursal, id_departamento, codigo, numero_accion]);
+                    const [reloj] = response.rows;
+                    if (reloj) {
+                        return res.status(200).jsonp({ message: 'guardado', reloj: reloj });
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'mal_registro' });
+                    }
                 }
                 else {
-                    return res.status(404).jsonp({ message: 'mal_registro' });
+                    return res.jsonp({ message: 'existe' });
                 }
             }
             catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: error });
+                return res.jsonp({ message: 'error' });
             }
         });
     }
@@ -133,7 +89,7 @@ class RelojesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const RELOJES = yield database_1.default.query(`
-            SELECT * FROM cg_relojes WHERE id = $1
+            SELECT * FROM ed_relojes WHERE id = $1
             `, [id]);
             if (RELOJES.rowCount > 0) {
                 return res.jsonp(RELOJES.rows);
@@ -147,53 +103,27 @@ class RelojesControlador {
     ActualizarReloj(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, id, numero_accion, id_real, user_name, user_ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const reloj = yield database_1.default.query('SELECT * FROM cg_relojes WHERE id = $1', [id_real]);
-                const [datosOriginales] = reloj.rows;
-                if (!datosOriginales) {
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'cg_relojes',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: user_ip,
-                        observacion: `Error al actualizar el registro con id: ${id}.`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'error' });
+                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, id_real } = req.body;
+                var VERIFICAR_DISCAPACIDAD = yield database_1.default.query(`
+                SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1 AND NOT id = $2
+                `, [codigo.toUpperCase(), id_real]);
+                if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
+                    yield database_1.default.query(`
+                    UPDATE ed_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
+                        modelo = $6, serie = $7, id_fabricacion = $8, fabricante = $9, mac = $10, 
+                        tiene_funciones = $11, id_sucursal = $12, id_departamento = $13, codigo = $14, 
+                        numero_accion = $15 
+                    WHERE id = $16
+                    `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                        tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, id_real]);
+                    return res.jsonp({ message: 'actualizado' });
                 }
-                yield database_1.default.query(`
-                UPDATE cg_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
-                    modelo = $6, serie = $7, id_fabricacion = $8, fabricante = $9, mac = $10, 
-                    tien_funciones = $11, id_sucursal = $12, id_departamento = $13, id = $14, 
-                    numero_accion = $15 
-                WHERE id = $16
-                `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                    tien_funciones, id_sucursal, id_departamento, id, numero_accion, id_real]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'cg_relojes',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tien_funciones": "${tien_funciones}", "id_sucursal": "${id_sucursal}", "id_departamento": "${id_departamento}", "id": "${id}", "numero_accion": "${numero_accion}"}`,
-                    ip: user_ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'actualizado' });
+                else {
+                    return res.jsonp({ message: 'existe' });
+                }
             }
             catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
+                return res.jsonp({ message: 'error' });
             }
         });
     }
@@ -202,11 +132,11 @@ class RelojesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const RELOJES = yield database_1.default.query(`
-            SELECT cr.id, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
-                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tien_funciones, cr.id_sucursal, 
+            SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
+                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tiene_funciones, cr.id_sucursal, 
                 cr.id_departamento, cr.numero_accion, cd.nombre AS nomdepar, s.nombre AS nomsucursal,
                 e.nombre AS nomempresa, c.descripcion AS nomciudad
-            FROM cg_relojes cr, cg_departamentos cd, sucursales s, ciudades c, cg_empresa e
+            FROM ed_relojes cr, ed_departamentos cd, e_sucursales s, e_ciudades c, e_empresa e
             WHERE cr.id_departamento = cd.id AND cd.id_sucursal = cr.id_sucursal AND cr.id_sucursal = s.id 
                 AND s.id_empresa = e.id AND s.id_ciudad = c.id AND cr.id = $1
             `, [id]);
@@ -228,60 +158,30 @@ class RelojesControlador {
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                try {
-                    // DATOS DE LA PLANTILLA INGRESADA
-                    const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tiene_funciones, sucursal, departamento, codigo_reloj, numero_accion, user_name, user_ip } = data;
-                    // INICIAR TRANSACCION
-                    yield database_1.default.query('BEGIN');
-                    // BUSCAR ID DE LA SUCURSAL INGRESADA
-                    const id_sucursal = yield database_1.default.query('SELECT id FROM sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
-                    const id_departamento = yield database_1.default.query('SELECT id FROM cg_departamentos WHERE UPPER(nombre) = $1 AND ' +
-                        'id_sucursal = $2', [departamento.toUpperCase(), id_sucursal.rows[0]['id']]);
-                    if (id_sucursal.rowCount === 0 || id_departamento.rowCount === 0) {
-                        // AUDITORIA
-                        yield auditoriaControlador_1.default.InsertarAuditoria({
-                            tabla: 'cg_relojes',
-                            usuario: user_name,
-                            accion: 'I',
-                            datosOriginales: '',
-                            datosNuevos: '',
-                            ip: user_ip,
-                            observacion: `Error al guardar el reloj con nombre: ${nombre} e ip: ${ip}.`
-                        });
-                        // FINALIZAR TRANSACCION
-                        yield database_1.default.query('COMMIT');
-                        return;
-                    }
-                    // VERIFICAR QUE SE HAYA INGRESADO NÚMERO DE ACCIONES SI EL DISPOSITIVO LAS TIENE
-                    if (tiene_funciones === true) {
-                        var accion = numero_accion;
-                    }
-                    else {
-                        accion = 0;
-                    }
-                    yield database_1.default.query('INSERT INTO cg_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, ' +
-                        'id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, id, numero_accion) ' +
-                        'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)', [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                        tiene_funciones, id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], codigo_reloj, accion]);
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'cg_relojes',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tien_funciones": "${tiene_funciones}", "id_sucursal": "${id_sucursal.rows[0]['id']}", "id_departamento": "${id_departamento.rows[0]['id']}", "id": "${codigo_reloj}", "numero_accion": "${accion}"}`,
-                        ip: user_ip,
-                        observacion: null
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    res.jsonp({ message: 'correcto' });
+                // Dtaos de la plantilla ingresada
+                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tiene_funciones, sucursal, departamento, codigo_reloj, numero_accion } = data;
+                // Buscar id de la sucursal ingresada
+                const id_sucursal = yield database_1.default.query(`
+                SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+                `, [sucursal.toUpperCase()]);
+                const id_departamento = yield database_1.default.query(`
+                SELECT id FROM ed_departamentos 
+                WHERE UPPER(nombre) = $1 AND id_sucursal = $2
+                `, [departamento.toUpperCase(), id_sucursal.rows[0]['id']]);
+                // Verificar que se haya ingresado número de acciones si el dispositivo las tiene
+                if (tiene_funciones === true) {
+                    var accion = numero_accion;
                 }
-                catch (error) {
-                    // REVERTIR TRANSACCION
-                    yield database_1.default.query('ROLLBACK');
-                    return;
+                else {
+                    accion = 0;
                 }
+                yield database_1.default.query(`
+                INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
+                    id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, id, numero_accion) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+                `, [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                    tiene_funciones, id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], codigo_reloj, accion]);
+                res.jsonp({ message: 'correcto' });
             }));
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
             fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
@@ -320,26 +220,36 @@ class RelojesControlador {
                     contarLlenos = contarLlenos + 1;
                 }
                 //Verificar que el codigo no se encuentre registrado
-                const VERIFICAR_CODIGO = yield database_1.default.query('SELECT * FROM cg_relojes WHERE id = $1', [codigo_reloj]);
+                const VERIFICAR_CODIGO = yield database_1.default.query(`
+                SELECT * FROM ed_relojes WHERE id = $1
+                `, [codigo_reloj]);
                 if (VERIFICAR_CODIGO.rowCount === 0) {
                     contarCodigo = contarCodigo + 1;
                 }
                 //Verificar que el nombre del equipo no se encuentre registrado
-                const VERIFICAR_NOMBRE = yield database_1.default.query('SELECT * FROM cg_relojes WHERE UPPER(nombre) = $1', [nombre.toUpperCase()]);
+                const VERIFICAR_NOMBRE = yield database_1.default.query(`
+                SELECT * FROM ed_relojes WHERE UPPER(nombre) = $1
+                `, [nombre.toUpperCase()]);
                 if (VERIFICAR_NOMBRE.rowCount === 0) {
                     contarNombre = contarNombre + 1;
                 }
                 //Verificar que la IP del dispositivo no se encuentre registrado
-                const VERIFICAR_IP = yield database_1.default.query('SELECT * FROM cg_relojes WHERE ip = $1', [ip]);
+                const VERIFICAR_IP = yield database_1.default.query(`
+                SELECT * FROM ed_relojes WHERE ip = $1
+                `, [ip]);
                 if (VERIFICAR_IP.rowCount === 0) {
                     contarIP = contarIP + 1;
                 }
                 //Verificar que la sucursal exista dentro del sistema
-                const VERIFICAR_SUCURSAL = yield database_1.default.query('SELECT id FROM sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
+                const VERIFICAR_SUCURSAL = yield database_1.default.query(`
+                SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+                `, [sucursal.toUpperCase()]);
                 if (VERIFICAR_SUCURSAL.rowCount > 0) {
                     contarSucursal = contarSucursal + 1;
                     // Verificar que el departamento exista dentro del sistema
-                    const VERIFICAR_DEPARTAMENTO = yield database_1.default.query('SELECT id FROM cg_departamentos WHERE UPPER(nombre) = $1 AND id_sucursal = $2', [departamento.toUpperCase(), VERIFICAR_SUCURSAL.rows[0]['id']]);
+                    const VERIFICAR_DEPARTAMENTO = yield database_1.default.query(`
+                    SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND id_sucursal = $2
+                    `, [departamento.toUpperCase(), VERIFICAR_SUCURSAL.rows[0]['id']]);
                     if (VERIFICAR_DEPARTAMENTO.rowCount > 0) {
                         contarDepartamento = contarDepartamento + 1;
                     }

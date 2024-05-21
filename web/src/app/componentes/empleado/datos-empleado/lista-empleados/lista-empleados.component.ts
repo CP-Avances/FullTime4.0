@@ -35,6 +35,9 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 
 export class ListaEmpleadosComponent implements OnInit {
 
+  empleadosEliminarActivos: any = [];
+  empleadosEliminarInactivos: any = [];
+
   // VARIABLES DE ALMACENAMIENTO DE DATOS
   nacionalidades: any = [];
   empleadoD: any = [];
@@ -120,7 +123,7 @@ export class ListaEmpleadosComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
-      this.empleado.forEach(row => this.selectionUno.select(row));
+      this.empleado.forEach((row: any) => this.selectionUno.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -184,7 +187,7 @@ export class ListaEmpleadosComponent implements OnInit {
   masterToggleDos() {
     this.isAllSelectedDos() ?
       this.selectionDos.clear() :
-      this.desactivados.forEach(row => this.selectionDos.select(row));
+      this.desactivados.forEach((row: any) => this.selectionDos.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -260,8 +263,8 @@ export class ListaEmpleadosComponent implements OnInit {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -550,7 +553,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
 
 
-  //Metodo para dar color a las celdas y representar las validaciones
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
@@ -563,7 +566,7 @@ export class ListaEmpleadosComponent implements OnInit {
       (arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Codigo ya') {
       return 'rgb(239, 203, 106)';
     } else if (arrayObservacion[0] == 'Cédula' || arrayObservacion[0] == 'Usuario') {
-      return 'rgb(222, 162, 73)';
+      return 'rgb(251, 73, 18)';
     } else if ((arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
     } else if ((observacion == 'Código ingresado no válido') ||
@@ -572,11 +575,12 @@ export class ListaEmpleadosComponent implements OnInit {
     ) {
       return 'rgb(222, 162, 73)';
     } else if ((observacion == 'Rol no existe en el sistema') ||
-      (observacion == 'Nacionalidad no existe en el sistema')
-    ) {
+      (observacion == 'Nacionalidad no existe en el sistema'))
+    {
       return 'rgb(255, 192, 203)';
-    }
-    else {
+    }else if (arrayObservacion[0] == 'Formato') {
+      return 'rgb(222, 162, 73)';
+    }else {
       return 'rgb(251, 73, 18)';
     }
 
@@ -784,7 +788,7 @@ export class ListaEmpleadosComponent implements OnInit {
                 { text: 'Nacionalidad', style: 'tableHeader' },
               ],
               ...arreglo.map(obj => {
-                var estadoCivil = this.EstadoCivilSelect[obj.esta_civil - 1];
+                var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
                 var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
                 let nacionalidad;
@@ -798,7 +802,7 @@ export class ListaEmpleadosComponent implements OnInit {
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.apellido, style: 'itemsTable' },
                   { text: obj.cedula, style: 'itemsTableD' },
-                  { text: obj.fec_nacimiento.split("T")[0], style: 'itemsTableD' },
+                  { text: obj.fecha_nacimiento.split("T")[0], style: 'itemsTableD' },
                   { text: obj.correo, style: 'itemsTableD' },
                   { text: genero, style: 'itemsTableD' },
                   { text: estadoCivil, style: 'itemsTableD' },
@@ -845,8 +849,8 @@ export class ListaEmpleadosComponent implements OnInit {
         CEDULA: obj.cedula,
         APELLIDO: obj.apellido,
         NOMBRE: obj.nombre,
-        FECHA_NACIMIENTO: obj.fec_nacimiento.split("T")[0],
-        ESTADO_CIVIL: this.EstadoCivilSelect[obj.esta_civil - 1],
+        FECHA_NACIMIENTO: obj.fecha_nacimiento.split("T")[0],
+        ESTADO_CIVIL: this.EstadoCivilSelect[obj.estado_civil - 1],
         GENERO: this.GeneroSelect[obj.genero - 1],
         CORREO: obj.correo,
         ESTADO: this.EstadoSelect[obj.estado - 1],
@@ -881,8 +885,8 @@ export class ListaEmpleadosComponent implements OnInit {
     }
     var objeto: any;
     var arregloEmpleado: any = [];
-    arreglo.forEach(obj => {
-      var estadoCivil = this.EstadoCivilSelect[obj.esta_civil - 1];
+    arreglo.forEach((obj: any) => {
+      var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
       var genero = this.GeneroSelect[obj.genero - 1];
       var estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
@@ -900,7 +904,7 @@ export class ListaEmpleadosComponent implements OnInit {
           "estadoCivil": estadoCivil,
           "genero": genero,
           "correo": obj.correo,
-          "fechaNacimiento": obj.fec_nacimiento.split("T")[0],
+          "fechaNacimiento": obj.fecha_nacimiento.split("T")[0],
           "estado": estado,
           "domicilio": obj.domicilio,
           "telefono": obj.telefono,
@@ -921,20 +925,20 @@ export class ListaEmpleadosComponent implements OnInit {
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
-    // Abrir una nueva pestaña o ventana con el contenido XML
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
-      newTab.focus(); // Dar foco a la nueva pestaña
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Empleados.xml';
-    // Simular un clic en el enlace para iniciar la descarga
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
   }
 
@@ -962,8 +966,8 @@ export class ListaEmpleadosComponent implements OnInit {
         CEDULA: obj.cedula,
         APELLIDO: obj.apellido,
         NOMBRE: obj.nombre,
-        FECHA_NACIMIENTO: obj.fec_nacimiento.split("T")[0],
-        ESTADO_CIVIL: this.EstadoCivilSelect[obj.esta_civil - 1],
+        FECHA_NACIMIENTO: obj.fecha_nacimiento.split("T")[0],
+        ESTADO_CIVIL: this.EstadoCivilSelect[obj.estado_civil - 1],
         GENERO: this.GeneroSelect[obj.genero - 1],
         CORREO: obj.correo,
         ESTADO: this.EstadoSelect[obj.estado - 1],
@@ -976,5 +980,172 @@ export class ListaEmpleadosComponent implements OnInit {
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "EmpleadosCSV" + '.csv');
   }
+
+  // Metodos para la eliminacion de empleados activos e inactivos
+
+  // METODOS PARA LA SELECCION MULTIPLE
+
+
+
+
+
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
+  Eliminar(id_empleado: number) {
+    this.rest.EliminarEmpleados(id_empleado).subscribe(res => {
+      if (res.message === 'error') {
+        this.toastr.error('No se puede eliminar.', '', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.GetEmpleados();
+      }
+
+    });
+  }
+
+
+  contador: number = 0;
+  ingresar: boolean = false;
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+        } else {
+          this.router.navigate(['/empleados']);
+        }
+      });
+
+    this.GetEmpleados();
+
+  }
+
+  ConfirmarDeleteMultipleActivos() {
+
+    this.ingresar = false;
+    this.contador = 0;
+
+
+    let EliminarActivos = this.selectionUno.selected.map(obj => {
+      return {
+        id: obj.id,
+        empleado: obj.nombre + ' ' + obj.apellido
+      }
+    })
+
+
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (EliminarActivos.length != 0) {
+
+              //ELIMINAR EMPLEADO
+
+            EliminarActivos.forEach((datos: any) => {
+
+              this.empleado = this.empleado.filter(item => item.id !== datos.id);
+              this.contador = this.contador + 1;
+
+              this.rest.EliminarEmpleados(datos.id).subscribe(res => {
+                if (res.message === 'error') {
+                  this.toastr.error('Existen datos relacionados con ' + datos.empleado + '.', 'No fue posible eliminar.', {
+                    timeOut: 6000,
+                  });
+                  this.contador = this.contador - 1;
+                } else {
+                  if (!this.ingresar) {
+                    this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+                      timeOut: 6000,
+                    });
+                    this.ingresar = true;
+                  }
+                  this.GetEmpleados();
+                }
+              });
+            }
+            )
+            this.btnCheckHabilitar = false;
+            this.empleadosEliminarActivos=[];
+            this.selectionUno.clear();
+            this.GetEmpleados();
+          } else {
+            this.toastr.warning('No ha seleccionado USUARIOS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+          this.selectionUno.clear();
+        } else {
+          this.router.navigate(['/empleados']);
+        }
+      }
+      );
+      //this.GetEmpleados();
+
+  }
+
+
+
+
+
+
+  ConfirmarDeleteMultipleInactivos() {
+    this.ingresar = false;
+    this.contador = 0;
+    let EliminarInactivos = this.selectionDos.selected.map(obj => {
+      return {
+        id: obj.id,
+        empleado: obj.nombre + ' ' + obj.apellido
+      }
+    })
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (EliminarInactivos.length != 0) {
+            EliminarInactivos.forEach((datos: any) => {
+              this.empleado = this.empleado.filter(item => item.id !== datos.id);
+              this.contador = this.contador + 1;
+              this.rest.EliminarEmpleados(datos.id).subscribe(res => {
+                if (res.message === 'error') {
+                  this.toastr.error('Existen datos relacionados con ' + datos.empleado + '.', 'No fue posible eliminar.', {
+                    timeOut: 6000,
+                  });
+                  this.contador = this.contador - 1;
+                } else {
+                  if (!this.ingresar) {
+                    this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+                      timeOut: 6000,
+                    });
+                    this.ingresar = true;
+                  }
+                  this.GetEmpleados();
+                }
+              });
+            }
+            )
+            this.btnCheckDeshabilitado = false;
+            this.empleadosEliminarActivos=[];
+            this.selectionUno.clear();
+            this.GetEmpleados();
+          } else {
+            this.toastr.warning('No ha seleccionado USUARIOS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+          this.selectionDos.clear();
+        } else {
+          this.router.navigate(['/empleados']);
+        }
+      }
+      );
+  }
+
+
+
 
 }

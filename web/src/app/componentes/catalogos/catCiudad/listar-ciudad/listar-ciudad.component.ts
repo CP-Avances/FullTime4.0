@@ -1,25 +1,27 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
-import * as moment from 'moment';
 import * as xlsx from 'xlsx';
-import * as FileSaver from 'file-saver';
+import * as xml2js from 'xml2js';
+import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
 
 import { RegistrarCiudadComponent } from 'src/app/componentes/catalogos/catCiudad/registrar-ciudad/registrar-ciudad.component'
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableCiudades } from 'src/app/model/reportes.model';
 import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
 
 @Component({
@@ -30,13 +32,15 @@ import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
 
 export class ListarCiudadComponent implements OnInit {
 
+  datosCiudadesEliminar: any = [];
+
   // ALMACENAMIENTO DE DATOS
   datosCiudades: any = [];
   filtroCiudad = '';
   filtroProvincias = '';
+  filtrodatosCiudades = '';
   empleado: any = [];
   idEmpleado: number;
-
 
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
@@ -61,6 +65,7 @@ export class ListarCiudadComponent implements OnInit {
     private router: Router,
     private toastr: ToastrService,
     public rest: CiudadService,
+    public restp: ProvinciaService,
     public restE: EmpleadoService,
     public ventana: MatDialog,
     public validar: ValidacionesService,
@@ -101,8 +106,8 @@ export class ListarCiudadComponent implements OnInit {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -127,33 +132,11 @@ export class ListarCiudadComponent implements OnInit {
     this.ventana.open(RegistrarCiudadComponent, { width: '600px' }).afterClosed().subscribe(item => {
       this.ListarCiudades();
     });
-  }
-
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
-  Eliminar(id_ciu: number) {
-    const datos = {
-      user_name: this.user_name,
-      ip: this.ip
-    };
-
-    this.rest.EliminarCiudad(id_ciu, datos).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ListarCiudades();
-    });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id);
-        } else {
-          this.router.navigate(['/listarCiudades']);
-        }
-      });
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectiondatosCiudades.clear();
+    this.datosCiudadesEliminar = [];
   }
 
   // METODO PARA VALIDAR INGRESO DE LETRAS
@@ -175,7 +158,6 @@ export class ListarCiudadComponent implements OnInit {
    ** ************************************************************************************************** **/
   generarPdf(action = "open") {
     const documentDefinition = this.getDocumentDefinicion();
-
     switch (action) {
       case "open":
         pdfMake.createPdf(documentDefinition).open();
@@ -357,23 +339,156 @@ export class ListarCiudadComponent implements OnInit {
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
-    // Abrir una nueva pestaña o ventana con el contenido XML
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
-      newTab.focus(); // Dar foco a la nueva pestaña
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
 
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Ciudades.xml';
-    // Simular un clic en el enlace para iniciar la descarga
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
 
   }
 
+
+  // METODOS PARA LA SELECCION MULTIPLE
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+  selectiondatosCiudades = new SelectionModel<ITableCiudades>(true, []);
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectiondatosCiudades.selected.length;
+    return numSelected === this.datosCiudades.length;
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectiondatosCiudades.clear() :
+      this.datosCiudades.forEach((row: any) => this.selectiondatosCiudades.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableCiudades): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.datosCiudadesEliminar = this.selectiondatosCiudades.selected;
+
+    return `${this.selectiondatosCiudades.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+
+  }
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
+  Eliminar(id_ciu: number) {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.rest.EliminarCiudad(id_ciu, datos).subscribe((res: any) => {
+      if (res.message === 'error') {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ListarCiudades();
+      }
+    });
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+          this.activar_seleccion = true;
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.datosCiudadesEliminar = [];
+          this.selectiondatosCiudades.clear();
+          this.ListarCiudades();
+        } else {
+          this.router.navigate(['/listarCiudades']);
+        }
+      });
+  }
+
+  contador: number = 0;
+  ingresar: boolean = false;
+  EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.ingresar = false;
+    this.contador = 0;
+    this.datosCiudadesEliminar = this.selectiondatosCiudades.selected;
+    this.datosCiudadesEliminar.forEach((datos: any) => {
+      this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
+      this.contador = this.contador + 1;
+      this.rest.EliminarCiudad(datos.id, data).subscribe((res: any) => {
+        if (res.message === 'error') {
+          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ListarCiudades();
+        }
+      });
+    }
+    )
+  }
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (this.datosCiudadesEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+            this.datosCiudadesEliminar = [];
+            this.selectiondatosCiudades.clear();
+            this.ListarCiudades();
+          } else {
+            this.toastr.warning('No ha seleccionado CIUDADES.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        } else {
+          this.router.navigate(['/listarCiudades']);
+        }
+      });
+  }
 
 }

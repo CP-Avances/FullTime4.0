@@ -155,7 +155,7 @@ export class RegistroComponent implements OnInit {
   // METODO PARA REGISTRAR EMPLEADO
   InsertarEmpleado(form1: any, form2: any, form3: any) {
     // BUSCA EL ID DE LA NACIONALIDAD ELEGIDA EN EL AUTOCOMPLETADO
-    this.nacionalidades.forEach(obj => {
+    this.nacionalidades.forEach((obj: any) => {
       if (form2.nacionalidadForm == obj.nombre) {
         this.idNacionalidad = obj.id;
       }

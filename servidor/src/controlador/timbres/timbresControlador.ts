@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 
-
 class TimbresControlador {
 
     // ELIMINAR NOTIFICACIONES TABLA DE AVISOS --**VERIFICADO
@@ -17,12 +16,12 @@ class TimbresControlador {
                     await pool.query('BEGIN');
 
                     // CONSULTAR DATOSORIGINALES
-                    const consulta = await pool.query('SELECT * FROM realtime_timbres WHERE id = $1', [obj]);
+                    const consulta = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [obj]);
                     const [datosOriginales] = consulta.rows;
 
                     if (!datosOriginales) {
                         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                            tabla: 'realtime_timbres',
+                            tabla: 'ecm_realtime_timbres',
                             usuario: user_name,
                             accion: 'D',
                             datosOriginales: '',
@@ -36,12 +35,16 @@ class TimbresControlador {
                         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                     }
 
-                    await pool.query('DELETE FROM realtime_timbres WHERE id = $1', [obj])
+                    await pool.query(
+                        `
+                        DELETE FROM ecm_realtime_timbres WHERE id = $1
+                        `
+                        , [obj])
                         .then(async (result: any) => {
                             contador = contador + 1;
                             // AUDITORIA
                             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                                tabla: 'realtime_timbres',
+                                tabla: 'ecm_realtime_timbres',
                                 usuario: user_name,
                                 accion: 'D',
                                 datosOriginales: JSON.stringify(datosOriginales),
@@ -77,12 +80,12 @@ class TimbresControlador {
             const id = req.userIdEmpleado;
             let timbres = await pool.query(
                 `
-                SELECT CAST(t.fec_hora_timbre AS VARCHAR), t.accion, t.tecl_funcion, t.observacion, 
+                SELECT CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, t.tecla_funcion, t.observacion, 
                     t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
-                    CAST(fec_hora_timbre_servidor AS VARCHAR), dispositivo_timbre 
-                FROM empleados AS e, timbres AS t 
+                    CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre 
+                FROM eu_empleados AS e, eu_timbres AS t 
                 WHERE e.id = $1 AND e.codigo = t.codigo 
-                ORDER BY t.fec_hora_timbre DESC LIMIT 100
+                ORDER BY t.fecha_hora_timbre DESC LIMIT 100
                 `
                 , [id]).then((result: any) => {
                     return result.rows
@@ -110,7 +113,7 @@ class TimbresControlador {
                 timbres_PES: await pool.query(
                     `
                     SELECT count(*) 
-                    FROM empleados AS e, timbres AS t 
+                    FROM eu_empleados AS e, eu_timbres AS t 
                     WHERE e.id = $1 AND e.codigo = t.codigo 
                         AND t.accion in (\'PES\', \'E/P\', \'S/P\')
                     `
@@ -119,7 +122,7 @@ class TimbresControlador {
                 timbres_AES: await pool.query(
                     `
                     SELECT count(*) 
-                    FROM empleados AS e, timbres AS t 
+                    FROM eu_empleados AS e, eu_:timbres AS t 
                     WHERE e.id = $1 AND e.codigo = t.codigo 
                     AND t.accion in (\'AES\', \'E/A\', \'S/A\')
                     `
@@ -128,7 +131,7 @@ class TimbresControlador {
                 timbres_EoS: await pool.query(
                     `
                     SELECT count(*) 
-                    FROM empleados AS e, timbres AS t 
+                    FROM eu_empleados AS e, eu_timbres AS t 
                     WHERE e.id = $1 AND e.codigo = t.codigo 
                         AND t.accion in (\'EoS\', \'E\', \'S\')
                     `
@@ -137,7 +140,7 @@ class TimbresControlador {
                 total_timbres: await pool.query(
                     `
                     SELECT count(*) 
-                    FROM empleados AS e, timbres AS t 
+                    FROM eu_empleados AS e, eu_timbres AS t 
                     WHERE e.id = $1 AND e.codigo = t.codigo
                     `
                     , [id]).then((result: any) => { return result.rows[0].count })
@@ -149,10 +152,10 @@ class TimbresControlador {
                 info: await pool.query(
                     `
                     SELECT ec.sueldo, tc.cargo, ec.hora_trabaja, cg.nombre AS departamento
-                    FROM empl_cargos AS ec, tipo_cargo AS tc, cg_departamentos AS cg
+                    FROM eu_empleado_cargos AS ec, e_cat_tipo_cargo AS tc, ed_departamentos AS cg
                     WHERE ec.id = (SELECT MAX(cargo_id) AS cargo_id FROM datos_empleado_cargo
                                     WHERE empl_id = $1)
-                    AND tc.id = ec.cargo AND cg.id = ec.id_departamento
+                        AND tc.id = ec.id_tipo_cargo AND cg.id = ec.id_departamento
                     `
                     , [id]).then((result: any) => {
                         return result.rows
@@ -170,8 +173,9 @@ class TimbresControlador {
             fecha = fecha + '%';
             if (codigo === '') {
                 let usuario = await pool.query(
-                    `SELECT * FROM datos_actuales_empleado 
-                        WHERE cedula = $1
+                    `
+                    SELECT * FROM datos_actuales_empleado    
+                    WHERE cedula = $1
                     `
                     , [cedula]).then((result: any) => {
                         return result.rows.map((obj: any) => {
@@ -181,8 +185,9 @@ class TimbresControlador {
                     );
             } else if (cedula === '') {
                 let usuario = await pool.query(
-                    `SELECT * FROM datos_actuales_empleado 
-                        WHERE codigo = $1
+                    `
+                    SELECT * FROM datos_actuales_empleado 
+                    WHERE codigo = $1
                     `
                     , [codigo]).then((result: any) => {
                         return result.rows.map((obj: any) => {
@@ -196,12 +201,12 @@ class TimbresControlador {
          
             let timbres = await pool.query(
                 `
-                SELECT (da.nombre || ' ' || da.apellido) AS empleado, CAST(t.fec_hora_timbre AS VARCHAR), t.accion, 
-                    t.tecl_funcion, t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
-                    CAST(fec_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id 
-                FROM timbres AS t, datos_actuales_empleado AS da
+                SELECT (da.nombre || ' ' || da.apellido) AS empleado, CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
+                    t.tecla_funcion, t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
+                    CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id 
+                FROM eu_timbres AS t, datos_actuales_empleado AS da
                 WHERE t.codigo = $1 
-                    AND CAST(t.fec_hora_timbre AS VARCHAR) LIKE $2
+                    AND CAST(t.fecha_hora_timbre AS VARCHAR) LIKE $2
                     AND da.codigo = t.codigo 
                     AND da.cedula = $3
                 `
@@ -216,7 +221,7 @@ class TimbresControlador {
             //generarTimbres('35', '2024-01-01', '2024-01-06');
 
             if (timbresRows == 0) {
-                return res.status(400).jsonp({ message: "No se encontraron timbres en esa fecha." })
+                return res.status(400).jsonp({ message: "No se encontraron registros." })
             }
 
         } catch (err) {
@@ -238,7 +243,8 @@ class TimbresControlador {
 
             await pool.query(
                 `
-                SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, $3::character varying, $4::integer, $5::character varying);  
+                SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, 
+                        $3::character varying, $4::integer, $5::character varying) 
                 `
                 , [fecha, codigo, tecla, id, observacion])
                 .then((result: any) => {
@@ -273,7 +279,7 @@ class TimbresControlador {
 
             let code = await pool.query(
                 `
-                SELECT codigo FROM empleados WHERE id = $1
+                SELECT codigo FROM eu_empleados WHERE id = $1
                 `
                 , [id_empleado]).then((result: any) => { return result.rows });
 
@@ -286,8 +292,8 @@ class TimbresControlador {
 
             const [timbre] = await pool.query(
                 `
-                INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, 
-                    codigo, fec_hora_timbre_servidor, id_reloj, ubicacion, dispositivo_timbre)
+                INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, 
+                    codigo, fecha_hora_timbre_servidor, id_reloj, ubicacion, dispositivo_timbre)
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id
                 `
                 , [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
@@ -295,11 +301,11 @@ class TimbresControlador {
                 .then(async (result: any) => {
                     // AUDITORIA
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                        tabla: 'timbres',
+                        tabla: 'eu_timbres',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fec_hora_timbre: ${fec_hora_timbre}, accion: ${accion}, tecl_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fec_hora_timbre_servidor: ${f.toLocaleString()}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: ${ip_cliente}}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fec_hora_timbre}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${f.toLocaleString()}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: ${ip_cliente}}`,
                         ip,
                         observacion: null
                     });
@@ -343,7 +349,7 @@ class TimbresControlador {
             let f = new Date();
             let servidor: any;
 
-            if (tipo === 'admin') {
+            if (tipo === 'administrar') {
                 servidor = fec_hora_timbre;
             }
             else {
@@ -352,7 +358,7 @@ class TimbresControlador {
 
             let code = await pool.query(
                 `
-                SELECT codigo FROM empleados WHERE id = $1
+                SELECT codigo FROM eu_empleados WHERE id = $1
                 `
                 , [id_empleado]).then((result: any) => { return result.rows });
 
@@ -366,8 +372,8 @@ class TimbresControlador {
 
             await pool.query(
                 `
-                INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, 
-                    longitud, codigo, id_reloj, dispositivo_timbre, fec_hora_timbre_servidor) 
+                INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, 
+                    longitud, codigo, id_reloj, dispositivo_timbre, fecha_hora_timbre_servidor) 
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 `
                 , [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
@@ -375,11 +381,11 @@ class TimbresControlador {
                 .then(async (result: any) => {
                     // AUDITORIA
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                        tabla: 'timbres',
+                        tabla: 'eu_timbres',
                         usuario: 'admin',
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fec_hora_timbre: ${fec_hora_timbre}, accion: ${accion}, tecl_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: ${ip_cliente}, fec_hora_timbre_servidor: ${servidor}}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fec_hora_timbre}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: ${ip_cliente}, fecha_hora_timbre_servidor: ${servidor}}`,
                         ip: ip_cliente,
                         observacion: null
                     });
@@ -403,10 +409,10 @@ class TimbresControlador {
         console.log('ver datos timbres ', codigo, fec_inicio, fec_final)
 
         const TIMBRES = await pool.query(
-            "SELECT * FROM timbres " +
-            "WHERE fec_hora_timbre_servidor BETWEEN $1 AND $2 " +
+            "SELECT * FROM eu_timbres " +
+            "WHERE fecha_hora_timbre_servidor BETWEEN $1 AND $2 " +
             "AND codigo IN (" + codigo + ") " +
-            "ORDER BY codigo, fec_hora_timbre_servidor ASC",
+            "ORDER BY codigo, fecha_hora_timbre_servidor ASC",
             [fec_inicio, fec_final]);
 
         if (TIMBRES.rowCount === 0) {
@@ -415,18 +421,19 @@ class TimbresControlador {
         else {
             var contador = 0;
             TIMBRES.rows.forEach(async obj => {
-                console.log('fecha ', obj.fec_hora_timbre_servidor)
+                console.log('fecha ', obj.fecha_hora_timbre_servidor)
                 console.log('codigo ', obj.codigo)
-                console.log('funcion ', obj.tecl_funcion)
+                console.log('funcion ', obj.tecla_funcion)
                 console.log('id ', obj.id)
                 console.log('observacion ', obj.observacion)
                 contador = contador + 1;
                 // fecha_hora_servidor, codigo, tecla_funcion, id_timbre, observcaion
                 await pool.query(
                     `
-                    SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, $3::character varying, $4::integer, $5::character varying);  
+                    SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, 
+                            $3::character varying, $4::integer, $5::character varying)  
                     `
-                    , [obj.fec_hora_timbre_servidor, obj.codigo, obj.tecl_funcion, obj.id, obj.observacion]);
+                    , [obj.fecha_hora_timbre_servidor, obj.codigo, obj.tecla_funcion, obj.id, obj.observacion]);
             })
 
             if (contador === TIMBRES.rowCount) {
@@ -445,9 +452,9 @@ class TimbresControlador {
 
         const TIMBRES_NOTIFICACION = await pool.query(
             `
-            SELECT id, to_char(create_at, 'yyyy-MM-dd HH24:mi:ss') AS create_at, id_send_empl, visto, 
-            descripcion, id_timbre, tipo, id_receives_empl
-            FROM realtime_timbres WHERE id_receives_empl = $1 
+            SELECT id, to_char(fecha_hora, 'yyyy-MM-dd HH24:mi:ss') AS fecha_hora, id_empleado_envia, visto, 
+                descripcion, id_timbre, tipo, id_empleado_recibe
+            FROM ecm_realtime_timbres WHERE id_empleado_recibe = $1 
             ORDER BY (visto is FALSE) DESC, id DESC LIMIT 20
             `
             , [id_empleado])
@@ -458,15 +465,15 @@ class TimbresControlador {
 
                         let nombre = await pool.query(
                             `
-                            SELECT nombre, apellido FROM empleados WHERE id = $1
+                            SELECT nombre, apellido FROM eu_empleados WHERE id = $1
                             `
-                            , [obj.id_send_empl]).then((ele: any) => {
+                            , [obj.id_empleado_envia]).then((ele: any) => {
                                 return ele.rows[0].nombre + ' ' + ele.rows[0].apellido
                             })
                         return {
-                            create_at: obj.create_at,
+                            create_at: obj.fecha_hora,
                             descripcion: obj.descripcion,
-                            id_receives_empl: obj.id_receives_empl,
+                            id_receives_empl: obj.id_empleado_recibe,
                             visto: obj.visto,
                             id_timbre: obj.id_timbre,
                             empleado: nombre,
@@ -482,7 +489,7 @@ class TimbresControlador {
             return res.jsonp(TIMBRES_NOTIFICACION)
         }
 
-        return res.status(404).jsonp({ message: 'No se encuentran registros' });
+        return res.status(404).jsonp({ message: 'No se encuentran registros.' });
     }
 
     // METODO DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA
@@ -490,17 +497,17 @@ class TimbresControlador {
         const id = req.params.id;
         const AVISOS = await pool.query(
             `
-            SELECT r.id, r.id_send_empl, r.id_receives_empl, r.create_at, r.tipo, r.visto, 
-            r.id_timbre, r.descripcion, (e.nombre || ' ' || e.apellido) AS empleado 
-            FROM realtime_timbres AS r, empleados AS e 
-            WHERE r.id = $1 AND e.id = r.id_send_empl
+            SELECT r.id, r.id_empleado_envia, r.id_empleado_recibe, r.fecha_hora, r.tipo, r.visto, 
+                r.id_timbre, r.descripcion, (e.nombre || ' ' || e.apellido) AS empleado 
+            FROM ecm_realtime_timbres AS r, eu_empleados AS e 
+            WHERE r.id = $1 AND e.id = r.id_empleado_envia
             `
             , [id]);
         if (AVISOS.rowCount > 0) {
             return res.jsonp(AVISOS.rows[0])
         }
         else {
-            return res.status(404).jsonp({ text: 'Registro no encontrado' });
+            return res.status(404).jsonp({ text: 'Registro no encontrado.' });
         }
     }
 
@@ -508,20 +515,29 @@ class TimbresControlador {
     public async ObtenerAvisosTimbresEmpleado(req: Request, res: Response) {
         const { id_empleado } = req.params
         console.log(id_empleado);
-        const TIMBRES_NOTIFICACION = await pool.query('SELECT * FROM realtime_timbres WHERE id_receives_empl = $1 ORDER BY create_at DESC', [id_empleado])
+        const TIMBRES_NOTIFICACION = await pool.query(
+            `
+            SELECT * FROM ecm_realtime_timbres WHERE id_empleado_recibe = $1 
+            ORDER BY fecha_hora DESC
+            `
+            , [id_empleado])
             .then((result: any) => { return result.rows });
 
-        if (TIMBRES_NOTIFICACION.length === 0) return res.status(404).jsonp({ message: 'No se encuentran registros' });
+        if (TIMBRES_NOTIFICACION.length === 0) return res.status(404).jsonp({ message: 'No se encuentran registros.' });
         console.log(TIMBRES_NOTIFICACION);
 
         const tim = await Promise.all(TIMBRES_NOTIFICACION.map(async (obj: any): Promise<any> => {
-            let [empleado] = await pool.query('SELECT  (nombre || \' \' || apellido) AS fullname FROM empleados WHERE id = $1', [obj.id_send_empl]).then((ele: any) => {
-                console.log('¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨', ele.rows);
-                return ele.rows
-            })
+            let [empleado] = await pool.query(
+                `
+                SELECT  (nombre || \' \' || apellido) AS fullname FROM eu_empleados WHERE id = $1
+                `
+                , [obj.id_empleado_envia]).then((ele: any) => {
+                    console.log('¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨', ele.rows);
+                    return ele.rows
+                })
             const fullname = (empleado === undefined) ? '' : empleado.fullname;
             return {
-                create_at: obj.create_at,
+                create_at: obj.fecha_hora,
                 descripcion: obj.descripcion,
                 visto: obj.visto,
                 id_timbre: obj.id_timbre,
@@ -546,12 +562,12 @@ class TimbresControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const consulta = await pool.query('SELECT * FROM realtime_timbres WHERE id = $1',[id]);
+            const consulta = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1',[id]);
             const [datosOriginales] = consulta.rows;
 
             if (!datosOriginales){
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'realtime_timbres',
+                    tabla: 'ecm_realtime_timbres',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
@@ -565,11 +581,15 @@ class TimbresControlador {
                 return res.status(404).jsonp({ message: 'Registro no encontrado.' });
             }
         
-            await pool.query('UPDATE realtime_timbres SET visto = $1 WHERE id = $2', [visto, id]);
+            await pool.query(
+                `
+                UPDATE ecm_realtime_timbres SET visto = $1 WHERE id = $2
+                `
+                , [visto, id]);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'realtime_timbres',
+                tabla: 'ecm_realtime_timbres',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
@@ -591,7 +611,14 @@ class TimbresControlador {
     public async ObtenerUltimoTimbreEmpleado(req: Request, res: Response): Promise<any> {
         try {
             const codigo = req.userCodigo
-            let timbre = await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR) as timbre, accion FROM timbres WHERE codigo = $1 ORDER BY fec_hora_timbre DESC LIMIT 1', [codigo])
+            let timbre = await pool.query(
+                `
+                SELECT CAST(fecha_hora_timbre AS VARCHAR) as timbre, accion 
+                FROM eu_timbres 
+                WHERE codigo = $1 
+                ORDER BY fecha_hora_timbre DESC LIMIT 1
+                `
+                , [codigo])
                 .then((result: any) => {
                     return result.rows.map((obj: any) => {
                         switch (obj.accion) {
@@ -622,10 +649,15 @@ class TimbresControlador {
     public async ObtenerTimbresEmpleado(req: Request, res: Response): Promise<any> {
         try {
             const { id } = req.params;
-            let timbres = await pool.query('SELECT CAST(t.fec_hora_timbre AS VARCHAR), t.accion, t.tecl_funcion, ' +
-                't.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj ' +
-                'FROM empleados AS e, timbres AS t WHERE e.id = $1 AND e.codigo = t.codigo ' +
-                'ORDER BY t.fec_hora_timbre DESC LIMIT 50', [id]).then((result: any) => {
+            let timbres = await pool.query(
+                `
+                SELECT CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, t.tecla_funcion, 
+                    t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj 
+                FROM eu_empleados AS e, eu_timbres AS t 
+                WHERE e.id = $1 AND e.codigo = t.codigo 
+                ORDER BY t.fecha_hora_timbre DESC LIMIT 50
+                `
+                , [id]).then((result: any) => {
                     return result.rows
                         .map((obj: any) => {
                             switch (obj.accion) {
@@ -644,7 +676,7 @@ class TimbresControlador {
                             return obj
                         })
                 });
-            if (timbres.length === 0) return res.status(400).jsonp({ message: 'No se encontraron registros de timbres.' });
+            if (timbres.length === 0) return res.status(400).jsonp({ message: 'No se encontraron registros.' });
             return res.status(200).jsonp({
                 timbres: timbres,
             });
@@ -660,11 +692,11 @@ class TimbresControlador {
         const { fecha, funcion, codigo } = req.body;
         const TIMBRE = await pool.query(
             `
-            SELECT t.*, t.fec_hora_timbre_servidor::date AS t_fec_timbre, 
-                t.fec_hora_timbre_servidor::time AS t_hora_timbre 
-                FROM timbres AS t
-                WHERE codigo = $1 AND fec_hora_timbre_servidor::date = $2 AND tecl_funcion = $3 
-                ORDER BY t.fec_hora_timbre_servidor ASC;
+            SELECT t.*, t.fecha_hora_timbre_servidor::date AS t_fec_timbre, 
+                t.fecha_hora_timbre_servidor::time AS t_hora_timbre 
+            FROM eu_timbres AS t
+            WHERE codigo = $1 AND fecha_hora_timbre_servidor::date = $2 AND tecla_funcion = $3 
+            ORDER BY t.fecha_hora_timbre_servidor ASC;
             `
             , [codigo, fecha, funcion]);
 
@@ -679,4 +711,5 @@ class TimbresControlador {
 }
 
 export const timbresControlador = new TimbresControlador;
+
 export default timbresControlador

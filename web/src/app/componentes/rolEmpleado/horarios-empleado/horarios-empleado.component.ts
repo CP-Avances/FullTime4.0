@@ -212,7 +212,7 @@ export class HorariosEmpleadoComponent implements OnInit {
       if (datos.message === 'OK') {
         this.horariosEmpleado = datos.data;
         let index = 0;
-        this.horariosEmpleado.forEach(obj => {
+        this.horariosEmpleado.forEach((obj: any) => {
           obj.index = index;
           index = index + 1;
         })
@@ -264,7 +264,7 @@ export class HorariosEmpleadoComponent implements OnInit {
         this.detalle_acciones = [];
         this.detalles = datos.data;
 
-        datos.data.forEach(obj => {
+        datos.data.forEach((obj: any) => {
           if (aux_h === '') {
             accion = obj.tipo_accion + ': ' + obj.hora;
             this.ValidarAcciones(obj);
@@ -311,7 +311,7 @@ export class HorariosEmpleadoComponent implements OnInit {
         }]
         this.detalle_acciones = this.detalle_acciones.concat(tipos);
 
-        this.detalle_acciones.forEach(detalle => {
+        this.detalle_acciones.forEach((detalle: any) => {
           detalle.entrada_ = this.validar.FormatearHora(detalle.entrada, this.formato_hora);
           if (detalle.inicio_comida != '') {
             detalle.inicio_comida = this.validar.FormatearHora(detalle.inicio_comida, this.formato_hora);

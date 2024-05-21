@@ -49,6 +49,18 @@ export class EmplCargosService {
     return this.http.get<any>(`${environment.url}/empleadoCargos/cargoInfo/${id_empl_contrato}`);
   }
 
+  // METODO PARA BUSCAR CARGOS POR FECHA
+  BuscarCargoFecha(data: any) {
+    return this.http.post(`${environment.url}/empleadoCargos/fecha_cargo`, data);
+  }
+
+  // METODO PARA BUSCAR CARGOS POR FECHA EDITAR
+  BuscarCargoFechaEditar(data: any) {
+    return this.http.post(`${environment.url}/empleadoCargos/fecha_cargo/editar`, data);
+  }
+
+
+
 
 
 
@@ -101,6 +113,15 @@ export class EmplCargosService {
 
   ObtenerCargoRegimen(id: number) {
     return this.http.get(`${environment.url}/empleadoCargos/buscar/cargo-regimen/${id}`);
+  }
+
+
+  RevisarFormato(formData) {
+    return this.http.post<any>(`${environment.url}/empleadoCargos/upload/revision`, formData);
+  }
+
+  subirArchivoExcelCargo(formData) {
+    return this.http.post<any>(`${environment.url}/empleadoCargos/cargar_plantilla/`, formData);
   }
 
 }

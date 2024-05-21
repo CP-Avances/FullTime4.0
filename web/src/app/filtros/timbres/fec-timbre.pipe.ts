@@ -12,7 +12,7 @@ export class FecTimbrePipe implements PipeTransform {
     let resultadoTimbres: any = [];
 
     for (const timbres of value) {
-      if (timbres.fec_hora_timbre && timbres.fec_hora_timbre.toLowerCase().indexOf(arg.toLowerCase()) > -1) {
+      if (timbres.fecha_hora_timbre && timbres.fecha_hora_timbre.toLowerCase().indexOf(arg.toLowerCase()) > -1) {
         resultadoTimbres.push(timbres);
       };
       if (timbres.accion && timbres.accion.toLowerCase().indexOf(arg.toLowerCase()) > -1) {
@@ -30,7 +30,7 @@ export class FecTimbrePipe implements PipeTransform {
       if (timbres.observacion && timbres.observacion.toLowerCase().indexOf(arg.toLowerCase()) > -1) {
         resultadoTimbres.push(timbres);
       };
-      if (timbres.tecl_funcion && timbres.tecl_funcion.toLowerCase().indexOf(arg.toLowerCase()) > -1) {
+      if (timbres.tecla_funcion && timbres.tecla_funcion.toLowerCase().indexOf(arg.toLowerCase()) > -1) {
         resultadoTimbres.push(timbres);
       };
     };

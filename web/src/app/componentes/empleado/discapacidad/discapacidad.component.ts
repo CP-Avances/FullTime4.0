@@ -63,9 +63,9 @@ export class DiscapacidadComponent implements OnInit {
     if (this.editar == 'editar') {
       this.rest.BuscarDiscapacidadUsuario(parseInt(this.idEmploy)).subscribe(data => {
         this.userDiscapacidad = data;
-        this.carnet.setValue(this.userDiscapacidad[0].carn_conadis);
+        this.carnet.setValue(this.userDiscapacidad[0].carnet_conadis);
         this.porcentaje.setValue(this.userDiscapacidad[0].porcentaje);
-        this.tipo.setValue(this.userDiscapacidad[0].tipo);
+        this.tipo.setValue(this.userDiscapacidad[0].id_discapacidad);
         this.texto = 'MODIFICAR'
       });
     }
@@ -166,8 +166,18 @@ export class DiscapacidadComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     }
-    this.rest.RegistrarTipo(tipo).subscribe(response => {
-      this.ActualizarDatos(form, response.id);
+    // VERIFICAR EXISTENCIA DE DISCAPACIDAD
+    let discapacidad = {
+      nombre: (tipo.nombre).toUpperCase()
+    }
+    this.rest.BuscarDiscapacidadNombre(discapacidad).subscribe(response => {
+      this.toastr.warning('Tipo discapacidad ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+        timeOut: 4000,
+      })
+    }, vacio => {
+      this.rest.RegistrarTipo(tipo).subscribe(response => {
+        this.ActualizarDatos(form, response.id);
+      });
     });
   }
 
@@ -178,8 +188,18 @@ export class DiscapacidadComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     }
-    this.rest.RegistrarTipo(tipo).subscribe(response => {
-      this.RegistarDatos(form, response.id);
+    // VERIFICAR EXISTENCIA DE DISCAPACIDAD
+    let discapacidad = {
+      nombre: (tipo.nombre).toUpperCase()
+    }
+    this.rest.BuscarDiscapacidadNombre(discapacidad).subscribe(response => {
+      this.toastr.warning('Tipo discapacidad ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+        timeOut: 4000,
+      })
+    }, vacio => {
+      this.rest.RegistrarTipo(tipo).subscribe(response => {
+        this.RegistarDatos(form, response.id);
+      });
     });
   }
 

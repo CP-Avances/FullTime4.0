@@ -19,7 +19,8 @@ class DatosGeneralesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             let estado = req.params.estado;
             // CONSULTA DE BUSQUEDA DE SUCURSALES
-            let sucursal_ = yield database_1.default.query(`SELECT ig.id_suc, ig.name_suc, ig.ciudad FROM informacion_general AS ig
+            let sucursal_ = yield database_1.default.query(`
+            SELECT ig.id_suc, ig.name_suc, ig.ciudad FROM informacion_general AS ig
             GROUP BY ig.id_suc, ig.name_suc, ig.ciudad
             ORDER BY ig.name_suc ASC
             `).then((result) => { return result.rows; });
@@ -391,7 +392,7 @@ class DatosGeneralesControlador {
             const DATOS = yield database_1.default.query(`
             SELECT da.id, da.nombre, da.apellido, da.id_departamento, 
                 ce.jefe, r.nombre AS rol, r.id AS id_rol
-            FROM datos_actuales_empleado AS da, empl_cargos AS ce, cg_roles AS r
+            FROM datos_actuales_empleado AS da, eu_empleado_cargos AS ce, ero_cat_roles AS r
             WHERE da.id_cargo = ce.id AND da.id_rol = r.id AND NOT da.id_rol = 2 AND da.id = $1
             ORDER BY da.apellido ASC
             `, [id_empleado]);
@@ -490,12 +491,12 @@ class DatosGeneralesControlador {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
                         car.cargos = yield Promise.all(car.cargos.map((empl) => __awaiter(this, void 0, void 0, function* () {
                             empl.empleado = yield database_1.default.query(`
-                            SELECT ig.*, cn.comunicado_mail, cn.comunicado_noti 
-                            FROM informacion_general AS ig, config_noti AS cn 
+                            SELECT ig.*, cn.comunicado_mail, cn.comunicado_notificacion 
+                            FROM informacion_general AS ig, eu_configurar_alertas AS cn 
                             WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
                                 AND ig.id_depa = $4 AND ig.id_regimen = $5 
                                 AND ig.id = cn.id_empleado
-                                AND (cn.comunicado_mail = true OR cn.comunicado_noti = true) 
+                                AND (cn.comunicado_mail = true OR cn.comunicado_notificacion = true) 
                             `, [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen])
                                 .then((result) => { return result.rows; });
                             return empl;
@@ -618,12 +619,12 @@ class DatosGeneralesControlador {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
                         car.cargos = yield Promise.all(car.cargos.map((empl) => __awaiter(this, void 0, void 0, function* () {
                             empl.empleado = yield database_1.default.query(`
-                            SELECT ig.*, cn.comunicado_mail, cn.comunicado_noti 
-                            FROM informacion_general AS ig, config_noti AS cn 
+                            SELECT ig.*, cn.comunicado_mail, cn.comunicado_notificacion 
+                            FROM informacion_general AS ig, eu_configurar_alertas AS cn 
                             WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
                                 AND ig.id_depa = $4 AND ig.id_regimen = $5 
                                 AND ig.id = cn.id_empleado
-                                AND (cn.comunicado_mail = true OR cn.comunicado_noti = true) 
+                                AND (cn.comunicado_mail = true OR cn.comunicado_notificacion = true) 
                             `, [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen])
                                 .then((result) => { return result.rows; });
                             return empl;
@@ -744,12 +745,12 @@ class DatosGeneralesControlador {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
                         car.cargos = yield Promise.all(car.cargos.map((empl) => __awaiter(this, void 0, void 0, function* () {
                             empl.empleado = yield database_1.default.query(`
-                            SELECT ig.*, cn.comunicado_mail, cn.comunicado_noti 
-                            FROM informacion_general AS ig, config_noti AS cn 
+                            SELECT ig.*, cn.comunicado_mail, cn.comunicado_notificacion 
+                            FROM informacion_general AS ig, eu_configurar_alertas AS cn 
                             WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
                                 AND ig.id_depa = $4 AND ig.id_regimen = $5 
                                 AND ig.id = cn.id_empleado
-                                AND (cn.comunicado_mail = true OR cn.comunicado_noti = true) 
+                                AND (cn.comunicado_mail = true OR cn.comunicado_notificacion = true) 
                             `, [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen])
                                 .then((result) => { return result.rows; });
                             return empl;
@@ -810,7 +811,7 @@ class DatosGeneralesControlador {
             let { id_sucursal } = req.body;
             // CONSULTA DE BUSQUEDA DE SUCURSALES
             let suc = yield database_1.default.query("SELECT s.id AS id_suc, s.nombre AS name_suc, c.descripcion AS ciudad " +
-                "FROM sucursales AS s, ciudades AS c " +
+                "FROM e_sucursales AS s, e_ciudades AS c " +
                 "WHERE s.id_ciudad = c.id AND s.id IN (" + id_sucursal + ")" +
                 "ORDER BY s.id ASC").then((result) => { return result.rows; });
             if (suc.length === 0)
@@ -819,7 +820,7 @@ class DatosGeneralesControlador {
             let departamentos = yield Promise.all(suc.map((dep) => __awaiter(this, void 0, void 0, function* () {
                 dep.departamentos = yield database_1.default.query(`
                 SELECT d.id as id_depa, d.nombre as name_dep, s.nombre AS sucursal
-                FROM cg_departamentos AS d, sucursales AS s
+                FROM ed_departamentos AS d, e_sucursales AS s
                 WHERE d.id_sucursal = $1 AND d.id_sucursal = s.id
                 `, [dep.id_suc]).then((result) => {
                     return result.rows.filter((obj) => {
@@ -843,11 +844,11 @@ class DatosGeneralesControlador {
                             co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                             d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
                             s.nombre AS sucursal, c.descripcion AS ciudad, ca.hora_trabaja
-                        FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
-                            tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, ciudades AS c
+                        FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e,
+                            e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s, e_ciudades AS c
                         WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
                             da.id = e.id) 
-                            AND tc.id = ca.cargo
+                            AND tc.id = ca.id_tipo_cargo
                             AND ca.id_departamento = $1
                             AND ca.id_departamento = d.id
                             AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
@@ -865,12 +866,12 @@ class DatosGeneralesControlador {
                             e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo, tc.id AS id_tipo_cargo,
                             co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                             d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
-                            s.nombre AS sucursal, c.descripcion AS ciudad, ca.fec_final, ca.hora_trabaja
-                        FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
-                            tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, ciudades AS c
+                            s.nombre AS sucursal, c.descripcion AS ciudad, ca.fecha_final, ca.hora_trabaja
+                        FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e,
+                            e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s, e_ciudades AS c
                         WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
                             da.id = e.id) 
-                            AND tc.id = ca.cargo
+                            AND tc.id = ca.id_tipo_cargo
                             AND ca.id_departamento = $1
                             AND ca.id_departamento = d.id
                             AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
@@ -904,7 +905,7 @@ class DatosGeneralesControlador {
                         //console.log('variables car ', reg)
                         reg.regimen = yield database_1.default.query(`
                             SELECT r.id AS id_regimen, r.descripcion AS name_regimen
-                            FROM cg_regimenes AS r
+                            FROM ere_cat_regimenes AS r
                             WHERE r.id = $1
                             ORDER BY r.descripcion ASC
                             `, [reg.id_regimen])
@@ -950,7 +951,7 @@ class DatosGeneralesControlador {
             // CONSULTA DE BUSQUEDA DE CARGOS
             let cargo = yield database_1.default.query(`
             SELECT tc.id AS id_cargo, tc.cargo AS name_cargo
-            FROM tipo_cargo AS tc 
+            FROM e_cat_tipo_cargo AS tc 
             ORDER BY tc.cargo ASC
             `).then((result) => { return result.rows; });
             if (cargo.length === 0)
@@ -963,12 +964,12 @@ class DatosGeneralesControlador {
                         "co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, " +
                         "d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, " +
                         "s.nombre AS sucursal, c.descripcion AS ciudad, ca.hora_trabaja " +
-                        "FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e, " +
-                        "tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, ciudades AS c " +
+                        "FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e, " +
+                        "e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s, e_ciudades AS c " +
                         "WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE " +
                         "da.id = e.id) " +
-                        "AND tc.id = ca.cargo " +
-                        "AND ca.cargo = $1 " +
+                        "AND tc.id = ca.id_tipo_cargo " +
+                        "AND ca.id_tipo_cargo = $1 " +
                         "AND ca.id_departamento = d.id " +
                         "AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE " +
                         "da.id = e.id) " +
@@ -983,13 +984,13 @@ class DatosGeneralesControlador {
                         "e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo, " +
                         "co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, " +
                         "d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, " +
-                        "s.nombre AS sucursal, c.descripcion AS ciudad, ca.fec_final, ca.hora_trabaja " +
-                        "FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e, " +
-                        "tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, ciudades AS c " +
+                        "s.nombre AS sucursal, c.descripcion AS ciudad, ca.fecha_final, ca.hora_trabaja " +
+                        "FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e, " +
+                        "e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s, e_ciudades AS c " +
                         "WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE " +
                         "da.id = e.id) " +
-                        "AND tc.id = ca.cargo " +
-                        "AND ca.cargo = $1 " +
+                        "AND tc.id = ca.id_tipo_cargo " +
+                        "AND ca.id_tipo_cargo = $1 " +
                         "AND ca.id_departamento = d.id " +
                         "AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE " +
                         "da.id = e.id) " +
@@ -1023,7 +1024,7 @@ class DatosGeneralesControlador {
             // CONSULTA DE BUSQUEDA DE SUCURSALES
             let suc = yield database_1.default.query(`
             SELECT s.id AS id_suc, s.nombre AS name_suc, c.descripcion AS ciudad 
-            FROM sucursales AS s, ciudades AS c 
+            FROM e_sucursales AS s, e_ciudades AS c 
             WHERE s.id_ciudad = c.id ORDER BY s.id ASC
             `).then((result) => { return result.rows; });
             if (suc.length === 0)
@@ -1032,7 +1033,7 @@ class DatosGeneralesControlador {
             let departamentos = yield Promise.all(suc.map((dep) => __awaiter(this, void 0, void 0, function* () {
                 dep.departamentos = yield database_1.default.query(`
                 SELECT d.id as id_depa, d.nombre as name_dep, s.nombre AS sucursal
-                FROM cg_departamentos AS d, sucursales AS s
+                FROM ed_departamentos AS d, e_sucursales AS s
                 WHERE d.id_sucursal = $1 AND d.id_sucursal = s.id
                 `, [dep.id_suc]).then((result) => {
                     return result.rows.filter((obj) => {
@@ -1056,19 +1057,19 @@ class DatosGeneralesControlador {
                             co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                             d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
                             s.nombre AS sucursal, ca.hora_trabaja
-                        FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
-                            tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                        FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e,
+                            e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s
                         WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
                             da.id = e.id) 
-                            AND tc.id = ca.cargo
+                            AND tc.id = ca.id_tipo_cargo
                             AND ca.id_departamento = $1
                             AND ca.id_departamento = d.id
                             AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
                             da.id = e.id) 
                             AND s.id = d.id_sucursal
                             AND co.id_regimen = r.id AND e.estado = $2
-                            AND NOT EXISTS (SELECT eu.id_empl FROM empl_ubicacion AS eu 
-                                WHERE eu.id_empl = e.id AND eu.id_ubicacion = $3)
+                            AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
+                                WHERE eu.id_empleado = e.id AND eu.id_ubicacion = $3)
                         ORDER BY name_empleado ASC
                         `, [empl.id_depa, estado, ubicacion])
                             .then((result) => { return result.rows; });
@@ -1079,20 +1080,20 @@ class DatosGeneralesControlador {
                             e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
                             co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                             d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
-                            s.nombre AS sucursal, ca.fec_final, ca.hora_trabaja
-                        FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
-                            tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                            s.nombre AS sucursal, ca.fecha_final, ca.hora_trabaja
+                        FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e,
+                            e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s
                         WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
                             da.id = e.id) 
-                            AND tc.id = ca.cargo
+                            AND tc.id = ca.id_tipo_cargo
                             AND ca.id_departamento = $1
                             AND ca.id_departamento = d.id
                             AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
                             da.id = e.id) 
                             AND s.id = d.id_sucursal
                             AND co.id_regimen = r.id AND e.estado = $2
-                            AND NOT EXISTS (SELECT eu.id_empl FROM empl_ubicacion AS eu 
-                                WHERE eu.id_empl = e.id AND eu.id_ubicacion = $3)
+                            AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
+                                WHERE eu.id_empleado = e.id AND eu.id_ubicacion = $3)
                         ORDER BY name_empleado ASC
                         `, [empl.id_depa, estado, ubicacion])
                             .then((result) => { return result.rows; });
@@ -1119,7 +1120,7 @@ class DatosGeneralesControlador {
                         //console.log('variables car ', reg)
                         reg.regimen = yield database_1.default.query(`
                     SELECT r.id AS id_regimen, r.descripcion AS name_regimen
-                    FROM cg_regimenes AS r
+                    FROM ere_cat_regimenes AS r
                     WHERE r.id = $1
                     ORDER BY r.descripcion ASC
                     `, [reg.id_regimen])
@@ -1165,7 +1166,7 @@ class DatosGeneralesControlador {
             // CONSULTA DE BUSQUEDA DE CARGOS
             let cargo = yield database_1.default.query(`
             SELECT tc.id AS id_cargo, tc.cargo AS name_cargo
-            FROM tipo_cargo AS tc 
+            FROM e_cat_tipo_cargo AS tc 
             ORDER BY tc.cargo ASC
             `).then((result) => { return result.rows; });
             if (cargo.length === 0)
@@ -1179,19 +1180,19 @@ class DatosGeneralesControlador {
                         co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                         d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
                         s.nombre AS sucursal, ca.hora_trabaja
-                    FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
-                        tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                    FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e,
+                        e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s
                     WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
                         da.id = e.id) 
-                        AND tc.id = ca.cargo
-                        AND ca.cargo = $1
+                        AND tc.id = ca.id_tipo_cargo
+                        AND ca.id_tipo_cargo = $1
                         AND ca.id_departamento = d.id
                         AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
                         da.id = e.id) 
                         AND s.id = d.id_sucursal
                         AND co.id_regimen = r.id AND e.estado = $2
-                        AND NOT EXISTS (SELECT eu.id_empl FROM empl_ubicacion AS eu 
-                            WHERE eu.id_empl = e.id AND eu.id_ubicacion = $3)
+                        AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
+                            WHERE eu.id_empleado = e.id AND eu.id_ubicacion = $3)
                     ORDER BY name_empleado ASC
                     `, [empl.id_cargo, estado, ubicacion]).then((result) => { return result.rows; });
                 }
@@ -1201,20 +1202,20 @@ class DatosGeneralesControlador {
                         e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
                         co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                         d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
-                        s.nombre AS sucursal, ca.fec_final, ca.hora_trabaja
-                    FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
-                        tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                        s.nombre AS sucursal, ca.fecha_final, ca.hora_trabaja
+                    FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e,
+                        e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s
                     WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
                         da.id = e.id) 
-                        AND tc.id = ca.cargo
-                        AND ca.cargo = $1
+                        AND tc.id = ca.id_tipo_cargo
+                        AND ca.id_tipo_cargo = $1
                         AND ca.id_departamento = d.id
                         AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
                         da.id = e.id) 
                         AND s.id = d.id_sucursal
                         AND co.id_regimen = r.id AND e.estado = $2
-                        AND NOT EXISTS (SELECT eu.id_empl FROM empl_ubicacion AS eu 
-                            WHERE eu.id_empl = e.id AND eu.id_ubicacion = $3)
+                        AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
+                            WHERE eu.id_empleado = e.id AND eu.id_ubicacion = $3)
                     ORDER BY name_empleado ASC
                     `, [empl.id_cargo, estado, ubicacion])
                         .then((result) => { return result.rows; });
@@ -1239,12 +1240,12 @@ class DatosGeneralesControlador {
                 e_datos.codigo, e_datos.id_contrato, r.id AS id_regimen, r.descripcion AS regimen,
                 e_datos.id_cargo, tc.id AS id_tipo_cargo, tc.cargo, c.id_departamento, 
                 d.nombre AS departamento, c.id_sucursal, s.nombre AS sucursal, s.id_empresa, 
-                empre.nombre AS empresa, s.id_ciudad, ciudades.descripcion AS ciudad, c.hora_trabaja
-            FROM datos_actuales_empleado AS e_datos, empl_cargos AS c, cg_departamentos AS d, 
-                sucursales AS s, cg_empresa AS empre, ciudades, cg_regimenes AS r, tipo_cargo AS tc, 
-                empl_contratos AS co 
+                empre.nombre AS empresa, s.id_ciudad, e_ciudades.descripcion AS ciudad, c.hora_trabaja
+            FROM datos_actuales_empleado AS e_datos, eu_empleado_cargos AS c, ed_departamentos AS d, 
+                e_sucursales AS s, e_empresa AS empre, e_ciudades, ere_cat_regimenes AS r, e_cat_tipo_cargo AS tc, 
+                eu_empleado_contratos AS co 
             WHERE c.id = e_datos.id_cargo AND d.id = c.id_departamento AND s.id = c.id_sucursal AND 
-                s.id_empresa = empre.id AND ciudades.id = s.id_ciudad AND c.cargo = tc.id AND 
+                s.id_empresa = empre.id AND e_ciudades.id = s.id_ciudad AND c.id_tipo_cargo = tc.id AND 
                 e_datos.id_contrato = co.id AND co.id_regimen = r.id 
             ORDER BY e_datos.nombre ASC
             `);
@@ -1262,9 +1263,9 @@ class DatosGeneralesControlador {
             const DATOS = yield database_1.default.query(`
             SELECT (da.nombre ||' '|| da.apellido) AS fullname, da.cedula, tc.cargo, 
                 cd.nombre AS departamento
-            FROM datos_actuales_empleado AS da, empl_cargos AS ec, tipo_cargo AS tc,
-                cg_departamentos AS cd
-            WHERE da.id_cargo = ec.id AND ec.cargo = tc.id AND cd.id = da.id_departamento AND 
+            FROM datos_actuales_empleado AS da, eu_empleado_cargos AS ec, e_cat_tipo_cargo AS tc,
+                ed_departamentos AS cd
+            WHERE da.id_cargo = ec.id AND ec.id_tipo_cargo = tc.id AND cd.id = da.id_departamento AND 
             da.id = $1
             `, [empleado_id]);
             if (DATOS.rowCount > 0) {
@@ -1281,16 +1282,16 @@ class DatosGeneralesControlador {
             const { objeto, depa_user_loggin } = req.body;
             const permiso = objeto;
             const JefesDepartamentos = yield database_1.default.query(`
-            SELECT da.id, da.estado, n.id_departamento as id_dep, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, 
-                n.id_establecimiento AS id_suc, n.departamento, s.nombre AS sucursal, da.id_empl_cargo as cargo, 
+            SELECT da.id, da.estado, n.id_departamento as id_dep, n.id_departamento_nivel, n.departamento_nombre_nivel, 
+                n.nivel, n.id_establecimiento AS id_suc, n.departamento, s.nombre AS sucursal, da.id_empl_cargo as cargo, 
                 dae.id_contrato as contrato, da.id_empleado AS empleado, (dae.nombre || ' ' || dae.apellido) as fullname,
-                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail, 
-                c.hora_extra_noti, c.comida_mail, c.comida_noti 
-            FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae,
-                config_noti AS c, cg_departamentos AS cg, sucursales AS s
+                dae.cedula, dae.correo, c.permiso_mail, c.permiso_notificacion, c.vacacion_mail, c.vacacion_notificacion, 
+                c.hora_extra_mail, c.hora_extra_notificacion, c.comida_mail, c.comida_notificacion 
+            FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, datos_actuales_empleado AS dae,
+                eu_configurar_alertas AS c, ed_departamentos AS cg, e_sucursales AS s
             WHERE n.id_departamento = $1
-                AND da.id_departamento = n.id_dep_nivel
-                AND dae.id_cargo = da.id_empl_cargo
+                AND da.id_departamento = n.id_departamento_nivel
+                AND dae.id_cargo = da.id_empleado_cargo
                 AND dae.id_contrato = c.id_empleado
                 AND cg.id = $1
                 AND s.id = n.id_establecimiento
@@ -1303,7 +1304,7 @@ class DatosGeneralesControlador {
             Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`
                 });
             const obj = JefesDepartamentos[JefesDepartamentos.length - 1];
-            let depa_padre = obj.id_dep_nivel;
+            let depa_padre = obj.id_departamento_nivel;
             let JefeDepaPadre;
             if (depa_padre !== null) {
                 /*JefeDepaPadre = await pool.query(
@@ -1314,11 +1315,11 @@ class DatosGeneralesControlador {
                         (e.nombre || ' ' || e.apellido) as fullname, e.cedula, e.correo, c.permiso_mail,
                         c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail,
                         c.hora_extra_noti, c.comida_mail, c.comida_noti
-                    FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg,
+                    FROM ed_autoriza_departamento AS da, empl_cargos AS ecr, ed_departamentos AS cg,
                         sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c
                     WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND
                         da.id_departamento = cg.id AND
-                        da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND
+                        da.estado = true AND cg.id_sucursal = s.id AND ecr.id_contrato = ecn.id AND
                         ecn.id_empleado = e.id AND e.id = c.id_empleado
                     `
                     , [depa_padre]);*/
@@ -1342,9 +1343,9 @@ class DatosGeneralesControlador {
                 SELECT da.id_departamento,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, 
                     da.cedula, da.correo, da.codigo, da.estado, da.id_sucursal, 
                     da.id_contrato,
-                    (SELECT cd.nombre FROM cg_departamentos AS cd WHERE cd.id = da.id_departamento) AS ndepartamento,
-                    (SELECT s.nombre FROM sucursales AS s WHERE s.id = da.id_sucursal) AS nsucursal
-                FROM datos_actuales_empleado AS da, config_noti AS cn 
+                    (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = da.id_departamento) AS ndepartamento,
+                    (SELECT s.nombre FROM e_sucursales AS s WHERE s.id = da.id_sucursal) AS nsucursal
+                FROM datos_actuales_empleado AS da, eu_configurar_alertas AS cn 
                 WHERE da.id = $1 AND cn.id_empleado = da.id
                 `, [id_empleado]);
                 const [infoEmpleado] = response.rows;
@@ -1366,8 +1367,8 @@ class DatosGeneralesControlador {
             console.log('ver ', lista_sucursales);
             const DATOS = yield database_1.default.query("SELECT da.id, da.nombre, da.apellido, da.id_sucursal AS suc_pertenece, s.nombre AS sucursal, " +
                 "   ce.jefe, r.nombre AS rol, us.id_sucursal, us.principal, us.id AS id_usucursal " +
-                "FROM datos_actuales_empleado AS da, empl_cargos AS ce, cg_roles AS r, usuario_sucursal AS us, " +
-                "   sucursales AS s " +
+                "FROM datos_actuales_empleado AS da, eu_empleado_cargos AS ce, ero_cat_roles AS r, eu_usuario_sucursal AS us, " +
+                "   e_sucursales AS s " +
                 "WHERE da.id_cargo = ce.id AND da.id_rol = r.id AND NOT da.id_rol = 2 AND s.id = da.id_sucursal " +
                 "   AND da.estado = $1 AND us.id_empleado = da.id AND us.id_sucursal IN (" + lista_sucursales + ") " +
                 "ORDER BY da.apellido ASC ", [estado]);

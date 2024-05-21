@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
 import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-titulos',
@@ -41,6 +42,7 @@ export class EditarTitulosComponent implements OnInit {
     private rest: TituloService,
     private toastr: ToastrService,
     public ventana: MatDialogRef<EditarTitulosComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
   }
@@ -84,8 +86,17 @@ export class EditarTitulosComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     };
-    this.ntitulo.RegistrarNivel(nivel).subscribe(response => {
-      this.ActualizarTitulo(form, response.id);
+    // VERIIFCAR DUPLICIDAD
+    let nombre_nivel = (nivel.nombre).toUpperCase();
+    this.ntitulo.BuscarNivelNombre(nombre_nivel).subscribe(response => {
+      this.toastr.warning('El nivel ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+        timeOut: 3000,
+      });
+    }, vacio => {
+      // GUARDAR DATOS DE NIVEL EN EL SISTEMA
+      this.ntitulo.RegistrarNivel(nivel).subscribe(response => {
+        this.ActualizarTitulo(form, response.id);
+      });
     });
   }
 
@@ -98,7 +109,28 @@ export class EditarTitulosComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     };
+    // VERIFICAR SI EL REGISTRO TITULO ES DIFERENTE
+    if ((titulo.nombre).toUpperCase() === (this.data.nombre).toUpperCase() && titulo.id_nivel === this.idNivel[0].id) {
+      this.AlmacenarTitulo(titulo);
+    }
+    else {
+      // METODO PARA VALIDAR DUPLICADOS
+      let verificar = {
+        nombre: (titulo.nombre).toUpperCase(),
+        nivel: titulo.id_nivel
+      }
+      this.rest.BuscarTituloNombre(verificar).subscribe(response => {
+        this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+          timeOut: 3000,
+        });
+      }, vacio => {
+        this.AlmacenarTitulo(titulo);
+      });
+    }
+  }
 
+  // METODO PARA ALMACENAR DATOS TITULO EN EL SISTEMA
+  AlmacenarTitulo(titulo: any) {
     this.rest.ActualizarUnTitulo(titulo).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
@@ -109,39 +141,7 @@ export class EditarTitulosComponent implements OnInit {
 
   // METODO PARA VALIDAR REGISTRO DE LETRAS
   IngresarSoloLetras(e: any) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACIÓN DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-        timeOut: 6000,
-      })
-      return false;
-    }
-  }
-
-  // METODO PARA EMITIR MENSAJES DE ERROR
-  ObtenerMensajeErrorNombre() {
-    if (this.nombre.hasError('required')) {
-      return 'Campo Obligatorio';
-    }
-    return this.nombre.hasError('pattern') ? 'Ingrese un nombre válido' : '';
-  }
-
-  ObtenerMensajeErrorNivel() {
-    if (this.nombreNivel.hasError('pattern')) {
-      return 'Ingrese un nombre válido';
-    }
+    return this.validar.IngresarSoloLetras(e);
   }
 
   // METODO PARA REGISTRAR DATOS
@@ -164,7 +164,8 @@ export class EditarTitulosComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS EN FORMULARIO
   ImprimirDatos() {
     this.idNivel = [];
-    this.ntitulo.BuscarNivelNombre(this.data.nivel).subscribe(datos => {
+    let nivel = (this.data.nivel).toUpperCase();
+    this.ntitulo.BuscarNivelNombre(nivel).subscribe(datos => {
       this.idNivel = datos;
       this.formulario.patchValue({
         tituloNombreForm: this.data.nombre,

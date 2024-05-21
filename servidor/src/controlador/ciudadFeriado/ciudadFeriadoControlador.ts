@@ -11,7 +11,7 @@ class CiudadFeriadoControlador {
         const CIUDAD_FERIADO = await pool.query(
             `
             SELECT c.id, c.descripcion, p.nombre, p.id AS id_prov
-            FROM ciudades c, cg_provincias p 
+            FROM e_ciudades c, e_provincias p 
             WHERE c.id_provincia = p.id AND p.nombre = $1
             `
             , [nombre]);
@@ -30,7 +30,7 @@ class CiudadFeriadoControlador {
             `
             SELECT fe.id AS idferiado, fe.descripcion AS nombreferiado, cfe.id AS idciudad_asignada,
                 c.id AS idciudad, c.descripcion AS nombreciudad
-            FROM cg_feriados fe, ciud_feriados cfe, ciudades c
+            FROM ef_cat_feriados fe, ef_ciudad_feriado cfe, e_ciudades c
             WHERE fe.id = cfe.id_feriado AND c.id = cfe.id_ciudad AND fe.id = $1
             `
             , [idferiado]);
@@ -52,13 +52,13 @@ class CiudadFeriadoControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOS ORIGINALES
-            const ciudad = await pool.query('SELECT * FROM ciud_feriados WHERE id = $1', [id]);
+            const ciudad = await pool.query('SELECT * FROM ef_ciudad_feriado WHERE id = $1', [id]);
             const [datosOriginales] = ciudad.rows;
 
             if (!datosOriginales) {
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'ciud_feriados',
+                    tabla: 'ef_ciudad_feriado',
                     usuario: user_name,
                     accion: 'D',
                     datosOriginales: '',
@@ -74,13 +74,13 @@ class CiudadFeriadoControlador {
 
             await pool.query(
                 `
-                DELETE FROM ciud_feriados WHERE id = $1
+                DELETE FROM ef_ciudad_feriado WHERE id = $1
                 `
                 , [id]);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'ciud_feriados',
+                tabla: 'ef_ciudad_feriado',
                 usuario: user_name,
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginales),
@@ -104,7 +104,7 @@ class CiudadFeriadoControlador {
         const { id_feriado, id_ciudad } = req.body;
         const CIUDAD_FERIADO = await pool.query(
             `
-            SELECT * FROM ciud_feriados WHERE id_feriado = $1 AND id_ciudad = $2
+            SELECT * FROM ef_ciudad_feriado WHERE id_feriado = $1 AND id_ciudad = $2
             `
             , [id_feriado, id_ciudad]);
         if (CIUDAD_FERIADO.rowCount > 0) {
@@ -125,15 +125,15 @@ class CiudadFeriadoControlador {
 
             const response: QueryResult = await pool.query(
                 `
-                INSERT INTO ciud_feriados (id_feriado, id_ciudad) VALUES ($1, $2) RETURNING *
+                INSERT INTO ef_ciudad_feriado (id_feriado, id_ciudad) VALUES ($1, $2) RETURNING *
                 `
                 , [id_feriado, id_ciudad]);
-    
+
             const [feriado] = response.rows;
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'ciud_feriados',
+                tabla: 'ef_ciudad_feriado',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
@@ -168,19 +168,19 @@ class CiudadFeriadoControlador {
             await pool.query('BEGIN');
     
             // CONSULTAR DATOS ORIGINALES
-            const ciudad = await pool.query('SELECT * FROM ciud_feriados WHERE id = $1', [id]);
+            const ciudad = await pool.query('SELECT * FROM ef_ciudad_feriado WHERE id = $1', [id]);
             const [datosOriginales] = ciudad.rows;
     
             if (!datosOriginales) {
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'ciud_feriados',
+                    tabla: 'ef_ciudad_feriado',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
                     ip,
-                    observacion: `Error al actualizar la ciudad con id ${id}`
+                    observacion: `Error al actualizar la ciudad con id ${id}. Registro no encontrado.`
                 });
     
                 // FINALIZAR TRANSACCION
@@ -190,13 +190,13 @@ class CiudadFeriadoControlador {
     
             await pool.query(
                 `
-                UPDATE ciud_feriados SET id_feriado = $1, id_ciudad = $2 WHERE id = $3
+                UPDATE ef_ciudad_feriado SET id_feriado = $1, id_ciudad = $2 WHERE id = $3
                 `
                 , [id_feriado, id_ciudad, id]);
     
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'ciud_feriados',
+                tabla: 'ef_ciudad_feriado',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
@@ -217,12 +217,16 @@ class CiudadFeriadoControlador {
 
     public async ObtenerFeriadosCiudad(req: Request, res: Response): Promise<any> {
         const id_ciudad = req.params.id_ciudad;
-        const CIUDAD_FERIADO = await pool.query('SELECT * FROM ciud_feriados WHERE id_ciudad = $1', [id_ciudad]);
+        const CIUDAD_FERIADO = await pool.query(
+            `
+            SELECT * FROM ef_ciudad_feriado WHERE id_ciudad = $1
+            `
+            , [id_ciudad]);
         if (CIUDAD_FERIADO.rowCount > 0) {
             return res.jsonp(CIUDAD_FERIADO.rows)
         }
         else {
-            return res.status(404).jsonp({ text: 'Registros no encontrados' });
+            return res.status(404).jsonp({ text: 'Registros no encontrados.' });
         }
     }
 

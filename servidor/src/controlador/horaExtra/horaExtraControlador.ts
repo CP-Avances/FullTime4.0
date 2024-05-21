@@ -1,161 +1,192 @@
 import { Request, Response } from 'express';
-import { VerificarHorario } from '../../libs/MetodosHorario';
 import { ReporteHoraExtra } from '../../class/HorasExtras';
+import { QueryResult } from 'pg';
 import {
   enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
   FormatearFecha, FormatearHora, dia_completo
 } from '../../libs/settingsMail';
-import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
 
-const builder = require('xmlbuilder');
-
 class HorasExtrasPedidasControlador {
+
   // verificar uso de estado
   public async ListarHorasExtrasPedidas(req: Request, res: Response) {
-    const HORAS_EXTRAS_PEDIDAS = await pool.query('SELECT h.id, h.fec_inicio, h.fec_final, h.estado, ' +
-      'h.fec_solicita, h.descripcion, h.num_hora, h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empl_cargo, ' +
-      'e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, contrato.id AS id_contrato, da.id_departamento, da.codigo, depa.nombre AS depa_nombre ' +
-      'FROM hora_extr_pedidos AS h, empleados AS e, empl_contratos As contrato, empl_cargos AS cargo, ' +
-      'datos_actuales_empleado AS da, cg_departamentos AS depa WHERE h.id_usua_solicita = e.id AND ' +
-      'da.id_contrato = contrato.id AND depa.id = da.id_departamento AND (h.estado = 1 OR h.estado = 2) AND ' +
-      'contrato.id = cargo.id_empl_contrato AND cargo.id = h.id_empl_cargo AND h.observacion = false ORDER BY id DESC');
+    const HORAS_EXTRAS_PEDIDAS = await pool.query(
+      `
+      SELECT h.id, h.fecha_inicio, h.fecha_final, h.estado, h.fecha_solicita, h.descripcion, h.horas_solicitud, 
+        h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empleado_cargo, e.nombre, e.apellido, 
+        (e.nombre || \' \' || e.apellido) AS fullname, contrato.id AS id_contrato, da.id_departamento, da.codigo, 
+        depa.nombre AS depa_nombre 
+      FROM mhe_solicitud_hora_extra AS h, eu_empleados AS e, eu_empleado_contratos As contrato, eu_empleado_cargos AS cargo,
+        datos_actuales_empleado AS da, ed_departamentos AS depa 
+      WHERE h.id_empleado_solicita = e.id AND 
+        da.id_contrato = contrato.id AND depa.id = da.id_departamento AND (h.estado = 1 OR h.estado = 2) AND 
+        contrato.id = cargo.id_contrato AND cargo.id = h.id_empleado_cargo AND h.observacion = false 
+      ORDER BY id DESC
+      `
+    );
     if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
   // verificar si se requiere uso de estado
   public async ListarHorasExtrasPedidasObservacion(req: Request, res: Response) {
-    const HORAS_EXTRAS_PEDIDAS = await pool.query('SELECT h.id, h.fec_inicio, h.fec_final, h.estado, ' +
-      'h.fec_solicita, h.descripcion, h.num_hora, h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empl_cargo, ' +
-      'e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, contrato.id AS id_contrato, da.id_departamento, da.codigo, depa.nombre AS depa_nombre FROM hora_extr_pedidos AS h, empleados AS e, ' +
-      'empl_contratos As contrato, empl_cargos AS cargo, datos_actuales_empleado AS da, cg_departamentos AS depa WHERE h.id_usua_solicita = e.id AND ' +
-      '(h.estado = 1 OR h.estado = 2) AND contrato.id = cargo.id_empl_contrato AND ' +
-      'cargo.id = h.id_empl_cargo AND h.observacion = true AND ' +
-      'da.id_contrato = e.id AND depa.id = da.id_departamento ORDER BY id DESC');
+    const HORAS_EXTRAS_PEDIDAS = await pool.query(
+      `
+      SELECT h.id, h.fecha_inicio, h.fecha_final, h.estado, h.fecha_solicita, h.descripcion, h.horas_solicitud, 
+        h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empleado_cargo, e.nombre, e.apellido,
+        (e.nombre || \' \' || e.apellido) AS fullname, contrato.id AS id_contrato, da.id_departamento, da.codigo, 
+        depa.nombre AS depa_nombre 
+      FROM mhe_solicitud_hora_extra AS h, eu_empleados AS e, eu_empleado_contratos As contrato, eu_empleado_cargos AS cargo, 
+        datos_actuales_empleado AS da, ed_departamentos AS depa 
+      WHERE h.id_empleado_solicita = e.id AND (h.estado = 1 OR h.estado = 2) AND contrato.id = cargo.id_contrato 
+        AND cargo.id = h.id_empleado_cargo AND h.observacion = true AND da.id_contrato = e.id AND depa.id = da.id_departamento
+      ORDER BY id DESC
+      `
+    );
     if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
   // verificar si se requiere estado
   public async ListarHorasExtrasPedidasAutorizadas(req: Request, res: Response) {
-    const HORAS_EXTRAS_PEDIDAS = await pool.query('SELECT h.id, h.fec_inicio, h.fec_final, h.estado, ' +
-      'h.fec_solicita, h.descripcion, h.num_hora, h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empl_cargo, ' +
-      'e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, contrato.id AS id_contrato, da.codigo, depa.nombre AS depa_nombre FROM hora_extr_pedidos AS h, empleados AS e, ' +
-      'empl_contratos As contrato, empl_cargos AS cargo, datos_actuales_empleado AS da, cg_departamentos AS depa WHERE h.id_usua_solicita = e.id AND ' +
-      '(h.estado = 3 OR h.estado = 4) AND contrato.id = cargo.id_empl_contrato AND ' +
-      'cargo.id = h.id_empl_cargo AND da.id_contrato = e.id AND depa.id = da.id_departamento ORDER BY id DESC');
+    const HORAS_EXTRAS_PEDIDAS = await pool.query(
+      `
+      SELECT h.id, h.fecha_inicio, h.fecha_final, h.estado, h.fecha_solicita, h.descripcion, h.horas_solicitud, 
+        h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empleado_cargo, e.nombre, e.apellido, 
+        (e.nombre || \' \' || e.apellido) AS fullname, contrato.id AS id_contrato, da.codigo, depa.nombre AS depa_nombre 
+      FROM mhe_solicitud_hora_extra AS h, eu_empleados AS e, eu_empleado_contratos As contrato, eu_empleado_cargos AS cargo, 
+        datos_actuales_empleado AS da, ed_departamentos AS depa 
+      WHERE h.id_empleado_solicita = e.id AND (h.estado = 3 OR h.estado = 4) AND contrato.id = cargo.id_contrato 
+        AND cargo.id = h.id_empleado_cargo AND da.id_contrato = e.id AND depa.id = da.id_departamento 
+      ORDER BY id DESC
+      `
+    );
     if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
   public async ObtenerSolicitudHoraExtra(req: Request, res: Response) {
     const id = req.params.id_emple_hora;
-    const SOLICITUD = await pool.query('SELECT *FROM VistaSolicitudHoraExtra WHERE id_emple_hora = $1', [id]);
+    const SOLICITUD = await pool.query(
+      `
+      SELECT * FROM VistaSolicitudHoraExtra WHERE id_emple_hora = $1
+      `
+      , [id]);
     if (SOLICITUD.rowCount > 0) {
       return res.json(SOLICITUD.rows)
     }
     else {
-      return res.status(404).json({ text: 'No se encuentran registros' });
+      return res.status(404).json({ text: 'No se encuentran registros.' });
     }
   }
 
   public async ObtenerAutorizacionHoraExtra(req: Request, res: Response) {
     const id = req.params.id_hora;
-    const SOLICITUD = await pool.query('SELECT a.id AS id_autorizacion, a.id_documento AS empleado_estado, ' +
-      'hp.id AS hora_extra FROM autorizaciones AS a, hora_extr_pedidos AS hp ' +
-      'WHERE hp.id = a.id_hora_extra AND hp.id = $1', [id]);
+    const SOLICITUD = await pool.query(
+      `
+      SELECT a.id AS id_autorizacion, a.id_autoriza_estado AS empleado_estado, hp.id AS hora_extra 
+      FROM ecm_autorizaciones AS a, mhe_solicitud_hora_extra AS hp 
+      WHERE hp.id = a.id_hora_extra AND hp.id = $1
+      `
+      , [id]);
     if (SOLICITUD.rowCount > 0) {
       return res.json(SOLICITUD.rows)
     }
     else {
-      return res.status(404).json({ text: 'No se encuentran registros' });
+      return res.status(404).json({ text: 'No se encuentran registros.' });
     }
   }
 
-  public async ObtenerHorarioEmpleado(req: Request, res: Response) {
-    const id_empl_cargo = parseInt(req.params.id_cargo);
-    console.log('IDS: ', id_empl_cargo);
-    // let respuesta = await ValidarHorarioEmpleado(id_empleado, id_empl_cargo)
-    let respuesta = await VerificarHorario(id_empl_cargo)
-    console.log(respuesta);
-
-    res.jsonp(respuesta)
-  }
-
   public async ListarPedidosHE(req: Request, res: Response) {
-    const HORAS_EXTRAS_PEDIDAS = await pool.query('SELECT e.id AS id_empleado, e.nombre, e.apellido, e.codigo, ' +
-      'ph.id AS id_solicitud, ph.fec_inicio::date AS fec_inicio, ph.fec_final::date AS fec_final, ' +
-      'ph.descripcion, ph.num_hora, ph.fec_inicio::time AS hora_inicio, ph.fec_final::time AS hora_final ' +
-      'FROM hora_extr_pedidos AS ph, empleados AS e ' +
-      'WHERE e.id = ph.id_usua_solicita ORDER BY e.nombre ASC, ph.fec_inicio ASC');
+    const HORAS_EXTRAS_PEDIDAS = await pool.query(
+      `
+      SELECT e.id AS id_empleado, e.nombre, e.apellido, e.codigo, ph.id AS id_solicitud, ph.fecha_inicio::date AS fec_inicio, 
+        ph.fecha_final::date AS fec_final, ph.descripcion, ph.horas_solicitud, ph.fecha_inicio::time AS hora_inicio, 
+        ph.fecha_final::time AS hora_final
+      FROM mhe_solicitud_hora_extra AS ph, eu_empleados AS e 
+      WHERE e.id = ph.id_empleado_solicita 
+      ORDER BY e.nombre ASC, ph.fecha_inicio ASC
+      `
+    );
     if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
   public async ListarPedidosHEAutorizadas(req: Request, res: Response) {
-    const HORAS_EXTRAS_PEDIDAS = await pool.query('SELECT e.id AS id_empleado, e.nombre, e.apellido, e.codigo, ' +
-      'ph.id AS id_solicitud, ph.fec_inicio::date AS fec_inicio, ph.fec_final::date AS fec_final, ' +
-      'ph.descripcion, ph.tiempo_autorizado, ph.fec_inicio::time AS hora_inicio, ' +
-      'ph.fec_final::time AS hora_final, a.estado, a.id_documento FROM hora_extr_pedidos AS ph, ' +
-      'empleados AS e, autorizaciones AS a ' +
-      'WHERE e.id = ph.id_usua_solicita AND a.id_hora_extra = ph.id AND a.estado = 3 ' +
-      'ORDER BY e.nombre ASC, ph.fec_inicio ASC');
+    const HORAS_EXTRAS_PEDIDAS = await pool.query(
+      `
+      SELECT e.id AS id_empleado, e.nombre, e.apellido, e.codigo, ph.id AS id_solicitud, ph.fecha_inicio::date AS fec_inicio, 
+        ph.fecha_final::date AS fec_final, ph.descripcion, ph.tiempo_autorizado, ph.fecha_inicio::time AS hora_inicio, 
+        ph.fecha_final::time AS hora_final, a.estado, a.id_autoriza_estado 
+      FROM mhe_solicitud_hora_extra AS ph, eu_empleados AS e, ecm_autorizaciones AS a 
+      WHERE e.id = ph.id_empleado_solicita AND a.id_hora_extra = ph.id AND a.estado = 3 
+      ORDER BY e.nombre ASC, ph.fecha_inicio ASC
+      `
+    );
     if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
   public async ListarPedidosHE_Empleado(req: Request, res: Response) {
     const { id_empleado } = req.params;
-    const HORAS_EXTRAS_PEDIDAS = await pool.query('SELECT e.id AS id_empleado, e.nombre, e.apellido, e.codigo, ' +
-      'ph.id AS id_solicitud, ph.fec_inicio::date AS fec_inicio, ph.fec_final::date AS fec_final, ' +
-      'ph.descripcion, ph.num_hora, ph.fec_inicio::time AS hora_inicio, ph.fec_final::time AS hora_fin ' +
-      'FROM hora_extr_pedidos AS ph, empleados AS e ' +
-      'WHERE e.id = ph.id_usua_solicita AND e.id = $1 ORDER BY e.nombre ASC, ph.fec_inicio ASC', [id_empleado]);
+    const HORAS_EXTRAS_PEDIDAS = await pool.query(
+      `
+      SELECT e.id AS id_empleado, e.nombre, e.apellido, e.codigo, ph.id AS id_solicitud, ph.fecha_inicio::date AS fec_inicio,
+        ph.fecha_final::date AS fec_final, ph.descripcion, ph.horas_solicitud, ph.fecha_inicio::time AS hora_inicio, 
+        ph.fecha_final::time AS hora_fin 
+      FROM mhe_solicitud_hora_extra AS ph, eu_empleados AS e 
+      WHERE e.id = ph.id_empleado_solicita AND e.id = $1 
+      ORDER BY e.nombre ASC, ph.fecha_inicio ASC
+      `
+      , [id_empleado]);
     if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
   public async ListarPedidosHEAutorizadas_Empleado(req: Request, res: Response) {
     const { id_empleado } = req.params;
-    const HORAS_EXTRAS_PEDIDAS = await pool.query('SELECT e.id AS id_empleado, e.nombre, e.apellido, e.codigo, ' +
-      'ph.id AS id_solicitud, ph.fec_inicio::date fec_inicio, ph.fec_final::date fec_final, ' +
-      'ph.descripcion, ph.tiempo_autorizado, ph.fec_inicio::time hora_inicio, ' +
-      'ph.fec_final::time hora_final, a.estado, a.id_documento FROM hora_extr_pedidos AS ph, ' +
-      'empleados AS e, autorizaciones AS a ' +
-      'WHERE e.id = ph.id_usua_solicita AND a.id_hora_extra = ph.id AND a.estado = 3 AND e.id = $1' +
-      'ORDER BY e.nombre ASC, ph.fec_inicio ASC', [id_empleado]);
+    const HORAS_EXTRAS_PEDIDAS = await pool.query(
+      `
+      SELECT e.id AS id_empleado, e.nombre, e.apellido, e.codigo, ph.id AS id_solicitud, ph.fecha_inicio::date fec_inicio,
+        ph.fecha_final::date fec_final, ph.descripcion, ph.tiempo_autorizado, ph.fecha_inicio::time hora_inicio, 
+        ph.fecha_final::time hora_final, a.estado, a.id_autoriza_estado 
+      FROM mhe_solicitud_hora_extra AS ph, eu_empleados AS e, ecm_autorizaciones AS a 
+      WHERE e.id = ph.id_empleado_solicita AND a.id_hora_extra = ph.id AND a.estado = 3 AND e.id = $1
+      ORDER BY e.nombre ASC, ph.fecha_inicio ASC
+      `
+      , [id_empleado]);
     if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
       HORAS_EXTRAS_PEDIDAS.rows.map((obj: any) => {
-        if (obj.id_documento != null && obj.id_documento != '' && obj.estado != 1) {
-          var autorizaciones = obj.id_documento.split(',');
+        if (obj.id_autoriza_estado != null && obj.id_autoriza_estado != '' && obj.estado != 1) {
+          var autorizaciones = obj.id_autoriza_estado.split(',');
           let empleado_id = autorizaciones[autorizaciones.length - 2].split('_')[0];
           obj.autoriza = parseInt(empleado_id);
         }
@@ -163,7 +194,7 @@ class HorasExtrasPedidasControlador {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
@@ -225,8 +256,8 @@ class HorasExtrasPedidasControlador {
 
       const response: QueryResult = await pool.query(
         `
-        INSERT INTO hora_extr_pedidos ( id_empl_cargo, id_usua_solicita, fec_inicio, fec_final, 
-        fec_solicita, num_hora, descripcion, estado, observacion, tipo_funcion, codigo ) 
+        INSERT INTO mhe_solicitud_hora_extra ( id_empleado_cargo, id_empleado_solicita, fecha_inicio, fecha_final, 
+          fecha_solicita, horas_solicitud, descripcion, estado, observacion, tipo_funcion, codigo ) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *
         `,
         [id_empl_cargo, id_usua_solicita, fec_inicio, fec_final, fec_solicita, num_hora, descripcion,
@@ -235,14 +266,11 @@ class HorasExtrasPedidasControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'hora_extr_pedidos',
+        tabla: 'mhe_solicitud_hora_extra',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{ id_empl_cargo: ${id_empl_cargo}, id_usua_solicita: ${id_usua_solicita}, 
-          fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, fec_solicita: ${fec_solicita}, 
-          num_hora: ${num_hora}, descripcion: ${descripcion}, estado: ${estado}, observacion: ${observacion}, 
-          tipo_funcion: ${tipo_funcion}, codigo: ${codigo} }`,
+        datosNuevos: JSON.stringify(objetoHoraExtra),
         ip,
         observacion: null
       });
@@ -254,60 +282,8 @@ class HorasExtrasPedidasControlador {
 
       const hora_extra = objetoHoraExtra;
 
-      const JefesDepartamentos = await pool.query(`
-      SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
-      cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,
-      e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo, 
-      c.hora_extra_mail, c.hora_extra_noti
-      FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-      sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-      WHERE da.id_departamento = $1 AND 
-      da.id_empl_cargo = ecr.id AND 
-      da.id_departamento = cg.id AND 
-      da.estado = true AND 
-      cg.id_sucursal = s.id AND 
-      ecr.id_empl_contrato = ecn.id AND 
-      ecn.id_empleado = e.id AND 
-      e.id = c.id_empleado
-      `, [depa_user_loggin])
-        .then((result: any) => {
-          return result.rows
-        })
+      return res.status(200).jsonp(hora_extra);
 
-      if (JefesDepartamentos.length === 0) return res.status(400)
-        .jsonp({ message: 'Ups !!! algo salio mal. Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.' });
-
-      const [obj] = JefesDepartamentos;
-      let depa_padre = obj.depa_padre;
-      let JefeDepaPadre;
-
-      if (depa_padre !== null) {
-        do {
-          JefeDepaPadre = await pool.query(
-            `
-            SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, 
-            cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, 
-            ecn.id AS contrato, e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname, e.cedula, 
-            e.correo, c.hora_extra_mail, c.hora_extra_noti 
-            FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-            sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-            WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND da.id_departamento = cg.id AND 
-            da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND 
-            ecn.id_empleado = e.id AND e.id = c.id_empleado
-            `
-            , [depa_padre]);
-
-          depa_padre = JefeDepaPadre.rows[0].depa_padre;
-          JefesDepartamentos.push(JefeDepaPadre.rows[0]);
-
-        } while (depa_padre !== null);
-        hora_extra.EmpleadosSendNotiEmail = JefesDepartamentos
-        return res.status(200).jsonp(hora_extra);
-
-      } else {
-        hora_extra.EmpleadosSendNotiEmail = JefesDepartamentos
-        return res.status(200).jsonp(hora_extra);
-      }
     } catch (error) {
       // REVERTIR TRNASACCION
       await pool.query('ROLLBACK');
@@ -349,8 +325,9 @@ class HorasExtrasPedidasControlador {
   
       const response: QueryResult = await pool.query(
         `
-          UPDATE hora_extr_pedidos SET fec_inicio = $1, fec_final = $2, num_hora = $3, descripcion = $4, 
-          estado = $5, tipo_funcion = $6 WHERE id = $7 RETURNING *
+          UPDATE mhe_solicitud_hora_extra SET fecha_inicio = $1, fecha_final = $2, horas_solicitud = $3, descripcion = $4, 
+            estado = $5, tipo_funcion = $6 
+          WHERE id = $7 RETURNING *
         `
         , [fec_inicio, fec_final, num_hora, descripcion, estado, tipo_funcion, id]);
   
@@ -358,83 +335,23 @@ class HorasExtrasPedidasControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'hora_extr_pedidos',
+        tabla: 'mhe_solicitud_hora_extra',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
-        datosNuevos: `{ fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, num_hora: ${num_hora}, descripcion: ${descripcion}, estado: ${estado}, tipo_funcion: ${tipo_funcion} }`,
+        datosNuevos: JSON.stringify(objetoHoraExtra),
         ip,
         observacion: null
       });
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-  
-      if (!objetoHoraExtra) return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
-  
-      const hora_extra = objetoHoraExtra;
-  
-      const JefesDepartamentos = await pool.query(`
-          SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
-          cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,
-          e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo, 
-          c.hora_extra_mail, c.hora_extra_noti
-          FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-          sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-          WHERE da.id_departamento = $1 AND 
-          da.id_empl_cargo = ecr.id AND 
-          da.id_departamento = cg.id AND 
-          da.estado = true AND 
-          cg.id_sucursal = s.id AND 
-          ecr.id_empl_contrato = ecn.id AND 
-          ecn.id_empleado = e.id AND 
-          e.id = c.id_empleado
-          `, [depa_user_loggin])
-        .then((result: any) => {
-          return result.rows
-        })
-  
-      if (JefesDepartamentos.length === 0) return res.status(400)
-        .jsonp({ message: 'Ups !!! algo salio mal. Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.' });
-  
-      const [obj] = JefesDepartamentos;
-      let depa_padre = obj.depa_padre;
-      let JefeDepaPadre;
-  
-      if (depa_padre !== null) {
-        do {
-          JefeDepaPadre = await pool.query(
-            `
-                SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, 
-                cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, 
-                ecn.id AS contrato, e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname, e.cedula, 
-                e.correo, c.hora_extra_mail, c.hora_extra_noti 
-                FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-                sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-                WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND da.id_departamento = cg.id AND 
-                da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND 
-                ecn.id_empleado = e.id AND e.id = c.id_empleado
-                `
-            , [depa_padre]);
-  
-          depa_padre = JefeDepaPadre.rows[0].depa_padre;
-          JefesDepartamentos.push(JefeDepaPadre.rows[0]);
-  
-        } while (depa_padre !== null);
-        hora_extra.EmpleadosSendNotiEmail = JefesDepartamentos
-        return res.status(200).jsonp(hora_extra);
-  
-      } else {
-        hora_extra.EmpleadosSendNotiEmail = JefesDepartamentos
-        return res.status(200).jsonp(hora_extra);
-      }
+      return res.status(200).jsonp(objetoHoraExtra);
     } catch (error) {
       // REVERTIR TRNASACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
     }
-
-
   }
 
   // ELIMINAR REGISTRO DE HORAS EXTRAS
@@ -447,18 +364,18 @@ class HorasExtrasPedidasControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES REALTIME_NOTI
-      const datosOriginalesRealTime = await pool.query('SELECT * FROM realtime_noti WHERE id_hora_extra = $1', [id_hora_extra]);
+      const datosOriginalesRealTime = await pool.query('SELECT * FROM ecm_realtime_notificacion WHERE id_hora_extra = $1', [id_hora_extra]);
       const [objetoRealTime] = datosOriginalesRealTime.rows;
 
       if (!objetoRealTime) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'realtime_noti',
+          tabla: 'ecm_realtime_notificacion',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
           ip,
-          observacion: `Error al eliminar registro de realtime_noti con id_hora_extra ${id_hora_extra}`
+          observacion: `Error al eliminar registro de ecm_realtime_notificacion con id_hora_extra ${id_hora_extra}`
         });
 
         // FINALIZAR TRANSACCION
@@ -468,13 +385,13 @@ class HorasExtrasPedidasControlador {
   
       await pool.query(
         `
-        DELETE FROM realtime_noti WHERE id_hora_extra = $1
+        DELETE FROM ecm_realtime_notificacion WHERE id_hora_extra = $1
         `
         , [id_hora_extra]);
       
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'realtime_noti',
+        tabla: 'ecm_realtime_notificacion',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(objetoRealTime),
@@ -484,18 +401,18 @@ class HorasExtrasPedidasControlador {
       });
 
       // CONSULTAR DATOSORIGINALES AUTORIZACIONES
-      const datosOriginalesAutorizaciones = await pool.query('SELECT * FROM autorizaciones WHERE id_hora_extra = $1', [id_hora_extra]);
+      const datosOriginalesAutorizaciones = await pool.query('SELECT * FROM ecm_autorizaciones WHERE id_hora_extra = $1', [id_hora_extra]);
       const [objetoAutorizaciones] = datosOriginalesAutorizaciones.rows;
 
       if (!objetoAutorizaciones) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'autorizaciones',
+          tabla: 'ecm_autorizaciones',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
           ip,
-          observacion: `Error al eliminar registro de autorizaciones con id_hora_extra ${id_hora_extra}`
+          observacion: `Error al eliminar registro de ecm_autorizaciones con id_hora_extra ${id_hora_extra}`
         });
 
         // FINALIZAR TRANSACCION
@@ -505,13 +422,13 @@ class HorasExtrasPedidasControlador {
   
       await pool.query(
         `
-        DELETE FROM autorizaciones WHERE id_hora_extra = $1
+        DELETE FROM ecm_autorizaciones WHERE id_hora_extra = $1
         `
         , [id_hora_extra]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'autorizaciones',
+        tabla: 'ecm_autorizaciones',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(objetoAutorizaciones),
@@ -521,18 +438,18 @@ class HorasExtrasPedidasControlador {
       });
   
       // CONSULTAR DATOSORIGINALES HORA_EXTR_PEDIDOS
-      const datosOriginalesHoraExtra = await pool.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id_hora_extra]);
+      const datosOriginalesHoraExtra = await pool.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id_hora_extra]);
       const [objetoHoraExtraOriginal] = datosOriginalesHoraExtra.rows;
 
       if (!objetoHoraExtraOriginal) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'hora_extr_pedidos',
+          tabla: 'mhe_solicitud_hora_extra',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
           ip,
-          observacion: `Error al eliminar registro de hora_extr_pedidos con id ${id_hora_extra}`
+          observacion: `Error al eliminar registro de mhe_solicitud_hora_extra con id ${id_hora_extra}`
         });
 
         // FINALIZAR TRANSACCION
@@ -542,7 +459,7 @@ class HorasExtrasPedidasControlador {
 
       const response: QueryResult = await pool.query(
         `
-        DELETE FROM hora_extr_pedidos WHERE id = $1 RETURNING *
+        DELETE FROM mhe_solicitud_hora_extra WHERE id = $1 RETURNING *
         `
         , [id_hora_extra]);
 
@@ -550,7 +467,7 @@ class HorasExtrasPedidasControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'hora_extr_pedidos',
+        tabla: 'mhe_solicitud_hora_extra',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
@@ -593,7 +510,7 @@ class HorasExtrasPedidasControlador {
     const { id_user } = req.params;
     const HORAS_EXTRAS_PEDIDAS = await pool.query(
       `
-      SELECT * FROM hora_extr_pedidos WHERE id_usua_solicita = $1 ORDER BY id DESC
+      SELECT * FROM mhe_solicitud_hora_extra WHERE id_empleado_solicita = $1 ORDER BY id DESC
       `
       , [id_user]);
     if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
@@ -614,18 +531,18 @@ class HorasExtrasPedidasControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const datosOriginales = await pool.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id_hora]);
+      const datosOriginales = await pool.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id_hora]);
       const [objetoHoraExtraOriginal] = datosOriginales.rows;
 
       if (!objetoHoraExtraOriginal) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'hora_extr_pedidos',
+          tabla: 'mhe_solicitud_hora_extra',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
           ip,
-          observacion: `Error al actualizar hora extra con id ${id_hora}`
+          observacion: `Error al actualizar hora extra con id ${id_hora}. Registro no encontrado.`
         });
 
         // FINALIZAR TRANSACCION
@@ -635,7 +552,7 @@ class HorasExtrasPedidasControlador {
 
       const response: QueryResult = await pool.query(
         `
-        UPDATE hora_extr_pedidos SET tiempo_autorizado = $2 WHERE id = $1 RETURNING *
+        UPDATE mhe_solicitud_hora_extra SET tiempo_autorizado = $2 WHERE id = $1 RETURNING *
         `
         , [id_hora, hora])
 
@@ -643,7 +560,7 @@ class HorasExtrasPedidasControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'hora_extr_pedidos',
+        tabla: 'mhe_solicitud_hora_extra',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
@@ -657,7 +574,7 @@ class HorasExtrasPedidasControlador {
 
       if (!horaExtra) {
         return res.status(400)
-          .jsonp({ message: 'Upps !!! algo salio mal. Solicitud de hora extra no ingresada' })
+          .jsonp({ message: 'Upps!!! algo salio mal. Solicitud de hora extra no ingresada.' })
       }
       else {
         return res.status(200).jsonp(horaExtra);
@@ -683,18 +600,18 @@ class HorasExtrasPedidasControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const datosOriginales = await pool.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id]);
+      const datosOriginales = await pool.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id]);
       const [objetoHoraExtraOriginal] = datosOriginales.rows;
 
       if (!objetoHoraExtraOriginal) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'hora_extr_pedidos',
+          tabla: 'mhe_solicitud_hora_extra',
           usuario: usser_name,
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
           ip,
-          observacion: `Error al actualizar hora extra con id ${id}`
+          observacion: `Error al actualizar hora extra con id ${id}. Registro no encontrado.`
         });
 
         // FINALIZAR TRANSACCION
@@ -704,7 +621,7 @@ class HorasExtrasPedidasControlador {
 
       const response: QueryResult = await pool.query(
         `
-          UPDATE hora_extr_pedidos SET estado = $1 WHERE id = $2 RETURNING *
+          UPDATE mhe_solicitud_hora_extra SET estado = $1 WHERE id = $2 RETURNING *
         `
         , [estado, id]);
 
@@ -712,7 +629,7 @@ class HorasExtrasPedidasControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'hora_extr_pedidos',
+        tabla: 'mhe_solicitud_hora_extra',
         usuario: usser_name,
         accion: 'U',
         datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
@@ -726,7 +643,7 @@ class HorasExtrasPedidasControlador {
 
       if (!horaExtra) {
         return res.status(400)
-          .jsonp({ message: 'Upps !!! algo salio mal. Solicitud de hora extra no ingresada' })
+          .jsonp({ message: 'Upps!!! algo salio mal. Solicitud de hora extra no ingresada.' })
       }
       else {
         return res.status(200).jsonp(horaExtra);
@@ -750,18 +667,18 @@ class HorasExtrasPedidasControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const datosOriginales = await pool.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id]);
+      const datosOriginales = await pool.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id]);
       const [objetoHoraExtraOriginal] = datosOriginales.rows;
 
       if (!objetoHoraExtraOriginal) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'hora_extr_pedidos',
+          tabla: 'mhe_solicitud_hora_extra',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
           ip,
-          observacion: `Error al actualizar hora extra con id ${id}`
+          observacion: `Error al actualizar hora extra con id ${id}. Registro no encontrado.`
         });
 
         // FINALIZAR TRANSACCION
@@ -771,7 +688,7 @@ class HorasExtrasPedidasControlador {
 
       const response: QueryResult = await pool.query(
         `
-      UPDATE hora_extr_pedidos SET observacion = $1 WHERE id = $2 RETURNING *
+      UPDATE mhe_solicitud_hora_extra SET observacion = $1 WHERE id = $2 RETURNING *
       `
         , [observacion, id]);
 
@@ -779,7 +696,7 @@ class HorasExtrasPedidasControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'hora_extr_pedidos',
+        tabla: 'mhe_solicitud_hora_extra',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
@@ -793,7 +710,7 @@ class HorasExtrasPedidasControlador {
 
       if (!horaExtra) {
         return res.status(400)
-          .jsonp({ message: 'Upps !!! algo salio mal. Solicitud de hora extra no ingresada' })
+          .jsonp({ message: 'Upps!!! algo salio mal. Solicitud de hora extra no ingresada.' })
       }
       else {
         return res.status(200).jsonp(horaExtra);
@@ -812,18 +729,18 @@ class HorasExtrasPedidasControlador {
     const { id } = req.params;
     const HORAS_EXTRAS_PEDIDAS = await pool.query(
       `
-      SELECT h.id_empl_cargo, h.id_usua_solicita, h.fec_inicio, h.fec_final, h.fec_solicita, 
-        h.descripcion, h.estado, h.tipo_funcion, h.num_hora, h.id, h.tiempo_autorizado,
+      SELECT h.id_empleado_cargo, h.id_empleado_solicita, h.fecha_inicio, h.fecha_final, h.fecha_solicita, 
+        h.descripcion, h.estado, h.tipo_funcion, h.horas_solicitud, h.id, h.tiempo_autorizado,
         (e.nombre || ' ' || e.apellido) AS fullname, e.cedula     
-      FROM hora_extr_pedidos AS h, empleados AS e 
-      WHERE h.id = $1 AND e.id = h.id_usua_solicita
+      FROM mhe_solicitud_hora_extra AS h, eu_empleados AS e 
+      WHERE h.id = $1 AND e.id = h.id_empleado_solicita
       `
       , [id]);
     if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
@@ -841,18 +758,18 @@ class HorasExtrasPedidasControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const datosOriginales = await pool.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id]);
+      const datosOriginales = await pool.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id]);
       const [objetoHoraExtraOriginal] = datosOriginales.rows;
 
       if (!objetoHoraExtraOriginal) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'hora_extr_pedidos',
+          tabla: 'mhe_solicitud_hora_extra',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
           ip,
-          observacion: `Error al actualizar hora extra con id ${id}`
+          observacion: `Error al actualizar hora extra con id ${id}. Registro no encontrado.`
         });
 
         // FINALIZAR TRANSACCION
@@ -862,13 +779,13 @@ class HorasExtrasPedidasControlador {
 
       await pool.query(
         `
-        UPDATE hora_extr_pedidos SET documento = $2, docu_nombre = $3 WHERE id = $1
+        UPDATE mhe_solicitud_hora_extra SET documento = $2, docu_nombre = $3 WHERE id = $1
         `
         , [id, doc, nombre]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'hora_extr_pedidos',
+        tabla: 'mhe_solicitud_hora_extra',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
@@ -896,12 +813,12 @@ class HorasExtrasPedidasControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const datosOriginales = await pool.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id]);
+      const datosOriginales = await pool.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id]);
       const [objetoHoraExtraOriginal] = datosOriginales.rows;
 
       if (!objetoHoraExtraOriginal) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'hora_extr_pedidos',
+          tabla: 'mhe_solicitud_hora_extra',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -917,13 +834,13 @@ class HorasExtrasPedidasControlador {
   
       await pool.query(
         `
-        UPDATE hora_extr_pedidos SET documento = null, docu_nombre = null WHERE id = $1
+        UPDATE mhe_solicitud_hora_extra SET documento = null, docu_nombre = null WHERE id = $1
         `
         , [id]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'hora_extr_pedidos',
+        tabla: 'mhe_solicitud_hora_extra',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
@@ -962,8 +879,8 @@ class HorasExtrasPedidasControlador {
     if (documento != 'null' && documento != '' && documento != null) {
       let filePath = `servidor\\horasExtras\\${documento}`
       let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-       // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-       fs.access(direccionCompleta, fs.constants.F_OK, (err) => {
+      // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+      fs.access(direccionCompleta, fs.constants.F_OK, (err) => {
         if (err) {
         } else {
           // ELIMINAR DEL SERVIDOR
@@ -979,13 +896,6 @@ class HorasExtrasPedidasControlador {
     const docs = req.params.docs;
     let filePath = `servidor\\horasExtras\\${docs}`
     res.sendFile(__dirname.split("servidor")[0] + filePath);
-
-   /* fs.access(ruta, fs.constants.F_OK, (err) => {
-      if (err) {
-      } else {
-        res.sendFile(path.resolve(ruta));
-      }
-    });*/
   }
 
 
@@ -1012,13 +922,13 @@ class HorasExtrasPedidasControlador {
       const correoInfoPideHoraExtra = await pool.query(
         `
         SELECT e.correo, e.nombre, e.apellido, e.cedula, 
-        ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
-        d.nombre AS departamento 
-        FROM empl_contratos AS ecn, empleados AS e, empl_cargos AS ecr, tipo_cargo AS tc, 
-        cg_departamentos AS d 
+          ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
+          d.nombre AS departamento 
+        FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
+          ed_departamentos AS d 
         WHERE ecn.id = $1 AND ecn.id_empleado = e.id AND 
-        (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
-        AND tc.id = ecr.cargo AND d.id = ecr.id_departamento 
+          (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
+          AND tc.id = ecr.id_tipo_cargo AND d.id = ecr.id_departamento 
         ORDER BY cargo DESC
         `
         , [id_empl_contrato]);
@@ -1031,47 +941,49 @@ class HorasExtrasPedidasControlador {
         to: correo,
         from: email,
         subject: asunto,
-        html: `
-                   <body>
-                       <div style="text-align: center;">
-                           <img width="25%" height="25%" src="cid:cabeceraf"/>
-                       </div>
-                       <br>
-                       <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                           El presente correo es para informar que se ha ${proceso} la siguiente solicitud de realización de horas extras: <br>  
-                       </p>
-                       <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
-                       <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                           <b>Empresa:</b> ${nombre} <br>   
-                           <b>Asunto:</b> ${asunto} <br> 
-                           <b>Colaborador que envía:</b> ${correoInfoPideHoraExtra.rows[0].nombre} ${correoInfoPideHoraExtra.rows[0].apellido} <br>
-                           <b>Número de Cédula:</b> ${correoInfoPideHoraExtra.rows[0].cedula} <br>
-                           <b>Cargo:</b> ${correoInfoPideHoraExtra.rows[0].tipo_cargo} <br>
-                           <b>Departamento:</b> ${correoInfoPideHoraExtra.rows[0].departamento} <br>
-                           <b>Generado mediante:</b> Aplicación Web <br>
-                           <b>Fecha de envío:</b> ${fecha} <br> 
-                           <b>Hora de envío:</b> ${hora} <br><br> 
-                       </p>
-                       <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
-                       <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                           <b>Motivo:</b> Solicitud de Horas Extras <br>   
-                           <b>Fecha de Solicitud:</b> ${solicitud} <br> 
-                           <b>Desde:</b> ${desde} <br>
-                           <b>Hasta:</b> ${hasta} <br>
-                           <b>Horario:</b> ${h_inicio} a ${h_final} <br>
-                           <b>Observación:</b> ${observacion} <br>
-                           <b>Num. horas solicitadas:</b> ${num_horas} <br>
-                           <b>Estado:</b> ${estado_h} <br><br>
-                           <b>${tipo_solicitud}:</b> ${solicitado_por} <br><br>
-                           <a href="${url}/${id}">Dar clic en el siguiente enlace para revisar solicitud de realización de hora extra.</a> <br><br>                         
-                       </p>
-                       <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-                           <b>Gracias por la atención</b><br>
-                           <b>Saludos cordiales,</b> <br><br>
-                       </p>
-                       <img src="cid:pief" width="50%" height="50%"/>
-                    </body>
-                `,
+        html:
+          `
+          <body>
+            <div style="text-align: center;">
+              <img width="25%" height="25%" src="cid:cabeceraf"/>
+            </div>
+            <br>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                El presente correo es para informar que se ha ${proceso} la siguiente solicitud de realización de horas extras: <br>  
+            </p>
+            <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Empresa:</b> ${nombre} <br>   
+              <b>Asunto:</b> ${asunto} <br> 
+              <b>Colaborador que envía:</b> ${correoInfoPideHoraExtra.rows[0].nombre} ${correoInfoPideHoraExtra.rows[0].apellido} <br>
+              <b>Número de Cédula:</b> ${correoInfoPideHoraExtra.rows[0].cedula} <br>
+              <b>Cargo:</b> ${correoInfoPideHoraExtra.rows[0].tipo_cargo} <br>
+              <b>Departamento:</b> ${correoInfoPideHoraExtra.rows[0].departamento} <br>
+              <b>Generado mediante:</b> Aplicación Web <br>
+              <b>Fecha de envío:</b> ${fecha} <br> 
+              <b>Hora de envío:</b> ${hora} <br><br> 
+            </p>
+            <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Motivo:</b> Solicitud de Horas Extras <br>   
+              <b>Fecha de Solicitud:</b> ${solicitud} <br> 
+              <b>Desde:</b> ${desde} <br>
+              <b>Hasta:</b> ${hasta} <br>
+              <b>Horario:</b> ${h_inicio} a ${h_final} <br>
+              <b>Observación:</b> ${observacion} <br>
+              <b>Num. horas solicitadas:</b> ${num_horas} <br>
+              <b>Estado:</b> ${estado_h} <br><br>
+              <b>${tipo_solicitud}:</b> ${solicitado_por} <br><br>
+              <a href="${url}/${id}">Dar clic en el siguiente enlace para revisar solicitud de realización de hora extra.</a> <br><br>                         
+            </p>
+            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Gracias por la atención</b><br>
+              <b>Saludos cordiales,</b> <br><br>
+            </p>
+            <img src="cid:pief" width="50%" height="50%"/>
+          </body>
+          `
+        ,
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
@@ -1099,7 +1011,7 @@ class HorasExtrasPedidasControlador {
       });
     }
     else {
-      res.jsonp({ message: 'Ups! algo salio mal!!! No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
     }
 
   }
@@ -1123,13 +1035,13 @@ class HorasExtrasPedidasControlador {
       const correoInfoPideHoraExtra = await pool.query(
         `
         SELECT e.correo, e.nombre, e.apellido, e.cedula, 
-        ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
-        d.nombre AS departamento 
-        FROM empl_contratos AS ecn, empleados AS e, empl_cargos AS ecr, tipo_cargo AS tc, 
-        cg_departamentos AS d 
+          ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
+          d.nombre AS departamento 
+        FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
+          ed_departamentos AS d 
         WHERE ecn.id = $1 AND ecn.id_empleado = e.id AND 
-        (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
-        AND tc.id = ecr.cargo AND d.id = ecr.id_departamento 
+          (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
+          AND tc.id = ecr.id_tipo_cargo AND d.id = ecr.id_departamento 
         ORDER BY cargo DESC
         `
         , [id_empl_contrato]);
@@ -1140,45 +1052,47 @@ class HorasExtrasPedidasControlador {
         to: correo,
         from: email,
         subject: asunto,
-        html: `
-                   <body>
-                       <div style="text-align: center;">
-                           <img width="25%" height="25%" src="cid:cabeceraf"/>
-                       </div>
-                       <br>
-                       <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                           El presente correo es para informar que se ha ${proceso} la siguiente solicitud de realización de horas extras: <br>  
-                       </p>
-                       <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
-                       <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                           <b>Empresa:</b> ${nombre} <br>   
-                           <b>Asunto:</b> ${asunto} <br> 
-                           <b>Colaborador que envía:</b> ${correoInfoPideHoraExtra.rows[0].nombre} ${correoInfoPideHoraExtra.rows[0].apellido} <br>
-                           <b>Número de Cédula:</b> ${correoInfoPideHoraExtra.rows[0].cedula} <br>
-                           <b>Cargo:</b> ${correoInfoPideHoraExtra.rows[0].tipo_cargo} <br>
-                           <b>Departamento:</b> ${correoInfoPideHoraExtra.rows[0].departamento} <br>
-                           <b>Generado mediante:</b> Aplicación Móvil <br>
-                           <b>Fecha de envío:</b> ${fecha} <br> 
-                           <b>Hora de envío:</b> ${hora} <br><br> 
-                       </p>
-                       <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
-                       <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                           <b>Motivo:</b> ${observacion} <br>   
-                           <b>Fecha de Solicitud:</b> ${solicitud} <br> 
-                           <b>Desde:</b> ${desde} <br>
-                           <b>Hasta:</b> ${hasta} <br>
-                           <b>Horario:</b> ${h_inicio} a ${h_final} <br>
-                           <b>Num. horas solicitadas:</b> ${num_horas} <br>
-                           <b>Estado:</b> ${estado_h} <br><br>
-                           <b>${tipo_solicitud}:</b> ${solicitado_por} <br><br>
-                       </p>
-                       <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-                           <b>Gracias por la atención</b><br>
-                           <b>Saludos cordiales,</b> <br><br>
-                       </p>
-                       <img src="cid:pief" width="50%" height="50%"/>
-                    </body>
-                `,
+        html:
+          `
+          <body>
+            <div style="text-align: center;">
+              <img width="25%" height="25%" src="cid:cabeceraf"/>
+            </div>
+            <br>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              El presente correo es para informar que se ha ${proceso} la siguiente solicitud de realización de horas extras: <br>  
+            </p>
+            <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Empresa:</b> ${nombre} <br>   
+              <b>Asunto:</b> ${asunto} <br> 
+              <b>Colaborador que envía:</b> ${correoInfoPideHoraExtra.rows[0].nombre} ${correoInfoPideHoraExtra.rows[0].apellido} <br>
+              <b>Número de Cédula:</b> ${correoInfoPideHoraExtra.rows[0].cedula} <br>
+              <b>Cargo:</b> ${correoInfoPideHoraExtra.rows[0].tipo_cargo} <br>
+              <b>Departamento:</b> ${correoInfoPideHoraExtra.rows[0].departamento} <br>
+              <b>Generado mediante:</b> Aplicación Móvil <br>
+              <b>Fecha de envío:</b> ${fecha} <br> 
+              <b>Hora de envío:</b> ${hora} <br><br> 
+            </p>
+            <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Motivo:</b> ${observacion} <br>   
+              <b>Fecha de Solicitud:</b> ${solicitud} <br> 
+              <b>Desde:</b> ${desde} <br>
+              <b>Hasta:</b> ${hasta} <br>
+              <b>Horario:</b> ${h_inicio} a ${h_final} <br>
+              <b>Num. horas solicitadas:</b> ${num_horas} <br>
+              <b>Estado:</b> ${estado_h} <br><br>
+              <b>${tipo_solicitud}:</b> ${solicitado_por} <br><br>
+            </p>
+            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Gracias por la atención</b><br>
+              <b>Saludos cordiales,</b> <br><br>
+            </p>
+            <img src="cid:pief" width="50%" height="50%"/>
+          </body>
+          `
+        ,
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
@@ -1206,7 +1120,7 @@ class HorasExtrasPedidasControlador {
       });
     }
     else {
-      res.jsonp({ message: 'Ups! algo salio mal!!! No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
 
@@ -1221,10 +1135,10 @@ const BuscarHorasExtras = async function (id: string | number, desde: string, ha
   return await pool.query(
     `
     SELECT p.fecha_desde, p.fecha_hasta, p.hora_inicio, p.hora_fin, p.descripcion, 
-    p.horas_totales, e.nombre AS planifica_nombre, e.apellido AS planifica_apellido 
-    FROM plan_hora_extra AS p, plan_hora_extra_empleado AS pe, empleados AS e 
-    WHERE p.id = pe.id_plan_hora AND e.id = p.id_empl_planifica AND pe.codigo = $1 AND 
-    p.fecha_desde BETWEEN $2 AND $3
+      p.horas_totales, e.nombre AS planifica_nombre, e.apellido AS planifica_apellido 
+    FROM mhe_detalle_plan_hora_extra AS p, mhe_empleado_plan_hora_extra AS pe, eu_empleados AS e 
+    WHERE p.id = pe.id_detalle_plan AND e.id = p.id_empleado_planifica AND pe.codigo = $1 AND 
+      p.fecha_desde BETWEEN $2 AND $3
     `
     , [id, desde, hasta])
     .then(res => {

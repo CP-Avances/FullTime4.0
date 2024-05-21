@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CIUDAD_CONTROLADOR = void 0;
-const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class CiudadControlador {
     // BUSCAR DATOS RELACIONADOS A LA CIUDAD
@@ -22,14 +21,14 @@ class CiudadControlador {
             const { id_ciudad } = req.params;
             const CIUDAD = yield database_1.default.query(`
             SELECT p.continente, p.nombre AS pais, p.id AS id_pais, pro.nombre AS provincia
-            FROM cg_paises AS p, cg_provincias AS pro, ciudades AS c
+            FROM e_cat_paises AS p, e_provincias AS pro, e_ciudades AS c
             WHERE c.id = $1 AND c.id_provincia = pro.id AND p.id = pro.id_pais
             `, [id_ciudad]);
             if (CIUDAD.rowCount > 0) {
                 return res.jsonp(CIUDAD.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -37,13 +36,13 @@ class CiudadControlador {
     ListarCiudades(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const CIUDAD = yield database_1.default.query(`
-            SELECT * FROM ciudades
+            SELECT * FROM e_ciudades
             `);
             if (CIUDAD.rowCount > 0) {
                 return res.jsonp(CIUDAD.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -52,45 +51,24 @@ class CiudadControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_provincia } = req.params;
             const CIUDAD = yield database_1.default.query(`
-            SELECT * FROM ciudades WHERE id_provincia = $1
+            SELECT * FROM e_ciudades WHERE id_provincia = $1
             `, [id_provincia]);
             if (CIUDAD.rowCount > 0) {
                 return res.jsonp(CIUDAD.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
     // REGISTRAR CIUDAD
     CrearCiudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id_provincia, descripcion, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
-                INSERT INTO ciudades (id_provincia, descripcion) VALUES ($1, $2)
-                `, [id_provincia, descripcion]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'ciudades',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{id_provincia: ${id_provincia}, descripcion: ${descripcion}}`,
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                res.jsonp({ message: 'Registro guardado.' });
-            }
-            catch (error) {
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                res.status(500).jsonp({ message: 'Error al guardar el registro.' });
-            }
+            const { id_provincia, descripcion } = req.body;
+            yield database_1.default.query(`
+            INSERT INTO e_ciudades (id_provincia, descripcion) VALUES ($1, $2)
+            `, [id_provincia, descripcion]);
+            res.jsonp({ message: 'Registro guardado.' });
         });
     }
     // METODO PARA LISTAR NOMBRE DE CIUDADES - PROVINCIAS
@@ -98,7 +76,7 @@ class CiudadControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const CIUDAD = yield database_1.default.query(`
             SELECT c.id, c.descripcion AS nombre, p.nombre AS provincia, p.id AS id_prov
-            FROM ciudades c, cg_provincias p
+            FROM e_ciudades c, e_provincias p
             WHERE c.id_provincia = p.id
             ORDER BY provincia, nombre ASC
             `);
@@ -114,49 +92,14 @@ class CiudadControlador {
     EliminarCiudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
                 const id = req.params.id;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOS ORIGINALES
-                const ciudad = yield database_1.default.query('SELECT * FROM ciudades WHERE id = $1', [id]);
-                const [datosOriginales] = ciudad.rows;
-                if (!datosOriginales) {
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'ciudades',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al eliminar la ciudad con id ${id}`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
-                }
                 yield database_1.default.query(`
-                DELETE FROM ciudades WHERE id = $1
+                DELETE FROM e_ciudades WHERE id = $1
                 `, [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'ciudades',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
+                res.jsonp({ message: 'Registro eliminado.' });
             }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+            catch (_a) {
+                return res.jsonp({ message: 'error' });
             }
         });
     }
@@ -165,7 +108,7 @@ class CiudadControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const CIUDAD = yield database_1.default.query(`
-            SELECT * FROM ciudades WHERE id = $1
+            SELECT * FROM e_ciudades WHERE id = $1
             `, [id]);
             if (CIUDAD.rowCount > 0) {
                 return res.jsonp(CIUDAD.rows);

@@ -52,15 +52,15 @@ export class TipoSeguridadComponent implements OnInit {
   // METODO PARA IMPRIMIR DATOS EN FORMULARIO
   ImprimirDatos() {
 
-    if (this.data.seg_contrasena != null && this.data.seg_contrasena != false) {
+    if (this.data.seguridad_contrasena != null && this.data.seguridad_contrasena != false) {
       this.formulario.patchValue({ tipoForm: 'contrasena' });
     }
 
-    if (this.data.seg_frase != null && this.data.seg_frase != false) {
+    if (this.data.seguridad_frase != null && this.data.seguridad_frase != false) {
       this.formulario.patchValue({ tipoForm: 'frase' });
     }
 
-    if (this.data.seg_ninguna != null && this.data.seg_ninguna != false) {
+    if (this.data.seguridad_ninguna != null && this.data.seguridad_ninguna != false) {
       this.formulario.patchValue({ tipoForm: 'ninguna' });
     }
 

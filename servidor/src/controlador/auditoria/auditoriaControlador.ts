@@ -5,10 +5,15 @@ class AuditoriaControlador {
 
     public async BuscarDatosAuditoria(req: Request, res: Response) {
         const { tabla, desde, hasta } = req.body
-        const DATOS = await pool.query('SELECT schema_name, table_name, user_name, action_tstamp, ' +
-            'action, original_data, new_data, ip FROM audit.auditoria WHERE table_name = $1 ' +
-            'AND action_tstamp::date BETWEEN $2 AND $3 ORDER BY action_tstamp::date DESC',
-            [tabla, desde, hasta]);
+        const DATOS = await pool.query(
+            `
+            SELECT plataforma, table_name, user_name, fecha_hora, 
+                action, original_data, new_data, ip_address 
+            FROM audit.auditoria 
+            WHERE table_name = $1 AND fecha_hora::date BETWEEN $2 AND $3 
+            ORDER BY fecha_hora::date DESC
+            `
+            , [tabla, desde, hasta]);
         if (DATOS.rowCount > 0) {
             return res.jsonp(DATOS.rows)
         }

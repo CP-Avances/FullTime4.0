@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 
 import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registrar-nivel-titulos',
@@ -27,6 +28,7 @@ export class RegistrarNivelTitulosComponent implements OnInit {
     private toastr: ToastrService,
     private nivel: NivelTitulosService,
     public ventana: MatDialogRef<RegistrarNivelTitulosComponent>,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -34,21 +36,33 @@ export class RegistrarNivelTitulosComponent implements OnInit {
     this.ip = localStorage.getItem('ip')
   }
 
-
-  // METODO PARA GUARDAR DATOS DE NIVELES DE TITULO
+  // METODO PARA GUARDAR DATOS DE NIVELES DE TITULO Y VERIFICAR DUPLICIDAD
   InsertarNivelTitulo(form: any) {
     let nivel = {
       nombre: form.nombreForm,
       user_name: this.user_name,
       ip: this.ip,
     };
+    // VERIIFCAR DUPLICIDAD
+    let nombre_nivel = (nivel.nombre).toUpperCase();
+    this.nivel.BuscarNivelNombre(nombre_nivel).subscribe(response => {
+      this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+        timeOut: 3000,
+      });
+    }, vacio => {
+      // GUARDAR DATOS EN EL SISTEMA
+      this.GuardarDatos(nivel);
+    });
+  }
+
+  // METODO PARA ALMACENRA EN LA BASE DE DATOS
+  GuardarDatos(nivel: any) {
     this.nivel.RegistrarNivel(nivel).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
       this.CerrarVentana();
-    }, error => {
-    });;
+    });
   }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -58,25 +72,7 @@ export class RegistrarNivelTitulosComponent implements OnInit {
 
   // METODO PARA VALIDAR INGRESO DE LETRAS
   IngresarSoloLetras(e: any) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACIÓN DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+    return this.validar.IngresarSoloLetras(e);
   }
 
   // METODO PARA CERRAR VENTANA DE REGISTRO
@@ -84,5 +80,6 @@ export class RegistrarNivelTitulosComponent implements OnInit {
     this.LimpiarCampos();
     this.ventana.close();
   }
+
 
 }

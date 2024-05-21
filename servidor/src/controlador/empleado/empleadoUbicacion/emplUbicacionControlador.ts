@@ -2,9 +2,6 @@ import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import pool from '../../../database';
-import fs from 'fs';
-
-const builder = require('xmlbuilder');
 
 class UbicacionControlador {
 
@@ -20,15 +17,19 @@ class UbicacionControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            const response: QueryResult = await pool.query('INSERT INTO cg_ubicaciones (latitud, longitud, descripcion) ' +
-                'VALUES ($1, $2, $3) RETURNING *',
+            const response: QueryResult = await pool.query(
+                `
+                INSERT INTO mg_cat_ubicaciones (latitud, longitud, descripcion)
+                VALUES ($1, $2, $3) RETURNING *
+                `
+                ,
                 [latitud, longitud, descripcion]);
     
             const [coordenadas] = response.rows;
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'cg_ubicaciones',
+                tabla: 'mg_cat_ubicaciones',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
@@ -62,12 +63,12 @@ class UbicacionControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const coordenada = await pool.query('SELECT * FROM cg_ubicaciones WHERE id = $1', [id]);
+            const coordenada = await pool.query('SELECT * FROM mg_cat_ubicaciones WHERE id = $1', [id]);
             const [datosOriginales] = coordenada.rows;
 
             if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_ubicaciones',
+                    tabla: 'mg_cat_ubicaciones',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
@@ -81,13 +82,17 @@ class UbicacionControlador {
                 return res.status(404).jsonp({ message: 'Error al actualizar coordenada' });
             }
 
-            await pool.query('UPDATE cg_ubicaciones SET latitud = $1, longitud = $2, descripcion = $3 ' +
-                'WHERE id = $4',
+            await pool.query(
+                `
+                UPDATE mg_cat_ubicaciones SET latitud = $1, longitud = $2, descripcion = $3
+                WHERE id = $4
+                `
+                ,
                 [latitud, longitud, descripcion, id]);
             
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'cg_ubicaciones',
+                tabla: 'mg_cat_ubicaciones',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
@@ -108,7 +113,11 @@ class UbicacionControlador {
 
     // LISTAR TODOS LOS REGISTROS DE COORDENADAS GENERALES DE UBICACIÓN
     public async ListarCoordenadas(req: Request, res: Response) {
-        const UBICACIONES = await pool.query('SELECT * FROM cg_ubicaciones');
+        const UBICACIONES = await pool.query(
+            `
+            SELECT * FROM mg_cat_ubicaciones
+            `
+        );
         if (UBICACIONES.rowCount > 0) {
             return res.jsonp(UBICACIONES.rows)
         }
@@ -120,7 +129,11 @@ class UbicacionControlador {
     // LISTAR TODOS LOS REGISTROS DE COORDENADAS GENERALES DE UBICACIÓN CON EXCEPCIONES
     public async ListarCoordenadasDefinidas(req: Request, res: Response) {
         const id = req.params.id;
-        const UBICACIONES = await pool.query('SELECT * FROM cg_ubicaciones WHERE NOT id = $1', [id]);
+        const UBICACIONES = await pool.query(
+            `
+            SELECT * FROM mg_cat_ubicaciones WHERE NOT id = $1
+            `
+            , [id]);
         if (UBICACIONES.rowCount > 0) {
             return res.jsonp(UBICACIONES.rows)
         }
@@ -132,7 +145,11 @@ class UbicacionControlador {
     // LISTAR TODOS LOS REGISTROS DE COORDENADAS GENERALES DE UBICACIÓN
     public async ListarUnaCoordenada(req: Request, res: Response) {
         const id = req.params.id;
-        const UBICACIONES = await pool.query('SELECT * FROM cg_ubicaciones WHERE id = $1', [id]);
+        const UBICACIONES = await pool.query(
+            `
+            SELECT * FROM mg_cat_ubicaciones WHERE id = $1
+            `
+            , [id]);
         if (UBICACIONES.rowCount > 0) {
             return res.jsonp(UBICACIONES.rows)
         }
@@ -143,7 +160,11 @@ class UbicacionControlador {
 
     // BUSCAR ÚLTIMO REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
     public async BuscarUltimoRegistro(req: Request, res: Response) {
-        const UBICACIONES = await pool.query('SELECT MAX(id) AS id FROM cg_ubicaciones');
+        const UBICACIONES = await pool.query(
+            `
+            SELECT MAX(id) AS id FROM mg_cat_ubicaciones
+            `
+        );
         if (UBICACIONES.rowCount > 0) {
             return res.jsonp(UBICACIONES.rows)
         }
@@ -162,12 +183,12 @@ class UbicacionControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const coordenada = await pool.query('SELECT * FROM cg_ubicaciones WHERE id = $1', [id]);
+            const coordenada = await pool.query('SELECT * FROM mg_cat_ubicaciones WHERE id = $1', [id]);
             const [datosOriginales] = coordenada.rows;
 
             if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_ubicaciones',
+                    tabla: 'mg_cat_ubicaciones',
                     usuario: user_name,
                     accion: 'D',
                     datosOriginales: '',
@@ -181,11 +202,15 @@ class UbicacionControlador {
                 return res.status(404).jsonp({ message: 'Registro no encontrado.' });
             }
 
-            await pool.query('DELETE FROM cg_ubicaciones WHERE id = $1', [id]);
+            await pool.query(
+            `
+            DELETE FROM mg_cat_ubicaciones WHERE id = $1
+            `
+            , [id]);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'cg_ubicaciones',
+                tabla: 'mg_cat_ubicaciones',
                 usuario: user_name,
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginales),
@@ -214,10 +239,10 @@ class UbicacionControlador {
         const { id_empl } = req.params;
         const UBICACIONES = await pool.query(
             `
-            SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empl, cu.latitud, cu.longitud, 
+            SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empleado, cu.latitud, cu.longitud, 
                 cu.descripcion 
-            FROM empl_ubicacion AS eu, cg_ubicaciones AS cu 
-            WHERE eu.id_ubicacion = cu.id AND eu.id_empl = $1
+            FROM mg_empleado_ubicacion AS eu, mg_cat_ubicaciones AS cu 
+            WHERE eu.id_ubicacion = cu.id AND eu.id_empleado = $1
             `
             , [id_empl]);
         if (UBICACIONES.rowCount > 0) {
@@ -236,13 +261,17 @@ class UbicacionControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            await pool.query('INSERT INTO empl_ubicacion (codigo, id_empl, id_ubicacion) ' +
-                'VALUES ($1, $2, $3)',
+            await pool.query(
+                `
+                INSERT INTO mg_empleado_ubicacion (codigo, id_empleado, id_ubicacion) 
+                VALUES ($1, $2, $3)
+                `
+                ,
                 [codigo, id_empl, id_ubicacion]);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'empl_ubicacion',
+                tabla: 'mg_empleado_ubicacion',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
@@ -264,11 +293,14 @@ class UbicacionControlador {
     // LISTAR REGISTROS DE COORDENADAS GENERALES DE UNA UBICACIÓN 
     public async ListarRegistroUsuarioU(req: Request, res: Response) {
         const id_ubicacion = req.params.id_ubicacion;
-        const UBICACIONES = await pool.query('SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empl, ' +
-            'cu.latitud, cu.longitud, cu.descripcion, e.nombre, e.apellido ' +
-            'FROM empl_ubicacion AS eu, cg_ubicaciones AS cu, empleados AS e ' +
-            'WHERE eu.id_ubicacion = cu.id AND e.codigo = eu.codigo AND cu.id = $1',
-            [id_ubicacion]);
+        const UBICACIONES = await pool.query(
+            `
+            SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empleado, cu.latitud, cu.longitud, 
+                cu.descripcion, e.nombre, e.apellido 
+            FROM mg_empleado_ubicacion AS eu, mg_cat_ubicaciones AS cu, eu_empleados AS e 
+            WHERE eu.id_ubicacion = cu.id AND e.codigo = eu.codigo AND cu.id = $1
+            `
+            , [id_ubicacion]);
         if (UBICACIONES.rowCount > 0) {
             return res.jsonp(UBICACIONES.rows)
         }
@@ -287,12 +319,12 @@ class UbicacionControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const ubicacion = await pool.query('SELECT * FROM empl_ubicacion WHERE id = $1', [id]);
+            const ubicacion = await pool.query('SELECT * FROM mg_empleado_ubicacion WHERE id = $1', [id]);
             const [datosOriginales] = ubicacion.rows;
 
             if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'empl_ubicacion',
+                    tabla: 'mg_empleado_ubicacion',
                     usuario: user_name,
                     accion: 'D',
                     datosOriginales: '',
@@ -306,11 +338,15 @@ class UbicacionControlador {
                 return res.status(404).jsonp({ message: 'Registro no encontrado.' });
             }
 
-            await pool.query('DELETE FROM empl_ubicacion WHERE id = $1', [id]);
+            await pool.query(
+                `
+                DELETE FROM mg_empleado_ubicacion WHERE id = $1
+                `
+                , [id]);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'empl_ubicacion',
+                tabla: 'mg_empleado_ubicacion',
                 usuario: user_name,
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginales),

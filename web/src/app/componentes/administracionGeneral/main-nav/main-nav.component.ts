@@ -137,7 +137,7 @@ export class MainNavComponent implements OnInit {
   ConfigurarSeguridad() {
     this.restEmpresa.ConsultarDatosEmpresa(this.idEmpresa).subscribe(datos => {
       this.datosEmpresa = datos;
-      if (this.datosEmpresa[0].seg_frase === true) {
+      if (this.datosEmpresa[0].seguridad_frase === true) {
         this.restUsuario.BuscarDatosUser(this.id_empleado_logueado).subscribe(data => {
           if (data[0].id_rol === 1) {
             if (data[0].frase === null || data[0].frase === '') {
@@ -195,7 +195,7 @@ export class MainNavComponent implements OnInit {
   SeleccionMenu() {
     const name_emp = localStorage.getItem('name_empresa');
 
-    if (this.inicio.getRol() === 3) {
+    if (this.inicio.getRol() === 1) {
       this.superadmin = true;
     }
     else {
@@ -276,7 +276,12 @@ export class MainNavComponent implements OnInit {
           { name: 'Configurar Código', url: '/codigo', color: true, ver: true },
           { name: 'Nivel de Educación', url: '/nivelTitulos', color: true, ver: true },
           { name: 'Título Profesional', url: '/titulos', color: true, ver: true },
+          { name: 'Tipo Discapacidad', url: '/discapacidades', color: true, ver: true },
+          { name: 'Tipo Vacunas', url: '/vacunas', color: true, ver: true },
           { name: 'Empleados', url: '/empleado', color: true, ver: true },
+          { name: 'Cargar Plantillas', url: '/cargarPlantilla', color: true, ver: true },
+          { name: 'Modalida Laboral', url: '/modalidaLaboral', color: true, ver: true },
+          { name: 'Tipo Cargos', url: '/tipoCargos', color: true, ver: true },
           { name: 'Asignar Establecimientos', url: '/administrarSucursales', color: true, ver: this.superadmin },
         ]
       },

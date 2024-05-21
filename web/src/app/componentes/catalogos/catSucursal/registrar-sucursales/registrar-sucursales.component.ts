@@ -158,7 +158,7 @@ export class RegistrarSucursalesComponent implements OnInit {
   // METODO PARA CARGAR INFORMACION DE PROVINCIAS EN EL FORMULARIO
   FiltrarProvincias(form: any) {
     let idPais: number = 0;
-    this.paises.forEach(obj => {
+    this.paises.forEach((obj: any) => {
       if (obj.nombre === form.nombrePaisForm) {
         idPais = obj.id
       }
@@ -204,7 +204,7 @@ export class RegistrarSucursalesComponent implements OnInit {
 
     // VALIDAR REGISTRO DE CIUDAD
     let ciudad_id: number = 0;
-    this.ciudades.forEach(obj => {
+    this.ciudades.forEach((obj: any) => {
       if (obj.descripcion.toUpperCase() === form.idCiudadForm.toUpperCase()) {
         ciudad_id = obj.id
       }

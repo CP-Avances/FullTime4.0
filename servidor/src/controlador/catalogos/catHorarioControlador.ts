@@ -13,23 +13,23 @@ class HorarioControlador {
 
   // REGISTRAR HORARIO
   public async CrearHorario(req: Request, res: Response): Promise<Response> {
-    const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_, user_name, ip } = req.body;
+    const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, user_name, ip } = req.body;
     try {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
         `
-      INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo,
-      nocturno, detalle, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+      INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
+        nocturno, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
       `
-        , [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_]);
+        , [nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_]);
 
       const [horario] = response.rows;
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_horarios',
+        tabla: 'eh_cat_horarios',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
@@ -60,7 +60,7 @@ class HorarioControlador {
     try {
       const HORARIOS = await pool.query(
         `
-        SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1
+        SELECT * FROM eh_cat_horarios WHERE UPPER(codigo) = $1
         `
         , [codigo.toUpperCase()]);
 
@@ -98,7 +98,7 @@ class HorarioControlador {
   
       const horario = await pool.query(
         `
-        SELECT * FROM cg_horarios WHERE id = $1
+        SELECT * FROM eh_cat_horarios WHERE id = $1
         `
         , [id]);
       const [datosOriginales] = horario.rows;
@@ -106,13 +106,13 @@ class HorarioControlador {
       if (!datosOriginales) {
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'cg_horarios',
+          tabla: 'eh_cat_horarios',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
           ip,
-          observacion: `Error al actualizar el horario con id: ${id}`
+          observacion: `Error al actualizar el horario con id: ${id}. Registro no encontrado.`
         });
   
         // FINALIZAR TRANSACCION
@@ -122,13 +122,13 @@ class HorarioControlador {
   
       await pool.query(
         `
-        UPDATE cg_horarios SET documento = $2 WHERE id = $1
+        UPDATE eh_cat_horarios SET documento = $2 WHERE id = $1
         `
         , [id, documento]);
       
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_horarios',
+        tabla: 'eh_cat_horarios',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -165,7 +165,7 @@ class HorarioControlador {
   // METODO PARA ACTUALIZAR DATOS DE HORARIO
   public async EditarHorario(req: Request, res: Response): Promise<any> {
     const id = req.params.id;
-    const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_, user_name, ip } = req.body;
+    const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, user_name, ip } = req.body;
 
     try {
       // INICIAR TRANSACCION
@@ -197,20 +197,20 @@ class HorarioControlador {
       }
       const respuesta = await pool.query(
         `
-        UPDATE cg_horarios SET nombre = $1, min_almuerzo = $2, hora_trabajo = $3,  
-        nocturno = $4, detalle = $5, codigo = $6, default_ = $7
-        WHERE id = $8 RETURNING *
+        UPDATE eh_cat_horarios SET nombre = $1, minutos_comida = $2, hora_trabajo = $3,  
+          nocturno = $4, codigo = $5, default_ = $6
+        WHERE id = $7 RETURNING *
         `
-        , [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_, id,])
+        , [nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, id,])
         .then((result: any) => { return result.rows })
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_horarios',
+        tabla: 'eh_cat_horarios',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{nombre: ${nombre}, min_almuerzo: ${min_almuerzo}, hora_trabajo: ${hora_trabajo}, nocturno: ${nocturno}, detalle: ${detalle}, codigo: ${codigo}, default_: ${default_}}`,
+        datosNuevos: `{nombre: ${nombre}, minutos_comida: ${min_almuerzo}, hora_trabajo: ${hora_trabajo}, nocturno: ${nocturno}, codigo: ${codigo}, default_: ${default_}}`,
         ip,
         observacion: null
       });
@@ -253,7 +253,7 @@ class HorarioControlador {
       // CONSULTAR DATOSORIGINALES
       const horario = await pool.query(
         `
-        SELECT * FROM cg_horarios WHERE id = $1
+        SELECT * FROM eh_cat_horarios WHERE id = $1
         `
         , [id]);
       const [datosOriginales] = horario.rows;
@@ -261,13 +261,13 @@ class HorarioControlador {
       if (!datosOriginales) {
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'cg_horarios',
+          tabla: 'eh_cat_horarios',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
           ip,
-          observacion: `Error al actualizar el horario con id: ${id}`
+          observacion: `Error al actualizar el horario con id: ${id}. Registro no encontrado.`
         });
 
         // FINALIZAR TRANSACCION
@@ -277,13 +277,13 @@ class HorarioControlador {
 
       await pool.query(
         `
-              UPDATE cg_horarios SET documento = null WHERE id = $1
+              UPDATE eh_cat_horarios SET documento = null WHERE id = $1
               `
         , [id]);
       
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_horarios',
+        tabla: 'eh_cat_horarios',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -326,7 +326,7 @@ class HorarioControlador {
   public async ListarHorarios(req: Request, res: Response) {
     const HORARIOS = await pool.query(
       `
-      SELECT * FROM cg_horarios ORDER BY codigo ASC
+      SELECT * FROM eh_cat_horarios ORDER BY codigo ASC
       `);
     if (HORARIOS.rowCount > 0) {
       return res.jsonp(HORARIOS.rows)
@@ -342,7 +342,7 @@ class HorarioControlador {
     try {
       const HORARIOS = await pool.query(
         `
-        SELECT * FROM cg_horarios WHERE NOT id = $1 AND UPPER(codigo) = $2)
+        SELECT * FROM eh_cat_horarios WHERE NOT id = $1 AND UPPER(codigo) = $2
         `,
         [parseInt(id), codigo.toUpperCase()]);
 
@@ -368,7 +368,7 @@ class HorarioControlador {
       // CONSULTAR DATOSORIGINALES
       const horario = await pool.query(
         `
-        SELECT * FROM cg_horarios WHERE id = $1
+        SELECT * FROM eh_cat_horarios WHERE id = $1
         `
         , [id]);
       const [datosOriginales] = horario.rows;
@@ -376,13 +376,13 @@ class HorarioControlador {
       if (!datosOriginales) {
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'cg_horarios',
+          tabla: 'eh_cat_horarios',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
           ip,
-          observacion: `Error al eliminar el horario con id: ${id}`
+          observacion: `Error al eliminar el horario con id: ${id}. Registro no encontrado.`
         });
 
         // FINALIZAR TRANSACCION
@@ -392,13 +392,13 @@ class HorarioControlador {
 
       await pool.query(
         `
-        DELETE FROM cg_horarios WHERE id = $1
+        DELETE FROM eh_cat_horarios WHERE id = $1
         `
         , [id]);
       
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_horarios',
+        tabla: 'eh_cat_horarios',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -422,7 +422,7 @@ class HorarioControlador {
     const { id } = req.params;
     const UN_HORARIO = await pool.query(
       `
-      SELECT * FROM cg_horarios WHERE id = $1
+      SELECT * FROM eh_cat_horarios WHERE id = $1
       `
       , [id]);
     if (UN_HORARIO.rowCount > 0) {
@@ -444,7 +444,7 @@ class HorarioControlador {
       // CONSULTAR DATOSORIGINALES
       const horario = await pool.query(
         `
-        SELECT * FROM cg_horarios WHERE id = $1
+        SELECT * FROM eh_cat_horarios WHERE id = $1
         `
         , [id]);
       const [datosOriginales] = horario.rows;
@@ -452,7 +452,7 @@ class HorarioControlador {
       if (!datosOriginales) {
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'cg_horarios',
+          tabla: 'eh_cat_horarios',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -468,14 +468,14 @@ class HorarioControlador {
 
       const respuesta = await pool.query(
         `
-        UPDATE cg_horarios SET hora_trabajo = $1 WHERE id = $2 RETURNING *
+        UPDATE eh_cat_horarios SET hora_trabajo = $1 WHERE id = $2 RETURNING *
         `
         , [hora_trabajo, id])
         .then((result: any) => { return result.rows });
       
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_horarios',
+        tabla: 'eh_cat_horarios',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -513,7 +513,7 @@ class HorarioControlador {
 
   // METODO PARA CARGAR HORARIOS Y DETALLES DE UNA PLANTILLA EN LA BASE DE DATOS
   public async CargarHorarioPlantilla(req: Request, res: Response): Promise<Response> {
-   
+
     try {
       const { horarios, detalles, user_name, } = req.body;
       let horariosCargados = true;
@@ -563,8 +563,8 @@ class HorarioControlador {
             // INSERTAR EN LA BASE DE DATOS
             const response: QueryResult = await pool.query(
               `
-              INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo,
-              nocturno, detalle, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+              INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
+              nocturno, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
               `
               , [DESCRIPCION, MIN_ALIMENTACION, HORAS_TOTALES, HORARIO_NOCTURNO, true, CODIGO_HORARIO, TIPO_HORARIO]);
   
@@ -572,7 +572,7 @@ class HorarioControlador {
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-              tabla: 'cg_horarios',
+              tabla: 'eh_cat_horarios',
               usuario: user_name,
               accion: 'I',
               datosOriginales: '',
@@ -600,7 +600,7 @@ class HorarioControlador {
           }
         }
       }
-  
+
       // SI DETALLES NO ESTA VACIO CARGAR EN LA BASE DE DATOS
       if (detalles.length > 0) {
         // CARGAR DETALLES
@@ -664,10 +664,21 @@ class HorarioControlador {
             // INSERTAR EN LA BASE DE DATOS
             const response2: QueryResult = await pool.query(
               `
-              INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes,
-                  min_despues) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+              INSERT INTO eh_detalle_horarios (orden, hora, tolerancia, id_horario, tipo_accion, segundo_dia, tercer_dia, 
+                minutos_antes, minutos_despues) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
               `
               , [ORDEN, HORA, TOLERANCIA, ID_HORARIO, TIPO_ACCION, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'eh_detalle_horarios',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(response2.rows),
+              ip: '',
+              observacion: null
+            });
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
@@ -707,13 +718,13 @@ class HorarioControlador {
     let codigos: string[] = [];
 
     for (const [index, data] of plantillaHorarios.entries()) {
-      let {DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO} = data;
+      let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = data;
       if (MIN_ALIMENTACION === undefined) {
-        data.MIN_ALIMENTACION = 0; 
+        data.MIN_ALIMENTACION = 0;
       }
 
       if (HORARIO_NOCTURNO === undefined) {
-        data.HORARIO_NOCTURNO = 'No'; 
+        data.HORARIO_NOCTURNO = 'No';
       }
 
       // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
@@ -741,7 +752,7 @@ class HorarioControlador {
 
       if (faltanDatos) {
         data.OBSERVACION = 'Datos no registrados: ' + datosFaltantes.join(', ');
-        continue; 
+        continue;
       }
 
       codigos.push(CODIGO_HORARIO.toString());
@@ -767,7 +778,7 @@ class HorarioControlador {
       if (data.OBSERVACION === 'Ok') {
         plantillaHorarios[index] = ValidarHorasTotales(data);
       }
-      
+
     };
 
     for (const data of plantillaDetalles) {
@@ -776,10 +787,10 @@ class HorarioControlador {
       // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
       // const requiredValues = [CODIGO_HORARIO, TIPO_ACCION, HORA];
       const requeridos = ['CODIGO_HORARIO', 'TIPO_ACCION', 'HORA'];
-      
+
       let faltanDatosDetalles = false;
       let datosFaltantesDetalles = [];
-      
+
       // MAPEO DE CLAVES A DESCRIPCIONES
       let descripciones: any = {
         CODIGO_HORARIO: 'código',
@@ -797,7 +808,7 @@ class HorarioControlador {
 
       if (faltanDatosDetalles) {
         data.OBSERVACION = 'Datos no registrados: ' + datosFaltantesDetalles.join(', ');
-        continue; 
+        continue;
       }
 
       switch (TIPO_ACCION.toLowerCase()) {
@@ -823,7 +834,7 @@ class HorarioControlador {
       data.MIN_DESPUES = MIN_DESPUES ?? 0;
       data.SALIDA_SIGUIENTE_DIA = SALIDA_SIGUIENTE_DIA ?? 'No';
       data.TOLERANCIA = TIPO_ACCION.toLowerCase() === 'entrada' ? (TOLERANCIA ?? 0) : '';
-      
+
 
       if (!VerificarCodigoHorarioDetalleHorario(CODIGO_HORARIO.toString(), plantillaHorarios)) {
         data.OBSERVACION = 'Requerido codigo de horario existente';
@@ -861,7 +872,7 @@ class HorarioControlador {
     });
 
     const horariosOk = plantillaHorarios.filter((horario: any) => horario.OBSERVACION === 'Ok');
-    
+
 
     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
     fs.access(ruta, fs.constants.F_OK, (err) => {
@@ -874,7 +885,7 @@ class HorarioControlador {
 
     const mensaje = horariosOk.length > 0 ? 'correcto' : 'error';
 
-    res.json({plantillaHorarios, plantillaDetalles, mensaje});
+    res.json({ plantillaHorarios, plantillaDetalles, mensaje });
   }
 
 }
@@ -898,20 +909,23 @@ function VerificarFormatoDatos(data: any): [boolean, string] {
   horasTotalesFormatoCorrecto ? null : observacion = 'Formato de horas totales incorrecto (HH:mm)';
   minAlimentacionFormatoCorrecto ? null : observacion = 'Formato de minutos de alimentación incorrecto';
   tipoHorarioValido ? null : observacion = 'Tipo de horario incorrecto';
-  tipoHorarioNocturnoValido ? null : observacion = 'Tipo de horario nocturno incorrecto'; 
-  error = horasTotalesFormatoCorrecto && minAlimentacionFormatoCorrecto && tipoHorarioValido && tipoHorarioNocturnoValido ? false : true ;
+  tipoHorarioNocturnoValido ? null : observacion = 'Tipo de horario nocturno incorrecto';
+  error = horasTotalesFormatoCorrecto && minAlimentacionFormatoCorrecto && tipoHorarioValido && tipoHorarioNocturnoValido ? false : true;
   return [error, observacion];
 }
 
 // FUNCION PARA VERIFICAR SI EXISTEN DATOS DUPLICADOS EN LA BASE DE DATOS
-async function VerificarDuplicadoBase(codigo: string): Promise<boolean>{
-  const result = await pool.query('SELECT * FROM cg_horarios WHERE LOWER(codigo) = $1',
-            [codigo.toLowerCase()]);
+async function VerificarDuplicadoBase(codigo: string): Promise<boolean> {
+  const result = await pool.query(
+    `
+    SELECT * FROM eh_cat_horarios WHERE LOWER(codigo) = $1
+    `
+    , [codigo.toLowerCase()]);
   return result.rowCount > 0;
 }
 
 // FUNCION PARA COMPROBAR QUE CODIGO_HORARIO EXISTA EN PLANTILLAHORARIOS
-function VerificarCodigoHorarioDetalleHorario(codigo: string, plantillaHorarios: Horario[]): boolean{
+function VerificarCodigoHorarioDetalleHorario(codigo: string, plantillaHorarios: Horario[]): boolean {
   const result = plantillaHorarios.filter((valor: Horario) => valor.CODIGO_HORARIO == codigo && valor.OBSERVACION == 'Ok');
   return result.length > 0;
 }
@@ -932,7 +946,7 @@ function VerificarFormatoDetalleHorario(data: any): [boolean, string] {
   toleranciaFormatoCorrecto ? null : observacion = observacion.concat('Formato de tolerancia incorrecto');
   minAntesFormatoCorrecto ? null : observacion = observacion.concat('Formato de minutos antes incorrecto');
   minDespuesFormatoCorrecto ? null : observacion = observacion.concat('Formato de minutos después incorrecto');
-  error = horaFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto && toleranciaFormatoCorrecto ? false : true ;
+  error = horaFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto && toleranciaFormatoCorrecto ? false : true;
   return [error, observacion];
 }
 
@@ -950,7 +964,7 @@ function AgruparDetalles(plantillaDetalles: DetalleHorario[]): any {
 function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[]): any {
   horarios = horarios.filter((horario: Horario) => horario.OBSERVACION === 'Ok');
   let codigosHorarios = horarios.map((horario: Horario) => horario.CODIGO_HORARIO.toString());
-  let codigosDetalles= [];
+  let codigosDetalles = [];
 
   // FILTRAR DETALLES QUE TENGAN CODIGO_HORARIO EN HORARIOS
   for (const codigoHorario in detallesAgrupados) {
@@ -966,21 +980,21 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
       const tieneAlimentacion = horario.MIN_ALIMENTACION > 0;
       const tiposAccionRequeridos = tieneAlimentacion ? ['Entrada', 'Inicio alimentación', 'Fin alimentación', 'Salida'] : ['Entrada', 'Salida'];
       const tiposAccionExistentes = detalles.map((detalle: any) => detalle.TIPO_ACCION);
-      if (tiposAccionExistentes.length < tiposAccionRequeridos.length ) {
-        codigosDetalles.push({codigo: codigoHorario, observacion:`Requerido ${tiposAccionRequeridos.length} detalles`});
-      } else if  ( tiposAccionExistentes.length > tiposAccionRequeridos.length ) {
-        codigosDetalles.push({codigo: codigoHorario, observacion:`Requerido solo ${tiposAccionRequeridos.length} detalles`});
-      } 
+      if (tiposAccionExistentes.length < tiposAccionRequeridos.length) {
+        codigosDetalles.push({ codigo: codigoHorario, observacion: `Requerido ${tiposAccionRequeridos.length} detalles` });
+      } else if (tiposAccionExistentes.length > tiposAccionRequeridos.length) {
+        codigosDetalles.push({ codigo: codigoHorario, observacion: `Requerido solo ${tiposAccionRequeridos.length} detalles` });
+      }
 
-      
+
       //VERIFICAR QUE EN LOS TIPOSACCIONEXISTENTES ESTEN TODOS LOS TIPOSACCIONREQUERIDOS
       else if (tiposAccionRequeridos.some((tipo: string) => !tiposAccionExistentes.includes(tipo))) {
-        codigosDetalles.push({codigo: codigoHorario, observacion:`Requerido tipos de acción: ${tiposAccionRequeridos.join(', ')}`});
+        codigosDetalles.push({ codigo: codigoHorario, observacion: `Requerido tipos de acción: ${tiposAccionRequeridos.join(', ')}` });
       }
 
       else {
         //VALIDAR QUE LA SUMA DE HORAS DE ENTRADA Y SALIDA SEA IGUAL A HORAS_TOTALES
-        
+
         const getDetalle = (accion: string) => detalles.find((detalle: any) => detalle.TIPO_ACCION === accion);
         const getHora = (detalle: any) => moment(detalle.HORA, 'HH:mm');
 
@@ -992,20 +1006,20 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
         let diferenciaAlimentacion = 0;
 
         if (tieneAlimentacion) {
-            const inicioAlimentacion = getDetalle('Inicio alimentación');
-            const finAlimentacion = getDetalle('Fin alimentación');
-            const horaInicioAlimentacion = getHora(inicioAlimentacion);
-            const horaFinAlimentacion = getHora(finAlimentacion);
+          const inicioAlimentacion = getDetalle('Inicio alimentación');
+          const finAlimentacion = getDetalle('Fin alimentación');
+          const horaInicioAlimentacion = getHora(inicioAlimentacion);
+          const horaFinAlimentacion = getHora(finAlimentacion);
 
-            diferenciaAlimentacion = horaFinAlimentacion.diff(horaInicioAlimentacion, 'minutes');
-            minutosAlimentacion = Number(horario.MIN_ALIMENTACION.toString());
+          diferenciaAlimentacion = horaFinAlimentacion.diff(horaInicioAlimentacion, 'minutes');
+          minutosAlimentacion = Number(horario.MIN_ALIMENTACION.toString());
 
-            if (diferenciaAlimentacion < minutosAlimentacion) {
-                codigosDetalles.push({codigo: codigoHorario, observacion: 'Minutos de alimentación no corresponden a los asignados'});
-                return codigosDetalles;
-            }
+          if (diferenciaAlimentacion < minutosAlimentacion) {
+            codigosDetalles.push({ codigo: codigoHorario, observacion: 'Minutos de alimentación no corresponden a los asignados' });
+            return codigosDetalles;
+          }
         } else if (salida.SALIDA_SIGUIENTE_DIA.toLowerCase() == 'si') {
-            horaSalida.add(1, 'days');
+          horaSalida.add(1, 'days');
         }
 
         const diferencia = horaSalida.diff(horaEntrada, 'minutes');
@@ -1013,7 +1027,7 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
         const horasTotalesEnMinutos = convertirHorasTotalesAMinutos(horario.HORAS_TOTALES.toString());
 
         if (direnciaTotal !== horasTotalesEnMinutos) {
-            codigosDetalles.push({codigo: codigoHorario, observacion: 'No cumple con las horas totales'});
+          codigosDetalles.push({ codigo: codigoHorario, observacion: 'No cumple con las horas totales' });
         }
       }
     }
@@ -1052,21 +1066,20 @@ function FormatearHoras(hora: string, detalle: boolean): string {
 function ValidarHorasTotales(horario: Horario): Horario {
   const hora = FormatearHoras(horario.HORAS_TOTALES.toString(), true);
   if ((hora >= '24:00' && hora < '72:00') ||
-      (hora >= '24:00:00' && hora < '72:00:00') ||
-      hora >= '72:00' || 
-      hora >= '72:00:00') {
+    (hora >= '24:00:00' && hora < '72:00:00') ||
+    hora >= '72:00' ||
+    hora >= '72:00:00') {
     horario.MIN_ALIMENTACION = 0;
   }
   return horario;
 }
 
-
 interface Horario {
-  DESCRIPCION: string | number, 
-  CODIGO_HORARIO: string | number, 
-  HORAS_TOTALES: string | number, 
+  DESCRIPCION: string | number,
+  CODIGO_HORARIO: string | number,
+  HORAS_TOTALES: string | number,
   MIN_ALIMENTACION: number,
-  TIPO_HORARIO: string, 
+  TIPO_HORARIO: string,
   HORARIO_NOCTURNO: string,
   OBSERVACION: string,
   DETALLE: boolean,
@@ -1075,7 +1088,7 @@ interface Horario {
 interface DetalleHorario {
   CODIGO_HORARIO: string | number,
   TIPO_ACCION: string,
-  HORA: string,	
+  HORA: string,
   ORDEN: string | number,
   TOLERANCIA: string | number,
   SALIDA_SIGUIENTE_DIA: string,
@@ -1084,10 +1097,6 @@ interface DetalleHorario {
   MIN_DESPUES: string | number,
   OBSERVACION: string,
 }
-
-
-
-
 
 export const HORARIO_CONTROLADOR = new HorarioControlador();
 

@@ -9,7 +9,7 @@ class ProvinciaControlador {
     const { continente } = req.params;
     const CONTINENTE = await pool.query(
       `
-      SELECT * FROM cg_paises WHERE continente = $1 ORDER BY nombre ASC
+      SELECT * FROM e_cat_paises WHERE continente = $1 ORDER BY nombre ASC
       `
       , [continente]);
 
@@ -17,7 +17,7 @@ class ProvinciaControlador {
       return res.jsonp(CONTINENTE.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
@@ -25,7 +25,7 @@ class ProvinciaControlador {
   public async ListarContinentes(req: Request, res: Response) {
     const CONTINENTE = await pool.query(
       `
-      SELECT continente FROM cg_paises GROUP BY continente ORDER BY continente ASC
+      SELECT continente FROM e_cat_paises GROUP BY continente ORDER BY continente ASC
       `);
     if (CONTINENTE.rowCount > 0) {
       return res.jsonp(CONTINENTE.rows)
@@ -40,7 +40,7 @@ class ProvinciaControlador {
     const { id_pais } = req.params;
     const UNA_PROVINCIA = await pool.query(
       `
-      SELECT * FROM cg_provincias WHERE id_pais = $1
+      SELECT * FROM e_provincias WHERE id_pais = $1
       `
       , [id_pais]);
     if (UNA_PROVINCIA.rowCount > 0) {
@@ -56,7 +56,7 @@ class ProvinciaControlador {
     const PROVINCIA = await pool.query(
       `
       SELECT pro.id, pro.nombre, pro.id_pais, pa.nombre AS pais
-      FROM cg_provincias pro, cg_paises pa
+      FROM e_provincias pro, e_cat_paises pa
       WHERE pro.id_pais = pa.id;
       `
     );
@@ -78,19 +78,19 @@ class ProvinciaControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const provincia = await pool.query('SELECT * FROM cg_provincias WHERE id = $1', [id]);
+      const provincia = await pool.query('SELECT * FROM e_provincias WHERE id = $1', [id]);
       const [datosOriginales] = provincia.rows;
 
       if (!datosOriginales) {
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'cg_provincias',
+          tabla: 'e_provincias',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
           ip: ip,
-          observacion: `Error al eliminar el registro con id: ${id}.`
+          observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
         });
 
         // FINALIZAR TRANSACCION
@@ -100,13 +100,13 @@ class ProvinciaControlador {
 
       await pool.query(
         `
-        DELETE FROM cg_provincias WHERE id = $1
+        DELETE FROM e_provincias WHERE id = $1
         `
         , [id]);
       
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_provincias',
+        tabla: 'e_provincias',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -125,6 +125,7 @@ class ProvinciaControlador {
     }
   }
 
+
   // METODO PARA REGISTRAR PROVINCIA
   public async CrearProvincia(req: Request, res: Response): Promise<void> {
     try {
@@ -135,13 +136,13 @@ class ProvinciaControlador {
 
       await pool.query(
         `
-        INSERT INTO cg_provincias (nombre, id_pais) VALUES ($1, $2)
+        INSERT INTO e_provincias (nombre, id_pais) VALUES ($1, $2)
         `
         , [nombre, id_pais]);
       
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_provincias',
+        tabla: 'e_provincias',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
@@ -165,7 +166,7 @@ class ProvinciaControlador {
     const { id } = req.params;
     const PAIS = await pool.query(
       `
-      SELECT * FROM cg_paises WHERE id = $1
+      SELECT * FROM e_cat_paises WHERE id = $1
       `
       , [id]);
     if (PAIS.rowCount > 0) {
@@ -178,33 +179,45 @@ class ProvinciaControlador {
 
   public async ObtenerProvincia(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
-    const UNA_PROVINCIA = await pool.query('SELECT * FROM cg_provincias WHERE id = $1', [id]);
+    const UNA_PROVINCIA = await pool.query(
+      `
+      SELECT * FROM e_provincias WHERE id = $1
+      `
+      , [id]);
     if (UNA_PROVINCIA.rowCount > 0) {
       return res.jsonp(UNA_PROVINCIA.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'La provincia no ha sido encontrada' });
+      return res.status(404).jsonp({ text: 'El registro no ha sido encontrada.' });
     }
   }
 
   public async ObtenerIdProvincia(req: Request, res: Response): Promise<any> {
     const { nombre } = req.params;
-    const UNA_PROVINCIA = await pool.query('SELECT * FROM cg_provincias WHERE nombre = $1', [nombre]);
+    const UNA_PROVINCIA = await pool.query(
+      `
+      SELECT * FROM e_provincias WHERE nombre = $1
+      `
+      , [nombre]);
     if (UNA_PROVINCIA.rowCount > 0) {
       return res.jsonp(UNA_PROVINCIA.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'La provincia no ha sido encontrada' });
+      return res.status(404).jsonp({ text: 'El registro no ha sido encontrada.' });
     }
   }
 
   public async ListarTodoPais(req: Request, res: Response) {
-    const PAIS = await pool.query('SELECT *FROM cg_paises');
+    const PAIS = await pool.query(
+      `
+      SELECT * FROM e_cat_paises
+      `
+    );
     if (PAIS.rowCount > 0) {
       return res.jsonp(PAIS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 

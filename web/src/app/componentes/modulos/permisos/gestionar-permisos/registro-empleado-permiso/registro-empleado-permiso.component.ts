@@ -1389,7 +1389,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
     if (this.recuperar.length != 0) {
       this.fechas_solicitud.map(obj => {
         for (let j = 0; j < this.recuperar.length; j++) {
-          if (moment(this.recuperar[j].fec_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
+          if (moment(this.recuperar[j].fecha_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
             this.contar_recuperables = this.contar_recuperables + 1;
             break;
           }
@@ -1399,10 +1399,10 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
     if (this.horario.length != 0) {
       for (let k = 0; k < this.horario.length; k++) {
-        if (this.horario[k].estado_origen === 'L' && this.horario[k].tipo_entr_salida === 'E') {
+        if (this.horario[k].estado_origen === 'L' && this.horario[k].tipo_accion === 'E') {
           this.contar_libres = this.contar_libres + 1;
         }
-        if (this.horario[k].estado_origen === 'N' && this.horario[k].tipo_entr_salida === 'E') {
+        if (this.horario[k].estado_origen === 'N' && this.horario[k].tipo_accion === 'E') {
           this.contar_laborables = this.contar_laborables + 1;
         }
       }
@@ -1636,7 +1636,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
           this.solInfo = [];
           this.solInfo = {
             permiso_mail: res.permiso_mail,
-            permiso_noti: res.permiso_noti,
+            permiso_noti: res.permiso_notificacion,
             empleado: res.id_empleado,
             id_dep: res.id_departamento,
             id_suc: res.id_sucursal,
@@ -1686,7 +1686,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
     // LEYENDO DATOS DE TIPO DE PERMISO
     var tipo_permiso = '';
-    this.tipoPermisos.filter(o => {
+    this.tipoPermisos.filter((o: any) => {
       if (o.id === permiso.id_tipo_permiso) {
         tipo_permiso = o.descripcion
       }

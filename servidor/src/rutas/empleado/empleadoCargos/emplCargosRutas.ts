@@ -1,6 +1,23 @@
 import { Router } from 'express';
 import { TokenValidation } from '../../../libs/verificarToken';
 import EMPLEADO_CARGO_CONTROLADOR from '../../../controlador/empleado/empleadoCargos/emplCargosControlador';
+import multer from 'multer';
+import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
+
+
+const storage_plantilla = multer.diskStorage({
+
+    destination: function (req, file, cb) {
+        cb(null, ObtenerRutaLeerPlantillas())
+    },
+    filename: function (req, file, cb) {
+        let documento = file.originalname;
+
+        cb(null, documento);
+    }
+})
+
+const upload_plantilla = multer({ storage: storage_plantilla });
 
 class EmpleadosCargpsRutas {
     public router: Router = Router();
@@ -20,8 +37,10 @@ class EmpleadosCargpsRutas {
         this.router.put('/:id_empl_contrato/:id/actualizar', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EditarCargo);
         // METODO DE CONSULTA DE DATOS DE CARGO POR ID CONTRATO
         this.router.get('/cargoInfo/:id_empl_contrato', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EncontrarCargoIDContrato);
-
-
+        // METODO PARA BUSCAR CARGOS POR FECHA
+        this.router.post('/fecha_cargo', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.BuscarCargosFecha);
+        // METODO PARA BUSCAR CARGOS POR FECHA EDICION
+        this.router.post('/fecha_cargo/editar', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.BuscarCargosFechaEditar);
 
 
 
@@ -29,7 +48,6 @@ class EmpleadosCargpsRutas {
 
         this.router.get('/', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.list);
         this.router.get('/lista-empleados/', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.ListarCargoEmpleado);
-        this.router.get('/empleadosAutorizan/:id', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.ListarEmpleadoAutoriza);
         this.router.get('/buscar/:id_empleado', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EncontrarIdCargo);
         this.router.get('/buscar/cargoActual/:id_empleado', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EncontrarIdCargoActual);
 
@@ -53,6 +71,13 @@ class EmpleadosCargpsRutas {
         this.router.get('/buscar/cargo-departamento/:id', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.BuscarTipoDepartamento);
         this.router.get('/buscar/cargo-sucursal/:id', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.BuscarTipoSucursal);
         this.router.get('/buscar/cargo-regimen/:id', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.BuscarTipoRegimen);
+
+
+        /** ********************************************************************************************* **
+         ** **            METODO PAARA LA LECTURA DEL REGISTRO MULTIPLE DE CARGOS                   ** **
+         ** ********************************************************************************************* **/
+        this.router.post('/upload/revision', [TokenValidation, upload_plantilla.single('uploads')], EMPLEADO_CARGO_CONTROLADOR.RevisarDatos);
+        this.router.post('/cargar_plantilla/', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.CargarPlantilla_cargos);
 
     }
 }

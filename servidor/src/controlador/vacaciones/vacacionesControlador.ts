@@ -1,16 +1,14 @@
-import { Request, Response } from 'express';
 import { RestarPeriodoVacacionAutorizada } from '../../libs/CargarVacacion';
+import { Request, Response } from 'express';
+import { QueryResult } from 'pg';
 import {
   enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
   FormatearFecha, FormatearHora, dia_completo
 }
   from '../../libs/settingsMail';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
-import { QueryResult } from 'pg';
 import pool from '../../database';
 import path from 'path';
-
-const builder = require('xmlbuilder');
 
 class VacacionesControlador {
 
@@ -18,17 +16,18 @@ class VacacionesControlador {
     const { id } = req.params;
     const VACACIONES = await pool.query(
       `
-      SELECT v.fec_inicio, v.fec_final, fec_ingreso, v.estado, v.dia_libre, v.dia_laborable, 
-      v.legalizado, v.id, v.id_peri_vacacion 
-      FROM vacaciones AS v, peri_vacaciones AS p 
-      WHERE v.id_peri_vacacion = p.id AND p.id = $1 ORDER BY v.id DESC
+      SELECT v.fecha_inicio, v.fecha_final, fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, 
+        v.legalizado, v.id, v.id_periodo_vacacion 
+      FROM mv_solicitud_vacacion AS v, mv_periodo_vacacion AS p 
+      WHERE v.id_periodo_vacacion = p.id AND p.id = $1 
+      ORDER BY v.id DESC
       `
       , [id]);
     if (VACACIONES.rowCount > 0) {
       return res.jsonp(VACACIONES.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
@@ -36,11 +35,12 @@ class VacacionesControlador {
     const { estado } = req.body;
     const VACACIONES = await pool.query(
       `
-      SELECT v.fec_inicio, v.fec_final, v.fec_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
-        v.id, v.id_peri_vacacion, v.id_empl_cargo, dc.contrato_id, e.id AS id_empl_solicita, da.id_departamento, 
+      SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
+        v.id, v.id_periodo_vacacion, v.id_empleado_cargo, dc.contrato_id, e.id AS id_empl_solicita, da.id_departamento, 
 	      e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, da.codigo, depa.nombre AS depa_nombre
-      FROM vacaciones AS v, datos_empleado_cargo AS dc, empleados AS e, datos_actuales_empleado AS da, cg_departamentos AS depa   
-      WHERE dc.cargo_id = v.id_empl_cargo 
+      FROM mv_solicitud_vacacion AS v, datos_empleado_cargo AS dc, eu_empleados AS e, datos_actuales_empleado AS da, 
+        ed_departamentos AS depa   
+      WHERE dc.cargo_id = v.id_empleado_cargo 
 	      AND dc.empl_id = e.id  
 	      AND da.id_contrato = dc.contrato_id
         AND depa.id = da.id_departamento
@@ -55,59 +55,75 @@ class VacacionesControlador {
       return res.jsonp(VACACIONES.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
   public async ListarVacacionesAutorizadas(req: Request, res: Response) {
-    const VACACIONES = await pool.query(`
-    SELECT v.fec_inicio, v.fec_final, v.fec_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
-    v.id, v.id_peri_vacacion, v.id_empl_cargo, e.id AS id_empl_solicita, e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, 
-    dc.codigo, depa.nombre AS depa_nombre 
-	  FROM vacaciones AS v, datos_empleado_cargo AS dc, empleados AS e, cg_departamentos AS depa   
-	  WHERE dc.cargo_id = v.id_empl_cargo AND dc.empl_id = e.id  AND depa.id = dc.id_departamento
-	  AND (v.estado = 3 OR v.estado = 4) ORDER BY id DESC
-    `);
+    const VACACIONES = await pool.query(
+      `
+      SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
+        v.id, v.id_periodo_vacacion, v.id_empleado_cargo, e.id AS id_empl_solicita, e.nombre, e.apellido, 
+        (e.nombre || \' \' || e.apellido) AS fullname, dc.codigo, depa.nombre AS depa_nombre 
+	    FROM mv_solicitud_vacacion AS v, datos_empleado_cargo AS dc, eu_empleados AS e, ed_departamentos AS depa   
+	    WHERE dc.cargo_id = v.id_empleado_cargo AND dc.empl_id = e.id  AND depa.id = dc.id_departamento
+	      AND (v.estado = 3 OR v.estado = 4) 
+      ORDER BY id DESC
+      `
+    );
     if (VACACIONES.rowCount > 0) {
       return res.jsonp(VACACIONES.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
   public async ObtenerFechasFeriado(req: Request, res: Response): Promise<any> {
     const { fechaSalida, fechaIngreso } = req.body;
-    const FECHAS = await pool.query('SELECT fecha FROM cg_feriados WHERE fecha BETWEEN $1 AND $2 ORDER BY fecha ASC', [fechaSalida, fechaIngreso]);
+    const FECHAS = await pool.query(
+      `
+      SELECT fecha FROM ef_cat_feriados WHERE fecha BETWEEN $1 AND $2 ORDER BY fecha ASC
+      `
+      , [fechaSalida, fechaIngreso]);
     if (FECHAS.rowCount > 0) {
       return res.jsonp(FECHAS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'Registros no encontrados' });
+      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
     }
   }
 
   public async ObtenerSolicitudVacaciones(req: Request, res: Response) {
     const id = req.params.id_emple_vacacion;
-    const SOLICITUD = await pool.query('SELECT *FROM vista_datos_solicitud_vacacion WHERE id_emple_vacacion = $1', [id]);
+    const SOLICITUD = await pool.query(
+      `
+      SELECT * FROM vista_datos_solicitud_vacacion WHERE id_emple_vacacion = $1
+      `
+      , [id]);
     if (SOLICITUD.rowCount > 0) {
       return res.json(SOLICITUD.rows)
     }
     else {
-      return res.status(404).json({ text: 'No se encuentran registros' });
+      return res.status(404).json({ text: 'No se encuentran registros.' });
     }
   }
 
   public async ObtenerAutorizacionVacaciones(req: Request, res: Response) {
     const id = req.params.id_vacaciones;
-    const SOLICITUD = await pool.query('SELECT a.id AS id_autorizacion, a.id_documento AS empleado_estado, ' +
-      'v.id AS vacacion_id FROM autorizaciones AS a, vacaciones AS v ' +
-      'WHERE v.id = a.id_vacacion AND v.id = $1', [id]);
+    const SOLICITUD = await pool.query(
+      `
+      SELECT a.id AS id_autorizacion, a.id_autoriza_estado AS empleado_estado, 
+        v.id AS vacacion_id 
+      FROM ecm_autorizaciones AS a, mv_solicitud_vacacion AS v 
+      WHERE v.id = a.id_vacacion AND v.id = $1
+      `
+      , [id]);
     if (SOLICITUD.rowCount > 0) {
       return res.json(SOLICITUD.rows)
     }
     else {
-      return res.status(404).json({ text: 'No se encuentran registros' });
+      return res.status(404).json({ text: 'No se encuentran registros.' });
     }
   }
 
@@ -127,18 +143,18 @@ class VacacionesControlador {
 
       const response: QueryResult = await pool.query(
         `
-        INSERT INTO vacaciones (fec_inicio, fec_final, 
-        fec_ingreso, estado, dia_libre, dia_laborable, legalizado, id_peri_vacacion, id_empl_cargo, codigo)
+        INSERT INTO mv_solicitud_vacacion (fecha_inicio, fecha_final, fecha_ingreso, estado, dia_libre, dia_laborable, 
+          legalizado, id_periodo_vacacion, id_empleado_cargo, codigo)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
-        `,
-        [fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado, id_peri_vacacion,
+        `
+        , [fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado, id_peri_vacacion,
           id_empl_cargo, codigo]);
 
       const [objetoVacacion] = response.rows;
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'vacaciones',
+        tabla: 'mv_solicitud_vacacion',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
@@ -151,67 +167,12 @@ class VacacionesControlador {
       await pool.query('COMMIT');
 
       if (!objetoVacacion) return res.status(400)
-        .jsonp({ message: 'Upps !!! algo salio mal. Solicitud de vacación no ingresada' })
+        .jsonp({ message: 'Upps!!! algo salio mal. Solicitud de vacación no ingresada.' })
 
       const vacacion = objetoVacacion;
 
-      const JefesDepartamentos = await pool.query(
-        `
-        SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc, 
-        cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato, 
-        e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo, 
-        c.vaca_mail, c.vaca_noti 
-        FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-        sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-        WHERE da.id_departamento = $1 AND 
-        da.id_empl_cargo = ecr.id AND 
-        da.id_departamento = cg.id AND 
-        da.estado = true AND 
-        cg.id_sucursal = s.id AND 
-        ecr.id_empl_contrato = ecn.id AND 
-        ecn.id_empleado = e.id AND 
-        e.id = c.id_empleado
-        `, [depa_user_loggin]).then((result: any) => { return result.rows });
+      return res.status(200).jsonp(vacacion);
 
-      if (JefesDepartamentos.length === 0) return res.status(400)
-        .jsonp({ message: 'Ups !!! algo salio mal. Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.' });
-
-      const [obj] = JefesDepartamentos;
-      let depa_padre = obj.depa_padre;
-      let JefeDepaPadre;
-
-      if (depa_padre !== null) {
-        console.log('******************', depa_padre);
-        do {
-          JefeDepaPadre = await pool.query(
-            `
-            SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
-            cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,
-            e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo, 
-            c.vaca_mail, c.vaca_noti
-            FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-            sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-            WHERE da.id_departamento = $1 AND 
-            da.id_empl_cargo = ecr.id AND 
-            da.id_departamento = cg.id AND 
-            da.estado = true AND 
-            cg.id_sucursal = s.id AND 
-            ecr.id_empl_contrato = ecn.id AND 
-            ecn.id_empleado = e.id AND 
-            e.id = c.id_empleado
-            `, [depa_padre]);
-
-          console.log(JefeDepaPadre.rows.length);
-          depa_padre = JefeDepaPadre.rows[0].depa_padre;
-          JefesDepartamentos.push(JefeDepaPadre.rows[0]);
-
-        } while (depa_padre !== null);
-        vacacion.EmpleadosSendNotiEmail = JefesDepartamentos
-        return res.status(200).jsonp(vacacion);
-      } else {
-        vacacion.EmpleadosSendNotiEmail = JefesDepartamentos
-        return res.status(200).jsonp(vacacion);
-      }
 
     } catch (error) {
       // REVERTIR TRANSACCIÓN
@@ -232,12 +193,12 @@ class VacacionesControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM vacaciones WHERE id = $1', [id]);
+      const consulta = await pool.query('SELECT * FROM mv_solicitud_vacacion WHERE id = $1', [id]);
       const [datosOriginales] = consulta.rows; 
 
       if (!datosOriginales){
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'vacaciones',
+          tabla: 'mv_solicitud_vacacion',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -253,15 +214,16 @@ class VacacionesControlador {
 
       const response: QueryResult = await pool.query(
         `
-        UPDATE vacaciones SET fec_inicio = $1, fec_final = $2, fec_ingreso = $3, dia_libre = $4, 
+        UPDATE mv_solicitud_vacacion SET fecha_inicio = $1, fecha_final = $2, fecha_ingreso = $3, dia_libre = $4, 
         dia_laborable = $5 WHERE id = $6 RETURNING *
-        `, [fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, id]);
+        `
+        , [fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, id]);
 
       const [objetoVacacion] = response.rows;
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'vacaciones',
+        tabla: 'mv_solicitud_vacacion',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -274,67 +236,12 @@ class VacacionesControlador {
       await pool.query('COMMIT');
 
       if (!objetoVacacion) return res.status(400)
-        .jsonp({ message: 'Upps !!! algo salio mal. Solicitud de vacación no ingresada' })
+        .jsonp({ message: 'Upps !!! algo salio mal. Solicitud de vacación no ingresada.' })
 
       const vacacion = objetoVacacion;
 
-      const JefesDepartamentos = await pool.query(
-        `
-        SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc, 
-        cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato, 
-        e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo, 
-        c.vaca_mail, c.vaca_noti 
-        FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-        sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-        WHERE da.id_departamento = $1 AND 
-        da.id_empl_cargo = ecr.id AND 
-        da.id_departamento = cg.id AND 
-        da.estado = true AND 
-        cg.id_sucursal = s.id AND 
-        ecr.id_empl_contrato = ecn.id AND 
-        ecn.id_empleado = e.id AND
-        e.id = c.id_empleado
-        `, [depa_user_loggin]).then((result: any) => { return result.rows });
+      return res.status(200).jsonp(vacacion);
 
-      if (JefesDepartamentos.length === 0) return res.status(400)
-        .jsonp({ message: 'Ups !!! algo salio mal. Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.' });
-
-      const [obj] = JefesDepartamentos;
-      let depa_padre = obj.depa_padre;
-      let JefeDepaPadre;
-
-      if (depa_padre !== null) {
-
-        do {
-          JefeDepaPadre = await pool.query(
-            `
-            SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
-            cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,
-            e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo,
-            c.vaca_mail, c.vaca_noti
-            FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-            sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-            WHERE da.id_departamento = $1 AND 
-            da.id_empl_cargo = ecr.id AND 
-            da.id_departamento = cg.id AND 
-            da.estado = true AND 
-            cg.id_sucursal = s.id AND 
-            ecr.id_empl_contrato = ecn.id AND 
-            ecn.id_empleado = e.id AND 
-            e.id = c.id_empleado
-            `, [depa_padre]);
-
-          console.log(JefeDepaPadre.rows.length);
-          depa_padre = JefeDepaPadre.rows[0].depa_padre;
-          JefesDepartamentos.push(JefeDepaPadre.rows[0]);
-
-        } while (depa_padre !== null);
-        vacacion.EmpleadosSendNotiEmail = JefesDepartamentos
-        return res.status(200).jsonp(vacacion);
-      } else {
-        vacacion.EmpleadosSendNotiEmail = JefesDepartamentos
-        return res.status(200).jsonp(vacacion);
-      }
 
     } catch (error) {
       // REVERTIR TRANSACCIÓN
@@ -348,7 +255,6 @@ class VacacionesControlador {
   public async EliminarVacaciones(req: Request, res: Response): Promise<Response> {
 
     try {
-      // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
       const { user_name, ip } = req.body;
       let { id_vacacion } = req.params;
 
@@ -356,12 +262,12 @@ class VacacionesControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM realtime_noti WHERE id_vacaciones = $1', [id_vacacion]);
+      const consulta = await pool.query('SELECT * FROM ecm_realtime_notificacion WHERE id_vacaciones = $1', [id_vacacion]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'realtime_noti',
+          tabla: 'ecm_realtime_notificacion',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
@@ -377,13 +283,13 @@ class VacacionesControlador {
   
       await pool.query(
         `
-        DELETE FROM realtime_noti WHERE id_vacaciones = $1
+        DELETE FROM ecm_realtime_notificacion WHERE id_vacaciones = $1
         `
         , [id_vacacion]);
       
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'realtime_noti',
+        tabla: 'ecm_realtime_notificacion',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -393,12 +299,12 @@ class VacacionesControlador {
       });
 
       // CONSULTAR DATOSORIGINALESAUTORIZACIONES
-      const consultaAutorizaciones = await pool.query('SELECT * FROM autorizaciones WHERE id_vacacion = $1', [id_vacacion]);
+      const consultaAutorizaciones = await pool.query('SELECT * FROM ecm_autorizaciones WHERE id_vacacion = $1', [id_vacacion]);
       const [datosOriginalesAutorizaciones] = consultaAutorizaciones.rows;
 
       if (!datosOriginalesAutorizaciones) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'autorizaciones',
+          tabla: 'ecm_autorizaciones',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
@@ -410,13 +316,13 @@ class VacacionesControlador {
   
       await pool.query(
         `
-          DELETE FROM autorizaciones WHERE id_vacacion = $1
+        DELETE FROM ecm_autorizaciones WHERE id_vacacion = $1
         `
         , [id_vacacion]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'autorizaciones',
+        tabla: 'ecm_autorizaciones',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginalesAutorizaciones),
@@ -426,12 +332,12 @@ class VacacionesControlador {
       });
 
       // CONSULTAR DATOSORIGINALESVACACIONES
-      const consultaVacaciones = await pool.query('SELECT * FROM vacaciones WHERE id = $1', [id_vacacion]);
+      const consultaVacaciones = await pool.query('SELECT * FROM mv_solicitud_vacacion WHERE id = $1', [id_vacacion]);
       const [datosOriginalesVacaciones] = consultaVacaciones.rows;
 
       if (!datosOriginalesVacaciones) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'vacaciones',
+          tabla: 'mv_solicitud_vacacion',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
@@ -443,7 +349,7 @@ class VacacionesControlador {
   
       const response: QueryResult = await pool.query(
         `
-        DELETE FROM vacaciones WHERE id = $1 RETURNING *
+        DELETE FROM mv_solicitud_vacacion WHERE id = $1 RETURNING *
         `
         , [id_vacacion]);
   
@@ -451,7 +357,7 @@ class VacacionesControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'vacaciones',
+        tabla: 'mv_solicitud_vacacion',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginalesVacaciones),
@@ -483,9 +389,9 @@ class VacacionesControlador {
     const { estado } = req.body; // ---
     const VACACIONES = await pool.query(
       `
-      SELECT v.id, v.fec_inicio, v.fec_final, fec_ingreso, v.estado, 
-      v.dia_libre, v.dia_laborable, v.legalizado, v.id, v.id_peri_vacacion, e.id AS id_empleado, de.id_contrato
-      FROM vacaciones AS v, empleados AS e, datos_actuales_empleado AS de
+      SELECT v.id, v.fecha_inicio, v.fecha_final, fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, 
+        v.legalizado, v.id, v.id_periodo_vacacion, e.id AS id_empleado, de.id_contrato
+      FROM mv_solicitud_vacacion AS v, eu_empleados AS e, datos_actuales_empleado AS de
 	    WHERE v.id = $1 AND e.codigo = v.codigo AND e.id = de.id AND de.estado = $2
       `
       , [id, estado]);
@@ -508,12 +414,12 @@ class VacacionesControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM vacaciones WHERE id = $1', [id]);
+      const consulta = await pool.query('SELECT * FROM mv_solicitud_vacacion WHERE id = $1', [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'vacaciones',
+          tabla: 'mv_solicitud_vacacion',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -529,12 +435,12 @@ class VacacionesControlador {
   
       await pool.query(
         `
-        UPDATE vacaciones SET estado = $1 WHERE id = $2
+        UPDATE mv_solicitud_vacacion SET estado = $1 WHERE id = $2
         `, [estado, id]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'vacaciones',
+        tabla: 'mv_solicitud_vacacion',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -562,10 +468,10 @@ class VacacionesControlador {
     const id = req.params.id;
     const VACACIONES = await pool.query(
       `
-      SELECT v.fec_inicio, v.fec_final, v.fec_ingreso, v.estado, v.dia_libre, v.dia_laborable, 
-        v.legalizado, v.id, v.id_peri_vacacion, v.id_empl_cargo, e.id AS id_empleado,
+      SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, 
+        v.legalizado, v.id, v.id_periodo_vacacion, v.id_empleado_cargo, e.id AS id_empleado,
         (e.nombre || ' ' || e.apellido) AS fullname, e.cedula
-      FROM vacaciones AS v, empleados AS e 
+      FROM mv_solicitud_vacacion AS v, eu_empleados AS e 
       WHERE v.id = $1 AND e.codigo = v.codigo::varchar
       `
       , [id]);
@@ -573,7 +479,7 @@ class VacacionesControlador {
       return res.jsonp(VACACIONES.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
@@ -600,15 +506,16 @@ class VacacionesControlador {
       const correoInfoPideVacacion = await pool.query(
         `
         SELECT e.correo, e.nombre, e.apellido, e.cedula, 
-        ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
-        d.nombre AS departamento 
-        FROM empl_contratos AS ecn, empleados AS e, empl_cargos AS ecr, tipo_cargo AS tc, 
-        cg_departamentos AS d 
+          ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
+          d.nombre AS departamento 
+        FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
+          ed_departamentos AS d 
         WHERE ecn.id = $1 AND ecn.id_empleado = e.id AND 
-        (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
-        AND tc.id = ecr.cargo AND d.id = ecr.id_departamento 
+          (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
+          AND tc.id = ecr.id_tipo_cargo AND d.id = ecr.id_departamento 
         ORDER BY cargo DESC
-        `, [idContrato]);
+        `
+        , [idContrato]);
 
       // obj.id_dep === correoInfoPideVacacion.rows[0].id_departamento && obj.id_suc === correoInfoPideVacacion.rows[0].id_sucursal
       var url = `${process.env.URL_DOMAIN}/ver-vacacion`;
@@ -617,44 +524,46 @@ class VacacionesControlador {
         to: correo,
         from: email,
         subject: asunto,
-        html: `
-               <body>
-                   <div style="text-align: center;">
-                       <img width="25%" height="25%" src="cid:cabeceraf"/>
-                   </div>
-                   <br>
-                   <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                       El presente correo es para informar que se ha ${proceso} la siguiente solicitud de vacaciones: <br>  
-                   </p>
-                   <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
-                   <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                       <b>Empresa:</b> ${nombre} <br>   
-                       <b>Asunto:</b> ${asunto} <br> 
-                       <b>Colaborador que envía:</b> ${correoInfoPideVacacion.rows[0].nombre} ${correoInfoPideVacacion.rows[0].apellido} <br>
-                       <b>Número de Cédula:</b> ${correoInfoPideVacacion.rows[0].cedula} <br>
-                       <b>Cargo:</b> ${correoInfoPideVacacion.rows[0].tipo_cargo} <br>
-                       <b>Departamento:</b> ${correoInfoPideVacacion.rows[0].departamento} <br>
-                       <b>Generado mediante:</b> Aplicación Web <br>
-                       <b>Fecha de envío:</b> ${fecha} <br> 
-                       <b>Hora de envío:</b> ${hora} <br><br> 
-                   </p>
-                   <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
-                   <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                       <b>Motivo:</b> Vacaciones <br>   
-                       <b>Fecha de Solicitud:</b> ${fecha} <br> 
-                       <b>Desde:</b> ${desde} <br>
-                       <b>Hasta:</b> ${hasta} <br>
-                       <b>Estado:</b> ${estado_v} <br><br>
-                       <b>${tipo_solicitud}:</b> ${solicitado_por} <br><br>
-                       <a href="${url}/${id}">Dar clic en el siguiente enlace para revisar solicitud de realización de vacaciones.</a> <br><br>                                                  
-                   </p>
-                   <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-                       <b>Gracias por la atención</b><br>
-                       <b>Saludos cordiales,</b> <br><br>
-                   </p>
-                   <img src="cid:pief" width="50%" height="50%"/>
-                </body>
-            `,
+        html:
+          `
+          <body>
+            <div style="text-align: center;">
+              <img width="25%" height="25%" src="cid:cabeceraf"/>
+            </div>
+            <br>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              El presente correo es para informar que se ha ${proceso} la siguiente solicitud de vacaciones: <br>  
+            </p>
+            <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Empresa:</b> ${nombre} <br>   
+              <b>Asunto:</b> ${asunto} <br> 
+              <b>Colaborador que envía:</b> ${correoInfoPideVacacion.rows[0].nombre} ${correoInfoPideVacacion.rows[0].apellido} <br>
+              <b>Número de Cédula:</b> ${correoInfoPideVacacion.rows[0].cedula} <br>
+              <b>Cargo:</b> ${correoInfoPideVacacion.rows[0].tipo_cargo} <br>
+              <b>Departamento:</b> ${correoInfoPideVacacion.rows[0].departamento} <br>
+              <b>Generado mediante:</b> Aplicación Web <br>
+              <b>Fecha de envío:</b> ${fecha} <br> 
+              <b>Hora de envío:</b> ${hora} <br><br> 
+            </p>
+            <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Motivo:</b> Vacaciones <br>   
+              <b>Fecha de Solicitud:</b> ${fecha} <br> 
+              <b>Desde:</b> ${desde} <br>
+              <b>Hasta:</b> ${hasta} <br>
+              <b>Estado:</b> ${estado_v} <br><br>
+              <b>${tipo_solicitud}:</b> ${solicitado_por} <br><br>
+              <a href="${url}/${id}">Dar clic en el siguiente enlace para revisar solicitud de realización de vacaciones.</a> <br><br>                                                  
+            </p>
+            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Gracias por la atención</b><br>
+              <b>Saludos cordiales,</b> <br><br>
+            </p>
+            <img src="cid:pief" width="50%" height="50%"/>
+          </body>
+          `
+        ,
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
@@ -683,7 +592,7 @@ class VacacionesControlador {
 
     }
     else {
-      res.jsonp({ message: 'Ups! algo salio mal!!! No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
 
@@ -706,15 +615,16 @@ class VacacionesControlador {
       const correoInfoPideVacacion = await pool.query(
         `
         SELECT e.correo, e.nombre, e.apellido, e.cedula, 
-        ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
-        d.nombre AS departamento 
-        FROM empl_contratos AS ecn, empleados AS e, empl_cargos AS ecr, tipo_cargo AS tc, 
-        cg_departamentos AS d 
+          ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
+          d.nombre AS departamento 
+        FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
+          ed_departamentos AS d 
         WHERE ecn.id = $1 AND ecn.id_empleado = e.id AND 
-        (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
-        AND tc.id = ecr.cargo AND d.id = ecr.id_departamento 
+          (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
+          AND tc.id = ecr.id_tipo_cargo AND d.id = ecr.id_departamento 
         ORDER BY cargo DESC
-        `, [idContrato]);
+        `
+        , [idContrato]);
 
       // obj.id_dep === correoInfoPideVacacion.rows[0].id_departamento && obj.id_suc === correoInfoPideVacacion.rows[0].id_sucursal
 
@@ -722,43 +632,45 @@ class VacacionesControlador {
         to: correo,
         from: email,
         subject: asunto,
-        html: `
-                 <body>
-                     <div style="text-align: center;">
-                         <img width="25%" height="25%" src="cid:cabeceraf"/>
-                     </div>
-                     <br>
-                     <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                         El presente correo es para informar que se ha ${proceso} la siguiente solicitud de vacaciones: <br>  
-                     </p>
-                     <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
-                     <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                         <b>Empresa:</b> ${nombre} <br>   
-                         <b>Asunto:</b> ${asunto} <br> 
-                         <b>Colaborador que envía:</b> ${correoInfoPideVacacion.rows[0].nombre} ${correoInfoPideVacacion.rows[0].apellido} <br>
-                         <b>Número de Cédula:</b> ${correoInfoPideVacacion.rows[0].cedula} <br>
-                         <b>Cargo:</b> ${correoInfoPideVacacion.rows[0].tipo_cargo} <br>
-                         <b>Departamento:</b> ${correoInfoPideVacacion.rows[0].departamento} <br>
-                         <b>Generado mediante:</b> Aplicación Móvil <br>
-                         <b>Fecha de envío:</b> ${fecha} <br> 
-                         <b>Hora de envío:</b> ${hora} <br><br> 
-                     </p>
-                     <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
-                     <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                         <b>Motivo:</b> Vacaciones <br>   
-                         <b>Fecha de Solicitud:</b> ${fecha} <br> 
-                         <b>Desde:</b> ${desde} <br>
-                         <b>Hasta:</b> ${hasta} <br>
-                         <b>Estado:</b> ${estado_v} <br><br>
-                         <b>${tipo_solicitud}:</b> ${solicitado_por} <br><br>
-                     </p>
-                     <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-                         <b>Gracias por la atención</b><br>
-                         <b>Saludos cordiales,</b> <br><br>
-                     </p>
-                     <img src="cid:pief" width="50%" height="50%"/>
-                  </body>
-              `,
+        html:
+          `
+          <body>
+            <div style="text-align: center;">
+              <img width="25%" height="25%" src="cid:cabeceraf"/>
+            </div>
+            <br>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              El presente correo es para informar que se ha ${proceso} la siguiente solicitud de vacaciones: <br>  
+            </p>
+            <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Empresa:</b> ${nombre} <br>   
+              <b>Asunto:</b> ${asunto} <br> 
+              <b>Colaborador que envía:</b> ${correoInfoPideVacacion.rows[0].nombre} ${correoInfoPideVacacion.rows[0].apellido} <br>
+              <b>Número de Cédula:</b> ${correoInfoPideVacacion.rows[0].cedula} <br>
+              <b>Cargo:</b> ${correoInfoPideVacacion.rows[0].tipo_cargo} <br>
+              <b>Departamento:</b> ${correoInfoPideVacacion.rows[0].departamento} <br>
+              <b>Generado mediante:</b> Aplicación Móvil <br>
+              <b>Fecha de envío:</b> ${fecha} <br> 
+              <b>Hora de envío:</b> ${hora} <br><br> 
+            </p>
+            <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Motivo:</b> Vacaciones <br>   
+              <b>Fecha de Solicitud:</b> ${fecha} <br> 
+              <b>Desde:</b> ${desde} <br>
+              <b>Hasta:</b> ${hasta} <br>
+              <b>Estado:</b> ${estado_v} <br><br>
+              <b>${tipo_solicitud}:</b> ${solicitado_por} <br><br>
+            </p>
+            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Gracias por la atención</b><br>
+              <b>Saludos cordiales,</b> <br><br>
+            </p>
+            <img src="cid:pief" width="50%" height="50%"/>
+          </body>
+          `
+        ,
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
@@ -786,7 +698,7 @@ class VacacionesControlador {
       });
     }
     else {
-      res.jsonp({ message: 'Ups algo salio mal !!! No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
 

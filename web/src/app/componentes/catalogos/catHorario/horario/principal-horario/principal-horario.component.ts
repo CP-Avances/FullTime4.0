@@ -1,21 +1,23 @@
 // IMPORTAR LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
+
 import * as xlsx from 'xlsx';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as xml2js from 'xml2js';
+import * as moment from 'moment';
+import * as FileSaver from 'file-saver';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
-import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
@@ -26,8 +28,9 @@ import { DetalleCatHorarioComponent } from 'src/app/componentes/catalogos/catHor
 import { RegistroHorarioComponent } from 'src/app/componentes/catalogos/catHorario/horario/registro-horario/registro-horario.component';
 import { EditarHorarioComponent } from '../editar-horario/editar-horario.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { ThemePalette } from '@angular/material/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableHorarios } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-principal-horario',
@@ -37,9 +40,11 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 export class PrincipalHorarioComponent implements OnInit {
 
+
   // ALMACENAMIENTO DE DATOS Y BUSQUEDA
   horarios: any = [];
   ver_horarios: boolean = true;
+  horariosEliminar: any = [];
 
   // FILTROS
   filtroNombreHorario = '';
@@ -106,7 +111,6 @@ export class PrincipalHorarioComponent implements OnInit {
     public router: Router, // VARIABLE DE MANEJO DE RUTAS
     public restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     private rest: HorarioService, // SERVICIO DATOS DE HORARIO
-    private restD: DetalleCatHorariosService, // SERVICIO DE DATOS DE DETALLES DE HORARIOS
     private toastr: ToastrService, // VARIABLE DE MANEJO DE NOTIFICACIONES
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -145,8 +149,8 @@ export class PrincipalHorarioComponent implements OnInit {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -174,7 +178,7 @@ export class PrincipalHorarioComponent implements OnInit {
     this.horarios = [];
     this.rest.BuscarListaHorarios().subscribe(datos => {
       this.horarios = datos;
-      this.horarios.forEach(obj => {
+      this.horarios.forEach((obj: any) => {
         if (obj.default_ === 'N') {
           obj.default_tipo = 'Laborable';
         }
@@ -202,6 +206,11 @@ export class PrincipalHorarioComponent implements OnInit {
           this.ObtenerHorarios();
         }
       });
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionHorarios.clear();
+    this.horariosEliminar = [];
   }
 
   // METODO PARA ABRIR VENTANA REGISTRAR DETALLE DE HORARIO
@@ -245,33 +254,6 @@ export class PrincipalHorarioComponent implements OnInit {
       .afterClosed().subscribe(items => {
         if (items === 1) {
           this.VerDetallesHorario(datosSeleccionados.id)
-        }
-      });
-  }
-
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
-  EliminarDetalle(id_horario: any) {
-    const datos = {
-      user_name: this.user_name,
-      ip: this.ip
-    };
-
-    this.rest.EliminarRegistro(id_horario.id, datos).subscribe(res => {
-      // METODO PARA AUDITAR CATÁLOGO HORARIOS
-      this.validar.Auditar('app-web', 'cg_horarios', id_horario, '', 'DELETE');
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerHorarios();
-    });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.EliminarDetalle(datos);
         }
       });
   }
@@ -342,19 +324,15 @@ export class PrincipalHorarioComponent implements OnInit {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
 
     }
-    this.listaHorariosCorrectos = [];
-    this.listaDetalleCorrectos = [];
-
-    console.log("formdata", formData);
+    //--console.log("formdata", formData);
     this.rest.VerificarDatosHorario(formData).subscribe(res => {
       this.dataHorarios = res;
-      this.dataHorarios.plantillaHorarios.forEach(obj => {
+      this.dataHorarios.plantillaHorarios.forEach((obj: any) => {
         if (obj.OBSERVACION == 'Ok') {
           this.listaHorariosCorrectos.push(obj);
         }
       });
-
-      this.dataHorarios.plantillaDetalles.forEach(obj => {
+      this.dataHorarios.plantillaDetalles.forEach((obj: any) => {
         if (obj.OBSERVACION == 'Ok') {
           this.listaDetalleCorrectos.push(obj);
         }
@@ -396,7 +374,7 @@ export class PrincipalHorarioComponent implements OnInit {
           this.archivo1Form.reset();
           this.nameFile = '';
         } else {
-          this.toastr.success('Plantilla de horarios importada','Operación exitosa.', {
+          this.toastr.success('Plantilla de horarios importada', 'Operación exitosa.', {
             timeOut: 6000,
           });
           this.LimpiarCamposPlantilla();
@@ -478,7 +456,7 @@ export class PrincipalHorarioComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
             body: [
               [
                 { text: 'Código', style: 'tableHeader' },
@@ -486,17 +464,15 @@ export class PrincipalHorarioComponent implements OnInit {
                 { text: 'Minutos de almuerzo', style: 'tableHeader' },
                 { text: 'Horas de trabajo', style: 'tableHeader' },
                 { text: 'Horario noturno', style: 'tableHeader' },
-                { text: 'Requiere detalle', style: 'tableHeader' },
                 { text: 'Documento', style: 'tableHeader' },
               ],
-              ...this.horarios.map(obj => {
+              ...this.horarios.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
-                  { text: obj.min_almuerzo, style: 'itemsTableC' },
+                  { text: obj.minutos_comida, style: 'itemsTableC' },
                   { text: obj.hora_trabajo, style: 'itemsTableC' },
                   { text: obj.noturno == true ? 'Sí' : 'No', style: 'itemsTableC' },
-                  { text: obj.detalle == true ? 'Sí' : 'No', style: 'itemsTableC' },
                   { text: obj.documento, style: 'itemsTableC' },
                 ];
               })
@@ -546,15 +522,14 @@ export class PrincipalHorarioComponent implements OnInit {
   ExportToXML() {
     var objeto: any;
     var arregloHorarios: any = [];
-    this.horarios.forEach(obj => {
+    this.horarios.forEach((obj: any) => {
       objeto = {
         "horario": {
           "$": { "id": obj.id },
           "nombre": obj.nombre,
-          "min_almuerzo": obj.min_almuerzo,
+          "min_almuerzo": obj.minutos_comida,
           "hora_trabajo": obj.hora_trabajo,
           "noturno": obj.nocturno,
-          "requiere_detalle": obj.detalle,
           "documento": obj.documento,
         }
       }
@@ -580,7 +555,6 @@ export class PrincipalHorarioComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
 
     const a = document.createElement('a');
     a.href = xmlUrl;
@@ -591,7 +565,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
 
   //METODO PARA DEFINIR EL COLOR DE LA OBSERVACION
-  ObtenerColorValidacion(observacion: string): string{
+  ObtenerColorValidacion(observacion: string): string {
     if (observacion.startsWith('Datos no registrados:')) {
       return 'rgb(242, 21, 21)';
     }
@@ -600,27 +574,164 @@ export class PrincipalHorarioComponent implements OnInit {
       return 'rgb(222, 162, 73)';
     }
 
-    if(observacion.startsWith('Requerido') || observacion.startsWith('No cumple') || observacion.startsWith('Minutos de alimentación no')){
+    if (observacion.startsWith('Requerido') || observacion.startsWith('No cumple') || observacion.startsWith('Minutos de alimentación no')) {
       return 'rgb(238, 34, 207)';
     }
 
-    switch(observacion) {
+    switch (observacion) {
       case 'Ok':
-          return 'rgb(159, 221, 154)';
+        return 'rgb(159, 221, 154)';
       case 'Ya existe en el sistema':
-          return 'rgb(239, 203, 106)';
+        return 'rgb(239, 203, 106)';
       case 'Codigo de horario no existe en los horarios validos':
-          return 'rgb(239, 203, 106)';
+        return 'rgb(239, 203, 106)';
       case 'Registro duplicado dentro de la plantilla':
-          return 'rgb(156, 214, 255)';
+        return 'rgb(156, 214, 255)';
       default:
-          return 'rgb(242, 21, 21)';
+        return 'rgb(242, 21, 21)';
     }
   }
 
-  ObtenerColorDatoRegistrado(dato: string){
-    if (dato == 'No registrado'){
+  ObtenerColorDatoRegistrado(dato: string) {
+    if (dato == 'No registrado') {
       return 'rgb(242, 21, 21)';
     }
   }
+
+  // METODOS PARA LA SELECCION MULTIPLE
+
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionHorarios = new SelectionModel<ITableHorarios>(true, []);
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionHorarios.selected.length;
+    return numSelected === this.horarios.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionHorarios.clear() :
+      this.horarios.forEach((row: any) => this.selectionHorarios.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableHorarios): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.horariosEliminar = this.selectionHorarios.selected;
+
+    return `${this.selectionHorarios.isSelected(row) ? 'deselect' : 'select'} row ${row.descripcion + 1}`;
+  }
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
+  EliminarDetalle(id_horario: any) {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistro(id_horario, datos).subscribe((res: any) => {
+      if (res.message === 'error') {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerHorarios();
+      }
+    });
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.EliminarDetalle(datos.id);
+          this.activar_seleccion = true;
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.horariosEliminar = [];
+          this.selectionHorarios.clear();
+          this.ObtenerHorarios();
+        }
+      });
+  }
+
+// METODO PARA ELIMINAR REGISTROS
+  contador: number = 0;
+  ingresar: boolean = false;
+  EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.ingresar = false;
+    this.contador = 0;
+    this.horariosEliminar = this.selectionHorarios.selected;
+    this.horariosEliminar.forEach((datos: any) => {
+      this.horarios = this.horarios.filter(item => item.id !== datos.id);
+      this.contador = this.contador + 1;
+      this.rest.EliminarRegistro(datos.id, data).subscribe((res:any) => {
+        if (res.message === 'error') {
+          this.toastr.error('Existen datos relacionados con ' + datos.codigo + '.', 'No fue posible eliminar.', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ObtenerHorarios();
+        }
+      });
+    }
+    )
+  }
+
+// METODO PARA CONFIRMAR ELIMINACION MULTIPLE
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (this.horariosEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+            this.horariosEliminar = [];
+            this.selectionHorarios.clear();
+            this.ObtenerHorarios();
+          } else {
+            this.toastr.warning('No ha seleccionado HORARIOS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        } else {
+          this.router.navigate(['/horario']);
+        }
+      });
+
+  }
+
 }

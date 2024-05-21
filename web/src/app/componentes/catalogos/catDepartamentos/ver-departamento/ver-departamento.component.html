@@ -14,17 +14,54 @@
     </div>
     <div class="container" style="padding: 10px; text-align: center; margin-top: 10px; margin-bottom: 10px;">
         <div class="mat-elevation-z8" style="background: white;">
-            <div id="resultados">
-                <span>
-                    DEPARTAMENTO {{info.nombre}} - ESTABLECIMIENTO {{nombre_sucursal}}
-                </span>
-                <mat-icon class="float-right" id="cerrar" (click)="CargarDatos(info)" matTooltipPosition="right"
+
+
+
+
+            <div class="d-flex bd-highlight" id="titulo">
+
+
+
+                <div class="w-100 bd-highlight">
+                    <h5>
+                        DEPARTAMENTO {{info.nombre}} - ESTABLECIMIENTO {{nombre_sucursal}}
+                    </h5>
+                </div>
+
+                
+                <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+    
+                    <mat-icon class="float-right" id="cerrar" (click)="CargarDatos(info)" matTooltipPosition="right"
                     matTooltip="Actualización de niveles de aprobación.">autorenew</mat-icon>
+                </div>
+    
+    
+                <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+    
+                    <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                        (click)="ConfirmarDeleteMultiple()">Eliminar </button>
+                </div>
             </div>
+
+
+    
             <div class="table-responsive">
                 <table class="table table-hover table-sm">
                     <thead class="thead-light">
                         <tr>
+
+                            <th>
+                                <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                    matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                                    id="SelectCheck" (click)="HabilitarSeleccion()">
+                                    library_add_check
+                                </mat-icon>
+                                <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                                    [checked]="selectionNivel.hasValue() && isAllSelectedPag()"
+                                    [indeterminate]="selectionNivel.hasValue() && !isAllSelectedPag()"
+                                    [aria-label]="checkboxLabelPag()">
+                                </mat-checkbox>
+                            </th>
                             <th scope="col">Nivel jerárquico</th>
                             <th scope="col">Establecimiento</th>
                             <th scope="col">Departamento</th>
@@ -33,9 +70,17 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let departamento of departamentos">
+
+                            <td>
+                                <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                    (change)="$event ? selectionNivel.toggle(departamento) : null"
+                                    [checked]="selectionNivel.isSelected(departamento)"
+                                    [aria-label]="checkboxLabelPag(departamento)">
+                                </mat-checkbox>
+                            </td>
                             <td>{{departamento.nivel}}</td>
                             <td>{{departamento.suc_nivel}}</td>
-                            <td>{{departamento.dep_nivel_nombre}}</td>
+                            <td>{{departamento.departamento_nombre_nivel}}</td>
                             <td class="d-flex justify-content-center">
                                 <i (click)="AbrirVentanaVerListadoEmpleados(departamento)" id="t-detalles"
                                     class="fa fa-user-circle" matSuffix matTooltipPosition="right"
@@ -59,7 +104,8 @@
         <div class="mat-elevation-z8" style="background: white;">
             <div id="resultados">
                 LISTA DE USUARIOS QUE AUTORIZAN EN {{depa}}
-                <mat-icon class="float-right" id="cerrar" style="color: rgb(255, 52, 52);" (click)="CerrarTabla()">highlight_off</mat-icon>
+                <mat-icon class="float-right" id="cerrar" style="color: rgb(255, 52, 52);"
+                    (click)="CerrarTabla()">highlight_off</mat-icon>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover table-sm">
@@ -72,6 +118,8 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let empleado of empleados">
+
+
                             <td>{{empleado.nombre}} {{empleado.apellido}}</td>
                             <td>{{empleado.cargo}}</td>
                             <td>

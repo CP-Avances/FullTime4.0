@@ -47,7 +47,7 @@
                         </td>
                         <td>{{t.fecha}}</td>
                         <td>{{t.hora}}</td>
-                        <td>{{t.tecl_funcion}}</td>
+                        <td>{{t.tecla_funcion}}</td>
                         <td>{{t.observacion}}</td>
                         <td>{{t.latitud}}</td>
                         <td>{{t.longitud}}</td>
@@ -118,7 +118,7 @@
                     </tr>
                     <tr
                         *ngFor="let d of datosEmpleado | emplCargo: filtroCargo | departamento: filtroDepartamento | emplCodigo: filtroCodigo | emplCedula: filtroCedula | nombreApellido: filtroEmpleado | paginate:tamanio_pagina_e:numero_pagina_e">
-                        <th scope="row">{{d.codigo}}</th>
+                        <td>{{d.codigo}}</td>
                         <td>{{d.cedula}}</td>
                         <td>{{d.apellido}} {{d.nombre}}</td>
                         <td>{{d.departamento | titlecase}}</td>

@@ -2,10 +2,10 @@ import { Request, Response } from 'express';
 import { ObtenerRutaVacuna } from '../../../libs/accesoCarpetas';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
+import moment from 'moment';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
-import moment from 'moment';
 
 class VacunasControlador {
 
@@ -14,10 +14,9 @@ class VacunasControlador {
         const { id_empleado } = req.params;
         const VACUNA = await pool.query(
             `
-            SELECT ev.id, ev.id_empleado, ev.id_tipo_vacuna, ev.carnet, ev.fecha, 
-            tv.nombre, ev.descripcion
-            FROM empl_vacunas AS ev, tipo_vacuna AS tv 
-            WHERE ev.id_tipo_vacuna = tv.id AND ev.id_empleado = $1
+            SELECT ev.id, ev.id_empleado, ev.id_vacuna, ev.carnet, ev.fecha, tv.nombre, ev.descripcion
+            FROM eu_empleado_vacunas AS ev, e_cat_vacuna AS tv 
+            WHERE ev.id_vacuna = tv.id AND ev.id_empleado = $1
             ORDER BY ev.id DESC
             `
             , [id_empleado]);
@@ -33,8 +32,25 @@ class VacunasControlador {
     public async ListarTipoVacuna(req: Request, res: Response) {
         const VACUNA = await pool.query(
             `
-            SELECT * FROM tipo_vacuna
+            SELECT * FROM e_cat_vacuna
             `
+        );
+        if (VACUNA.rowCount > 0) {
+            return res.jsonp(VACUNA.rows)
+        }
+        else {
+            res.status(404).jsonp({ text: 'Registro no encontrado.' });
+        }
+    }
+
+    // METODO PARA BUSCAR VACUNA POR FECHA Y TIPO
+    public async BuscarVacunaFechaTipo(req: Request, res: Response) {
+        const { id_empleado, id_vacuna, fecha } = req.body;
+        const VACUNA = await pool.query(
+            `
+            SELECT * FROM eu_empleado_vacunas WHERE fecha = $1 AND id_vacuna = $2 AND id_empleado = $3
+            `
+            , [fecha, id_vacuna, id_empleado]
         );
         if (VACUNA.rowCount > 0) {
             return res.jsonp(VACUNA.rows)
@@ -54,7 +70,7 @@ class VacunasControlador {
 
             const response: QueryResult = await pool.query(
                 `
-                INSERT INTO empl_vacunas (id_empleado, descripcion, fecha, id_tipo_vacuna) 
+                INSERT INTO eu_empleado_vacunas (id_empleado, descripcion, fecha, id_vacuna) 
                 VALUES ($1, $2, $3, $4) RETURNING *
                 `
                 , [id_empleado, descripcion, fecha, id_tipo_vacuna]);
@@ -63,7 +79,7 @@ class VacunasControlador {
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'empl_vacunas',
+                tabla: 'eu_empleado_vacunas',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
@@ -107,7 +123,7 @@ class VacunasControlador {
     
             const response: QueryResult = await pool.query(
                 `
-                SELECT codigo FROM empleados WHERE id = $1
+                SELECT codigo FROM eu_empleados WHERE id = $1
                 `
                 , [id_empleado]);
     
@@ -116,12 +132,12 @@ class VacunasControlador {
             let documento = vacuna.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
 
             // CONSULTAR DATOSORIGINALES
-            const vacuna1 = await pool.query('SELECT * FROM empl_vacunas WHERE id = $1', [id]);
+            const vacuna1 = await pool.query('SELECT * FROM eu_empleado_vacunas WHERE id = $1', [id]);
             const [datosOriginales] = vacuna1.rows;
 
             if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'empl_vacunas',
+                    tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
@@ -137,13 +153,13 @@ class VacunasControlador {
     
             await pool.query(
                 `
-                UPDATE empl_vacunas SET carnet = $2 WHERE id = $1
+                UPDATE eu_empleado_vacunas SET carnet = $2 WHERE id = $1
                 `
                 , [id, documento]);
             
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'empl_vacunas',
+                tabla: 'eu_empleado_vacunas',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: '',
@@ -173,12 +189,12 @@ class VacunasControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const vacuna = await pool.query('SELECT * FROM empl_vacunas WHERE id = $1', [id]);
+            const vacuna = await pool.query('SELECT * FROM eu_empleado_vacunas WHERE id = $1', [id]);
             const [datosOriginales] = vacuna.rows;
 
             if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'empl_vacunas',
+                    tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
@@ -194,8 +210,8 @@ class VacunasControlador {
 
             await pool.query(
                 `
-                UPDATE empl_vacunas SET id_empleado = $1, descripcion = $2, fecha = $3, 
-                id_tipo_vacuna = $4 WHERE id = $5
+                UPDATE eu_empleado_vacunas SET id_empleado = $1, descripcion = $2, fecha = $3, id_vacuna = $4 
+                WHERE id = $5
                 `
                 , [id_empleado, descripcion, fecha, id_tipo_vacuna, id]);
             
@@ -205,7 +221,7 @@ class VacunasControlador {
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: `{id_empleado: ${id_empleado}, descripcion: ${descripcion}, fecha: ${fecha}, id_tipo_vacuna: ${id_tipo_vacuna}}`,
+                datosNuevos: `{id_empleado: ${id_empleado}, descripcion: ${descripcion}, fecha: ${fecha}, id_vacuna: ${id_tipo_vacuna}}`,
                 ip, 
                 observacion: null
             });
@@ -249,12 +265,12 @@ class VacunasControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const vacunaconsulta = await pool.query('SELECT * FROM empl_vacunas WHERE id = $1', [id]);
+            const vacunaconsulta = await pool.query('SELECT * FROM eu_empleado_vacunas WHERE id = $1', [id]);
             const [datosOriginales] = vacunaconsulta.rows;
 
             if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'empl_vacunas',
+                    tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
@@ -270,7 +286,7 @@ class VacunasControlador {
     
             const response: QueryResult = await pool.query(
                 `
-                UPDATE empl_vacunas SET carnet = null WHERE id = $1 RETURNING *
+                UPDATE eu_empleado_vacunas SET carnet = null WHERE id = $1 RETURNING *
                 `
                 , [id]);
     
@@ -278,7 +294,7 @@ class VacunasControlador {
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'empl_vacunas',
+                tabla: 'eu_empleado_vacunas',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
@@ -322,12 +338,12 @@ class VacunasControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const vacunaconsulta = await pool.query('SELECT * FROM empl_vacunas WHERE id = $1', [id]);
+            const vacunaconsulta = await pool.query('SELECT * FROM eu_empleado_vacunas WHERE id = $1', [id]);
             const [datosOriginales] = vacunaconsulta.rows;
 
             if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'empl_vacunas',
+                    tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'D',
                     datosOriginales: '',
@@ -343,7 +359,7 @@ class VacunasControlador {
 
             const response: QueryResult = await pool.query(
                 `
-                DELETE FROM empl_vacunas WHERE id = $1 RETURNING *
+                DELETE FROM eu_empleado_vacunas WHERE id = $1 RETURNING *
                 `
                 , [id]);
     
@@ -351,7 +367,7 @@ class VacunasControlador {
     
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'empl_vacunas',
+                tabla: 'eu_empleado_vacunas',
                 usuario: user_name,
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginales),
@@ -385,26 +401,31 @@ class VacunasControlador {
     // CREAR REGISTRO DE TIPO DE VACUNA
     public async CrearTipoVacuna(req: Request, res: Response): Promise<Response> {
         try {
-            const { nombre, user_name, ip } = req.body;
+            const { vacuna, user_name, ip } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            const response: QueryResult = await pool.query(
+            const VERIFICAR_VACUNA: QueryResult = await pool.query(
                 `
-                INSERT INTO tipo_vacuna (nombre) VALUES ($1) RETURNING *
+                SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
                 `
-                , [nombre]);
+                , [vacuna.toUpperCase()])
 
-            const [vacunas] = response.rows;
+            if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
+                const response: QueryResult = await pool.query(
+                    `
+                    INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
+                    `
+                    , [vacuna]);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'tipo_vacuna',
+                tabla: 'e_cat_vacuna',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{nombre: ${nombre}}`,
+                datosNuevos: `{nombre: ${vacuna}}`,
                 ip, 
                 observacion: null
             });
@@ -412,11 +433,16 @@ class VacunasControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
 
-            if (vacunas) {
-                return res.status(200).jsonp(vacunas)
-            }
-            else {
-                return res.status(404).jsonp({ message: 'error' })
+            const [vacunaInsertada] = response.rows;
+
+                if (vacunaInsertada) {
+                    return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' })
+                } else {
+                    return res.status(404).jsonp({ message: 'Ups!!! algo slaio mal.', status: '400' })
+                }
+
+            } else {
+                return res.jsonp({ message: 'Registro de tipo de vacuna ya existe en el sistema.', status: '300' })
             }
 
         } catch (error) {
@@ -436,19 +462,18 @@ class VacunasControlador {
         fs.access(ruta, fs.constants.F_OK, (err) => {
             if (err) {
             } else {
-              res.sendFile(path.resolve(ruta));
+                res.sendFile(path.resolve(ruta));
             }
-          });
+        });
     }
 
     // LISTAR TODOS LOS REGISTROS DE VACUNACIÓN
     public async ListarRegistro(req: Request, res: Response) {
         const VACUNA = await pool.query(
             `
-            SELECT ev.id, ev.id_empleado, ev.id_tipo_vacuna, ev.carnet, ev.fecha, 
-            tv.nombre, ev.descripcion
-            FROM empl_vacunas AS ev, tipo_vacuna AS tv 
-            WHERE ev.id_tipo_vacuna = tv.id
+            SELECT ev.id, ev.id_empleado, ev.id_vacuna, ev.carnet, ev.fecha, tv.nombre, ev.descripcion
+            FROM eu_empleado_vacunas AS ev, e_cat_vacuna AS tv 
+            WHERE ev.id_vacuna = tv.id
             ORDER BY ev.id DESC
             `
         );

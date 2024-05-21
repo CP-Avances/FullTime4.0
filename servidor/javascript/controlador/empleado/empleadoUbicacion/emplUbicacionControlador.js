@@ -13,9 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UBICACION_CONTROLADOR = void 0;
-const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../../database"));
-const builder = require('xmlbuilder');
 class UbicacionControlador {
     /** ************************************************************************************************ **
      ** **        REGISTRO TABLA CATALOGO DE UBICACIONES - COORDENADAS (cg_ubicaciones)               ** **
@@ -23,90 +21,37 @@ class UbicacionControlador {
     // CREAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
     RegistrarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { latitud, longitud, descripcion, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const response = yield database_1.default.query('INSERT INTO cg_ubicaciones (latitud, longitud, descripcion) ' +
-                    'VALUES ($1, $2, $3) RETURNING *', [latitud, longitud, descripcion]);
-                const [coordenadas] = response.rows;
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'cg_ubicaciones',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{latitud: ${latitud}, longitud: ${longitud}, descripcion: ${descripcion}}`,
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                if (coordenadas) {
-                    return res.status(200).jsonp({ message: 'OK', respuesta: coordenadas });
-                }
-                else {
-                    return res.status(404).jsonp({ message: 'error' });
-                }
+            const { latitud, longitud, descripcion } = req.body;
+            const response = yield database_1.default.query(`
+            INSERT INTO mg_cat_ubicaciones (latitud, longitud, descripcion)
+            VALUES ($1, $2, $3) RETURNING *
+            `, [latitud, longitud, descripcion]);
+            const [coordenadas] = response.rows;
+            if (coordenadas) {
+                return res.status(200).jsonp({ message: 'OK', respuesta: coordenadas });
             }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
+            else {
+                return res.status(404).jsonp({ message: 'error' });
             }
         });
     }
     // ACTUALIZAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
     ActualizarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { latitud, longitud, descripcion, id, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const coordenada = yield database_1.default.query('SELECT * FROM cg_ubicaciones WHERE id = $1', [id]);
-                const [datosOriginales] = coordenada.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'cg_ubicaciones',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al actualizar coordenada con id: ${id}`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Error al actualizar coordenada' });
-                }
-                yield database_1.default.query('UPDATE cg_ubicaciones SET latitud = $1, longitud = $2, descripcion = $3 ' +
-                    'WHERE id = $4', [latitud, longitud, descripcion, id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'cg_ubicaciones',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{latitud: ${latitud}, longitud: ${longitud}, descripcion: ${descripcion}}`,
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro guardado.' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al guardar registro.' });
-            }
+            const { latitud, longitud, descripcion, id } = req.body;
+            yield database_1.default.query(`
+            UPDATE mg_cat_ubicaciones SET latitud = $1, longitud = $2, descripcion = $3
+            WHERE id = $4
+            `, [latitud, longitud, descripcion, id]);
+            res.jsonp({ message: 'Registro guardado.' });
         });
     }
     // LISTAR TODOS LOS REGISTROS DE COORDENADAS GENERALES DE UBICACIÓN
     ListarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const UBICACIONES = yield database_1.default.query('SELECT * FROM cg_ubicaciones');
+            const UBICACIONES = yield database_1.default.query(`
+            SELECT * FROM mg_cat_ubicaciones
+            `);
             if (UBICACIONES.rowCount > 0) {
                 return res.jsonp(UBICACIONES.rows);
             }
@@ -119,7 +64,9 @@ class UbicacionControlador {
     ListarCoordenadasDefinidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const UBICACIONES = yield database_1.default.query('SELECT * FROM cg_ubicaciones WHERE NOT id = $1', [id]);
+            const UBICACIONES = yield database_1.default.query(`
+            SELECT * FROM mg_cat_ubicaciones WHERE NOT id = $1
+            `, [id]);
             if (UBICACIONES.rowCount > 0) {
                 return res.jsonp(UBICACIONES.rows);
             }
@@ -132,7 +79,9 @@ class UbicacionControlador {
     ListarUnaCoordenada(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const UBICACIONES = yield database_1.default.query('SELECT * FROM cg_ubicaciones WHERE id = $1', [id]);
+            const UBICACIONES = yield database_1.default.query(`
+            SELECT * FROM mg_cat_ubicaciones WHERE id = $1
+            `, [id]);
             if (UBICACIONES.rowCount > 0) {
                 return res.jsonp(UBICACIONES.rows);
             }
@@ -144,7 +93,9 @@ class UbicacionControlador {
     // BUSCAR ÚLTIMO REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
     BuscarUltimoRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const UBICACIONES = yield database_1.default.query('SELECT MAX(id) AS id FROM cg_ubicaciones');
+            const UBICACIONES = yield database_1.default.query(`
+            SELECT MAX(id) AS id FROM mg_cat_ubicaciones
+            `);
             if (UBICACIONES.rowCount > 0) {
                 return res.jsonp(UBICACIONES.rows);
             }
@@ -157,46 +108,14 @@ class UbicacionControlador {
     EliminarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
                 const { id } = req.params;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const coordenada = yield database_1.default.query('SELECT * FROM cg_ubicaciones WHERE id = $1', [id]);
-                const [datosOriginales] = coordenada.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'cg_ubicaciones',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al eliminar coordenada con id: ${id}`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                }
-                yield database_1.default.query('DELETE FROM cg_ubicaciones WHERE id = $1', [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'cg_ubicaciones',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
+                yield database_1.default.query(`
+                DELETE FROM mg_cat_ubicaciones WHERE id = $1
+                `, [id]);
+                res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (_a) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'false' });
+                res.jsonp({ message: 'false' });
             }
         });
     }
@@ -208,10 +127,10 @@ class UbicacionControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empl } = req.params;
             const UBICACIONES = yield database_1.default.query(`
-            SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empl, cu.latitud, cu.longitud, 
+            SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empleado, cu.latitud, cu.longitud, 
                 cu.descripcion 
-            FROM empl_ubicacion AS eu, cg_ubicaciones AS cu 
-            WHERE eu.id_ubicacion = cu.id AND eu.id_empl = $1
+            FROM mg_empleado_ubicacion AS eu, mg_cat_ubicaciones AS cu 
+            WHERE eu.id_ubicacion = cu.id AND eu.id_empleado = $1
             `, [id_empl]);
             if (UBICACIONES.rowCount > 0) {
                 return res.jsonp(UBICACIONES.rows);
@@ -224,41 +143,24 @@ class UbicacionControlador {
     // ASIGNAR COORDENADAS GENERALES DE UBICACIÓN A LOS USUARIOS
     RegistrarCoordenadasUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { codigo, id_empl, id_ubicacion, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                yield database_1.default.query('INSERT INTO empl_ubicacion (codigo, id_empl, id_ubicacion) ' +
-                    'VALUES ($1, $2, $3)', [codigo, id_empl, id_ubicacion]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'empl_ubicacion',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{codigo: ${codigo}, id_empl: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                res.jsonp({ message: 'Registro guardado.' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                res.status(500).jsonp({ message: 'Error al guardar registro.' });
-            }
+            const { codigo, id_empl, id_ubicacion } = req.body;
+            yield database_1.default.query(`
+            INSERT INTO mg_empleado_ubicacion (codigo, id_empleado, id_ubicacion) 
+            VALUES ($1, $2, $3)
+            `, [codigo, id_empl, id_ubicacion]);
+            res.jsonp({ message: 'Registro guardado.' });
         });
     }
     // LISTAR REGISTROS DE COORDENADAS GENERALES DE UNA UBICACIÓN 
     ListarRegistroUsuarioU(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id_ubicacion = req.params.id_ubicacion;
-            const UBICACIONES = yield database_1.default.query('SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empl, ' +
-                'cu.latitud, cu.longitud, cu.descripcion, e.nombre, e.apellido ' +
-                'FROM empl_ubicacion AS eu, cg_ubicaciones AS cu, empleados AS e ' +
-                'WHERE eu.id_ubicacion = cu.id AND e.codigo = eu.codigo AND cu.id = $1', [id_ubicacion]);
+            const UBICACIONES = yield database_1.default.query(`
+            SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empleado, cu.latitud, cu.longitud, 
+                cu.descripcion, e.nombre, e.apellido 
+            FROM mg_empleado_ubicacion AS eu, mg_cat_ubicaciones AS cu, eu_empleados AS e 
+            WHERE eu.id_ubicacion = cu.id AND e.codigo = eu.codigo AND cu.id = $1
+            `, [id_ubicacion]);
             if (UBICACIONES.rowCount > 0) {
                 return res.jsonp(UBICACIONES.rows);
             }
@@ -270,48 +172,11 @@ class UbicacionControlador {
     // ELIMINAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
     EliminarCoordenadasUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { user_name, ip } = req.body;
-                const { id } = req.params;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const ubicacion = yield database_1.default.query('SELECT * FROM empl_ubicacion WHERE id = $1', [id]);
-                const [datosOriginales] = ubicacion.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'empl_ubicacion',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al eliminar ubicación con id: ${id}`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                }
-                yield database_1.default.query('DELETE FROM empl_ubicacion WHERE id = $1', [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'empl_ubicacion',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
-            }
+            const { id } = req.params;
+            yield database_1.default.query(`
+            DELETE FROM mg_empleado_ubicacion WHERE id = $1
+            `, [id]);
+            res.jsonp({ message: 'Registro eliminado.' });
         });
     }
 }

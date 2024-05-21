@@ -928,7 +928,7 @@ export class PermisosMultiplesComponent implements OnInit {
           }
           else {
             this.ciclo_final = 0;
-            this.sin_permisos.forEach(obj => {
+            this.sin_permisos.forEach((obj: any) => {
               this.ciclo_final = this.ciclo_final + 1;
               this.BuscarFeriados(form, obj);
             })
@@ -947,7 +947,7 @@ export class PermisosMultiplesComponent implements OnInit {
         if (this.contar_permisos === tamaño) {
           this.ciclo_final = 0;
           //console.log('ver datos sin permisos ', this.sin_permisos)
-          this.sin_permisos.forEach(obj => {
+          this.sin_permisos.forEach((obj: any) => {
             this.ciclo_final = this.ciclo_final + 1;
             this.BuscarFeriados(form, obj);
           })
@@ -1035,7 +1035,7 @@ export class PermisosMultiplesComponent implements OnInit {
     if (this.recuperar.length != 0) {
       this.fechas_solicitud.map(obj => {
         for (let j = 0; j < this.recuperar.length; j++) {
-          if (moment(this.recuperar[j].fec_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
+          if (moment(this.recuperar[j].fecha_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
             this.contar_recuperables = this.contar_recuperables + 1;
             break;
           }
@@ -1046,10 +1046,10 @@ export class PermisosMultiplesComponent implements OnInit {
 
     if (valor.horario.length != 0) {
       for (let k = 0; k < valor.horario.length; k++) {
-        if (valor.horario[k].estado_origen === 'L' && valor.horario[k].tipo_entr_salida === 'E') {
+        if (valor.horario[k].estado_origen === 'L' && valor.horario[k].tipo_accion === 'E') {
           this.contar_libres = this.contar_libres + 1;
         }
-        if (valor.horario[k].estado_origen === 'N' && valor.horario[k].tipo_entr_salida === 'E') {
+        if (valor.horario[k].estado_origen === 'N' && valor.horario[k].tipo_accion === 'E') {
           this.contar_laborables = this.contar_laborables + 1;
         }
       }
@@ -1702,13 +1702,14 @@ export class PermisosMultiplesComponent implements OnInit {
 
   // METODO PARA OBTENER CONFIGURACION DE NOTIFICACIONES
   ObtenerInformacionEmpleado(valor: any) {
+    console.log('verificar valor de notificacion valor ', valor)
     this.informacion_.ObtenerInfoConfiguracion(valor.id).subscribe(
       res => {
         if (res) {
           valor.configurado = true;
           valor.id_sucursal = res.id_sucursal;
           valor.permiso_mail = res.permiso_mail;
-          valor.permiso_noti = res.permiso_noti;
+          valor.permiso_noti = res.permiso_notificacion;
           valor.id_departamento = res.id_departamento;
         }
         else {
@@ -2055,7 +2056,7 @@ export class PermisosMultiplesComponent implements OnInit {
   LeerDatosMail(datos: any, form: any) {
     // LEYENDO DATOS DE TIPO DE PERMISO
     var tipo_permiso = '';
-    this.tipoPermisos.filter(o => {
+    this.tipoPermisos.filter((o: any) => {
       if (o.id === datos.id_tipo_permiso) {
         tipo_permiso = o.descripcion
       }

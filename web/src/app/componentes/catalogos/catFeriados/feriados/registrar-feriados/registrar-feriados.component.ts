@@ -6,7 +6,6 @@ import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { Observable } from 'rxjs';
-import { Router } from '@angular/router';
 import * as moment from 'moment';
 
 // IMPORTAR SERVICIOS
@@ -63,7 +62,6 @@ export class RegistrarFeriadosComponent implements OnInit {
     private restP: ProvinciaService,
     private restF: CiudadFeriadosService,
     private toastr: ToastrService,
-    private router: Router,
     public componentel: ListarFeriadosComponent,
   ) { }
 
@@ -109,8 +107,8 @@ export class RegistrarFeriadosComponent implements OnInit {
   VerificarSinRecuperacion(feriado: any) {
     // VERIFICAMOS SI EXISTE REGISTROS
     if (this.feriados.length != 0) {
-      this.feriados.forEach(obj => {
-        if (moment(obj.fec_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
+      this.feriados.forEach((obj: any) => {
+        if (moment(obj.fecha_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
           this.contador = 1;
         }
       })
@@ -132,14 +130,14 @@ export class RegistrarFeriadosComponent implements OnInit {
   ValidarFechaRecuperacion(feriado: any, form: any) {
     // VERIFICAMOS SI EXISTE REGISTROS
     if (this.feriados.length != 0) {
-      this.feriados.forEach(obj => {
-        if (obj.fecha.split('T')[0] === moment(feriado.fec_recuperacion).format('YYYY-MM-DD') ||
-          moment(obj.fec_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
+      this.feriados.forEach((obj: any) => {
+        if (obj.fecha.split('T')[0] === moment(feriado.fecha_recuperacion).format('YYYY-MM-DD') ||
+          moment(obj.fecha_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
           this.contador = 1;
         }
       })
       if (this.contador === 0) {
-        if (Date.parse(form.fechaForm) < Date.parse(feriado.fec_recuperacion)) {
+        if (Date.parse(form.fechaForm) < Date.parse(feriado.fecha_recuperacion)) {
           this.CrearFeriado(feriado);
         }
         else {
@@ -166,8 +164,14 @@ export class RegistrarFeriadosComponent implements OnInit {
       this.habilitarprogress = true;
       this.rest.CrearNuevoFeriado(datos).subscribe(response => {
         this.habilitarprogress = false;
+        console.log('ver ', response, 'response ', response.message)
         if (response.message === 'error') {
           this.toastr.error('La fecha del feriado o la fecha de recuperación se encuentran dentro de otro registro.', 'Upss!!! algo salio mal.', {
+            timeOut: 6000,
+          })
+        }
+        else if (response.message === 'existe') {
+          this.toastr.warning('Nombre de feriado ya existe en el sistema.', 'Upss!!! algo salio mal.', {
             timeOut: 6000,
           })
         }
@@ -223,7 +227,7 @@ export class RegistrarFeriadosComponent implements OnInit {
   private _filterPais(value: string): any {
     if (value != null) {
       const filterValue = value.toLowerCase();
-      return this.paises.filter(pais => pais.nombre.toLowerCase().includes(filterValue));
+      return this.paises.filter((pais: any) => pais.nombre.toLowerCase().includes(filterValue));
     }
   }
 
@@ -231,7 +235,7 @@ export class RegistrarFeriadosComponent implements OnInit {
   private _filterProvincia(value: string): any {
     if (value != null) {
       const filterValue = value.toLowerCase();
-      return this.provincias.filter(provincias => provincias.nombre.toLowerCase().includes(filterValue));
+      return this.provincias.filter((provincias: any) => provincias.nombre.toLowerCase().includes(filterValue));
     }
   }
 
@@ -282,7 +286,7 @@ export class RegistrarFeriadosComponent implements OnInit {
   // METODO PARA MOSTRAR LISTA EN FORMULARIO
   FiltrarProvincias(form: any) {
     let idPais = 0;
-    this.paises.forEach(obj => {
+    this.paises.forEach((obj: any) => {
       if (obj.nombre === form.nombrePaisForm) {
         idPais = obj.id
       }
@@ -373,7 +377,7 @@ export class RegistrarFeriadosComponent implements OnInit {
 
     this.habilitarprogress = true;
     // RECORRER LA LISTA DE CIUDADES SELECCIONADAS
-    this.ciudadesSeleccionadas.map(obj => {
+    this.ciudadesSeleccionadas.map((obj: any) => {
       var buscarCiudad = {
         id_feriado: id,
         id_ciudad: obj.id,

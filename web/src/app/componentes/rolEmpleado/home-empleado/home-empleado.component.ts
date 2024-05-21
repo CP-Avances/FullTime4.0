@@ -105,7 +105,7 @@ export class HomeEmpleadoComponent implements OnInit {
     this.datosEmpleado = [];
     this.restEmpleado.BuscarUnEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
       this.datosEmpleado = data[0];
-      this.datosEmpleado.fec_nacimiento_ = this.validar.FormatearFecha(this.datosEmpleado.fec_nacimiento, formato_fecha, this.validar.dia_abreviado);
+      this.datosEmpleado.fecha_nacimiento_ = this.validar.FormatearFecha(this.datosEmpleado.fecha_nacimiento, formato_fecha, this.validar.dia_abreviado);
       if (data[0].imagen != null) {
         this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
         this.restEmpleado.obtenerImagen(data[0].id, data[0].imagen).subscribe(data => {

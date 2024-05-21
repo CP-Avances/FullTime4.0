@@ -6,7 +6,7 @@ const pool = new Pool({
   user: 'fulltime',
   host: 'localhost', //'186.4.226.49',
   port: 5432,
-  database: 'fulltime4_prueba',
+  database: 'fulltime4.0',
   password: 'fulltime'
 })
 

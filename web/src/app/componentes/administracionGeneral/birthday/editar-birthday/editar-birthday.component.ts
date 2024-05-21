@@ -49,8 +49,8 @@ export class EditarBirthdayComponent implements OnInit {
   ImprimirDatos() {
     this.formulario.patchValue({
       mensajeForm: this.data.mensaje,
-      tituloForm: this.data.titulo,
-      linkForm: this.data.url
+      tituloForm: this.data.asunto,
+      linkForm: this.data.link
     })
   }
 

@@ -62,6 +62,18 @@ export class TituloEmpleadoComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip
     }
+    // VERIFICAR DUPLICADO DE REGISTRO
+    this.restEmpleado.BuscarTituloEspecifico(titulo).subscribe(data => {
+      this.toastr.warning('Registro ya se encuentra en el sistema.', 'Ups!!! algo salio mal.', {
+        timeOut: 3000,
+      });
+    }, vacio => {
+      this.AlmacenarTitulo(titulo);
+    });
+  }
+
+  // METODO PARA ALMACENAR DATOS EN EL SISTEMA
+  AlmacenarTitulo(titulo: any) {
     this.restEmpleado.RegistrarTitulo(titulo).subscribe(data => {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,

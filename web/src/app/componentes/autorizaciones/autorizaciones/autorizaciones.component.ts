@@ -231,7 +231,7 @@ export class AutorizacionesComponent implements OnInit {
     if (e != null && e != undefined) {
       select.value = null;
       select.defaultTabIndex = 0;
-      const [departamento] = this.ArrayAutorizacionTipos.filter(o => {
+      const [departamento] = this.ArrayAutorizacionTipos.filter((o: any) => {
         return o.id_departamento === e
       })
       this.listafiltrada = [];
@@ -284,7 +284,7 @@ export class AutorizacionesComponent implements OnInit {
             this.cont = this.cont + 1;
             this.restAutorizaciones.BuscarAutorizacionPermiso(o.id).subscribe(
               autorizacion => {
-                var autorizaciones = autorizacion[0].id_documento.split(',');
+                var autorizaciones = autorizacion[0].id_autoriza_estado.split(',');
                 autorizaciones.map((obj: string) => {
                   this.lectura = this.lectura + 1;
                   if (obj != '') {

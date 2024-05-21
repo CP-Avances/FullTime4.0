@@ -90,7 +90,7 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');;
 
-    this.estados.forEach(obj => {
+    this.estados.forEach((obj: any) => {
       if (this.datos.estado === obj.nombre) {
         this.PedirHoraExtraForm.patchValue({ estadoForm: obj.id });
       }
@@ -146,7 +146,7 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
         this.solInfo = [];
         this.solInfo = {
           hora_extra_mail: res.hora_extra_mail,
-          hora_extra_noti: res.hora_extra_noti,
+          hora_extra_noti: res.hora_extra_notificacion,
           empleado: res.id_empleado,
           id_dep: res.id_departamento,
           id_suc: res.id_sucursal,

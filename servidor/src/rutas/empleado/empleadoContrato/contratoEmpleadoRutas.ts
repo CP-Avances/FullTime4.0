@@ -1,5 +1,6 @@
 import CONTRATO_EMPLEADO_CONTROLADOR from '../../../controlador/empleado/empleadoContrato/contratoEmpleadoControlador';
 import { ObtenerRutaContrato } from '../../../libs/accesoCarpetas';
+import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { TokenValidation } from '../../../libs/verificarToken';
 import { Router } from 'express';
 import multer from 'multer';
@@ -12,13 +13,14 @@ const multipartMiddleware = multipart({
     uploadDir: './contratos',
 });
 
+
 const storage = multer.diskStorage({
 
     destination: async function (req, file, cb) {
         let id = req.params.id;
         const usuario = await pool.query(
             `
-            SELECT e.id FROM empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+            SELECT e.id FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
             `
             , [id]);
         var ruta = await ObtenerRutaContrato(usuario.rows[0].id);
@@ -37,7 +39,7 @@ const storage = multer.diskStorage({
 
         const usuario = await pool.query(
             `
-            SELECT codigo FROM empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+            SELECT codigo FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
             `
             , [id]);
 
@@ -46,8 +48,22 @@ const storage = multer.diskStorage({
         cb(null, documento)
     }
 })
-
 const upload = multer({ storage: storage });
+
+
+const storage_plantilla = multer.diskStorage({
+
+    destination: function (req, file, cb) {
+        cb(null, ObtenerRutaLeerPlantillas())
+    },
+    filename: function (req, file, cb) {
+        let documento = file.originalname;
+
+        cb(null, documento);
+    }
+})
+const upload_plantilla = multer({ storage: storage_plantilla });
+
 
 class DepartamentoRutas {
     public router: Router = Router();
@@ -92,16 +108,8 @@ class DepartamentoRutas {
         this.router.post('/modalidad/trabajo', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.CrearTipoContrato);
         // BUSCAR LISTA DE MODALIDAD DE TRABAJO
         this.router.get('/modalidad/trabajo', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.ListarTiposContratos);
-
-
-
-
-
-
-
-
-
-
+        // BUSCAR MODALIDAD LABORAL POR SU NOMBRE
+        this.router.post('/modalidad/trabajo/nombre', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.BuscarModalidadLaboralNombre);
 
 
         this.router.get('/', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.ListarContratos);
@@ -111,6 +119,11 @@ class DepartamentoRutas {
         this.router.post('/buscarFecha/contrato', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarFechaContratoId);
 
 
+        /** ********************************************************************************************* **
+         ** **            METODO PAARA LA LECTURA DEL REGISTRO MULTIPLE DE CONTRATOS                   ** **
+         ** ********************************************************************************************* **/
+        this.router.post('/upload/revision', [TokenValidation, upload_plantilla.single('uploads')], CONTRATO_EMPLEADO_CONTROLADOR.RevisarDatos);
+        this.router.post('/cargar_plantilla/', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.CargarPlantilla_contrato);
     }
 }
 

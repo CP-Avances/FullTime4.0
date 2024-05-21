@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
 import { vacacionesByIdUser, ReportePeriVacaciones } from '../../libs/CalcularVacaciones';
 import { CalcularHoraExtra } from '../../libs/CalcularHorasExtras';
+import { Request, Response } from 'express';
 
 class KardexVacacion {
 
@@ -10,7 +10,7 @@ class KardexVacacion {
         let fec_hasta = req.params.hasta
         let jsonData = await vacacionesByIdUser(req.userIdEmpleado, fec_desde, fec_hasta);
         res.jsonp(jsonData);
-    } 
+    }
 
     public async CarcularVacacionByIdEmpleado(req: Request, res: Response) {
         let id_empleado = parseInt(req.params.id_empleado)
@@ -18,7 +18,7 @@ class KardexVacacion {
         let fec_hasta = req.params.hasta
         let jsonData = await vacacionesByIdUser(id_empleado, fec_desde, fec_hasta);
         res.jsonp(jsonData);
-    } 
+    }
 
     public async CarcularHorasExtras(req: Request, res: Response) {
         let id_empleado = parseInt(req.params.id_empleado)
@@ -27,7 +27,7 @@ class KardexVacacion {
         let jsonData = await CalcularHoraExtra(id_empleado, new Date(fec_desde), new Date(fec_hasta));
         res.jsonp(jsonData);
     }
-    
+
     public async ReportePeriodosVacaciones(req: Request, res: Response) {
         let id_empleado = parseInt(req.params.id_empleado)
         let jsonData = await ReportePeriVacaciones(id_empleado);

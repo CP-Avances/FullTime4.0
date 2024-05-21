@@ -477,7 +477,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
-      this.planEmpleados.forEach(row => this.selectionUno.select(row));
+      this.planEmpleados.forEach((row: any) => this.selectionUno.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
@@ -792,7 +792,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   exportToXML() {
     var objeto: any;
     var arregloPlanificacion: any = [];
-    this.listaPlan.forEach(obj => {
+    this.listaPlan.forEach((obj: any) => {
       objeto = {
         "lista_planificaciones": {
           '@id': obj.id,

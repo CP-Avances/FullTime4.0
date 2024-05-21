@@ -142,15 +142,17 @@ export class EditarPlanificacionComponent implements OnInit {
     this.horarios = [];
     this.vista_horarios = [];
     this.vista_descanso = [];
+    let contar = 0;
     // BUSQUEDA DE HORARIOS
     this.restH.BuscarListaHorarios().subscribe(datos => {
       this.horarios = datos;
-      this.horarios.map(hor => {
+      this.horarios.map((hor: any) => {
         // BUSQUEDA DE DETALLES DE ACUERDO AL ID DE HORARIO
         this.restD.ConsultarUnDetalleHorario(hor.id).subscribe(res => {
+          contar = contar + 1;
           this.detalles_horarios = res;
           //console.log('detalles ', this.detalles_horarios)
-          this.detalles_horarios.map(det => {
+          this.detalles_horarios.map((det: any) => {
             if (det.tipo_accion === 'E') {
               this.hora_entrada = det.hora.slice(0, 5);
             }
@@ -159,7 +161,6 @@ export class EditarPlanificacionComponent implements OnInit {
               this.segundo_dia = det.segundo_dia;
               this.tercer_dia = det.tercer_dia;
             }
-
           })
           let datos_horario = [{
             id: hor.id,
@@ -177,11 +178,14 @@ export class EditarPlanificacionComponent implements OnInit {
           else {
             this.vista_horarios = this.vista_horarios.concat(datos_horario);
           }
+          // VERIFICAR LECTURA DE TODA LA DATA
+          //--console.log('ver contador cont ', contar, ' horarios ', this.horarios.length)
+          if (contar === this.horarios.length) {
+            this.ListarHorariosSeleccionados();
+            contar = 0;
+          }
         })
       })
-
-      this.ListarHorariosSeleccionados();
-
     })
   }
 
@@ -192,15 +196,14 @@ export class EditarPlanificacionComponent implements OnInit {
   seleccionar_horario: boolean = true;
   seleccionar_libre: boolean = true;
   ListarHorariosSeleccionados() {
+    //--console.log('ingresa aqui')
     this.tipo_dia_verificar = '';
     this.horas = [];
     this.lista_libres = [];
     let total = this.datos_horarios.datosPlan.split(',').length;
-
     let fecha = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
     let fecha_ = moment(fecha, 'YYYY-MM-D').format('YYYY/MM/DD');
     this.dia_fecha = (moment(fecha_, 'YYYY/MM/DD').format('MMMM, ddd DD, YYYY')).toUpperCase();
-
     for (var i = 0; i < total; i++) {
       // HORARIOS LIBRE Y FERIADO PROPIOS DEL SISTEMA
       if ((this.datos_horarios.datosPlan.split(',')[i]).trim() === 'L' ||
@@ -209,7 +212,7 @@ export class EditarPlanificacionComponent implements OnInit {
         break;
       }
       else {
-        this.horarios.forEach(o => {
+        this.horarios.forEach((o: any) => {
           // COMPARAR HORARIOS (SE RETIRA ESPACIOS)
           if (o.codigo === (this.datos_horarios.datosPlan.split(',')[i]).trim()) {
             let data = {
@@ -224,7 +227,6 @@ export class EditarPlanificacionComponent implements OnInit {
         })
       }
     }
-
     if (this.feriados.length) {
       //console.log('existen feriados', this.feriados);
       this.seleccionar_libre = false;
@@ -233,9 +235,7 @@ export class EditarPlanificacionComponent implements OnInit {
       this.notas1 = 'DÍA CONFIGURADO EN EL SISTEMA COMO FERIADO.';
       this.nota_ = 'feriado';
     }
-
     //console.log('ver horarios asignados ', this.horas)
-
     this.BuscarPlanificacionAntes();
     this.BuscarPlanificacionDespues();
   }
@@ -292,6 +292,7 @@ export class EditarPlanificacionComponent implements OnInit {
   // METODO PARA BUSCAR PLANIFICACION DIA ANTES
   antes: any = [];
   BuscarPlanificacionAntes() {
+    console.log('ver horraios ', this.horarios)
     let formato = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
     var restar = moment(formato, 'YYYY-MM-DD').subtract(1, 'days');
     var fecha = moment(restar, 'YYYY-MM-DD').format('YYYY-MM-DD');
@@ -303,7 +304,7 @@ export class EditarPlanificacionComponent implements OnInit {
       codigo: '\'' + this.datos_horarios.codigo + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
-      //console.log('ver datos horarios antes', datos)
+      console.log('ver datos horarios antes', datos)
       if (datos.message === 'OK') {
         for (var j = 0; j < this.horarios.length; j++) {
           for (var k = 0; k < datos.data.length; k++) {
@@ -363,13 +364,13 @@ export class EditarPlanificacionComponent implements OnInit {
   // METODO PARA VALIDAR SELECCION DE HORARIO
   ValidarHorario() {
 
-    const [obj_res] = this.horarios.filter(o => {
+    const [obj_res] = this.horarios.filter((o: any) => {
       return o.codigo === this.horarioF.value
     })
 
     if (!obj_res) return this.toastr.warning('Horario no válido.');
 
-    const { hora_trabajo, id, codigo, min_almuerzo } = obj_res;
+    const { hora_trabajo, id, codigo, minutos_comida } = obj_res;
 
     // VERIFICACION DE FORMATO CORRECTO DE HORARIOS
     if (!this.StringTimeToSegundosTime(hora_trabajo)) {
@@ -383,7 +384,7 @@ export class EditarPlanificacionComponent implements OnInit {
       });
     }
     else {
-      this.ObtenerDetallesHorario(id, codigo, min_almuerzo);
+      this.ObtenerDetallesHorario(id, codigo, minutos_comida);
       this.AgregarHorario();
     }
   }
@@ -397,7 +398,7 @@ export class EditarPlanificacionComponent implements OnInit {
   fin_comida = '';
   entrada: '';
   salida: '';
-  ObtenerDetallesHorario(id: number, codigo: any, min_almuerzo: any) {
+  ObtenerDetallesHorario(id: number, codigo: any, minutos_comida: any) {
     this.inicio_comida = '';
     this.fin_comida = '';
     this.entrada = '';
@@ -412,7 +413,7 @@ export class EditarPlanificacionComponent implements OnInit {
       this.detalle_acciones = [];
       this.detalles = res;
 
-      this.detalles.forEach(obj => {
+      this.detalles.forEach((obj: any) => {
         this.ValidarAcciones(obj);
       })
 
@@ -423,12 +424,12 @@ export class EditarPlanificacionComponent implements OnInit {
         inicio_comida: this.inicio_comida,
         fin_comida: this.fin_comida,
         salida: this.salida,
-        almuerzo: min_almuerzo,
+        almuerzo: minutos_comida,
       }]
 
       this.detalle_acciones = this.detalle_acciones.concat(tipos);
 
-      this.detalle_acciones.forEach(detalle => {
+      this.detalle_acciones.forEach((detalle: any) => {
         detalle.entrada_ = this.validar.FormatearHora(detalle.entrada, this.formato_hora);
         if (detalle.inicio_comida != '') {
           detalle.inicio_comida = this.validar.FormatearHora(detalle.inicio_comida, this.formato_hora);
@@ -459,7 +460,7 @@ export class EditarPlanificacionComponent implements OnInit {
 
   // METODO PARA AGREGAR UN NUEVO HORARIO
   AgregarHorario() {
-    const [obj_res] = this.horarios.filter(o => {
+    const [obj_res] = this.horarios.filter((o: any) => {
       return o.codigo === this.horarioF.value
     })
 
@@ -669,7 +670,6 @@ export class EditarPlanificacionComponent implements OnInit {
   // METODO PARA AGREGAR DIAS LIBRES
   asignado_libre: any = [];
   AgregarLibre() {
-
     if (this.horas.length != 0) {
       this.toastr.warning('Este día ya tiene configurado horarios. No puede ser libre.', 'Ups!!! VERIFICAR.', {
         timeOut: 6000,
@@ -685,9 +685,9 @@ export class EditarPlanificacionComponent implements OnInit {
         this.notas2 = '';
       }
       else {
-        //console.log('ver horarios ', this.horarios)
-        const [obj_res] = this.horarios.filter(o => {
-          return o.default_ === 'DL'
+        console.log('ver horarios ', this.horarios)
+        const [obj_res] = this.horarios.filter((o: any) => {
+          return o.default_ === 'DL';
         })
 
         this.asignado_libre = [];
@@ -872,7 +872,7 @@ export class EditarPlanificacionComponent implements OnInit {
     let fecha = moment(this.dia_fecha, 'MMMM, ddd DD, YYYY').format('YYYY-MM-DD');
     let cont1 = 0;
     // CONTAR HORARIOS ASIGNADOS
-    lista.forEach(h => {
+    lista.forEach((h: any) => {
       if (h.asignado === true) {
         cont1 = cont1 + 1;
       }
@@ -884,7 +884,7 @@ export class EditarPlanificacionComponent implements OnInit {
       let origen = '';
       var laborar = 0;
       // SELECCIONADOS CON HORARIOS
-      lista.forEach(h => {
+      lista.forEach((h: any) => {
         //console.log('ver asignado ', h)
         if (h.asignado === true) {
           this.restD.ConsultarUnDetalleHorario(h.horarios.id).subscribe(res => {
@@ -897,7 +897,7 @@ export class EditarPlanificacionComponent implements OnInit {
                 var accion = 0;
                 var nocturno: number = 0;
                 if (deta.tipo_accion === 'E') {
-                  accion = deta.minu_espera;
+                  accion = deta.tolerancia;
                 }
                 if (deta.segundo_dia === true) {
                   nocturno = 1;
@@ -942,10 +942,10 @@ export class EditarPlanificacionComponent implements OnInit {
                 let plan = {
                   codigo: this.datos_horarios.codigo,
                   tipo_dia: dia_tipo,
-                  min_antes: deta.min_antes,
+                  min_antes: deta.minutos_antes,
                   tolerancia: accion,
                   id_horario: h.horarios.id,
-                  min_despues: deta.min_despues,
+                  min_despues: deta.minutos_despues,
                   fec_horario: fecha,
                   estado_origen: origen,
                   estado_timbre: estado,
@@ -954,7 +954,7 @@ export class EditarPlanificacionComponent implements OnInit {
                   salida_otro_dia: nocturno,
                   tipo_entr_salida: deta.tipo_accion,
                   fec_hora_horario: fecha + ' ' + deta.hora,
-                  min_alimentacion: deta.min_almuerzo,
+                  min_alimentacion: deta.minutos_comida,
                 };
                 if (deta.segundo_dia === true) {
                   plan.fec_hora_horario = moment(fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + deta.hora;
@@ -1027,7 +1027,7 @@ export class EditarPlanificacionComponent implements OnInit {
   ver_feriado: boolean = false;
   asignado_feriados: any = [];
   RegistrarFeriado() {
-    const [obj_res] = this.horarios.filter(o => {
+    const [obj_res] = this.horarios.filter((o: any) => {
       return o.default_ === 'FD'
     })
 

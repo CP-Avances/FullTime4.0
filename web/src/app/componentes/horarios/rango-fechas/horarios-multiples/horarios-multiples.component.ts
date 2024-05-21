@@ -148,11 +148,11 @@ export class HorariosMultiplesComponent implements OnInit {
     // BUSQUEDA DE HORARIOS
     this.restH.BuscarListaHorarios().subscribe(datos => {
       this.horarios = datos;
-      this.horarios.map(hor => {
+      this.horarios.map((hor: any) => {
         // BUSQUEDA DE DETALLES DE ACUERDO AL ID DE HORARIO
         this.restD.ConsultarUnDetalleHorario(hor.id).subscribe(res => {
           this.detalles_horarios = res;
-          this.detalles_horarios.map(det => {
+          this.detalles_horarios.map((det: any) => {
             if (det.tipo_accion === 'E') {
               this.hora_entrada = det.hora.slice(0, 5);
             }
@@ -227,7 +227,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA VERIFICAR EL FORMATO DE HORAS DE UN HORARIO
   VerificarFormatoHoras(form: any) {
-    const [obj_res] = this.horarios.filter(o => {
+    const [obj_res] = this.horarios.filter((o: any) => {
       return o.id === parseInt(form.horarioForm)
     })
     if (!obj_res) return this.toastr.warning('Horario no válido.');
@@ -330,7 +330,7 @@ export class HorariosMultiplesComponent implements OnInit {
     let duplicados = [];
     this.usuarios_invalidos = [];
 
-    this.datos.map(dh => {
+    this.datos.map((dh: any) => {
       // METODO PARA BUSCAR DATOS DUPLICADOS DE HORARIOS
       this.rest.VerificarDuplicidadHorarios(dh.codigo, fechas).subscribe(response => {
         this.contador = this.contador + 1;
@@ -372,7 +372,7 @@ export class HorariosMultiplesComponent implements OnInit {
     let contrato = [];
     let sin_contrato = [];
 
-    correctos.map(dh => {
+    correctos.map((dh: any) => {
       let datosBusqueda = {
         id_cargo: dh.id_cargo,
         id_empleado: dh.id
@@ -382,7 +382,8 @@ export class HorariosMultiplesComponent implements OnInit {
         this.cont2 = this.cont2 + 1;
 
         // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS
-        if (Date.parse(response[0].fec_ingreso.split('T')[0]) <= Date.parse(form.fechaInicioForm)) {
+        if ((Date.parse(response[0].fecha_ingreso.split('T')[0]) <= Date.parse(form.fechaInicioForm)) &&
+          (Date.parse(response[0].fecha_salida.split('T')[0]) >= Date.parse(form.fechaFinalForm))) {
 
           dh.observacion = 'OK';
           contrato = contrato.concat(dh);
@@ -423,15 +424,15 @@ export class HorariosMultiplesComponent implements OnInit {
     let horas_correctas = [];
     let horas_incorrectas = [];
     this.usuarios_validos = [];
-    const [obj_res] = this.horarios.filter(o => {
+    const [obj_res] = this.horarios.filter((o: any) => {
       return o.id === parseInt(form.horarioForm)
     })
 
     const { hora_trabajo } = obj_res;
     this.cont3 = 0;
 
-    correctos.map(dh => {
-      //console.log('dh ************************* ', dh)
+    correctos.map((dh: any) => {
+      //--console.log('dh ************************* ', dh)
       // METODO PARA LECTURA DE HORARIOS DE EMPLEADO
       this.horariosEmpleado = [];
       let fechas = {
@@ -447,7 +448,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
         this.horariosEmpleado = existe;
 
-        this.horariosEmpleado.map(h => {
+        this.horariosEmpleado.map((h: any) => {
           // SUMA DE HORAS DE CADA UNO DE LOS HORARIOS DEL EMPLEADO
           if (h.default_ != 'DL' && h.default_ != 'DFD') {
             this.suma = this.SumarHoras(this.suma, h.hora_trabajo);
@@ -548,6 +549,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA COMPARAR HORAS DE TRABAJO CON HORAS DE CONTRATO
   IndicarNotificacionHoras(horas: any, dh: any) {
+    //console.log('horas', horas, ' dh ', dh.hora_trabaja)
     if (this.StringTimeToSegundosTime(horas) <= this.StringTimeToSegundosTime(dh.hora_trabaja)) {
       dh.observacion = 'OK';
       dh.nota = '';
@@ -627,6 +629,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA SUMAR HORAS
   StringTimeToSegundosTime(stringTime: string) {
+    //--console.log('ver horas ... ', stringTime)
     const h = parseInt(stringTime.split(':')[0]) * 3600;
     const m = parseInt(stringTime.split(':')[1]) * 60;
     const s = parseInt(stringTime.split(':')[2]);
@@ -639,16 +642,13 @@ export class HorariosMultiplesComponent implements OnInit {
     let sumah = parseInt(suma.split(':')[0]) + parseInt(tiempo.split(':')[0]);
     let sumam = parseInt(suma.split(':')[1]) + parseInt(tiempo.split(':')[1]);
     let sumas = parseInt(suma.split(':')[2]) + parseInt(tiempo.split(':')[2]);
-
     if (sumam === 60) {
       sumam = 0;
       sumah = sumah + 1;
     }
-
     let h = '00';
     let m = '00';
     let s = '00';
-
     if (sumah < 10) {
       h = '0' + sumah;
     }
@@ -667,9 +667,7 @@ export class HorariosMultiplesComponent implements OnInit {
     else {
       s = String(sumas)
     }
-
-    return h + ':' + m + ':' + s
-
+    return h + ':' + m + ':' + s;
   }
 
   // METODO PARA CREAR LA DATA QUE SE VA A INSERTAR EN LA BASE DE DATOS
@@ -678,7 +676,7 @@ export class HorariosMultiplesComponent implements OnInit {
     //console.log('ver datos validos ', this.usuarios_validos)
     this.plan_general = [];
     this.validos = 0;
-    this.usuarios_validos.map(obj => {
+    this.usuarios_validos.map((obj: any) => {
       this.validos = this.validos + 1;
       this.RegistrarPlanificacion(form, obj, this.validos);
     })
@@ -731,7 +729,7 @@ export class HorariosMultiplesComponent implements OnInit {
   CrearPlanGeneral(form: any, dh: any, validos: number) {
 
     // CONSULTAR HORARIO
-    const [obj_res] = this.horarios.filter(o => {
+    const [obj_res] = this.horarios.filter((o: any) => {
       return o.id === parseInt(form.horarioForm)
     })
 
@@ -754,7 +752,7 @@ export class HorariosMultiplesComponent implements OnInit {
     var origen: string = '';
     var tipo_dia: string = '';
 
-    this.fechasHorario.map(obj => {
+    this.fechasHorario.map((obj: any) => {
       // DEFINICION DE TIPO DE DIA SEGUN HORARIO
       tipo_dia = default_;
       origen = default_;
@@ -832,7 +830,7 @@ export class HorariosMultiplesComponent implements OnInit {
       // BUSCAR FECHAS DE RECUPERACION DE FERIADOS
       if (this.recuperar.length != 0) {
         for (let j = 0; j < this.recuperar.length; j++) {
-          if (moment(this.recuperar[j].fec_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
+          if (moment(this.recuperar[j].fecha_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
             tipo = 'REC';
             tipo_dia = 'REC';
             break;
@@ -855,7 +853,7 @@ export class HorariosMultiplesComponent implements OnInit {
           //console.log('ver existe ----------------------------- ', existe)
           this.EliminarRegistrosH(existe, obj, dh);
         });
-        this.lista_descanso.forEach(desc => {
+        this.lista_descanso.forEach((desc: any) => {
           if (desc.tipo === 'DFD') {
             tipo = 'FD';
             tipo_dia = 'FD';
@@ -869,7 +867,7 @@ export class HorariosMultiplesComponent implements OnInit {
           //console.log('ver existe ----------------------------- ', existe)
           this.EliminarRegistrosH(existe, obj, dh);
         });
-        this.lista_descanso.forEach(desc => {
+        this.lista_descanso.forEach((desc: any) => {
           if (desc.tipo === 'DL') {
             tipo = 'L';
             tipo_dia = 'L';
@@ -892,7 +890,7 @@ export class HorariosMultiplesComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     }
-    existe.forEach(h => {
+    existe.forEach((h: any) => {
       //console.log(' ver valor h ..... ', h)
       if (h.default_ === 'N' || h.default_ === 'DHA' || h.default_ === 'L' || h.default_ === 'FD') {
         let plan_fecha = {
@@ -937,12 +935,12 @@ export class HorariosMultiplesComponent implements OnInit {
 
     if (lista.length != 0) {
       // COLOCAR DETALLE DE DIA SEGUN HORARIO
-      lista.map(element => {
+      lista.map((element: any) => {
         //console.log('ver detalle ', element)
         var accion = 0;
         var nocturno: number = 0;
         if (element.tipo_accion === 'E') {
-          accion = element.minu_espera;
+          accion = element.tolerancia;
         }
         if (element.segundo_dia === true) {
           nocturno = 1;
@@ -957,10 +955,10 @@ export class HorariosMultiplesComponent implements OnInit {
         let plan = {
           codigo: dh.codigo,
           tipo_dia: tipo_dia,
-          min_antes: element.min_antes,
+          min_antes: element.minutos_antes,
           tolerancia: accion,
           id_horario: element.id_horario,
-          min_despues: element.min_despues,
+          min_despues: element.minutos_despues,
           fec_horario: obj,
           estado_origen: origen,
           estado_timbre: tipo,
@@ -969,7 +967,7 @@ export class HorariosMultiplesComponent implements OnInit {
           salida_otro_dia: nocturno,
           tipo_entr_salida: element.tipo_accion,
           fec_hora_horario: obj + ' ' + element.hora,
-          min_alimentacion: element.min_almuerzo,
+          min_alimentacion: element.minutos_comida,
         };
         if (element.segundo_dia === true) {
           plan.fec_hora_horario = moment(obj).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
@@ -992,7 +990,7 @@ export class HorariosMultiplesComponent implements OnInit {
     this.eliminar = [];
     this.contar_eliminar = 0;
 
-    this.lista_descanso.forEach(obj => {
+    this.lista_descanso.forEach((obj: any) => {
       let data_eliminar = {
         id: obj.id_horario,
       }
@@ -1001,16 +999,16 @@ export class HorariosMultiplesComponent implements OnInit {
 
     //console.log('ver eliminar ', this.eliminar_horarios);
     let total = 0;
-    this.usuarios_validos.forEach(obj => {
+    this.usuarios_validos.forEach((obj: any) => {
       //console.log('ver obj ', obj)
-      this.eliminar_horarios.forEach(eh => {
+      this.eliminar_horarios.forEach((eh: any) => {
         total = total + 1;
       })
     })
 
     //console.log('total ', total)
-    this.usuarios_validos.forEach(obj => {
-      this.eliminar_horarios.forEach(eh => {
+    this.usuarios_validos.forEach((obj: any) => {
+      this.eliminar_horarios.forEach((eh: any) => {
         let plan_fecha = {
           codigo: obj.codigo,
           fec_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
@@ -1099,7 +1097,7 @@ export class HorariosMultiplesComponent implements OnInit {
   CargarTimbres(form: any) {
     this.guardar = false;
     var codigos = '';
-    this.usuarios_validos.forEach(obj => {
+    this.usuarios_validos.forEach((obj: any) => {
       if (codigos === '') {
         codigos = '\'' + obj.codigo + '\''
       }
@@ -1200,14 +1198,14 @@ export class HorariosMultiplesComponent implements OnInit {
     let anidar_eliminar: any = [];
 
     //console.log('ver datos ', datos)
-    datos.forEach(ver => {
+    datos.forEach((ver: any) => {
       let data_eliminar = [{
         id: form.horarioForm,
       }]
       anidar_eliminar = anidar_eliminar.concat(data_eliminar);
       // VERIFICAR SI EL HORARIO A ELIMINAR EXISTE EN EL REGISTRO DE USUARIO
       let verificar = 0;
-      ver.horarios_existentes.forEach(he => {
+      ver.horarios_existentes.forEach((he: any) => {
         if (he.id_horario === form.horarioForm) {
           verificar = verificar + 1;
         }
@@ -1218,7 +1216,7 @@ export class HorariosMultiplesComponent implements OnInit {
         if (ver.existencias >= 2) {
         }
         else {
-          this.lista_descanso.forEach(obj => {
+          this.lista_descanso.forEach((obj: any) => {
             if (obj.tipo === 'DL') {
               data_eliminar = [{
                 id: obj.id_horario,
@@ -1226,7 +1224,7 @@ export class HorariosMultiplesComponent implements OnInit {
               anidar_eliminar = anidar_eliminar.concat(data_eliminar);
             }
           })
-          this.lista_descanso.forEach(obj => {
+          this.lista_descanso.forEach((obj: any) => {
             if (obj.tipo === 'DFD') {
               data_eliminar = [{
                 id: obj.id_horario,
@@ -1246,16 +1244,16 @@ export class HorariosMultiplesComponent implements OnInit {
 
     // SE CONTABILIZA HORARIOS A ELIMINAR
     let total = 0;
-    datos.forEach(obj => {
-      obj.eliminar.forEach(eh => {
+    datos.forEach((obj: any) => {
+      obj.eliminar.forEach((eh: any) => {
         total = total + 1;
       })
     })
 
     //console.log('total ', total)
     // PROCESO PARA BUSCAR FECHAS A ELIMINAR
-    datos.forEach(obj => {
-      obj.eliminar.forEach(eh => {
+    datos.forEach((obj: any) => {
+      obj.eliminar.forEach((eh: any) => {
         let plan_fecha = {
           codigo: obj.codigo,
           fec_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
@@ -1355,7 +1353,7 @@ export class HorariosMultiplesComponent implements OnInit {
       fechaInicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
       fechaFinal: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
     };
-    datos.forEach(d => {
+    datos.forEach((d: any) => {
       //console.log('datos d ----------------------------- ', d)
       //console.log('datos d ----------------------------- ', fechas)
       this.rest.VerificarHorariosExistentes(d.codigo, fechas).subscribe(existe => {

@@ -1,20 +1,22 @@
 // IMPORTACION DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { ScriptService } from 'src/app/servicios/empleado/script.service';
+import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
 import * as moment from 'moment';
-import * as FileSaver from 'file-saver';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
@@ -24,6 +26,9 @@ import { RegistroDepartamentoComponent } from 'src/app/componentes/catalogos/cat
 import { EditarDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/editar-departamento/editar-departamento.component';
 import { VerDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/ver-departamento/ver-departamento.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableDepartamentos } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-principal-departamento',
@@ -38,8 +43,11 @@ export class PrincipalDepartamentoComponent implements OnInit {
   filtroNombreSuc = '';
   filtroEmpresaSuc = '';
   filtroDeparPadre = '';
+  departamentosEliminar: any = [];
   departamentos: any = [];
   depainfo: any = [];
+  empleado: any = [];
+  idEmpleado: number;
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   departamentoPadreF = new FormControl('');
@@ -58,8 +66,22 @@ export class PrincipalDepartamentoComponent implements OnInit {
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
-  empleado: any = [];
-  idEmpleado: number;
+  tamanio_paginaMul: number = 5;
+  numero_paginaMul: number = 1;
+
+  // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
+  nameFile: string;
+  archivoSubido: Array<File>;
+  archivoForm = new FormControl('', Validators.required);
+
+  // VARIABLE PARA TOMAR RUTA DEL SISTEMA
+  hipervinculo: string = environment.url
+
+  // VARIABLES PROGRESS SPINNER
+  progreso: boolean = false;
+  color: ThemePalette = 'primary';
+  mode: ProgressSpinnerMode = 'indeterminate';
+  value = 10;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -110,8 +132,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -139,6 +161,11 @@ export class PrincipalDepartamentoComponent implements OnInit {
       { width: '500px' }).afterClosed().subscribe(item => {
         this.ListaDepartamentos();
       });
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionDepartamentos.clear();
+    this.departamentosEliminar = [];
   }
 
   // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO
@@ -160,56 +187,19 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   // METODO PARA LIMPIRA FORMULARIO
   LimpiarCampos() {
+    this.DataDepartamentos = null;
+    this.archivoSubido = [];
+    this.nameFile = '';
     this.formulario.setValue({
       departamentoForm: '',
       departamentoPadreForm: '',
       buscarNombreForm: '',
     });
     this.ListaDepartamentos();
-  }
-
-
-  public departamentosNiveles: any = [];
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
-  Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
-    const datos = {
-      user_name: this.user_name,
-      ip: this.ip,
-    }
-    this.rest.EliminarRegistro(id_dep, datos).subscribe(res => {
-      this.departamentosNiveles = [];
-      var id_departamento = id_dep;
-      var id_establecimiento = id_sucursal;
-      const datos = {
-        user_name: this.user_name,
-        ip: this.ip
-      };
-      if (nivel > 0) {
-        this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
-          this.departamentosNiveles = datos;
-          this.departamentosNiveles.filter(item => {
-            this.rest.EliminarRegistroNivelDepa(item.id, datos).subscribe({})
-          })
-        })
-      }
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ListaDepartamentos();
-    });
-  }
-
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
-        } else {
-          this.router.navigate(['/departamento']);
-        }
-      });
+    this.ngOnInit();
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = false;
+    this.messajeExcel = '';
   }
 
   // ORDENAR LOS DATOS SEGUN EL ID
@@ -226,6 +216,11 @@ export class PrincipalDepartamentoComponent implements OnInit {
     array.sort(compare);
   }
 
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
+  }
 
   // METODO PARA NAVEGAR A PANTALLA DE NIVELES
   data_id: number = 0;
@@ -237,6 +232,136 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.pagina = 'ver-departamento';
     this.ver_nivel = true;
     this.ver_departamentos = false;
+  }
+
+  mostrarbtnsubir: boolean = false;
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE FERIADOS
+  FileChange(element: any) {
+    this.archivoSubido = [];
+    this.nameFile = '';
+    this.archivoSubido = element.target.files;
+    this.nameFile = this.archivoSubido[0].name;
+    let arrayItems = this.nameFile.split(".");
+    let itemExtencion = arrayItems[arrayItems.length - 1];
+    let itemName = arrayItems[0].slice(0, 13);
+    if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
+      if (itemName.toLowerCase() == 'departamentos') {
+        this.numero_paginaMul = 1;
+        this.tamanio_paginaMul = 5;
+        this.Revisarplantilla();
+      } else {
+        this.toastr.error('Seleccione plantilla con nombre Departamentos', 'Plantilla seleccionada incorrecta', {
+          timeOut: 6000,
+        });
+        this.nameFile = '';
+      }
+    } else {
+      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+        timeOut: 6000,
+      });
+      this.nameFile = '';
+    }
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = true;
+  }
+
+  DataDepartamentos: any;
+  listDepartamentosCorrectos: any = [];
+  messajeExcel: string = '';
+  Revisarplantilla() {
+    this.listDepartamentosCorrectos = [];
+    let formData = new FormData();
+    for (var i = 0; i < this.archivoSubido.length; i++) {
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+    }
+    this.progreso = true;
+    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    this.rest.RevisarFormato(formData).subscribe(res => {
+      this.DataDepartamentos = res.data;
+      this.messajeExcel = res.message;
+      console.log('probando plantilla1 departamentos', this.DataDepartamentos);
+      if (this.messajeExcel == 'error') {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      } else {
+        this.DataDepartamentos.forEach(item => {
+          if (item.observacion.toLowerCase() == 'ok') {
+            this.listDepartamentosCorrectos.push(item);
+          }
+        });
+      }
+    }, error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+      this.progreso = false;
+    }, () => {
+      this.progreso = false;
+    });
+  }
+
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    console.log('listDepartamentosCorrectos: ', this.listDepartamentosCorrectos.length);
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.registrarDepartamentos();
+        }
+      });
+  }
+
+  registrarDepartamentos() {
+    if (this.listDepartamentosCorrectos.length > 0) {
+      this.rest.subirArchivoExcel(this.listDepartamentosCorrectos).subscribe(response => {
+        console.log('respuesta: ', response);
+        this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
+          timeOut: 3000,
+        });
+        //window.location.reload();
+        this.LimpiarCampos();
+        this.archivoForm.reset();
+        this.nameFile = '';
+      });
+    } else {
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+      this.nameFile = '';
+    }
+  }
+
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
+  colorCelda: string = ''
+  stiloCelda(observacion: string): string {
+    let arrayObservacion = observacion.split(" ");
+    if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya existe en el sistema') {
+      return 'rgb(239, 203, 106)';
+    } else if (observacion == 'Sucursal no existe en el sistema') {
+      return 'rgb(255, 192, 203)';
+    } else if (arrayObservacion[0] == 'Departamento' || arrayObservacion[0] == 'Sucursal') {
+      return 'rgb(242, 21, 21)';
+    } else {
+      return 'white'
+    }
+  }
+  colorTexto: string = '';
+  stiloTextoCelda(texto: string): string {
+    let arrayObservacion = texto.split(" ");
+    if (arrayObservacion[0] == 'No') {
+      return 'rgb(255, 80, 80)';
+    } else {
+      return 'black'
+    }
   }
 
 
@@ -315,7 +440,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
                 { text: 'Nivel', style: 'tableHeader' },
                 { text: 'Departamento Superior', style: 'tableHeader' }
               ],
-              ...this.departamentos.map(obj => {
+              ...this.departamentos.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.nomempresa, style: 'itemsTable' },
@@ -369,7 +494,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   exportToXML() {
     var objeto;
     var arregloDepartamentos: any = [];
-    this.departamentos.forEach(obj => {
+    this.departamentos.forEach((obj: any) => {
       objeto = {
         "departamento": {
           "$": { "id": obj.id },
@@ -393,23 +518,214 @@ export class PrincipalDepartamentoComponent implements OnInit {
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
-    // Abrir una nueva pestaña o ventana con el contenido XML
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
-      newTab.focus(); // Dar foco a la nueva pestaña
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
 
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Departamentos.xml';
-    // Simular un clic en el enlace para iniciar la descarga
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
   }
 
+
+  // METODOS PARA LA SELECCION MULTIPLE
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionDepartamentos = new SelectionModel<ITableDepartamentos>(true, []);
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionDepartamentos.selected.length;
+    return numSelected === this.departamentos.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionDepartamentos.clear() :
+      this.departamentos.forEach((row: any) => this.selectionDepartamentos.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableDepartamentos): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.departamentosEliminar = this.selectionDepartamentos.selected;
+
+    return `${this.selectionDepartamentos.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+
+  }
+
+  contador: number = 0;
+  ingresar: boolean = false;
+  public departamentosNiveles: any = [];
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
+  Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.rest.EliminarRegistro(id_dep, datos).subscribe((res: any) => {
+      if (res.message === 'error') {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+          timeOut: 6000,
+        });
+      } else {
+        this.departamentosNiveles = [];
+        var id_departamento = id_dep;
+        var id_establecimiento = id_sucursal;
+        if (nivel != 0) {
+          this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
+            this.departamentosNiveles = datos;
+            this.departamentosNiveles.filter(item => {
+              this.rest.EliminarRegistroNivelDepa(item.id, datos).subscribe(
+                (res: any) => {
+                  if (res.message === 'error') {
+                    this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+                      timeOut: 6000,
+                    });
+                  } else {
+                    this.toastr.error('Nivel eliminado de ' + item.departamento, '', {
+                      timeOut: 6000,
+                    });
+                    this.ListaDepartamentos();
+                  }
+                }
+              );
+            })
+          })
+          this.ListaDepartamentos();
+        } else {
+          this.ListaDepartamentos();
+        }
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ListaDepartamentos();
+      }
+    });
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
+          this.activar_seleccion = true;
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.departamentosEliminar = [];
+          this.selectionDepartamentos.clear();
+          this.ListaDepartamentos();
+        } else {
+          this.router.navigate(['/departamento']);
+        }
+      });
+  }
+
+  EliminarMultiple() {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.ingresar = false;
+    this.contador = 0;
+    this.departamentosEliminar = this.selectionDepartamentos.selected;
+    this.departamentosEliminar.forEach((datos: any) => {
+      this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
+      this.contador = this.contador + 1;
+      this.rest.EliminarRegistro(datos.id, datos).subscribe((res:any) => {
+        if (res.message === 'error') {
+          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+        } else {
+          this.departamentosNiveles = [];
+          var id_departamento = datos.id;
+          var id_establecimiento = datos.id_sucursal;
+          if (datos.nivel != 0) {
+            this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
+              this.departamentosNiveles = datos;
+              this.departamentosNiveles.filter(item => {
+                this.rest.EliminarRegistroNivelDepa(item.id, datos).subscribe(
+                  (res: any) => {
+                    if (res.message === 'error') {
+                      this.toastr.error('Existen datos relacionados con ' + item.nombre + '.', 'No fue posible eliminar.',  {
+                        timeOut: 6000,
+                      });
+                    } else {
+                      this.toastr.error('Nivel eliminado de ' + item.departamento, '', {
+                        timeOut: 6000,
+                      });
+                      this.ListaDepartamentos();
+                    }
+                  }
+                )
+                this.ListaDepartamentos();
+              })
+            })
+            this.ListaDepartamentos();
+          } else {
+            this.ListaDepartamentos();
+          }
+          if (!this.ingresar) {
+            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ListaDepartamentos();
+        }
+      });
+    }
+    )
+  }
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (this.departamentosEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+            this.departamentosEliminar = [];
+            this.selectionDepartamentos.clear();
+            this.ListaDepartamentos();
+          } else {
+            this.toastr.warning('No ha seleccionado DEPARTAMENTOS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        } else {
+          this.router.navigate(['/departamento']);
+        }
+      });
+  }
 }
 
 

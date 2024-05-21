@@ -146,7 +146,7 @@ export class EditarAutorizacionDepaComponent implements OnInit {
   InsertarAutorizacion(form: any) {
     let autoriza = {
       id_departamento: form.idDeparForm,
-      id_empl_cargo: this.datoEmpleado.datosAuto.id_empl_cargo,
+      id_empl_cargo: this.datoEmpleado.datosAuto.id_empleado_cargo,
       preautorizar: false,
       autorizar: false,
       estado: false,

@@ -40,7 +40,7 @@ export class ButtonAvisosComponent implements OnInit {
       // METODO DE ESCUCHA DE EVENTOS DE NOTIFICACIONES
       this.socket.on('recibir_aviso', (data) => {
         // VERIFICACION DE USUARIO QUE RECIBE NOTIFICACION
-        if (parseInt(data.id_receives_empl) === this.id_empleado_logueado) {
+        if (parseInt(data.id_empleado_recibe) === this.id_empleado_logueado) {
           // BUSQUEDA DE LOS DATOS DE LA NOTIFICACION RECIBIDA
           this.aviso.ObtenerUnAviso(data.id).subscribe(res => {
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION
@@ -122,7 +122,7 @@ export class ButtonAvisosComponent implements OnInit {
       this.avisos = res;
       if (!this.avisos.message) {
         if (this.avisos.length > 0) {
-          this.avisos.forEach(obj => {
+          this.avisos.forEach((obj: any) => {
 
             if (obj.visto === false) {
               this.num_timbre_false = this.num_timbre_false + 1;

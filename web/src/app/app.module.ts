@@ -209,7 +209,6 @@ import { RecuperarFraseComponent } from './componentes/administracionGeneral/fra
 
 import { OlvidarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/olvidar-frase/olvidar-frase.component';
 import { TipoVacunaComponent } from './componentes/empleado/vacunacion/tipo-vacuna/tipo-vacuna.component';
-import { CrearParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/crear-parametro/crear-parametro.component';
 import { ListarParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/listar-parametro/listar-parametro.component';
 import { EditarParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/editar-parametro/editar-parametro.component';
 import { VerParametroComponent } from './componentes/administracionGeneral/parametrizacion/detalle-parametros/ver-parametro/ver-parametro.component';
@@ -322,7 +321,18 @@ import { DefinicionPlantillaComponent } from './componentes/administracionGenera
 import { SpinnerModule } from './componentes/spinner/spinner.module';
 import { SpinnerComponent } from './componentes/spinner/spinner.component';
 import { SpinnerInterceptor } from './componentes/spinner/Interceptor/spinner.interceptor';
-import { VisualizarObservacionComponent } from './componentes/horarios/cargar-plantillas/visualizar-observacion/visualizar-observacion/visualizar-observacion.component';
+import { CargarPlantillaComponent } from './componentes/empleado/cargar-plantilla/cargar-plantilla.component';
+import { CatModalidaLaboralComponent } from './componentes/catalogos/catalogoModalidadLaboral/cat-modalida-laboral/cat-modalida-laboral.component';
+import { CatTipoCargosComponent } from './componentes/catalogos/catalogoTipoCargo/listar-tipo-cargo/cat-tipo-cargos.component';
+import { RegistroModalidadComponent } from './componentes/catalogos/catalogoModalidadLaboral/registro-modalidad/registro-modalidad.component';
+import { EditarModalidadComponent } from './componentes/catalogos/catalogoModalidadLaboral/editar-modalidad/editar-modalidad.component';
+import { RegistrarCargoComponent } from './componentes/catalogos/catalogoTipoCargo/registrar-cargo/registrar-cargo.component';
+import { EditarTipoCargoComponent } from './componentes/catalogos/catalogoTipoCargo/editar-tipo-cargo/editar-tipo-cargo.component';
+import { CatDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/listar-discapacidad/cat-discapacidad.component';
+import { RegistroDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/registrar-discapacidad/registrar-discapacidad.component';
+import { EditarDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/editar-discapacidad/editar-discapacidad.component';
+import { CatVacunasComponent } from './componentes/catalogos/catalogoVacuna/listar-vacuna/cat-vacunas.component';
+import { EditarVacunasComponent } from './componentes/catalogos/catalogoVacuna/editar-vacuna/editar-vacuna.component';
 
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
@@ -451,7 +461,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     VerDipositivoComponent,
     ProcesosEmpleadoComponent,
     AutorizaEmpleadoComponent,
-    ConfigurarCodigoComponent,
+    //ConfigurarCodigoComponent,
     EditarPermisoEmpleadoComponent,
     CancelarHoraExtraComponent,
     EditarHoraExtraEmpleadoComponent,
@@ -548,7 +558,6 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     ListaWebComponent,
     OlvidarFraseComponent,
     TipoVacunaComponent,
-    CrearParametroComponent,
     ListarParametroComponent,
     EditarParametroComponent,
     VerParametroComponent,
@@ -575,8 +584,18 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     PrincipalSucursalUsuarioComponent,
     AsignarUsuarioComponent,
     DefinicionPlantillaComponent,
-    VisualizarObservacionComponent,
-
+    CargarPlantillaComponent,
+    CatModalidaLaboralComponent,
+    CatTipoCargosComponent,
+    RegistroModalidadComponent,
+    EditarModalidadComponent,
+    RegistrarCargoComponent,
+    EditarTipoCargoComponent,
+    CatDiscapacidadComponent,
+    RegistroDiscapacidadComponent,
+    EditarDiscapacidadComponent,
+    CatVacunasComponent,
+    EditarVacunasComponent
 
   ],
 

@@ -2,17 +2,16 @@
 import { FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+import * as moment from 'moment';
+import * as xml2js from 'xml2js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
 
 // IMPORTACION DE COMPONENTES
 import { RegistroRolComponent } from 'src/app/componentes/catalogos/catRoles/registro-rol/registro-rol.component';
@@ -25,6 +24,9 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service';
 
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableRoles } from 'src/app/model/reportes.model';
+
 @Component({
   selector: 'app-vista-roles',
   templateUrl: './vista-roles.component.html',
@@ -32,6 +34,10 @@ import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service
 })
 
 export class VistaRolesComponent implements OnInit {
+
+  rolesEliminar: any = [];
+  ver_roles: boolean = true;
+  ver_funciones: boolean = false;
 
   filtroRoles = ''; // VARIABLE DE BUSQUEDA DE DATOS
   idEmpleado: number; // VARIABLE DE ID DE EMPLEADO QUE INICIA SESIÓN
@@ -121,39 +127,16 @@ export class VistaRolesComponent implements OnInit {
         this.ObtenerRoles();
       }
     });
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionRoles.clear();
+    this.rolesEliminar = [];
   }
 
   // METODO PARA LIMPIAR CAMPOS DE BUSQUEDA
   LimpiarCampoBuscar() {
     this.buscarDescripcion.reset();
-  }
-
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
-  Eliminar(rol: any) {
-    const datos = {
-      user_name: this.user_name,
-      ip: this.ip
-    };
-
-    this.rest.EliminarRoles(rol.id, datos).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.validar.Auditar('app-web', 'cg_roles', rol, '', 'DELETE');
-      this.ObtenerRoles();
-    });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos);
-        } else {
-          this.router.navigate(['/roles']);
-        }
-      });
   }
 
   // ORDENAR LOS DATOS SEGÚN EL ID
@@ -169,6 +152,16 @@ export class VistaRolesComponent implements OnInit {
     }
     array.sort(compare);
   }
+
+  // METODO PARA ABRIR PAGINA LISTA DE FUNCIONES
+  rol_id: number = 0;
+  VerFunciones(id_rol: number) {
+    this.rol_id = id_rol;
+    console.log('ver rol --- ', this.rol_id)
+    this.ver_roles = false;
+    this.ver_funciones = true;
+  }
+
 
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
@@ -294,7 +287,7 @@ export class VistaRolesComponent implements OnInit {
     this.OrdenarDatos(this.roles);
     var objeto: any;
     var arregloRoles: any = [];
-    this.roles.forEach(obj => {
+    this.roles.forEach((obj: any) => {
       objeto = {
         "rol": {
           "$": { "id": obj.id },
@@ -314,20 +307,20 @@ export class VistaRolesComponent implements OnInit {
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
-    // Abrir una nueva pestaña o ventana con el contenido XML
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
-      newTab.focus(); // Dar foco a la nueva pestaña
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Roles.xml';
-    // Simular un clic en el enlace para iniciar la descarga
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
     this.ObtenerRoles();
   }
@@ -343,5 +336,154 @@ export class VistaRolesComponent implements OnInit {
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "RolesCSV" + '.csv');
     this.ObtenerRoles();
+  }
+
+
+
+
+  // METODOS PARA LA SELECCION MULTIPLE
+
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionRoles = new SelectionModel<ITableRoles>(true, []);
+
+
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionRoles.selected.length;
+    return numSelected === this.roles.length
+  }
+
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionRoles.clear() :
+      this.roles.forEach((row: any) => this.selectionRoles.select(row));
+  }
+
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableRoles): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.rolesEliminar = this.selectionRoles.selected;
+    //console.log('paginas para Eliminar',this.paginasEliminar);
+
+    //console.log(this.selectionPaginas.selected)
+    return `${this.selectionRoles.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+
+  }
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
+  Eliminar(rol: any) {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRoles(rol.id, datos).subscribe((res: any) => {
+
+      if (res.message === 'error') {
+        this.toastr.error('No se puede eliminar.', '', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerRoles();
+      }
+    });
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos);
+          this.activar_seleccion = true;
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.rolesEliminar = [];
+          this.selectionRoles.clear();
+          this.ObtenerRoles();
+        } else {
+          this.router.navigate(['/roles']);
+        }
+      });
+  }
+
+  // FUNCION PARA ELIMINAR LOS REGISTROS SELECCIONADOS
+  contador: number = 0;
+  ingresar: boolean = false;
+  EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.ingresar = false;
+    this.contador = 0;
+    this.rolesEliminar = this.selectionRoles.selected;
+    this.rolesEliminar.forEach((datos: any) => {
+
+      this.roles = this.roles.filter(item => item.id !== datos.id);
+      this.contador = this.contador + 1;
+      this.rest.EliminarRoles(datos.id, data).subscribe((res: any) => {
+        if (res.message === 'error') {
+          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ObtenerRoles();
+        }
+      });
+    }
+    )
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO LOS REGISTROS
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (this.rolesEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+            this.rolesEliminar = [];
+            this.selectionRoles.clear();
+            this.ObtenerRoles();
+          } else {
+            this.toastr.warning('No ha seleccionado ROLES.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        } else {
+          this.router.navigate(['/roles']);
+        }
+      });
   }
 }

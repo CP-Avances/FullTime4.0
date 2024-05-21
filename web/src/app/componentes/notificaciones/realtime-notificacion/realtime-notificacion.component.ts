@@ -85,7 +85,7 @@ export class RealtimeNotificacionComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
-      this.notificaciones.forEach(row => this.selectionUno.select(row));
+      this.notificaciones.forEach((row: any) => this.selectionUno.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA

@@ -11,11 +11,11 @@ class RelojesControlador {
     public async ListarRelojes(req: Request, res: Response) {
         const RELOJES = await pool.query(
             `
-            SELECT cr.id, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
-                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tien_funciones, cr.id_sucursal, 
+            SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
+                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tiene_funciones, cr.id_sucursal, 
                 cr.id_departamento, cr.numero_accion, cd.nombre AS nomdepar, s.nombre AS nomsucursal, 
                 e.nombre AS nomempresa, c.descripcion AS nomciudad
-            FROM cg_relojes cr, cg_departamentos cd, sucursales s, ciudades c, cg_empresa e
+            FROM ed_relojes cr, ed_departamentos cd, e_sucursales s, e_ciudades c, e_empresa e
             WHERE cr.id_departamento = cd.id AND cd.id_sucursal = cr.id_sucursal AND 
                 cr.id_sucursal = s.id AND s.id_empresa = e.id AND s.id_ciudad = c.id;
             `
@@ -38,13 +38,13 @@ class RelojesControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const reloj = await pool.query('SELECT * FROM cg_relojes WHERE id = $1', [id]);
+            const reloj = await pool.query('SELECT * FROM ed_relojes WHERE id = $1', [id]);
             const [datosOriginales] = reloj.rows;
 
             if (!datosOriginales) {
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_relojes',
+                    tabla: 'ed_relojes',
                     usuario: user_name,
                     accion: 'D',
                     datosOriginales: '',
@@ -55,18 +55,18 @@ class RelojesControlador {
 
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
+                return res.jsonp({ message: `Error al eliminar registro con id ${id}. Registro no encontrado`});
             }
 
             await pool.query(
                 `
-                DELETE FROM cg_relojes WHERE id = $1
+                DELETE FROM ed_relojes WHERE id = $1
                 `
                 , [id]);
             
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'cg_relojes',
+                tabla: 'ed_relojes',
                 usuario: user_name,
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginales),
@@ -90,43 +90,51 @@ class RelojesControlador {
     public async CrearRelojes(req: Request, res: Response) {
         try {
             const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                tien_funciones, id_sucursal, id_departamento, id, numero_accion, user_name, user_ip } = req.body;
+                tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, user_name, user_ip } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            const response: QueryResult = await pool.query(
+            var VERIFICAR_CODIGO = await pool.query(
                 `
-                INSERT INTO cg_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                    id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, id, 
-                    numero_accion )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1
                 `
-                , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                    tien_funciones, id_sucursal, id_departamento, id, numero_accion]);
+                , [codigo.toUpperCase()])
 
-            const [reloj] = response.rows;
+            if (VERIFICAR_CODIGO.rows[0] == undefined || VERIFICAR_CODIGO.rows[0] == '') {
+                const response: QueryResult = await pool.query(
+                    `
+                    INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
+                        id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, codigo, 
+                        numero_accion )
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                    `
+                    , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                        tien_funciones, id_sucursal, id_departamento, codigo, numero_accion]);
 
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'cg_relojes',
-                usuario: user_name,
-                accion: 'I',
-                datosOriginales: '',
-                datosNuevos: JSON.stringify(reloj),
-                ip: user_ip,
-                observacion: null
-            });
+                const [reloj] = response.rows;
 
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'cg_relojes',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(reloj),
+                    ip: user_ip,
+                    observacion: null
+                });
 
-            if (reloj) {
-                return res.status(200).jsonp({ message: 'guardado', reloj: reloj })
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
+                if (reloj) {
+                    return res.status(200).jsonp({ message: 'guardado', reloj: reloj })
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'mal_registro' })
             }
-            else {
-                return res.status(404).jsonp({ message: 'mal_registro' })
-            }
+        }
         }
         catch (error) {
             // REVERTIR TRANSACCION
@@ -140,7 +148,7 @@ class RelojesControlador {
         const { id } = req.params;
         const RELOJES = await pool.query(
             `
-            SELECT * FROM cg_relojes WHERE id = $1
+            SELECT * FROM ed_relojes WHERE id = $1
             `
             , [id]);
         if (RELOJES.rowCount > 0) {
@@ -155,13 +163,13 @@ class RelojesControlador {
     public async ActualizarReloj(req: Request, res: Response): Promise<Response> {
         try {
             const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                tien_funciones, id_sucursal, id_departamento, id, numero_accion, id_real, user_name, user_ip } = req.body;
+                tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, id_real, user_name, user_ip } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const reloj = await pool.query('SELECT * FROM cg_relojes WHERE id = $1', [id_real]);
+            const reloj = await pool.query('SELECT * FROM cg_relojes WHERE codigo = $1', [codigo]);
             const [datosOriginales] = reloj.rows;
 
             if (!datosOriginales) {
@@ -173,7 +181,7 @@ class RelojesControlador {
                     datosOriginales: '',
                     datosNuevos: '',
                     ip: user_ip,
-                    observacion: `Error al actualizar el registro con id: ${id}.`
+                    observacion: `Error al actualizar el registro con id: ${codigo}.`
                 });
 
                 // FINALIZAR TRANSACCION
@@ -181,31 +189,43 @@ class RelojesControlador {
                 return res.status(404).jsonp({ message: 'error' });
             }
 
-            await pool.query(
+            var VERIFICAR_DISCAPACIDAD = await pool.query(
                 `
-                UPDATE cg_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
-                    modelo = $6, serie = $7, id_fabricacion = $8, fabricante = $9, mac = $10, 
-                    tien_funciones = $11, id_sucursal = $12, id_departamento = $13, id = $14, 
-                    numero_accion = $15 
-                WHERE id = $16
+                SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1 AND NOT id = $2
                 `
-                , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                    tien_funciones, id_sucursal, id_departamento, id, numero_accion, id_real]);
-            
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'cg_relojes',
-                usuario: user_name,
-                accion: 'U',
-                datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tien_funciones": "${tien_funciones}", "id_sucursal": "${id_sucursal}", "id_departamento": "${id_departamento}", "id": "${id}", "numero_accion": "${numero_accion}"}`,
-                ip: user_ip,
-                observacion: null
-            });
+                , [codigo.toUpperCase(), id_real])
 
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-            return res.jsonp({ message: 'actualizado' });
+            if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
+                await pool.query(
+                    `
+                    UPDATE ed_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
+                        modelo = $6, serie = $7, id_fabricacion = $8, fabricante = $9, mac = $10, 
+                        tiene_funciones = $11, id_sucursal = $12, id_departamento = $13, codigo = $14, 
+                        numero_accion = $15 
+                    WHERE id = $16
+                    `
+                    , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                        tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, id_real]);
+
+                 // AUDITORIA
+                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'ed_relojes',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tien_funciones": "${tien_funciones}", "id_sucursal": "${id_sucursal}", "id_departamento": "${id_departamento}", "codigo": "${codigo}", "numero_accion": "${numero_accion}"}`,
+                    ip: user_ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
+                return res.jsonp({ message: 'actualizado' });
+            }
+            else {
+                return res.jsonp({ message: 'existe' });
+            }
         }
         catch (error) {
             // REVERTIR TRANSACCION
@@ -219,11 +239,11 @@ class RelojesControlador {
         const { id } = req.params;
         const RELOJES = await pool.query(
             `
-            SELECT cr.id, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
-                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tien_funciones, cr.id_sucursal, 
+            SELECT cr.id, cr.codigo, cr.nombre, cr.ip, cr.puerto, cr.contrasenia, cr.marca, cr.modelo, cr.serie,
+                cr.id_fabricacion, cr.fabricante, cr.mac, cr.tiene_funciones, cr.id_sucursal, 
                 cr.id_departamento, cr.numero_accion, cd.nombre AS nomdepar, s.nombre AS nomsucursal,
                 e.nombre AS nomempresa, c.descripcion AS nomciudad
-            FROM cg_relojes cr, cg_departamentos cd, sucursales s, ciudades c, cg_empresa e
+            FROM ed_relojes cr, ed_departamentos cd, e_sucursales s, e_ciudades c, e_empresa e
             WHERE cr.id_departamento = cd.id AND cd.id_sucursal = cr.id_sucursal AND cr.id_sucursal = s.id 
                 AND s.id_empresa = e.id AND s.id_ciudad = c.id AND cr.id = $1
             `
@@ -256,15 +276,15 @@ class RelojesControlador {
                 await pool.query('BEGIN');
     
                 // BUSCAR ID DE LA SUCURSAL INGRESADA
-                const id_sucursal = await pool.query('SELECT id FROM sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
+                const id_sucursal = await pool.query('SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
                 
-                const id_departamento = await pool.query('SELECT id FROM cg_departamentos WHERE UPPER(nombre) = $1 AND ' +
+                const id_departamento = await pool.query('SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND ' +
                     'id_sucursal = $2', [departamento.toUpperCase(), id_sucursal.rows[0]['id']]);
 
                 if (id_sucursal.rowCount === 0 || id_departamento.rowCount === 0) {
                     // AUDITORIA
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                        tabla: 'cg_relojes',
+                        tabla: 'ed_relojes',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
@@ -286,10 +306,13 @@ class RelojesControlador {
                     accion = 0;
                 }
     
-                await pool.query('INSERT INTO cg_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, ' +
-                    'id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, id, numero_accion) ' +
-                    'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)',
-                    [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                await pool.query(
+                    `
+                    INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
+                        id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, id, numero_accion) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+                    `
+                    , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
                         tiene_funciones, id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], codigo_reloj, accion]);
                 
                 // AUDITORIA
@@ -351,30 +374,49 @@ class RelojesControlador {
             }
 
             //Verificar que el codigo no se encuentre registrado
-            const VERIFICAR_CODIGO = await pool.query('SELECT * FROM cg_relojes WHERE id = $1', [codigo_reloj]);
+            const VERIFICAR_CODIGO = await pool.query(
+                `
+                SELECT * FROM ed_relojes WHERE id = $1
+                `
+                , [codigo_reloj]);
             if (VERIFICAR_CODIGO.rowCount === 0) {
                 contarCodigo = contarCodigo + 1;
             }
 
             //Verificar que el nombre del equipo no se encuentre registrado
-            const VERIFICAR_NOMBRE = await pool.query('SELECT * FROM cg_relojes WHERE UPPER(nombre) = $1', [nombre.toUpperCase()]);
+            const VERIFICAR_NOMBRE = await pool.query(
+                `
+                SELECT * FROM ed_relojes WHERE UPPER(nombre) = $1
+                `
+                , [nombre.toUpperCase()]);
             if (VERIFICAR_NOMBRE.rowCount === 0) {
                 contarNombre = contarNombre + 1;
             }
 
             //Verificar que la IP del dispositivo no se encuentre registrado
-            const VERIFICAR_IP = await pool.query('SELECT * FROM cg_relojes WHERE ip = $1', [ip]);
+            const VERIFICAR_IP = await pool.query(
+                `
+                SELECT * FROM ed_relojes WHERE ip = $1
+                `
+                , [ip]);
             if (VERIFICAR_IP.rowCount === 0) {
                 contarIP = contarIP + 1;
             }
 
             //Verificar que la sucursal exista dentro del sistema
-            const VERIFICAR_SUCURSAL = await pool.query('SELECT id FROM sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
+            const VERIFICAR_SUCURSAL = await pool.query(
+                `
+                SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+                `
+                , [sucursal.toUpperCase()]);
             if (VERIFICAR_SUCURSAL.rowCount > 0) {
                 contarSucursal = contarSucursal + 1;
                 // Verificar que el departamento exista dentro del sistema
-                const VERIFICAR_DEPARTAMENTO = await pool.query('SELECT id FROM cg_departamentos WHERE UPPER(nombre) = $1 AND id_sucursal = $2',
-                    [departamento.toUpperCase(), VERIFICAR_SUCURSAL.rows[0]['id']]);
+                const VERIFICAR_DEPARTAMENTO = await pool.query(
+                    `
+                    SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND id_sucursal = $2
+                    `
+                    , [departamento.toUpperCase(), VERIFICAR_SUCURSAL.rows[0]['id']]);
                 if (VERIFICAR_DEPARTAMENTO.rowCount > 0) {
                     contarDepartamento = contarDepartamento + 1;
                 }

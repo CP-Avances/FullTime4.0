@@ -30,7 +30,7 @@ export const ListarDocumentos = async function (nombre_carpeta: string) {
     // CONSULTA DE BUSQUEDA DE DOCUMENTOS
     let documentos = await pool.query(
         `
-        SELECT * FROM documentacion ORDER BY id
+        SELECT * FROM e_documentacion ORDER BY id
         `
     ).then(result => { return result.rows });
 
@@ -107,7 +107,7 @@ export const ListarHorarios = async function (nombre_carpeta: string) {
     // CONSULTA DE BUSQUEDA DE DOCUMENTOS
     let documentos = await pool.query(
         `
-        SELECT * FROM cg_horarios WHERE documento NOTNULL ORDER BY id
+        SELECT * FROM eh_cat_horarios WHERE documento NOTNULL ORDER BY id
         `
     ).then(result => { return result.rows });
 
@@ -160,7 +160,7 @@ export const VerCarpeta = async function () {
     // CONSULTA DE BUSQUEDA DE DOCUMENTOS
     let documentos = await pool.query(
         `
-         SELECT * FROM documentacion ORDER BY id
+         SELECT * FROM e_documentacion ORDER BY id
          `
     ).then(result => { return result.rows });
 

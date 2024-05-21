@@ -1,97 +1,186 @@
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
+import { QueryResult } from 'pg';
 
 class RolPermisosControlador {
-  public async list(req: Request, res: Response) {
-    const rolPermisos = await pool.query('SELECT * FROM cg_rol_permisos');
-    res.jsonp(rolPermisos.rows);
-  }
 
-  public async getOne(req: Request, res: Response): Promise<any> {
-    const { id } = req.params;
-    const unRolPermiso = await pool.query('SELECT * FROM cg_rol_permisos WHERE id = $1', [id]);
-    if (unRolPermiso.rowCount > 0) {
-      return res.jsonp(unRolPermiso.rows)
+
+  //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
+  public async ListarMenuRoles(req: Request, res: Response) {
+    const Roles = await pool.query(
+      `
+      SELECT * FROM es_paginas WHERE modulo = false
+      `
+    );
+    if (Roles.rowCount > 0) {
+      return res.jsonp(Roles.rows);
     }
-    res.status(404).jsonp({ text: 'Rol permiso no encontrado' });
+    else {
+      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+    }
   }
 
-  public async create(req: Request, res: Response): Promise<void> {
+  //METODO PARA ENLISTAR PAGINAS SEAN MODULOS
+  public async ListarMenuModulosRoles(req: Request, res: Response) {
+    const Roles = await pool.query(
+      `
+      SELECT * FROM es_paginas WHERE modulo = true
+      `
+    );
+    if (Roles.rowCount > 0) {
+      return res.jsonp(Roles.rows);
+    }
+    else {
+      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+    }
+  }
+
+  //METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO
+  public async ListarModuloPorNombre(req: Request, res: Response) {
+    const { nombre_modulo } = req.body;
+    const Roles = await pool.query(
+      `
+      SELECT * FROM es_paginas WHERE nombre_modulo = $1
+      `
+      , [nombre_modulo]
+    );
+    if (Roles.rowCount > 0) {
+      return res.jsonp(Roles.rows);
+    }
+    else {
+      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+    }
+  }
+
+  // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION
+  public async ObtenerIdPaginas(req: Request, res: Response): Promise<any> {
+    const { funcion, id_rol } = req.body;
+    const PAGINA_ROL = await pool.query(
+      `
+      SELECT * FROM ero_rol_permisos WHERE pagina = $1  AND id_rol = $2 
+      `
+      , [funcion, id_rol]);
+    if (PAGINA_ROL.rowCount > 0) {
+      return res.jsonp(PAGINA_ROL.rows)
+    }
+    else {
+      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+    }
+  }
+
+  // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA
+  public async ObtenerIdPaginasConAcciones(req: Request, res: Response): Promise<any> {
+    const { funcion, id_rol, id_accion } = req.body;
+    const PAGINA_ROL = await pool.query(
+      `
+      SELECT * FROM ero_rol_permisos WHERE pagina = $1 AND id_rol = $2 AND id_accion = $3
+      `
+      , [funcion, id_rol, id_accion]);
+    if (PAGINA_ROL.rowCount > 0) {
+      return res.jsonp(PAGINA_ROL.rows)
+    }
+    else {
+      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+    }
+  }
+
+  // METODO PARA BUSCAR LAS PAGINAS POR EL ID DEL ROL
+  public async ObtenerPaginasRol(req: Request, res: Response): Promise<any> {
     try {
-      const { funcion, link, etiqueta, user_name, ip } = req.body;
-
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
-
-      await pool.query('INSERT INTO cg_rol_permisos ( funcion, link, etiqueta ) VALUES ($1, $2, $3)', [funcion, link, etiqueta]);
-      
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_rol_permisos',
-        usuario: user_name,
-        accion: 'I',
-        datosOriginales: '',
-        datosNuevos: `{funcion: ${funcion}, link: ${link}, etiqueta: ${etiqueta}}`,
-        ip,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-
-      const rolPermisos = await pool.query('SELECT id FROM cg_rol_permisos');
-      const ultimoDato = rolPermisos.rows.length - 1;
-      const idRespuesta = rolPermisos.rows[ultimoDato].id;
-      res.jsonp({ message: 'Rol permiso Guardado', id: idRespuesta});
+      const { id_rol } = req.body;
+      const PAGINA_ROL = await pool.query(
+        `
+      SELECT * FROM ero_rol_permisos WHERE id_rol = $1 order by 3,5
+      `, [id_rol]);
+      return res.jsonp(PAGINA_ROL.rows)
     } catch (error) {
-      // FINALIZAR TRANSACCION
-      await pool.query('ROLLBACK');
-      res.status(500).jsonp({ message: 'Error al guardar el rol permiso.' });
+      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
     }
   }
 
-  public async createPermisoDenegado(req: Request, res: Response): Promise<void> {
+  // METODO PARA ASIGNAR FUNCIONES AL ROL
+  public async AsignarPaginaRol(req: Request, res: Response) {
     try {
-      const { id_rol, id_permiso, user_name, ip } = req.body;
-
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
-
-      await pool.query('INSERT INTO rol_perm_denegado ( id_rol, id_permiso ) VALUES ($1, $2)', [id_rol, id_permiso]);
-      
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'rol_perm_denegado',
-        usuario: user_name,
-        accion: 'I',
-        datosOriginales: '',
-        datosNuevos: `{id_rol: ${id_rol}, id_permiso: ${id_permiso}}`,
-        ip,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-      res.jsonp({ message: 'Permiso denegado Guardado'});
+      const { funcion, link, id_rol, id_accion } = req.body;
+      const response: QueryResult = await pool.query(
+        `
+        INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion) VALUES ($1, $2, $3, $4) RETURNING *
+        `, [funcion, link, id_rol, id_accion]);
+      const [rol] = response.rows;
+      if (rol) {
+        return res.status(200).jsonp({ message: 'OK', reloj: rol })
+      }
+      else {
+        return res.status(404).jsonp({ message: 'error' })
+      }
     } catch (error) {
-      // FINALIZAR TRANSACCION
-      await pool.query('ROLLBACK');
-      res.status(500).jsonp({ message: 'Error al guardar el permiso denegado.' });
+      return res.status(500).jsonp({ message: 'error' })
     }
   }
 
-  public async getPermisosUsuario(req: Request, res: Response): Promise<any> {
-    const { id } = req.params;
-    const unRolPermiso = await pool.query('SELECT * FROM VistaPermisoRoles WHERE id_rol = $1', [id]);
-    if (unRolPermiso.rowCount > 0) {
-      console.log(unRolPermiso.rows);
-      return res.jsonp(unRolPermiso.rows);
+  // METODO PARA ELIMINAR REGISTRO
+  public async EliminarPaginaRol(req: Request, res: Response): Promise<any> {
+    try {
+      const { id } = req.body
+      await pool.query(
+        `
+      DELETE FROM ero_rol_permisos WHERE id = $1
+      `
+        , [id]);
+      res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      return res.jsonp({ message: 'error' });
     }
-    res.status(404).jsonp({ text: 'El rol no tiene permisos' });
+  }
+
+  // METODO PARA BUSCAR LAS ACCIONES POR CADA PAGINA
+  public async ObtenerAccionesPaginas(req: Request, res: Response): Promise<any> {
+    const { id_funcion } = req.body;
+    const PAGINA_ROL = await pool.query(
+      `
+      SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
+      `
+      , [id_funcion]);
+    if (PAGINA_ROL.rowCount > 0) {
+      return res.jsonp(PAGINA_ROL.rows)
+    }
+    else {
+      return res.jsonp([])
+    }
+  }
+
+  // METODO PARA ENLISTAR ACCIONES SEGUN LA PAGINA 
+  public async ObtenerAccionesPaginasExistentes(req: Request, res: Response): Promise<any> {
+    const { id_funcion } = req.body;
+    const PAGINA_ROL = await pool.query(
+      `
+          SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
+          `
+      , [id_funcion]);
+    if (PAGINA_ROL.rowCount > 0) {
+      return res.jsonp(PAGINA_ROL.rows)
+    }
+    else {
+      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+    }
+  }
+
+  //METODO PARA ENLISTAR ACCIONES 
+  public async ListarAcciones(req: Request, res: Response) {
+    const Roles = await pool.query(
+      `
+      SELECT * FROM es_acciones_paginas
+      `
+    );
+    if (Roles.rowCount > 0) {
+      return res.jsonp(Roles.rows);
+    }
+    else {
+      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+    }
   }
 }
 
 export const rolPermisosControlador = new RolPermisosControlador();
-
 export default rolPermisosControlador;

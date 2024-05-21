@@ -11,7 +11,7 @@ import { ReporteFaltasComponent } from './asistencia/reporte-faltas/reporte-falt
 import { CriteriosBusquedaComponent } from './configuracion-reportes/criterios-busqueda/criterios-busqueda.component';
 import { ReporteTimbresMultiplesComponent } from './timbres/reporte-timbres-multiples/reporte-timbres-multiples.component';
 
-import { ReporteEmpleadosComponent } from './generales/empleados/reporte-empleados/reporte-empleados.component';
+import { ReporteEmpleadosComponent } from './generales/reporte-empleados/reporte-empleados.component';
 import { ReporteKardexComponent } from './modulos/vacaciones/reporte-kardex/reporte-kardex.component';
 import { ReporteHorasPedidasComponent } from './modulos/horasExtras/reporte-horas-pedidas/reporte-horas-pedidas.component';
 import { ReporteHorasExtrasComponent } from './modulos/horasExtras/reporte-horas-extras/reporte-horas-extras.component';
@@ -28,7 +28,7 @@ import { AdministradorTodasComponent } from './notificaciones/administrador-toda
 import { PorUsuarioComponent } from './notificaciones/por-usuario/por-usuario.component';
 import { OptionTimbreDispositivoComponent } from './configuracion-reportes/option-timbre-dispositivo/option-timbre-dispositivo.component';
 import { TimbreAbiertosComponent } from './timbres/timbre-abiertos/timbre-abiertos.component';
-import { VacunaMultipleComponent } from './generales/vacunas/vacuna-multiple/vacuna-multiple.component';
+import { VacunaMultipleComponent } from './generales/vacuna-multiple/vacuna-multiple.component';
 import { AlimentosInvitadosComponent } from './modulos/alimentacion/alimentos-invitados/alimentos-invitados.component';
 import { TimbreIncompletoComponent } from './timbres/timbre-incompleto/timbre-incompleto.component';
 import { SalidasAntesComponent } from './asistencia/salidas-antes/salidas-antes.component';
@@ -37,8 +37,6 @@ import { SolicitudVacacionComponent } from './modulos/vacaciones/solicitud-vacac
 import { HorasPlanificadasComponent } from './modulos/horasExtras/horas-planificadas/horas-planificadas.component';
 import { TimbreSistemaComponent } from './timbres/timbre-sistema/timbre-sistema.component';
 import { TimbreVirtualComponent } from './timbres/timbre-virtual/timbre-virtual.component';
-import { VerEmpleadosDetalleComponent } from './generales/empleados/ver-empleados-detalle/ver-empleados-detalle.component';
-import { VerVacunasComponent } from './generales/vacunas/ver-vacunas/ver-vacunas.component';
 import { ReporteTiempoAlimentacionComponent } from './asistencia/reporte-tiempo-alimentacion/reporte-tiempo-alimentacion.component';
 import { ReportePlanificacionHorariaComponent } from './asistencia/reporte-planificacion-horaria/reporte-planificacion-horaria.component';
 import { ReporteResumenAsistenciaComponent } from './asistencia/reporte-resumen-asistencia/reporte-resumen-asistencia.component';
@@ -77,8 +75,6 @@ import { AnalisisDatosComponent } from './analisis-datos/analisis-datos.componen
     HorasPlanificadasComponent,
     TimbreSistemaComponent,
     TimbreVirtualComponent,
-    VerEmpleadosDetalleComponent,
-    VerVacunasComponent,
     ReporteTiempoAlimentacionComponent,
     ReportePlanificacionHorariaComponent,
     ReporteResumenAsistenciaComponent,

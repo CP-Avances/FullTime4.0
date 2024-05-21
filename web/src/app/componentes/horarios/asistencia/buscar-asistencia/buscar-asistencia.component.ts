@@ -99,10 +99,10 @@ export class BuscarAsistenciaComponent implements OnInit {
         console.log('ver respuesta ', data.respuesta)
         this.asistencia = data.respuesta;
         this.asistencia.forEach((obj: any) => {
-          //console.log('ver fecha ', moment(obj.fec_hora_horario).format('YYYY-MM-DD'))
-          //console.log('ver hora ', moment(obj.fec_hora_horario).format('HH:mm:ss'))
-          obj.fecha_general_ = this.validar.FormatearFecha(moment(obj.fec_horario).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_abreviado);
-          obj.fecha_horario_ = this.validar.FormatearFecha(obj.fecha_horario, this.formato_fecha, this.validar.dia_abreviado);
+          //console.log('ver fecha ', moment(obj.fecha_hora_horario).format('YYYY-MM-DD'))
+          //console.log('ver hora ', moment(obj.fecha_hora_horario).format('HH:mm:ss'))
+          obj.fecha_general_ = this.validar.FormatearFecha(moment(obj.fecha_horario).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_abreviado);
+          obj.fecha_horario_ = this.validar.FormatearFecha(obj.fecha_horarios, this.formato_fecha, this.validar.dia_abreviado);
           obj.hora_horario_ = this.validar.FormatearHora(obj.hora_horario, this.formato_hora);
           if (obj.fecha_timbre) {
             obj.fecha_timbre_ = this.validar.FormatearFecha(obj.fecha_timbre, this.formato_fecha, this.validar.dia_abreviado);
@@ -110,25 +110,25 @@ export class BuscarAsistenciaComponent implements OnInit {
           if (obj.hora_timbre) {
             obj.hora_timbre_ = this.validar.FormatearHora(obj.hora_timbre, this.formato_hora);
           }
-          if (obj.tipo_entr_salida === 'E') {
+          if (obj.tipo_accion === 'E') {
             obj.tipo_ = 'Entrada';
           }
-          else if (obj.tipo_entr_salida === 'S') {
+          else if (obj.tipo_accion === 'S') {
             obj.tipo_ = 'Salida';
           }
-          else if (obj.tipo_entr_salida === 'I/A') {
+          else if (obj.tipo_accion === 'I/A') {
             obj.tipo_ = 'Inicio alimentación';
           }
-          else if (obj.tipo_entr_salida === 'F/A') {
+          else if (obj.tipo_accion === 'F/A') {
             obj.tipo_ = 'Fin alimentación';
           }
-          else if (obj.tipo_entr_salida === 'I/P') {
+          else if (obj.tipo_accion === 'I/P') {
             obj.tipo_ = 'Inicio permiso';
           }
-          else if (obj.tipo_entr_salida === 'F/P') {
+          else if (obj.tipo_accion === 'F/P') {
             obj.tipo_ = 'Fin permiso';
           }
-          else if (obj.tipo_entr_salida === 'HA') {
+          else if (obj.tipo_accion === 'HA') {
             obj.tipo_ = 'Timbre libre';
           }
         })

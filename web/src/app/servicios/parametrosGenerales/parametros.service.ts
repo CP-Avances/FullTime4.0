@@ -59,11 +59,6 @@ export class ParametrosService {
     return this.http.put(`${environment.url}/parametrizacion/actual-detalle`, datos);
   }
 
-  // REGISTRAR PARAMETRO
-  IngresarTipoParametro(data: any) {
-    return this.http.post<any>(`${environment.url}/parametrizacion/tipo`, data);
-  }
-
   // METODO PARA COMPARAR CORDENADAS
   ObtenerCoordenadas(data: any) {
     return this.http.post<any>(`${environment.url}/parametrizacion/coordenadas`, data);;

@@ -20,7 +20,7 @@
                 <div class="col">
                     <mat-form-field>
                         <mat-label>N° de carnet Conadis</mat-label>
-                        <input matInput type="number" placeholder="Ej: " [formControl]="carnet" maxlength="7"
+                        <input matInput placeholder="Ej: " [formControl]="carnet" maxlength="7"
                             oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                             (keypress)="IngresarSoloNumeros($event)" required>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"

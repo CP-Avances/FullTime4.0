@@ -28,6 +28,9 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { environment } from 'src/environments/environment';
 import { use } from 'echarts';
 
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableSucursales } from 'src/app/model/reportes.model';
+
 @Component({
   selector: 'app-lista-sucursales',
   templateUrl: './lista-sucursales.component.html',
@@ -35,6 +38,8 @@ import { use } from 'echarts';
 })
 
 export class ListaSucursalesComponent implements OnInit {
+
+  sucursalesEliminar: any = [];
 
   buscarNombre = new FormControl('', [Validators.minLength(2)]);
   buscarCiudad = new FormControl('', [Validators.minLength(2)]);
@@ -130,8 +135,8 @@ export class ListaSucursalesComponent implements OnInit {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -149,6 +154,8 @@ export class ListaSucursalesComponent implements OnInit {
 
   // METODO PARA BUSCAR SUCURSALES
   ObtenerSucursal() {
+
+    this.sucursales = [];
     this.rest.BuscarSucursal().subscribe(data => {
       this.sucursales = data;
     });
@@ -164,6 +171,16 @@ export class ListaSucursalesComponent implements OnInit {
           }
         }
       });
+    this.ObtenerSucursal();
+
+
+    this.activar_seleccion = true;
+
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionSucursales.clear();
+    this.sucursalesEliminar = [];
+
   }
 
   // METODO PARA EDITAR SUCURSAL
@@ -197,31 +214,6 @@ export class ListaSucursalesComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
-  Eliminar(id_sucursal: number) {
-    const datos = {
-      user_name: this.user_name,
-      ip: this.ip
-    }
-    this.rest.EliminarRegistro(id_sucursal, datos).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerSucursal();
-    });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id);
-        } else {
-          this.router.navigate(['/sucursales']);
-        }
-      });
-  }
 
   // METODO PARA VER DATOS DE DEPARTAMENTOS DE SUCURSAL
   ver_departamentos: boolean = false;
@@ -358,7 +350,7 @@ export class ListaSucursalesComponent implements OnInit {
   exportToXML() {
     var objeto;
     var arregloSucursales: any = [];
-    this.sucursales.forEach(obj => {
+    this.sucursales.forEach((obj: any) => {
       objeto = {
         "establecimiento": {
           "$": { "id": obj.id },
@@ -381,20 +373,20 @@ export class ListaSucursalesComponent implements OnInit {
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
-    // Abrir una nueva pestaña o ventana con el contenido XML
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
-      newTab.focus(); // Dar foco a la nueva pestaña
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Estamblecimientos.xml';
-    // Simular un clic en el enlace para iniciar la descarga
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
   }
 
@@ -404,7 +396,7 @@ export class ListaSucursalesComponent implements OnInit {
   nameFile: string;
   archivoSubido: Array<File>;
   mostrarbtnsubir: boolean = false;
-  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE FERIADOS -----------------------------------------------------------------
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE SUCURSALES
   FileChange(element: any) {
     this.archivoSubido = [];
     this.nameFile = '';
@@ -469,9 +461,6 @@ export class ListaSucursalesComponent implements OnInit {
           this.btn_registrar = false;
         }
       }
-
-
-
     }, error => {
       console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
@@ -531,7 +520,7 @@ export class ListaSucursalesComponent implements OnInit {
             data.id_ciudad = valor.id;
             data.id_empresa = '1';
 
-            // Capitalizar la primera letra de la primera palabra
+            // CAPITALIZAR LA PRIMERA LETRA DE LA PRIMERA PALABRA
             const textonombre = data.nombre.charAt(0).toUpperCase();
             const restoDelTexto = data.nombre.slice(1);
 
@@ -563,7 +552,7 @@ export class ListaSucursalesComponent implements OnInit {
   }
 
 
-  //Metodo para dar color a las celdas y representar las validaciones
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
   stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
@@ -596,6 +585,138 @@ export class ListaSucursalesComponent implements OnInit {
     } else {
       return 'black'
     }
+  }
+
+  // METODOS PARA LA SELECCION MULTIPLE
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+  selectionSucursales = new SelectionModel<ITableSucursales>(true, []);
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionSucursales.selected.length;
+    return numSelected === this.sucursales.length;
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionSucursales.clear() :
+      this.sucursales.forEach((row: any) => this.selectionSucursales.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableSucursales): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.sucursalesEliminar = this.selectionSucursales.selected;
+
+    return `${this.selectionSucursales.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+
+  }
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
+  Eliminar(id_sucursal: number) {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistro(id_sucursal, datos).subscribe((res: any) => {
+      if (res.message === 'error') {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerSucursal();
+      }
+    });
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+          this.activar_seleccion = true;
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.sucursalesEliminar = [];
+          this.selectionSucursales.clear();
+          this.ObtenerSucursal();
+        } else {
+          this.router.navigate(['/sucursales']);
+        }
+      });
+  }
+
+  contador: number = 0;
+  ingresar: boolean = false;
+  EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.ingresar = false;
+    this.contador = 0;
+    this.sucursalesEliminar = this.selectionSucursales.selected;
+    this.sucursalesEliminar.forEach((datos: any) => {
+      this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
+      this.contador = this.contador + 1;
+      this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
+        if (res.message === 'error') {
+          this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ObtenerSucursal();
+        }
+      });
+    }
+    )
+  }
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          if (this.sucursalesEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+            this.sucursalesEliminar = [];
+            this.selectionSucursales.clear();
+            this.ObtenerSucursal();
+          } else {
+            this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+        } else {
+          this.router.navigate(['/sucursales']);
+        }
+      });
   }
 
 }

@@ -46,7 +46,7 @@ const storage = multer_1.default.diskStorage({
             // DATOS DOCUMENTO
             let id = req.params.id_empleado;
             const usuario = yield database_1.default.query(`
-            SELECT codigo FROM empleados WHERE id = $1
+            SELECT codigo FROM eu_empleados WHERE id = $1
             `, [id]);
             let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
             cb(null, documento);
@@ -111,6 +111,8 @@ class EmpleadoRutas {
         this.router.put('/:id_empleado/uploadImage', [verificarToken_1.TokenValidation, upload.single('image')], empleadoControlador_1.default.CrearImagenEmpleado);
         // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO
         this.router.put('/geolocalizacion/:id', verificarToken_1.TokenValidation, empleadoControlador_1.default.GeolocalizacionCrokis);
+        // METODO PARA ELIMINAR EMPLEADOS
+        this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, empleadoControlador_1.default.EliminarEmpleado);
         /** **************************************************************************************** **
          ** **                       MANEJO DE DATOS DE TITULO PROFESIONAL                        ** **
          ** **************************************************************************************** **/
@@ -118,6 +120,8 @@ class EmpleadoRutas {
         this.router.get('/emplTitulos/:id_empleado', verificarToken_1.TokenValidation, empleadoControlador_1.default.ObtenerTitulosEmpleado);
         // METODO PARA REGISTRAR TITULO PROFESIONAL
         this.router.post('/emplTitulos/', verificarToken_1.TokenValidation, empleadoControlador_1.default.CrearEmpleadoTitulos);
+        // METODO PARA BUSCAR TITULO ESPECIFICO DEL EMPLEADO
+        this.router.post('/emplTitulos/usuario', verificarToken_1.TokenValidation, empleadoControlador_1.default.ObtenerTituloEspecifico);
         // METODO PARA ACTUALIZAR REGISTRO
         this.router.put('/:id_empleado_titulo/titulo', verificarToken_1.TokenValidation, empleadoControlador_1.default.EditarTituloEmpleado);
         // METODO PARA ELIMINAR TITULO 
@@ -142,12 +146,6 @@ class EmpleadoRutas {
         this.router.post('/verificar/manual/plantillaExcel/', [verificarToken_1.TokenValidation, upload_plantilla.single('uploads')], empleadoControlador_1.default.VerificarPlantilla_Manual);
         //this.router.post('/verificar/datos/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosManual);
         this.router.post('/cargar_manual/plantillaExcel/', verificarToken_1.TokenValidation, empleadoControlador_1.default.CargarPlantilla_Manual);
-        // HABILITACIÓN Y DESHABILITACIÓN DE USUARIOS
-        // METODOS PARA CONTROL DE MARCACIONES DENTRO DE UNA UBICACIÓN GEOGRÁFICA 
-        this.router.post('/geolocalizacion-domicilio/:id/:codigo', verificarToken_1.TokenValidation, empleadoControlador_1.default.IngresarGelocalizacion);
-        this.router.put('/geolocalizacion-trabajo/:id', verificarToken_1.TokenValidation, empleadoControlador_1.default.ActualizarTrabajo);
-        this.router.put('/geolocalizacion-nuevo-domicilio/:id', verificarToken_1.TokenValidation, empleadoControlador_1.default.ActualizarDomicilio);
-        this.router.put('/actualizar-geolocalizacion/:id', verificarToken_1.TokenValidation, empleadoControlador_1.default.ActualizarGeolocalizacion);
     }
 }
 const EMPLEADO_RUTAS = new EmpleadoRutas();

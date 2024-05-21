@@ -14,20 +14,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PROVINCIA_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
-const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 class ProvinciaControlador {
     // LISTA DE PAISES DE ACUERDO AL CONTINENTE
     ListarPaises(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { continente } = req.params;
             const CONTINENTE = yield database_1.default.query(`
-      SELECT * FROM cg_paises WHERE continente = $1 ORDER BY nombre ASC
+      SELECT * FROM e_cat_paises WHERE continente = $1 ORDER BY nombre ASC
       `, [continente]);
             if (CONTINENTE.rowCount > 0) {
                 return res.jsonp(CONTINENTE.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -35,7 +34,7 @@ class ProvinciaControlador {
     ListarContinentes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const CONTINENTE = yield database_1.default.query(`
-      SELECT continente FROM cg_paises GROUP BY continente ORDER BY continente ASC
+      SELECT continente FROM e_cat_paises GROUP BY continente ORDER BY continente ASC
       `);
             if (CONTINENTE.rowCount > 0) {
                 return res.jsonp(CONTINENTE.rows);
@@ -50,7 +49,7 @@ class ProvinciaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_pais } = req.params;
             const UNA_PROVINCIA = yield database_1.default.query(`
-      SELECT * FROM cg_provincias WHERE id_pais = $1
+      SELECT * FROM e_provincias WHERE id_pais = $1
       `, [id_pais]);
             if (UNA_PROVINCIA.rowCount > 0) {
                 return res.jsonp(UNA_PROVINCIA.rows);
@@ -65,7 +64,7 @@ class ProvinciaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const PROVINCIA = yield database_1.default.query(`
       SELECT pro.id, pro.nombre, pro.id_pais, pa.nombre AS pais
-      FROM cg_provincias pro, cg_paises pa
+      FROM e_provincias pro, e_cat_paises pa
       WHERE pro.id_pais = pa.id;
       `);
             if (PROVINCIA.rowCount > 0) {
@@ -80,81 +79,25 @@ class ProvinciaControlador {
     EliminarProvincia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
                 const id = req.params.id;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const provincia = yield database_1.default.query('SELECT * FROM cg_provincias WHERE id = $1', [id]);
-                const [datosOriginales] = provincia.rows;
-                if (!datosOriginales) {
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'cg_provincias',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        observacion: `Error al eliminar el registro con id: ${id}.`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                }
                 yield database_1.default.query(`
-        DELETE FROM cg_provincias WHERE id = $1
+        DELETE FROM e_provincias WHERE id = $1
         `, [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'cg_provincias',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip: ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
+                res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: error });
+                return res.jsonp({ message: 'error' });
             }
         });
     }
     // METODO PARA REGISTRAR PROVINCIA
     CrearProvincia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { nombre, id_pais, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
-        INSERT INTO cg_provincias (nombre, id_pais) VALUES ($1, $2)
-        `, [nombre, id_pais]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'cg_provincias',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{"nombre": "${nombre}", "id_pais": "${id_pais}"}`,
-                    ip: ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                res.jsonp({ message: 'Registro guardado.' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                res.status(500).jsonp({ message: error });
-            }
+            const { nombre, id_pais } = req.body;
+            yield database_1.default.query(`
+      INSERT INTO e_provincias (nombre, id_pais) VALUES ($1, $2)
+      `, [nombre, id_pais]);
+            res.jsonp({ message: 'Registro guardado.' });
         });
     }
     // METODO PARA BUSCAR INFORMACION DE UN PAIS
@@ -162,7 +105,7 @@ class ProvinciaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const PAIS = yield database_1.default.query(`
-      SELECT * FROM cg_paises WHERE id = $1
+      SELECT * FROM e_cat_paises WHERE id = $1
       `, [id]);
             if (PAIS.rowCount > 0) {
                 return res.jsonp(PAIS.rows);
@@ -175,35 +118,41 @@ class ProvinciaControlador {
     ObtenerProvincia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const UNA_PROVINCIA = yield database_1.default.query('SELECT * FROM cg_provincias WHERE id = $1', [id]);
+            const UNA_PROVINCIA = yield database_1.default.query(`
+      SELECT * FROM e_provincias WHERE id = $1
+      `, [id]);
             if (UNA_PROVINCIA.rowCount > 0) {
                 return res.jsonp(UNA_PROVINCIA.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'La provincia no ha sido encontrada' });
+                return res.status(404).jsonp({ text: 'El registro no ha sido encontrada.' });
             }
         });
     }
     ObtenerIdProvincia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.params;
-            const UNA_PROVINCIA = yield database_1.default.query('SELECT * FROM cg_provincias WHERE nombre = $1', [nombre]);
+            const UNA_PROVINCIA = yield database_1.default.query(`
+      SELECT * FROM e_provincias WHERE nombre = $1
+      `, [nombre]);
             if (UNA_PROVINCIA.rowCount > 0) {
                 return res.jsonp(UNA_PROVINCIA.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'La provincia no ha sido encontrada' });
+                return res.status(404).jsonp({ text: 'El registro no ha sido encontrada.' });
             }
         });
     }
     ListarTodoPais(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const PAIS = yield database_1.default.query('SELECT *FROM cg_paises');
+            const PAIS = yield database_1.default.query(`
+      SELECT * FROM e_cat_paises
+      `);
             if (PAIS.rowCount > 0) {
                 return res.jsonp(PAIS.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }

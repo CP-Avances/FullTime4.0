@@ -6,11 +6,11 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
 
     let horarios = await pool.query(
         `
-        SELECT pg.fec_hora_horario::date AS fecha, pg.fec_hora_horario::time AS hora, pg.tipo_dia, pg.tipo_entr_salida,
-            pg.min_alimentacion
-        FROM plan_general AS pg
-        WHERE pg.fec_horario BETWEEN $1 AND $2 AND pg.codigo = $3 AND (tipo_dia = 'N' OR estado_origen = 'HFD' OR estado_origen = 'HL')
-        ORDER BY pg.fec_hora_horario ASC
+        SELECT pg.fecha_hora_horario::date AS fecha, pg.fecha_hora_horario::time AS hora, pg.tipo_dia, pg.tipo_accion,
+            pg.minutos_alimentacion
+        FROM eu_asistencia_general AS pg
+        WHERE pg.fecha_horario BETWEEN $1 AND $2 AND pg.codigo = $3 AND (tipo_dia = 'N' OR estado_origen = 'HFD' OR estado_origen = 'HL')
+        ORDER BY pg.fecha_hora_horario ASC
         `
         , [inicio, fin, codigo])
         .then(result => {
@@ -27,7 +27,7 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
         let tecla_funcion: string = '';
         let fecha: string = '';
 
-        switch (ele.tipo_entr_salida) {
+        switch (ele.tipo_accion) {
             case 'E':
                 //var hora_ = moment(ele.hora, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
                 //var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:00:00")).format("HH:mm:ss");
@@ -60,7 +60,7 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
                 auxiliar = hora_;
                 break;
             case 'F/A':
-                var comida = moment(formatearMinutos(ele.min_alimentacion), 'HH:mm:ss').format('HH:mm:ss');
+                var comida = moment(formatearMinutos(ele.minutos_alimentacion), 'HH:mm:ss').format('HH:mm:ss');
                 //var min = moment(comida, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
                 //var min = moment(comida, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
                 var min = moment(comida, "HH:mm:ss").add(moment.duration("00:00:00")).format("HH:mm:ss")
@@ -81,8 +81,8 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
         if (fecha) {
             await pool.query(
                 `
-                INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, 
-                    codigo, id_reloj, fec_hora_timbre_servidor)
+                INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, 
+                    codigo, id_reloj, fecha_hora_timbre_servidor)
                 values($1, $2, $3, $4, $5, $6, $7, $8, $9)         
                 `
                 , [fecha, accion, tecla_funcion, observacion, latitud, longitud, codigo, 3, fecha]
@@ -93,8 +93,8 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
 
     /*
         `
-            INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, 
-                codigo, id_reloj, fec_hora_timbre_servidor)
+            INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, 
+                codigo, id_reloj, fecha_hora_timbre_servidor)
             values($1, $2, $3, $4, $5, $6, $7, $8, $9)
             `
             , [fecha, accion, tecla_funcion, observacion, latitud, longitud, codigo, 3, fecha]
@@ -168,7 +168,7 @@ function fechaIterada(fechaIterada: Date, horario: any) {
 
 export const EliminarTimbres = async function (id_empleado: number) {
 
-    await pool.query('DELETE FROM timbres WHERE codigo = $1', [id_empleado])
+    await pool.query('DELETE FROM eu_timbres WHERE codigo = $1', [id_empleado])
         .then(result => {
             console.log(result.command);
         });
@@ -176,27 +176,27 @@ export const EliminarTimbres = async function (id_empleado: number) {
 }
 
 export const ModificarTimbresEntrada = async function () {
-    let arrayRespuesta = await pool.query('select id, CAST(fec_hora_timbre as VARCHAR) from timbres where accion like \'E\' order by fec_hora_timbre, codigo ASC')
+    let arrayRespuesta = await pool.query('select id, CAST(fecha_hora_timbre as VARCHAR) FROM eu_timbres WHERE accion like \'E\' ORDER BY fecha_hora_timbre, codigo ASC')
         .then(result => {
             console.log(result.rowCount);
 
             return result.rows.filter(obj => {
-                var minuto: number = obj.fec_hora_timbre.split(' ')[1].split(':')[1];
+                var minuto: number = obj.fecha_hora_timbre.split(' ')[1].split(':')[1];
                 return (minuto >= 0 && minuto <= 35)
             });
         });
     console.log(arrayRespuesta.length);
 
     arrayRespuesta.forEach(async (obj) => {
-        var hora: number = parseInt(obj.fec_hora_timbre.split(' ')[1].split(':')[0]) + 1;
-        var minuto: number = obj.fec_hora_timbre.split(' ')[1].split(':')[1];
-        var f = new Date(obj.fec_hora_timbre.split(' ')[0]);
+        var hora: number = parseInt(obj.fecha_hora_timbre.split(' ')[1].split(':')[0]) + 1;
+        var minuto: number = obj.fecha_hora_timbre.split(' ')[1].split(':')[1];
+        var f = new Date(obj.fecha_hora_timbre.split(' ')[0]);
 
         // console.log(f.toJSON());
         f.setUTCHours(hora);
         f.setUTCMinutes(minuto);
         // console.log('Fecha corregidad',f.toJSON());
 
-        await pool.query('UPDATE timbres SET fec_hora_timbre = $1 WHERE id = $2', [f.toJSON(), obj.id])
+        await pool.query('UPDATE eu_timbres SET fecha_hora_timbre = $1 WHERE id = $2', [f.toJSON(), obj.id])
     })
 }

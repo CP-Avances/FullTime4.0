@@ -64,20 +64,25 @@ export class AdministraComidaComponent implements OnInit {
     this.usuario = [];
     this.restU.BuscarDatosUser(this.datoEmpleado.idEmpleado).subscribe(datos => {
       this.usuario = datos;
-      this.formulario.patchValue({
-        comidaForm: this.usuario[0].admin_comida
-      })
-      if (this.usuario[0].admin_comida === true) {
-        this.selec1 = true;
+      if (this.usuario[0].administra_comida === true) {
+        this.comidaF.setValue('si');
       }
       else {
-        this.selec2 = true;
+        this.comidaF.setValue('no');
       }
     });
   }
 
   // METODO PARA REGISTRAR AUTORIZACION
   InsertarAutorizacion(form: any) {
+    let administra: boolean;
+    // VALIDAR SELECCION DEL USUARIO
+    if (form.comidaForm === 'si') {
+      administra = true;
+    }
+    else {
+      administra = false;
+    }
     let control = {
       admin_comida: form.comidaForm,
       id_empleado: this.datoEmpleado.idEmpleado,

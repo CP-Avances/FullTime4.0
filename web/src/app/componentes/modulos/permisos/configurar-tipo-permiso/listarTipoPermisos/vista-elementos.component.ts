@@ -112,8 +112,8 @@ export class VistaElementosComponent implements OnInit {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -126,6 +126,7 @@ export class VistaElementosComponent implements OnInit {
 
   // METODO DE BUSQUEDA DE TIPOS DE PERMISOS
   ObtenerTipoPermiso() {
+    this.tipoPermiso=[];
     this.rest.BuscarTipoPermiso().subscribe(datos => {
       this.tipoPermiso = datos;
     });
@@ -351,7 +352,7 @@ export class VistaElementosComponent implements OnInit {
   exportToXML() {
     var objeto;
     var arregloTipoPermisos: any = [];
-    this.tipoPermiso.forEach(obj => {
+    this.tipoPermiso.forEach((obj: any) => {
       var descuento = this.DescuentoSelect[obj.tipo_descuento - 1];
       var acceso = this.AccesoEmpleadoSelect[obj.acce_empleado - 1];
       var fecha = this.obtenerFecha(obj.fecha);

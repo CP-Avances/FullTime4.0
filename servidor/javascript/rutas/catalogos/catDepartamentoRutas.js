@@ -6,6 +6,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const catDepartamentoControlador_1 = __importDefault(require("../../controlador/catalogos/catDepartamentoControlador"));
 const verificarToken_1 = require("../../libs/verificarToken");
+const multer_1 = __importDefault(require("multer"));
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const storage = multer_1.default.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)());
+    },
+    filename: function (req, file, cb) {
+        // FECHA DEL SISTEMA
+        //var fecha = moment();
+        //var anio = fecha.format('YYYY');
+        //var mes = fecha.format('MM');
+        //var dia = fecha.format('DD');
+        let documento = file.originalname;
+        cb(null, documento);
+    }
+});
+const upload = (0, multer_1.default)({ storage: storage });
 class DepartamentoRutas {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -46,6 +63,8 @@ class DepartamentoRutas {
         this.router.get('/busqueda/:nombre', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ObtenerIdDepartamento);
         this.router.get('/busqueda-cargo/:id_cargo', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.BuscarDepartamentoPorCargo);
         this.router.get('/buscar/regimen-departamento/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ListarDepartamentosRegimen);
+        this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catDepartamentoControlador_1.default.RevisarDatos);
+        this.router.post('/cargar_plantilla/', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.CargarPlantilla);
     }
 }
 const DEPARTAMENTO_RUTAS = new DepartamentoRutas();

@@ -158,7 +158,7 @@ export class TiempoAutorizadoComponent implements OnInit {
         this.solInfo = [];
         this.solInfo = {
           hora_extra_mail: res.hora_extra_mail,
-          hora_extra_noti: res.hora_extra_noti,
+          hora_extra_noti: res.hora_extra_notificacion,
           empleado: res.id_empleado,
           id_dep: res.id_departamento,
           id_suc: res.id_sucursal,
@@ -209,7 +209,7 @@ export class TiempoAutorizadoComponent implements OnInit {
   // EDITAR ESTADO DE LA AUTORIZACION
   ActualizarEstadoAprobacion(estado: number, valor: any) {
     let aprobacion = {
-      id_documento: this.data.auto.id_documento + localStorage.getItem('empleado') as string + '_' + estado + ',',
+      id_documento: this.data.auto.id_autoriza_estado + localStorage.getItem('empleado') as string + '_' + estado + ',',
       estado: estado,
       user_name: this.user_name,
       ip: this.ip
@@ -303,7 +303,7 @@ export class TiempoAutorizadoComponent implements OnInit {
       this.autorizacion = res1;
       console.log('this.autorizacion: ',this.autorizacion);
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
-      var autorizaciones = this.autorizacion[0].id_documento.split(',');
+      var autorizaciones = this.autorizacion[0].id_autoriza_estado.split(',');
       autorizaciones.map((obj: string) => {
         this.lectura = this.lectura + 1;
         if (obj != '') {

@@ -531,8 +531,8 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -775,15 +775,15 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
                     this.formato_fecha,
                     this.validacionService.dia_abreviado);
 
-                  const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null
-                    ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+                  const inicioAlimentacion = obj3.inicioAlimentacion.fecha_hora_timbre != null
+                    ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
                     : 'FT';
-                  const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
-                    ? this.validacionService.FormatearHora(obj3.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+                  const finAlimentacion = obj3.finAlimentacion.fecha_hora_timbre != null
+                    ? this.validacionService.FormatearHora(obj3.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
                     : 'FT';
 
-                  const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
-                  const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre, obj3.finAlimentacion.fec_hora_timbre);
+                  const minAlimentacion = obj3.inicioAlimentacion.minutos_alimentacion;
+                  const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fecha_hora_timbre, obj3.finAlimentacion.fecha_hora_timbre);
                   const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
                   totalExcesoEmpleado += exceso;
                   totalExcesoRegimen += exceso;
@@ -1020,15 +1020,15 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
                       this.formato_fecha,
                       this.validacionService.dia_abreviado);
 
-                    const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null
-                      ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+                    const inicioAlimentacion = obj3.inicioAlimentacion.fecha_hora_timbre != null
+                      ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
                       : 'FT';
-                    const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
-                      ? this.validacionService.FormatearHora(obj3.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+                    const finAlimentacion = obj3.finAlimentacion.fecha_hora_timbre != null
+                      ? this.validacionService.FormatearHora(obj3.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
                       : 'FT';
 
-                    const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
-                    const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre, obj3.finAlimentacion.fec_hora_timbre);
+                    const minAlimentacion = obj3.inicioAlimentacion.minutos_alimentacion;
+                    const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fecha_hora_timbre, obj3.finAlimentacion.fecha_hora_timbre);
                     const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
                     totalExcesoEmpleado += exceso;
                     totalExcesoSucursal += exceso;
@@ -1184,20 +1184,20 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             n++;
-            const inicioAlimentacion = obj4.inicioAlimentacion.fec_hora_timbre != null
-              ? this.validacionService.FormatearHora(obj4.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+            const inicioAlimentacion = obj4.inicioAlimentacion.fecha_hora_timbre != null
+              ? this.validacionService.FormatearHora(obj4.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
               : 'FT';
-            const finAlimentacion = obj4.finAlimentacion.fec_hora_timbre != null
-              ? this.validacionService.FormatearHora(obj4.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+            const finAlimentacion = obj4.finAlimentacion.fecha_hora_timbre != null
+              ? this.validacionService.FormatearHora(obj4.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
               : 'FT';
-            const minAlimentacion = obj4.inicioAlimentacion.min_alimentacion;
-            const minutosTomados = this.CalcularDiferenciaFechas(obj4.inicioAlimentacion.fec_hora_timbre, obj4.finAlimentacion.fec_hora_timbre);
+            const minAlimentacion = obj4.inicioAlimentacion.minutos_alimentacion;
+            const minutosTomados = this.CalcularDiferenciaFechas(obj4.inicioAlimentacion.fecha_hora_timbre, obj4.finAlimentacion.fecha_hora_timbre);
             const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
             let ele = {
               'N°': n, 'Código': obj3.codigo, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula,
               'Sucursal': obj1.name_suc, 'Ciudad': obj1.ciudad, 'Régimen': obj3.regimen[0].name_regimen,
               'Departamento': obj2.name_dep, 'Cargo': obj3.cargo,
-              'Fecha': new Date(obj4.inicioAlimentacion.fec_hora_horario), 'Inicio Alimentación': inicioAlimentacion,
+              'Fecha': new Date(obj4.inicioAlimentacion.fecha_hora_horario), 'Inicio Alimentación': inicioAlimentacion,
               'Fin Alimentación': finAlimentacion, 'M. Alimentación': minAlimentacion, 'M. Tomados': minutosTomados !== null ? minutosTomados : minAlimentacion,
               'M. Exceso': exceso
             }
@@ -1216,21 +1216,21 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
           n++;
-          const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null
-            ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+          const inicioAlimentacion = obj3.inicioAlimentacion.fecha_hora_timbre != null
+            ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
             : 'FT';
-          const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
-            ? this.validacionService.FormatearHora(obj3.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+          const finAlimentacion = obj3.finAlimentacion.fecha_hora_timbre != null
+            ? this.validacionService.FormatearHora(obj3.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
             : 'FT';
-          const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
-          const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre, obj3.finAlimentacion.fec_hora_timbre);
+          const minAlimentacion = obj3.inicioAlimentacion.minutos_alimentacion;
+          const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fecha_hora_timbre, obj3.finAlimentacion.fecha_hora_timbre);
           const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
           let ele = {
             'N°': n, 'Código': obj2.codigo, 'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula,
             'Sucursal': obj2.sucursal, 'Ciudad': obj2.ciudad,
             'Régimen': this.bool.bool_cargo ? obj2.regimen : obj2.regimen[0].name_regimen,
             'Departamento': obj2.departamento, 'Cargo': obj2.cargo,
-            'Fecha': new Date(obj3.inicioAlimentacion.fec_hora_horario), 'Inicio Alimentación': inicioAlimentacion,
+            'Fecha': new Date(obj3.inicioAlimentacion.fecha_hora_horario), 'Inicio Alimentación': inicioAlimentacion,
             'Fin Alimentación': finAlimentacion, 'M. Alimentación': minAlimentacion, 'M. Tomados': minutosTomados !== null ? minutosTomados : minAlimentacion,
             'M. Exceso': exceso
           }
@@ -1257,15 +1257,15 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
               this.formato_fecha,
               this.validacionService.dia_abreviado);
 
-            const inicioAlimentacion = obj4.inicioAlimentacion.fec_hora_timbre != null
-              ? this.validacionService.FormatearHora(obj4.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+            const inicioAlimentacion = obj4.inicioAlimentacion.fecha_hora_timbre != null
+              ? this.validacionService.FormatearHora(obj4.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
               : 'FT';
-            const finAlimentacion = obj4.finAlimentacion.fec_hora_timbre != null
-              ? this.validacionService.FormatearHora(obj4.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+            const finAlimentacion = obj4.finAlimentacion.fecha_hora_timbre != null
+              ? this.validacionService.FormatearHora(obj4.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
               : 'FT';
 
-            const minAlimentacion = obj4.inicioAlimentacion.min_alimentacion;
-            const minutosTomados = this.CalcularDiferenciaFechas(obj4.inicioAlimentacion.fec_hora_timbre, obj4.finAlimentacion.fec_hora_timbre);
+            const minAlimentacion = obj4.inicioAlimentacion.minutos_alimentacion;
+            const minutosTomados = this.CalcularDiferenciaFechas(obj4.inicioAlimentacion.fecha_hora_timbre, obj4.finAlimentacion.fecha_hora_timbre);
             const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
             n = n + 1;
             const ele = {
@@ -1294,15 +1294,15 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
             this.formato_fecha,
             this.validacionService.dia_abreviado);
 
-          const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null
-            ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+          const inicioAlimentacion = obj3.inicioAlimentacion.fecha_hora_timbre != null
+            ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
             : 'FT';
-          const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
-            ? this.validacionService.FormatearHora(obj3.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+          const finAlimentacion = obj3.finAlimentacion.fecha_hora_timbre != null
+            ? this.validacionService.FormatearHora(obj3.finAlimentacion.fecha_hora_timbre.split(' ')[1], this.formato_hora)
             : 'FT';
 
-          const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
-          const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre, obj3.finAlimentacion.fec_hora_timbre);
+          const minAlimentacion = obj3.inicioAlimentacion.minutos_alimentacion;
+          const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fecha_hora_timbre, obj3.finAlimentacion.fecha_hora_timbre);
           const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
           n = n + 1;
           const ele = {
@@ -1357,7 +1357,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
-      this.sucursales.forEach(row => this.selectionSuc.select(row));
+      this.sucursales.forEach((row: any) => this.selectionSuc.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -1378,7 +1378,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   masterToggleReg() {
     this.isAllSelectedReg()
       ? this.selectionReg.clear()
-      : this.regimen.forEach((row) => this.selectionReg.select(row));
+      : this.regimen.forEach((row: any) => this.selectionReg.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
@@ -1400,7 +1400,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   masterToggleCar() {
     this.isAllSelectedCar() ?
       this.selectionCar.clear() :
-      this.cargos.forEach(row => this.selectionCar.select(row));
+      this.cargos.forEach((row: any) => this.selectionCar.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -1421,7 +1421,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
-      this.departamentos.forEach(row => this.selectionDep.select(row));
+      this.departamentos.forEach((row: any) => this.selectionDep.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -1442,7 +1442,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
-      this.empleados.forEach(row => this.selectionEmp.select(row));
+      this.empleados.forEach((row: any) => this.selectionEmp.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA

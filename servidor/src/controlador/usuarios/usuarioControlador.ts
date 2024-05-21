@@ -24,14 +24,14 @@ class UsuarioControlador {
 
       await pool.query(
         `
-        INSERT INTO usuarios (usuario, contrasena, estado, id_rol, id_empleado) 
-        VALUES ($1, $2, $3, $4, $5)
+        INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado) 
+          VALUES ($1, $2, $3, $4, $5)
         `
         , [usuario, contrasena, estado, id_rol, id_empleado]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'usuarios',
+        tabla: 'eu_usuarios',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
@@ -57,14 +57,14 @@ class UsuarioControlador {
     const { id_empleado } = req.params;
     const UN_USUARIO = await pool.query(
       `
-      SELECT * FROM usuarios WHERE id_empleado = $1
+      SELECT * FROM eu_usuarios WHERE id_empleado = $1
       `
       , [id_empleado]);
     if (UN_USUARIO.rowCount > 0) {
       return res.jsonp(UN_USUARIO.rows);
     }
     else {
-      res.status(404).jsonp({ text: 'No se ha encontrado el usuario' });
+      res.status(404).jsonp({ text: 'No se ha encontrado el usuario.' });
     }
   }
 
@@ -72,8 +72,9 @@ class UsuarioControlador {
     const { id_empleado } = req.params;
     const EMPLEADO = await pool.query(
       `
-      SELECT e.id, e.id_departamento, e.id_contrato, cg_departamentos.nombre FROM datos_actuales_empleado AS e 
-      INNER JOIN cg_departamentos ON e.id_departamento = cg_departamentos.id 
+      SELECT e.id, e.id_departamento, e.id_contrato, ed_departamentos.nombre 
+      FROM datos_actuales_empleado AS e 
+      INNER JOIN ed_departamentos ON e.id_departamento = ed_departamentos.id 
       WHERE id_contrato = $1
       `
       , [id_empleado]);
@@ -81,7 +82,7 @@ class UsuarioControlador {
       return res.jsonp(EMPLEADO.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'Registros no encontrados' });
+      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
     }
   }
 
@@ -116,7 +117,7 @@ class UsuarioControlador {
 
       await pool.query(
         `
-        UPDATE usuarios SET usuario = $1, contrasena = $2, id_rol = $3 WHERE id_empleado = $4
+        UPDATE eu_usuarios SET usuario = $1, contrasena = $2, id_rol = $3 WHERE id_empleado = $4
         `
         , [usuario, contrasena, id_rol, id_empleado]);
 
@@ -151,12 +152,12 @@ class UsuarioControlador {
       await pool.query('BEGIN');
   
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = consulta.rows;
   
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'usuarios',
+          tabla: 'eu_usuarios',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -172,7 +173,7 @@ class UsuarioControlador {
   
       await pool.query(
         `
-        UPDATE usuarios SET contrasena = $1 WHERE id_empleado = $2
+        UPDATE eu_usuarios SET contrasena = $1 WHERE id_empleado = $2
         `
         , [contrasena, id_empleado]);
   
@@ -207,12 +208,12 @@ class UsuarioControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'usuarios',
+          tabla: 'eu_usuarios',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -228,17 +229,17 @@ class UsuarioControlador {
 
       await pool.query(
         `
-        UPDATE usuarios SET admin_comida = $1 WHERE id_empleado = $2
+        UPDATE eu_usuarios SET administra_comida = $1 WHERE id_empleado = $2
         `
         , [admin_comida, id_empleado]);
       
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'usuarios',
+        tabla: 'eu_usuarios',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{admin_comida: ${admin_comida}}`,
+        datosNuevos: `{administra_comida: ${admin_comida}}`,
         ip,
         observacion: null
       });
@@ -266,12 +267,12 @@ class UsuarioControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'usuarios',
+          tabla: 'eu_usuarios',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -287,13 +288,13 @@ class UsuarioControlador {
 
       await pool.query(
         `
-        UPDATE usuarios SET frase = $1 WHERE id_empleado = $2
+        UPDATE eu_usuarios SET frase = $1 WHERE id_empleado = $2
         `
         , [frase, id_empleado]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'usuarios',
+        tabla: 'eu_usuarios',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -329,9 +330,10 @@ class UsuarioControlador {
     // CONSULTA DE BUSQUEDA DE SUCURSALES
     let sucursal_ = await pool.query(
       `
-        SELECT ig.id_suc, ig.name_suc FROM informacion_general AS ig
-        GROUP BY ig.id_suc, ig.name_suc
-        ORDER BY ig.name_suc ASC
+      SELECT ig.id_suc, ig.name_suc 
+      FROM informacion_general AS ig
+      GROUP BY ig.id_suc, ig.name_suc
+      ORDER BY ig.name_suc ASC
       `
     ).then((result: any) => { return result.rows });
 
@@ -341,11 +343,11 @@ class UsuarioControlador {
     let regimen_ = await Promise.all(sucursal_.map(async (reg: any) => {
       reg.regimenes = await pool.query(
         `
-          SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-          FROM informacion_general AS ig
-          WHERE ig.id_suc = $1
-          GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-          ORDER BY ig.name_suc ASC
+        SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
+        FROM informacion_general AS ig
+        WHERE ig.id_suc = $1
+        GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
+        ORDER BY ig.name_suc ASC
         `
         , [reg.id_suc]
       ).then((result: any) => { return result.rows });
@@ -363,11 +365,11 @@ class UsuarioControlador {
       reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
         dep.departamentos = await pool.query(
           `
-            SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-            FROM informacion_general AS ig
-            WHERE ig.id_regimen = $1 AND ig.id_suc = $2
-            GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-            ORDER BY ig.name_suc ASC
+          SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
+          FROM informacion_general AS ig
+          WHERE ig.id_regimen = $1 AND ig.id_suc = $2
+          GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
+          ORDER BY ig.name_suc ASC
           `
           , [dep.id_regimen, dep.id_suc]
         ).then((result: any) => { return result.rows });
@@ -392,13 +394,13 @@ class UsuarioControlador {
           //console.log('ver car ', car)
           car.cargos = await pool.query(
             `
-              SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
-                  ig.name_regimen
-              FROM informacion_general AS ig
-              WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
-              GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
-                  ig.name_regimen
-              ORDER BY ig.name_suc ASC
+            SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
+              ig.name_regimen
+            FROM informacion_general AS ig
+            WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
+            GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
+              ig.name_regimen
+            ORDER BY ig.name_suc ASC
             `
             , [car.id_depa, car.id_suc, car.id_regimen]
           ).then((result: any) => { return result.rows });
@@ -428,13 +430,13 @@ class UsuarioControlador {
           car.cargos = await Promise.all(car.cargos.map(async (empl: any) => {
             empl.empleado = await pool.query(
               `
-                SELECT ig.*, u.usuario, u.web_habilita, u.id AS userid
-                FROM informacion_general AS ig, usuarios AS u 
-                WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
-                  AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
-                  AND u.web_habilita = $6
-              `,
-              [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
+              SELECT ig.*, u.usuario, u.web_habilita, u.id AS userid
+              FROM informacion_general AS ig, eu_usuarios AS u 
+              WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
+                AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
+                AND u.web_habilita = $6
+              `
+              , [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
               .then((result: any) => { return result.rows });
             return empl;
           }));
@@ -491,11 +493,11 @@ class UsuarioControlador {
     let regimen_ = await Promise.all(sucursal_.map(async (reg: any) => {
       reg.regimenes = await pool.query(
         `
-          SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-          FROM informacion_general AS ig
-          WHERE ig.id_suc = $1
-          GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-          ORDER BY ig.name_suc ASC
+        SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
+        FROM informacion_general AS ig
+        WHERE ig.id_suc = $1
+        GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
+        ORDER BY ig.name_suc ASC
         `
         , [reg.id_suc]
       ).then((result: any) => { return result.rows });
@@ -513,11 +515,11 @@ class UsuarioControlador {
       reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
         dep.departamentos = await pool.query(
           `
-            SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-            FROM informacion_general AS ig
-            WHERE ig.id_regimen = $1 AND ig.id_suc = $2
-            GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-            ORDER BY ig.name_suc ASC
+          SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
+          FROM informacion_general AS ig
+          WHERE ig.id_regimen = $1 AND ig.id_suc = $2
+          GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
+          ORDER BY ig.name_suc ASC
           `
           , [dep.id_regimen, dep.id_suc]
         ).then((result: any) => { return result.rows });
@@ -578,13 +580,13 @@ class UsuarioControlador {
           car.cargos = await Promise.all(car.cargos.map(async (empl: any) => {
             empl.empleado = await pool.query(
               `
-                SELECT ig.*, u.usuario, u.web_habilita, u.id AS userid
-                FROM informacion_general AS ig, usuarios AS u 
-                WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
-                  AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
-                  AND u.web_habilita = $6
-              `,
-              [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
+              SELECT ig.*, u.usuario, u.web_habilita, u.id AS userid
+              FROM informacion_general AS ig, eu_usuarios AS u 
+              WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
+                AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
+                AND u.web_habilita = $6
+              `
+              , [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
               .then((result: any) => { return result.rows });
             return empl;
           }));
@@ -640,11 +642,11 @@ class UsuarioControlador {
     let regimen_ = await Promise.all(sucursal_.map(async (reg: any) => {
       reg.regimenes = await pool.query(
         `
-          SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-          FROM informacion_general AS ig
-          WHERE ig.id_suc = $1
-          GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-          ORDER BY ig.name_suc ASC
+        SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
+        FROM informacion_general AS ig
+        WHERE ig.id_suc = $1
+        GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
+        ORDER BY ig.name_suc ASC
         `
         , [reg.id_suc]
       ).then((result: any) => { return result.rows });
@@ -689,13 +691,13 @@ class UsuarioControlador {
           //console.log('ver car ', car)
           car.cargos = await pool.query(
             `
-              SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
-                  ig.name_regimen
-              FROM informacion_general AS ig
-              WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
-              GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
-                  ig.name_regimen
-              ORDER BY ig.name_suc ASC
+            SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
+              ig.name_regimen
+            FROM informacion_general AS ig
+            WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
+            GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
+              ig.name_regimen
+            ORDER BY ig.name_suc ASC
             `
             , [car.id_depa, car.id_suc, car.id_regimen]
           ).then((result: any) => { return result.rows });
@@ -725,11 +727,11 @@ class UsuarioControlador {
           car.cargos = await Promise.all(car.cargos.map(async (empl: any) => {
             empl.empleado = await pool.query(
               `
-                SELECT ig.*, u.usuario, u.web_habilita, u.id AS userid
-                FROM informacion_general AS ig, usuarios AS u 
-                WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
-                  AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
-                  AND u.web_habilita = $6
+              SELECT ig.*, u.usuario, u.web_habilita, u.id AS userid
+              FROM informacion_general AS ig, eu_usuarios AS u 
+              WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
+                AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
+                AND u.web_habilita = $6
               `,
               [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
               .then((result: any) => { return result.rows });
@@ -781,12 +783,12 @@ class UsuarioControlador {
           await pool.query('BEGIN');
 
           // CONSULTA DATOSORIGINALES
-          const consulta = await pool.query(`SELECT * FROM usuarios WHERE id = $1`, [o.userid]);
+          const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id = $1`, [o.userid]);
           const [datosOriginales] = consulta.rows;
 
           if (!datosOriginales) {
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-              tabla: 'usuarios',
+              tabla: 'eu_usuarios',
               usuario: user_name,
               accion: 'U',
               datosOriginales: '',
@@ -802,14 +804,14 @@ class UsuarioControlador {
 
           const [result] = await pool.query(
             `
-            UPDATE usuarios SET web_habilita = $1 WHERE id = $2 RETURNING id
+            UPDATE eu_usuarios SET web_habilita = $1 WHERE id = $2 RETURNING id
             `
             , [!o.web_habilita, o.userid])
             .then((result: any) => { return result.rows });
 
           // AUDITORIA
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'usuarios',
+            tabla: 'eu_usuarios',
             usuario: user_name,
             accion: 'U',
             datosOriginales: JSON.stringify(datosOriginales),
@@ -853,9 +855,9 @@ class UsuarioControlador {
     // CONSULTA DE BUSQUEDA DE SUCURSALES
     let sucursal_ = await pool.query(
       `
-        SELECT ig.id_suc, ig.name_suc FROM informacion_general AS ig
-        GROUP BY ig.id_suc, ig.name_suc
-        ORDER BY ig.name_suc ASC
+      SELECT ig.id_suc, ig.name_suc FROM informacion_general AS ig
+      GROUP BY ig.id_suc, ig.name_suc
+      ORDER BY ig.name_suc ASC
       `
     ).then((result: any) => { return result.rows });
 
@@ -865,11 +867,11 @@ class UsuarioControlador {
     let regimen_ = await Promise.all(sucursal_.map(async (reg: any) => {
       reg.regimenes = await pool.query(
         `
-          SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-          FROM informacion_general AS ig
-          WHERE ig.id_suc = $1
-          GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-          ORDER BY ig.name_suc ASC
+        SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
+        FROM informacion_general AS ig
+        WHERE ig.id_suc = $1
+        GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
+        ORDER BY ig.name_suc ASC
         `
         , [reg.id_suc]
       ).then((result: any) => { return result.rows });
@@ -887,11 +889,11 @@ class UsuarioControlador {
       reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
         dep.departamentos = await pool.query(
           `
-            SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-            FROM informacion_general AS ig
-            WHERE ig.id_regimen = $1 AND ig.id_suc = $2
-            GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-            ORDER BY ig.name_suc ASC
+          SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
+          FROM informacion_general AS ig
+          WHERE ig.id_regimen = $1 AND ig.id_suc = $2
+          GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
+          ORDER BY ig.name_suc ASC
           `
           , [dep.id_regimen, dep.id_suc]
         ).then((result: any) => { return result.rows });
@@ -916,13 +918,13 @@ class UsuarioControlador {
           //console.log('ver car ', car)
           car.cargos = await pool.query(
             `
-              SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
-                  ig.name_regimen
-              FROM informacion_general AS ig
-              WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
-              GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
-                  ig.name_regimen
-              ORDER BY ig.name_suc ASC
+            SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
+              ig.name_regimen
+            FROM informacion_general AS ig
+            WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
+            GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
+              ig.name_regimen
+            ORDER BY ig.name_suc ASC
             `
             , [car.id_depa, car.id_suc, car.id_regimen]
           ).then((result: any) => { return result.rows });
@@ -952,11 +954,11 @@ class UsuarioControlador {
           car.cargos = await Promise.all(car.cargos.map(async (empl: any) => {
             empl.empleado = await pool.query(
               `
-                SELECT ig.*, u.usuario, u.app_habilita, u.id AS userid
-                FROM informacion_general AS ig, usuarios AS u 
-                WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
-                  AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
-                  AND u.app_habilita = $6
+              SELECT ig.*, u.usuario, u.app_habilita, u.id AS userid
+              FROM informacion_general AS ig, eu_usuarios AS u 
+              WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
+                AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
+                AND u.app_habilita = $6
               `,
               [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
               .then((result: any) => { return result.rows });
@@ -1015,11 +1017,11 @@ class UsuarioControlador {
     let regimen_ = await Promise.all(sucursal_.map(async (reg: any) => {
       reg.regimenes = await pool.query(
         `
-          SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-          FROM informacion_general AS ig
-          WHERE ig.id_suc = $1
-          GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-          ORDER BY ig.name_suc ASC
+        SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
+        FROM informacion_general AS ig
+        WHERE ig.id_suc = $1
+        GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
+        ORDER BY ig.name_suc ASC
         `
         , [reg.id_suc]
       ).then((result: any) => { return result.rows });
@@ -1037,11 +1039,11 @@ class UsuarioControlador {
       reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
         dep.departamentos = await pool.query(
           `
-            SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-            FROM informacion_general AS ig
-            WHERE ig.id_regimen = $1 AND ig.id_suc = $2
-            GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-            ORDER BY ig.name_suc ASC
+          SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
+          FROM informacion_general AS ig
+          WHERE ig.id_regimen = $1 AND ig.id_suc = $2
+          GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
+          ORDER BY ig.name_suc ASC
           `
           , [dep.id_regimen, dep.id_suc]
         ).then((result: any) => { return result.rows });
@@ -1066,13 +1068,13 @@ class UsuarioControlador {
           //console.log('ver car ', car)
           car.cargos = await pool.query(
             `
-              SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
-                  ig.name_regimen
-              FROM informacion_general AS ig
-              WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
-              GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
-                  ig.name_regimen
-              ORDER BY ig.name_suc ASC
+            SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
+              ig.name_regimen
+            FROM informacion_general AS ig
+            WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
+            GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
+              ig.name_regimen
+            ORDER BY ig.name_suc ASC
             `
             , [car.id_depa, car.id_suc, car.id_regimen]
           ).then((result: any) => { return result.rows });
@@ -1103,12 +1105,12 @@ class UsuarioControlador {
             empl.empleado = await pool.query(
               `
               SELECT ig.*, u.usuario, u.app_habilita, u.id AS userid
-              FROM informacion_general AS ig, usuarios AS u 
+              FROM informacion_general AS ig, eu_usuarios AS u 
               WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
                 AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
                 AND u.app_habilita = $6
-            `,
-              [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
+              `
+              , [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
               .then((result: any) => { return result.rows });
             return empl;
           }));
@@ -1164,11 +1166,11 @@ class UsuarioControlador {
     let regimen_ = await Promise.all(sucursal_.map(async (reg: any) => {
       reg.regimenes = await pool.query(
         `
-          SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-          FROM informacion_general AS ig
-          WHERE ig.id_suc = $1
-          GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-          ORDER BY ig.name_suc ASC
+        SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
+        FROM informacion_general AS ig
+        WHERE ig.id_suc = $1
+        GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
+        ORDER BY ig.name_suc ASC
         `
         , [reg.id_suc]
       ).then((result: any) => { return result.rows });
@@ -1189,7 +1191,7 @@ class UsuarioControlador {
           "FROM informacion_general AS ig " +
           "WHERE ig.id_regimen = $1 AND ig.id_suc = $2 AND ig.id_depa IN (" + id_departamento + ")" +
           "GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen " +
-          "ORDER BY ig.name_suc ASC "
+          "ORDER BY ig.name_suc ASC"
           , [dep.id_regimen, dep.id_suc]
         ).then((result: any) => { return result.rows });
         return dep;
@@ -1213,13 +1215,13 @@ class UsuarioControlador {
           //console.log('ver car ', car)
           car.cargos = await pool.query(
             `
-              SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
-                  ig.name_regimen
-              FROM informacion_general AS ig
-              WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
-              GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
-                  ig.name_regimen
-              ORDER BY ig.name_suc ASC
+            SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
+              ig.name_regimen
+            FROM informacion_general AS ig
+            WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
+            GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
+              ig.name_regimen
+            ORDER BY ig.name_suc ASC
             `
             , [car.id_depa, car.id_suc, car.id_regimen]
           ).then((result: any) => { return result.rows });
@@ -1250,12 +1252,12 @@ class UsuarioControlador {
             empl.empleado = await pool.query(
               `
               SELECT ig.*, u.usuario, u.app_habilita, u.id AS userid
-              FROM informacion_general AS ig, usuarios AS u 
+              FROM informacion_general AS ig, eu_usuarios AS u 
               WHERE ig.id_cargo_= $1 AND ig.id_suc = $2 AND ig.estado = $3
                 AND ig.id_depa = $4 AND ig.id_regimen = $5 AND u.id_empleado = ig.id
                 AND u.app_habilita = $6
-            `,
-              [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
+              `
+              , [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen, habilitado])
               .then((result: any) => { return result.rows });
             return empl;
           }));
@@ -1304,12 +1306,12 @@ class UsuarioControlador {
           await pool.query('BEGIN');
 
           // CONSULTA DATOSORIGINALES
-          const consulta = await pool.query(`SELECT * FROM usuarios WHERE id = $1`, [o.userid]);
+          const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id = $1`, [o.userid]);
           const [datosOriginales] = consulta.rows;
 
           if (!datosOriginales) {
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-              tabla: 'usuarios',
+              tabla: 'eu_usuarios',
               usuario: user_name,
               accion: 'U',
               datosOriginales: '',
@@ -1325,14 +1327,14 @@ class UsuarioControlador {
 
           const [result] = await pool.query(
             `
-            UPDATE usuarios SET app_habilita = $1 WHERE id = $2 RETURNING id
+            UPDATE eu_usuarios SET app_habilita = $1 WHERE id = $2 RETURNING id
             `
             , [!o.app_habilita, o.userid])
             .then((result: any) => { return result.rows });
 
           // AUDITORIA
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'usuarios',
+            tabla: 'eu_usuarios',
             usuario: user_name,
             accion: 'U',
             datosOriginales: JSON.stringify(datosOriginales),
@@ -1369,7 +1371,8 @@ class UsuarioControlador {
       const DISPOSITIVOS = await pool.query(
         `
         SELECT e.codigo, (e.nombre || \' \' || e.apellido) AS nombre, e.cedula, d.id_dispositivo, d.modelo_dispositivo
-        FROM id_dispositivos AS d INNER JOIN empleados AS e ON d.id_empleado = e.codigo
+        FROM mrv_dispositivos AS d 
+        INNER JOIN eu_empleados AS e ON d.codigo_empleado = e.codigo
         ORDER BY nombre
         `
       ).then((result: any) => { return result.rows });
@@ -1400,12 +1403,12 @@ class UsuarioControlador {
           await pool.query('BEGIN');
 
           // CONSULTA DATOSORIGINALES
-          const consulta = await pool.query(`SELECT * FROM id_dispositivos WHERE id_dispositivo = $1`, [id_dispo]);
+          const consulta = await pool.query(`SELECT * FROM mrv_dispositivos WHERE id_dispositivo = $1`, [id_dispo]);
           const [datosOriginales] = consulta.rows;
 
           if (!datosOriginales) {
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-              tabla: 'id_dispositivos',
+              tabla: 'mrv_dispositivos',
               usuario: user_name,
               accion: 'D',
               datosOriginales: '',
@@ -1421,14 +1424,14 @@ class UsuarioControlador {
 
           const [result] = await pool.query(
             `
-            DELETE FROM id_dispositivos WHERE id_dispositivo = $1 RETURNING *
+            DELETE FROM mrv_dispositivos WHERE id_dispositivo = $1 RETURNING *
             `
             , [id_dispo])
             .then((result: any) => { return result.rows });
 
           // AUDITORIA
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'id_dispositivos',
+            tabla: 'mrv_dispositivos',
             usuario: user_name,
             accion: 'D',
             datosOriginales: JSON.stringify(datosOriginales),
@@ -1473,8 +1476,8 @@ class UsuarioControlador {
     const correoValido = await pool.query(
       `
       SELECT e.id, e.nombre, e.apellido, e.correo, u.usuario, u.contrasena 
-      FROM empleados AS e, usuarios AS u 
-      WHERE E.correo = $1 AND u.id_empleado = e.id
+      FROM eu_empleados AS e, eu_usuarios AS u 
+      WHERE e.correo = $1 AND u.id_empleado = e.id
       `
       , [correo]);
 
@@ -1493,36 +1496,38 @@ class UsuarioControlador {
         to: correoValido.rows[0].correo,
         from: email,
         subject: 'FULLTIME CAMBIO FRASE DE SEGURIDAD',
-        html: `
-                <body>
-                    <div style="text-align: center;">
-                        <img width="25%" height="25%" src="cid:cabeceraf"/>
-                    </div>
-                    <br>
-                    <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                        El presente correo es para informar que se ha enviado un link para cambiar su frase de seguridad. <br>  
-                    </p>
-                    <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
-                    <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                        <b>Empresa:</b> ${nombre} <br>   
-                        <b>Asunto:</b> CAMBIAR FRASE DE SEGURIDAD <br> 
-                        <b>Colaborador que envía:</b> ${correoValido.rows[0].nombre} ${correoValido.rows[0].apellido} <br>
-                        <b>Generado mediante:</b> Aplicación Web <br>
-                        <b>Fecha de envío:</b> ${fecha} <br> 
-                        <b>Hora de envío:</b> ${hora} <br><br> 
-                    </p>
-                    <h3 style="font-family: Arial; text-align: center;">CAMBIAR FRASE DE SEGURIDAD</h3>
-                        <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                            <b>Ingrese al siguiente link y registre una nueva frase de seguridad.</b> <br>   
-                            <a href="${url}/${token}">${url}/${token}</a>  
-                        </p>
-                        <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-                            <b>Gracias por la atención</b><br>
-                            <b>Saludos cordiales,</b> <br><br>
-                        </p>
-                        <img src="cid:pief" width="50%" height="50%"/>
-                </body>
-            `,
+        html:
+          `
+          <body>
+            <div style="text-align: center;">
+              <img width="25%" height="25%" src="cid:cabeceraf"/>
+            </div>
+            <br>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              El presente correo es para informar que se ha enviado un link para cambiar su frase de seguridad. <br>  
+            </p>
+            <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Empresa:</b> ${nombre} <br>   
+              <b>Asunto:</b> CAMBIAR FRASE DE SEGURIDAD <br> 
+              <b>Colaborador que envía:</b> ${correoValido.rows[0].nombre} ${correoValido.rows[0].apellido} <br>
+              <b>Generado mediante:</b> Aplicación Web <br>
+              <b>Fecha de envío:</b> ${fecha} <br> 
+              <b>Hora de envío:</b> ${hora} <br><br> 
+            </p>
+            <h3 style="font-family: Arial; text-align: center;">CAMBIAR FRASE DE SEGURIDAD</h3>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Ingrese al siguiente link y registre una nueva frase de seguridad.</b> <br>   
+              <a href="${url}/${token}">${url}/${token}</a>  
+            </p>
+            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Gracias por la atención</b><br>
+              <b>Saludos cordiales,</b> <br><br>
+            </p>
+            <img src="cid:pief" width="50%" height="50%"/>
+          </body>
+          `
+        ,
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
@@ -1567,12 +1572,12 @@ class UsuarioControlador {
       await pool.query('BEGIN');
 
       // CONSULTA DATOSORIGINALES
-      const consulta = await pool.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'usuarios',
+          tabla: 'eu_usuarios',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -1588,13 +1593,13 @@ class UsuarioControlador {
 
       await pool.query(
         `
-        UPDATE usuarios SET frase = $2 WHERE id_empleado = $1
+        UPDATE eu_usuarios SET frase = $2 WHERE id_empleado = $1
         `
         , [id_empleado, frase]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'usuarios',
+        tabla: 'eu_usuarios',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -1614,23 +1619,31 @@ class UsuarioControlador {
   }
 
   public async list(req: Request, res: Response) {
-    const USUARIOS = await pool.query('SELECT * FROM usuarios');
+    const USUARIOS = await pool.query(
+      `
+      SELECT * FROM eu_usuarios
+      `
+    );
     if (USUARIOS.rowCount > 0) {
       return res.jsonp(USUARIOS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
   public async getIdByUsuario(req: Request, res: Response): Promise<any> {
     const { usuario } = req.params;
-    const unUsuario = await pool.query('SELECT id FROM usuarios WHERE usuario = $1', [usuario]);
+    const unUsuario = await pool.query(
+      `
+      SELECT id FROM eu_usuarios WHERE usuario = $1
+      `
+      , [usuario]);
     if (unUsuario.rowCount > 0) {
       return res.jsonp(unUsuario.rows);
     }
     else {
-      res.status(404).jsonp({ text: 'No se ha encontrado el usuario' });
+      res.status(404).jsonp({ text: 'No se ha encontrado el usuario.' });
     }
   }
 
@@ -1643,7 +1656,7 @@ class UsuarioControlador {
     const { id_empleado } = req.body;
     const USUARIOS = await pool.query(
       `
-      SELECT * FROM usuario_sucursal WHERE id_empleado = $1
+      SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1
       `,
       [id_empleado]
     );
@@ -1665,14 +1678,14 @@ class UsuarioControlador {
 
       await pool.query(
         `
-        INSERT INTO usuario_sucursal (id_empleado, id_sucursal, principal) 
+        INSERT INTO eu_usuario_sucursal (id_empleado, id_sucursal, principal) 
         VALUES ($1, $2, $3)
         `
         , [id_empleado, id_sucursal, principal]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'usuario_sucursal',
+        tabla: 'eu_usuario_sucursal',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
@@ -1697,7 +1710,7 @@ class UsuarioControlador {
     const { id_empleado } = req.body;
     const USUARIOS = await pool.query(
       `
-      SELECT * FROM usuario_sucursal WHERE id_empleado = $1 AND principal = true;
+      SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1 AND principal = true;
       `,
       [id_empleado]
     );
@@ -1718,12 +1731,12 @@ class UsuarioControlador {
       await pool.query('BEGIN');
 
       // CONSULTA DATOSORIGINALES
-      const consulta = await pool.query(`SELECT * FROM usuario_sucursal WHERE id_empleado = $1 AND principal = true`, [id_empleado]);
+      const consulta = await pool.query(`SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1 AND principal = true`, [id_empleado]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'usuario_sucursal',
+          tabla: 'eu_usuario_sucursal',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -1739,13 +1752,13 @@ class UsuarioControlador {
 
       await pool.query(
         `
-        UPDATE usuario_sucursal SET id_sucursal = $1 WHERE id_empleado = $2 AND principal = true;
+        UPDATE eu_usuario_sucursal SET id_sucursal = $1 WHERE id_empleado = $2 AND principal = true;
         `
         , [id_sucursal, id_empleado]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'usuario_sucursal',
+        tabla: 'eu_usuario_sucursal',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -1776,12 +1789,12 @@ class UsuarioControlador {
       await pool.query('BEGIN');
 
       // CONSULTA DATOSORIGINALES
-      const consulta = await pool.query(`SELECT * FROM usuario_sucursal WHERE id = $1`, [id]);
+      const consulta = await pool.query(`SELECT * FROM eu_usuario_sucursal WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'usuario_sucursal',
+          tabla: 'eu_usuario_sucursal',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
@@ -1797,13 +1810,13 @@ class UsuarioControlador {
 
       await pool.query(
         `
-        DELETE FROM usuario_sucursal WHERE id = $1
+        DELETE FROM eu_usuario_sucursal WHERE id = $1
         `
         , [id]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'usuario_sucursal',
+        tabla: 'eu_usuario_sucursal',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -1821,39 +1834,6 @@ class UsuarioControlador {
       return res.status(500).jsonp({ message: 'error' });
     }
   }
-
-  //ACCESOS AL SISTEMA
-  public async AuditarAcceso(req: Request, res: Response) {
-    try {
-      const { modulo, user_name, fecha, hora, acceso, ip_address} = req.body;
-
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
-
-      await pool.query('INSERT INTO logged_user ( modulo, user_name, fecha, hora, acceso, ip_address ) ' +
-        'VALUES ($1, $2, $3, $4, $5, $6)', [modulo, user_name, fecha, hora, acceso, ip_address]);
-
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'logged_user',
-        usuario: user_name,
-        accion: 'I',
-        datosOriginales: '',
-        datosNuevos: `{"modulo": "${modulo}", "user_name": "${user_name}", "fecha": "${fecha}", "hora": "${hora}", "acceso": "${acceso}", "ip_address": "${ip_address}"}`,
-        ip: ip_address,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-      return res.jsonp({ message: 'Auditoria Realizada' });
-    } catch (error) {
-      // REVERTIR TRANSACCION
-      await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'error' });
-    }
-  }
-
 }
 
 export const USUARIO_CONTROLADOR = new UsuarioControlador();

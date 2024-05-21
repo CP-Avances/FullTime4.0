@@ -2,9 +2,9 @@ import { DescargarArchivo, listaCarpetas, ListarContratos, ListarDocumentos, Lis
 import { ObtenerRutaDocumento } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
+import fs from 'fs';
 import pool from '../../database';
 import path from 'path';
-import fs from 'fs';
 import moment from 'moment';
 export var carpeta: any;
 
@@ -88,7 +88,6 @@ class DocumentosControlador {
     // METODO PARA ELIMINAR REGISTROS DE DOCUMENTACION
     public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
         try {
-            // TODO ANALIZAR COMOOBTENER USER_NAME E IP DESDE EL FRONT
             const { user_name, ip } = req.body;
             let { id, documento } = req.params;
 
@@ -96,19 +95,19 @@ class DocumentosControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const doc = await pool.query('SELECT * FROM documentacion WHERE id = $1', [id]);
+            const doc = await pool.query('SELECT * FROM e_documentacion WHERE id = $1', [id]);
             const [datosOriginales] = doc.rows;
 
             if (!datosOriginales) {
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'documentacion',
+                    tabla: 'e_documentacion',
                     usuario: user_name,
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
                     ip,
-                    observacion: `Error al eliminar el documento con id ${id}`
+                    observacion: `Error al eliminar el documento con id ${id}. Registro no encontrado.`
                 });
 
                 // FINALIZAR TRANSACCION
@@ -118,13 +117,13 @@ class DocumentosControlador {
 
             await pool.query(
                 `
-                DELETE FROM documentacion WHERE id = $1
+                DELETE FROM e_documentacion WHERE id = $1
                 `
                 , [id]);
             
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'documentacion',
+                tabla: 'e_documentacion',
                 usuario: user_name,
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginales),
@@ -175,13 +174,13 @@ class DocumentosControlador {
             
             await pool.query(
                 `
-                INSERT INTO documentacion (documento) VALUES ($1)
+                INSERT INTO e_documentacion (documento) VALUES ($1)
                 `
                 , [documento]);
             
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'documentacion',
+                tabla: 'e_documentacion',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',

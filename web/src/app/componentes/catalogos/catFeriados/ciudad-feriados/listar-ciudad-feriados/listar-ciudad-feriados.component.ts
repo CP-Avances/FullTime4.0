@@ -102,8 +102,8 @@ export class ListarCiudadFeriadosComponent implements OnInit {
       this.datosFeriado = data;
       this.datosFeriado.forEach(data => {
         data.fecha_ = this.validar.FormatearFecha(data.fecha, formato_fecha, this.validar.dia_abreviado);
-        if (data.fec_recuperacion != null) {
-          data.fec_recuperacion_ = this.validar.FormatearFecha(data.fec_recuperacion, formato_fecha, this.validar.dia_abreviado);
+        if (data.fecha_recuperacion != null) {
+          data.fec_recuperacion_ = this.validar.FormatearFecha(data.fecha_recuperacion, formato_fecha, this.validar.dia_abreviado);
         }
       })
     })
@@ -222,6 +222,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
   CerrarPantalla() {
     this.componentef.ver_asignar = false;
     this.componentef.ver_ciudades = false;
+    this.componentef.BuscarParametro();
     this.componentef.ver_lista = true;
   }
 
@@ -252,7 +253,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selection.clear() :
-      this.datosCiudades.forEach(row => this.selection.select(row));
+      this.datosCiudades.forEach((row: any) => this.selection.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA

@@ -48,7 +48,7 @@ export class SearchComponent implements OnInit {
       // console.log('ya hay lista en la sesion iniciada');
       let empleados = JSON.parse(sessionStorage.getItem('lista-empleados') as string);
 
-      empleados.forEach(obj => {
+      empleados.forEach((obj: any) => {
         this.options.push(obj.empleado)
       });
       this.buscar_empl = empleados
@@ -57,7 +57,7 @@ export class SearchComponent implements OnInit {
       this.empleadoService.BuscarListaEmpleados().subscribe(res => {
         let ObjetoJSON = JSON.stringify(res)
         sessionStorage.setItem('lista-empleados', ObjetoJSON)
-        res.forEach(obj => {
+        res.forEach((obj: any) => {
           this.options.push(obj.empleado)
         });
         this.buscar_empl = res

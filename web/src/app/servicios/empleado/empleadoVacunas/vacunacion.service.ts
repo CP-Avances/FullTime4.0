@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -22,9 +23,14 @@ export class VacunacionService {
     return this.http.get(`${environment.url}/vacunas/lista/tipo_vacuna`);
   }
 
-  // SERVICIO REGISTROS DE VACUNACIÓN
+  // SERVICIO REGISTROS DE VACUNACION
   RegistrarVacunacion(data: any) {
     return this.http.post<any>(`${environment.url}/vacunas`, data);
+  }
+
+  // SERVICIO PARA BUSCAR VACUNA FECHA - TIPO
+  BuscarVacunaFechaTipo(data: any) {
+    return this.http.post<any>(`${environment.url}/vacunas/fecha_nombre/tipo_vacuna`, data);
   }
 
   // METODO PARA SUBIR UN DOCUMENTO
@@ -58,8 +64,12 @@ export class VacunacionService {
 
   // METODO DE REGISTROS DE TIPO DE VACUNACION
   CrearTipoVacuna(data: any) {
-    return this.http.post<any>(`${environment.url}/vacunas/tipo_vacuna`, data);
+    return this.http.post<any>(`${environment.url}/vacunas/tipo_vacuna`, data).pipe(catchError(data));
   }
 
+  // METODO DE REGISTROS DE TIPO DE VACUNACION
+  BuscarVacunaNombre(data: any) {
+    return this.http.post<any>(`${environment.url}/vacunas/tipo_vacuna/nombre`, data);
+  }
 
 }

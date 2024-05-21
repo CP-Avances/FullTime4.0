@@ -138,8 +138,8 @@ export class ColoresEmpresaComponent implements OnInit {
     this.empresas = [];
     this.rest.ConsultarDatosEmpresa(this.data.datos.id).subscribe(res => {
       this.empresas = res;
-      this.p_color = this.empresas[0].color_p;
-      this.s_color = this.empresas[0].color_s;
+      this.p_color = this.empresas[0].color_principal;
+      this.s_color = this.empresas[0].color_secundario;
       this.frase = this.empresas[0].marca_agua;
     });
   }

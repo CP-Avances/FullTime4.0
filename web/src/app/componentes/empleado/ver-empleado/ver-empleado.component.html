@@ -255,7 +255,7 @@
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
                                             <label id="datosF">Carnet Conadis:</label>
-                                            <label>{{d.carn_conadis}}</label>
+                                            <label>{{d.carnet_conadis}}</label>
                                         </div>
                                         <div class="espacio d-flex justify-content-start">
                                             <label id="datosF">Discapacidad:</label>
@@ -414,7 +414,7 @@
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
                                             <label id="datosF">Fecha hasta:</label>
-                                            <label *ngIf="ce.fec_salida === null; else fechaSalida">
+                                            <label *ngIf="ce.fecha_salida === null; else fechaSalida">
                                                 Sin fecha
                                             </label>
                                             <ng-template #fechaSalida>
@@ -435,7 +435,7 @@
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
                                             <label id="datosF">Control de asistencia:</label>
-                                            <label> {{ce.asis_controla === true ? 'Si' : 'No'}} </label>
+                                            <label> {{ce.controlar_asistencia === true ? 'Si' : 'No'}} </label>
                                         </div>
                                     </div>
                                 </div>
@@ -443,7 +443,7 @@
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
                                             <label id="datosF">Control de vacaciones:</label>
-                                            <label> {{ce.vaca_controla === true ? 'Si' : 'No'}} </label>
+                                            <label> {{ce.controlar_vacacion === true ? 'Si' : 'No'}} </label>
                                         </div>
                                     </div>
                                 </div>
@@ -528,8 +528,8 @@
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
                                             <label id="datosF">Fecha hasta:</label>
-                                            <label *ngIf="ce.fec_salida === null">Sin fecha</label>
-                                            <label *ngIf="ce.fec_salida != null">{{ce.fec_salida_}}</label>
+                                            <label *ngIf="ce.fecha_salida === null">Sin fecha</label>
+                                            <label *ngIf="ce.fecha_salida != null">{{ce.fec_salida_}}</label>
                                         </div>
                                     </div>
                                 </div>
@@ -537,8 +537,8 @@
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
                                             <label id="datosF">Control de asistencia:</label>
-                                            <label *ngIf="ce.asis_controla == true">Si</label>
-                                            <label *ngIf="ce.asis_controla == false">No</label>
+                                            <label *ngIf="ce.controlar_asistencia == true">Si</label>
+                                            <label *ngIf="ce.controlar_asistencia == false">No</label>
                                         </div>
                                     </div>
                                 </div>
@@ -546,8 +546,8 @@
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
                                             <label id="datosF">Control de vacaciones:</label>
-                                            <label *ngIf="ce.vaca_controla == true">Si</label>
-                                            <label *ngIf="ce.vaca_controla == false">No</label>
+                                            <label *ngIf="ce.controlar_vacacion == true">Si</label>
+                                            <label *ngIf="ce.controlar_vacacion == false">No</label>
                                         </div>
                                     </div>
                                 </div>
@@ -1698,7 +1698,7 @@
                                     </div>
                                     <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Minutos de Vacaciones:</label>
-                                        <label>{{p.min_vacaciones}}</label>
+                                        <label>{{p.minutos_vacaciones}}</label>
                                     </div>
                                 </div>
                             </div>
@@ -2232,9 +2232,9 @@
                             <div class="d-flex flex-wrap justify-content-between" style="margin-bottom: 10px;">
                                 <div class="d-flex justify-content-start">
                                     <label id="datosF">Administra módulo de alimentación:</label>
-                                    <label *ngIf="ac.admin_comida == true">Sí</label>
-                                    <label *ngIf="ac.admin_comida == false">No</label>
-                                    <label *ngIf="ac.admin_comida == null">No</label>
+                                    <label *ngIf="ac.administra_comida == true">Sí</label>
+                                    <label *ngIf="ac.administra_comida == false">No</label>
+                                    <label *ngIf="ac.administra_comida == null">No</label>
                                 </div>
                             </div>
                             <mat-divider></mat-divider>

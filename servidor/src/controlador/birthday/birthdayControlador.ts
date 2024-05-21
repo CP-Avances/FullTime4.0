@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
 import { ObtenerRutaBirthday } from '../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
+import { Request, Response } from 'express';
+import moment from 'moment';
 import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
-import moment from 'moment';
 
 class BirthdayControlador {
 
@@ -13,7 +13,7 @@ class BirthdayControlador {
         const { id_empresa } = req.params;
         const DAY = await pool.query(
             `
-            SELECT * FROM Message_birthday WHERE id_empresa = $1
+            SELECT * FROM e_message_birthday WHERE id_empresa = $1
             `
             , [id_empresa]);
         if (DAY.rowCount > 0) {
@@ -34,13 +34,13 @@ class BirthdayControlador {
 
             await pool.query(
                 `
-                INSERT INTO message_birthday (id_empresa, titulo, mensaje, url) VALUES ($1, $2, $3, $4)
+                INSERT INTO e_message_birthday (id_empresa, titulo, mensaje, url) VALUES ($1, $2, $3, $4)
                 `
                 , [id_empresa, titulo, mensaje, link]);
             
             // AUDITORIA
             AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'message_birthday',
+                tabla: 'e_message_birthday',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
@@ -54,7 +54,7 @@ class BirthdayControlador {
 
             const oneMessage = await pool.query(
                 `
-                SELECT id FROM message_birthday WHERE id_empresa = $1
+                SELECT id FROM e_message_birthday WHERE id_empresa = $1
                 `
                 , [id_empresa]);
             const idMessageGuardado = oneMessage.rows[0].id;
@@ -83,7 +83,7 @@ class BirthdayControlador {
     
             const unEmpleado = await pool.query(
                 `
-                SELECT * FROM message_birthday WHERE id = $1
+                SELECT * FROM e_message_birthday WHERE id = $1
                 `
                 , [id]);  
             if (unEmpleado.rowCount > 0) {
@@ -107,13 +107,13 @@ class BirthdayControlador {
 
                         await pool.query(
                             `
-                            UPDATE message_birthday SET img = $2 WHERE id = $1
+                            UPDATE e_message_birthday SET img = $2 WHERE id = $1
                             `
                             , [id, imagen]);
                         
                         // AUDITORIA
                         AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                            tabla: 'message_birthday',
+                            tabla: 'e_message_birthday',
                             usuario: user_name,
                             accion: 'U',
                             datosOriginales: JSON.stringify(obj),
@@ -121,6 +121,9 @@ class BirthdayControlador {
                             ip,
                             observacion: null
                         });
+
+                        // FINALIZAR TRANSACCION
+                        await pool.query('COMMIT');
                     } catch (error) {
                         // REVERTIR TRANSACCION
                         await pool.query('ROLLBACK');
@@ -132,7 +135,7 @@ class BirthdayControlador {
             }
 
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'message_birthday',
+                tabla: 'e_message_birthday',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: '',
@@ -149,6 +152,7 @@ class BirthdayControlador {
         }    
         
     }
+
 
     // METODO PARA VER IMAGENES
     public async getImagen(req: Request, res: Response): Promise<any> {
@@ -172,13 +176,13 @@ class BirthdayControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
     
-            const response = await pool.query(`SELECT * FROM message_birthday WHERE id = $1`
+            const response = await pool.query(`SELECT * FROM e_message_birthday WHERE id = $1`
                 , [id_mensaje]);
             const [datos] = response.rows;
     
             if (!datos) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'message_birthday',
+                    tabla: 'e_message_birthday',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
@@ -193,13 +197,13 @@ class BirthdayControlador {
     
             await pool.query(
                 `
-                UPDATE message_birthday SET titulo = $1, mensaje = $2, url = $3 WHERE id = $4
+                UPDATE e_message_birthday SET titulo = $1, mensaje = $2, url = $3 WHERE id = $4
                 `
                 , [titulo, mensaje, link, id_mensaje]);
             
             // AUDITORIA
             AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'message_birthday',
+                tabla: 'e_message_birthday',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datos),

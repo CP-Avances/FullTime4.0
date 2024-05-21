@@ -72,22 +72,7 @@
                             </div>
                             <div class="espacio d-flex justify-content-start" *ngIf="regimen.acumular === true">
                                 <label id="datosF">Días máximos acumulación:</label>
-                                <label>{{regimen.dias_max_acumulacion}} días</label>
-                            </div>
-                        </div>
-
-                        <div class="col-md" id="verticalLine">
-                            <div class="espacio d-flex justify-content-start"
-                                *ngIf="regimen.contar_feriados === true || regimen.contar_dias_libres === true || regimen.contar_licencias === true || regimen.contar_faltas === true || regimen.contar_permiso === true">
-                                <label id="datosF">Solicitudes de vacaciones contabiliza:</label>
-                            </div>
-                            <div class="espacio d-flex justify-content-start" style="position: relative; left: 40px;"
-                                *ngIf="regimen.contar_feriados === true">
-                                <mat-checkbox matSuffix matTooltipPosition="right" disabled
-                                    [checked]="regimen.contar_feriados"
-                                    matTooltip="Dentro de la solicitud de vacaciones se contabilizará feriados.">
-                                    <span id="color_fuente">Feriados</span>
-                                </mat-checkbox>
+                                <label>{{regimen.dias_maximo_acumulacion}} días</label>
                             </div>
                         </div>
                     </div>

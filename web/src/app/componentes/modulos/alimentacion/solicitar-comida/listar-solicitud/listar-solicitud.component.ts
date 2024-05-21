@@ -198,7 +198,7 @@ export class ListarSolicitudComponent implements OnInit {
       this.solicitudes = res;
 
       // FILTRA LA LISTA DE HORAS EXTRAS AUTORIZADAS PARA DESCARTAR LAS SOLICITUDES DEL MISMO USUARIO Y ALMACENA EN UNA NUEVA LISTA
-      this.lista_solicitudes_filtradas = this.solicitudes.filter(o => {
+      this.lista_solicitudes_filtradas = this.solicitudes.filter((o: any) => {
         if(this.idEmpleado !== o.id_empleado){
           return this.lista_solicitudes_filtradas.push(o);
         }
@@ -229,7 +229,7 @@ export class ListarSolicitudComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
-      this.lista_solicitudes_filtradas.forEach(row => this.selectionUno.select(row));
+      this.lista_solicitudes_filtradas.forEach((row: any) => this.selectionUno.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
@@ -312,7 +312,7 @@ export class ListarSolicitudComponent implements OnInit {
       this.solicitudesAutorizados = res;
 
       // FILTRA LA LISTA DE HORAS EXTRAS AUTORIZADAS PARA DESCARTAR LAS SOLICITUDES DEL MISMO USUARIO Y ALMACENA EN UNA NUEVA LISTA
-      this.solicitudesAutorizadas_filtradas = this.solicitudesAutorizados.filter(o => {
+      this.solicitudesAutorizadas_filtradas = this.solicitudesAutorizados.filter((o: any) => {
         if(this.idEmpleado !== o.id_empleado){
           return this.solicitudesAutorizadas_filtradas.push(o);
         }
@@ -355,7 +355,7 @@ export class ListarSolicitudComponent implements OnInit {
   masterToggleEstado() {
     this.isAllSelectedEstado() ?
       this.selectionUnoEstado.clear() :
-      this.solicitudesAutorizadas_filtradas.forEach(row => this.selectionUnoEstado.select(row));
+      this.solicitudesAutorizadas_filtradas.forEach((row: any) => this.selectionUnoEstado.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA..
@@ -416,7 +416,7 @@ export class ListarSolicitudComponent implements OnInit {
       this.solicitudesExpiradas = res;
 
        //Filtra la lista de Horas Extras Autorizadas para descartar las solicitudes del mismo usuario y almacena en una nueva lista
-       this.solicitudesExpiradas_filtradas = this.solicitudesExpiradas.filter(o => {
+       this.solicitudesExpiradas_filtradas = this.solicitudesExpiradas.filter((o: any) => {
         if(this.idEmpleado !== o.id_empleado){
           return this.solicitudesExpiradas_filtradas.push(o);
         }
@@ -671,7 +671,7 @@ export class ListarSolicitudComponent implements OnInit {
     var arregloSolicitudes: any = [];
     (opcion == "Servicios de alimentación solicitados"?this.lista_solicitudes_filtradas:(
       opcion=="Servicios de alimentación aprobados"?this.solicitudesAutorizadas_filtradas:this.solicitudesExpiradas_filtradas
-      )).forEach(obj => {
+      )).forEach((obj: any) => {
       objeto = {
         "lista_servicios_alimentacion": {
         '@id': obj.id,

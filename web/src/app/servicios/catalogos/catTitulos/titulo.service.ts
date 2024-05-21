@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment'
+import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,11 @@ export class TituloService {
   // METODO PARA LISTAR TITULOS
   ListarTitulos() {
     return this.http.get(`${environment.url}/titulo/`);
+  }
+
+  // METODO PARA CREAR ARCHIVO XML
+  BuscarTituloNombre(data: any) {
+    return this.http.post(`${environment.url}/titulo/titulo-nombre`, data);
   }
 
   // METODO PARA ELIMINAR REGISTRO

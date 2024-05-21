@@ -7,15 +7,10 @@ class ParametrosControlador {
 
     // METODO PARA LISTAR PARAMETROS GENERALES
     public async ListarParametros(req: Request, res: Response) {
-        /**
-          SELECT tp.id, tp.descripcion, dtp.descripcion AS detalle
-            FROM tipo_parametro AS tp, detalle_tipo_parametro AS dtp
-            WHERE tp.id = dtp.id_tipo_parametro
-         */
         const PARAMETRO = await pool.query(
             `
             SELECT tp.id, tp.descripcion
-            FROM tipo_parametro AS tp
+            FROM ep_parametro AS tp
             `
         );
         if (PARAMETRO.rowCount > 0) {
@@ -23,67 +18,6 @@ class ParametrosControlador {
         }
         else {
             res.status(404).jsonp({ text: 'Registros no encontrados.' });
-        }
-    }
-
-    // METODO PARA ELIMINAR TIPO PARAMETRO GENERAL
-    public async EliminarTipoParametro(req: Request, res: Response): Promise<Response> {
-        try {
-            const { user_name, ip } = req.body;
-            const id = req.params.id;
-
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-
-            // OBTENER DATOSORIGINALES
-            const consulta = await pool.query(
-                `
-                SELECT * FROM tipo_parametro WHERE id = $1
-                `
-                , [id]);
-            const [datosOriginales] = consulta.rows;
-
-            if (!datosOriginales) {
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'tipo_parametro',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: '',
-                    datosNuevos: '',
-                    ip,
-                    observacion: `Error al eliminar tipo parametro con id ${id}`
-                });
-
-                //FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-            }
-
-            await pool.query(
-                `
-                DELETE FROM tipo_parametro WHERE id = $1
-                `
-                , [id]);
-
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'tipo_parametro',
-                usuario: user_name,
-                accion: 'D',
-                datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: '',
-                ip,
-                observacion: null
-            });
-
-            //FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-            return res.jsonp({ message: 'Registro eliminado.' });
-        }
-        catch {
-            // REVERTIR TRANSACCION
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'false' });
         }
     }
 
@@ -96,12 +30,12 @@ class ParametrosControlador {
             await pool.query('BEGIN');
 
             // OBTENER DATOSORIGINALES
-            const consulta = await pool.query(`SELECT descripcion FROM tipo_parametro WHERE id = $1`, [id]);
+            const consulta = await pool.query(`SELECT descripcion FROM ep_parametro WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
 
             if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'tipo_parametro',
+                    tabla: 'ep_parametro',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
@@ -117,13 +51,13 @@ class ParametrosControlador {
 
             await pool.query(
                 `
-                UPDATE tipo_parametro SET descripcion = $1 WHERE id = $2
+                UPDATE ep_parametro SET descripcion = $1 WHERE id = $2
                 `
                 , [descripcion, id]);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'tipo_parametro',
+                tabla: 'ep_parametro',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
@@ -147,7 +81,7 @@ class ParametrosControlador {
         const { id } = req.params;
         const PARAMETRO = await pool.query(
             `
-            SELECT * FROM tipo_parametro WHERE id = $1
+            SELECT * FROM ep_parametro WHERE id = $1
             `
             , [id]);
         if (PARAMETRO.rowCount > 0) {
@@ -164,8 +98,8 @@ class ParametrosControlador {
         const PARAMETRO = await pool.query(
             `
             SELECT tp.id AS id_tipo, tp.descripcion AS tipo, dtp.id AS id_detalle, dtp.descripcion
-            FROM tipo_parametro AS tp, detalle_tipo_parametro AS dtp
-            WHERE tp.id = dtp.id_tipo_parametro AND tp.id = $1
+            FROM ep_parametro AS tp, ep_detalle_parametro AS dtp
+            WHERE tp.id = dtp.id_parametro AND tp.id = $1
             `
             , [id]);
         if (PARAMETRO.rowCount > 0) {
@@ -186,12 +120,12 @@ class ParametrosControlador {
             await pool.query('BEGIN');
 
             // OBTENER DATOSORIGINALES
-            const consulta = await pool.query(`SELECT * FROM detalle_tipo_parametro WHERE id = $1`, [id]);
+            const consulta = await pool.query(`SELECT * FROM ep_detalle_parametro WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
 
             if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'detalle_tipo_parametro',
+                    tabla: 'ep_detalle_parametro',
                     usuario: user_name,
                     accion: 'D',
                     datosOriginales: '',
@@ -207,13 +141,13 @@ class ParametrosControlador {
 
             await pool.query(
                 `
-                DELETE FROM detalle_tipo_parametro WHERE id = $1
+                DELETE FROM ep_detalle_parametro WHERE id = $1
                 `
                 , [id]);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'detalle_tipo_parametro',
+                tabla: 'ep_detalle_parametro',
                 usuario: user_name,
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginales),
@@ -243,14 +177,14 @@ class ParametrosControlador {
 
             await pool.query(
                 `
-                INSERT INTO detalle_tipo_parametro
-                (id_tipo_parametro, descripcion) VALUES ($1, $2)
+                INSERT INTO ep_detalle_parametro
+                (id_parametro, descripcion) VALUES ($1, $2)
                 `
                 , [id_tipo, descripcion]);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'detalle_tipo_parametro',
+                tabla: 'ep_detalle_parametro',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
@@ -283,7 +217,7 @@ class ParametrosControlador {
 
             if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'detalle_tipo_parametro',
+                    tabla: 'ep_detalle_parametro',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
@@ -299,13 +233,13 @@ class ParametrosControlador {
 
             await pool.query(
                 `
-                UPDATE detalle_tipo_parametro SET descripcion = $1 WHERE id = $2
+                UPDATE ep_detalle_parametro SET descripcion = $1 WHERE id = $2
                 `
                 , [descripcion, id]);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'detalle_tipo_parametro',
+                tabla: 'ep_detalle_parametro',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
@@ -324,48 +258,6 @@ class ParametrosControlador {
         }
     }
 
-    // METODO PARA INGRESAR TIPO PARAMETRO GENERAL
-    public async IngresarTipoParametro(req: Request, res: Response): Promise<any> {
-        try {
-            const { descripcion, user_name, ip } = req.body;
-
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-
-            const response: QueryResult = await pool.query(
-                `
-                INSERT INTO tipo_parametro (descripcion) VALUES ($1) RETURNING *
-                `
-                , [descripcion]);
-    
-            const [parametro] = response.rows;
-    
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'tipo_parametro',
-                usuario: user_name,
-                accion: 'I',
-                datosOriginales: '',
-                datosNuevos: JSON.stringify(parametro),
-                ip,
-                observacion: null
-            });
-
-            //FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-
-            if (parametro) {
-                return res.status(200).jsonp({ message: 'OK', respuesta: parametro })
-            }
-            else {
-                return res.status(404).jsonp({ message: 'error' })
-            }
-        } catch (error) {
-            // REVERTIR TRANSACCION
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'error' });
-        }
-    }
 
     // METODO PARA COMPARAR COORDENADAS
     public async CompararCoordenadas(req: Request, res: Response): Promise<Response> {

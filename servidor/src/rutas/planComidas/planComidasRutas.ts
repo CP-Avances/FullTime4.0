@@ -17,9 +17,6 @@ class DepartamentoRutas {
         this.router.get('/infoComida/estado/negado', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EncontrarSolicitaComidaNull);
         this.router.get('/infoComida/estado/expirada', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EncontrarSolicitaComidaExpirada);
 
-        /** CONOCER JEFES DE UN DEPARTAMENTO */
-        this.router.get('/enviar/notificacion/:id_departamento', TokenValidation, PLAN_COMIDAS_CONTROLADOR.BuscarJefes);
-
         /** PLANIFICACIÓN DE ALIMENTACIÓN */
         this.router.get('/', TokenValidation, PLAN_COMIDAS_CONTROLADOR.ListarPlanComidas);
         this.router.post('/', TokenValidation, PLAN_COMIDAS_CONTROLADOR.CrearPlanComidas);

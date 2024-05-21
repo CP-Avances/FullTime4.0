@@ -174,7 +174,7 @@ export class DetalleCatHorarioComponent implements OnInit {
 
     console.log('ver datos de horario ', detalle)
     this.ValidarMinEspera(form, detalle);
-    if (this.datosHorario[0].min_almuerzo === 0) {
+    if (this.datosHorario[0].minutos_comida === 0) {
       this.ValidarDetallesSinAlimentacion(detalle);
     }
     else {

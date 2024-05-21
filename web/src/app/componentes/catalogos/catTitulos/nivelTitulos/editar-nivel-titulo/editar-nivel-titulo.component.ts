@@ -4,6 +4,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
 import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-nivel-titulo',
@@ -27,6 +28,7 @@ export class EditarNivelTituloComponent implements OnInit {
     private nivel: NivelTitulosService,
     private toastr: ToastrService,
     public ventana: MatDialogRef<EditarNivelTituloComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) { }
 
@@ -45,12 +47,31 @@ export class EditarNivelTituloComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     };
+    // VERIFICAR SI EL NOMBRE DEL NIVEL ES DIFERENTE DEL REGISTRO
+    if ((this.data.nombre).toUpperCase() === (nivel.nombre).toUpperCase()) {
+      this.GuardarDatos(nivel);
+    }
+    else {
+      // VERIIFCAR DUPLICIDAD
+      let nombre_nivel = (nivel.nombre).toUpperCase();
+      this.nivel.BuscarNivelNombre(nombre_nivel).subscribe(response => {
+        this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+          timeOut: 3000,
+        });
+      }, vacio => {
+        // GUARDAR DATOS EN EL SISTEMA
+        this.GuardarDatos(nivel);
+      });
+    }
+  }
+
+  // METODO PARA ALMACENAR LOS DATOS EN EL SISTEMA
+  GuardarDatos(nivel: any) {
     this.nivel.ActualizarNivelTitulo(nivel).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });
       this.CerrarVentana();
-    }, error => {
     });
   }
 
@@ -68,25 +89,7 @@ export class EditarNivelTituloComponent implements OnInit {
 
   // METODO PARA VALIDAR INGRESO DE LETRAS
   IngresarSoloLetras(e: any) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACIÓN DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+    return this.validar.IngresarSoloLetras(e);
   }
 
   // METODO PARA CERRAR VENTANA DE REGISTRO

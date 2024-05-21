@@ -1,13 +1,13 @@
+import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 
-import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 
 import pool from '../../database';
 import excel from 'xlsx';
-import fs from 'fs';
 import path from 'path';
+import fs from 'fs';
 
 class NivelTituloControlador {
 
@@ -15,7 +15,7 @@ class NivelTituloControlador {
   public async ListarNivel(req: Request, res: Response) {
     const titulo = await pool.query(
       `
-      SELECT * FROM nivel_titulo ORDER BY nombre ASC
+      SELECT * FROM et_cat_nivel_titulo ORDER BY nombre ASC
       `
     );
     if (titulo.rowCount > 0) {
@@ -36,12 +36,12 @@ class NivelTituloControlador {
       await pool.query('BEGIN');
 
       // OBTENER DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM nivel_titulo WHERE id = $1', [id]);
+      const consulta = await pool.query('SELECT * FROM et_cat_nivel_titulo WHERE id = $1', [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'nivel_titulo',
+          tabla: 'et_cat_nivel_titulo',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
@@ -56,13 +56,13 @@ class NivelTituloControlador {
       }
       await pool.query(
         `
-        DELETE FROM nivel_titulo WHERE id = $1
+        DELETE FROM et_cat_nivel_titulo WHERE id = $1
         `
         , [id]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'nivel_titulo',
+        tabla: 'et_cat_nivel_titulo',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -91,7 +91,7 @@ class NivelTituloControlador {
 
       const response: QueryResult = await pool.query(
         `
-        INSERT INTO nivel_titulo (nombre) VALUES ($1) RETURNING *
+        INSERT INTO et_cat_nivel_titulo (nombre) VALUES ($1) RETURNING *
         `
         , [nombre]);
 
@@ -99,7 +99,7 @@ class NivelTituloControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'nivel_titulo',
+        tabla: 'et_cat_nivel_titulo',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
@@ -134,12 +134,12 @@ class NivelTituloControlador {
       await pool.query('BEGIN');
 
       // OBTENER DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM nivel_titulo WHERE id = $1', [id]);
+      const consulta = await pool.query('SELECT * FROM et_cat_nivel_titulo WHERE id = $1', [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'nivel_titulo',
+          tabla: 'et_cat_nivel_titulo',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -155,13 +155,13 @@ class NivelTituloControlador {
 
       await pool.query(
         `
-        UPDATE nivel_titulo SET nombre = $1 WHERE id = $2
+        UPDATE et_cat_nivel_titulo SET nombre = $1 WHERE id = $2
         `
         , [nombre, id]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'nivel_titulo',
+        tabla: 'et_cat_nivel_titulo',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -185,7 +185,7 @@ class NivelTituloControlador {
     const { nombre } = req.params;
     const unNivelTitulo = await pool.query(
       `
-      SELECT * FROM nivel_titulo WHERE nombre = $1
+      SELECT * FROM et_cat_nivel_titulo WHERE UPPER(nombre) = $1
       `
       , [nombre]);
 
@@ -193,18 +193,22 @@ class NivelTituloControlador {
       return res.jsonp(unNivelTitulo.rows)
     }
     else {
-      res.status(404).jsonp({ text: 'Registro no encontrado' });
+      res.status(404).jsonp({ text: 'Registro no encontrado.' });
     }
   }
 
   public async getOne(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
-    const unNivelTitulo = await pool.query('SELECT * FROM nivel_titulo WHERE id = $1', [id]);
+    const unNivelTitulo = await pool.query(
+      `
+      SELECT * FROM et_cat_nivel_titulo WHERE id = $1
+      `
+      , [id]);
     if (unNivelTitulo.rowCount > 0) {
       return res.jsonp(unNivelTitulo.rows)
     }
     else {
-      res.status(404).jsonp({ text: 'Registro no encontrado' });
+      res.status(404).jsonp({ text: 'Registro no encontrado.' });
     }
 
   }
@@ -231,37 +235,40 @@ class NivelTituloControlador {
 
     // LECTURA DE LOS DATOS DE LA PLANTILLA
     plantilla.forEach(async (dato: any, indice: any, array: any) => {
-      var {item, nombre} = dato;
+      var { item, nombre } = dato;
       data.fila = dato.item
       data.nombre = dato.nombre;
 
-      if((data.fila != undefined && data.fila != '') && 
-        (data.nombre != undefined && data.nombre != '' && data.nombre != null)){
+      if ((data.fila != undefined && data.fila != '') &&
+        (data.nombre != undefined && data.nombre != '' && data.nombre != null)) {
         //Validar primero que exista la ciudad en la tabla ciudades
-        const existe_nivelProfecional = await pool.query('SELECT nombre FROM nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [data.nombre]);
-        if(existe_nivelProfecional.rowCount == 0){
+        const existe_nivelProfecional = await pool.query(
+          `
+          SELECT nombre FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
+          `
+          , [data.nombre]);
+        if (existe_nivelProfecional.rowCount == 0) {
           data.fila = item
           data.nombre = nombre;
-          if(duplicados.find((p: any)=> p.nombre.toLowerCase() === data.nombre.toLowerCase()) == undefined)
-          {
-              data.observacion = 'ok';
-              duplicados.push(dato);
+          if (duplicados.find((p: any) => p.nombre.toLowerCase() === data.nombre.toLowerCase()) == undefined) {
+            data.observacion = 'ok';
+            duplicados.push(dato);
           }
 
           listNivelesProfesionales.push(data);
-        }else{
+        } else {
           data.fila = item
           data.nombre = nombre;
           data.observacion = 'Ya existe en el sistema';
 
           listNivelesProfesionales.push(data);
         }
-      }else{
+      } else {
         data.fila = item
         data.nombre = 'No registrado';
         data.observacion = 'Nivel no registrado';
 
-        if(data.fila == '' || data.fila == undefined){
+        if (data.fila == '' || data.fila == undefined) {
           data.fila = 'error';
           mensaje = 'error'
         }
@@ -272,13 +279,13 @@ class NivelTituloControlador {
       data = {};
 
     });
-    
+
     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
     fs.access(ruta, fs.constants.F_OK, (err) => {
       if (err) {
       } else {
-          // ELIMINAR DEL SERVIDOR
-          fs.unlinkSync(ruta);
+        // ELIMINAR DEL SERVIDOR
+        fs.unlinkSync(ruta);
       }
     });
 
@@ -287,40 +294,40 @@ class NivelTituloControlador {
       listNivelesProfesionales.sort((a: any, b: any) => {
         // Compara los números de los objetos
         if (a.fila < b.fila) {
-            return -1;
+          return -1;
         }
         if (a.fila > b.fila) {
-            return 1;
+          return 1;
         }
         return 0; // Son iguales
       });
 
       var filaDuplicada: number = 0;
 
-      listNivelesProfesionales.forEach((item:any) => {
-        if(item.observacion == undefined || item.observacion == null || item.observacion == ''){
+      listNivelesProfesionales.forEach((item: any) => {
+        if (item.observacion == undefined || item.observacion == null || item.observacion == '') {
           item.observacion = 'Registro duplicado'
         }
 
         //Valida si los datos de la columna N son numeros.
         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
           //Condicion para validar si en la numeracion existe un numero que se repite dara error.
-              if(item.fila == filaDuplicada){
-                  mensaje = 'error';
-              }
-        }else{
-            return mensaje = 'error';
-        } 
+          if (item.fila == filaDuplicada) {
+            mensaje = 'error';
+          }
+        } else {
+          return mensaje = 'error';
+        }
 
         filaDuplicada = item.fila;
 
       });
 
-      if(mensaje == 'error'){
+      if (mensaje == 'error') {
         listNivelesProfesionales = undefined;
       }
 
-      return res.jsonp({ message: mensaje, data:  listNivelesProfesionales});
+      return res.jsonp({ message: mensaje, data: listNivelesProfesionales });
 
     }, 1500)
   }

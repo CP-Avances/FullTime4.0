@@ -62,7 +62,7 @@ export class EditarRolComponent implements OnInit {
     this.data_nueva = dataRol;
     this.rest.ListarRolesActualiza(this.data.datosRol.id).subscribe(response => {
       this.roles = response;
-      this.roles.forEach(obj => {
+      this.roles.forEach((obj: any) => {
         if (obj.nombre.toUpperCase() === dataRol.nombre.toUpperCase()) {
           this.contador = this.contador + 1;
         }
@@ -72,16 +72,14 @@ export class EditarRolComponent implements OnInit {
           this.toastr.success('Operacion exitosa.', 'Rol actualizado', {
             timeOut: 6000,
           });
-          this.validar.Auditar('app-web', 'cg_roles', this.data.datosRol, this.data_nueva, 'UPDATE');
           this.LimpiarCampos();
           this.salir = true;
           this.ventana.close(this.salir);
         });
       }
       else {
-        this.toastr.error('Para el correcto funcionamiento del sistema ingresar un nuevo rol ' +
-          'que no se encuentre registrado en el sistema.',
-          'Nombre de Rol Duplicado', {
+        this.toastr.error('',
+          'Nombre ingresado ya existe en el sistema.', {
           timeOut: 6000,
         });
       }

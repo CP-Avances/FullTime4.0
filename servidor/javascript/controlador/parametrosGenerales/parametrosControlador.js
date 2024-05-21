@@ -13,20 +13,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PARAMETROS_CONTROLADOR = void 0;
-const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class ParametrosControlador {
     // METODO PARA LISTAR PARAMETROS GENERALES
     ListarParametros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            /**
-              SELECT tp.id, tp.descripcion, dtp.descripcion AS detalle
-                FROM tipo_parametro AS tp, detalle_tipo_parametro AS dtp
-                WHERE tp.id = dtp.id_tipo_parametro
-             */
             const PARAMETRO = yield database_1.default.query(`
             SELECT tp.id, tp.descripcion
-            FROM tipo_parametro AS tp
+            FROM ep_parametro AS tp
             `);
             if (PARAMETRO.rowCount > 0) {
                 return res.jsonp(PARAMETRO.rows);
@@ -36,103 +30,14 @@ class ParametrosControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR TIPO PARAMETRO GENERAL
-    EliminarTipoParametro(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { user_name, ip } = req.body;
-                const id = req.params.id;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query(`
-                SELECT * FROM tipo_parametro WHERE id = $1
-                `, [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'tipo_parametro',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al eliminar tipo parametro con id ${id}`
-                    });
-                    //FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                }
-                yield database_1.default.query(`
-                DELETE FROM tipo_parametro WHERE id = $1
-                `, [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'tipo_parametro',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
-                //FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
-            }
-            catch (_a) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'false' });
-            }
-        });
-    }
     // METODO PARA ACTUALIZAR TIPO PARAMETRO GENERAL
     ActualizarTipoParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { descripcion, id, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT descripcion FROM tipo_parametro WHERE id = $1`, [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'tipo_parametro',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al actualizar tipo parametro con id ${id}`
-                    });
-                    //FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                }
-                yield database_1.default.query(`
-                UPDATE tipo_parametro SET descripcion = $1 WHERE id = $2
-                `, [descripcion, id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'tipo_parametro',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: JSON.stringify({ descripcion }),
-                    ip,
-                    observacion: null
-                });
-                //FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro exitoso.' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
+            const { descripcion, id } = req.body;
+            yield database_1.default.query(`
+            UPDATE ep_parametro SET descripcion = $1 WHERE id = $2
+            `, [descripcion, id]);
+            res.jsonp({ message: 'Registro exitoso.' });
         });
     }
     // METODO PARA LISTAR UN PARAMETRO GENERALES
@@ -140,7 +45,7 @@ class ParametrosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const PARAMETRO = yield database_1.default.query(`
-            SELECT * FROM tipo_parametro WHERE id = $1
+            SELECT * FROM ep_parametro WHERE id = $1
             `, [id]);
             if (PARAMETRO.rowCount > 0) {
                 return res.jsonp(PARAMETRO.rows);
@@ -156,8 +61,8 @@ class ParametrosControlador {
             const { id } = req.params;
             const PARAMETRO = yield database_1.default.query(`
             SELECT tp.id AS id_tipo, tp.descripcion AS tipo, dtp.id AS id_detalle, dtp.descripcion
-            FROM tipo_parametro AS tp, detalle_tipo_parametro AS dtp
-            WHERE tp.id = dtp.id_tipo_parametro AND tp.id = $1
+            FROM ep_parametro AS tp, ep_detalle_parametro AS dtp
+            WHERE tp.id = dtp.id_parametro AND tp.id = $1
             `, [id]);
             if (PARAMETRO.rowCount > 0) {
                 return res.jsonp(PARAMETRO.rows);
@@ -171,166 +76,36 @@ class ParametrosControlador {
     EliminarDetalleParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
                 const id = req.params.id;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM detalle_tipo_parametro WHERE id = $1`, [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'detalle_tipo_parametro',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al eliminar detalle tipo parametro con id ${id}`
-                    });
-                    //FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                }
                 yield database_1.default.query(`
-                DELETE FROM detalle_tipo_parametro WHERE id = $1
+                DELETE FROM ep_detalle_parametro WHERE id = $1
                 `, [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'detalle_tipo_parametro',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
-                //FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
+                res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (_a) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.jsonp({ message: 'false' });
+                res.jsonp({ message: 'false' });
             }
         });
     }
     // METODO PARA INGRESAR DETALLE TIPO PARAMETRO GENERAL
     IngresarDetalleParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id_tipo, descripcion, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
-                INSERT INTO detalle_tipo_parametro
-                (id_tipo_parametro, descripcion) VALUES ($1, $2)
-                `, [id_tipo, descripcion]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'detalle_tipo_parametro',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: JSON.stringify({ id_tipo, descripcion }),
-                    ip,
-                    observacion: null
-                });
-                //FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                res.jsonp({ message: 'Registro exitoso.' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                res.status(500).jsonp({ message: 'error' });
-            }
+            const { id_tipo, descripcion } = req.body;
+            yield database_1.default.query(`
+            INSERT INTO ep_detalle_parametro
+            (id_parametro, descripcion) VALUES ($1, $2)
+            `, [id_tipo, descripcion]);
+            res.jsonp({ message: 'Registro exitoso.' });
         });
     }
     // METODO PARA ACTUALIZAR DETALLE TIPO PARAMETRO GENERAL
     ActualizarDetalleParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id, descripcion, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT descripcion FROM detalle_tipo_parametro WHERE id = $1`, [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'detalle_tipo_parametro',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al actualizar detalle tipo parametro con id ${id}`
-                    });
-                    //FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                }
-                yield database_1.default.query(`
-                UPDATE detalle_tipo_parametro SET descripcion = $1 WHERE id = $2
-                `, [descripcion, id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'detalle_tipo_parametro',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"descripcion": "${descripcion}"}`,
-                    ip,
-                    observacion: null
-                });
-                //FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro exitoso.' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
-    // METODO PARA INGRESAR TIPO PARAMETRO GENERAL
-    IngresarTipoParametro(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { descripcion, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const response = yield database_1.default.query(`
-                INSERT INTO tipo_parametro (descripcion) VALUES ($1) RETURNING *
-                `, [descripcion]);
-                const [parametro] = response.rows;
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'tipo_parametro',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: JSON.stringify(parametro),
-                    ip,
-                    observacion: null
-                });
-                //FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                if (parametro) {
-                    return res.status(200).jsonp({ message: 'OK', respuesta: parametro });
-                }
-                else {
-                    return res.status(404).jsonp({ message: 'error' });
-                }
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
+            const { id, descripcion } = req.body;
+            yield database_1.default.query(`
+            UPDATE ep_detalle_parametro SET descripcion = $1 WHERE id = $2
+            `, [descripcion, id]);
+            res.jsonp({ message: 'Registro exitoso.' });
         });
     }
     // METODO PARA COMPARAR COORDENADAS

@@ -490,8 +490,8 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -510,11 +510,11 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
           obj3.timbres.forEach((obj4: any) => {
             n = n + 1;
             const servidor_fecha = this.validacionService.FormatearFecha(
-              obj4.fec_hora_timbre_servidor.split(' ')[0],
+              obj4.fecha_hora_timbre_servidor.split(' ')[0],
               this.formato_fecha,
               'no');
             const servidor_hora = this.validacionService.FormatearHora(
-              obj4.fec_hora_timbre_servidor.split(' ')[1],
+              obj4.fecha_hora_timbre_servidor.split(' ')[1],
               this.formato_hora);
 
             switch (obj4.accion) {
@@ -554,11 +554,11 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
         obj2.timbres.forEach((obj3: any) => {
           n = n + 1;
           const servidor_fecha = this.validacionService.FormatearFecha(
-            obj3.fec_hora_timbre_servidor.split(' ')[0],
+            obj3.fecha_hora_timbre_servidor.split(' ')[0],
             this.formato_fecha,
             this.validacionService.dia_abreviado);
           const servidor_hora = this.validacionService.FormatearHora(
-            obj3.fec_hora_timbre_servidor.split(' ')[1],
+            obj3.fecha_hora_timbre_servidor.split(' ')[1],
             this.formato_hora);
 
           switch (obj3.accion) {
@@ -630,7 +630,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
-      this.sucursales.forEach(row => this.selectionSuc.select(row));
+      this.sucursales.forEach((row: any) => this.selectionSuc.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -651,7 +651,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   masterToggleReg() {
     this.isAllSelectedReg()
       ? this.selectionReg.clear()
-      : this.regimen.forEach((row) => this.selectionReg.select(row));
+      : this.regimen.forEach((row: any) => this.selectionReg.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
@@ -673,7 +673,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   masterToggleCar() {
     this.isAllSelectedCar() ?
       this.selectionCar.clear() :
-      this.cargos.forEach(row => this.selectionCar.select(row));
+      this.cargos.forEach((row: any) => this.selectionCar.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -694,7 +694,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
-      this.departamentos.forEach(row => this.selectionDep.select(row));
+      this.departamentos.forEach((row: any) => this.selectionDep.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -715,7 +715,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
-      this.empleados.forEach(row => this.selectionEmp.select(row));
+      this.empleados.forEach((row: any) => this.selectionEmp.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA

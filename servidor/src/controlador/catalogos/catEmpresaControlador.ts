@@ -2,9 +2,9 @@ import { ImagenBase64LogosEmpresas } from '../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
+import moment from 'moment';
 import path from 'path';
 import pool from '../../database';
-import moment from 'moment';
 import fs from 'fs';
 
 class EmpresaControlador {
@@ -13,7 +13,7 @@ class EmpresaControlador {
     public async BuscarCadena(req: Request, res: Response) {
         const EMPRESA = await pool.query(
             `
-            SELECT cadena FROM cg_empresa
+            SELECT cadena FROM e_empresa
             `
         );
         if (EMPRESA.rowCount > 0) {
@@ -29,7 +29,7 @@ class EmpresaControlador {
 
         const file_name = await pool.query(
             `
-            SELECT nombre, logo FROM cg_empresa WHERE id = $1
+            SELECT nombre, logo FROM e_empresa WHERE id = $1
             `
             , [req.params.id_empresa])
             .then((result: any) => {
@@ -69,13 +69,13 @@ class EmpresaControlador {
         // CONSULTAR SI EXISTE UNA IMAGEN
         const logo_name = await pool.query(
             `
-            SELECT nombre, logo FROM cg_empresa WHERE id = $1
+            SELECT nombre, logo FROM e_empresa WHERE id = $1
             `
             , [id]);
         
         if (logo_name.rows.length === 0) {
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'cg_empresa',
+                tabla: 'e_empresa',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: '',
@@ -107,13 +107,13 @@ class EmpresaControlador {
                 // ACTUALIZAR REGISTRO DE IMAGEN
                 await pool.query(
                     `
-                    UPDATE cg_empresa SET logo = $2 WHERE id = $1
+                    UPDATE e_empresa SET logo = $2 WHERE id = $1
                     `
                     , [id, logo]);
                 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_empresa',
+                    tabla: 'e_empresa',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(obj),
@@ -132,7 +132,7 @@ class EmpresaControlador {
 
         // LEER DATOS DE IMAGEN
         const codificado = await ImagenBase64LogosEmpresas(logo);
-        res.send({ imagen: codificado, nom_empresa: logo_name.rows[0].nombre, message: 'Logo actualizado' })
+        res.send({ imagen: codificado, nom_empresa: logo_name.rows[0].nombre, message: 'Logo actualizado.' })
     }
 
     // METODO PARA BUSCAR DATOS GENERALES DE EMPRESA
@@ -140,7 +140,7 @@ class EmpresaControlador {
         const { id } = req.params;
         const EMPRESA = await pool.query(
             `
-            SELECT * FROM cg_empresa WHERE id = $1
+            SELECT * FROM e_empresa WHERE id = $1
             `
             , [id]);
         if (EMPRESA.rowCount > 0) {
@@ -163,13 +163,13 @@ class EmpresaControlador {
             // CONSULTAR DATOS ORIGINALES
             const datosOriginales = await pool.query(
                 `
-                SELECT * FROM cg_empresa WHERE id = $1
+                SELECT * FROM e_empresa WHERE id = $1
                 `
                 , [id]);
             
             if (datosOriginales.rows.length === 0) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_empresa',
+                    tabla: 'e_empresa',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
@@ -184,16 +184,16 @@ class EmpresaControlador {
             
             await pool.query(
                 `
-                UPDATE cg_empresa SET nombre = $1, ruc = $2, direccion = $3, telefono = $4, correo_empresa = $5,
+                UPDATE e_empresa SET nombre = $1, ruc = $2, direccion = $3, telefono = $4, correo_empresa = $5,
                 tipo_empresa = $6, representante = $7, establecimiento = $8, dias_cambio = $9, cambios = $10, 
-                num_partida = $11 WHERE id = $12
+                numero_partida = $11 WHERE id = $12
                 `
                 , [nombre, ruc, direccion, telefono, correo_empresa, tipo_empresa, representante, establecimiento,
                     dias_cambio, cambios, num_partida, id]);
             
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'cg_empresa',
+                tabla: 'e_empresa',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales.rows[0]),
@@ -223,13 +223,13 @@ class EmpresaControlador {
             // CONSULTAR DATOS ORIGINALES
             const datosOriginales = await pool.query(
                 `
-                SELECT color_p, color_s FROM cg_empresa WHERE id = $1
+                SELECT color_principal, color_secundario FROM e_empresa WHERE id = $1
                 `
                 , [id]);
             
             if (datosOriginales.rows.length === 0) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_empresa',
+                    tabla: 'e_empresa',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
@@ -244,17 +244,17 @@ class EmpresaControlador {
     
             await pool.query(
                 `
-                UPDATE cg_empresa SET color_p = $1, color_s = $2 WHERE id = $3
+                UPDATE e_empresa SET color_principal = $1, color_secundario = $2 WHERE id = $3
                 `
                 , [color_p, color_s, id]);
             
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'cg_empresa',
+                tabla: 'e_empresa',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales.rows[0]),
-                datosNuevos: `{"color_p": "${color_p}", "color_s": "${color_s}"}`,
+                datosNuevos: `{"color_principal": "${color_p}", "color_secundario": "${color_s}"}`,
                 ip,
                 observacion: null
             });
@@ -281,19 +281,19 @@ class EmpresaControlador {
 
             const datosOriginales = await pool.query(
                 `
-                SELECT marca_agua FROM cg_empresa WHERE id = $1
+                SELECT marca_agua FROM e_empresa WHERE id = $1
                 `
                 , [id]);
             
             if (datosOriginales.rows.length === 0) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_empresa',
+                    tabla: 'e_empresa',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
                     ip,
-                    observacion: `Error al actualizar marca de agua de empresa con id: ${id}`
+                    observacion: `Error al actualizar marca de agua de empresa con id: ${id}. Registro no encontrado.`
                 });
                 
                 await pool.query('COMMIT');
@@ -302,13 +302,13 @@ class EmpresaControlador {
             
             await pool.query(
                 `
-                UPDATE cg_empresa SET marca_agua = $1 WHERE id = $2
+                UPDATE e_empresa SET marca_agua = $1 WHERE id = $2
                 `
                 , [marca_agua, id]);
             
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'cg_empresa',
+                tabla: 'e_empresa',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales.rows[0]),
@@ -338,19 +338,19 @@ class EmpresaControlador {
             // CONSULTAR DATOS ORIGINALES
             const datosOriginales = await pool.query(
                 `
-                SELECT seg_contrasena, seg_frase, seg_ninguna FROM cg_empresa WHERE id = $1
+                SELECT seguridad_contrasena, seguridad_frase, seguridad_ninguna FROM e_empresa WHERE id = $1
                 `
                 , [id]);
             
             if (datosOriginales.rows.length === 0) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_empresa',
+                    tabla: 'e_empresa',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
                     ip,
-                    observacion: `Error al actualizar niveles de seguridad de empresa con id: ${id}`
+                    observacion: `Error al actualizar niveles de seguridad de empresa con id: ${id}. Registro no encontrado.`
                 });
                 
                 await pool.query('COMMIT');
@@ -359,18 +359,18 @@ class EmpresaControlador {
 
             await pool.query(
                 `
-                UPDATE cg_empresa SET seg_contrasena = $1, seg_frase = $2, seg_ninguna = $3
+                UPDATE e_empresa SET seguridad_contrasena = $1, seguridad_frase = $2, seguridad_ninguna = $3
                 WHERE id = $4
                 `
                 , [seg_contrasena, seg_frase, seg_ninguna, id]);
             
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'cg_empresa',
+                tabla: 'e_empresa',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales.rows[0]),
-                datosNuevos: `{"seg_contrasena": "${seg_contrasena}", "seg_frase": "${seg_frase}", "seg_ninguna": "${seg_ninguna}"}`,
+                datosNuevos: `{"seguridad_contrasena": "${seg_contrasena}", "seguridad_frase": "${seg_frase}", "seguridad_ninguna": "${seg_ninguna}"}`,
                 ip,
                 observacion: null
             });
@@ -403,13 +403,13 @@ class EmpresaControlador {
 
         const logo_name = await pool.query(
             `
-            SELECT cabecera_firma FROM cg_empresa WHERE id = $1
+            SELECT cabecera_firma FROM e_empresa WHERE id = $1
             `
             , [id]);
 
         if (logo_name.rows.length === 0) {
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'cg_empresa',
+                tabla: 'e_empresa',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: '',
@@ -441,13 +441,13 @@ class EmpresaControlador {
                 // ACTUALIZAR REGISTRO DE IMAGEN
                 await pool.query(
                     `
-                    UPDATE cg_empresa SET cabecera_firma = $2 WHERE id = $1
+                    UPDATE e_empresa SET cabecera_firma = $2 WHERE id = $1
                     `
                     , [id, logo]);
                 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_empresa',
+                    tabla: 'e_empresa',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(obj),
@@ -474,7 +474,7 @@ class EmpresaControlador {
         const file_name =
             await pool.query(
                 `
-                SELECT cabecera_firma FROM cg_empresa WHERE id = $1
+                SELECT cabecera_firma FROM e_empresa WHERE id = $1
                 `
                 , [req.params.id_empresa])
                 .then((result: any) => {
@@ -506,19 +506,19 @@ class EmpresaControlador {
 
         const logo_name = await pool.query(
             `
-            SELECT pie_firma FROM cg_empresa WHERE id = $1
+            SELECT pie_firma FROM e_empresa WHERE id = $1
             `
             , [id]);
 
         if (logo_name.rows.length === 0) {
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'cg_empresa',
+                tabla: 'e_empresa',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: '',
                 datosNuevos: '',
                 ip,
-                observacion: `Error al actualizar pie de firma de empresa con id: ${id}`
+                observacion: `Error al actualizar pie de firma de empresa con id: ${id}. Registro no encontrado.`
             });
 
             res.status(404).jsonp({ message: 'error' });
@@ -544,13 +544,13 @@ class EmpresaControlador {
                 // ACTUALIZAR REGISTRO DE IMAGEN
                 await pool.query(
                     `
-                    UPDATE cg_empresa SET pie_firma = $2 WHERE id = $1
+                    UPDATE e_empresa SET pie_firma = $2 WHERE id = $1
                     `
                     , [id, logo]);
                 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_empresa',
+                    tabla: 'e_empresa',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(obj),
@@ -576,7 +576,7 @@ class EmpresaControlador {
         const file_name =
             await pool.query(
                 `
-                SELECT pie_firma FROM cg_empresa WHERE id = $1
+                SELECT pie_firma FROM e_empresa WHERE id = $1
                 `
                 , [req.params.id_empresa])
                 .then((result: any) => {
@@ -602,19 +602,19 @@ class EmpresaControlador {
             // CONSULTAR DATOS ORIGINALES
             const datosOriginales = await pool.query(
                 `
-                SELECT correo, password_correo, servidor, puerto FROM cg_empresa WHERE id = $1
+                SELECT correo, password_correo, servidor, puerto FROM e_empresa WHERE id = $1
                 `
                 , [id]);
             
             if (datosOriginales.rows.length === 0) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_empresa',
+                    tabla: 'e_empresa',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
                     ip,
-                    observacion: `Error al actualizar datos de correo de empresa con id: ${id}`
+                    observacion: `Error al actualizar datos de correo de empresa con id: ${id}. Registro no encontrado.`
                 });
                 
                 await pool.query('COMMIT');
@@ -623,14 +623,14 @@ class EmpresaControlador {
     
             await pool.query(
                 `
-                UPDATE cg_empresa SET correo = $1, password_correo = $2, servidor = $3, puerto = $4
+                UPDATE e_empresa SET correo = $1, password_correo = $2, servidor = $3, puerto = $4
                 WHERE id = $5
                 `
                 , [correo, password_correo, servidor, puerto, id]);
             
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'cg_empresa',
+                tabla: 'e_empresa',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales.rows[0]),
@@ -660,19 +660,19 @@ class EmpresaControlador {
             // CONSULTAR DATOS ORIGINALES
             const datosOriginales = await pool.query(
                 `
-                SELECT acciones_timbres FROM cg_empresa WHERE id = $1
+                SELECT acciones_timbres FROM e_empresa WHERE id = $1
                 `
                 , [id]);
             
             if (datosOriginales.rows.length === 0) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_empresa',
+                    tabla: 'e_empresa',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
                     ip,
-                    observacion: `Error al actualizar acciones de empresa con id: ${id}`
+                    observacion: `Error al actualizar acciones de empresa con id: ${id}. Registro no encontrado.`
                 });
                 
                 await pool.query('COMMIT');
@@ -681,13 +681,13 @@ class EmpresaControlador {
 
             await pool.query(
                 `
-                UPDATE cg_empresa SET acciones_timbres = $1 WHERE id = $2
+                UPDATE e_empresa SET acciones_timbres = $1 WHERE id = $2
                 `
                 , [bool_acciones, id]);
             
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'cg_empresa',
+                tabla: 'e_empresa',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales.rows[0]),
@@ -712,9 +712,9 @@ class EmpresaControlador {
     public async ListarEmpresa(req: Request, res: Response) {
         const EMPRESA = await pool.query(
             `
-            SELECT id, nombre, ruc, direccion, telefono, correo,
-            representante, tipo_empresa, establecimiento, logo, color_p, color_s, num_partida, marca_agua,
-            correo_empresa FROM cg_empresa ORDER BY nombre ASC
+            SELECT id, nombre, ruc, direccion, telefono, correo, representante, tipo_empresa, establecimiento, logo, 
+                color_principal, color_secundario, numero_partida, marca_agua, correo_empresa 
+            FROM e_empresa ORDER BY nombre ASC
             `
         );
         if (EMPRESA.rowCount > 0) {

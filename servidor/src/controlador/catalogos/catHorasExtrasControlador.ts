@@ -5,23 +5,31 @@ import pool from '../../database';
 
 class HorasExtrasControlador {
   public async ListarHorasExtras(req: Request, res: Response) {
-    const HORAS_EXTRAS = await pool.query('SELECT * FROM cg_hora_extras');
+    const HORAS_EXTRAS = await pool.query(
+      `
+      SELECT * FROM mhe_configurar_hora_extra
+      `
+    );
     if (HORAS_EXTRAS.rowCount > 0) {
       return res.jsonp(HORAS_EXTRAS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
   public async ObtenerUnaHoraExtra(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
-    const HORAS_EXTRAS = await pool.query('SELECT * FROM cg_hora_extras WHERE id = $1', [id]);
+    const HORAS_EXTRAS = await pool.query(
+      `
+      SELECT * FROM mhe_configurar_hora_extra WHERE id = $1
+      `
+      , [id]);
     if (HORAS_EXTRAS.rowCount > 0) {
       return res.jsonp(HORAS_EXTRAS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
@@ -35,9 +43,9 @@ class HorasExtrasControlador {
       
       const response: QueryResult = await pool.query(
         `
-        INSERT INTO cg_hora_extras ( descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, 
-          tipo_dia, codigo, incl_almuerzo, tipo_funcion ) 
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
+        INSERT INTO mhe_configurar_hora_extra ( descripcion, tipo_descuento, recargo_porcentaje, hora_inicio, hora_final, 
+          hora_jornada, tipo_dia, codigo, minutos_comida, tipo_funcion ) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
         `
         , [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion]);
   
@@ -45,7 +53,7 @@ class HorasExtrasControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_hora_extras',
+        tabla: 'mhe_configurar_hora_extra',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
@@ -78,19 +86,19 @@ class HorasExtrasControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const horaExtra = await pool.query('SELECT * FROM cg_hora_extras WHERE id = $1', [id]);
+      const horaExtra = await pool.query('SELECT * FROM mhe_configurar_hora_extra WHERE id = $1', [id]);
       const [datosOriginales] = horaExtra.rows;
 
       if (!datosOriginales) {
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'cg_hora_extras',
+          tabla: 'mhe_configurar_hora_extra',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
           ip: ip,
-          observacion: `Error al eliminar el registro con id: ${id}.`
+          observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
         });
 
         // FINALIZAR TRANSACCION
@@ -98,11 +106,11 @@ class HorasExtrasControlador {
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
 
-      await pool.query('DELETE FROM cg_hora_extras WHERE id = $1', [id]);
+      await pool.query('DELETE FROM mhe_configurar_hora_extra WHERE id = $1', [id]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_hora_extras',
+        tabla: 'mhe_configurar_hora_extra',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -131,19 +139,19 @@ class HorasExtrasControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const horaExtra = await pool.query('SELECT * FROM cg_hora_extras WHERE id = $1', [id]);
+      const horaExtra = await pool.query('SELECT * FROM mhe_configurar_hora_extra WHERE id = $1', [id]);
       const [datosOriginales] = horaExtra.rows;
 
       if (!datosOriginales) {
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'cg_hora_extras',
+          tabla: 'mhe_configurar_hora_extra',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
           ip: ip,
-          observacion: `Error al actualizar el registro con id: ${id}.`
+          observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`
         });
 
         // FINALIZAR TRANSACCION
@@ -151,11 +159,17 @@ class HorasExtrasControlador {
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
 
-      await pool.query('UPDATE cg_hora_extras SET descripcion = $1, tipo_descuento = $2, reca_porcentaje = $3, hora_inicio = $4, hora_final = $5, hora_jornada = $6, tipo_dia = $7, codigo = $8, incl_almuerzo = $9, tipo_funcion = $10 WHERE id = $11', [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, id]);
+      await pool.query(
+        `
+        UPDATE mhe_configurar_hora_extra SET descripcion = $1, tipo_descuento = $2, recargo_porcentaje = $3, hora_inicio = $4, 
+          hora_final = $5, hora_jornada = $6, tipo_dia = $7, codigo = $8, minutos_comida = $9, tipo_funcion = $10 
+        WHERE id = $11
+        `
+        , [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, id]);
       
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_hora_extras',
+        tabla: 'mhe_configurar_hora_extra',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),

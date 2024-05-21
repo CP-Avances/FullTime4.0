@@ -4,7 +4,6 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
-import { Router } from '@angular/router';
 import * as moment from 'moment';
 
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
@@ -58,7 +57,7 @@ export class EditarFeriadosComponent implements OnInit {
 
   // METODO PARA MOSTRAR DATOS EN FORMULARIO
   ImprimirDatos() {
-    if (this.data.datosFeriado.fec_recuperacion === null || this.data.datosFeriado.fec_recuperacion === '') {
+    if (this.data.datosFeriado.fecha_recuperacion === null || this.data.datosFeriado.fecha_recuperacion === '') {
       this.formulario.patchValue({
         fechaRecuperacionForm: null
       })
@@ -66,7 +65,7 @@ export class EditarFeriadosComponent implements OnInit {
     this.formulario.setValue({
       fechaForm: this.data.datosFeriado.fecha,
       descripcionForm: this.data.datosFeriado.descripcion,
-      fechaRecuperacionForm: this.data.datosFeriado.fec_recuperacion
+      fechaRecuperacionForm: this.data.datosFeriado.fecha_recuperacion
     })
   }
 
@@ -104,8 +103,8 @@ export class EditarFeriadosComponent implements OnInit {
   // METODO PARA VALIDAR REGISTRO SIN FECHA DE RECUPERACION
   ValidarSinRecuperacion(feriado: any) {
     if (this.feriados.length != 0) {
-      this.feriados.forEach(obj => {
-        if (moment(obj.fec_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
+      this.feriados.forEach((obj: any) => {
+        if (moment(obj.fecha_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
           this.contador = 1;
         }
       })
@@ -128,14 +127,14 @@ export class EditarFeriadosComponent implements OnInit {
   // METODO PARA VALIDAR REGISTRO CON FECHA DE RECUPERACION
   ValidarRecuperacion(feriado: any, form: any) {
     if (this.feriados.length != 0) {
-      this.feriados.forEach(obj => {
-        if (obj.fecha.split('T')[0] === moment(feriado.fec_recuperacion).format('YYYY-MM-DD') ||
-          moment(obj.fec_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
+      this.feriados.forEach((obj: any) => {
+        if (obj.fecha.split('T')[0] === moment(feriado.fecha_recuperacion).format('YYYY-MM-DD') ||
+          moment(obj.fecha_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
           this.contador = 1;
         }
       })
       if (this.contador === 0) {
-        if (Date.parse(form.fechaForm) < Date.parse(feriado.fec_recuperacion)) {
+        if (Date.parse(form.fechaForm) < Date.parse(feriado.fecha_recuperacion)) {
           this.RegistrarFeriado(feriado);
         }
         else {
@@ -168,6 +167,11 @@ export class EditarFeriadosComponent implements OnInit {
         this.toastr.error(
           'La fecha del feriado o la fecha de recuperación se encuentran dentro de otro registro.',
           'Verificar las fechas', {
+          timeOut: 6000,
+        })
+      }
+      else if (response.message === 'existe') {
+        this.toastr.warning('Nombre de feriado ya existe en el sistema.', 'Upss!!! algo salio mal.', {
           timeOut: 6000,
         })
       }

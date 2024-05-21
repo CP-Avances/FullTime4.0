@@ -26,7 +26,7 @@ export class BuscarTimbreComponent implements OnInit {
   cedula = new FormControl('',);
   fecha = new FormControl('', Validators.required);
 
-  mostrarTabla: boolean = true;
+  mostrarTabla: boolean = false;
 
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public formulario = new FormGroup({
@@ -40,7 +40,6 @@ export class BuscarTimbreComponent implements OnInit {
   tamanio_pagina_e: number = 5;
   pageSizeOptions_e = [5, 10, 20, 50];
 
-  rol: any;
   timbres: any = [];
   idEmpleadoLogueado: any;
 
@@ -56,7 +55,6 @@ export class BuscarTimbreComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.rol = localStorage.getItem('rol');
     this.BuscarParametro();
     this.BuscarHora();
     this.ObtenerEmpleadoLogueado(this.idEmpleadoLogueado);
@@ -115,12 +113,6 @@ export class BuscarTimbreComponent implements OnInit {
   BuscarTimbresFecha(form: any) {
     this.timbres = [];
 
-    if (this.rol != '1') {
-      form.codigoForm = this.datosEmpleadoLogueado.codigo;
-      form.cedulaForm = this.datosEmpleadoLogueado.cedula;
-    }
-
-
     if (form.codigoForm === "" && form.cedulaForm === "") {
       return this.toastr.error('Ingrese código o cédula del usuario.', 'Llenar los campos.', {
         timeOut: 6000,
@@ -134,17 +126,17 @@ export class BuscarTimbreComponent implements OnInit {
       }
 
       this.timbresServicio.ObtenerTimbresFechaEmple(datos).subscribe(timbres => {
-        //console.log('ver timbres ', timbres)
+        this.mostrarTabla = true;
+        //--console.log('ver timbres ', timbres)
         this.timbres = timbres.timbres;
-        this.timbres.forEach(data => {
-          data.fecha = this.validar.FormatearFecha(data.fec_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
-          data.hora = this.validar.FormatearHora(data.fec_hora_timbre_servidor.split(' ')[1], this.formato_hora);
+        this.timbres.forEach((data: any) => {
+          data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
+          data.hora = this.validar.FormatearHora(data.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
         })
         //console.log('ver timbres ', this.timbres)
-        this.mostrarTabla = false;
-
       }, error => {
         //console.log('error: ', error);
+        this.mostrarTabla = false;
         return this.toastr.error(error.error.message, 'Notificación', {
           timeOut: 6000,
         })
@@ -176,11 +168,11 @@ export class BuscarTimbreComponent implements OnInit {
     this.codigo.reset('');
     this.cedula.reset('');
     this.fecha.reset();
-    this.mostrarTabla = true;
+    this.mostrarTabla = false;
   }
 
   ngOnDestroy(): void {
-    this.mostrarTabla = true
+    this.mostrarTabla = false
   }
 
 }

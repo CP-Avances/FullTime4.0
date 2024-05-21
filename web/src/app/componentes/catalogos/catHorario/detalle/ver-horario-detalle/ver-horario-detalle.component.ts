@@ -11,11 +11,11 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 
 import { EditarDetalleCatHorarioComponent } from 'src/app/componentes/catalogos/catHorario/detalle/editar-detalle-cat-horario/editar-detalle-cat-horario.component';
+import { HorarioMultipleEmpleadoComponent } from 'src/app/componentes/horarios/rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 import { DetalleCatHorarioComponent } from 'src/app/componentes/catalogos/catHorario/detalle/detalle-cat-horario/detalle-cat-horario.component';
 import { PrincipalHorarioComponent } from '../../horario/principal-horario/principal-horario.component';
 import { EditarHorarioComponent } from 'src/app/componentes/catalogos/catHorario/horario/editar-horario/editar-horario.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { HorarioMultipleEmpleadoComponent } from 'src/app/componentes/horarios/rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 
 @Component({
   selector: 'app-ver-horario-detalle',
@@ -98,7 +98,7 @@ export class VerHorarioDetalleComponent implements OnInit {
 
   // METODO PARA COLOCAR TIPO DE HORARIO
   ColocarTipo() {
-    this.datosHorario.forEach(obj => {
+    this.datosHorario.forEach((obj: any) => {
       if (obj.default_ === 'N') {
         obj.default_tipo = 'Laborable';
       }
@@ -125,7 +125,7 @@ export class VerHorarioDetalleComponent implements OnInit {
       this.datosDetalle.forEach(data => {
         data.hora_ = this.validar.FormatearHora(data.hora, formato_hora);
       });
-      console.log('ver detales ', this.datosDetalle)
+      //--console.log('ver detales ', this.datosDetalle)
     })
   }
 
@@ -190,7 +190,7 @@ export class VerHorarioDetalleComponent implements OnInit {
   // METODO PARA CALCULAR HORAS DE TRABAJO
   CalcularHorasTrabaja() {
     const [cg_horario] = this.datosHorario;
-    const { nocturno, id, min_almuerzo } = cg_horario;
+    const { nocturno, id, minutos_comida } = cg_horario;
 
     // SI LAS HORAS TIENEN FORMATO HH:mm SE REALIZA VALIDACIONES
     if (this.datosHorario[0].hora_trabajo.split(':').length === 2) {
@@ -206,7 +206,7 @@ export class VerHorarioDetalleComponent implements OnInit {
       );
 
       // VALIDAR SI EXISTE REGISTRO MINUTOS DE ALMUERZO
-      if (min_almuerzo != 0) {
+      if (minutos_comida != 0) {
         if (this.datosDetalle.length != 4) return this.toastr.error(
           `El horario debe tener 4 detalles. (Entrada - Inicio alimentación - Fin alimentación - Salida)`,
           'Detalle de horario incompleto.'
@@ -277,7 +277,7 @@ export class VerHorarioDetalleComponent implements OnInit {
       }
 
       // VALIDAR HORAS TOTALES DE HORARIO
-      this.ValidarHorario(nocturno, id, min_almuerzo);
+      this.ValidarHorario(nocturno, id, minutos_comida);
 
     }
     // VERIFICADO QUE LAS HORAS TENGAN EL FORMATO HH:mm:ss
@@ -327,8 +327,9 @@ export class VerHorarioDetalleComponent implements OnInit {
     }
   }
 
+  // METODO PARA CALCULAR EL TIEMPO DE LAS HORAS
   CalcularMetodoNocturno(id: number, min_almuerzo: any) {
-    const detalleNocturno = this.datosDetalle.map(o => {
+    const detalleNocturno = this.datosDetalle.map((o: any) => {
       if ((o.orden === 4 || o.orden === 3) && o.hora === '00:00:00') {
         o.hora = '24:00:00';
       }

@@ -112,8 +112,8 @@ export class HoraExtraRealComponent implements OnInit {
     frase: any;
     ObtenerColores() {
       this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-        this.p_color = res[0].color_p;
-        this.s_color = res[0].color_s;
+        this.p_color = res[0].color_principal;
+        this.s_color = res[0].color_secundario;
         this.frase = res[0].marca_agua;
       });
     }
@@ -212,7 +212,7 @@ export class HoraExtraRealComponent implements OnInit {
   VerificarTimbres(listaPedidos: any, listaTimbres: any) {
     console.log('pedidos', listaPedidos);
     console.log('timbres', listaTimbres);
-    listaPedidos.forEach(obj => {
+    listaPedidos.forEach((obj: any) => {
       listaTimbres.forEach(element => {
         if (obj.fec_inicio.split('T')[0] === element.fecha_inicio.split('T')[0]) {
           if (element.fecha_inicio.split('T')[1] <= obj.fec_inicio.split('T')[1]) {
@@ -240,7 +240,7 @@ export class HoraExtraRealComponent implements OnInit {
   VerificarTimbresTodos(listaPedidos: any, listaTimbres: any) {
     console.log('pedidos', listaPedidos);
     console.log('timbres', listaTimbres);
-    listaPedidos.forEach(obj => {
+    listaPedidos.forEach((obj: any) => {
       listaTimbres.forEach(element => {
         if (obj.fec_inicio.split('T')[0] === element.fecha_inicio.split('T')[0] && obj.id_usua_solicita === element.id_empleado) {
           if (element.fecha_inicio.split('T')[1] <= obj.fec_inicio.split('T')[1]) {
@@ -464,7 +464,7 @@ export class HoraExtraRealComponent implements OnInit {
                 { text: 'Nacionalidad', style: 'tableHeader' },
               ],
               ...this.empleado.map(obj => {
-                var estadoCivil = this.EstadoCivilSelect[obj.esta_civil - 1];
+                var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
                 var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
                 let nacionalidad;
@@ -478,7 +478,7 @@ export class HoraExtraRealComponent implements OnInit {
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.apellido, style: 'itemsTable' },
                   { text: obj.cedula, style: 'itemsTableD' },
-                  { text: obj.fec_nacimiento.split("T")[0], style: 'itemsTableD' },
+                  { text: obj.fecha_nacimiento.split("T")[0], style: 'itemsTableD' },
                   { text: obj.correo, style: 'itemsTableD' },
                   { text: genero, style: 'itemsTableD' },
                   { text: estadoCivil, style: 'itemsTableD' },
@@ -515,8 +515,8 @@ export class HoraExtraRealComponent implements OnInit {
   exportToXML() {
     var objeto;
     var arregloEmpleado: any = [];
-    this.empleado.forEach(obj => {
-      var estadoCivil = this.EstadoCivilSelect[obj.esta_civil - 1];
+    this.empleado.forEach((obj: any) => {
+      var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
       var genero = this.GeneroSelect[obj.genero - 1];
       var estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad;
@@ -535,7 +535,7 @@ export class HoraExtraRealComponent implements OnInit {
           "estadoCivil": estadoCivil,
           "genero": genero,
           "correo": obj.correo,
-          "fechaNacimiento": obj.fec_nacimiento.split("T")[0],
+          "fechaNacimiento": obj.fecha_nacimiento.split("T")[0],
           "estado": estado,
           "domicilio": obj.domicilio,
           "telefono": obj.telefono,
@@ -710,7 +710,7 @@ export class HoraExtraRealComponent implements OnInit {
                 { text: 'Nacionalidad', style: 'tableHeader' },
               ],
               ...this.empleadoTimbre.map(obj => {
-                var estadoCivil = this.EstadoCivilSelect[obj.esta_civil - 1];
+                var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
                 var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
                 let nacionalidad;
@@ -724,7 +724,7 @@ export class HoraExtraRealComponent implements OnInit {
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.apellido, style: 'itemsTable' },
                   { text: obj.cedula, style: 'itemsTableD' },
-                  { text: obj.fec_nacimiento.split("T")[0], style: 'itemsTableD' },
+                  { text: obj.fehac_nacimiento.split("T")[0], style: 'itemsTableD' },
                   { text: obj.correo, style: 'itemsTableD' },
                   { text: genero, style: 'itemsTableD' },
                   { text: estadoCivil, style: 'itemsTableD' },

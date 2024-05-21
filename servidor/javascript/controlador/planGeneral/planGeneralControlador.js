@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PLAN_GENERAL_CONTROLADOR = void 0;
-const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class PlanGeneralControlador {
     // METODO PARA REGISTRAR PLAN GENERAL   --**VERIFICADO
@@ -26,62 +25,41 @@ class PlanGeneralControlador {
             errores = 0;
             iterar = 0;
             cont = 0;
-            const { user_name, ip, plan_general } = req.body;
-            for (var i = 0; i < plan_general.length; i++) {
-                try {
-                    // INICIAR TRANSACCION
-                    yield database_1.default.query('BEGIN');
-                    database_1.default.query(`
-                    INSERT INTO plan_general (fec_hora_horario, tolerancia, estado_timbre, id_det_horario,
-                        fec_horario, id_empl_cargo, tipo_entr_salida, codigo, id_horario, tipo_dia, salida_otro_dia,
-                        min_antes, min_despues, estado_origen, min_alimentacion) 
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                    `, [plan_general[i].fec_hora_horario, plan_general[i].tolerancia, plan_general[i].estado_timbre,
-                        plan_general[i].id_det_horario, plan_general[i].fec_horario, plan_general[i].id_empl_cargo,
-                        plan_general[i].tipo_entr_salida, plan_general[i].codigo, plan_general[i].id_horario, plan_general[i].tipo_dia,
-                        plan_general[i].salida_otro_dia, plan_general[i].min_antes, plan_general[i].min_despues, plan_general[i].estado_origen,
-                        plan_general[i].min_alimentacion], (error, results) => __awaiter(this, void 0, void 0, function* () {
-                        iterar = iterar + 1;
-                        // AUDITORIA
-                        yield auditoriaControlador_1.default.InsertarAuditoria({
-                            tabla: 'plan_general',
-                            usuario: user_name,
-                            accion: 'I',
-                            datosOriginales: '',
-                            datosNuevos: JSON.stringify(results.rows),
-                            ip,
-                            observacion: null
-                        });
-                        // FINALIZAR TRANSACCION
-                        yield database_1.default.query('COMMIT');
-                        try {
-                            console.log('if ', error);
-                            if (error) {
-                                errores = errores + 1;
-                                if (iterar === plan_general.length && errores > 0) {
-                                    return res.status(200).jsonp({ message: 'error' });
-                                }
-                            }
-                            else {
-                                cont = cont + 1;
-                                if (iterar === plan_general.length && cont === plan_general.length) {
-                                    return res.status(200).jsonp({ message: 'OK' });
-                                }
-                                else if (iterar === plan_general.length && cont != plan_general.length) {
-                                    return res.status(200).jsonp({ message: 'error' });
-                                }
+            for (var i = 0; i < req.body.length; i++) {
+                database_1.default.query(`
+                INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
+                    fecha_horario, id_empleado_cargo, tipo_accion, codigo, id_horario, tipo_dia, salida_otro_dia,
+                    minutos_antes, minutos_despues, estado_origen, minutos_alimentacion) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                `, [req.body[i].fec_hora_horario, req.body[i].tolerancia, req.body[i].estado_timbre,
+                    req.body[i].id_det_horario, req.body[i].fec_horario, req.body[i].id_empl_cargo,
+                    req.body[i].tipo_entr_salida, req.body[i].codigo, req.body[i].id_horario, req.body[i].tipo_dia,
+                    req.body[i].salida_otro_dia, req.body[i].min_antes, req.body[i].min_despues, req.body[i].estado_origen,
+                    req.body[i].min_alimentacion], (error) => {
+                    iterar = iterar + 1;
+                    try {
+                        console.log('if error --> ', error);
+                        if (error) {
+                            errores = errores + 1;
+                            if (iterar === req.body.length && errores > 0) {
+                                return res.status(200).jsonp({ message: 'error' });
                             }
                         }
-                        catch (error) {
-                            throw error;
+                        else {
+                            cont = cont + 1;
+                            if (iterar === req.body.length && cont === req.body.length) {
+                                return res.status(200).jsonp({ message: 'OK' });
+                            }
+                            else if (iterar === req.body.length && cont != req.body.length) {
+                                return res.status(200).jsonp({ message: 'error' });
+                            }
                         }
-                    }));
-                }
-                catch (error) {
-                    // REVERTIR TRANSACCION
-                    yield database_1.default.query('ROLLBACK');
-                    return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
-                }
+                    }
+                    catch (error) {
+                        console.log('ver el error ', error);
+                        return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
+                    }
+                });
             }
         });
     }
@@ -90,8 +68,8 @@ class PlanGeneralControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final, id_horario, codigo } = req.body;
             const FECHAS = yield database_1.default.query(`
-            SELECT id FROM plan_general WHERE 
-            (fec_horario BETWEEN $1 AND $2) AND id_horario = $3 AND codigo = $4
+            SELECT id FROM eu_asistencia_general 
+            WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND codigo = $4
             `, [fec_inicio, fec_final, id_horario, codigo]);
             if (FECHAS.rowCount > 0) {
                 return res.jsonp(FECHAS.rows);
@@ -111,73 +89,33 @@ class PlanGeneralControlador {
             errores = 0;
             iterar = 0;
             cont = 0;
-            const { user_name, ip, id_plan } = req.body;
-            for (var i = 0; i < id_plan.length; i++) {
-                try {
-                    // INICIAR TRANSACCION
-                    yield database_1.default.query('BEGIN');
-                    // CONSULTAR DATOSORIGINALES
-                    const consulta = yield database_1.default.query(`SELECT * FROM plan_general WHERE id = $1`, [id_plan[i].id]);
-                    const [datosOriginales] = consulta.rows;
-                    if (!datosOriginales) {
-                        yield auditoriaControlador_1.default.InsertarAuditoria({
-                            tabla: 'plan_general',
-                            usuario: user_name,
-                            accion: 'D',
-                            datosOriginales: '',
-                            datosNuevos: '',
-                            ip,
-                            observacion: `Error al eliminar el registro con id ${id_plan[i].id}. Registro no encontrado.`
-                        });
-                        // FINALIZAR TRANSACCION
-                        yield database_1.default.query('COMMIT');
-                        return res.status(404).jsonp({ message: 'error' });
+            for (var i = 0; i < req.body.length; i++) {
+                database_1.default.query(`
+                DELETE FROM eu_asistencia_general WHERE id = $1
+                `, [req.body[i].id], (error) => {
+                    iterar = iterar + 1;
+                    try {
+                        if (error) {
+                            errores = errores + 1;
+                            if (iterar === req.body.length && errores > 0) {
+                                return res.status(200).jsonp({ message: 'error' });
+                            }
+                        }
+                        else {
+                            cont = cont + 1;
+                            if (iterar === req.body.length && cont === req.body.length) {
+                                return res.status(200).jsonp({ message: 'OK' });
+                            }
+                            else if (iterar === req.body.length && cont != req.body.length) {
+                                return res.status(200).jsonp({ message: 'error' });
+                            }
+                        }
                     }
-                    database_1.default.query(`
-                    DELETE FROM plan_general WHERE id = $1
-                    `, [id_plan[i].id], (error) => __awaiter(this, void 0, void 0, function* () {
-                        iterar = iterar + 1;
-                        // AUDITORIA
-                        yield auditoriaControlador_1.default.InsertarAuditoria({
-                            tabla: 'plan_general',
-                            usuario: user_name,
-                            accion: 'D',
-                            datosOriginales: JSON.stringify(datosOriginales),
-                            datosNuevos: '',
-                            ip,
-                            observacion: null
-                        });
-                        // FINALIZAR TRANSACCION
-                        yield database_1.default.query('COMMIT');
-                        try {
-                            if (error) {
-                                errores = errores + 1;
-                                if (iterar === id_plan.length && errores > 0) {
-                                    return res.status(200).jsonp({ message: 'error' });
-                                }
-                            }
-                            else {
-                                cont = cont + 1;
-                                if (iterar === id_plan.length && cont === id_plan.length) {
-                                    return res.status(200).jsonp({ message: 'OK' });
-                                }
-                                else if (iterar === id_plan.length && cont != id_plan.length) {
-                                    return res.status(200).jsonp({ message: 'error' });
-                                }
-                            }
-                        }
-                        catch (error) {
-                            throw error;
-                        }
-                    }));
-                }
-                catch (error) {
-                    // REVERTIR TRANSACCION
-                    yield database_1.default.query('ROLLBACK');
-                    return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
-                }
+                    catch (error) {
+                        return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
+                    }
+                });
             }
-            return res.status(200).jsonp({ message: 'OK' });
         });
     }
     // METODO PARA BUSCAR PLANIFICACION EN UN RANGO DE FECHAS
@@ -186,13 +124,12 @@ class PlanGeneralControlador {
             try {
                 const { codigo, lista_fechas } = req.body;
                 const HORARIO = yield database_1.default.query(`
-                SELECT DISTINCT(pg.fec_horario), pg.tipo_dia, c.hora_trabaja, pg.tipo_entr_salida, pg.codigo,
-                pg.estado_origen 
-                FROM plan_general AS pg, empl_cargos AS c 
-                WHERE pg.fec_horario IN(${lista_fechas}) 
-                AND pg.codigo = $1 AND c.id = pg.id_empl_cargo 
-                AND(pg.tipo_entr_salida = 'E' OR pg.tipo_entr_salida = 'S') 
-                ORDER BY pg.fec_horario ASC
+                SELECT DISTINCT (pg.fecha_horario), pg.tipo_dia, c.hora_trabaja, pg.tipo_accion, pg.codigo, pg.estado_origen 
+                FROM eu_asistencia_general AS pg, eu_empleado_cargos AS c 
+                WHERE pg.fecha_horario IN (${lista_fechas}) 
+                    AND pg.codigo = $1 AND c.id = pg.id_empleado_cargo 
+                    AND (pg.tipo_accion = 'E' OR pg.tipo_accion = 'S') 
+                ORDER BY pg.fecha_horario ASC
                 `, [codigo]);
                 if (HORARIO.rowCount > 0) {
                     return res.jsonp(HORARIO.rows);
@@ -211,7 +148,6 @@ class PlanGeneralControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fecha_inicio, fecha_final, codigo } = req.body;
-                console.log('ver datos ', fecha_inicio, ' ', fecha_final, ' ', codigo);
                 const HORARIO = yield database_1.default.query("SELECT codigo_e, nombre_e, anio, mes, " +
                     "CASE WHEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') ELSE '-' END AS dia1, " +
                     "CASE WHEN STRING_AGG(CASE WHEN dia = 2 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 2 THEN codigo_dia end,', ') ELSE '-' END AS dia2, " +
@@ -245,13 +181,13 @@ class PlanGeneralControlador {
                     "CASE WHEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') ELSE '-' END AS dia30, " +
                     "CASE WHEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') ELSE '-' END AS dia31 " +
                     "FROM ( " +
-                    "SELECT p_g.codigo AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fec_horario) AS anio, EXTRACT('month' FROM fec_horario) AS mes, " +
-                    "EXTRACT('day' FROM fec_horario) AS dia, " +
+                    "SELECT p_g.codigo AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fecha_horario) AS anio, EXTRACT('month' FROM fecha_horario) AS mes, " +
+                    "EXTRACT('day' FROM fecha_horario) AS dia, " +
                     "CASE WHEN ((tipo_dia = 'L' OR tipo_dia = 'FD') AND (NOT estado_origen = 'HL' AND NOT estado_origen = 'HFD')) THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
-                    "FROM plan_general p_g " +
-                    "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
-                    "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
-                    "WHERE fec_horario BETWEEN $1 AND $2 " +
+                    "FROM eu_asistencia_general p_g " +
+                    "INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
+                    "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
+                    "WHERE fecha_horario BETWEEN $1 AND $2 " +
                     "GROUP BY codigo_e, nombre_e, anio, mes, dia, codigo_dia, p_g.id_horario " +
                     "ORDER BY p_g.codigo,anio, mes , dia, p_g.id_horario " +
                     ") AS datos " +
@@ -276,11 +212,11 @@ class PlanGeneralControlador {
                 const { fecha_inicio, fecha_final, codigo } = req.body;
                 const HORARIO = yield database_1.default.query("SELECT horario.codigo AS codigo_dia, horario.nombre AS nombre, " +
                     "dh.hora, dh.tipo_accion, dh.id_horario, dh.id AS detalle " +
-                    "FROM plan_general p_g " +
-                    "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
-                    "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
-                    "INNER JOIN deta_horarios dh ON dh.id = p_g.id_det_horario " +
-                    "WHERE fec_horario BETWEEN $1 AND $2 " +
+                    "FROM eu_asistencia_general p_g " +
+                    "INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
+                    "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
+                    "INNER JOIN eh_detalle_horarios dh ON dh.id = p_g.id_detalle_horario " +
+                    "WHERE fecha_horario BETWEEN $1 AND $2 " +
                     "GROUP BY codigo_dia, tipo_dia, horario.nombre, dh.id_horario, dh.hora, dh.tipo_accion, dh.id " +
                     "ORDER BY dh.id_horario, dh.hora ASC", [fecha_inicio, fecha_final]);
                 if (HORARIO.rowCount > 0) {
@@ -301,10 +237,10 @@ class PlanGeneralControlador {
             try {
                 const { fecha_inicio, fecha_final, codigo } = req.body;
                 const HORARIO = yield database_1.default.query("SELECT p_g.id_horario, horario.codigo  AS codigo_horario " +
-                    "FROM plan_general p_g " +
-                    "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
-                    "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
-                    "WHERE fec_horario BETWEEN $1 AND $2 " +
+                    "FROM eu_asistencia_general p_g " +
+                    "INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
+                    "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
+                    "WHERE fecha_horario BETWEEN $1 AND $2 " +
                     "GROUP BY codigo_horario, p_g.id_horario", [fecha_inicio, fecha_final]);
                 if (HORARIO.rowCount > 0) {
                     return res.jsonp({ message: 'OK', data: HORARIO.rows });
@@ -324,10 +260,10 @@ class PlanGeneralControlador {
             try {
                 const { fecha_inicio, fecha_final, codigo } = req.body;
                 const HORARIO = yield database_1.default.query("SELECT p_g.id_horario, horario.codigo  AS codigo_horario, horario.default " +
-                    "FROM plan_general p_g " +
-                    "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
-                    "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
-                    "WHERE fec_horario BETWEEN $1 AND $2 AND (horario.default = 'FD' OR horario.default = 'L') " +
+                    "FROM eu_asistencia_general p_g " +
+                    "INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
+                    "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
+                    "WHERE fecha_horario BETWEEN $1 AND $2 AND (horario.default = 'FD' OR horario.default = 'L') " +
                     "GROUP BY codigo_horario, p_g.id_horario, horario.default", [fecha_inicio, fecha_final]);
                 if (HORARIO.rowCount > 0) {
                     return res.jsonp({ message: 'OK', data: HORARIO.rows });
@@ -351,17 +287,17 @@ class PlanGeneralControlador {
             if (codigo === '') {
                 // BUSCAR CODIGO POR CEDULA DEL USUARIO
                 EMPLEADO = yield database_1.default.query(`
-                SELECT codigo FROM empleados WHERE cedula = $1
+                SELECT codigo FROM eu_empleados WHERE cedula = $1
                 `, [cedula]);
                 if (EMPLEADO.rowCount === 0) {
                     // BUSCAR CODIGO POR NOMBRE DEL USUARIO
                     EMPLEADO = yield database_1.default.query(`
-                    SELECT codigo FROM empleados WHERE UPPER(nombre) ilike '%${nombre}%'
+                    SELECT codigo FROM eu_empleados WHERE UPPER(nombre) ilike '%${nombre}%'
                     `);
                     if (EMPLEADO.rowCount === 0) {
                         // BUSCAR CODIGO POR APELLIDO DEL USUARIO
                         EMPLEADO = yield database_1.default.query(`
-                        SELECT codigo FROM empleados WHERE UPPER(apellido) ilike '%${apellido}%'
+                        SELECT codigo FROM eu_empleados WHERE UPPER(apellido) ilike '%${apellido}%'
                         `);
                         if (EMPLEADO.rowCount != 0) {
                             // TRATAMIENTO DE CODIGOS
@@ -387,13 +323,13 @@ class PlanGeneralControlador {
                 codigos = '\'' + codigo + '\'';
             }
             if (verificador === 0) {
-                const ASISTENCIA = yield database_1.default.query("SELECT p_g.*, p_g.fec_hora_horario::time AS hora_horario, p_g.fec_hora_horario::date AS fecha_horario, " +
-                    "p_g.fec_hora_timbre::date AS fecha_timbre, p_g.fec_hora_timbre::time AS hora_timbre, " +
+                const ASISTENCIA = yield database_1.default.query("SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios, " +
+                    "p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre, " +
                     "empleado.cedula, empleado.nombre, empleado.apellido " +
-                    "FROM plan_general p_g " +
-                    "INNER JOIN empleados empleado on empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigos + ")" +
-                    "WHERE p_g.fec_horario BETWEEN $1 AND $2 " +
-                    "ORDER BY p_g.fec_hora_horario ASC", [inicio, fin]);
+                    "FROM eu_asistencia_general p_g " +
+                    "INNER JOIN eu_empleados empleado on empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigos + ")" +
+                    "WHERE p_g.fecha_horario BETWEEN $1 AND $2 " +
+                    "ORDER BY p_g.fecha_hora_horario ASC", [inicio, fin]);
                 if (ASISTENCIA.rowCount === 0) {
                     return res.status(404).jsonp({ message: 'vacio' });
                 }
@@ -410,71 +346,26 @@ class PlanGeneralControlador {
     ActualizarManual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { codigo, fecha, id, accion, id_timbre, user_name, ip } = req.body;
+                const { codigo, fecha, id, accion, id_timbre } = req.body;
                 console.log('ver datos ', codigo, ' ', fecha, ' ', id);
                 const ASIGNADO = yield database_1.default.query(`
                 SELECT * FROM fnbuscarregistroasignado ($1, $2::character varying);
                 `, [fecha, codigo]);
                 //console.log('ver asignado ', ASIGNADO)
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM plan_general WHERE id = $1`, [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'plan_general',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al actualizar el registro con id ${id}. Registro no encontrado.`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'error' });
-                }
                 const PLAN = yield database_1.default.query(`
-                UPDATE plan_general SET fec_hora_timbre = $1, estado_timbre = 'R' WHERE id = $2 RETURNING *
+                UPDATE eu_asistencia_general SET fecha_hora_timbre = $1, estado_timbre = 'R' WHERE id = $2 RETURNING *
                 `, [fecha, id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'plan_general',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: JSON.stringify(PLAN.rows),
-                    ip,
-                    observacion: null
-                });
                 if (PLAN.rowCount > 0) {
                     const TIMBRE = yield database_1.default.query(`
-                    UPDATE timbres SET accion = $1 WHERE id = $2
+                    UPDATE eu_timbres SET accion = $1 WHERE id = $2
                     `, [accion, id_timbre]);
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'timbres',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: JSON.stringify(TIMBRE.rows),
-                        ip,
-                        observacion: null
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
                     return res.jsonp({ message: 'OK', respuesta: PLAN.rows });
                 }
                 else {
-                    // REVERTIR TRANSACCION
-                    yield database_1.default.query('ROLLBACK');
                     res.status(404).jsonp({ message: 'error' });
                 }
             }
             catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error', error: error });
             }
         });
@@ -482,13 +373,15 @@ class PlanGeneralControlador {
     BuscarFecha(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, id_horario, codigo } = req.body;
-            const FECHAS = yield database_1.default.query('SELECT id FROM plan_general WHERE fec_horario = $1 AND ' +
-                'id_horario = $2 AND codigo = $3', [fec_inicio, id_horario, codigo]);
+            const FECHAS = yield database_1.default.query(`
+            SELECT id FROM eu_asistencia_general 
+            WHERE fecha_horario = $1 AND id_horario = $2 AND codigo = $3
+            `, [fec_inicio, id_horario, codigo]);
             if (FECHAS.rowCount > 0) {
                 return res.jsonp(FECHAS.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }

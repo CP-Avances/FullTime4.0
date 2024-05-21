@@ -24,8 +24,8 @@ export class ConfiguracionComponent implements OnInit {
   // IMAGENES
   cabecera: string;
   pie: string;
-  imagen_default_c: boolean = true;
-  imagen_default_p: boolean = true;
+  imagen_default_c: boolean = true
+  imagen_default_p: boolean = true;;
 
   constructor(
     public restE: EmpresaService,
@@ -60,8 +60,8 @@ export class ConfiguracionComponent implements OnInit {
         this.imagen_default_c = true
       }
       else {
-        this.cabecera = 'data:image/jpeg;base64,' + res.imagen;
         this.imagen_default_c = false;
+        this.cabecera = 'data:image/jpeg;base64,' + res.imagen;
       }
     })
   }
@@ -73,8 +73,8 @@ export class ConfiguracionComponent implements OnInit {
         this.imagen_default_p = true
       }
       else {
-        this.pie = 'data:image/jpeg;base64,' + res.imagen;
         this.imagen_default_p = false;
+        this.pie = 'data:image/jpeg;base64,' + res.imagen;
       }
     })
   }

@@ -103,8 +103,8 @@ export class ReporteHorasPedidasComponent implements OnInit {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.nombreEmpresa = res[0].nombre;
       this.frase = res[0].marca_agua;
     });
@@ -635,7 +635,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     // INICIALIZACIÓN DE VARIBLES
     var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;
     // BUSQUEDA DE LOS DATOS DEL EMPLEADO DEL CUAL SE OBTIENE EL REPORTE
-    this.datosEmpleado.forEach(obj => {
+    this.datosEmpleado.forEach((obj: any) => {
       if (obj.id === id_seleccionado) {
         nombre = obj.nombre;
         apellido = obj.apellido;
@@ -752,7 +752,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     // INICIALIZACIÓN DE VARIABLES
     var datosGenerales, mensaje: string;
     // BUSQUEDA DE LOS DATOS DEL EMPLEADO DEL CUAL SE OBTIENE EL REPORTE
-    this.datosEmpleado.forEach(obj => {
+    this.datosEmpleado.forEach((obj: any) => {
       if (obj.id === id_seleccionado) {
         datosGenerales = [{
           NOMBRE: obj.nombre,
@@ -866,7 +866,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     // INICIALIZACIÓN DE VARIABLES
     var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;
     // BUSQUEDA DE LOS DATOS DEL EMPLEADO DEL CUAL SE OBTIENE EL REPORTE
-    this.datosEmpleado.forEach(obj => {
+    this.datosEmpleado.forEach((obj: any) => {
       if (obj.id === id_seleccionado) {
         nombre = obj.nombre;
         apellido = obj.apellido;
@@ -979,7 +979,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     // INICIALIZACIÓN DE VARIABLES
     var datosGenerales: any;
     // BUSQUEDA DE LOS DATOS DEL EMPLEADO DEL CUAL SE OBTIENE EL REPORTE
-    this.datosEmpleado.forEach(obj => {
+    this.datosEmpleado.forEach((obj: any) => {
       if (obj.id === id_seleccionado) {
         datosGenerales = [{
           NOMBRE: obj.nombre,

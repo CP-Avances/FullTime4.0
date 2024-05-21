@@ -90,7 +90,7 @@
                             <mat-form-field id="fechas">
                                 <mat-label>Fecha de salida</mat-label>
                                 <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
-                                    [formControl]="fechaSalidaF">
+                                    [formControl]="fechaSalidaF" required>
                                 <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
                                     matTooltipPosition="right"
                                     matTooltip="Ingresar la fecha estimada de salida del empleado, en caso de conocerla. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
@@ -157,7 +157,6 @@
                             <div class="separar">
                                 <input type="text" readonly id="respaldo" placeholder="Ningún archivo seleccionado"
                                     class="form-control" style="width: 200px;" [formControl]="documentoF">
-
                                 <i *ngIf="HabilitarBtn" class="far fa-trash-alt" style="color:red; margin-left: 5px;"
                                     id="i-cursor" (click)="QuitarArchivo()" matSuffix matTooltipPosition="right"
                                     matTooltip="Eliminar archivo seleccionado.">

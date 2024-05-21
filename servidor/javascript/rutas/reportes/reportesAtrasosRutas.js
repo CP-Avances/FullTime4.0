@@ -12,8 +12,9 @@ class ReportesAtrasosRutas {
         this.configuracion();
     }
     configuracion() {
-        // REPORTES DE ATRASOS
+        // METODO DE BUSQUEDA DE DATOS DE ATRASOS LISTA sucursales[regimenes[departamentos[cargos[empleados]]]]
         this.router.put('/atrasos-empleados/:desde/:hasta', verificarToken_1.TokenValidation, reportesAtrasosControlador_1.default.ReporteAtrasos);
+        // METODO DE BUSQUEDA DE DATOS DE ATRASOS LISTA sucursales[empleados]]
         this.router.put('/atrasos-empleados-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAtrasosControlador_1.default.ReporteAtrasosRegimenCargo);
     }
 }

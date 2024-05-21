@@ -223,7 +223,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
     //console.log('ver original ', this.origen)
-    informacion.forEach(obj => {
+    informacion.forEach((obj: any) => {
       //console.log('ver obj ', obj)
       this.sucursales.push({
         id: obj.id_suc,
@@ -231,8 +231,8 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((obj: any) => {
         this.regimen.push({
           id: obj.id_regimen,
           nombre: obj.name_regimen,
@@ -242,9 +242,9 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(dep => {
-        dep.departamentos.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((dep: any) => {
+        dep.departamentos.forEach((obj: any) => {
           this.departamentos.push({
             id: obj.id_depa,
             departamento: obj.name_dep,
@@ -256,10 +256,10 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(dep => {
-        dep.departamentos.forEach(car => {
-          car.cargos.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((dep: any) => {
+        dep.departamentos.forEach((car: any) => {
+          car.cargos.forEach((obj: any) => {
             this.cargos.push({
               id: obj.id_cargo_,
               nombre: obj.name_cargo,
@@ -271,14 +271,14 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       })
     })
 
-    informacion.forEach(reg => {
-      reg.regimenes.forEach(dep => {
-        dep.departamentos.forEach(car => {
-          car.cargos.forEach(empl => {
-            empl.empleado.forEach(obj => {
+    informacion.forEach((reg: any) => {
+      reg.regimenes.forEach((dep: any) => {
+        dep.departamentos.forEach((car: any) => {
+          car.cargos.forEach((empl: any) => {
+            empl.empleado.forEach((obj: any) => {
               let elemento = {
                 id: obj.id,
-                nombre: obj.nombre + ' ' + obj.apellido,
+                nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
                 codigo: obj.codigo,
                 cedula: obj.cedula,
                 correo: obj.correo,
@@ -288,7 +288,8 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
                 id_suc: obj.id_suc,
                 id_regimen: obj.id_regimen,
                 id_depa: obj.id_depa,
-                id_cargo_: obj.id_cargo_ // TIPO DE CARGO
+                id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+                hora_trabaja: obj.hora_trabaja,
               }
               this.empleados.push(elemento)
             })
@@ -452,7 +453,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   masterToggleReg() {
     this.isAllSelectedReg() ?
       this.selectionReg.clear() :
-      this.regimen.forEach(row => this.selectionReg.select(row));
+      this.regimen.forEach((row: any) => this.selectionReg.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -473,7 +474,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   masterToggleCarg() {
     this.isAllSelectedCarg() ?
       this.selectionCarg.clear() :
-      this.cargos.forEach(row => this.selectionCarg.select(row));
+      this.cargos.forEach((row: any) => this.selectionCarg.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -494,7 +495,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
-      this.departamentos.forEach(row => this.selectionDep.select(row));
+      this.departamentos.forEach((row: any) => this.selectionDep.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -515,7 +516,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
-      this.empleados.forEach(row => this.selectionEmp.select(row));
+      this.empleados.forEach((row: any) => this.selectionEmp.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -524,6 +525,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       return `${this.isAllSelectedEmp() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+
   }
 
   // EVENTO DE PAGINACION DE TABLAS
@@ -963,7 +965,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
         // CONTROL DE ASIGNACION DE TIMBRES A LA ASISTENCIA
         var codigos = '';
-        data.forEach(obj => {
+        data.forEach((obj: any) => {
           if (codigos === '') {
             codigos = '\'' + obj.codigo + '\''
           }

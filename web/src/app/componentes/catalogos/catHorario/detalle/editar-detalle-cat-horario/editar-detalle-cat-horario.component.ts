@@ -114,7 +114,7 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
 
   // METODO PARA MOSTRAR DATOS EN FORMULARIO
   CargarDatos() {
-    const [obj] = this.options.filter(o => {
+    const [obj] = this.options.filter((o: any) => {
       return o.orden === this.data.detalle.orden
     })
     this.formulario.patchValue({
@@ -123,9 +123,9 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
       accionForm: obj.accion,
       segundoForm: this.data.detalle.segundo_dia,
       terceroForm: this.data.detalle.tercer_dia,
-      minEsperaForm: this.data.detalle.minu_espera,
-      min_antesForm: this.data.detalle.min_antes,
-      min_despuesForm: this.data.detalle.min_despues,
+      minEsperaForm: this.data.detalle.tolerancia,
+      min_antesForm: this.data.detalle.minutos_antes,
+      min_despuesForm: this.data.detalle.minutos_despues,
     })
     if (obj.orden === 1) {
       this.espera = true;
@@ -213,7 +213,7 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
     }
     console.log('ver datos de horario ', detalle)
     this.ValidarMinEspera(form, detalle);
-    if (this.datosHorario[0].min_almuerzo === 0) {
+    if (this.datosHorario[0].minutos_comida === 0) {
       this.ValidarDetallesSinAlimentacion(detalle);
     }
     else {

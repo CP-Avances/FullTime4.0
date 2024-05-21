@@ -115,8 +115,13 @@ export class EmpleadoService {
     return this.http.put(`${environment.url}/empleado/${idEmpleado}/uploadImage`, formData)
   }
 
-  obtenerImagen(id: any, imagen: any){
+  obtenerImagen(id: any, imagen: any) {
     return this.http.get<any>(`${environment.url}/empleado/img/codificado/${id}/${imagen}`)
+  }
+
+  // METODO PARA ELIMINAR REGISTRO
+  EliminarEmpleados(id: any) {
+    return this.http.delete(`${environment.url}/empleado/eliminar/${id}`).pipe(catchError(id));
   }
 
 
@@ -132,6 +137,11 @@ export class EmpleadoService {
   // METODO PARA REGISTRAR TITULO PROFESIONAL
   RegistrarTitulo(data: any) {
     return this.http.post(`${environment.url}/empleado/emplTitulos`, data);
+  }
+
+  // METODO PARA BUSCAR TITULO ESPECIFICO DEL USUARIO
+  BuscarTituloEspecifico(data: any) {
+    return this.http.post(`${environment.url}/empleado/emplTitulos/usuario`, data);
   }
 
   ActualizarTitulo(id: number, data: any) {
@@ -175,6 +185,11 @@ export class EmpleadoService {
   // REGISTRAR MODALIDAD DE TRABAJO
   CrearTiposContrato(datos: any) {
     return this.http.post<any>(`${environment.url}/contratoEmpleado/modalidad/trabajo`, datos);
+  }
+
+  // REGISTRAR MODALIDAD DE TRABAJO
+  BuscarModalidadLaboralNombre(datos: any) {
+    return this.http.post<any>(`${environment.url}/contratoEmpleado/modalidad/trabajo/nombre`, datos);
   }
 
 
@@ -337,6 +352,14 @@ export class EmpleadoService {
     return this.http.get<any>(`${environment.url}/contratoEmpleado/modalidad/trabajo/ultimo`);
   }
 
+
+  RevisarFormato(formData) {
+    return this.http.post<any>(`${environment.url}/contratoEmpleado/upload/revision`, formData);
+  }
+
+  subirArchivoExcelContrato(formData) {
+    return this.http.post<any>(`${environment.url}/contratoEmpleado/cargar_plantilla/`, formData);
+  }
 
 
 

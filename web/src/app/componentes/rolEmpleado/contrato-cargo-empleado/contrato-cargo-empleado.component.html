@@ -33,7 +33,7 @@
                             <div class="col-md">
                                 <div class="espacio d-flex justify-content-start">
                                     <label id="datosF">Fecha hasta:</label>
-                                    <label *ngIf="ce.fec_salida === null; else fechaSalida">
+                                    <label *ngIf="ce.fecha_salida === null; else fechaSalida">
                                         Sin fecha
                                     </label>
                                     <ng-template #fechaSalida>
@@ -54,7 +54,7 @@
                             <div class="col-md">
                                 <div class="espacio d-flex justify-content-start">
                                     <label id="datosF">Control de asistencia:</label>
-                                    <label> {{ce.asis_controla === true ? 'Si' : 'No'}} </label>
+                                    <label> {{ce.controlar_asistencia === true ? 'Si' : 'No'}} </label>
                                 </div>
                             </div>
                         </div>
@@ -62,7 +62,7 @@
                             <div class="col-md">
                                 <div class="espacio d-flex justify-content-start">
                                     <label id="datosF">Control de vacaciones:</label>
-                                    <label> {{ce.vaca_controla === true ? 'Si' : 'No'}} </label>
+                                    <label> {{ce.controlar_vacacion === true ? 'Si' : 'No'}} </label>
                                 </div>
                             </div>
                         </div>
@@ -134,8 +134,8 @@
                             <div class="col-md">
                                 <div class="espacio d-flex justify-content-start">
                                     <label id="datosF">Fecha hasta:</label>
-                                    <label *ngIf="ce.fec_salida === null">Sin fecha</label>
-                                    <label *ngIf="ce.fec_salida != null">{{ce.fec_salida_}}</label>
+                                    <label *ngIf="ce.fecha_salida === null">Sin fecha</label>
+                                    <label *ngIf="ce.fecha_salida != null">{{ce.fec_salida_}}</label>
                                 </div>
                             </div>
                         </div>
@@ -143,8 +143,8 @@
                             <div class="col-md">
                                 <div class="espacio d-flex justify-content-start">
                                     <label id="datosF">Control de asistencia:</label>
-                                    <label *ngIf="ce.asis_controla == true">Si</label>
-                                    <label *ngIf="ce.asis_controla == false">No</label>
+                                    <label *ngIf="ce.controlar_asistencia == true">Si</label>
+                                    <label *ngIf="ce.controlar_asistencia == false">No</label>
                                 </div>
                             </div>
                         </div>
@@ -152,8 +152,8 @@
                             <div class="col-md">
                                 <div class="espacio d-flex justify-content-start">
                                     <label id="datosF">Control de vacaciones:</label>
-                                    <label *ngIf="ce.vaca_controla == true">Si</label>
-                                    <label *ngIf="ce.vaca_controla == false">No</label>
+                                    <label *ngIf="ce.controlar_vacacion == true">Si</label>
+                                    <label *ngIf="ce.controlar_vacacion == false">No</label>
                                 </div>
                             </div>
                         </div>

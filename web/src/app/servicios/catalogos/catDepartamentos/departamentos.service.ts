@@ -134,8 +134,13 @@ export class DepartamentosService {
 
 
 
-
-
+  RevisarFormato(formData) {
+    console.log('formDataDepartamentos: ',formData);
+    return this.http.post<any>(environment.url + '/departamento/upload/revision', formData);
+  }
+  subirArchivoExcel(formData) {
+    return this.http.post<any>(`${environment.url}/departamento/cargar_plantilla/`, formData);
+  }
 
 
   BuscarDepartamentoRegimen(id: number) {

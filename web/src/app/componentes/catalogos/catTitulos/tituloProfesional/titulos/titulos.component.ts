@@ -5,6 +5,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 
 import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
 import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-titulos',
@@ -40,6 +41,7 @@ export class TitulosComponent implements OnInit {
     private nivel_: NivelTitulosService,
     private toastr: ToastrService,
     public ventana: MatDialogRef<TitulosComponent>,
+    public validar: ValidacionesService,
   ) {
   }
 
@@ -77,39 +79,7 @@ export class TitulosComponent implements OnInit {
 
   // METODO PARA VALIDAR INGRESO DE LETRAS
   IngresarSoloLetras(e: any) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACIÓN DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTo.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-        timeOut: 6000,
-      })
-      return false;
-    }
-  }
-
-  // METODO PARA EMITIR MENSAJES DE ERROR
-  ObtenerMensajeErrorNombre() {
-    if (this.nombre.hasError('required')) {
-      return 'Campo Obligatorio';
-    }
-    return this.nombre.hasError('pattern') ? 'Ingrese un nombre válido' : '';
-  }
-
-  ObtenerMensajeErrorNivel() {
-    if (this.nombreNivel.hasError('pattern')) {
-      return 'Ingrese un nombre válido';
-    }
+    return this.validar.IngresarSoloLetras(e);
   }
 
   // METODO PARA REGISTRAR TITULO
@@ -117,7 +87,6 @@ export class TitulosComponent implements OnInit {
     if (form.tituloNivelForm === undefined || form.tituloNivelForm === 'OTRO') {
       if (form.nombreNivelForm != '') {
         this.GuardarNivel(form);
-
       }
       else {
         this.toastr.info('Ingrese un nombre de nivel o seleccione uno de la lista de niveles.', '', {
@@ -137,9 +106,18 @@ export class TitulosComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     };
-    this.nivel_.RegistrarNivel(nivel).subscribe(response => {
-      this.GuardarTitulo(form, response.id);
-    })
+    // VERIIFCAR DUPLICIDAD
+    let nombre_nivel = (nivel.nombre).toUpperCase();
+    this.nivel_.BuscarNivelNombre(nombre_nivel).subscribe(response => {
+      this.toastr.warning('El nivel ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+        timeOut: 3000,
+      });
+    }, vacio => {
+      // GUARDAR DATOS DE NIVEL EN EL SISTEMA
+      this.nivel_.RegistrarNivel(nivel).subscribe(response => {
+        this.GuardarTitulo(form, response.id);
+      })
+    });
   }
 
   // METODO PARA GUARDAR TITULO
@@ -150,7 +128,22 @@ export class TitulosComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip
     };
+    // METODO PARA VALIDAR DUPLICADOS
+    let verificar = {
+      nombre: (titulo.nombre).toUpperCase(),
+      nivel: titulo.id_nivel
+    }
+    this.rest.BuscarTituloNombre(verificar).subscribe(response => {
+      this.toastr.warning('El nombre ingresado ya existe en el sistema.', 'Ups!!! algo salio mal.', {
+        timeOut: 3000,
+      });
+    }, vacio => {
+      this.AlmacenarTitulo(titulo);
+    });
+  }
 
+  // METODO PARA ALMACENAR EN LA BASE DE DATOS
+  AlmacenarTitulo(titulo: any) {
     this.rest.RegistrarTitulo(titulo).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
@@ -168,6 +161,11 @@ export class TitulosComponent implements OnInit {
   CerrarVentana() {
     this.LimpiarCampos();
     this.ventana.close();
+  }
+
+  // METODO PARA BUSCAR TITULO
+  BuscarTitulo() {
+
   }
 
 }

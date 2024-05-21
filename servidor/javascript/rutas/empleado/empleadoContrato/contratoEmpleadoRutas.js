@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const contratoEmpleadoControlador_1 = __importDefault(require("../../../controlador/empleado/empleadoContrato/contratoEmpleadoControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 const verificarToken_1 = require("../../../libs/verificarToken");
 const express_1 = require("express");
 const multer_1 = __importDefault(require("multer"));
@@ -28,7 +29,7 @@ const storage = multer_1.default.diskStorage({
         return __awaiter(this, void 0, void 0, function* () {
             let id = req.params.id;
             const usuario = yield database_1.default.query(`
-            SELECT e.id FROM empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+            SELECT e.id FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
             `, [id]);
             var ruta = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(usuario.rows[0].id);
             cb(null, ruta);
@@ -44,7 +45,7 @@ const storage = multer_1.default.diskStorage({
             // DATOS DOCUMENTO
             let id = req.params.id;
             const usuario = yield database_1.default.query(`
-            SELECT codigo FROM empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+            SELECT codigo FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
             `, [id]);
             let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
             cb(null, documento);
@@ -52,6 +53,16 @@ const storage = multer_1.default.diskStorage({
     }
 });
 const upload = (0, multer_1.default)({ storage: storage });
+const storage_plantilla = multer_1.default.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, (0, accesoCarpetas_2.ObtenerRutaLeerPlantillas)());
+    },
+    filename: function (req, file, cb) {
+        let documento = file.originalname;
+        cb(null, documento);
+    }
+});
+const upload_plantilla = (0, multer_1.default)({ storage: storage_plantilla });
 class DepartamentoRutas {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -88,10 +99,17 @@ class DepartamentoRutas {
         this.router.post('/modalidad/trabajo', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.CrearTipoContrato);
         // BUSCAR LISTA DE MODALIDAD DE TRABAJO
         this.router.get('/modalidad/trabajo', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.ListarTiposContratos);
+        // BUSCAR MODALIDAD LABORAL POR SU NOMBRE
+        this.router.post('/modalidad/trabajo/nombre', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.BuscarModalidadLaboralNombre);
         this.router.get('/', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.ListarContratos);
         this.router.get('/:id/get', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.ObtenerUnContrato);
         this.router.get('/:id_empleado', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EncontrarIdContrato);
         this.router.post('/buscarFecha/contrato', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EncontrarFechaContratoId);
+        /** ********************************************************************************************* **
+         ** **            METODO PAARA LA LECTURA DEL REGISTRO MULTIPLE DE CONTRATOS                   ** **
+         ** ********************************************************************************************* **/
+        this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload_plantilla.single('uploads')], contratoEmpleadoControlador_1.default.RevisarDatos);
+        this.router.post('/cargar_plantilla/', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.CargarPlantilla_contrato);
     }
 }
 const CONTRATO_EMPLEADO_RUTAS = new DepartamentoRutas();

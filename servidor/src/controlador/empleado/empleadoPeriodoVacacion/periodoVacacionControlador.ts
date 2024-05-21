@@ -6,32 +6,35 @@ import fs from "fs";
 
 class PeriodoVacacionControlador {
   // METODO PARA BUSCAR ID DE PERIODO DE VACACIONES
-  public async EncontrarIdPerVacaciones(req: Request,res: Response): Promise<any> {
+  public async EncontrarIdPerVacaciones(req: Request, res: Response): Promise<any> {
+
     const { id_empleado } = req.params;
     const VACACIONES = await pool.query(
-      `
-            SELECT pv.id, pv.id_empl_contrato
-            FROM peri_vacaciones AS pv
-            WHERE pv.id = (SELECT MAX(pv.id) AS id 
-                           FROM peri_vacaciones AS pv, empleados AS e 
-                           WHERE pv.codigo = e.codigo AND e.id = $1 )
-            `,
-      [id_empleado]
-    );
+        `
+        SELECT pv.id, pv.id_empleado_contrato
+        FROM mv_periodo_vacacion AS pv
+        WHERE pv.id = (SELECT MAX(pv.id) AS id 
+                       FROM mv_periodo_vacacion AS pv, eu_empleados AS e 
+                       WHERE pv.codigo = e.codigo AND e.id = $1 )
+        `
+        , [id_empleado]);
     if (VACACIONES.rowCount > 0) {
-      return res.jsonp(VACACIONES.rows);
+        return res.jsonp(VACACIONES.rows)
     }
-    res.status(404).jsonp({ text: "Registro no encontrado" });
+    res.status(404).jsonp({ text: 'Registro no encontrado' });
   }
 
   public async ListarPerVacaciones(req: Request, res: Response) {
     const VACACIONES = await pool.query(
-      "SELECT * FROM peri_vacaciones WHERE estado = 1 ORDER BY fec_inicio DESC"
+        `
+        SELECT * FROM mv_periodo_vacacion WHERE estado = 1 ORDER BY fecha_inicio DESC
+        `
     );
     if (VACACIONES.rowCount > 0) {
-      return res.jsonp(VACACIONES.rows);
-    } else {
-      return res.status(404).jsonp({ text: "No se encuentran registros" });
+        return res.jsonp(VACACIONES.rows)
+    }
+    else {
+        return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
@@ -46,9 +49,11 @@ class PeriodoVacacionControlador {
       await pool.query("BEGIN");
 
       await pool.query(
-        "INSERT INTO peri_vacaciones (id_empl_contrato, descripcion, dia_vacacion, " +
-          "dia_antiguedad, estado, fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, codigo ) " +
-          "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+        `
+          INSERT INTO mv_periodo_vacacion (id_empleado_contrato, descripcion, dia_vacacion,
+              dia_antiguedad, estado, fecha_inicio, fecha_final, dia_perdido, horas_vacaciones, minutos_vacaciones, codigo)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        `,
         [ id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
           fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones,
           codigo,]
@@ -56,11 +61,11 @@ class PeriodoVacacionControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: "peri_vacaciones",
+        tabla: "mv_periodo_vacacion",
         usuario: user_name,
         accion: "I",
         datosOriginales: "",
-        datosNuevos: `{id_empl_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, estado: ${estado}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, min_vacaciones: ${min_vacaciones}, codigo: ${codigo}}`,
+        datosNuevos: `{id_empleado_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, estado: ${estado}, fecha_inicio: ${fec_inicio}, fecha_final: ${fec_final}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, minutos_vacaciones: ${min_vacaciones}, codigo: ${codigo}}`,
         ip,
         observacion: null,
       });
@@ -75,16 +80,17 @@ class PeriodoVacacionControlador {
     }
   }
 
-  public async EncontrarPerVacaciones(req: Request,res: Response): Promise<any> {
+  public async EncontrarPerVacaciones(req: Request, res: Response): Promise<any> {
     const { codigo } = req.params;
     const PERIODO_VACACIONES = await pool.query(
-      "SELECT * FROM peri_vacaciones AS p WHERE p.codigo = $1",
-      [codigo]
-    );
+        `
+        SELECT * FROM mv_periodo_vacacion AS p WHERE p.codigo = $1
+        `
+        , [codigo]);
     if (PERIODO_VACACIONES.rowCount > 0) {
-      return res.jsonp(PERIODO_VACACIONES.rows);
+        return res.jsonp(PERIODO_VACACIONES.rows)
     }
-    res.status(404).jsonp({ text: "Registro no encontrado" });
+    res.status(404).jsonp({ text: 'Registro no encontrado.' });
   }
 
   public async ActualizarPeriodo(req: Request,res: Response): Promise<Response> {
@@ -99,14 +105,14 @@ class PeriodoVacacionControlador {
 
       // CONSULTAR DATOSORIGINALES
       const periodo = await pool.query(
-        "SELECT * FROM peri_vacaciones WHERE id = $1",
+        "SELECT * FROM mv_periodo_vacacion WHERE id = $1",
         [id]
       );
       const [datosOriginales] = periodo.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: "peri_vacaciones",
+          tabla: "mv_periodo_vacacion",
           usuario: user_name,
           accion: "U",
           datosOriginales: "",
@@ -121,18 +127,24 @@ class PeriodoVacacionControlador {
       }
 
       await pool.query(
-        "UPDATE peri_vacaciones SET id_empl_contrato = $1, descripcion = $2, dia_vacacion = $3 , dia_antiguedad = $4, estado = $5, fec_inicio = $6, fec_final = $7, dia_perdido = $8, horas_vacaciones = $9, min_vacaciones = $10 WHERE id = $11",
+        `
+        UPDATE mv_periodo_vacacion SET id_empleado_contrato = $1, descripcion = $2, dia_vacacion = $3 ,
+            dia_antiguedad = $4, estado = $5, fecha_inicio = $6, fecha_final = $7, dia_perdido = $8, 
+            horas_vacaciones = $9, minutos_vacaciones = $10 
+        WHERE id = $11
+        `
+        ,
         [ id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
           fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id, ]
       );
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: "peri_vacaciones",
+        tabla: "mv_periodo_vacacion",
         usuario: user_name,
         accion: "U",
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{id_empl_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, estado: ${estado}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, min_vacaciones: ${min_vacaciones}}`,
+        datosNuevos: `{id_empleado_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, estado: ${estado}, fecha_inicio: ${fec_inicio}, fecha_final: ${fec_final}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, minutos_vacaciones: ${min_vacaciones}}`,
         ip,
         observacion: null,
       });
@@ -192,22 +204,28 @@ class PeriodoVacacionControlador {
       // VERIFICAR SI LA CÉDULA DEL EMPLEADO EXISTEN DENTRO DEL SISTEMA
       if (cedula != undefined) {
         const CEDULA = await pool.query(
-          "SELECT id, codigo FROM empleados WHERE cedula = $1",
+          `
+          SELECT id, codigo FROM eu_empleados WHERE cedula = $1
+          `,
           [cedula]
         );
         if (CEDULA.rowCount != 0) {
           contarCedula = contarCedula + 1;
           // VERIFICAR SI EL EMPLEADO TIENE UN CONTRATO
           const CONTRATO = await pool.query(
-            "SELECT MAX(ec.id) FROM empl_contratos AS ec, empleados AS e WHERE ec.id_empleado = e.id AND e.id = $1",
-            [CEDULA.rows[0]["id"]]
+            `
+            SELECT MAX(ec.id) FROM eu_empleado_contratos AS ec, eu_empleados AS e 
+            WHERE ec.id_empleado = e.id AND e.id = $1
+            `,[CEDULA.rows[0]["id"]]
           );
           if (CONTRATO.rowCount != 0) {
             contarContrato = contarContrato + 1;
             // VERIFICAR SI EL EMPLEADO YA TIENE REGISTRADO UN PERIODO DE VACACIONES
             const PERIODO = await pool.query(
-              "SELECT * FROM peri_vacaciones WHERE codigo = $1",
-              CEDULA.rows[0]["codigo"]
+              `
+              SELECT * FROM mv_periodo_vacacion WHERE codigo = $1
+              `
+              ,CEDULA.rows[0]["codigo"]
             );
             if (PERIODO.rowCount === 0) {
               contarPeriodos = contarPeriodos + 1;
@@ -216,7 +234,6 @@ class PeriodoVacacionControlador {
         }
       }
       // VERIFICAR QUE TODOS LOS DATOS SEAN CORRECTOS
-      console.log("datos", contarDatos, contarCedula, contarContrato);
       if (contador === plantilla.length) {
         if (
           contarDatos === plantilla.length &&
@@ -258,8 +275,7 @@ class PeriodoVacacionControlador {
     //LEER LA PLANTILLA PARA LLENAR UN ARRAY CON LOS DATOS NOMBRE PARA VERIFICAR QUE NO SEAN DUPLICADOS
     plantilla.forEach(async (data: any) => {
       // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
-      const {
-        nombre_empleado, apellido_empleado, cedula, descripcion, vacaciones_tomadas, fecha_inicia_periodo, 
+      const { nombre_empleado, apellido_empleado, cedula, descripcion, vacaciones_tomadas, fecha_inicia_periodo, 
         fecha_fin_periodo, dias_vacacion, horas_vacacion, minutos_vacacion, dias_por_antiguedad, dias_perdidos,
       } = data;
 
@@ -325,13 +341,17 @@ class PeriodoVacacionControlador {
 
         // OBTENER ID DEL EMPLEADO MEDIANTE LA CÉDULA
         const datosEmpleado = await pool.query(
-          "SELECT id, nombre, apellido, codigo, estado FROM empleados WHERE cedula = $1",
-          [cedula]
+          `
+          SELECT id, nombre, apellido, codigo, estado FROM eu_empleados WHERE cedula = $1
+          `,[cedula]
         );
         let id_empleado = datosEmpleado.rows[0]["id"];
         // OBTENER EL ID DEL CONTRATO ACTUAL DEL EMPLEADO INDICADO
         const CONTRATO = await pool.query(
-          "SELECT MAX(ec.id) FROM empl_contratos AS ec, empleados AS e WHERE ec.id_empleado = e.id AND e.id = $1",
+          `
+          SELECT MAX(ec.id) FROM eu_empleado_contratos AS ec, eu_empleados AS e 
+          WHERE ec.id_empleado = e.id AND e.id = $1
+          `,
           [id_empleado]
         );
         let id_empl_contrato = CONTRATO.rows[0]["max"];
@@ -344,9 +364,12 @@ class PeriodoVacacionControlador {
 
         // REGISTRAR DATOS DE PERIODO DE VACACIÓN
         await pool.query(
-          "INSERT INTO peri_vacaciones (id_empl_contrato, descripcion, dia_vacacion, " +
-            "dia_antiguedad, estado, fec_inicio, fec_final, dia_perdido, horas_vacaciones, " +
-            "min_vacaciones, codigo ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+          `
+          INSERT INTO mv_periodo_vacacion (id_empleado_contrato, descripcion, dia_vacacion,
+              dia_antiguedad, estado, fecha_inicio, fecha_final, dia_perdido, horas_vacaciones,
+              minutos_vacaciones, codigo) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+          `,
           [
             id_empl_contrato, descripcion, dias_vacacion, dias_por_antiguedad, estado, fecha_inicia_periodo,
             fecha_fin_periodo, dias_perdidos, horas_vacacion, minutos_vacacion, datosEmpleado.rows[0]["codigo"],
@@ -355,11 +378,11 @@ class PeriodoVacacionControlador {
 
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: "peri_vacaciones",
+          tabla: "mv_periodo_vacacion",
           usuario: user_name,
           accion: "I",
           datosOriginales: "",
-          datosNuevos: `{id_empl_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, dia_vacacion: ${dias_vacacion}, dia_antiguedad: ${dias_por_antiguedad}, estado: ${estado}, fec_inicio: ${fecha_inicia_periodo}, fec_final: ${fecha_fin_periodo}, dia_perdido: ${dias_perdidos}, horas_vacaciones: ${horas_vacacion}, min_vacaciones: ${minutos_vacacion}, codigo: ${datosEmpleado.rows[0]["codigo"]}}`,
+          datosNuevos: `{id_empleado_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, dia_vacacion: ${dias_vacacion}, dia_antiguedad: ${dias_por_antiguedad}, estado: ${estado}, fecha_inicio: ${fecha_inicia_periodo}, fecha_final: ${fecha_fin_periodo}, dia_perdido: ${dias_perdidos}, horas_vacaciones: ${horas_vacacion}, minutos_vacaciones: ${minutos_vacacion}, codigo: ${datosEmpleado.rows[0]["codigo"]}}`,
           ip,
           observacion: null,
         });

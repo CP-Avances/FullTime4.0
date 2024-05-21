@@ -5,7 +5,6 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
 // IMPORTAR SERVICIOS
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
@@ -23,7 +22,7 @@ export class CrearTimbreComponent implements OnInit {
   FechaF = new FormControl('', Validators.required);
   HoraF = new FormControl('', Validators.required);
 
-  // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESIÓN
+  // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
   idEmpleadoLogueado: any;
   nombre: string;
 
@@ -63,7 +62,6 @@ export class CrearTimbreComponent implements OnInit {
   constructor(
     public ventana: MatDialogRef<CrearTimbreComponent>, // VARIABLE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE MANEJO DE NOTIFICACIONES
-    private validar: ValidacionesService, // VARIABLE DE CONTROL DE VALIDACIÓN
     private restTimbres: TimbresService, // SERVICIO DATOS DE TIMBRES
     private restEmpleado: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     @Inject(MAT_DIALOG_DATA) public data: any, // MANEJO DE DATOS ENTRE VENTANAS
@@ -141,17 +139,13 @@ export class CrearTimbreComponent implements OnInit {
     }
   }
 
-  // VARIABLE DE ALMACENAMIENTO DE DATOS
-  data_nueva: any = [];
-
   // METODO DE INGRESO DE TIMBRES
   contador: number = 0;
   InsertarTimbre(form: any) {
-
     let timbre = {
       fec_hora_timbre: form.fechaForm.toJSON().split('T')[0] + 'T' + form.horaForm + ':00',
       tecl_funcion: this.TeclaFuncion(form.accionForm),
-      observacion: 'Timbre creado por Admin. ' + this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido,
+      observacion: 'Timbre creado por ' + this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido,
       id_empleado: '',
       id_reloj: 98,
       longitud: this.longitud,
@@ -163,22 +157,16 @@ export class CrearTimbreComponent implements OnInit {
     }
 
     if (this.data.length === undefined) {
-      console.log(' id' + this.data.id);
+      //-console.log(' id' + this.data.id);
       timbre.id_empleado = this.data.id;
       this.ventana.close(timbre);
     }
     else {
       this.contador = 0;
-      this.data.map(obj => {
+      this.data.map((obj: any) => {
         timbre.id_empleado = obj.id;
-        // LIMPIAR VARIABLE Y ALMACENAR DATOS
-        this.data_nueva = [];
-        this.data_nueva = timbre;
         // METODO DE INSERCIoN DE TIMBRES
         this.restTimbres.RegistrarTimbreAdmin(timbre).subscribe(res => {
-          // METODO PARA AUDITAR TIMBRES
-          this.data_nueva.id_empleado = obj.id;
-          this.validar.Auditar('app-web', 'timbres', '', this.data_nueva, 'INSERT');
           this.contador = this.contador + 1;
           if (this.contador === this.data.length) {
             this.ventana.close();

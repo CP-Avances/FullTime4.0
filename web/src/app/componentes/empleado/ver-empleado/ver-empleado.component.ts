@@ -343,7 +343,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.empleadoUno = [];
     this.restEmpleado.BuscarUnEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
       this.empleadoUno = data;
-      this.empleadoUno[0].fec_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fec_nacimiento, formato_fecha, this.validar.dia_abreviado);
+      this.empleadoUno[0].fec_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fecha_nacimiento, formato_fecha, this.validar.dia_abreviado);
       var empleado = data[0].nombre + data[0].apellido;
       if (data[0].imagen != null) {
         this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
@@ -740,8 +740,8 @@ export class VerEmpleadoComponent implements OnInit {
     this.restEmpleado.BuscarDatosContrato(id_contrato).subscribe(res => {
       this.contratoEmpleado = res;
       this.contratoEmpleado.forEach(data => {
-        data.fec_ingreso_ = this.validar.FormatearFecha(data.fec_ingreso, formato_fecha, this.validar.dia_abreviado);
-        data.fec_salida_ = this.validar.FormatearFecha(data.fec_salida, formato_fecha, this.validar.dia_abreviado);
+        data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, formato_fecha, this.validar.dia_abreviado);
+        data.fec_salida_ = this.validar.FormatearFecha(data.fecha_salida, formato_fecha, this.validar.dia_abreviado);
       })
     });
   }
@@ -753,7 +753,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.restEmpleado.BuscarContratosEmpleado(parseInt(this.idEmpleado)).subscribe(res => {
       this.contratoBuscado = res;
       this.contratoBuscado.forEach(data => {
-        data.fec_ingreso_ = this.validar.FormatearFecha(data.fec_ingreso, formato_fecha, this.validar.dia_abreviado);
+        data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, formato_fecha, this.validar.dia_abreviado);
       })
     });
   }
@@ -771,14 +771,14 @@ export class VerEmpleadoComponent implements OnInit {
     this.restEmpleado.BuscarDatosContrato(form.fechaContratoForm).subscribe(res => {
       this.contratoSeleccionado = res;
       this.contratoSeleccionado.forEach(data => {
-        data.fec_ingreso_ = this.validar.FormatearFecha(data.fec_ingreso, this.formato_fecha, this.validar.dia_abreviado);
-        data.fec_salida_ = this.validar.FormatearFecha(data.fec_salida, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_salida_ = this.validar.FormatearFecha(data.fecha_salida, this.formato_fecha, this.validar.dia_abreviado);
       })
     });
     this.restCargo.BuscarCargoIDContrato(form.fechaContratoForm).subscribe(datos => {
       this.listaCargos = datos;
       this.listaCargos.forEach(data => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
       })
     }, error => {
       this.toastr.info('El contrato seleccionado no registra ningún cargo.', 'VERIFICAR', {
@@ -843,8 +843,8 @@ export class VerEmpleadoComponent implements OnInit {
     this.restCargo.BuscarCargoID(id_cargo).subscribe(datos => {
       this.cargoEmpleado = datos;
       this.cargoEmpleado.forEach(data => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
-        data.fec_final_ = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
+        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado);
+        data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, formato_fecha, this.validar.dia_abreviado);
       })
     });
   }
@@ -867,8 +867,8 @@ export class VerEmpleadoComponent implements OnInit {
     this.restCargo.BuscarCargoID(form.fechaICargoForm).subscribe(datos => {
       this.cargoSeleccionado = datos;
       this.cargoSeleccionado.forEach(data => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, this.formato_fecha, this.validar.dia_abreviado);
-        data.fec_final_ = this.validar.FormatearFecha(data.fec_final, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, this.formato_fecha, this.validar.dia_abreviado);
       })
     });
   }
@@ -1003,7 +1003,7 @@ export class VerEmpleadoComponent implements OnInit {
         this.ver_activar_editar = true;
         this.editar_activar = false;
 
-        this.horariosEmpleado.forEach(obj => {
+        this.horariosEmpleado.forEach((obj: any) => {
           obj.index = index;
           index = index + 1;
         })
@@ -1052,7 +1052,7 @@ export class VerEmpleadoComponent implements OnInit {
         this.detalle_acciones = [];
         this.detalles = datos.data;
 
-        datos.data.forEach(obj => {
+        datos.data.forEach((obj: any) => {
           if (aux_h === '') {
             accion = obj.tipo_accion + ': ' + obj.hora;
             this.ValidarAcciones(obj);
@@ -1099,7 +1099,7 @@ export class VerEmpleadoComponent implements OnInit {
         }]
         this.detalle_acciones = this.detalle_acciones.concat(tipos);
 
-        this.detalle_acciones.forEach(detalle => {
+        this.detalle_acciones.forEach((detalle: any) => {
           detalle.entrada_ = this.validar.FormatearHora(detalle.entrada, this.formato_hora);
           if (detalle.inicio_comida != '') {
             detalle.inicio_comida = this.validar.FormatearHora(detalle.inicio_comida, this.formato_hora);
@@ -1592,12 +1592,12 @@ export class VerEmpleadoComponent implements OnInit {
     this.lectura = 1;
     this.aprobar.BuscarAutorizacionPermiso(id).subscribe(data => {
       this.aprobacionPermiso = data[0];
-      if (this.aprobacionPermiso.id_documento === '' || this.aprobacionPermiso.id_documento === null) {
+      if (this.aprobacionPermiso.id_autoriza_estado === '' || this.aprobacionPermiso.id_autoriza_estado === null) {
         this.GenerarPDFPermisos('open');
       }
       else {
         // METODO PARA OBTENER EMPLEADOS Y ESTADOS
-        var autorizaciones = this.aprobacionPermiso.id_documento.split(',');
+        var autorizaciones = this.aprobacionPermiso.id_autoriza_estado.split(',');
         autorizaciones.map((obj: string) => {
           this.lectura = this.lectura + 1;
           if (obj != '') {
@@ -1965,8 +1965,8 @@ export class VerEmpleadoComponent implements OnInit {
 
       this.peridoVacaciones.forEach(v => {
         // TRATAMIENTO DE FECHAS Y HORAS
-        v.fec_inicio_ = this.validar.FormatearFecha(v.fec_inicio, formato_fecha, this.validar.dia_completo);
-        v.fec_final_ = this.validar.FormatearFecha(v.fec_final, formato_fecha, this.validar.dia_completo);
+        v.fec_inicio_ = this.validar.FormatearFecha(v.fecha_inicio, formato_fecha, this.validar.dia_completo);
+        v.fec_final_ = this.validar.FormatearFecha(v.fecha_final, formato_fecha, this.validar.dia_completo);
       })
     })
   }
@@ -2100,7 +2100,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.hora_extra = [];
     this.restHE.ObtenerListaEmpleado(parseInt(this.idEmpleado)).subscribe(res => {
       this.hora_extra = res;
-      this.hora_extra.forEach(h => {
+      this.hora_extra.forEach((h: any) => {
         if (h.estado === 1) {
           h.estado = 'Pendiente';
         }
@@ -2147,7 +2147,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.hora_extra_plan = [];
     this.plan_hora.ListarPlanificacionUsuario(parseInt(this.idEmpleado)).subscribe(res => {
       this.hora_extra_plan = res;
-      this.hora_extra_plan.forEach(h => {
+      this.hora_extra_plan.forEach((h: any) => {
         if (h.estado === 1) {
           h.estado = 'Pendiente';
         }
@@ -2746,7 +2746,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.empresa = [];
     this.restEmpresa.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(data => {
       this.empresa = data;
-      if (this.empresa[0].seg_frase === true) {
+      if (this.empresa[0].seguridad_frase === true) {
         this.activar_frase = true;
         this.restU.BuscarDatosUser(this.idEmpleadoLogueado).subscribe(data => {
           if (data[0].frase === null || data[0].frase === '') {
@@ -2793,7 +2793,7 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   GetDocumentDefinicion() {
-    let estadoCivil = this.EstadoCivilSelect[this.empleadoUno[0].esta_civil - 1];
+    let estadoCivil = this.EstadoCivilSelect[this.empleadoUno[0].estado_civil - 1];
     let genero = this.GeneroSelect[this.empleadoUno[0].genero - 1];
     let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
     let nacionalidad: any;
@@ -2920,10 +2920,10 @@ export class VerEmpleadoComponent implements OnInit {
             return [
               { text: contrato.descripcion, style: 'tableCell' },
               { text: contrato.fec_ingreso_, style: 'tableCell' },
-              { text: contrato.fec_salida === null ? 'Sin fecha' : contrato.fec_salida_, style: 'tableCell' },
+              { text: contrato.fecha_salida === null ? 'Sin fecha' : contrato.fec_salida_, style: 'tableCell' },
               { text: contrato.nombre_contrato, style: 'tableCell' },
-              { text: contrato.asis_controla ? 'Si' : 'No', style: 'tableCell' },
-              { text: contrato.vaca_controla ? 'Si' : 'No', style: 'tableCell' },
+              { text: contrato.controlar_asistencia ? 'Si' : 'No', style: 'tableCell' },
+              { text: contrato.controlar_vacacion ? 'Si' : 'No', style: 'tableCell' },
             ];
           }),
         ],
@@ -2951,7 +2951,7 @@ export class VerEmpleadoComponent implements OnInit {
               { text: cargo.departamento, style: 'tableCell' },
               { text: cargo.nombre_cargo, style: 'tableCell' },
               { text: cargo.fec_inicio_, style: 'tableCell' },
-              { text: cargo.fec_final === null ? 'Sin fecha' : cargo.fec_final_, style: 'tableCell' },
+              { text: cargo.fecha_final === null ? 'Sin fecha' : cargo.fec_final_, style: 'tableCell' },
               { text: cargo.hora_trabaja, style: 'tableCell' },
               { text: cargo.sueldo, style: 'tableCell' },
             ]
@@ -2974,7 +2974,7 @@ export class VerEmpleadoComponent implements OnInit {
             ],
             ...this.discapacidadUser.map(obj => {
               return [
-                { text: obj.carn_conadis, style: 'tableCell' },
+                { text: obj.carnet_conadis, style: 'tableCell' },
                 { text: obj.tipo, style: 'tableCell' },
                 { text: obj.porcentaje + ' %', style: 'tableCell' },
               ];
@@ -3001,7 +3001,7 @@ export class VerEmpleadoComponent implements OnInit {
     let arregloContrato: any = [];
     let arregloCargo: any = [];
     this.empleadoUno.forEach((obj: any) => {
-      let estadoCivil = this.EstadoCivilSelect[obj.esta_civil - 1];
+      let estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
@@ -3036,7 +3036,7 @@ export class VerEmpleadoComponent implements OnInit {
     if (this.discapacidadUser !== null) {
       this.discapacidadUser.map(discapacidad => {
         objetoDiscapacidad = {
-          'Carnet Conadis': discapacidad.carn_conadis,
+          'Carnet Conadis': discapacidad.carnet_conadis,
           'Tipo': discapacidad.tipo,
           'Porcentaje': discapacidad.porcentaje + '%',
         };
@@ -3055,14 +3055,14 @@ export class VerEmpleadoComponent implements OnInit {
     if (this.contratoEmpleado !== null) {
       this.contratoEmpleado.map((contrato: any) => {
         let fechaI = contrato.fec_ingreso_.split(" ");
-        let fechaS: string = contrato.fec_salida === null ? 'Sin fecha' : contrato.fec_salida_.split(" ")[1];
+        let fechaS: string = contrato.fecha_salida === null ? 'Sin fecha' : contrato.fec_salida_.split(" ")[1];
         objetoContrato = {
           'Regimen': contrato.descripcion,
           'Fecha desde': fechaI[1],
           'Fecha hasta': fechaS,
           'Modalidad laboral': contrato.nombre_contrato,
-          'Control asistencia': contrato.asis_controla ? 'Si' : 'No',
-          'Control vacaciones': contrato.vaca_controla ? 'Si' : 'No',
+          'Control asistencia': contrato.controlar_asistencia ? 'Si' : 'No',
+          'Control vacaciones': contrato.controlar_vaccaion ? 'Si' : 'No',
         };
         arregloContrato.push(objetoContrato);
       });
@@ -3070,7 +3070,7 @@ export class VerEmpleadoComponent implements OnInit {
     if (this.cargoEmpleado !== null) {
       this.cargoEmpleado.map((cargo: any) => {
         let fechaI = cargo.fec_inicio_.split(" ");
-        let fechaS: string = cargo.fec_final === null ? 'Sin fecha' : cargo.fec_final_.split(" ")[1];
+        let fechaS: string = cargo.fecha_final === null ? 'Sin fecha' : cargo.fec_final_.split(" ")[1];
         objetoCargo = {
           'Sucursal': cargo.sucursal,
           'Departamento': cargo.departamento,
@@ -3151,8 +3151,8 @@ export class VerEmpleadoComponent implements OnInit {
   ExportToXML() {
     let objeto: any;
     let arregloEmpleado: any = [];
-    this.empleadoUno.forEach(obj => {
-      let estadoCivil = this.EstadoCivilSelect[obj.esta_civil - 1];
+    this.empleadoUno.forEach((obj: any) => {
+      let estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
@@ -3187,7 +3187,7 @@ export class VerEmpleadoComponent implements OnInit {
       if (this.discapacidadUser !== null) {
         this.discapacidadUser.map(discapacidad => {
           objeto.empleado.discapacidad = {
-            'carnet_conadis': discapacidad.carn_conadis,
+            'carnet_conadis': discapacidad.carnet_conadis,
             'tipo': discapacidad.tipo,
             'porcentaje': discapacidad.porcentaje + '%',
           }
@@ -3206,10 +3206,10 @@ export class VerEmpleadoComponent implements OnInit {
           objeto.empleado.contrato = {
             'regimen': contrato.descripcion,
             'fecha_desde': contrato.fec_ingreso_,
-            'fecha_hasta': contrato.fec_salida === null ? 'Sin fecha' : contrato.fec_salida_,
+            'fecha_hasta': contrato.fecha_salida === null ? 'Sin fecha' : contrato.fec_salida_,
             'modalidad_laboral': contrato.nombre_contrato,
-            'control_asistencia': contrato.asis_controla ? 'Si' : 'No',
-            'control_vacaciones': contrato.vaca_controla ? 'Si' : 'No',
+            'control_asistencia': contrato.controlar_asistencia ? 'Si' : 'No',
+            'control_vacaciones': contrato.controlar_vacacion ? 'Si' : 'No',
           };
         });
 
@@ -3221,7 +3221,7 @@ export class VerEmpleadoComponent implements OnInit {
             'departamento': cargo.departamento,
             'cargo': cargo.nombre_cargo,
             'fecha_desde': cargo.fec_inicio_,
-            'fecha_hasta': cargo.fec_final === null ? 'Sin fecha' : cargo.fec_final_,
+            'fecha_hasta': cargo.fecha_final === null ? 'Sin fecha' : cargo.fec_final_,
             'sueldo': cargo.sueldo,
             'horas_trabaja': cargo.hora_trabaja,
           };
@@ -3240,20 +3240,20 @@ export class VerEmpleadoComponent implements OnInit {
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
-    // Abrir una nueva pestaña o ventana con el contenido XML
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
-      newTab.focus(); // Dar foco a la nueva pestaña
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
+    
 
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = objeto.empleado.nombre + '-' + objeto.empleado.apellido + '.xml';
-    // Simular un clic en el enlace para iniciar la descarga
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
   }
 

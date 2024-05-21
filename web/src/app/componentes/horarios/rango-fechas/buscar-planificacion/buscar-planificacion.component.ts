@@ -120,7 +120,7 @@ export class BuscarPlanificacionComponent {
   VerPlanificacion() {
     this.codigos = '';
     console.log('resultados .... ', this.resultados)
-    this.resultados.forEach(obj => {
+    this.resultados.forEach((obj: any) => {
       if (this.codigos === '') {
         this.codigos = '\'' + obj.codigo + '\''
       }
@@ -170,7 +170,7 @@ export class BuscarPlanificacionComponent {
       if (datos.message === 'OK') {
         this.horariosEmpleado = datos.data;
         let index = 0;
-        this.horariosEmpleado.forEach(obj => {
+        this.horariosEmpleado.forEach((obj: any) => {
           this.resultados.forEach(r => {
             if (r.codigo === obj.codigo_e) {
               obj.id_empleado = r.id;
@@ -359,7 +359,7 @@ export class BuscarPlanificacionComponent {
         this.detalle_acciones = [];
         this.detalles = datos.data;
 
-        datos.data.forEach(obj => {
+        datos.data.forEach((obj: any) => {
           if (aux_h === '') {
             accion = obj.tipo_accion + ': ' + obj.hora;
             this.ValidarAcciones(obj);
@@ -407,7 +407,7 @@ export class BuscarPlanificacionComponent {
         this.detalle_acciones = this.detalle_acciones.concat(tipos);
 
         // FORMATEAR HORAS
-        this.detalle_acciones.forEach(detalle => {
+        this.detalle_acciones.forEach((detalle: any) => {
           detalle.entrada_ = this.validar.FormatearHora(detalle.entrada, this.formato_hora);
           if (detalle.inicio_comida != '') {
             detalle.inicio_comida = this.validar.FormatearHora(detalle.inicio_comida, this.formato_hora);

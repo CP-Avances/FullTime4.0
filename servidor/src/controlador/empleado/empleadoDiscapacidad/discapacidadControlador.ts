@@ -10,9 +10,9 @@ class DiscapacidadControlador {
     const { id_empleado } = req.params;
     const unaDiscapacidad = await pool.query(
       `
-      SELECT cd.id_empleado, cd.carn_conadis, cd.porcentaje, cd.tipo, td.nombre AS nom_tipo
-      FROM cg_discapacidades cd, tipo_discapacidad td, empleados e
-      WHERE cd.id_empleado = e.id AND cd.tipo = td.id AND cd.id_empleado = $1
+      SELECT cd.id_empleado, cd.carnet_conadis, cd.porcentaje, cd.id_discapacidad, td.nombre AS nom_tipo
+      FROM eu_empleado_discapacidad cd, e_cat_discapacidad td, eu_empleados e
+      WHERE cd.id_empleado = e.id AND cd.id_discapacidad = td.id AND cd.id_empleado = $1
       `
       , [id_empleado]);
     if (unaDiscapacidad.rowCount > 0) {
@@ -33,7 +33,7 @@ class DiscapacidadControlador {
 
       await pool.query(
         `
-        INSERT INTO cg_discapacidades (id_empleado, carn_conadis, porcentaje, tipo) 
+        INSERT INTO eu_empleado_discapacidad (id_empleado, carnet_conadis, porcentaje, id_discapacidad) 
         VALUES ($1, $2, $3, $4)
         `
         , [id_empleado, carn_conadis, porcentaje, tipo]);
@@ -68,12 +68,12 @@ class DiscapacidadControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const discapacidad = await pool.query('SELECT * FROM cg_discapacidades WHERE id_empleado = $1', [id_empleado]);
+      const discapacidad = await pool.query('SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1', [id_empleado]);
       const [datosOriginales] = discapacidad.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'cg_discapacidades',
+          tabla: 'eu_empleado_discapacidad',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -85,18 +85,18 @@ class DiscapacidadControlador {
       
       await pool.query(
         `
-        UPDATE cg_discapacidades SET carn_conadis = $1, porcentaje = $2, tipo = $3 
+        UPDATE eu_empleado_discapacidad SET carnet_conadis = $1, porcentaje = $2, id_discapacidad = $3 
         WHERE id_empleado = $4
         `
         , [carn_conadis, porcentaje, tipo, id_empleado]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_discapacidades',
+        tabla: 'eu_empleado_discapacidad',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{carn_conadis: ${carn_conadis}, porcentaje: ${porcentaje}, tipo: ${tipo}}`,
+        datosNuevos: `{carnet_conadis: ${carn_conadis}, porcentaje: ${porcentaje}, tipo: ${tipo}}`,
         ip, 
         observacion: null
       });
@@ -121,12 +121,12 @@ class DiscapacidadControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const discapacidad = await pool.query('SELECT * FROM cg_discapacidades WHERE id_empleado = $1', [id_empleado]);
+      const discapacidad = await pool.query('SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1', [id_empleado]);
       const [datosOriginales] = discapacidad.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'cg_discapacidades',
+          tabla: 'eu_empleado_discapacidad',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
@@ -142,13 +142,13 @@ class DiscapacidadControlador {
 
       await pool.query(
         `
-        DELETE FROM cg_discapacidades WHERE id_empleado = $1
+        DELETE FROM eu_empleado_discapacidad WHERE id_empleado = $1
         `
         , [id_empleado]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_discapacidades',
+        tabla: 'eu_empleado_discapacidad',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -183,7 +183,7 @@ class DiscapacidadControlador {
 
       const response: QueryResult = await pool.query(
         `
-        INSERT INTO tipo_discapacidad (nombre) VALUES ($1) RETURNING *
+        INSERT INTO e_cat_discapacidad (nombre) VALUES ($1) RETURNING *
         `
         , [nombre]);
   
@@ -191,7 +191,7 @@ class DiscapacidadControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'tipo_discapacidad',
+        tabla: 'e_cat_discapacidad',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
@@ -220,7 +220,7 @@ class DiscapacidadControlador {
   public async ListarTipo(req: Request, res: Response) {
     const TIPO_DISCAPACIDAD = await pool.query(
       `
-      SELECT * FROM tipo_discapacidad
+      SELECT * FROM e_cat_discapacidad
       `
     );
     if (TIPO_DISCAPACIDAD.rowCount > 0) {
@@ -231,13 +231,33 @@ class DiscapacidadControlador {
     }
   }
 
+  // METODO PARA BUSCAR DISCAPACIDAD POR SU NOMBRE
+  public async BuscarDiscapacidadNombre(req: Request, res: Response) {
+    const { nombre } = req.body;
+    const TIPO_DISCAPACIDAD = await pool.query(
+      `
+      SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1
+      `
+      , [nombre])
+    if (TIPO_DISCAPACIDAD.rowCount > 0) {
+      return res.jsonp(TIPO_DISCAPACIDAD.rows)
+    }
+    else {
+      res.status(404).jsonp({ text: 'Registro no encontrado.' });
+    }
+  }
+
   public async list(req: Request, res: Response) {
-    const DISCAPACIDAD = await pool.query('SELECT * FROM cg_discapacidades');
+    const DISCAPACIDAD = await pool.query(
+      `
+      SELECT * FROM eu_empleado_discapacidad
+      `
+    );
     if (DISCAPACIDAD.rowCount > 0) {
       return res.jsonp(DISCAPACIDAD.rows)
     }
     else {
-      res.status(404).jsonp({ text: 'Discapacidad no encontrada' });
+      res.status(404).jsonp({ text: 'Registro no encontrado.' });
     }
   }
 
@@ -245,12 +265,16 @@ class DiscapacidadControlador {
 
   public async ObtenerUnTipoD(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
-    const TIPO_DISCAPACIDAD = await pool.query('SELECT * FROM tipo_discapacidad WHERE id = $1', [id]);
+    const TIPO_DISCAPACIDAD = await pool.query(
+      `
+      SELECT * FROM e_cat_discapacidad WHERE id = $1
+      `
+      , [id]);
     if (TIPO_DISCAPACIDAD.rowCount > 0) {
       return res.jsonp(TIPO_DISCAPACIDAD.rows)
     }
     else {
-      res.status(404).jsonp({ text: 'Registro no encontrado' });
+      res.status(404).jsonp({ text: 'Registro no encontrado.' });
     }
   }
 
@@ -263,12 +287,12 @@ class DiscapacidadControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const tipoDiscapacidad = await pool.query('SELECT * FROM tipo_discapacidad WHERE id = $1', [id]);
+      const tipoDiscapacidad = await pool.query('SELECT * FROM e_cat_discapacidad WHERE id = $1', [id]);
       const [datosOriginales] = tipoDiscapacidad.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'tipo_discapacidad',
+          tabla: 'e_cat_discapacidad',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -282,11 +306,15 @@ class DiscapacidadControlador {
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
       
-      await pool.query('UPDATE tipo_discapacidad SET nombre = $1 WHERE id = $2', [nombre, id]);
+      await pool.query(
+        `
+        UPDATE e_cat_discapacidad SET nombre = $1 WHERE id = $2
+        `
+        , [nombre, id]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'tipo_discapacidad',
+        tabla: 'e_cat_discapacidad',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),

@@ -20,12 +20,12 @@ export const cumpleanios = function () {
         if (hora === 15 && minutos === 0) {
             const felizCumple = await pool.query(
                 `
-                SELECT da.nombre, da.apellido, da.correo, da.fec_nacimiento, s.id_empresa, 
+                SELECT da.nombre, da.apellido, da.correo, da.fecha_nacimiento, s.id_empresa, 
                     ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
-                    ce.pie_firma, ce.cabecera_firma, m.titulo, m.mensaje, m.img, m.url  
-                FROM datos_actuales_empleado AS da, sucursales AS s, message_birthday AS m,
-                    cg_empresa AS ce 
-                WHERE CAST(da.fec_nacimiento AS VARCHAR) LIKE '%' || $1 AND da.id_sucursal = s.id
+                    ce.pie_firma, ce.cabecera_firma, m.asunto, m.mensaje, m.imagen, m.link  
+                FROM datos_actuales_empleado AS da, e_sucursales AS s, e_message_birthday AS m,
+                    e_empresa AS ce 
+                WHERE CAST(da.fecha_nacimiento AS VARCHAR) LIKE '%' || $1 AND da.id_sucursal = s.id
                     AND da.estado = 1
                 `
                 , [fecha]);
@@ -42,9 +42,13 @@ export const cumpleanios = function () {
 
                 let message_url =
                     `<p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;"></p>`;
-                if (felizCumple.rows[0].url != null) {
-                    message_url = `<p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; text-align: center;">
-                    <a style="background-color: #199319; color: white; padding: 15px 15px 15px 15px; text-decoration: none;" href="${felizCumple.rows[0].url}">¡ VER FELICITACIONES !</a></p>`
+                if (felizCumple.rows[0].link != null) {
+                    message_url =
+                        `
+                        <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; text-align: center;">
+                            <a style="background-color: #199319; color: white; padding: 15px 15px 15px 15px; text-decoration: none;" href="${felizCumple.rows[0].url}">¡ VER FELICITACIONES !</a>
+                        </p>
+                        `
                 }
 
                 if (felizCumple.rows[0].cabecera_firma === null || felizCumple.rows[0].cabecera_firma === '') {
@@ -58,36 +62,37 @@ export const cumpleanios = function () {
                 let data = {
                     to: correos,
                     from: felizCumple.rows[0].correo_empresa,
-                    subject: felizCumple.rows[0].titulo,
+                    subject: felizCumple.rows[0].asunto,
                     html:
                         `
-                            <body>
-                                <div style="text-align: center;">
-                                    <img width="25%" height="25%" src="cid:cabeceraf"/>
-                                </div>
-                                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                    Este es un correo electrónico para desearle un Feliz Cumpleaños. <br>  
-                                </p>
-                                <div style="text-align: center;">
-                                    <p style="font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; color:rgb(11, 22, 121); font-size:18px;">
-                                        <b> <i> ${usuarios} </i> </b>
-                                    </p>
-                                </div>
-                                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 2em;">  
-                                    ${felizCumple.rows[0].mensaje} <br><br>
-                                    ${message_url} <br>
-                                </p>
-                                <div style="text-align: center;">
-                                    <img src="cid:cumple"/> <br><br>
-                                </div>
-                                <br>                       
-                                <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-                                    <b>Gracias por la atención</b><br>
-                                    <b>Saludos cordiales,</b> <br><br>
-                                </p>
-                                <img src="cid:pief" width="50%" height="50%"/>
-                            </body>
-                        `,
+                        <body>
+                            <div style="text-align: center;">
+                                <img width="25%" height="25%" src="cid:cabeceraf"/>
+                            </div>
+                            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                                Este es un correo electrónico para desearle un Feliz Cumpleaños. <br>  
+                            </p>
+                            <div style="text-align: center;">
+                            <p style="font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; color:rgb(11, 22, 121); font-size:18px;">
+                                <b> <i> ${usuarios} </i> </b>
+                            </p>
+                            </div>
+                            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 2em;">  
+                                ${felizCumple.rows[0].mensaje} <br><br>
+                                ${message_url} <br>
+                            </p>
+                            <div style="text-align: center;">
+                                <img src="cid:cumple"/> <br><br>
+                            </div>
+                            <br>                       
+                            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+                                <b>Gracias por la atención</b><br>
+                                <b>Saludos cordiales,</b> <br><br>
+                            </p>
+                            <img src="cid:pief" width="50%" height="50%"/>
+                        </body>
+                        `
+                    ,
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
@@ -101,7 +106,7 @@ export const cumpleanios = function () {
                         },
                         {
                             filename: 'birthday1.jpg',
-                            path: `${path_folder_}/${felizCumple.rows[0].img}`,
+                            path: `${path_folder_}/${felizCumple.rows[0].imagen}`,
                             cid: 'cumple' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]
