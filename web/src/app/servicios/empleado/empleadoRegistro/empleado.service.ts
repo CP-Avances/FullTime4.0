@@ -50,7 +50,7 @@ export class EmpleadoService {
 
 
   /** ********************************************************************************************** **
-   ** **                     METODO PARA MANEJAR DATOS DE EMPLEADO                                ** ** 
+   ** **                     METODO PARA MANEJAR DATOS DE EMPLEADO                                ** **
    ** ********************************************************************************************** **/
 
   // BUSCAR UN REGISTRO DE USUARIO  --**VERIFICADO
@@ -96,17 +96,17 @@ export class EmpleadoService {
   }
 
   // DESACTIVAR VARIOS EMPLEADOS SELECCIONADOS
-  DesactivarVariosUsuarios(data: any[]) {
+  DesactivarVariosUsuarios(data: any) {
     return this.http.put<any>(`${environment.url}/empleado/desactivar/masivo`, data)
   }
 
   // ACTIVAR VARIOS EMPLEADOS
-  ActivarVariosUsuarios(data: any[]) {
+  ActivarVariosUsuarios(data: any) {
     return this.http.put<any>(`${environment.url}/empleado/activar/masivo`, data)
   }
 
   // METODO PARA REACTIVAR USUARIOS
-  ReActivarVariosUsuarios(data: any[]) {
+  ReActivarVariosUsuarios(data: any) {
     return this.http.put<any>(`${environment.url}/empleado/re-activar/masivo`, data)
   }
 
@@ -149,8 +149,12 @@ export class EmpleadoService {
   }
 
   // METODO DE ELIMINACION DE TITULO DE EMPLEADO
-  EliminarTitulo(id: number) {
-    return this.http.delete(`${environment.url}/empleado/eliminar/titulo/${id}`);
+  EliminarTitulo(id: number, datos: any) {
+    const url = `${environment.url}/empleado/eliminar/titulo/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
 
@@ -189,8 +193,8 @@ export class EmpleadoService {
   }
 
 
-  /** ***************************************************************************************** ** 
-   ** **                        MANEJO DE DATOS DE CONTRATOS                                 ** ** 
+  /** ***************************************************************************************** **
+   ** **                        MANEJO DE DATOS DE CONTRATOS                                 ** **
    ** ***************************************************************************************** **/
 
   // REGISTRO DE DATOS DE CONTRATO
@@ -258,7 +262,7 @@ export class EmpleadoService {
 
 
 
-  // BUSQUEDA DE EMPLEADOS INGRESANDO NOMBRE Y APELLIDO 
+  // BUSQUEDA DE EMPLEADOS INGRESANDO NOMBRE Y APELLIDO
   BuscarEmpleadoNombre(data: any) {
     return this.http.post(`${environment.url}/empleado/buscar/informacion`, data);
   }
@@ -278,7 +282,7 @@ export class EmpleadoService {
     return this.http.post<any>(`${environment.url}/empleado/verificar/datos/automatico/plantillaExcel/`, formData);
   }
 
-  subirArchivoExcel_Automatico(formData) {
+  subirArchivoExcel_Automatico(formData: any) {
     return this.http.post<any>(`${environment.url}/empleado/cargar_automatico/plantillaExcel/`, formData);
   }
 
@@ -287,11 +291,11 @@ export class EmpleadoService {
     return this.http.post<any>(`${environment.url}/empleado/verificar/manual/plantillaExcel/`, formData);
   }
 
-  verificarArchivoExcel_DatosManual(formData) {
+  verificarArchivoExcel_DatosManual(formData: any) {
     return this.http.post<any>(`${environment.url}/empleado/verificar/datos/manual/plantillaExcel/`, formData);
   }
 
-  subirArchivoExcel_Manual(formData) {
+  subirArchivoExcel_Manual(formData: any) {
     return this.http.post<any>(`${environment.url}/empleado/cargar_manual/plantillaExcel/`, formData);
   }
 

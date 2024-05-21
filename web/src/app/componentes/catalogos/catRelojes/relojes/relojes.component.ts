@@ -29,6 +29,10 @@ export class RelojesComponent implements OnInit {
   // ACTIVAR INGRESO DE NUMERO DE ACCIONES
   activarCampo: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
 
   // PRIMER FORMULARIO
@@ -61,6 +65,9 @@ export class RelojesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.FiltrarSucursales();
     this.ValidarFormulario();
   }
@@ -136,6 +143,8 @@ export class RelojesComponent implements OnInit {
       fabricante: form2.fabricanteForm,
       contrasenia: form2.contraseniaForm,
       id_fabricacion: form2.idFabricacionForm,
+      user_name: this.user_name,
+      user_ip: this.ip,
     };
     this.rest.CrearNuevoReloj(reloj).subscribe(response => {
       //--console.log('ver response', response)

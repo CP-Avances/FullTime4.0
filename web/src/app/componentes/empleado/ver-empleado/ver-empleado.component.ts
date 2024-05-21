@@ -89,6 +89,10 @@ export class VerEmpleadoComponent implements OnInit {
 
   @ViewChild('tabla2') tabla2: ElementRef;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // VARIABLES DE ALMACENAMIENTO DE DATOS CONSULTADOS
   discapacidadUser: any = [];
   empleadoLogueado: any = [];
@@ -163,6 +167,9 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     var a = moment();
     this.FechaActual = a.format('YYYY-MM-DD');
     this.activatedRoute.params
@@ -425,7 +432,13 @@ export class VerEmpleadoComponent implements OnInit {
       .afterClosed().subscribe((res: any) => {
         if (res.message === true) {
           if (res.latlng != undefined) {
-            this.restEmpleado.ActualizarDomicilio(parseInt(this.idEmpleado), res.latlng).subscribe(respuesta => {
+            const datos = {
+              lat: res.latlng.lat,
+              lng: res.latlng.lng,
+              user_name: this.user_name,
+              ip: this.ip,
+            }
+            this.restEmpleado.ActualizarDomicilio(parseInt(this.idEmpleado), datos).subscribe(respuesta => {
               this.toastr.success(respuesta.message);
               this.MAP.off();
               this.MapGeolocalizar(res.latlng.lat, res.latlng.lng, nombre + ' ' + apellido);
@@ -491,6 +504,9 @@ export class VerEmpleadoComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("image", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restEmpleado.SubirImagen(formData, parseInt(this.idEmpleado)).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Imagen registrada.', {
         timeOut: 6000,
@@ -546,7 +562,11 @@ export class VerEmpleadoComponent implements OnInit {
 
   // ELIMINAR REGISTRO DE TITULO
   EliminarTituloEmpleado(id: number) {
-    this.restEmpleado.EliminarTitulo(id).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.restEmpleado.EliminarTitulo(id, datos).subscribe(res => {
       this.ObtenerTituloEmpleado();
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
@@ -583,7 +603,12 @@ export class VerEmpleadoComponent implements OnInit {
 
   // ELIMINAR REGISTRO DE DISCAPACIDAD
   EliminarDiscapacidad(id_discapacidad: number) {
-    this.restDiscapacidad.EliminarDiscapacidad(id_discapacidad).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.restDiscapacidad.EliminarDiscapacidad(id_discapacidad, datos).subscribe(res => {
       this.ObtenerDiscapacidadEmpleado();
       this.btnDisc = 'Añadir';
       this.toastr.error('Registro eliminado.', '', {
@@ -672,7 +697,12 @@ export class VerEmpleadoComponent implements OnInit {
 
   // ELIMINAR REGISTRO DE VACUNA
   EliminarVacuna(datos: any) {
-    this.restVacuna.EliminarRegistroVacuna(datos.id, datos.carnet).subscribe(res => {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.restVacuna.EliminarRegistroVacuna(datos.id, datos.carnet, data).subscribe(res => {
       this.ObtenerDatosVacunas(this.formato_fecha);
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
@@ -1227,6 +1257,10 @@ export class VerEmpleadoComponent implements OnInit {
       formData.append("uploads[]", this.archivoSubidoHorario[i], this.archivoSubidoHorario[i].name);
       console.log("toda la data", this.archivoSubidoHorario[i])
     }
+
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restEmpleHorario.VerificarDatos_EmpleadoHorario(formData, parseInt(this.idEmpleado)).subscribe(res => {
       console.log('entra')
       if (res.message === 'error') {
@@ -1327,8 +1361,14 @@ export class VerEmpleadoComponent implements OnInit {
     };
     this.restPlanGeneral.BuscarFechas(plan_fecha).subscribe(res => {
       this.id_planificacion_general = res;
+      let datos = {
+        user_name: this.user_name,
+        ip: this.ip,
+        id_plan: '',
+      }
       this.id_planificacion_general.map(obj => {
-        this.restPlanGeneral.EliminarRegistro(obj.id).subscribe(res => {
+        datos.id_plan = obj.id;
+        this.restPlanGeneral.EliminarRegistro(datos).subscribe(res => {
         })
       })
     })
@@ -2196,6 +2236,11 @@ export class VerEmpleadoComponent implements OnInit {
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO DE PLANIFICACIÓN
   EliminarPlanEmpleado(id_plan: number, id_empleado: number, datos: any) {
 
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
     // LECTURA DE DATOS DE USUARIO
     let usuario = '<tr><th>' + datos.nombre +
       '</th><th>' + datos.cedula + '</th></tr>';
@@ -2207,7 +2252,7 @@ export class VerEmpleadoComponent implements OnInit {
     let h_inicio = this.validar.FormatearHora(datos.hora_inicio, this.formato_hora);
     let h_fin = this.validar.FormatearHora(datos.hora_fin, this.formato_hora);
 
-    this.plan_hora.EliminarPlanEmpleado(id_plan, id_empleado).subscribe(res => {
+    this.plan_hora.EliminarPlanEmpleado(id_plan, id_empleado, data).subscribe(res => {
       this.NotificarPlanHora(desde, hasta, h_inicio, h_fin, id_empleado);
       this.EnviarCorreoPlanH(datos, cuenta_correo, usuario, desde, hasta, h_inicio, h_fin);
       this.toastr.error('Registro eliminado.', '', {
@@ -2226,6 +2271,8 @@ export class VerEmpleadoComponent implements OnInit {
       mensaje: 'Planificación de horas extras eliminada desde ' +
         desde + ' hasta ' +
         hasta + ' horario de ' + h_inicio + ' a ' + h_fin,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.plan_hora.EnviarNotiPlanificacion(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);
@@ -2414,7 +2461,13 @@ export class VerEmpleadoComponent implements OnInit {
     let h_inicio = this.validar.FormatearHora(datos.hora_inicio, this.formato_hora);
     let h_fin = this.validar.FormatearHora(datos.hora_fin, this.formato_hora);
 
-    this.restPlanComidas.EliminarPlanComida(id_plan, id_empleado).subscribe(res => {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
+
+    this.restPlanComidas.EliminarPlanComida(id_plan, id_empleado, data).subscribe(res => {
       this.NotificarPlanificacion(datos, desde, hasta, h_inicio, h_fin, id_empleado);
       this.EnviarCorreo(datos, cuenta_correo, usuario, desde, hasta, h_inicio, h_fin);
       this.toastr.error('Registro eliminado.', '', {
@@ -2467,6 +2520,8 @@ export class VerEmpleadoComponent implements OnInit {
         desde + ' hasta ' +
         hasta +
         ' horario de ' + h_inicio + ' a ' + h_fin + ' servicio ',
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restPlanComidas.EnviarMensajePlanComida(mensaje).subscribe(res => {
     })
@@ -2551,7 +2606,11 @@ export class VerEmpleadoComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PROCESOS
   EliminarProceso(id_plan: number) {
-    this.restEmpleadoProcesos.EliminarRegistro(id_plan).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.restEmpleadoProcesos.EliminarRegistro(id_plan, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -2614,7 +2673,12 @@ export class VerEmpleadoComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
   EliminarAutorizacion(id_auto: number) {
-    this.restAutoridad.EliminarRegistro(id_auto).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.restAutoridad.EliminarRegistro(id_auto, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });

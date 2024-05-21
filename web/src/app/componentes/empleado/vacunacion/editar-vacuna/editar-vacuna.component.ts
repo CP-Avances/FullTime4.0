@@ -22,6 +22,10 @@ export class EditarVacunaComponent implements OnInit {
   idEmploy: string;
   dvacuna: any;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restVacuna: VacunacionService, // SERVICIO DE DATOS DE VACUNACIÓN
     public validar: ValidacionesService, // VARIABLE USADA EN VALIDACIONES
@@ -32,6 +36,9 @@ export class EditarVacunaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.idEmploy = this.datos.idEmpleado;
     this.dvacuna = this.datos.vacuna;
     this.ObtenerTipoVacunas();
@@ -92,13 +99,15 @@ export class EditarVacunaComponent implements OnInit {
     }
   }
 
-  // METODO PARA CAPTURRA DATOS 
+  // METODO PARA CAPTURRA DATOS
   GuardarDatosCarnet(form: any) {
     let vacuna = {
       id_tipo_vacuna: form.vacunaForm,
       descripcion: form.nombreForm,
       id_empleado: parseInt(this.idEmploy),
       fecha: form.fechaForm,
+      user_name: this.user_name,
+      ip: this.ip
     }
     // VERIFICAR SI EL REGISTRO ES SIMILAR AL EXISTENTE
     if (vacuna.fecha === this.dvacuna.fecha && vacuna.id_tipo_vacuna === this.dvacuna.id_vacuna) {
@@ -135,7 +144,9 @@ export class EditarVacunaComponent implements OnInit {
     if (this.opcion === 1) {
       let eliminar = {
         documento: this.dvacuna.carnet,
-        id: parseInt(this.dvacuna.id)
+        id: parseInt(this.dvacuna.id),
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.GuardarDatos(datos);
       this.restVacuna.EliminarArchivo(eliminar).subscribe(res => {
@@ -216,13 +227,17 @@ export class EditarVacunaComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restVacuna.SubirDocumento(formData, this.dvacuna.id, this.idEmploy).subscribe(res => {
       this.archivoF.reset();
       this.nameFile = '';
     });
   }
 
-  // METODOS DE ACTIVACION DE CARGA DE ARCHIVO 
+  // METODOS DE ACTIVACION DE CARGA DE ARCHIVO
   activar: boolean = false;
   opcion: number = 0;
   ActivarArchivo() {

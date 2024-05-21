@@ -37,6 +37,10 @@ export class ListaArchivosComponent implements OnInit {
 
   filtroDescripcion = '';
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.minLength(2)]);
 
@@ -57,6 +61,9 @@ export class ListaArchivosComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.MostrarArchivos();
   }
 
@@ -228,9 +235,9 @@ export class ListaArchivosComponent implements OnInit {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.archivosEliminar = this.selectionArchivos.selected;
-    
 
-    
+
+
     return `${this.selectionArchivos.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
 
   }
@@ -239,7 +246,11 @@ export class ListaArchivosComponent implements OnInit {
 
   // METODO PARA ELIMINAR ARCHIVOS
   EliminarArchivo(filename: string, id: number) {
-    this.rest.EliminarRegistro(id, filename).subscribe(res => {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistro(id, filename, data).subscribe((res: any) => {
 
 
       if (res.message === 'error') {
@@ -291,6 +302,11 @@ export class ListaArchivosComponent implements OnInit {
   ingresar: boolean = false;
   EliminarMultiple() {
 
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
     this.ingresar = false;
     this.contador = 0;
 
@@ -301,7 +317,7 @@ export class ListaArchivosComponent implements OnInit {
 
       this.contador = this.contador + 1;
 
-      this.rest.EliminarRegistro(datos.id, datos.filename).subscribe(res => {
+      this.rest.EliminarRegistro(datos.id, datos.filename, data).subscribe((res: any) => {
 
 
         if (res.message === 'error') {

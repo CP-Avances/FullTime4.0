@@ -83,6 +83,10 @@ export class PrincipalDepartamentoComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private scriptService: ScriptService,
     private toastr: ToastrService,
@@ -97,13 +101,16 @@ export class PrincipalDepartamentoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ListaDepartamentos();
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
     this.ObtenerLogo();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -119,7 +126,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -161,7 +168,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.departamentosEliminar = [];
   }
 
-  // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO 
+  // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO
   AbrirEditarDepartamento(departamento: any): void {
     this.ventana.open(EditarDepartamentoComponent,
       { width: '400px', data: { data: departamento, establecimiento: false } })
@@ -195,7 +202,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.messajeExcel = '';
   }
 
-  // ORDENAR LOS DATOS SEGUN EL ID 
+  // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
       if (a.nomsucursal < b.nomsucursal) {
@@ -358,7 +365,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   }
 
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                       METODO PARA EXPORTAR A PDF                             ** **
    ** ************************************************************************************************** **/
 
@@ -457,7 +464,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     };
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A EXCEL                                 ** **
    ** ************************************************************************************************** **/
   exportToExcel() {
@@ -467,7 +474,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     xlsx.writeFile(wb, "Departamentos" + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A CSV                               ** **
    ** ************************************************************************************************** **/
 
@@ -575,7 +582,11 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
-    this.rest.EliminarRegistro(id_dep).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.rest.EliminarRegistro(id_dep, datos).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
@@ -588,8 +599,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
           this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
             this.departamentosNiveles = datos;
             this.departamentosNiveles.filter(item => {
-              this.rest.EliminarRegistroNivelDepa(item.id).subscribe(
-                res => {
+              this.rest.EliminarRegistroNivelDepa(item.id, datos).subscribe(
+                (res: any) => {
                   if (res.message === 'error') {
                     this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
                       timeOut: 6000,
@@ -616,7 +627,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -635,13 +646,17 @@ export class PrincipalDepartamentoComponent implements OnInit {
   }
 
   EliminarMultiple() {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
     this.ingresar = false;
     this.contador = 0;
     this.departamentosEliminar = this.selectionDepartamentos.selected;
     this.departamentosEliminar.forEach((datos: any) => {
       this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+      this.rest.EliminarRegistro(datos.id, datos).subscribe((res:any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -655,8 +670,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
             this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
               this.departamentosNiveles = datos;
               this.departamentosNiveles.filter(item => {
-                this.rest.EliminarRegistroNivelDepa(item.id).subscribe(
-                  res => {
+                this.rest.EliminarRegistroNivelDepa(item.id, datos).subscribe(
+                  (res: any) => {
                     if (res.message === 'error') {
                       this.toastr.error('Existen datos relacionados con ' + item.nombre + '.', 'No fue posible eliminar.',  {
                         timeOut: 6000,

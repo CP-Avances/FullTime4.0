@@ -60,6 +60,10 @@ export class ColoresEmpresaComponent implements OnInit {
   value = 10;
   habilitarprogress: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private toastr: ToastrService,
     private rest: EmpresaService,
@@ -73,6 +77,9 @@ export class ColoresEmpresaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerLogo();
     this.VerFormularios();
@@ -89,7 +96,7 @@ export class ColoresEmpresaComponent implements OnInit {
     }
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -111,7 +118,9 @@ export class ColoresEmpresaComponent implements OnInit {
     let datos = {
       color_p: this.p_color,
       color_s: this.s_color,
-      id: this.data.datos.id
+      id: this.data.datos.id,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.rest.ActualizarColores(datos).subscribe(data => {
       this.toastr.success('Colores de encabezados de reportes registrados.', '', {
@@ -185,7 +194,9 @@ export class ColoresEmpresaComponent implements OnInit {
     this.habilitarprogress = true;
     let datos = {
       marca_agua: this.frase,
-      id: this.data.datos.id
+      id: this.data.datos.id,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.rest.ActualizarMarcaAgua(datos).subscribe(data => {
       this.toastr.success('Frase registrada exitosamente.', '', {
@@ -215,7 +226,7 @@ export class ColoresEmpresaComponent implements OnInit {
     }
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************** **/
 

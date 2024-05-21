@@ -4,6 +4,7 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { use } from 'echarts';
 
 @Component({
     selector: 'app-configuracionNotificacion',
@@ -16,6 +17,10 @@ export class ConfiguracionNotificacionComponent implements OnInit {
     // FORMULARIO
     formGroup: FormGroup;
 
+    // VARIABLES PARA AUDITORIA
+    user_name: string | null;
+    ip: string | null;
+
     constructor(
         private toaster: ToastrService,
         private avisos: RealTimeService,
@@ -27,6 +32,8 @@ export class ConfiguracionNotificacionComponent implements OnInit {
     }
 
     ngOnInit(): void {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
         this.ImprimirDatosUsuario();
     }
 
@@ -79,7 +86,9 @@ export class ConfiguracionNotificacionComponent implements OnInit {
             comida_mail: form.comidaMail,
             comida_noti: form.comidaNoti,
             comunicado_mail: form.comunicadoMail,
-            comunicado_noti: form.comunicadoNoti
+            comunicado_noti: form.comunicadoNoti,
+            user_name: this.user_name,
+            ip: this.ip,
         }
         this.avisos.IngresarConfigNotiEmpleado(data).subscribe(res => {
             if (this.empleados.length == contador) {
@@ -103,7 +112,9 @@ export class ConfiguracionNotificacionComponent implements OnInit {
             comida_mail: form.comidaMail,
             comida_noti: form.comidaNoti,
             comunicado_mail: form.comunicadoMail,
-            comunicado_noti: form.comunicadoNoti
+            comunicado_noti: form.comunicadoNoti,
+            user_name: this.user_name,
+            ip: this.ip,
         }
         this.avisos.ObtenerConfiguracionEmpleado(this.empleados.id).subscribe(res => {
             this.avisos.ActualizarConfigNotiEmpl(this.empleados.id, data).subscribe(res => {
@@ -132,7 +143,9 @@ export class ConfiguracionNotificacionComponent implements OnInit {
                 comida_mail: form.comidaMail,
                 comida_noti: form.comidaNoti,
                 comunicado_mail: form.comunicadoMail,
-                comunicado_noti: form.comunicadoNoti
+                comunicado_noti: form.comunicadoNoti,
+                user_name: this.user_name,
+                ip: this.ip,
             }
             this.avisos.ObtenerConfiguracionEmpleado(item.id).subscribe(res => {
                 this.avisos.ActualizarConfigNotiEmpl(item.id, data).subscribe(res => {

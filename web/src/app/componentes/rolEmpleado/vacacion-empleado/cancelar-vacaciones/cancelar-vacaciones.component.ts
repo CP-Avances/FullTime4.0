@@ -21,6 +21,10 @@ export class CancelarVacacionesComponent implements OnInit {
   nota = 'su solicitud';
   user = '';
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private informacion: DatosGeneralesService,
     private realTime: RealTimeService,
@@ -35,13 +39,15 @@ export class CancelarVacacionesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.data);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.obtenerInformacionEmpleado();
     this.BuscarParametro();
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -83,7 +89,12 @@ export class CancelarVacacionesComponent implements OnInit {
   }
 
   aceptarAdvertencia() {
-    this.restV.EliminarVacacion(this.data.id).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
+    this.restV.EliminarVacacion(this.data.id, datos).subscribe(res => {
       console.log(res);
       var datos = {
         depa_user_loggin: this.solInfo.id_dep,
@@ -198,6 +209,8 @@ export class CancelarVacacionesComponent implements OnInit {
       tipo: 3,
       mensaje: 'Ha eliminado ' + this.nota + ' de vacaciones ' + this.user + ' desde ' +
         desde + ' hasta ' + hasta,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     //Listado para eliminar el usuario duplicado

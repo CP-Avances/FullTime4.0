@@ -23,7 +23,7 @@ export class PermisosService {
     return this.http.get(`${environment.url}/empleadoPermiso/numPermiso/${id}`);
   }
 
-  // METODO PARA BUSCAR PERMISOS SOLICITADOS 
+  // METODO PARA BUSCAR PERMISOS SOLICITADOS
   BuscarPermisosSolicitadosTotales(datos: any) {
     return this.http.post<any>(`${environment.url}/empleadoPermiso/permisos-solicitados-totales`, datos);
   }
@@ -87,8 +87,14 @@ export class PermisosService {
   }
 
   // METODO PARA ELIMINAR PERMISOS
-  EliminarPermiso(id_permiso: number, doc: string, codigo: number) {
-    return this.http.delete<any>(`${environment.url}/empleadoPermiso/eliminar/${id_permiso}/${doc}/verificar/${codigo}`);
+  EliminarPermiso(datos: any) {
+    const { id_permiso, doc, codigo, user_name, ip } = datos;
+    const data = { user_name, ip };
+    const url = `${environment.url}/empleadoPermiso/eliminar/${id_permiso}/${doc}/verificar/${codigo}`;
+    const httpOtions = {
+      body: data
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA CREAR ARCHIVO XML

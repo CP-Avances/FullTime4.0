@@ -29,6 +29,7 @@ import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableNivelesEducacion } from 'src/app/model/reportes.model';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-listar-nivel-titulos',
@@ -70,11 +71,13 @@ export class ListarNivelTitulosComponent implements OnInit {
   get frase(): string { return this.plantillaPDF.marca_Agua }
   get logo(): string { return this.plantillaPDF.logoBase64 }
 
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
+  // VARIABLE PARA TOMAR RUTA DEL SISTEMA
+  hipervinculo: string = environment.url;
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
 
   constructor(
     public nivel: NivelTitulosService, // SERVICIO DATOS NIVELES DE TÍTULOS
@@ -89,6 +92,9 @@ export class ListarNivelTitulosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerNiveles();
   }
@@ -105,7 +111,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     this.numero_paginaMul = e.pageIndex + 1
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -125,7 +131,7 @@ export class ListarNivelTitulosComponent implements OnInit {
   nameFile: string;
   archivoSubido: Array<File>;
   mostrarbtnsubir: boolean = false;
-  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE NIVELES 
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE NIVELES
   FileChange(element: any) {
     this.archivoSubido = [];
     this.nameFile = '';
@@ -133,15 +139,15 @@ export class ListarNivelTitulosComponent implements OnInit {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 25);
+    let itemName = arrayItems[0];
     console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'niveles_profesionales') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre Niveles_profesionales', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
         this.nameFile = '';
@@ -166,8 +172,9 @@ export class ListarNivelTitulosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.progreso = true;
-    // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+
+
+    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.nivel.RevisarFormato(formData).subscribe(res => {
       this.DataNivelesProfesionales = res.data;
       this.messajeExcel = res.message;
@@ -187,9 +194,9 @@ export class ListarNivelTitulosComponent implements OnInit {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
-      this.progreso = false;
+
     }, () => {
-      this.progreso = false;
+
     });
   }
 
@@ -207,7 +214,9 @@ export class ListarNivelTitulosComponent implements OnInit {
   btn_registrar: boolean = true;
   registrarNiveles() {
     var data = {
-      nombre: ''
+      nombre: '',
+      user_name: this.user_name,
+      ip: this.ip,
     }
     if (this.listNivelesCorrectos.length > 0) {
       var cont = 0;
@@ -263,7 +272,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     }
   }
 
-  // ORDENAR LOS DATOS SEGUN EL ID 
+  // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
       if (a.id < b.id) {
@@ -476,7 +485,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     this.ObtenerNiveles();
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A CSV                                   ** **
    ** ************************************************************************************************** **/
 
@@ -529,9 +538,13 @@ export class ListarNivelTitulosComponent implements OnInit {
     return `${this.selectionNiveles.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_nivel: number) {
-    this.nivel.EliminarNivel(id_nivel).subscribe(res => {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.nivel.EliminarNivel(id_nivel, data).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
@@ -545,7 +558,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -567,13 +580,17 @@ export class ListarNivelTitulosComponent implements OnInit {
   ingresar: boolean = false;
 
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ingresar = false;
     this.contador = 0;
     this.nivelesEliminar = this.selectionNiveles.selected;
     this.nivelesEliminar.forEach((datos: any) => {
       this.nivelTitulos = this.nivelTitulos.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.nivel.EliminarNivel(datos.id).subscribe(res => {
+      this.nivel.EliminarNivel(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,

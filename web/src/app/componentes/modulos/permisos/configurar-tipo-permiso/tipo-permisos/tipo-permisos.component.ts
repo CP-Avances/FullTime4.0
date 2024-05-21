@@ -41,6 +41,10 @@ interface opcionesDiasHoras {
 
 export class TipoPermisosComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // DEFINIR TIPO DE DESCUENTOS
   descuentos: TipoDescuentos[] = [
     { value: '1', viewValue: 'Vacaciones' },
@@ -98,6 +102,9 @@ export class TipoPermisosComponent implements OnInit {
   HabilitarDias: boolean = true;
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ValidarFormulario();
   }
 
@@ -328,6 +335,8 @@ export class TipoPermisosComponent implements OnInit {
       correo_autorizar: form3.correo_autorizarForm,
       correo_negar: form3.correo_negarForm,
       correo_legalizar: form3.correo_legalizarForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     console.log('ver permiso ', permiso)
     if (nombrePermiso === 'OTRO') {

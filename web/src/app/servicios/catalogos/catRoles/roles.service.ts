@@ -17,8 +17,12 @@ export class RolesService {
   }
 
   // ELIMINAR REGISTRO DE ROL
-  EliminarRoles(id: any) {
-    return this.http.delete(`${environment.url}/rol/eliminar/${id}`).pipe(catchError(id));
+  EliminarRoles(id: number, datos:any) {
+    const url = `${environment.url}/rol/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA CREAR ARCHIVO XML
@@ -32,11 +36,10 @@ export class RolesService {
     return this.http.post(`${environment.url}/rol`, data);
   }
 
+
   // Roles
   getOneRol(id: number) {
     return this.http.get<any>(`${environment.url}/rol/${id}`);
-  }
-  ListarRolesActualiza(id: number) {
     return this.http.get<any>(`${environment.url}/rol/actualiza/${id}`);
   }
   ActualizarRol(data: any) {

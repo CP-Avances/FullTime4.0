@@ -49,6 +49,10 @@ export class VistaRolesComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CAMPO DE BUSQUEDA DE DATOS
   buscarDescripcion = new FormControl('', Validators.minLength(2));
 
@@ -71,6 +75,9 @@ export class VistaRolesComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerRoles();
   }
@@ -82,7 +89,7 @@ export class VistaRolesComponent implements OnInit {
     this.tamanio_pagina = e.pageSize;
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -132,7 +139,7 @@ export class VistaRolesComponent implements OnInit {
     this.buscarDescripcion.reset();
   }
 
-  // ORDENAR LOS DATOS SEGÚN EL ID 
+  // ORDENAR LOS DATOS SEGÚN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
       if (a.id < b.id) {
@@ -308,7 +315,7 @@ export class VistaRolesComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;
@@ -318,8 +325,7 @@ export class VistaRolesComponent implements OnInit {
     this.ObtenerRoles();
   }
 
-
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A CSV                               ** **
    ** ************************************************************************************************** **/
 
@@ -383,9 +389,13 @@ export class VistaRolesComponent implements OnInit {
 
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(rol: any) {
-    this.rest.EliminarRoles(rol.id).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRoles(rol.id, datos).subscribe((res: any) => {
 
       if (res.message === 'error') {
         this.toastr.error('No se puede eliminar.', '', {
@@ -400,7 +410,7 @@ export class VistaRolesComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -418,10 +428,14 @@ export class VistaRolesComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA ELIMINAR LOS REGISTROS SELECCIONADOS 
+  // FUNCION PARA ELIMINAR LOS REGISTROS SELECCIONADOS
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ingresar = false;
     this.contador = 0;
     this.rolesEliminar = this.selectionRoles.selected;
@@ -429,7 +443,7 @@ export class VistaRolesComponent implements OnInit {
 
       this.roles = this.roles.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.rest.EliminarRoles(datos.id).subscribe(res => {
+      this.rest.EliminarRoles(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,

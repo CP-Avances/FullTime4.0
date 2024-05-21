@@ -17,6 +17,10 @@ import { ValidacionesService } from "src/app/servicios/validaciones/validaciones
 
 export class RegistroProvinciaComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   paises: any = [];
   continentes: any = [];
 
@@ -47,6 +51,9 @@ export class RegistroProvinciaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.BuscarProvincias();
     this.continentes = this.ObtenerContinentes();
   }
@@ -118,6 +125,8 @@ export class RegistroProvinciaComponent implements OnInit {
       let provincia = {
         nombre: form.nombreProvinciaForm,
         id_pais: idPais,
+        user_name: this.user_name,
+        ip: this.ip,
       };
       // VALIDAR SI EXISTE REGISTRO DE PROVINCIA
       if (this.provincias.length != 0) {

@@ -101,8 +101,12 @@ export class EmpleadoHorariosService {
     return this.http.put(`${environment.url}/empleadoHorario`, datos);
   }
 
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/empleadoHorario/eliminar/${id}`);
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${environment.url}/empleadoHorario/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   ObtenerHorariosFechasEmpleado(codigo: string | number, data: any) {

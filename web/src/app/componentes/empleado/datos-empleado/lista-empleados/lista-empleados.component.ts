@@ -38,7 +38,7 @@ export class ListaEmpleadosComponent implements OnInit {
   empleadosEliminarActivos: any = [];
   empleadosEliminarInactivos: any = [];
 
-  // VARIABLES DE ALMACENAMIENTO DE DATOS 
+  // VARIABLES DE ALMACENAMIENTO DE DATOS
   nacionalidades: any = [];
   empleadoD: any = [];
   empleado: any = [];
@@ -85,6 +85,10 @@ export class ListaEmpleadosComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
     public ventana: MatDialog, // VARIABLE MANEJO DE VENTANAS DE DIÁLOGO
@@ -97,6 +101,9 @@ export class ListaEmpleadosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerNacionalidades();
     this.DescargarPlantilla();
@@ -105,14 +112,14 @@ export class ListaEmpleadosComponent implements OnInit {
     this.ObtenerLogo();
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelected() {
     const numSelected = this.selectionUno.selected.length;
     const numRows = this.empleado.length;
     return numSelected === numRows;
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
@@ -176,7 +183,7 @@ export class ListaEmpleadosComponent implements OnInit {
     return numSelected === numRows;
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDos() {
     this.isAllSelectedDos() ?
       this.selectionDos.clear() :
@@ -234,7 +241,7 @@ export class ListaEmpleadosComponent implements OnInit {
     }
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleadoD = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -250,7 +257,7 @@ export class ListaEmpleadosComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -303,7 +310,6 @@ export class ListaEmpleadosComponent implements OnInit {
     });
   }
 
-  //TODO ordenar Datos
   // ORDENAR LOS DATOS SEGUN EL  CODIGO
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
@@ -509,9 +515,15 @@ export class ListaEmpleadosComponent implements OnInit {
 
   registrarUsuariosMultiple() {
     if (this.listUsuariosCorrectas.length > 0) {
+      const datos = {
+        plantilla: this.listUsuariosCorrectas,
+        user_name: this.user_name,
+        ip: this.ip
+      };
+
       if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
-        this.rest.subirArchivoExcel_Automatico(this.listUsuariosCorrectas).subscribe(datos_archivo => {
-          console.log('datos plantilla a enviar: ', this.listUsuariosCorrectas);
+
+        this.rest.subirArchivoExcel_Automatico(datos).subscribe(datos_archivo => {
           this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
             timeOut: 3000,
           });
@@ -521,8 +533,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
         });
       } else {
-        this.rest.subirArchivoExcel_Manual(this.listUsuariosCorrectas).subscribe(datos_archivo => {
-          console.log('datos plantilla a enviar: ', this.listUsuariosCorrectas);
+        this.rest.subirArchivoExcel_Manual(datos).subscribe(datos_archivo => {
           this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
             timeOut: 3000,
           });
@@ -564,7 +575,7 @@ export class ListaEmpleadosComponent implements OnInit {
     ) {
       return 'rgb(222, 162, 73)';
     } else if ((observacion == 'Rol no existe en el sistema') ||
-      (observacion == 'Nacionalidad no existe en el sistema')) 
+      (observacion == 'Nacionalidad no existe en el sistema'))
     {
       return 'rgb(255, 192, 203)';
     }else if (arrayObservacion[0] == 'Formato') {
@@ -922,7 +933,7 @@ export class ListaEmpleadosComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;
@@ -931,7 +942,7 @@ export class ListaEmpleadosComponent implements OnInit {
     a.click();
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A CSV                                   ** **
    ** ************************************************************************************************** **/
 
@@ -1077,7 +1088,7 @@ export class ListaEmpleadosComponent implements OnInit {
       //this.GetEmpleados();
 
   }
-  
+
 
 
 

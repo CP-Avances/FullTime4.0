@@ -18,8 +18,12 @@ export class RelojesService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarRegistro(id: any) {
-    return this.http.delete(`${environment.url}/relojes/eliminar/${id}`).pipe(catchError(id));
+  EliminarRegistro(id: number, datos:any) {
+    const url = `${environment.url}/relojes/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA CREAR ARCHIVO XML

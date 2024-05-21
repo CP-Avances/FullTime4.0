@@ -16,6 +16,15 @@ export class ParametrosService {
     return this.http.get<any>(`${environment.url}/parametrizacion`);
   }
 
+  // ELIMINAR REGISTRO DE PARAMETRO
+  EliminarTipoParametro(id: number, datos: any) {
+    const url = `${environment.url}/parametrizacion/eliminar-tipo/${id}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
+  }
+
   // ACTUALIZAR REGISTRO PARAMETRO
   ActualizarTipoParametro(datos: any) {
     return this.http.put(`${environment.url}/parametrizacion/actual-tipo`, datos);
@@ -32,8 +41,12 @@ export class ParametrosService {
   }
 
   // METODO PARA ELIMINAR DETALLE DE PARAMETRO
-  EliminarDetalleParametro(id: number) {
-    return this.http.delete<any>(`${environment.url}/parametrizacion/eliminar-detalle/${id}`);
+  EliminarDetalleParametro(id: number, datos: any) {
+    const url = `${environment.url}/parametrizacion/eliminar-detalle/${id}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
   }
 
   // METODO PARA REGISTRAR DETALLE DE PARAMETRO

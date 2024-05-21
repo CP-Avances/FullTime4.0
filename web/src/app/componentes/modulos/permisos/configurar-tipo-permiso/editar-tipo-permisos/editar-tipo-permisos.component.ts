@@ -32,6 +32,10 @@ interface opcionesDiasHoras {
 
 export class EditarTipoPermisosComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // TIPOS DE DESCUENTO
   descuentos: TipoDescuentos[] = [
     { value: '1', viewValue: 'Vacaciones' },
@@ -79,6 +83,9 @@ export class EditarTipoPermisosComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ValidarFormulario();
     this.CargarDatosPermiso();
     this.ObtenerTipoPermiso();
@@ -349,9 +356,9 @@ export class EditarTipoPermisosComponent implements OnInit {
       correo_autorizar: form3.correo_autorizarForm,
       correo_negar: form3.correo_negarForm,
       correo_legalizar: form3.correo_legalizarForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
-
-    console.log('ver data a registrar ', permiso)
 
     if (this.tipoPermiso.descripcion.toUpperCase() === permiso.descripcion.toUpperCase()) {
       this.VerificarIngresoFecha(permiso);

@@ -54,8 +54,12 @@ export class HorarioService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarRegistro(id: any) {
-    return this.http.delete(`${environment.url}/horario/eliminar/${id}`).pipe(catchError(id));
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${environment.url}/horario/eliminar/${id}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.delete(url, httpOptions);
   }
 
   // METODO PARA CREAR ARCHIVO XML

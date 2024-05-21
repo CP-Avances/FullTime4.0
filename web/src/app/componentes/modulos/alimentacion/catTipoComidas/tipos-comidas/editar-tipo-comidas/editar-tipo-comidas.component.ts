@@ -15,6 +15,10 @@ import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.s
 
 export class EditarTipoComidasComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   tipoF = new FormControl('');
   nombreF = new FormControl('', [Validators.required, Validators.minLength(4)]);
@@ -41,6 +45,9 @@ export class EditarTipoComidasComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerServicios();
     this.servicios[this.servicios.length] = { nombre: "OTRO" };
     this.ImprimirDatos();
@@ -77,7 +84,9 @@ export class EditarTipoComidasComponent implements OnInit {
       nombre: form.nombreForm,
       tipo_comida: form.tipoForm,
       hora_inicio: form.horaInicioForm,
-      hora_fin: form.horaFinForm
+      hora_fin: form.horaFinForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     if (form.tipoForm === undefined) {
       this.RegistrarServicio(form, datosTipoComida);
@@ -138,7 +147,9 @@ export class EditarTipoComidasComponent implements OnInit {
   RegistrarServicio(form: any, datos: any) {
     if (form.servicioForm != '') {
       let tipo_servicio = {
-        nombre: form.servicioForm
+        nombre: form.servicioForm,
+        user_name: this.user_name,
+        ip: this.ip
       }
       this.restPlan.CrearTipoComidas(tipo_servicio).subscribe(res => {
         datos.tipo_comida = res.id;

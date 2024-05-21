@@ -52,6 +52,10 @@ export class EditarPlanificacionComponent implements OnInit {
   ver_horario_: boolean = false;
   ver_guardar: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public componentev: VerEmpleadoComponent,
     public componenteb: BuscarPlanificacionComponent,
@@ -71,13 +75,15 @@ export class EditarPlanificacionComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    //--console.log('ver rotativo ', this.datos_horarios)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.BuscarHora();
     this.BuscarFeriados();
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
   formato_hora: string = 'HH:mm:ss';
 
@@ -779,7 +785,7 @@ export class EditarPlanificacionComponent implements OnInit {
     }
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarEliminar(lista: any, asignacion: any) {
     this.ventanae.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -794,6 +800,12 @@ export class EditarPlanificacionComponent implements OnInit {
     let cont = 0;
     let eliminado = 0;
     let no_eliminado = 0;
+
+    let datos = {
+      id_plan: [],
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     lista.forEach(horario => {
       let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;
       //console.log('fecha ', moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
@@ -804,9 +816,10 @@ export class EditarPlanificacionComponent implements OnInit {
         id_horario: horario.horarios.id,
       };
       //console.log('plan ', plan_fecha)
-      this.restP.BuscarFechas(plan_fecha).subscribe(res => {
+      this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
+        datos.id_plan = res;
         // METODO PARA ELIMINAR DE LA BASE DE DATOS
-        this.restP.EliminarRegistro(res).subscribe(datos => {
+        this.restP.EliminarRegistro(datos).subscribe(datos => {
           cont = cont + 1;
           if (datos.message === 'OK') {
             eliminado = eliminado + 1;
@@ -976,8 +989,13 @@ export class EditarPlanificacionComponent implements OnInit {
   // METODO PARA INGRESAR DATOS A LA BASE
   plan_general: any = [];
   InsertarPlanificacion() {
+    const datos = {
+      plan_general: this.plan_general,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     //console.log('plan genral ', this.plan_general)
-    this.restP.CrearPlanGeneral(this.plan_general).subscribe(res => {
+    this.restP.CrearPlanGeneral(datos).subscribe(res => {
       //console.log('ver respuesta ', res)
       if (res.message === 'OK') {
         //this.progreso = false;
@@ -1082,6 +1100,11 @@ export class EditarPlanificacionComponent implements OnInit {
 
   // METODO PARA ELIMINAR FERIADOS
   EliminarFeriados(lista: any) {
+    let datos = {
+      id_plan: [],
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     lista.forEach(horario => {
       let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;
       //console.log('fecha ', moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
@@ -1092,9 +1115,10 @@ export class EditarPlanificacionComponent implements OnInit {
         id_horario: horario.horarios.id,
       };
       //console.log('plan ', plan_fecha)
-      this.restP.BuscarFechas(plan_fecha).subscribe(res => {
+      this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
+        datos.id_plan = res;
         // METODO PARA ELIMINAR DE LA BASE DE DATOS
-        this.restP.EliminarRegistro(res).subscribe(datos => {
+        this.restP.EliminarRegistro(datos).subscribe(datos => {
         })
       })
     })

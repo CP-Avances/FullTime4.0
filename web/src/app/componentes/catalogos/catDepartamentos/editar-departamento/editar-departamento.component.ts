@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-editar-departamento',
@@ -40,6 +41,10 @@ export class EditarDepartamentoComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private rest: DepartamentosService,
     private restS: SucursalService,
@@ -52,6 +57,9 @@ export class EditarDepartamentoComponent implements OnInit {
   datos: any;
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.datos = this.info.data;
     if (this.info.establecimiento === true) {
       this.Habilitar = false;
@@ -101,6 +109,8 @@ export class EditarDepartamentoComponent implements OnInit {
     var departamento = {
       id_sucursal: form.idSucursalForm,
       nombre: form.nombreForm.toUpperCase(),
+      user_name: this.user_name,
+      ip: this.ip
     };
 
     // VERIFICAR ID DE SUCURSAL
@@ -136,7 +146,7 @@ export class EditarDepartamentoComponent implements OnInit {
     }
   }
 
-  // METODO DE ACTUALIZACION DE REGISTRO EN BASE DE DATOS  
+  // METODO DE ACTUALIZACION DE REGISTRO EN BASE DE DATOS
   ActualizarDepartamento(departamento: any) {
     this.habilitarprogress = true;
     this.rest.ActualizarDepartamento(this.datos.id, departamento).subscribe(response => {
@@ -165,7 +175,9 @@ export class EditarDepartamentoComponent implements OnInit {
   ActulizarNombreNiveles(departamento: any) {
     let data = {
       departamento: departamento.nombre,
-      id_departamento: this.datos.id
+      id_departamento: this.datos.id,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.rest.ActualizarNombreNivel(data).subscribe(response => {
     });

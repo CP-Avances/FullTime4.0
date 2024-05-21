@@ -26,6 +26,10 @@ export class RegistrarPeriodoVComponent implements OnInit {
   // Datos del empleado
   empleados: any = [];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreEmpleadoF = new FormControl('', [Validators.required]);
   descripcionF = new FormControl('', [Validators.required, Validators.minLength(4)]);
@@ -61,6 +65,9 @@ export class RegistrarPeriodoVComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
     this.ObtenerContrato();
     this.PerVacacionesForm.patchValue({
@@ -72,7 +79,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
     })
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -85,7 +92,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
   }
 
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   datosContrato: any = [];
   ObtenerContrato() {
     this.datosContrato = [];
@@ -126,7 +133,9 @@ export class RegistrarPeriodoVComponent implements OnInit {
       dia_perdido: form.diaPerdidoForm,
       horas_vacaciones: form.horaVacacionForm,
       min_vacaciones: form.minVacacionForm,
-      codigo: this.empleados[0].codigo
+      codigo: this.empleados[0].codigo,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.restV.CrearPerVacaciones(datosPerVacaciones).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Período de Vacaciones registrado', {

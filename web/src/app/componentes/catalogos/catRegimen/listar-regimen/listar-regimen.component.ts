@@ -56,6 +56,10 @@ export class ListarRegimenComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string {
     return this.plantillaPDF.color_Secundary;
@@ -82,6 +86,9 @@ export class ListarRegimenComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerRegimen();
   }
@@ -423,7 +430,7 @@ export class ListarRegimenComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;
@@ -498,14 +505,18 @@ export class ListarRegimenComponent implements OnInit {
 
 
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ingresar = false;
     this.contador = 0;
     this.regimenesEliminar = this.selectionRegimen.selected;
     this.regimenesEliminar.forEach((datos: any) => {
       this.regimen = this.regimen.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      //AQUI MODIFICAR EL METODO 
-      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+      //AQUI MODIFICAR EL METODO
+      this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -551,7 +562,11 @@ export class ListarRegimenComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_regimen: number) {
-    this.rest.EliminarRegistro(id_regimen).subscribe((res) => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistro(id_regimen, datos).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,

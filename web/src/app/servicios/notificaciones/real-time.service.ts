@@ -48,18 +48,18 @@ export class RealTimeService {
   }
 
 
-  PutVistaNotificacion(id_realtime: number) {
-    let data = { visto: true };
+  PutVistaNotificacion(id_realtime: number, data: any) {
+    data.append('visto', true);
     return this.http.put(`${environment.url}/noti-real-time/vista/${id_realtime}`, data);
   }
 
-  EliminarNotificaciones(Seleccionados: any[]) {
+  EliminarNotificaciones(Seleccionados: any) {
     return this.http.put<any>(`${environment.url}/noti-real-time/eliminar-multiples/avisos`, Seleccionados); //Eliminacion de datos seleccionados.
   }
 
 
   /** ************************************************************************************ **
-   ** **                        METODOS PARA CONFIG_NOTI                                ** ** 
+   ** **                        METODOS PARA CONFIG_NOTI                                ** **
    ** ************************************************************************************ **/
 
 
@@ -78,12 +78,11 @@ export class RealTimeService {
 
   // METODO PARA ENVIO DE CORREO MULTIPLE
   EnviarCorreoMultiple(datos: any) {
-    console.log('datos: ',datos);
     return this.http.post<any>(`${environment.url}/noti-real-time/mail-multiple`, datos);
   }
 
 
-  
+
 
 
 
@@ -92,7 +91,7 @@ export class RealTimeService {
 
 
   /** ************************************************************************************ **
-   ** **                 METODOS DE CONSULTA DE DATOS DE COMUNICADOS                    ** ** 
+   ** **                 METODOS DE CONSULTA DE DATOS DE COMUNICADOS                    ** **
    ** ************************************************************************************ **/
 
   // METODO PARA ENVIO DE CORREO DE COMUNICADOS

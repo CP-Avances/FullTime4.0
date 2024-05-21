@@ -13,7 +13,7 @@ export class RegimenService {
   ) { }
 
   /** ** *************************************************************************************** **
-   ** ** **                           CONSULTA REGIMEN LABORAL                                ** ** 
+   ** ** **                           CONSULTA REGIMEN LABORAL                                ** **
    ** ** *************************************************************************************** **/
 
   // REGISTRAR NUEVO REGIMEN LABORAL
@@ -43,8 +43,12 @@ export class RegimenService {
   }
 
   // ELIMINAR REGISTRO DE REGIMEN LABORAL
-  EliminarRegistro(id: any) {
-    return this.http.delete(`${environment.url}/regimenLaboral/eliminar/${id}`).pipe(catchError(id));;
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${environment.url}/regimenLaboral/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // BUSCAR REGISTRO DE REGIMEN LABORAL POR PAIS
@@ -58,7 +62,7 @@ export class RegimenService {
   }
 
   /** ** *************************************************************************************** **
-   ** ** **                        CONSULTA PERIODOS DE VACACIONES                            ** ** 
+   ** ** **                        CONSULTA PERIODOS DE VACACIONES                            ** **
    ** ** *************************************************************************************** **/
 
   // REGISTRAR NUEVO PERIODO DE VACACIONES
@@ -78,12 +82,16 @@ export class RegimenService {
   }
 
   // ELIMINAR REGISTRO DE PERIODO DE VACACIONES
-  EliminarPeriodo(id: number) {
-    return this.http.delete(`${environment.url}/regimenLaboral/periodo-vacaciones/eliminar/${id}`);
+  EliminarPeriodo(id: number, datos:any) {
+    const url = `${environment.url}/regimenLaboral/periodo-vacaciones/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   /** ** *************************************************************************************** **
-   ** ** **                        CONSULTA ANTIGUEDAD DE VACACIONES                            ** ** 
+   ** ** **                        CONSULTA ANTIGUEDAD DE VACACIONES                            ** **
    ** ** *************************************************************************************** **/
 
   // REGISTRAR NUEVA ANTIGUEDAD DE VACACIONES
@@ -103,8 +111,12 @@ export class RegimenService {
   }
 
   // ELIMINAR REGISTRO DE ANTIGUEDAD DE VACACIONES
-  EliminarAntiguedad(id: number) {
-    return this.http.delete(`${environment.url}/regimenLaboral/antiguedad-vacaciones/eliminar/${id}`);
+  EliminarAntiguedad(id: number, datos: any) {
+    const url = `${environment.url}/regimenLaboral/antiguedad-vacaciones/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
 
@@ -115,7 +127,7 @@ export class RegimenService {
 
 
 
-  
+
 
   ConsultarRegimenSucursal(id: number) {
     return this.http.get(`${environment.url}/regimenLaboral/sucursal-regimen/${id}`);

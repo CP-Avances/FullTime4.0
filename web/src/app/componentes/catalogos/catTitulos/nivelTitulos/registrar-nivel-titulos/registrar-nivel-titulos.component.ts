@@ -14,6 +14,10 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 
 export class RegistrarNivelTitulosComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   nombre = new FormControl('', Validators.required)
 
   public formulario = new FormGroup({
@@ -28,12 +32,16 @@ export class RegistrarNivelTitulosComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip')
   }
 
   // METODO PARA GUARDAR DATOS DE NIVELES DE TITULO Y VERIFICAR DUPLICIDAD
   InsertarNivelTitulo(form: any) {
     let nivel = {
       nombre: form.nombreForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     // VERIIFCAR DUPLICIDAD
     let nombre_nivel = (nivel.nombre).toUpperCase();

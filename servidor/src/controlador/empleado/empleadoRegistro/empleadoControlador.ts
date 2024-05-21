@@ -4,9 +4,10 @@ import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import { Md5 } from 'ts-md5';
+import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
+import pool from '../../../database';
 import moment from 'moment';
 import excel from 'xlsx';
-import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
 
@@ -33,13 +34,37 @@ class EmpleadoControlador {
 
   // CREAR CODIGO DE EMPLEADO
   public async CrearCodigo(req: Request, res: Response) {
-    const { id, valor, automatico, manual } = req.body;
-    await pool.query(
-      `
-      INSERT INTO e_codigo (id, valor, automatico, manual) VALUES ($1, $2, $3, $4)
-      `
-      , [id, valor, automatico, manual]);
-    res.jsonp({ message: 'Registro guardado.' });
+    try {
+      const { id, valor, automatico, manual, user_name, ip } = req.body;
+      
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      await pool.query(
+        `
+        INSERT INTO e_codigo (id, valor, automatico, manual) VALUES ($1, $2, $3, $4)
+        `
+        , [id, valor, automatico, manual]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'e_codigo',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos:`{id: ${id}, valor: ${valor}, automatico: ${automatico}, manual: ${manual}}`,
+        ip, 
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      res.jsonp({ message: 'Registro guardado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      res.status(500).jsonp({ message: 'Error al guardar código.' });
+    }
   }
 
   // BUSQUEDA DEL ULTIMO CODIGO REGISTRADO EN EL SISTEMA
@@ -49,7 +74,7 @@ class EmpleadoControlador {
         `
         SELECT MAX(codigo::BIGINT) AS codigo FROM eu_empleados
         `
-      ); //TODO Revisar Instrucción SQL max codigo
+      );
       if (VALOR.rowCount > 0) {
         return res.jsonp(VALOR.rows)
       }
@@ -63,25 +88,113 @@ class EmpleadoControlador {
   }
 
   // METODO PARA ACTUALIZAR INFORMACION DE CODIGOS
-  public async ActualizarCodigoTotal(req: Request, res: Response) {
-    const { valor, automatico, manual, cedula, id } = req.body;
-    await pool.query(
-      `
-      UPDATE e_codigo SET valor = $1, automatico = $2, manual = $3 , cedula = $4 WHERE id = $5
-      `
-      , [valor, automatico, manual, cedula, id]);
-    res.jsonp({ message: 'Registro actualizado.' });
+  public async ActualizarCodigoTotal(req: Request, res: Response): Promise<Response> {
+    try {
+      const { valor, automatico, manual, cedula, id, user_name, ip } = req.body;
+      
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+  
+      // CONSULTAR DATOSORIGINALES
+      const codigo = await pool.query('SELECT * FROM e_codigo WHERE id = $1', [id]);
+      const [datosOriginales] = codigo.rows;
+  
+      if (!datosOriginales){
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'e_codigo',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar código con id: ${id}`
+        });
+  
+        //FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al actualizar código' });
+      }
+  
+      await pool.query(
+        `
+        UPDATE e_codigo SET valor = $1, automatico = $2, manual = $3 , cedula = $4 WHERE id = $5
+        `
+        , [valor, automatico, manual, cedula, id]);
+  
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'e_codigo',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{valor: ${valor}, automatico: ${automatico}, manual: ${manual}, cedula: ${cedula}}`,
+        ip,
+        observacion: null
+      });
+  
+      //FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro actualizado.' });
+    } catch (error) {
+      //REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'Error al actualizar código.' });
+    }
   }
 
   // METODO PARA ACTUALIZAR CODIGO DE EMPLEADO
-  public async ActualizarCodigo(req: Request, res: Response) {
-    const { valor, id } = req.body;
-    await pool.query(
-      `
-      UPDATE e_codigo SET valor = $1 WHERE id = $2
-      `
-      , [valor, id]);
-    res.jsonp({ message: 'Registro actualizado.' });
+  public async ActualizarCodigo(req: Request, res: Response): Promise<Response>{
+    try {
+      const { valor, id, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const codigo = await pool.query('SELECT * FROM e_codigo WHERE id = $1', [id]);
+      const [datosOriginales] = codigo.rows;
+
+      if (!datosOriginales){
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'e_codigo',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar código con id: ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al actualizar código' });
+      }
+
+      await pool.query(
+         `
+        UPDATE e_codigo SET valor = $1 WHERE id = $2
+        `
+        , [valor, id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'e_codigo',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{valor: ${valor}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro actualizado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'Error al actualizar código.' });
+    }
   }
 
 
@@ -93,7 +206,10 @@ class EmpleadoControlador {
   public async InsertarEmpleado(req: Request, res: Response) {
     try {
       const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
-        domicilio, telefono, id_nacionalidad, codigo } = req.body;
+        domicilio, telefono, id_nacionalidad, codigo, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
         `
@@ -105,6 +221,20 @@ class EmpleadoControlador {
           telefono, id_nacionalidad, codigo]);
 
       const [empleado] = response.rows;
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_empleados',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: JSON.stringify(empleado),
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
 
       if (empleado) {
 
@@ -171,7 +301,9 @@ class EmpleadoControlador {
       }
     }
     catch (error) {
-      return res.jsonp({ message: 'error' });
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -180,7 +312,30 @@ class EmpleadoControlador {
     try {
       const id = req.params.id;
       const { cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
-        domicilio, telefono, id_nacionalidad, codigo } = req.body;
+        domicilio, telefono, id_nacionalidad, codigo, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const empleado = await pool.query('SELECT * FROM eu_empleados WHERE id = $1', [id]);
+      const [datosOriginales] = empleado.rows;
+
+      if (!datosOriginales){
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_empleados',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar empleado con id: ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al actualizar empleado' });
+      }
 
       await pool.query(
         `
@@ -191,6 +346,20 @@ class EmpleadoControlador {
         `
         , [id, cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
           domicilio, telefono, id_nacionalidad, codigo]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_empleados',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{cedula: ${cedula}, apellido: ${apellido}, nombre: ${nombre}, estado_civil: ${esta_civil}, genero: ${genero}, correo: ${correo}, fecha_nacimiento: ${fec_nacimiento}, estado: ${estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad}, codigo: ${codigo}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
 
       let verificar_permisos = 0;
 
@@ -299,7 +468,9 @@ class EmpleadoControlador {
 
     }
     catch (error) {
-      return res.jsonp({ message: 'error' });
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -360,26 +531,92 @@ class EmpleadoControlador {
 
   // METODO PARA INHABILITAR USUARIOS EN EL SISTEMA
   public async DesactivarMultiplesEmpleados(req: Request, res: Response): Promise<any> {
-    const arrayIdsEmpleados = req.body;
+    const {arrayIdsEmpleados, user_name, ip} = req.body;
 
     if (arrayIdsEmpleados.length > 0) {
       arrayIdsEmpleados.forEach(async (obj: number) => {
 
-        // 2 => DESACTIVADO O INACTIVO
-        await pool.query(
-          `
-          UPDATE eu_empleados SET estado = 2 WHERE id = $1
-          `
-          , [obj])
-          .then((result: any) => { });
+        try {
+          // INICIAR TRANSACCION
+          await pool.query('BEGIN');
 
-        // FALSE => YA NO TIENE ACCESO
-        await pool.query(
-          `
-          UPDATE eu_usuarios SET estado = false, app_habilita = false WHERE id_empleado = $1
-          `
-          , [obj])
-          .then((result: any) => { });
+          // CONSULTAR DATOSORIGINALES
+          const empleado = await pool.query('SELECT * FROM eu_empleados WHERE id = $1', [obj]);
+          const [datosOriginales] = empleado.rows;
+
+          const usuario = await pool.query('SELECT * FROM eu_usuarios WHERE id_empleado = $1', [obj]);
+          const [datosOriginalesUsuario] = usuario.rows;
+
+          if (!datosOriginales || !datosOriginalesUsuario){
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'eu_empleados',
+              usuario: user_name,
+              accion: 'U',
+              datosOriginales: '',
+              datosNuevos: '',
+              ip,
+              observacion: `Error al inhabilitar empleado con id: ${obj}`
+            });
+
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'eu_usuarios',
+              usuario: user_name,
+              accion: 'U',
+              datosOriginales: '',
+              datosNuevos: '',
+              ip,
+              observacion: `Error al inhabilitar usuario con id_empleado: ${obj}`
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            throw new Error('Error al inhabilitar empleado con id: ' + obj);
+          }
+
+          // 2 => DESACTIVADO O INACTIVO
+          await pool.query(
+            `
+            UPDATE eu_empleados SET estado = 2 WHERE id = $1
+            `
+            , [obj])
+            .then((result: any) => { });
+
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'eu_empleados',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: JSON.stringify(datosOriginales),
+            datosNuevos: `{estado: 2}`,
+            ip,
+            observacion: null
+          });
+
+          // FALSE => YA NO TIENE ACCESO
+          await pool.query(
+            `
+            UPDATE eu_usuarios SET estado = false, app_habilita = false WHERE id_empleado = $1
+            `
+            , [obj])
+            .then((result: any) => { });
+
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'eu_usuarios',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: JSON.stringify(datosOriginalesUsuario),
+            datosNuevos: `{estado: false, app_habilita: false}`,
+            ip,
+            observacion: null
+          });
+
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+        } catch (error) {
+          // REVERTIR TRANSACCION
+          await pool.query('ROLLBACK');
+        }
       });
 
       return res.jsonp({ message: 'Usuarios inhabilitados exitosamente.' });
@@ -390,25 +627,92 @@ class EmpleadoControlador {
 
   // METODO PARA HABILITAR EMPLEADOS
   public async ActivarMultiplesEmpleados(req: Request, res: Response): Promise<any> {
-    const arrayIdsEmpleados = req.body;
+    const {arrayIdsEmpleados, user_name, ip} = req.body;
 
     if (arrayIdsEmpleados.length > 0) {
       arrayIdsEmpleados.forEach(async (obj: number) => {
-        // 1 => ACTIVADO
-        await pool.query(
-          `
-          UPDATE eu_empleados SET estado = 1 WHERE id = $1
-          `
-          , [obj])
-          .then((result: any) => { });
+        try {
 
-        // TRUE => TIENE ACCESO
-        await pool.query(
-          `
-          UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
-          `
-          , [obj])
-          .then((result: any) => { });
+          // INICIAR TRANSACCION
+          await pool.query('BEGIN');
+
+          // CONSULTAR DATOSORIGINALES
+          const empleado = await pool.query('SELECT * FROM eu_empleados WHERE id = $1', [obj]);
+          const [datosOriginales] = empleado.rows;
+
+          const usuario = await pool.query('SELECT * FROM eu_usuarios WHERE id_empleado = $1', [obj]);
+          const [datosOriginalesUsuario] = usuario.rows;
+
+          if (!datosOriginales || !datosOriginalesUsuario){
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'eu_empleados',
+              usuario: user_name,
+              accion: 'U',
+              datosOriginales: '',
+              datosNuevos: '',
+              ip,
+              observacion: `Error al activar empleado con id: ${obj}`
+            });
+
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'eu_usuarios',
+              usuario: user_name,
+              accion: 'U',
+              datosOriginales: '',
+              datosNuevos: '',
+              ip,
+              observacion: `Error al activar usuario con id_empleado: ${obj}`
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            throw new Error('Error al activar empleado con id: ' + obj);
+          }
+
+          // 1 => ACTIVADO
+          await pool.query(
+            `
+            UPDATE eu_empleados SET estado = 1 WHERE id = $1
+            `
+            , [obj])
+            .then((result: any) => { });
+
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'eu_empleados',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: JSON.stringify(datosOriginales),
+            datosNuevos: `{estado: 1}`,
+            ip,
+            observacion: null
+          });
+  
+          // TRUE => TIENE ACCESO
+          await pool.query(
+            `
+            UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
+            `
+            , [obj])
+            .then((result: any) => { });
+
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'eu_usuarios',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: JSON.stringify(datosOriginalesUsuario),
+            datosNuevos: `{estado: true, app_habilita: true}`,
+            ip,
+            observacion: null
+          });
+
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+        } catch (error) {
+          // REVERTIR TRANSACCION
+          await pool.query('ROLLBACK');
+        }
       });
 
       return res.jsonp({ message: 'Usuarios habilitados exitosamente.' });
@@ -418,26 +722,93 @@ class EmpleadoControlador {
 
   // METODO PARA HABILITAR TODA LA INFORMACION DEL EMPLEADO
   public async ReactivarMultiplesEmpleados(req: Request, res: Response): Promise<any> {
-    const arrayIdsEmpleados = req.body;
+    const {arrayIdsEmpleados, user_name, ip} = req.body;
     if (arrayIdsEmpleados.length > 0) {
       arrayIdsEmpleados.forEach(async (obj: number) => {
-        // 1 => ACTIVADO
-        await pool.query(
-          `
-          UPDATE eu_empleados SET estado = 1 WHERE id = $1
-          `
-          , [obj])
-          .then((result: any) => { });
+        try {
+          // INICIAR TRANSACCION
+          await pool.query('BEGIN');
 
-        // TRUE => TIENE ACCESO
-        await pool.query(
-          `
-          UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
-          `
-          , [obj])
-          .then((result: any) => { });
-        // REVISAR
-        //EstadoHorarioPeriVacacion(obj);
+          // CONSULTAR DATOSORIGINALES
+          const empleado = await pool.query('SELECT * FROM eu_empleados WHERE id = $1', [obj]);
+          const [datosOriginales] = empleado.rows;
+
+          const usuario = await pool.query('SELECT * FROM eu_usuarios WHERE id_empleado = $1', [obj]);
+          const [datosOriginalesUsuario] = usuario.rows;
+
+          if (!datosOriginales || !datosOriginalesUsuario){
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'eu_empleados',
+              usuario: user_name,
+              accion: 'U',
+              datosOriginales: '',
+              datosNuevos: '',
+              ip,
+              observacion: `Error al reactivar empleado con id: ${obj}`
+            });
+
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'eu_usuarios',
+              usuario: user_name,
+              accion: 'U',
+              datosOriginales: '',
+              datosNuevos: '',
+              ip,
+              observacion: `Error al reactivar usuario con id_empleado: ${obj}`
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            throw new Error('Error al reactivar empleado con id: ' + obj);
+          }
+
+          // 1 => ACTIVADO
+          await pool.query(
+            `
+            UPDATE eu_empleados SET estado = 1 WHERE id = $1
+            `
+            , [obj])
+            .then((result: any) => { });
+
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'eu_empleados',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: JSON.stringify(datosOriginales),
+            datosNuevos: `{estado: 1}`,
+            ip,
+            observacion: null
+          });
+  
+          // TRUE => TIENE ACCESO
+          await pool.query(
+            `
+            UPDATE eu_usuarios SET estado = true, app_habilita = true WHERE id_empleado = $1
+            `
+            , [obj])
+            .then((result: any) => { });
+
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'eu_usuarios',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: JSON.stringify(datosOriginalesUsuario),
+            datosNuevos: `{estado: true, app_habilita: true}`,
+            ip,
+            observacion: null
+          });
+
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+
+          // REVISAR
+          //EstadoHorarioPeriVacacion(obj);
+        } catch (error) {
+          // REVERTIR TRANSACCION
+          await pool.query('ROLLBACK');          
+        }
       });
 
       return res.jsonp({ message: 'Usuarios habilitados exitosamente.' });
@@ -447,83 +818,137 @@ class EmpleadoControlador {
 
   // CARGAR IMAGEN DE EMPLEADO
   public async CrearImagenEmpleado(req: Request, res: Response): Promise<void> {
+  // FECHA DEL SISTEMA
+  const fecha = moment();
+  const anio = fecha.format('YYYY');
+  const mes = fecha.format('MM');
+  const dia = fecha.format('DD');
 
-    // FECHA DEL SISTEMA
-    var fecha = moment();
-    var anio = fecha.format('YYYY');
-    var mes = fecha.format('MM');
-    var dia = fecha.format('DD');
+  const id = req.params.id_empleado;
+  const separador = path.sep;
 
-    let id = req.params.id_empleado;
-    let separador = path.sep;
+  const { user_name, ip } = req.body;
 
-    const unEmpleado = await pool.query(
-      `
-      SELECT * FROM eu_empleados WHERE id = $1
-      `
-      , [id]);
+  const unEmpleado = await pool.query('SELECT * FROM eu_empleados WHERE id = $1', [id]);
 
-    if (unEmpleado.rowCount > 0) {
-
-      unEmpleado.rows.map(async (obj: any) => {
-
-        let imagen = obj.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
-
-        if (obj.imagen != 'null' && obj.imagen != '' && obj.imagen != null) {
-          try {
-            // ELIMINAR IMAGEN DE SERVIDOR
-            let ruta = await ObtenerRutaUsuario(obj.id) + separador + obj.imagen;
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs.access(ruta, fs.constants.F_OK, (err) => {
-              if (err) {
-              } else {
-                // ELIMINAR DEL SERVIDOR
-                fs.unlinkSync(ruta);
-              }
-            });
-
-            await pool.query(
-              `
-              UPDATE eu_empleados SET imagen = $2 Where id = $1
-              `
-              , [id, imagen]);
-            res.jsonp({ message: 'Imagen actualizada.' });
-
-          } catch (error) {
-            await pool.query(
-              `
-              UPDATE eu_empleados SET imagen = $2 Where id = $1
-              `
-              , [id, imagen]);
-            res.jsonp({ message: 'Imagen actualizada.' });
-          }
-        } else {
-          await pool.query(
-            `
-            UPDATE eu_empleados SET imagen = $2 Where id = $1
-            `
-            , [id, imagen]);
-          res.jsonp({ message: 'Imagen actualizada.' });
+  if (unEmpleado.rowCount > 0) {
+    const promises = unEmpleado.rows.map(async (obj: any) => {
+      try {
+        const imagen = `${obj.codigo}_${anio}_${mes}_${dia}_${req.file?.originalname}`;
+  
+        if (obj.imagen && obj.imagen !== 'null') {
+          const ruta = await ObtenerRutaUsuario(obj.id) + separador + obj.imagen;
+          fs.access(ruta, fs.constants.F_OK, (err) => {
+            if (!err) {
+              fs.unlinkSync(ruta);
+            }
+          });
         }
-      });
-    }
+
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+
+        // CONSULTAR DATOSORIGINALES
+        const empleado = await pool.query('SELECT * FROM empleados WHERE id = $1', [id]);
+        const [datosOriginales] = empleado.rows;
+
+        if (!datosOriginales){
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'eu_empleados',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: '',
+            datosNuevos: '',
+            ip,
+            observacion: `Error al actualizar imagen de empleado con id: ${id}. Registro no encontrado.`
+          });
+
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+          throw new Error('Error al actualizar imagen de empleado con id: ' + id);
+        }
+  
+        await pool.query('UPDATE eu_empleados SET imagen = $2 WHERE id = $1', [id, imagen]);
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_empleados',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: JSON.stringify(datosOriginales),
+          datosNuevos: `{imagen: ${imagen}}`,
+          ip,
+          observacion: null
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+      } catch (error) {
+        // REVERTIR TRANSACCION
+        await pool.query('ROLLBACK');
+        res.status(500).jsonp({ message: 'Error al actualizar imagen de empleado.' });
+      }
+    });
+
+    await Promise.all(promises);
+    res.jsonp({ message: 'Imagen actualizada.' });
   }
+}
 
   // METODO PARA TOMAR DATOS DE LA UBICACION DEL DOMICILIO DEL EMPLEADO
-  public async GeolocalizacionCrokis(req: Request, res: Response): Promise<any> {
+  public async GeolocalizacionCrokis(req: Request, res: Response): Promise<Response> {
     let id = req.params.id
-    let { lat, lng } = req.body
+    let { lat, lng, user_name, ip } = req.body
     console.log(lat, lng, id);
     try {
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const empleado = await pool.query('SELECT * FROM empleados WHERE id = $1', [id]);
+      const [datosOriginales] = empleado.rows;
+
+      if (!datosOriginales){
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'empleados',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar geolocalización de empleado con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al actualizar geolocalización de empleado.' });
+      }
+
       await pool.query(
         `
         UPDATE eu_empleados SET latitud = $1, longitud = $2 WHERE id = $3
         `
         , [lat, lng, id])
-        .then((result: any) => { })
-      res.status(200).jsonp({ message: 'Registro actualizado.' });
+        .then((result: any) => { });
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'empleados',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{latitud: ${lat}, longitud: ${lng}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.status(200).jsonp({ message: 'Registro actualizado.' });
     } catch (error) {
-      res.status(400).jsonp({ message: error });
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: error });
     }
   }
 
@@ -571,36 +996,149 @@ class EmpleadoControlador {
 
   // INGRESAR TITULO PROFESIONAL DEL EMPLEADO
   public async CrearEmpleadoTitulos(req: Request, res: Response): Promise<void> {
-    const { observacion, id_empleado, id_titulo } = req.body;
-    await pool.query(
-      `
-      INSERT INTO eu_empleado_titulos (observacion, id_empleado, id_titulo) VALUES ($1, $2, $3)
-      `
-      , [observacion, id_empleado, id_titulo]);
-    res.jsonp({ message: 'Registro guardado.' });
+    try {
+      const { observacion, id_empleado, id_titulo, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      await pool.query(
+        `
+        INSERT INTO eu_empleado_titulos (observacion, id_empleado, id_titulo) VALUES ($1, $2, $3)
+        `
+        , [observacion, id_empleado, id_titulo]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_empleado_titulos',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{observacion: ${observacion}, id_empleado: ${id_empleado}, id_titulo: ${id_titulo}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      res.jsonp({ message: 'Registro guardado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      res.status(500).jsonp({ message: 'error' });
+    }
   }
 
   // ACTUALIZAR TITULO PROFESIONAL DEL EMPLEADO
-  public async EditarTituloEmpleado(req: Request, res: Response): Promise<void> {
-    const id = req.params.id_empleado_titulo;
-    const { observacion, id_titulo } = req.body;
-    await pool.query(
-      `
-      UPDATE eu_empleado_titulos SET observacion = $1, id_titulo = $2 WHERE id = $3
-      `
-      , [observacion, id_titulo, id]);
-    res.jsonp({ message: 'Registro actualizado.' });
+  public async EditarTituloEmpleado(req: Request, res: Response): Promise<Response> {
+    try {
+      const id = req.params.id_empleado_titulo;
+      const { observacion, id_titulo, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const empleado = await pool.query('SELECT * FROM eu_empleado_titulos WHERE id = $1', [id]);
+      const [datosOriginales] = empleado.rows;
+
+      if (!datosOriginales){
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_empleado_titulos',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar titulo del empleado con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al actualizar titulo del empleado.' });
+      }
+
+      await pool.query(
+        `
+        UPDATE eu_empleado_titulos SET observacion = $1, id_titulo = $2 WHERE id = $3
+        `
+        , [observacion, id_titulo, id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_empleado_titulos',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{observacion: ${observacion}, id_titulo: ${id_titulo}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro actualizado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
 
   // METODO PARA ELIMINAR TITULO PROFESIONAL DEL EMPLEADO
-  public async EliminarTituloEmpleado(req: Request, res: Response): Promise<void> {
-    const id = req.params.id_empleado_titulo;
-    await pool.query(
-      `
-      DELETE FROM eu_empleado_titulos WHERE id = $1
-      `
-      , [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+  public async EliminarTituloEmpleado(req: Request, res: Response): Promise<Response> {
+    try {
+      const { user_name, ip } = req.body;
+      const id = req.params.id_empleado_titulo;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const empleado = await pool.query('SELECT * FROM eu_empleado_titulos WHERE id = $1', [id]);
+      const [datosOriginales] = empleado.rows;
+
+      if (!datosOriginales){
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_empleado_titulos',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar titulo del empleado con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al eliminar titulo del empleado.' });
+      }
+
+      await pool.query(
+        `
+        DELETE FROM eu_empleado_titulos WHERE id = $1
+        `
+        , [id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_empleado_titulos',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
 
 
@@ -624,13 +1162,6 @@ class EmpleadoControlador {
     }
   }
 
-
-
-
-
-
-
-
   // BUSQUEDA DE DATOS DE EMPLEADO INGRESANDO EL NOMBRE
   public async BuscarEmpleadoNombre(req: Request, res: Response): Promise<any> {
     const { informacion } = req.body;
@@ -647,10 +1178,6 @@ class EmpleadoControlador {
       return res.status(404).jsonp({ text: 'Registro no encontrado.' });
     }
   }
-
-
-
-
 
   // BUSQUEDA DE IMAGEN DE EMPLEADO
   public async BuscarImagen(req: Request, res: Response): Promise<any> {
@@ -692,11 +1219,6 @@ class EmpleadoControlador {
     });
   }
 
-
-
-
-
-
   // BUSQUEDA INFORMACIÓN DEPARTAMENTOS EMPLEADO
   public async ObtenerDepartamentoEmpleado(req: Request, res: Response): Promise<any> {
     const { id_emple, id_cargo } = req.body;
@@ -722,14 +1244,55 @@ class EmpleadoControlador {
     try {
 
       const id = req.params.id;
+      const { user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const empleado = await pool.query('SELECT * FROM eu_empleados WHERE id = $1', [id]);
+      const [datosOriginales] = empleado.rows;
+
+      if (!datosOriginales){
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_empleados',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar empleado con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al eliminar empleado.' });
+      }
+
       await pool.query(
         `
         DELETE FROM eu_empleados WHERE id = $1
         `
         , [id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_empleados',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
       res.jsonp({ message: 'Registro eliminado.' });
     }
     catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
       return res.jsonp({ message: 'error' });
     }
 
@@ -1127,16 +1690,10 @@ class EmpleadoControlador {
   }
 
   public async CargarPlantilla_Automatico(req: Request, res: Response): Promise<void> {
-
-    const plantilla = req.body;
-    console.log('datos automatico: ', plantilla);
-
-    const VALOR = await pool.query(
-      `
-      SELECT * FROM e_codigo
-      `
-    );
-    //TODO Revisar max codigo
+    
+    const {plantilla, user_name, ip} = req.body;
+    
+    const VALOR = await pool.query('SELECT * FROM codigo');
     var codigo_dato = VALOR.rows[0].valor;
     var codigo = 0;
     if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
@@ -1146,158 +1703,193 @@ class EmpleadoControlador {
 
     plantilla.forEach(async (data: any) => {
 
-      // Realiza un capital letter a los nombres y apellidos
-      var nombreE: any;
-      let nombres = data.nombre.split(' ');
-      if (nombres.length > 1) {
-        let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
-        let name2 = nombres[1].charAt(0).toUpperCase() + nombres[1].slice(1);
-        nombreE = name1 + ' ' + name2;
-      }
-      else {
-        let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
-        nombreE = name1
-      }
+      try {
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
 
-      var apellidoE: any;
-      let apellidos = data.apellido.split(' ');
-      if (apellidos.length > 1) {
-        let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
-        let lastname2 = apellidos[1].charAt(0).toUpperCase() + apellidos[1].slice(1);
-        apellidoE = lastname1 + ' ' + lastname2;
-      }
-      else {
-        let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
-        apellidoE = lastname1
-      }
-
-      // Encriptar contraseña
-      var md5 = new Md5();
-      var contrasena = md5.appendStr(data.contrasena).end()?.toString();
-
-      // Datos que se leen de la plantilla ingresada
-      const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono,
-        nacionalidad, usuario, rol } = data;
-
-      //Obtener id del estado_civil
-      var id_estado_civil = 0;
-      if (estado_civil.toUpperCase() === 'SOLTERO/A') {
-        id_estado_civil = 1;
-      }
-      else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
-        id_estado_civil = 2;
-      }
-      else if (estado_civil.toUpperCase() === 'CASADO/A') {
-        id_estado_civil = 3;
-      }
-      else if (estado_civil.toUpperCase() === 'DIVORCIADO/A') {
-        id_estado_civil = 4;
-      }
-      else if (estado_civil.toUpperCase() === 'VIUDO/A') {
-        id_estado_civil = 5;
-      }
-
-      //Obtener id del genero
-      var id_genero = 0;
-      if (genero.toUpperCase() === 'MASCULINO') {
-        id_genero = 1;
-      }
-      else if (genero.toUpperCase() === 'FEMENINO') {
-        id_genero = 2;
-      }
-
-      var _longitud = null;
-      if (longitud != 'No registrado') {
-        _longitud = longitud;
-      }
-
-
-      var _latitud = null
-      if (latitud != 'No registrado') {
-        _latitud = latitud;
-      }
-
-      //OBTENER ID DEL ESTADO
-      var id_estado = 1;
-      var estado_user = true;
-      var app_habilita = false;
-
-      //Obtener id de la nacionalidad
-      const id_nacionalidad = await pool.query(
-        `
-        SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
-        `
-        ,
-        [nacionalidad.toUpperCase()]);
-
-      //Obtener id del rol
-      const id_rol = await pool.query(
-        `
-        SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
-        `
+        // REALIZA UN CAPITAL LETTER A LOS NOMBRES Y APELLIDOS
+        var nombreE: any;
+        let nombres = data.nombre.split(' ');
+        if (nombres.length > 1) {
+          let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
+          let name2 = nombres[1].charAt(0).toUpperCase() + nombres[1].slice(1);
+          nombreE = name1 + ' ' + name2;
+        }
+        else {
+          let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
+          nombreE = name1
+        }
+  
+        var apellidoE: any;
+        let apellidos = data.apellido.split(' ');
+        if (apellidos.length > 1) {
+          let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
+          let lastname2 = apellidos[1].charAt(0).toUpperCase() + apellidos[1].slice(1);
+          apellidoE = lastname1 + ' ' + lastname2;
+        }
+        else {
+          let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
+          apellidoE = lastname1
+        }
+  
+        // ENCRIPTAR CONTRASEÑA
+        var md5 = new Md5();
+        var contrasena = md5.appendStr(data.contrasena).end()?.toString();
+  
+        // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
+        const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono,
+          nacionalidad, usuario, rol } = data;
+  
+        //OBTENER ID DEL ESTADO_CIVIL
+        var id_estado_civil = 0;
+        if (estado_civil.toUpperCase() === 'SOLTERO/A') {
+          id_estado_civil = 1;
+        }
+        else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
+          id_estado_civil = 2;
+        }
+        else if (estado_civil.toUpperCase() === 'CASADO/A') {
+          id_estado_civil = 3;
+        }
+        else if (estado_civil.toUpperCase() === 'DIVORCIADO/A') {
+          id_estado_civil = 4;
+        }
+        else if (estado_civil.toUpperCase() === 'VIUDO/A') {
+          id_estado_civil = 5;
+        }
+  
+        //OBTENER ID DEL GENERO
+        var id_genero = 0;
+        if (genero.toUpperCase() === 'MASCULINO') {
+          id_genero = 1;
+        }
+        else if (genero.toUpperCase() === 'FEMENINO') {
+          id_genero = 2;
+        }
+  
+        var _longitud = null;
+        if(longitud != 'No registrado'){
+          _longitud = longitud;
+        }
+          
+  
+        var _latitud = null
+        if(latitud != 'No registrado'){
+          _latitud = latitud;
+        }
+  
+        //OBTENER ID DEL ESTADO
+        var id_estado = 1;
+        var estado_user = true;
+        var app_habilita = false;
+  
+        //OBTENER ID DE LA NACIONALIDAD
+        const id_nacionalidad = await pool.query('SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1',
+          [nacionalidad.toUpperCase()]);
+  
+        //OBTENER ID DEL ROL
+        const id_rol = await pool.query(`
+          SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
+          `
         , [rol.toUpperCase()]);
-
-      console.log('codigo dato 222: ', codigo_dato);
-      console.log('codigo 222: ', codigo);
-      if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
-        // Incrementar el valor del código
-        codigo = codigo + 1;
-      } else {
-        codigo = cedula;
-      }
-
-
-      var fec_nacimi = new Date(moment(fec_nacimiento).format('YYYY-MM-DD'));
-
-      console.log('codigo: ', codigo)
-      console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
-      console.log('nombre: ', nombreE, ' usuario: ', apellidoE, ' fecha nacimien: ', fec_nacimi, ' estado civil: ', id_estado_civil);
-      console.log('genero: ', id_genero, ' estado: ', id_estado, ' nacionalidad: ', id_nacionalidad.rows, ' rol: ', id_rol);
-      console.log('longitud: ', _longitud, ' latitud: ', _latitud)
-
-
-      // Registro de nuevo empleado
-      await pool.query(
-        `
-        INSERT INTO eu_empleados (cedula, apellido, nombre, estado_civil, genero, correo,
-          fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-        `
-        , [cedula, apellidoE, nombreE,
+  
+        if(codigo_dato != null && codigo_dato != undefined && codigo_dato != ''){
+          // INCREMENTAR EL VALOR DEL CÓDIGO
+          codigo = codigo + 1;
+        }else{
+          codigo = cedula;
+        }
+        
+  
+        var fec_nacimi = new Date(moment(fec_nacimiento).format('YYYY-MM-DD'));
+  
+        console.log('codigo: ', codigo)
+        console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
+        console.log('nombre: ', nombreE, ' usuario: ', apellidoE, ' fecha nacimien: ', fec_nacimi, ' estado civil: ', id_estado_civil);
+        console.log('genero: ', id_genero, ' estado: ', id_estado, ' nacionalidad: ', id_nacionalidad.rows, ' rol: ', id_rol);
+        console.log('longitud: ', _longitud, ' latitud: ', _latitud)
+  
+  
+        // REGISTRO DE NUEVO EMPLEADO
+        await pool.query(
+          `
+          INSERT INTO eu_empleados (cedula, apellido, nombre, estado_civil, genero, correo,
+            fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+          `
+          , [cedula, apellidoE, nombreE,
           id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
-          domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
+          domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud ]);
 
-      // Obtener el id del empleado ingresado
-      const oneEmpley = await pool.query(
-        `
-        SELECT id FROM eu_empleados WHERE cedula = $1
-        `
-        , [cedula]);
-      const id_empleado = oneEmpley.rows[0].id;
-
-      // Registro de los datos de usuario
-      await pool.query(
-        `
-        INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        `
-        , [usuario, contrasena, estado_user, id_rol.rows[0]['id'],
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_empleados',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: `{cedula: ${cedula}, apellido: ${apellidoE}, nombre: ${nombreE}, estado_civil: ${id_estado_civil}, genero: ${id_genero}, correo: ${correo}, fecha_nacimiento: ${fec_nacimiento}, estado: ${id_estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad.rows[0]['id']}, codigo: ${codigo}, longitud: ${_longitud}, latitud: ${_latitud}}`,
+          ip,
+          observacion: null
+        });
+  
+        // OBTENER EL ID DEL EMPLEADO INGRESADO
+        const oneEmpley = await pool.query('SELECT id FROM eu_empleados WHERE cedula = $1', [cedula]);
+        const id_empleado = oneEmpley.rows[0].id;
+  
+        // REGISTRO DE LOS DATOS DE USUARIO
+        await pool.query(
+          `
+          INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita)
+          VALUES ($1, $2, $3, $4, $5, $6)
+          `
+          , [usuario, contrasena, estado_user, id_rol.rows[0]['id'],
           id_empleado, app_habilita]);
 
-      if (contador === plantilla.length) {
-        console.log('codigo_ver', codigo, VALOR.rows[0].id);
-        // Actualización del código
-        if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
-          await pool.query(
-            `
-            UPDATE e_codigo SET valor = $1 WHERE id = $2
-            `
-            , [codigo, VALOR.rows[0].id]);
-        }
-      }
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_usuarios',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: `{usuario: ${usuario}, contrasena: ${contrasena}, estado: ${estado_user}, id_rol: ${id_rol.rows[0]['id']}, id_empleado: ${id_empleado}, app_habilita: ${app_habilita}}`,
+          ip,
+          observacion: null
+        });
 
-      contador = contador + 1;
-      contrasena = undefined
+       
+  
+        if (contador === plantilla.length) {
+          // ACTUALIZACIÓN DEL CÓDIGO
+          if(codigo_dato != null && codigo_dato != undefined && codigo_dato != ''){
+            await pool.query(
+              `
+              UPDATE e_codigo SET valor = $1 WHERE id = $2
+              `
+              , [codigo, VALOR.rows[0].id]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'e_codigo',
+              usuario: user_name,
+              accion: 'U',
+              datosOriginales: JSON.stringify(codigo_dato),
+              datosNuevos: `{valor: ${codigo}}`,
+              ip,
+              observacion: null
+            });
+          }
+        }
+
+         // FINALIZAR TRANSACCION
+         await pool.query('COMMIT');
+  
+        contador = contador + 1;
+        contrasena = undefined
+      } catch (error) {
+        // REVERTIR TRANSACCION
+        await pool.query('ROLLBACK');
+        return res.status(500).jsonp({ message: error });
+      }
     });
 
     setTimeout(() => {
@@ -1345,11 +1937,11 @@ class EmpleadoControlador {
     var mensaje: string = 'correcto';
 
     plantilla.forEach(async (dato: any, indice: any, array: any) => {
-      // Datos que se leen de la plantilla ingresada
+      // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
       var { item, cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, latitud, longitud,
         domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
 
-      //Verificar que el registo no tenga datos vacios
+      //VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
       if ((item != undefined && item != '') &&
         (cedula != undefined) && (apellido != undefined) &&
         (nombre != undefined) && (codigo != undefined) && (estado_civil != undefined) &&
@@ -1372,7 +1964,7 @@ class EmpleadoControlador {
         data.nacionalidad = nacionalidad; 
         
 
-        //Valida si los datos de la columna cedula son numeros.
+        //VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
         const rege = /^[0-9]+$/;
         const valiContra = /\s/;
         if (rege.test(data.cedula)) {
@@ -1543,7 +2135,7 @@ class EmpleadoControlador {
           data.cedula = 'No registrado'
           data.observacion = 'Cédula no registrada';
         } else {
-          //Valida si los datos de la columna cedula son numeros.
+          //VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
           const rege = /^[0-9]+$/;
           if (rege.test(data.cedula)) {
             if (data.cedula.toString().length != 10) {
@@ -1661,14 +2253,14 @@ class EmpleadoControlador {
     setTimeout(() => {
 
       listEmpleadosManual.sort((a: any, b: any) => {
-        // Compara los números de los objetos
+        // COMPARA LOS NÚMEROS DE LOS OBJETOS
         if (a.fila < b.fila) {
           return -1;
         }
         if (a.fila > b.fila) {
           return 1;
         }
-        return 0; // Son iguales
+        return 0; // SON IGUALES
       });
 
       var filaDuplicada: number = 0;
@@ -1689,9 +2281,9 @@ class EmpleadoControlador {
           }
         }
 
-        //Valida si los datos de la columna N son numeros.
+        //VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-          //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+          //CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
           if (item.fila == filaDuplicada) {
             mensaje = 'error';
           }
@@ -1724,9 +2316,9 @@ class EmpleadoControlador {
     var contarCodigoData = 0;
     var contador_arreglo = 1;
     var arreglos_datos: any = [];
-    //Leer la plantilla para llenar un array con los datos cedula y usuario para verificar que no sean duplicados
+    //LEER LA PLANTILLA PARA LLENAR UN ARRAY CON LOS DATOS CEDULA Y USUARIO PARA VERIFICAR QUE NO SEAN DUPLICADOs
     plantilla.forEach(async (data: any) => {
-      // Datos que se leen de la plantilla ingresada
+      // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
       const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, estado, domicilio,
         telefono, nacionalidad, usuario, estado_user, rol, app_habilita } = data;
       let datos_array = {
@@ -1737,7 +2329,7 @@ class EmpleadoControlador {
       arreglos_datos.push(datos_array);
     });
 
-    // Vamos a verificar dentro de arreglo_datos que no se encuentren datos duplicados
+    // VAMOS A VERIFICAR DENTRO DE ARREGLO_DATOS QUE NO SE ENCUENTREN DATOS DUPLICADos
     for (var i = 0; i <= arreglos_datos.length - 1; i++) {
       for (var j = 0; j <= arreglos_datos.length - 1; j++) {
         if (arreglos_datos[i].cedula === arreglos_datos[j].cedula) {
@@ -1753,7 +2345,7 @@ class EmpleadoControlador {
       contador_arreglo = contador_arreglo + 1;
     }
 
-    // Cuando todos los datos han sido leidos verificamos si todos los datos son correctos
+    // CUANDO TODOS LOS DATOS HAN SIDO LEIDOS VERIFICAMOS SI TODOS LOS DATOS SON CORRECTOS
     console.log('cedula_data', contarCedulaData, plantilla.length, contador_arreglo);
     console.log('usuario_data', contarUsuarioData, plantilla.length, contador_arreglo);
     console.log('codigo_data', contarCodigoData, plantilla.length, contador_arreglo);
@@ -1776,104 +2368,108 @@ class EmpleadoControlador {
   }
 
   public async CargarPlantilla_Manual(req: Request, res: Response): Promise<void> {
-    const plantilla = req.body
-    console.log('datos manual: ', plantilla);
-
+    const {plantilla, user_name, ip}  = req.body
+    
     var contador = 1;
 
     plantilla.forEach(async (data: any) => {
-      // Realiza un capital letter a los nombres y apellidos
-      var nombreE: any;
-      let nombres = data.nombre.split(' ');
-      if (nombres.length > 1) {
-        let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
-        let name2 = nombres[1].charAt(0).toUpperCase() + nombres[1].slice(1);
-        nombreE = name1 + ' ' + name2;
-      }
-      else {
-        let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
-        nombreE = name1
-      }
+      try {
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
 
-      var apellidoE: any;
-      let apellidos = data.apellido.split(' ');
-      if (apellidos.length > 1) {
-        let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
-        let lastname2 = apellidos[1].charAt(0).toUpperCase() + apellidos[1].slice(1);
-        apellidoE = lastname1 + ' ' + lastname2;
-      }
-      else {
-        let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
-        apellidoE = lastname1
-      }
-
-      // Encriptar contraseña
-      const md5 = new Md5();
-      const contrasena = md5.appendStr(data.contrasena).end();
-
-      // Datos que se leen de la plantilla ingresada
-      const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, longitud, latitud,
-        telefono, nacionalidad, usuario, rol } = data;
-
-      //Obtener id del estado_civil
-      var id_estado_civil = 0;
-      if (estado_civil.toUpperCase() === 'SOLTERA/A') {
-        id_estado_civil = 1;
-      }
-      else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
-        id_estado_civil = 2;
-      }
-      else if (estado_civil.toUpperCase() === 'CASADO/A') {
-        id_estado_civil = 3;
-      }
-      else if (estado_civil.toUpperCase() === 'DIVORCIADO/A') {
-        id_estado_civil = 4;
-      }
-      else if (estado_civil.toUpperCase() === 'VIUDO/A') {
-        id_estado_civil = 5;
-      }
-
-      //Obtener id del genero
-      var id_genero = 0;
-      if (genero.toUpperCase() === 'MASCULINO') {
-        id_genero = 1;
-      }
-      else if (genero.toUpperCase() === 'FEMENINO') {
-        id_genero = 2;
-      }
-
-      var _longitud = null;
-      if (longitud != 'No registrado') {
-        _longitud = longitud;
-      }
-
-
-      var _latitud = null
-      if (latitud != 'No registrado') {
-        _latitud = latitud;
-      }
-
-      //OBTENER ID DEL ESTADO
-      var id_estado = 1;
-      var estado_user = true;
-      var app_habilita = false;
-
-      //Obtener id de la nacionalidad
-      const id_nacionalidad = await pool.query(
-        `
-        SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
-        `
-        , [nacionalidad.toUpperCase()]);
-
-      //Obtener id del rol
-      const id_rol = await pool.query(
-        `
-        SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
-        `
-        , [rol.toUpperCase()]);
-
-      // Registro de nuevo empleado
-      await pool.query(
+        // REALIZA UN CAPITAL LETTER A LOS NOMBRES Y APELLIDOS
+        var nombreE: any;
+        let nombres = data.nombre.split(' ');
+        if (nombres.length > 1) {
+          let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
+          let name2 = nombres[1].charAt(0).toUpperCase() + nombres[1].slice(1);
+          nombreE = name1 + ' ' + name2;
+        }
+        else {
+          let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
+          nombreE = name1
+        }
+  
+        var apellidoE: any;
+        let apellidos = data.apellido.split(' ');
+        if (apellidos.length > 1) {
+          let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
+          let lastname2 = apellidos[1].charAt(0).toUpperCase() + apellidos[1].slice(1);
+          apellidoE = lastname1 + ' ' + lastname2;
+        }
+        else {
+          let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
+          apellidoE = lastname1
+        }
+  
+        // ENCRIPTAR CONTRASEÑA
+        const md5 = new Md5();
+        const contrasena = md5.appendStr(data.contrasena).end();
+  
+        // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
+        const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, longitud, latitud,
+          telefono, nacionalidad, usuario, rol} = data;
+  
+        //OBTENER ID DEL ESTADO_CIVIL
+        var id_estado_civil = 0;
+        if (estado_civil.toUpperCase() === 'SOLTERA/A') {
+          id_estado_civil = 1;
+        }
+        else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
+          id_estado_civil = 2;
+        }
+        else if (estado_civil.toUpperCase() === 'CASADO/A') {
+          id_estado_civil = 3;
+        }
+        else if (estado_civil.toUpperCase() === 'DIVORCIADO/A') {
+          id_estado_civil = 4;
+        }
+        else if (estado_civil.toUpperCase() === 'VIUDO/A') {
+          id_estado_civil = 5;
+        }
+  
+        //OBTENER ID DEL GENERO
+        var id_genero = 0;
+        if (genero.toUpperCase() === 'MASCULINO') {
+          id_genero = 1;
+        }
+        else if (genero.toUpperCase() === 'FEMENINO') {
+          id_genero = 2;
+        }
+  
+        var _longitud = null;
+        if(longitud != 'No registrado'){
+          _longitud = longitud;
+        }
+          
+  
+        var _latitud = null
+        if(latitud != 'No registrado'){
+          _latitud = latitud;
+        }
+  
+        //OBTENER ID DEL ESTADO
+        var id_estado = 1;
+        var estado_user = true;
+        var app_habilita = false;
+  
+        //OBTENER ID DE LA NACIONALIDAD
+        const id_nacionalidad = await pool.query(
+          `
+          SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
+          `
+          ,
+          [nacionalidad.toUpperCase()]);
+  
+        //OBTENER ID DEL ROL
+        const id_rol = await pool.query(
+          `
+          SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
+          `
+          , [rol.toUpperCase()]);
+  
+        // REGISTRO DE NUEVO EMPLEADO
+        await pool.query(
         `
         INSERT INTO eu_empleados ( cedula, apellido, nombre, estado_civil, genero, correo,
           fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) 
@@ -1883,36 +2479,77 @@ class EmpleadoControlador {
           id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
           domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
 
-      // Obtener el id del empleado ingresado
-      const oneEmpley = await pool.query(
-        `
-        SELECT id FROM eu_empleados WHERE cedula = $1
-        `
-        , [cedula]);
-      const id_empleado = oneEmpley.rows[0].id;
-
-      // Registro de los datos de usuario
-      await pool.query(
-        `
-        INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        `
-        , [usuario, contrasena, estado_user, id_rol.rows[0]['id'], id_empleado,
-          app_habilita]);
-
-      if (contador === plantilla.length) {
-        // Actualización del código
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_empleados',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: `{cedula: ${cedula}, apellido: ${apellidoE}, nombre: ${nombreE}, estado_civil: ${id_estado_civil}, genero: ${id_genero}, correo: ${correo}, fecha_nacimiento: ${fec_nacimiento}, estado: ${id_estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad.rows[0]['id']}, codigo: ${codigo}, longitud: ${_longitud}, latitud: ${_latitud}}`,
+          ip,
+          observacion: null
+        });
+  
+        // OBTENER EL ID DEL EMPLEADO INGRESADO
+        const oneEmpley = await pool.query('SELECT id FROM eu_empleados WHERE cedula = $1', [cedula]);
+        const id_empleado = oneEmpley.rows[0].id;
+  
+        // REGISTRO DE LOS DATOS DE USUARIO
         await pool.query(
           `
-          UPDATE e_codigo SET valor = null WHERE id = 1
+          INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita)
+          VALUES ($1, $2, $3, $4, $5, $6)
           `
-        );
-        return res.jsonp({ message: 'correcto' });
+          , [usuario, contrasena, estado_user, id_rol.rows[0]['id'], id_empleado,
+          app_habilita]);
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_usuarios',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: `{usuario: ${usuario}, contrasena: ${contrasena}, estado: ${estado_user}, id_rol: ${id_rol.rows[0]['id']}, id_empleado: ${id_empleado}, app_habilita: ${app_habilita}}`,
+          ip,
+          observacion: null
+        });
+
+        if (contador === plantilla.length) {
+
+
+          // ACTUALIZACIÓN DEL CÓDIGO
+          await pool.query(
+            `
+            UPDATE e_codigo SET valor = null WHERE id = 1
+            `
+          );
+
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'e_codigo',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: '',
+            datosNuevos: `{valor: null}`,
+            ip,
+            observacion: null
+          });
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+          return res.jsonp({ message: 'correcto' });
+        }
+        contador = contador + 1;
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+
+      } catch (error) {
+        // REVERTIR TRANSACCION
+        await pool.query('ROLLBACK');
+        return res.status(500).jsonp({ message: error });
       }
-      contador = contador + 1;
     });
   }
-
 
 }
 

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import excel from 'xlsx';
 import pool from '../../database';
 import fs from 'fs';
@@ -28,17 +29,60 @@ class RelojesControlador {
     }
 
     // METODO PARA ELIMINAR REGISTROS
-    public async EliminarRegistros(req: Request, res: Response) {
+    public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
         try {
+            const { user_name, ip } = req.body;
             const id = req.params.id;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOSORIGINALES
+            const reloj = await pool.query('SELECT * FROM ed_relojes WHERE id = $1', [id]);
+            const [datosOriginales] = reloj.rows;
+
+            if (!datosOriginales) {
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'ed_relojes',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip: ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.jsonp({ message: `Error al eliminar registro con id ${id}. Registro no encontrado`});
+            }
+
             await pool.query(
                 `
                 DELETE FROM ed_relojes WHERE id = $1
                 `
                 , [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'ed_relojes',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: '',
+                ip: ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            return res.jsonp({ message: 'Registro eliminado.' });
         } catch (error) {
-            return res.jsonp({ message: 'error' });
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
         }
     }
 
@@ -46,7 +90,10 @@ class RelojesControlador {
     public async CrearRelojes(req: Request, res: Response) {
         try {
             const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                tien_funciones, id_sucursal, id_departamento, codigo, numero_accion } = req.body;
+                tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, user_name, user_ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
 
             var VERIFICAR_CODIGO = await pool.query(
                 `
@@ -67,19 +114,32 @@ class RelojesControlador {
 
                 const [reloj] = response.rows;
 
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'cg_relojes',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(reloj),
+                    ip: user_ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
                 if (reloj) {
                     return res.status(200).jsonp({ message: 'guardado', reloj: reloj })
                 }
                 else {
                     return res.status(404).jsonp({ message: 'mal_registro' })
-                }
-            }
-            else {
-                return res.jsonp({ message: 'existe' })
             }
         }
+        }
         catch (error) {
-            return res.jsonp({ message: 'error' });
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: error });
         }
     }
 
@@ -100,10 +160,34 @@ class RelojesControlador {
     }
 
     // METODO PARA ACTUALIZAR REGISTRO
-    public async ActualizarReloj(req: Request, res: Response) {
+    public async ActualizarReloj(req: Request, res: Response): Promise<Response> {
         try {
             const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, id_real } = req.body;
+                tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, id_real, user_name, user_ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOSORIGINALES
+            const reloj = await pool.query('SELECT * FROM cg_relojes WHERE codigo = $1', [codigo]);
+            const [datosOriginales] = reloj.rows;
+
+            if (!datosOriginales) {
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'cg_relojes',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip: user_ip,
+                    observacion: `Error al actualizar el registro con id: ${codigo}.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'error' });
+            }
 
             var VERIFICAR_DISCAPACIDAD = await pool.query(
                 `
@@ -123,6 +207,20 @@ class RelojesControlador {
                     , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
                         tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, id_real]);
 
+                 // AUDITORIA
+                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'ed_relojes',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tien_funciones": "${tien_funciones}", "id_sucursal": "${id_sucursal}", "id_departamento": "${id_departamento}", "codigo": "${codigo}", "numero_accion": "${numero_accion}"}`,
+                    ip: user_ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
                 return res.jsonp({ message: 'actualizado' });
             }
             else {
@@ -130,7 +228,9 @@ class RelojesControlador {
             }
         }
         catch (error) {
-            return res.jsonp({ message: 'error' });
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
         }
     }
 
@@ -156,33 +256,6 @@ class RelojesControlador {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public async CargaPlantillaRelojes(req: Request, res: Response): Promise<void> {
         let list: any = req.files;
         let cadena = list.uploads[0].path;
@@ -194,41 +267,73 @@ class RelojesControlador {
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
         plantilla.forEach(async (data: any) => {
-            // Dtaos de la plantilla ingresada
-            const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante,
-                mac, tiene_funciones, sucursal, departamento, codigo_reloj, numero_accion } = data;
+            try {
+                // DATOS DE LA PLANTILLA INGRESADA
+                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante,
+                    mac, tiene_funciones, sucursal, departamento, codigo_reloj, numero_accion, user_name, user_ip } = data;
 
-            // Buscar id de la sucursal ingresada
-            const id_sucursal = await pool.query(
-                `
-                SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
-                `
-                , [sucursal.toUpperCase()]);
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+    
+                // BUSCAR ID DE LA SUCURSAL INGRESADA
+                const id_sucursal = await pool.query('SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
+                
+                const id_departamento = await pool.query('SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND ' +
+                    'id_sucursal = $2', [departamento.toUpperCase(), id_sucursal.rows[0]['id']]);
 
-            const id_departamento = await pool.query(
-                `
-                SELECT id FROM ed_departamentos 
-                WHERE UPPER(nombre) = $1 AND id_sucursal = $2
-                `
-                , [departamento.toUpperCase(), id_sucursal.rows[0]['id']]);
+                if (id_sucursal.rowCount === 0 || id_departamento.rowCount === 0) {
+                    // AUDITORIA
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'ed_relojes',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: user_ip,
+                        observacion: `Error al guardar el reloj con nombre: ${nombre} e ip: ${ip}.`
+                    });
 
-            // Verificar que se haya ingresado número de acciones si el dispositivo las tiene
-            if (tiene_funciones === true) {
-                var accion = numero_accion;
+                    // FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
+                    return;
+                }
+    
+                // VERIFICAR QUE SE HAYA INGRESADO NÚMERO DE ACCIONES SI EL DISPOSITIVO LAS TIENE
+                if (tiene_funciones === true) {
+                    var accion = numero_accion;
+                }
+                else {
+                    accion = 0;
+                }
+    
+                await pool.query(
+                    `
+                    INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
+                        id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, id, numero_accion) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+                    `
+                    , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                        tiene_funciones, id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], codigo_reloj, accion]);
+                
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'cg_relojes',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tien_funciones": "${tiene_funciones}", "id_sucursal": "${id_sucursal.rows[0]['id']}", "id_departamento": "${id_departamento.rows[0]['id']}", "id": "${codigo_reloj}", "numero_accion": "${accion}"}`,
+                    ip: user_ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                res.jsonp({ message: 'correcto' });
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                return;
             }
-            else {
-                accion = 0;
-            }
-
-            await pool.query(
-                `
-                INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                    id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, id, numero_accion) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-                `
-                , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                    tiene_funciones, id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], codigo_reloj, accion]);
-            res.jsonp({ message: 'correcto' });
         });
         // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
         fs.access(filePath, fs.constants.F_OK, (err) => {
@@ -419,7 +524,6 @@ class RelojesControlador {
             }
         });
     }
-
 }
 
 const RELOJES_CONTROLADOR = new RelojesControlador();

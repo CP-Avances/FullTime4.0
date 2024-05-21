@@ -23,6 +23,10 @@ export class ConfigurarCodigoComponent implements OnInit {
   cedulaF = false;
   registrar: boolean = true;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CAMPOS FORMULARIO
   inicioF = new FormControl('');
   seleccionF = new FormControl('');
@@ -41,6 +45,9 @@ export class ConfigurarCodigoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.VerUltimoCodigo();
   }
 
@@ -72,6 +79,8 @@ export class ConfigurarCodigoComponent implements OnInit {
       manual: this.manualF,
       automatico: this.automaticoF,
       cedula: this.cedulaF,
+      user_name: this.user_name,
+      ip: this.ip
     }
     if (form.inicioForm != '') {
       this.rest.CrearCodigo(dataCodigo).subscribe(datos => {
@@ -97,6 +106,8 @@ export class ConfigurarCodigoComponent implements OnInit {
       manual: this.manualF,
       automatico: this.automaticoF,
       cedula: this.cedulaF,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.rest.CrearCodigo(dataCodigo).subscribe(datos => {
       this.toastr.success('Configuración Registrada', '', {
@@ -116,6 +127,8 @@ export class ConfigurarCodigoComponent implements OnInit {
       manual: this.manualF,
       automatico: this.automaticoF,
       cedula: this.cedulaF,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     if (form.inicioForm != '') {
       this.rest.ObtenerCodigoMAX().subscribe(datosE => {
@@ -151,6 +164,8 @@ export class ConfigurarCodigoComponent implements OnInit {
       manual: this.manualF,
       automatico: this.automaticoF,
       cedula: this.cedulaF,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.rest.ActualizarCodigoTotal(dataCodigo).subscribe(datos => {
       this.toastr.success('Configuración Registrada', '', {

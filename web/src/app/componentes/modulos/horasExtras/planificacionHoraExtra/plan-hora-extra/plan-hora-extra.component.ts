@@ -41,6 +41,10 @@ export class PlanHoraExtraComponent implements OnInit {
     { id: 4, nombre: 'Negado' },
   ];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   fechaSolicitudF = new FormControl('', [Validators.required]);
   descripcionF = new FormControl('', [Validators.required]);
@@ -75,7 +79,9 @@ export class PlanHoraExtraComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('data ', this.data)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
 
@@ -92,7 +98,7 @@ export class PlanHoraExtraComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -156,6 +162,8 @@ export class PlanHoraExtraComponent implements OnInit {
       descripcion: form.descripcionForm,
       fecha_hasta: form.fechaFinForm,
       hora_fin: form.horaFinForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     // INSERCIÓN DE PLANIFICACION
@@ -184,7 +192,9 @@ export class PlanHoraExtraComponent implements OnInit {
           id_plan_hora: plan.id,
           id_empl_cargo: this.data.planifica.id_cargo,
           id_empl_realiza: this.data.planifica.id,
-          id_empl_contrato: this.data.planifica.id_contrato
+          id_empl_contrato: this.data.planifica.id_contrato,
+          user_name: this.user_name,
+          ip: this.ip,
         }
 
         // VALIDAR SI LA PLANIFICACION ES DE VARIOS USUARIOS
@@ -325,6 +335,8 @@ export class PlanHoraExtraComponent implements OnInit {
         desde + ' hasta ' +
         hasta +
         ' horario de ' + h_inicio + ' a ' + h_fin,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restPE.EnviarNotiPlanificacion(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);

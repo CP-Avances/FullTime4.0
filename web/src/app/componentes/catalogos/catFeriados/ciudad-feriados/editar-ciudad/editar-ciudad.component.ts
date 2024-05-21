@@ -57,6 +57,10 @@ export class EditarCiudadComponent implements OnInit {
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restCiudad: CiudadService,
     private restF: CiudadFeriadosService,
@@ -68,6 +72,9 @@ export class EditarCiudadComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerContinentes();
     this.CargarDatos();
   }
@@ -228,7 +235,9 @@ export class EditarCiudadComponent implements OnInit {
     var ciudad = {
       id_feriado: idFeriado,
       id_ciudad: nombreCiudad,
-      id: this.data.idciudad_asignada
+      id: this.data.idciudad_asignada,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.ciudadFeriados = [];
     // VALIDAR EXISTENCIA DE REGISTRO

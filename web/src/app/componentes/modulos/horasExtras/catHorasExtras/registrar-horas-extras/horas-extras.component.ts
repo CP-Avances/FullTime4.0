@@ -83,6 +83,10 @@ export class HorasExtrasComponent implements OnInit {
   value = 10;
   habilitarprogress: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private _formBuilder: FormBuilder,
     private validar: ValidacionesService,
@@ -92,6 +96,9 @@ export class HorasExtrasComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.primeroFormGroup = this._formBuilder.group({
       descripcionForm: this.descripcion,
       tipoDescuentoForm: this.tipoDescuento,
@@ -126,7 +133,9 @@ export class HorasExtrasComponent implements OnInit {
       tipo_dia: form2.tipoDiaForm,
       codigo: form2.codigoForm,
       incl_almuerzo: form2.inclAlmuerzoForm,
-      tipo_funcion: form2.tipoFuncionForm
+      tipo_funcion: form2.tipoFuncionForm,
+      user_name: this.user_name,
+      ip: this.ip
     };
 
     this.rest.postHoraExtraRest(dataHoraExtra)

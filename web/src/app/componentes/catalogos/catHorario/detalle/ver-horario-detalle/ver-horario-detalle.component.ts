@@ -39,6 +39,10 @@ export class VerHorarioDetalleComponent implements OnInit {
   booleanMap = { 'true': 'Si', 'false': 'No' };
   hipervinculo: string = environment.url;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private toastr: ToastrService,
     private restD: DetalleCatHorariosService,
@@ -52,12 +56,15 @@ export class VerHorarioDetalleComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.BuscarDatosHorario(this.idHorario);
     this.BuscarHora();
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_hora: string = 'HH:mm:ss';
@@ -155,7 +162,11 @@ export class VerHorarioDetalleComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACION
   EliminarDetalle(id_detalle: number) {
-    this.restD.EliminarRegistro(id_detalle).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.restD.EliminarRegistro(id_detalle, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -164,7 +175,7 @@ export class VerHorarioDetalleComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -397,7 +408,7 @@ export class VerHorarioDetalleComponent implements OnInit {
 
       // VALIDAR MINUTOS DE ALIMENTACION
       if (minutos < min_almuerzo) return this.toastr.warning(
-        `El detalle de inicio y fin de alimentación tiene registrado menos minutos de alimentación 
+        `El detalle de inicio y fin de alimentación tiene registrado menos minutos de alimentación
                 de lo establecido en el horario.`,
         'Por favor revisar detalle de alimentación.', {
         timeOut: 6000
@@ -423,7 +434,7 @@ export class VerHorarioDetalleComponent implements OnInit {
 
     if (horasT < (this.datosHorario[0].hora_trabajo + ':00')) {
       this.toastr.warning(
-        `Las horas totales de trabajo definidas en su detalle son menores a las horas de trabajo establecidas en el horario. 
+        `Las horas totales de trabajo definidas en su detalle son menores a las horas de trabajo establecidas en el horario.
         ${horasT} < ${this.datosHorario[0].hora_trabajo}:00`,
         'Por favor revisar detalle de horario.', {
         timeOut: 6000
@@ -432,7 +443,7 @@ export class VerHorarioDetalleComponent implements OnInit {
 
     else if (horasT > (this.datosHorario[0].hora_trabajo + ':00')) {
       this.toastr.warning(
-        `Las horas totales de trabajo definidas en su detalle son mayores a las horas de trabajo establecidas en el horario. 
+        `Las horas totales de trabajo definidas en su detalle son mayores a las horas de trabajo establecidas en el horario.
         ${horasT} > ${this.datosHorario[0].hora_trabajo}:00`,
         'Por favor revisar detalle de horario.', {
         timeOut: 6000
@@ -464,7 +475,13 @@ export class VerHorarioDetalleComponent implements OnInit {
 
   // METODO PARA ACTUALIZAR HORAS DE HORARIO
   ActualizarHorario(id: any, horasT: any, mensaje: boolean) {
-    this.rest.ActualizarHorasTrabaja(id, { hora_trabajo: horasT }).subscribe(res => {
+
+    const datos = {
+      hora_trabajo: horasT,
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.rest.ActualizarHorasTrabaja(id, datos).subscribe(res => {
       this.datosHorario = res;
       this.ColocarTipo();
       if (mensaje === true) {

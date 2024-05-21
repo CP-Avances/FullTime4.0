@@ -182,8 +182,8 @@
                     </tbody>
                 </table>
             </div>
-            <mat-paginator id="pagina" [length]="horarios.length" [pageSize]="tamanio_pagina"
-                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            <mat-paginator #paginator id="pagina" [length]="horarios.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
             <!--  **********************  DESCARGAR REPORTES  ************************  -->
             <div>

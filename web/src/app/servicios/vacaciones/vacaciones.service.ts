@@ -52,8 +52,12 @@ export class VacacionesService {
     return this.http.get(`${environment.url}/vacaciones/datosAutorizacion/${id_vacaciones}`);
   }
 
-  EliminarVacacion(id_vacacion: number) {
-    return this.http.delete(`${environment.url}/vacaciones/eliminar/${id_vacacion}`);
+  EliminarVacacion(id_vacacion: number, datos: any) {
+    const url = `${environment.url}/vacaciones/eliminar/${id_vacacion}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
   }
 
 

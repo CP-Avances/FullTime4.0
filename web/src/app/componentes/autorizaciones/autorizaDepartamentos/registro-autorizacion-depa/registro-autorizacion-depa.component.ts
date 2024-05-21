@@ -16,6 +16,10 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 
 export class RegistroAutorizacionDepaComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // VARIABLES DE ALMACENAMIENTO
   departamento: any = [];
   sucursales: any = [];
@@ -48,12 +52,15 @@ export class RegistroAutorizacionDepaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerAutorizaciones();
     this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
     this.BuscarSucursales();
   }
 
-  // METODO PARA MOSTRAR DATOS DE AUTORIDAD DEPARTAMENTOS 
+  // METODO PARA MOSTRAR DATOS DE AUTORIDAD DEPARTAMENTOS
   autorizaciones: any = [];
   ObtenerAutorizaciones() {
     this.autorizaciones = [];
@@ -102,6 +109,8 @@ export class RegistroAutorizacionDepaComponent implements OnInit {
       id_empleado: this.datoEmpleado.idEmpleado,
       autorizar: false,
       estado: true,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     if (form.autorizarForm == 'preautorizar') {

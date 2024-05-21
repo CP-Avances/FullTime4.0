@@ -64,6 +64,10 @@ export class DetalleCatHorarioComponent implements OnInit {
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public ventana: MatDialogRef<DetalleCatHorarioComponent>,
     public validar: ValidacionesService,
@@ -76,6 +80,9 @@ export class DetalleCatHorarioComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.VerEmpresa();
     this.ListarDetalles(this.data.datosHorario.id);
     this.BuscarDatosHorario(this.data.datosHorario.id);
@@ -157,6 +164,8 @@ export class DetalleCatHorarioComponent implements OnInit {
       segundo_dia: form.segundoForm,
       min_antes: 0,
       min_despues: 0,
+      user_name: this.user_name,
+      ip: this.ip
     };
     if (this.acciones === true) {
       detalle.min_antes = parseInt(form.min_antesForm);

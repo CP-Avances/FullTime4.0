@@ -31,6 +31,10 @@ export class EditarCargoComponent implements OnInit {
   cargo: any = [];
   ver_jefe: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // VARIABLES DE FORMULARIO
   idDepartamento = new FormControl('', [Validators.required]);
   horaTrabaja = new FormControl('', [Validators.required, Validators.pattern("^[0-9]*(:[0-9][0-9])?$")]);
@@ -68,7 +72,9 @@ export class EditarCargoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('id rol ', this.idRol)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     if (this.idRol != 2) {
       this.ver_jefe = true;
     }
@@ -104,7 +110,7 @@ export class EditarCargoComponent implements OnInit {
     });
   }
 
-  // METODO DE BUSQUEDA DE DEPARTAMENTOS 
+  // METODO DE BUSQUEDA DE DEPARTAMENTOS
   ObtenerDepartamentosImprimir(id: number) {
     this.departamento = [];
     this.restCatDepartamento.BuscarDepartamentoSucursal(id).subscribe(datos => {
@@ -196,7 +202,9 @@ export class EditarCargoComponent implements OnInit {
       fec_final: form.fecFinalForm,
       sueldo: form.sueldoForm,
       cargo: form.tipoForm,
-      jefe: form.jefeForm
+      jefe: form.jefeForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     //console.log('ver cargo ', cargo)
 
@@ -281,7 +289,9 @@ export class EditarCargoComponent implements OnInit {
   IngresarTipoCargo(form: any, datos: any) {
     if (form.cargoForm != '') {
       let tipo_cargo = {
-        cargo: form.cargoForm
+        cargo: form.cargoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.restEmplCargos.CrearTipoCargo(tipo_cargo).subscribe(res => {
         datos.cargo = res.id;
@@ -356,7 +366,9 @@ export class EditarCargoComponent implements OnInit {
     let datos = {
       id_empleado: parseInt(this.idEmpleado),
       id_sucursal: form.idSucursalForm,
-      principal: true
+      principal: true,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.usuario.RegistrarUsuarioSucursal(datos).subscribe(res => {
     });
@@ -384,6 +396,8 @@ export class EditarCargoComponent implements OnInit {
     let datos = {
       id_sucursal: form.idSucursalForm,
       id_empleado: parseInt(this.idEmpleado),
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.usuario.ActualizarUsuarioSucursalPrincipal(datos).subscribe(res => {
     });

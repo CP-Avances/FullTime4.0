@@ -32,6 +32,11 @@ export class VistaMenuComponent implements OnInit {
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
+
   constructor(
     public router: Router,
     public ventana: MatDialog,
@@ -43,11 +48,14 @@ export class VistaMenuComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.BuscarHora();
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_hora: string = 'HH:mm:ss';
@@ -131,9 +139,14 @@ export class VistaMenuComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   EliminarDetalle(id_detalle: number) {
-    this.rest.EliminarDetalleMenu(id_detalle).subscribe(res => {
+    const datos: any = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
+    this.rest.EliminarDetalleMenu(id_detalle, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });

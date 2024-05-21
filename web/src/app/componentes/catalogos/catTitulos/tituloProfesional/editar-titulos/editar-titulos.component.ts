@@ -33,6 +33,10 @@ export class EditarTitulosComponent implements OnInit {
   niveles: any = [];
   idNivel: any = [];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private ntitulo: NivelTitulosService,
     private rest: TituloService,
@@ -44,6 +48,9 @@ export class EditarTitulosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerNivelesTitulo();
     this.ImprimirDatos();
   }
@@ -76,6 +83,8 @@ export class EditarTitulosComponent implements OnInit {
   GuardarNivel(form: any) {
     let nivel = {
       nombre: form.nombreNivelForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     // VERIIFCAR DUPLICIDAD
     let nombre_nivel = (nivel.nombre).toUpperCase();
@@ -97,6 +106,8 @@ export class EditarTitulosComponent implements OnInit {
       id: this.data.id,
       nombre: form.tituloNombreForm,
       id_nivel: idNivel,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     // VERIFICAR SI EL REGISTRO TITULO ES DIFERENTE
     if ((titulo.nombre).toUpperCase() === (this.data.nombre).toUpperCase() && titulo.id_nivel === this.idNivel[0].id) {

@@ -31,6 +31,10 @@ import { MainNavService } from 'src/app/componentes/administracionGeneral/main-n
 
 export class ListaHorasExtrasComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   horasExtras: any = [];
   filtroDescripcion = '';
 
@@ -77,6 +81,9 @@ export class ListaHorasExtrasComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
+
       this.BuscarHora();
       this.ObtenerLogo();
       this.ObtenerColores();
@@ -86,7 +93,7 @@ export class ListaHorasExtrasComponent implements OnInit {
 
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_hora: string = 'HH:mm:ss';
@@ -103,7 +110,7 @@ export class ListaHorasExtrasComponent implements OnInit {
       });
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -119,7 +126,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -181,7 +188,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     this.BuscarHora();
   }
 
-  // VENTANA PARA EDITAR DATOS DE HORA EXTRA SELECCIONADO 
+  // VENTANA PARA EDITAR DATOS DE HORA EXTRA SELECCIONADO
   ver_editar: boolean = false;
   pagina: string = '';
   EditarDatos(datosSeleccionados: any): void {
@@ -191,9 +198,14 @@ export class ListaHorasExtrasComponent implements OnInit {
     this.pagina = 'listar-configuracion';
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_permiso: number) {
-    this.rest.EliminarRegistro(id_permiso).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.rest.EliminarRegistro(id_permiso, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -203,7 +215,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -232,7 +244,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     this.hora_id = id;
   }
 
-  /** ******************************************************************************************** ** 
+  /** ******************************************************************************************** **
    ** **                           METODO PARA EXPORTAR A PDF                                   ** **
    ** ******************************************************************************************** **/
   generarPdf(action = 'open') {
@@ -350,7 +362,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     };
   }
 
-  /** ********************************************************************************************** ** 
+  /** ********************************************************************************************** **
    ** **                                  METODO PARA EXPORTAR A EXCEL                            ** **
    ** ********************************************************************************************** **/
   exportToExcel() {
@@ -364,7 +376,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     }
   }
 
-  /** ********************************************************************************************** ** 
+  /** ********************************************************************************************** **
    ** **                                   METODO PARA EXPORTAR A CSV                             ** **
    ** ********************************************************************************************** **/
 

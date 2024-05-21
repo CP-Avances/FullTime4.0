@@ -50,7 +50,9 @@
                         <div class="d-flex flex-wrap justify-content-around"
                             style="text-align: center; justify-content: center;">
                             <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
-                                matTooltip="Dar click para ver o descargar el documento.">
+                                matTooltip="Dar click para ver o descargar el documento."
+                                href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
+                                <!--span class="material-icons">cloud_download</span-->
                                 <br>
                                 Descargar plantilla
                             </a>
@@ -199,7 +201,7 @@
                         <th scope="col">Observación</th>
                         <th scope="col">Item</th>
                         <th scope="col">Nivel</th>
-                        
+
                     </tr>
                 </thead>
                 <tbody>
@@ -214,7 +216,7 @@
                         </td>
                         <td style="font-size: 12px; width: 50px;" align="center">{{data.fila}}</td>
                         <td style="font-size: 12px;" [style.color]="stiloTextoCelda(data.nombre)">{{ data.nombre}}</td>
-                        
+
                     </tr>
                 </tbody>
             </table>

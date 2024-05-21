@@ -1,8 +1,11 @@
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import excel from 'xlsx';
+
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
+
 import pool from '../../database';
+import excel from 'xlsx';
 import path from 'path';
 import fs from 'fs';
 
@@ -24,56 +27,157 @@ class NivelTituloControlador {
   }
 
   // METODO PARA ELIMINAR REGISTROS
-  public async EliminarNivelTitulo(req: Request, res: Response) {
-
+  public async EliminarNivelTitulo(req: Request, res: Response): Promise<Response> {
     try {
-
+      const { user_name, ip } = req.body;
       const id = req.params.id;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // OBTENER DATOSORIGINALES
+      const consulta = await pool.query('SELECT * FROM et_cat_nivel_titulo WHERE id = $1', [id]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'et_cat_nivel_titulo',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar el registro con id ${id}. No existe el registro en la base de datos.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
       await pool.query(
         `
         DELETE FROM et_cat_nivel_titulo WHERE id = $1
         `
         , [id]);
-      res.jsonp({ message: 'Registro eliminado.' });
 
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'et_cat_nivel_titulo',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
     } catch (error) {
-      return res.jsonp({ message: 'error' });
-
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });      
     }
-
   }
 
   // METODO PARA REGISTRAR NIVEL DE TITULO
   public async CrearNivel(req: Request, res: Response): Promise<Response> {
-    const { nombre } = req.body;
+    try {
+      const { nombre, user_name, ip } = req.body;
+  
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-    console.log('nombre ingresado: ', nombre);
+      const response: QueryResult = await pool.query(
+        `
+        INSERT INTO et_cat_nivel_titulo (nombre) VALUES ($1) RETURNING *
+        `
+        , [nombre]);
 
-    const response: QueryResult = await pool.query(
-      `
-      INSERT INTO et_cat_nivel_titulo (nombre) VALUES ($1) RETURNING *
-      `
-      , [nombre]);
+      const [nivel] = response.rows;
 
-    const [nivel] = response.rows;
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'et_cat_nivel_titulo',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{nombre: ${nombre}}`,
+        ip: ip,
+        observacion: null
+      });
 
-    if (nivel) {
-      return res.status(200).jsonp(nivel)
-    }
-    else {
-      return res.status(404).jsonp({ message: 'error' })
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+  
+      if (nivel) {
+        return res.status(200).jsonp(nivel)
+      }
+      else {
+        return res.status(404).jsonp({ message: 'error' })
+      }
+    } catch (error) {
+      console.log(error);
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'Error al registrar el nivel de título.' });
     }
   }
 
   // METODO PARA ACTUALIZAR REGISTRO DE NIVEL DE TITULO
-  public async ActualizarNivelTitulo(req: Request, res: Response): Promise<void> {
-    const { nombre, id } = req.body;
-    await pool.query(
-      `
-      UPDATE et_cat_nivel_titulo SET nombre = $1 WHERE id = $2
-      `
-      , [nombre, id]);
-    res.jsonp({ message: 'Registro actualizado.' });
+  public async ActualizarNivelTitulo(req: Request, res: Response): Promise<Response> {
+    try {
+      const { nombre, id, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // OBTENER DATOSORIGINALES
+      const consulta = await pool.query('SELECT * FROM et_cat_nivel_titulo WHERE id = $1', [id]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'et_cat_nivel_titulo',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      await pool.query(
+        `
+        UPDATE et_cat_nivel_titulo SET nombre = $1 WHERE id = $2
+        `
+        , [nombre, id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'et_cat_nivel_titulo',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{"nombre": "${nombre}"}`,
+        ip,
+        observacion: ''
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro actualizado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+    }
   }
 
   // METODO PARA BUSCAR TITULO POR SU NOMBRE
@@ -93,14 +197,6 @@ class NivelTituloControlador {
     }
   }
 
-
-
-
-
-
-
-
-
   public async getOne(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
     const unNivelTitulo = await pool.query(
@@ -116,7 +212,6 @@ class NivelTituloControlador {
     }
 
   }
-
 
   // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
   public async RevisarDatos(req: Request, res: Response): Promise<any> {

@@ -2,6 +2,7 @@ import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { ObtenerRutaContrato } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import moment from 'moment';
 import excel from 'xlsx';
 import pool from '../../../database';
@@ -12,56 +13,119 @@ class ContratoEmpleadoControlador {
 
     // REGISTRAR CONTRATOS
     public async CrearContrato(req: Request, res: Response): Promise<Response> {
-        const { id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla,
-            id_regimen, id_tipo_contrato } = req.body;
+        try {
+            const { id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla,
+                id_regimen, id_tipo_contrato, user_name, ip } = req.body;
 
-        const response: QueryResult = await pool.query(
-            `
-            INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
-            controlar_asistencia, id_regimen, id_modalidad_laboral) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-            `,
-            [id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
-                id_tipo_contrato]);
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+    
+            const response: QueryResult = await pool.query(
+                `
+                INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
+                controlar_asistencia, id_regimen, id_modalidad_laboral) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+                `,
+                [id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
+                    id_tipo_contrato]);
+    
+            const [contrato] = response.rows;
 
-        const [contrato] = response.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'eu_empleado_contratos',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: `{id_empleado: ${id_empleado}, fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
+                ip,
+                observacion: null
+            });
+    
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
 
-        if (contrato) {
-            return res.status(200).jsonp(contrato)
-        }
-        else {
-            return res.status(404).jsonp({ message: 'error' })
+            if (contrato) {
+                return res.status(200).jsonp(contrato)
+            }
+            else {
+                return res.status(404).jsonp({ message: 'error' })
+            }
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'Error al guardar el registro.' });
         }
     }
 
     // METODO PARA GUARDAR DOCUMENTO
-    public async GuardarDocumentoContrato(req: Request, res: Response): Promise<void> {
+    public async GuardarDocumentoContrato(req: Request, res: Response): Promise<Response> {
+        try {
+            // FECHA DEL SISTEMA
+            var fecha = moment();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
+    
+            const { user_name, ip } = req.body;
 
-        // FECHA DEL SISTEMA
-        var fecha = moment();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
+            let id = req.params.id;
 
-        let id = req.params.id;
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+    
+            const response: QueryResult = await pool.query(
+                `
+                SELECT codigo FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+                `
+                , [id]);
+    
+            const [empleado] = response.rows;
+    
+            let documento = empleado.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
 
-        const response: QueryResult = await pool.query(
-            `
-            SELECT codigo FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
-            `
-            , [id]);
+            if (!empleado) {
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'eu_empleado_contratos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar el documento del contrato con id ${id}. Registro no encontrado.`
+                });
+    
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Error al guardar el documento.' });
+            }
+    
+            await pool.query(
+                `
+                UPDATE eu_empleado_contratos SET documento = $2 WHERE id = $1
+                `
+                , [id, documento]);
 
-        const [empleado] = response.rows;
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'eu_empleado_contratos',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(empleado),
+                datosNuevos: `{documento: ${documento}}`,
+                ip,
+                observacion: null
+            });
 
-        let documento = empleado.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
-
-        await pool.query(
-            `
-            UPDATE eu_empleado_contratos SET documento = $2 WHERE id = $1
-            `
-            , [id, documento]);
-
-        res.jsonp({ message: 'Documento actualizado.' });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.jsonp({ message: 'Documento actualizado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'Error al guardar el documento.' });
+        }
     }
 
     // METODO PARA VER DOCUMENTO
@@ -98,48 +162,136 @@ class ContratoEmpleadoControlador {
     }
 
     // EDITAR DATOS DE CONTRATO
-    public async EditarContrato(req: Request, res: Response): Promise<any> {
-        const { id } = req.params;
-        const { fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
-            id_tipo_contrato } = req.body;
-        await pool.query(
-            `
-            UPDATE eu_empleado_contratos SET fecha_ingreso = $1, fecha_salida = $2, controlar_vacacion = $3,
-            controlar_asistencia = $4, id_regimen = $5, id_modalidad_laboral = $6 
-            WHERE id = $7
-            `
-            , [fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
-                id_tipo_contrato, id]);
+    public async EditarContrato(req: Request, res: Response): Promise<Response> {
+        try {
+            const { id } = req.params;
+            const { fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
+                id_tipo_contrato, user_name, ip } = req.body;
 
-        res.jsonp({ message: 'Registro actualizado exitosamente.' });
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOS ORIGINALES
+            const contrato = await pool.query('SELECT * FROM eu_empleado_contratos WHERE id = $1', [id]);
+            const [datosOriginales] = contrato.rows;
+
+            if (!datosOriginales) {
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'eu_empleado_contratos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar el contrato con id ${id}. Registro no encontrado.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+            }
+
+            await pool.query(
+                `
+                UPDATE eu_empleado_contratos SET fecha_ingreso = $1, fecha_salida = $2, controlar_vacacion = $3,
+                controlar_asistencia = $4, id_regimen = $5, id_modalidad_laboral = $6 
+                WHERE id = $7
+                `
+                , [fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
+                    id_tipo_contrato, id]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'eu_empleado_contratos',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: `{fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.jsonp({ message: 'Registro actualizado exitosamente.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+        }
     }
 
     // ELIMINAR DOCUMENTO CONTRATO BASE DE DATOS - SERVIDOR
-    public async EliminarDocumento(req: Request, res: Response): Promise<void> {
-        let { documento, id } = req.body;
-        let separador = path.sep;
+    public async EliminarDocumento(req: Request, res: Response): Promise<Response> {
+        try {
+            let { documento, id, user_name, ip } = req.body;
+            let separador = path.sep;
 
-        const response: QueryResult = await pool.query(
-            `
-            UPDATE eu_empleado_contratos SET documento = null WHERE id = $1 RETURNING *
-            `
-            , [id]);
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
 
-        const [contrato] = response.rows;
+            // CONSULTAR DATOS ORIGINALES
+            const contratoConsulta = await pool.query('SELECT * FROM eu_empleado_contratos WHERE id = $1', [id]);
+            const [datosOriginales] = contratoConsulta.rows;
 
-        if (documento != 'null' && documento != '' && documento != null) {
-            let ruta = await ObtenerRutaContrato(contrato.id_empleado) + separador + documento;
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs.access(ruta, fs.constants.F_OK, (err) => {
-                if (err) {
-                } else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs.unlinkSync(ruta);
-                }
+            if (!datosOriginales) {
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'eu_empleado_contratos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar el documento del contrato con id ${id}`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Error al eliminar el documento.' });
+            }
+    
+            const response: QueryResult = await pool.query(
+                `
+                UPDATE eu_empleado_contratos SET documento = null WHERE id = $1 RETURNING *
+                `
+                , [id]);
+    
+            const [contrato] = response.rows;
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'eu_empleado_contratos',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: `{documento: null}`,
+                ip,
+                observacion: null
             });
-        }
 
-        res.jsonp({ message: 'Documento actualizado.' });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+    
+            if (documento != 'null' && documento != '' && documento != null) {
+                let ruta = await ObtenerRutaContrato(contrato.id_empleado) + separador + documento;
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs.access(ruta, fs.constants.F_OK, (err) => {
+                    if (err) {
+                    } else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs.unlinkSync(ruta);
+                    }
+                });
+            }
+    
+            return res.jsonp({ message: 'Documento actualizado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'Error al eliminar el documento.' });
+        }
     }
 
     // ELIMINAR DOCUMENTO CONTRATO DEL SERVIDOR
@@ -242,22 +394,42 @@ class ContratoEmpleadoControlador {
 
     // REGISTRAR MODALIDAD DE TRABAJO
     public async CrearTipoContrato(req: Request, res: Response): Promise<Response> {
-        const { descripcion } = req.body;
+        try {
+            const { descripcion, user_name, ip } = req.body;
+    
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
 
-        const response: QueryResult = await pool.query(
-            `
-            INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1) RETURNING *
-            `,
-            [descripcion]);
+            const response: QueryResult = await pool.query(
+                `
+                INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1) RETURNING *
+                `,
+                [descripcion]);
+    
+    
+            const [contrato] = response.rows;
 
-
-        const [contrato] = response.rows;
-
-        if (contrato) {
-            return res.status(200).jsonp(contrato)
-        }
-        else {
-            return res.status(404).jsonp({ message: 'error' })
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'e_cat_modalidad_trabajo',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: `{descripcion: ${descripcion}}`,
+                ip,
+                observacion: null
+            });
+    
+            if (contrato) {
+                return res.status(200).jsonp(contrato)
+            }
+            else {
+                return res.status(404).jsonp({ message: 'error' })
+            }
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'Error al guardar el registro.' });
         }
 
     }
@@ -317,8 +489,6 @@ class ContratoEmpleadoControlador {
             return res.status(404).jsonp({ text: 'No se encuentran registros.' });
         }
     }
-
-
 
     public async EncontrarIdContrato(req: Request, res: Response): Promise<any> {
         const { id_empleado } = req.params;

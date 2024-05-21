@@ -68,16 +68,15 @@ export class TimbresService {
     return this.http.get<any>(`${environment.url}/timbres/aviso-individual/${id}`);
   }
 
-  PutVistaTimbre(id_noti_timbre: number) {
-    let data = { visto: true };
-    return this.http.put(`${environment.url}/timbres/noti-timbres/vista/${id_noti_timbre}`, data);
+  PutVistaTimbre(id_noti_timbre: number, datos: any) {
+    return this.http.put(`${environment.url}/timbres/noti-timbres/vista/${id_noti_timbre}`, datos);
   }
 
   AvisosTimbresRealtime(id_empleado: number) {
     return this.http.get(`${environment.url}/timbres/noti-timbres/avisos/${id_empleado}`);
   }
 
-  EliminarAvisos(Seleccionados: any[]) {
+  EliminarAvisos(Seleccionados: any) {
     return this.http.put<any>(`${environment.url}/timbres/eliminar-multiples/avisos`, Seleccionados); //Eliminacion de datos seleccionados.
   }
 

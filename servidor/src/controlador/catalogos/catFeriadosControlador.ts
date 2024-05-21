@@ -2,6 +2,7 @@
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import moment from 'moment';
 import excel from 'xlsx';
 import pool from '../../database';
@@ -26,28 +27,68 @@ class FeriadosControlador {
     }
 
     // METODO PARA ELIMINAR UN REGISTRO DE FERIADOS
-    public async EliminarFeriado(req: Request, res: Response): Promise<any> {
-
+    public async EliminarFeriado(req: Request, res: Response): Promise<Response> {
         try {
-
             const id = req.params.id;
+            const {user_name, ip} = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOS ORIGINALES
+
+            const datosOriginales = await pool.query('SELECT * FROM ef_cat_feriados WHERE id = $1', [id]);
+            const [feriado] = datosOriginales.rows;
+
+            if (!feriado) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'ef_cat_feriados',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar feriado con id ${id}. Registro no encontrado.`
+                })
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
             await pool.query(
                 `
                 DELETE FROM ef_cat_feriados WHERE id = $1
                 `
                 , [id]);
-            res.jsonp({ text: 'Registro eliminado.' });
+            
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'ef_cat_feriados',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(feriado),
+                datosNuevos: '',
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.jsonp({ text: 'Registro eliminado.' });
         } catch (error) {
-            return res.jsonp({ message: 'error' });
-
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ text: 'Error al eliminar el registro.' });
         }
-
     }
 
     // METODO PARA CREAR REGISTRO DE FERIADO
     public async CrearFeriados(req: Request, res: Response): Promise<Response> {
         try {
-            const { fecha, descripcion, fec_recuperacion } = req.body;
+            const { fecha, descripcion, fec_recuperacion, user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
 
             const busqueda: QueryResult = await pool.query(
                 `
@@ -70,6 +111,20 @@ class FeriadosControlador {
 
                 const [feriado] = response.rows;
 
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'cg_feriados',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(feriado),
+                    ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
                 if (feriado) {
                     return res.status(200).jsonp(feriado);
                 }
@@ -79,7 +134,9 @@ class FeriadosControlador {
             }
         }
         catch (error) {
-            return res.jsonp({ message: 'error' });
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
         }
     }
 
@@ -100,33 +157,59 @@ class FeriadosControlador {
     }
 
     // METODO PARA ACTUALIZAR UN FERIADO
-    public async ActualizarFeriado(req: Request, res: Response) {
+    public async ActualizarFeriado(req: Request, res: Response): Promise<Response> {
         try {
-            const { fecha, descripcion, fec_recuperacion, id } = req.body;
+            const { fecha, descripcion, fec_recuperacion, id, user_name, ip } = req.body;
 
-            const busqueda: QueryResult = await pool.query(
-                `
-                SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1 AND NOT id = $2
-                `
-                , [descripcion.toUpperCase(), id]);
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
 
-            const [nombres] = busqueda.rows;
+            // CONSULTAR DATOS ORIGINALES
+            const datosOriginales = await pool.query('SELECT * FROM ef_cat_feriados WHERE id = $1', [id]);
+            const [feriado] = datosOriginales.rows;
 
-            if (nombres) {
-                return res.jsonp({ message: 'existe', status: '300' });
+            if (!feriado) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'ef_cat_feriados',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar feriado con id ${id}.`
+                })
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
-            else {
-                await pool.query(
-                    `
-                    UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
-                    WHERE id = $4
-                    `
-                    , [fecha, descripcion, fec_recuperacion, id]);
-                return res.jsonp({ message: 'ok' });
-            }
+
+            await pool.query(
+                `
+                UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
+                WHERE id = $4
+                `
+                , [fecha, descripcion, fec_recuperacion, id]);
+            
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'ef_cat_feriados',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(feriado),
+                datosNuevos: JSON.stringify({ fecha, descripcion, fec_recuperacion }),
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.jsonp({ message: 'Registro actualizado.' });
         }
         catch (error) {
-            return res.jsonp({ message: 'error' });
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
         }
     }
 
@@ -196,16 +279,6 @@ class FeriadosControlador {
             return res.jsonp({ message: 'error' });
         }
     }
-
-
-
-
-
-
-
-
-
-
 
     /* 
     * Metodo para revisar
@@ -625,7 +698,7 @@ class FeriadosControlador {
 
         const workbook = excel.readFile(ruta);
         const sheet_name_list = workbook.SheetNames;
-        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[2]]);
 
         // VARIABLES DE CONTADORES DE REGISTROS
         var lectura = 1;
@@ -725,36 +798,58 @@ class FeriadosControlador {
     // INGRESAR DATOS DE FERIADOS MEDIANTE PLANTILLA
     public async CrearFeriadoPlantilla(req: Request, res: Response): Promise<void> {
         const documento = req.file?.originalname;
+        const { user_name, ip } = req.body;
         let separador = path.sep;
         let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
         var contador = 1;
         const workbook = excel.readFile(ruta);
         const sheet_name_list = workbook.SheetNames;
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-
         // LECTURA DE DATOS DE LA PLANTILLA
         plantilla.forEach(async (data: any) => {
-            const { fecha, descripcion, fec_recuperacion } = data;
-            // VERIFICACIÓN DE EXISTENCIA DE DATOS DE FECHA DE RECUPERACIÓN
-            if (fec_recuperacion === undefined) {
-                var recuperar = null;
-            }
-            else {
-                recuperar = fec_recuperacion;
-            }
-            // REGISTRO DE DATOS EN EL SISTEMA
-            await pool.query(
-                `
-                INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
-                VALUES ($1, $2, $3)
-                `
-                , [fecha, descripcion, recuperar]);
+            try {
+                const { fecha, descripcion, fec_recuperacion } = data;
+                // VERIFICACIÓN DE EXISTENCIA DE DATOS DE FECHA DE RECUPERACIÓN
+                if (fec_recuperacion === undefined) {
+                    var recuperar = null;
+                }
+                else {
+                    recuperar = fec_recuperacion;
+                }
 
-            // ENVIO DE MENSAJE UNA VEZ QUE SE HA LEIDO TODOS LOS DATOS DE LA PLANTILLA
-            if (contador === plantilla.length) {
-                return res.jsonp({ message: 'CORRECTO' });
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
+                // REGISTRO DE DATOS EN EL SISTEMA
+                await pool.query(
+                    `
+                    INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
+                    VALUES ($1, $2, $3)
+                    `, [fecha, descripcion, recuperar]);
+
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'cg_feriados',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify({ fecha, descripcion, recuperar }),
+                    ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+    
+                // ENVIO DE MENSAJE UNA VEZ QUE SE HA LEIDO TODOS LOS DATOS DE LA PLANTILLA
+                if (contador === plantilla.length) {
+                    return res.jsonp({ message: 'CORRECTO' });
+                }
+                contador = contador + 1;
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
             }
-            contador = contador + 1;
         });
 
         // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO

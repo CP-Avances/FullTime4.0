@@ -9,7 +9,7 @@ import { Observable } from "rxjs";
 import { Router } from "@angular/router";
 import * as moment from "moment";
 
-// IMPORTACION DE SERVICIOS 
+// IMPORTACION DE SERVICIOS
 import { AccionPersonalService } from "src/app/servicios/accionPersonal/accion-personal.service";
 import { ValidacionesService } from "src/app/servicios/validaciones/validaciones.service";
 import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
@@ -38,6 +38,10 @@ export class EditarPedidoAccionComponent implements OnInit {
 
   @Input() idPedido: number;
   @Input() pagina: string = '';
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // FILTRO DE NOMBRES DE LOS EMPLEADOS
   filtroNombreH: Observable<any[]>;
@@ -163,6 +167,9 @@ export class EditarPedidoAccionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.CargarInformacion();
     // INICIALIZACION DE FECHA Y MOSTRAR EN FORMULARIO
     var f = moment();
@@ -524,6 +531,8 @@ export class EditarPedidoAccionComponent implements OnInit {
               posesion_notificacion: form4.posesionNotificacionForm,
               descripcion_pose_noti: form4.descripcionPForm,
               id: this.idPedido,
+              user_name: this.user_name,
+              ip: this.ip,
             };
             // VALIDAR QUE FECHAS SE ENCUENTREN BIEN INGRESADA
             if (form4.fechaReempForm === "" || form4.fechaReempForm === null) {
@@ -631,6 +640,8 @@ export class EditarPedidoAccionComponent implements OnInit {
     if (form1.otroDecretoForm != "") {
       let acuerdo = {
         descripcion: form1.otroDecretoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       };
       this.restAccion.IngresarDecreto(acuerdo).subscribe((resol) => {
         // BUSCAR ID DE ULTIMO REGISTRO DE DECRETOS - ACUERDOS - RESOLUCION - OTROS
@@ -666,6 +677,8 @@ export class EditarPedidoAccionComponent implements OnInit {
     if (form2.otroCargoForm != "") {
       let cargo = {
         descripcion: form2.otroCargoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       };
       this.restAccion.IngresarCargoPropuesto(cargo).subscribe((resol) => {
         // BUSCAR ID DE ULTIMO REGISTRO DE CARGOS PROPUESTOS

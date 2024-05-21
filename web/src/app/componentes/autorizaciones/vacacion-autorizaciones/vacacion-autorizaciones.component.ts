@@ -67,6 +67,10 @@ export class VacacionAutorizacionesComponent implements OnInit {
   oculDepa: boolean = true;
   ocultar: boolean = true;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restAutorizaciones: AutorizacionService,
     public restAutoriza: AutorizaDepartamentoService,
@@ -79,8 +83,10 @@ export class VacacionAutorizacionesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log(this.data, 'data_vacaciones');
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
     this.obtenerDepartamento();
@@ -342,6 +348,8 @@ export class VacacionAutorizacionesComponent implements OnInit {
       id_hora_extra: null,
       id_documento: localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       id_plan_hora_extra: null,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restAutorizaciones.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
       this.EditarEstadoVacacion(form, id_vacacion, empleado_solicita, id_departamento);
@@ -367,7 +375,9 @@ export class VacacionAutorizacionesComponent implements OnInit {
       estado: form.estadoF,
       id_vacacion: id_vacacion,
       id_rece_emp: id_empleado,
-      id_depa_send: id_departamento
+      id_depa_send: id_departamento,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restV.ActualizarEstado(id_vacacion, datosVacacion).subscribe(respon => {
       this.resVacacion = respon
@@ -394,7 +404,9 @@ export class VacacionAutorizacionesComponent implements OnInit {
         estado: estado_letras,
         create_at: `${this.FechaActual}T${f.toLocaleTimeString()}.000Z`,
         id_vacaciones: id_vacacion,
-        id_permiso: null
+        id_permiso: null,
+        user_name: this.user_name,
+        ip: this.ip
       }
       this.realTime.IngresarNotificacionEmpleado(notificacion).subscribe(res => {
         this.NotifiRes = res;

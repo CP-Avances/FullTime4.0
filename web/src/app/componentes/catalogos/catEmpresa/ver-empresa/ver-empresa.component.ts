@@ -24,7 +24,6 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableSucursales } from 'src/app/model/reportes.model';
 
-
 @Component({
   selector: 'app-ver-empresa',
   templateUrl: './ver-empresa.component.html',
@@ -69,13 +68,9 @@ export class VerEmpresaComponent implements OnInit {
   verColores: boolean = false;
   verFrase: boolean = false;
 
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
-  habilitarprogress: boolean = false;
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   constructor(
     public ventana: MatDialog,
@@ -90,6 +85,9 @@ export class VerEmpresaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.CargarDatosEmpresa();
     this.ObtenerSucursal();
@@ -159,7 +157,7 @@ export class VerEmpresaComponent implements OnInit {
     });
   }
 
-  // VENTANA PARA EDITAR DATOS DE EMPRESA 
+  // VENTANA PARA EDITAR DATOS DE EMPRESA
   ver_informacion: boolean = true;
   ver_editar: boolean = false;
   EditarDatosEmpresa(): void {
@@ -233,18 +231,19 @@ export class VerEmpresaComponent implements OnInit {
 
   // METODO DE REGISTRO DE COLORES
   CambiarColores() {
-    this.habilitarprogress = true;
+
     let datos = {
       color_p: this.p_color,
       color_s: this.s_color,
-      id: this.datosEmpresa[0].id
+      id: this.datosEmpresa[0].id,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.empresa.ActualizarColores(datos).subscribe(data => {
       this.toastr.success('Operación exitosa.', 'Colores de reportes configurados.', {
         timeOut: 6000,
       });
       this.ObtenerColores();
-      this.habilitarprogress = false;
     })
   }
 
@@ -260,7 +259,7 @@ export class VerEmpresaComponent implements OnInit {
     });
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -279,7 +278,7 @@ export class VerEmpresaComponent implements OnInit {
     this.pagina = 'datos-empresa';
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************** **/
 
@@ -417,11 +416,15 @@ export class VerEmpresaComponent implements OnInit {
 
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   contador: number = 0;
   ingresar: boolean = false;
   Eliminar(id_sucursal: number) {
-    this.restS.EliminarRegistro(id_sucursal).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.restS.EliminarRegistro(id_sucursal, datos).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('Existen datos relacionados a este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
@@ -435,7 +438,7 @@ export class VerEmpresaComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -453,13 +456,17 @@ export class VerEmpresaComponent implements OnInit {
 
 
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ingresar = false;
     this.contador = 0;
     this.sucursalesEliminar = this.selectionSucursales.selected;
     this.sucursalesEliminar.forEach((datos: any) => {
       this.datosSucursales = this.datosSucursales.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.restS.EliminarRegistro(datos.id).subscribe(res => {
+      this.restS.EliminarRegistro(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionado con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,

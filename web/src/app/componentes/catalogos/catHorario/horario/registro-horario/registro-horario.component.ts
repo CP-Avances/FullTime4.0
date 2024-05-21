@@ -53,6 +53,10 @@ export class RegistroHorarioComponent implements OnInit {
   color: ThemePalette = 'primary';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public ventana: MatDialogRef<RegistroHorarioComponent>, // VARIABLE MANEJO DE VENTANAS
     public validar: ValidacionesService, // SERVICIO PARA CONTROL DE VALIDACIONES
@@ -62,6 +66,8 @@ export class RegistroHorarioComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   // VARAIBLE DE ALMACENAMIENTO DE DATOS DE AUDITORIA
@@ -78,6 +84,8 @@ export class RegistroHorarioComponent implements OnInit {
       nombre: form.nombreForm,
       codigo: form.codigoForm,
       default_: form.tipoHForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
 
     // FORMATEAR HORAS
@@ -151,7 +159,6 @@ export class RegistroHorarioComponent implements OnInit {
 
   // METODO PARA REGISTRAR DATOS DEL HORARIO
   GuardarDatos(datos: any, form: any) {
-    //--console.log('datos ', datos)
     this.rest.RegistrarHorario(datos).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
@@ -201,6 +208,10 @@ export class RegistroHorarioComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.rest.SubirArchivo(formData, id, null, codigo).subscribe(res => {
       this.habilitarprogress = false;
       this.archivoForm.reset();

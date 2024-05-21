@@ -21,6 +21,10 @@ export class ConfirmarContraseniaComponent implements OnInit {
   ConfirmarContrasenia = new FormControl('', Validators.maxLength(12));
   mensaje: any = [];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   public formulario = new FormGroup({
     nPass: this.NuevaContrasenia,
     cPass: this.ConfirmarContrasenia
@@ -37,6 +41,8 @@ export class ConfirmarContraseniaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   // METODO PARA COMPARAR LAS CONTRASEÑAS
@@ -57,7 +63,9 @@ export class ConfirmarContraseniaComponent implements OnInit {
 
     let data = {
       token: this.token,
-      contrasena: clave
+      contrasena: clave,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restLogin.ActualizarContrasenia(data).subscribe(res => {
       this.mensaje = res;

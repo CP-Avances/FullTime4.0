@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import pool from '../../database';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 
 class ProvinciaControlador {
 
@@ -68,37 +69,96 @@ class ProvinciaControlador {
   }
 
   // METODO PARA ELIMINAR REGISTROS
-
-  public async EliminarProvincia(req: Request, res: Response) {
-
-
+  public async EliminarProvincia(req: Request, res: Response): Promise<Response> {
     try {
-
+      const { user_name, ip } = req.body;
       const id = req.params.id;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const provincia = await pool.query('SELECT * FROM e_provincias WHERE id = $1', [id]);
+      const [datosOriginales] = provincia.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'e_provincias',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
       await pool.query(
         `
         DELETE FROM e_provincias WHERE id = $1
         `
         , [id]);
-      res.jsonp({ message: 'Registro eliminado.' });
-    }
-    catch (error) {
-      return res.jsonp({ message: 'error' });
-    }
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'e_provincias',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip: ip,
+        observacion: null
+      });
 
-
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: error });
+    }
   }
 
 
   // METODO PARA REGISTRAR PROVINCIA
   public async CrearProvincia(req: Request, res: Response): Promise<void> {
-    const { nombre, id_pais } = req.body;
-    await pool.query(
-      `
-      INSERT INTO e_provincias (nombre, id_pais) VALUES ($1, $2)
-      `
-      , [nombre, id_pais]);
-    res.jsonp({ message: 'Registro guardado.' });
+    try {
+      const { nombre, id_pais, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      await pool.query(
+        `
+        INSERT INTO e_provincias (nombre, id_pais) VALUES ($1, $2)
+        `
+        , [nombre, id_pais]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'e_provincias',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{"nombre": "${nombre}", "id_pais": "${id_pais}"}`,
+        ip: ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      res.jsonp({ message: 'Registro guardado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      res.status(500).jsonp({ message: error });
+    }
   }
 
   // METODO PARA BUSCAR INFORMACION DE UN PAIS

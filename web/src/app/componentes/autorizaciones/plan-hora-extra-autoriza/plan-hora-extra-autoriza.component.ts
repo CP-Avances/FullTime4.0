@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
 import { PlanHoraExtraService } from 'src/app/servicios/planHoraExtra/plan-hora-extra.service';
+import { use } from 'echarts';
 
 interface Orden {
   valor: number
@@ -55,6 +56,10 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
 
   id_user_loggin: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restAutorizaciones: AutorizacionService,
     public restDepartamento: DepartamentosService,
@@ -67,6 +72,8 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
   ngOnInit(): void {
     console.log('datos, planificacion', this.data);
     this.id_user_loggin = parseInt(localStorage.getItem("empleado") as string);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.obtenerDepartamento();
   }
 
@@ -112,6 +119,8 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
       id_hora_extra: null,
       id_plan_hora_extra: id_hora,
       id_documento: localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restAutorizaciones.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Autorizacion guardada', {
@@ -132,6 +141,8 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
       id_documento: documento + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
       id_plan_hora_extra: id_hora,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restAutorizaciones.PutEstadoAutoPermisoMultiple(newAutorizacionesM).subscribe(resA => {
       this.toastr.success('Operación exitosa.', 'Autorización Guardada', {
@@ -172,6 +183,8 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
   EditarEstadoPlan(id_hora, id_departamento, usuario_solicita, estado_hora) {
     let datosHorasExtras = {
       estado: estado_hora,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restPlanH.EditarEstado(id_hora, datosHorasExtras).subscribe(res => {
       this.resEstado = [res];

@@ -23,6 +23,10 @@ export class ButtonAvisosComponent implements OnInit {
   avisos: any = [];
   id_empleado_logueado: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public loginService: LoginService,
     public parametro: ParametrosService,
@@ -69,11 +73,13 @@ export class ButtonAvisosComponent implements OnInit {
 
   ngOnInit(): void {
     this.id_empleado_logueado = parseInt(localStorage.getItem('empleado') as string);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.BuscarParametro();
   }
 
   /** **************************************************************************************** **
-  ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+  ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
   ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -140,7 +146,12 @@ export class ButtonAvisosComponent implements OnInit {
 
 
   ActualizarVista(data: any) {
-    this.aviso.PutVistaTimbre(data.id).subscribe(res => {
+    const datos = {
+      visto: true,
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.aviso.PutVistaTimbre(data.id, datos).subscribe(res => {
       this.LlamarNotificacionesAvisos(this.formato_fecha, this.formato_hora);
     });
 

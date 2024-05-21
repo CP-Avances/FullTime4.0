@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { QueryResult } from 'pg';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
+import { QueryResult } from 'pg';
 
 class RolPermisosControlador {
 

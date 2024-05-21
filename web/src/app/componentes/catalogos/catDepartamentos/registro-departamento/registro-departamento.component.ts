@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-registro-departamento',
@@ -40,6 +41,10 @@ export class RegistroDepartamentoComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private rest: DepartamentosService,
     private restS: SucursalService,
@@ -49,6 +54,9 @@ export class RegistroDepartamentoComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     if (this.data != undefined) {
       this.Habilitar = false;
       this.rest.BuscarDepartamentoSucursal(this.data).subscribe(datos => {
@@ -89,6 +97,8 @@ export class RegistroDepartamentoComponent implements OnInit {
     var departamento = {
       id_sucursal: form.idSucursalForm,
       nombre: form.nombreForm.toUpperCase(),
+      user_name: this.user_name,
+      ip: this.ip
     };
 
     // VERIFICAR ID DE SUCURSAL

@@ -42,8 +42,12 @@ export class TipoComidasService {
     return this.http.post(`${environment.url}/tipoComidas/xmlDownload`, data);
   }
 
-  EliminarRegistro(id: any) {
-    return this.http.delete(`${environment.url}/tipoComidas/eliminar/${id}`).pipe(catchError(id));
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${environment.url}/tipoComidas/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   ObtenerUltimoId() {
@@ -63,8 +67,12 @@ export class TipoComidasService {
     return this.http.put(`${environment.url}/tipoComidas/detalle/menu`, datos);
   }
 
-  EliminarDetalleMenu(id: number) {
-    return this.http.delete(`${environment.url}/tipoComidas/detalle/menu/eliminar/${id}`);
+  EliminarDetalleMenu(id: number, datos: any) {
+    const url = `${environment.url}/tipoComidas/detalle/menu/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // Servicios para verificar y subir datos

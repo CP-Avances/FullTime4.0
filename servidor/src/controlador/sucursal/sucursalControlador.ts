@@ -1,8 +1,11 @@
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import excel from 'xlsx';
+
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
+
 import pool from '../../database';
+import excel from 'xlsx';
 import path from 'path';
 import fs from 'fs';
 
@@ -28,34 +31,100 @@ class SucursalControlador {
   // GUARDAR REGISTRO DE SUCURSAL
   public async CrearSucursal(req: Request, res: Response): Promise<Response> {
 
-    const { nombre, id_ciudad, id_empresa } = req.body;
+    try {
+      const { nombre, id_ciudad, id_empresa, user_name, ip } = req.body;
 
-    const response: QueryResult = await pool.query(
-      `
-      INSERT INTO e_sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
-      `
-      , [nombre, id_ciudad, id_empresa]);
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+  
+      const response: QueryResult = await pool.query(
+        `
+        INSERT INTO e_sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
+        `
+        , [nombre, id_ciudad, id_empresa]);
+  
+      const [sucursal] = response.rows;
 
-    const [sucursal] = response.rows;
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'e_sucursales',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: JSON.stringify(sucursal),
+        ip,
+        observacion: null
+      });
 
-    if (sucursal) {
-      return res.status(200).jsonp(sucursal)
-    }
-    else {
-      return res.status(404).jsonp({ message: 'error' })
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+  
+      if (sucursal) {
+        return res.status(200).jsonp(sucursal)
+      }
+      else {
+        return res.status(404).jsonp({ message: 'error' })
+      }
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
   // ACTUALIZAR REGISTRO DE ESTABLECIMIENTO
-  public async ActualizarSucursal(req: Request, res: Response): Promise<void> {
-    const { nombre, id_ciudad, id } = req.body;
-    await pool.query(
-      `
-      UPDATE e_sucursales SET nombre = $1, id_ciudad = $2 WHERE id = $3
-      `
-      , [nombre, id_ciudad, id]);
+  public async ActualizarSucursal(req: Request, res: Response): Promise<Response> {
+    try {
+      const { nombre, id_ciudad, id, user_name, ip } = req.body;
 
-    res.jsonp({ message: 'Registro actualizado.' });
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query('SELECT * FROM e_sucursales WHERE id = $1', [id]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'e_sucursales',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      await pool.query(
+        `
+        UPDATE e_sucursales SET nombre = $1, id_ciudad = $2 WHERE id = $3
+        `
+        , [nombre, id_ciudad, id]);
+  
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'e_sucursales',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{ "nombre": "${nombre}", "id_ciudad": "${id_ciudad}" }`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro actualizado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
 
   // BUSCAR SUCURSAL POR ID DE EMPRESA
@@ -93,20 +162,60 @@ class SucursalControlador {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  public async EliminarRegistros(req: Request, res: Response) {
+  public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
+      const { user_name, ip } = req.body;
+
       const id = req.params.id;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query('SELECT * FROM e_sucursales WHERE id = $1', [id]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'e_sucursales',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
       await pool.query(
         `
         DELETE FROM e_sucursales WHERE id = $1
         `
         , [id]);
-      res.jsonp({ message: 'Registro eliminado.' });
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'e_sucursales',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
     } catch (error) {
-      return res.jsonp({ message: 'error' });
-
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
-
   }
 
   // METODO PARA BUSCAR DATOS DE UNA SUCURSAL
@@ -137,7 +246,7 @@ class SucursalControlador {
 
     const workbook = excel.readFile(ruta);
     const sheet_name_list = workbook.SheetNames;
-    const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+    const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[3]]);
 
     let data: any = {
       fila: '',

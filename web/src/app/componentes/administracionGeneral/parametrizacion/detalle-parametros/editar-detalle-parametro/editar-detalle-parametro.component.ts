@@ -26,6 +26,10 @@ export class EditarDetalleParametroComponent implements OnInit {
   nota: string = '';
   especificacion: string = '';
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private rest: ParametrosService,
     private toastr: ToastrService,
@@ -34,6 +38,9 @@ export class EditarDetalleParametroComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.MostrarDatos();
     if (this.data.parametros.id_tipo === 22) {
       this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
@@ -63,7 +70,9 @@ export class EditarDetalleParametroComponent implements OnInit {
   GuardarDatos(form: any) {
     let datos = {
       id: this.data.parametros.id_detalle,
-      descripcion: form.descripcionForm
+      descripcion: form.descripcionForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.rest.ActualizarDetalleParametro(datos).subscribe(response => {
       this.toastr.success('Detalle registrado exitosamente.',

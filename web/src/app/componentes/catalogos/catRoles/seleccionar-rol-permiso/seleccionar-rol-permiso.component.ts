@@ -34,7 +34,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   funcion = new FormControl('', [Validators.minLength(2)]);
 
-  // DICCIONARIO DE MODULOS 
+  // DICCIONARIO DE MODULOS
   diccionarioFuncionesActivas: { [id_funcion: string]: boolean } = {
     "permisos": this.permisos,
     "geolocalizacion": this.geolocalizacion,
@@ -79,6 +79,10 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private varificarFunciones: MainNavService,
     public rest: RolPermisosService,
@@ -90,7 +94,8 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('id rol ---', this.id_rol)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.rol.getOneRol(this.id_rol).subscribe(data => {
       this.nombreRol = data[0].nombre.toUpperCase();
     })
@@ -123,7 +128,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1
   }
 
-  // METODO PARA BUSCAR LOS PAGINAS DEL MENU DEL SISTEMA 
+  // METODO PARA BUSCAR LOS PAGINAS DEL MENU DEL SISTEMA
   ObtenerMenu() {
     this.nombresMenu = [];
     this.rest.getMenu().subscribe(res => {
@@ -723,7 +728,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     console.log("Paginas eliminadas", this.paginasEliminar);
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -743,7 +748,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       });
   }
 
-  //FUNCION PARA BUSCAR LAS ACCIONES DE LAS PAGINAS 
+  //FUNCION PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
   ObtenerTodasPaginasAcciones(): any {
     this.rest.getMenu().subscribe(res => {
       this.nombrePaginas = res;
@@ -760,7 +765,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     return this.todasPaginasAcciones;
   }
 
-  //FUNCION PARA BUSCAR LAS ACCIONES DE LAS PAGINAS DE LOS MODULOS 
+  //FUNCION PARA BUSCAR LAS ACCIONES DE LAS PAGINAS DE LOS MODULOS
   ObtenerTodasModulosAcciones(): any {
     this.rest.getModulos().subscribe(res => {
       this.nombreModulosAsignados = res;

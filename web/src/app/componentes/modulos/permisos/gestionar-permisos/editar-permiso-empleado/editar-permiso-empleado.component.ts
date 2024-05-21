@@ -1,11 +1,11 @@
-// IMPORTACION LIBRERIAS 
+// IMPORTACION LIBRERIAS
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
 import * as moment from 'moment';
 
-// IMPORTACION DE SERVICIOS 
+// IMPORTACION DE SERVICIOS
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
@@ -20,7 +20,7 @@ import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-ge
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
 
-// CREACION DE LISTA DE OPCIONES DE SOLICITUD DE PERMISO 
+// CREACION DE LISTA DE OPCIONES DE SOLICITUD DE PERMISO
 interface opcionesDiasHoras {
   valor: string;
   nombre: string
@@ -56,7 +56,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   num: number = 0; // VARIABLE QUEALMACENA EL NUMERO DE PERMISO SOLICITADO
   Tdias = 0; // VARIABLE QUE ALMACENA EL TOTAL DE DÍAS DE PERMISO
   Thoras: any; // VARIABLE QUE ALMACENA EL TOTAL DE HORAS DE PERMISO
-  isChecked: boolean = false; // VARIABLE QUE INDICA SI SE VA A ACTUALIZAR EL ARCHIVO 
+  isChecked: boolean = false; // VARIABLE QUE INDICA SI SE VA A ACTUALIZAR EL ARCHIVO
 
   configuracion_permiso: string = ''; // VARIABLE QUE INDICA QUE TIPO DE PERMISOS SELECCIONO EL EMPLEADO
   horasTrabajo: any = []; // VARIABLE QUE ALMACENA EL TOTAL DE HORAS QUE TRABAJA EL EMPLEADO
@@ -69,6 +69,10 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   informacion1: string = '';
   informacion3: string = '';
   informacion4: string = '';
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   horas_alimentacionF = new FormControl('');
@@ -134,7 +138,9 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   info: any = [];
 
   ngOnInit(): void {
-    console.log('ver datos de permiso ', this.solicita_permiso)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     var f = moment();
     this.info = this.solicita_permiso[0].permiso;
     this.id_empleado = this.solicita_permiso[0].id_empleado;
@@ -150,7 +156,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -173,7 +179,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       });
   }
 
-  // METODO PARA OBTENER DATOS DEL EMPLEADO 
+  // METODO PARA OBTENER DATOS DEL EMPLEADO
   empleado: any = [];
   ObtenerEmpleado() {
     this.empleado = [];
@@ -182,7 +188,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     })
   }
 
-  // METODO PARA MOSTRAR LISTA DE PERMISOS DE ACUERDO AL ROL 
+  // METODO PARA MOSTRAR LISTA DE PERMISOS DE ACUERDO AL ROL
   ObtenerTiposPermiso() {
     this.tipoPermisos = [];
     let rol = this.loginServise.getRol();
@@ -269,7 +275,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     })
   }
 
-  // METODO PARA IMPRIMIR EN EL FORMULARIO LA INFORMACION DEL PERMISO SOLICITADO 
+  // METODO PARA IMPRIMIR EN EL FORMULARIO LA INFORMACION DEL PERMISO SOLICITADO
   documento: boolean = false;
   documento_editar: boolean = false;
   MostrarDatos() {
@@ -394,7 +400,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     });
   }
 
-  // ACTIVAR FORMULARIO DE ACUERDO A SELECCION DE TIPO 
+  // ACTIVAR FORMULARIO DE ACUERDO A SELECCION DE TIPO
   ActivarDiasHoras(form: any) {
     this.LimpiarComida(false);
     if (form.solicitarForm === 'Dias') {
@@ -538,12 +544,12 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
             this.fechaFinalF.setValue('');
           }
           else {
-            // BUSQUEDA DE FERIADOS 
+            // BUSQUEDA DE FERIADOS
             this.BuscarFeriados(form);
           }
         }
         else {
-          // BUSQUEDA DE FERIADOS 
+          // BUSQUEDA DE FERIADOS
           this.BuscarFeriados(form);
         }
       }
@@ -578,7 +584,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     }
     else if (this.configuracion_permiso === 'Horas') {
       this.toastr.warning
-        (`No puede solicitar días de permiso. 
+        (`No puede solicitar días de permiso.
               Las horas de permiso que puede solicitar deben ser menores o iguales a: ${String(this.Thoras)} horas.`,
           'Este tipo de permiso esta configurado por horas.', {
           timeOut: 6000,
@@ -1464,7 +1470,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     this.contar_laborables = 0;
     this.contar_recuperables = 0;
 
-    this.fechas_solicitud = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO 
+    this.fechas_solicitud = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
     var inicio = moment(this.dSalida, "YYYY/MM/DD").format("YYYY-MM-DD");
     var fin = moment(this.dIngreso, "YYYY/MM/DD").format("YYYY-MM-DD");
 
@@ -1475,7 +1481,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       inicio = newDate;
     }
 
-    // BUSCAR FERIADOS 
+    // BUSCAR FERIADOS
     if (this.feriados.length != 0) {
       this.fechas_solicitud.map((obj: any) => {
         for (let i = 0; i < this.feriados.length; i++) {
@@ -1550,7 +1556,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
 
   /** ********************************************************************************** **
-   ** **                    TRATAMIENTO DE DATOS DE REGISTRO DE PERMISO               ** ** 
+   ** **                    TRATAMIENTO DE DATOS DE REGISTRO DE PERMISO               ** **
    ** ********************************************************************************** **/
 
   // SETEAR VALORES DE DIAS Y HORAS
@@ -1607,6 +1613,8 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       dia: parseInt(form.diasForm),
       id_peri_vacacion: this.periodo_vacaciones,
       fec_edicion: this.FechaActual,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     if (this.info.id_tipo_permiso != datosPermiso.id_tipo_permiso) {
@@ -1742,6 +1750,10 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restP.SubirArchivoRespaldo(formData, id, codigo, this.info.documento).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Documento registrado.', {
         timeOut: 6000,
@@ -1792,6 +1804,8 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       archivo: this.info.documento,
       id: this.info.id,
       codigo: this.empleado.codigo,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restP.EliminarDocumentoPermiso(datos).subscribe(res => {
     });
@@ -2009,6 +2023,8 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       mensaje: 'Ha actualizado ' + this.nota + ' de permiso ' + this.user + ' desde ' +
         desde + ' ' + h_inicio + ' hasta ' +
         hasta + ' ' + h_fin,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     // LISTADO PARA ELIMINAR EL USUARIO DUPLICADO
@@ -2044,7 +2060,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   }
 
   /** ********************************************************************************* **
-   ** **                    LIMPIAR CAMPOS DEL FORMULARIO                            ** **             
+   ** **                    LIMPIAR CAMPOS DEL FORMULARIO                            ** **
    ** ********************************************************************************* **/
 
   LimpiarCampos() {

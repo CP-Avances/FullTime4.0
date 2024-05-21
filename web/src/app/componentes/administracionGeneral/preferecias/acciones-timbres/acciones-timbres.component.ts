@@ -17,6 +17,10 @@ export class AccionesTimbresComponent implements OnInit {
   formGroup: FormGroup;
   bool_acc: boolean = (localStorage.getItem('bool_timbres') === "true") ? true : false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public ventana: MatDialogRef<AccionesTimbresComponent>,
     public formBuilder: FormBuilder,
@@ -31,12 +35,16 @@ export class AccionesTimbresComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   GuardarAccion(form: any) {
     let data = {
       id: this.data.id_empresa,
-      bool_acciones: form.acciones_timbres
+      bool_acciones: form.acciones_timbres,
+      user_name: this.user_name,
+      ip: this.ip
     }
 
     this.ventana.close();

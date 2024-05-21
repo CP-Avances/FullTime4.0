@@ -30,6 +30,10 @@ export class EmplCargosComponent implements OnInit {
   tipoCargo: any = [];
   empresas: any = [];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // VARIABLES DE FORMULARIO
   idEmpleContrato = new FormControl('', [Validators.required]);
   idDepartamento = new FormControl('', [Validators.required]);
@@ -72,6 +76,9 @@ export class EmplCargosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     if (this.datoEmpleado.idRol != 2) {
       this.ver_jefe = true;
     }
@@ -177,6 +184,8 @@ export class EmplCargosComponent implements OnInit {
       sueldo: form.sueldoForm,
       cargo: form.tipoForm,
       jefe: form.jefeForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     // FORMATEAR HORAS
     if (cargo.hora_trabaja.split(':').length === 1) {
@@ -233,7 +242,9 @@ export class EmplCargosComponent implements OnInit {
   IngresarTipoCargo(form: any, datos: any) {
     if (form.cargoForm != '') {
       let tipo_cargo = {
-        cargo: form.cargoForm
+        cargo: form.cargoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.cargos.CrearTipoCargo(tipo_cargo).subscribe(res => {
         datos.cargo = res.id;
@@ -314,7 +325,9 @@ export class EmplCargosComponent implements OnInit {
     let datos = {
       id_empleado: this.idEmpleado,
       id_sucursal: form.idSucursalForm,
-      principal: true
+      principal: true,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.usuario.RegistrarUsuarioSucursal(datos).subscribe(res => {
     });
@@ -341,6 +354,8 @@ export class EmplCargosComponent implements OnInit {
     let datos = {
       id_sucursal: form.idSucursalForm,
       id_empleado: this.idEmpleado,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.usuario.ActualizarUsuarioSucursalPrincipal(datos).subscribe(res => {
     });

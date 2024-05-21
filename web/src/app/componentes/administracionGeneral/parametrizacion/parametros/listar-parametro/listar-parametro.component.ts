@@ -39,6 +39,10 @@ export class ListarParametroComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   descripcionF = new FormControl('', [Validators.minLength(2)]);
 
@@ -60,13 +64,16 @@ export class ListarParametroComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerParametros();
     this.ObtenerColores();
     this.ObtenerLogo();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -82,7 +89,7 @@ export class ListarParametroComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -141,7 +148,7 @@ export class ListarParametroComponent implements OnInit {
 
 
   // revisar
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************** **/
   generarPdf(action = 'open') {
@@ -233,7 +240,7 @@ export class ListarParametroComponent implements OnInit {
     };
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   exportToExcel() {
@@ -243,7 +250,7 @@ export class ListarParametroComponent implements OnInit {
     xlsx.writeFile(wb, "ParametrosGeneralesEXCEL" + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
    ** ************************************************************************************************** **/
 
@@ -269,7 +276,7 @@ export class ListarParametroComponent implements OnInit {
           "$": { "id": obj.id },
           "descripcion": obj.descripcion,
         }
-        
+
       }
       arregloParametrosGenerales.push(objeto)
     });
@@ -292,7 +299,7 @@ export class ListarParametroComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;

@@ -22,12 +22,20 @@ export class TipoVacunaComponent {
     vacuna: this.vacuna,
   });
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restVacuna: VacunacionService, // VARIABLE DE CONSULTA DE DATOS DE VACUNAS
     public ventana: MatDialogRef<TipoVacunaComponent>, // VARIABLE DE MANEJO DE VENTANAS
     public toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES,
   ) { }
 
+  ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+  }
 
   LimpiarCampos() {
     this.formulario.reset();
@@ -37,6 +45,8 @@ export class TipoVacunaComponent {
   GuardarTipoVacuna(form: any) {
     let vacuna = {
       vacuna: form.vacuna,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restVacuna.CrearTipoVacuna(vacuna).subscribe(response => {
       //---console.log('response: ', response);

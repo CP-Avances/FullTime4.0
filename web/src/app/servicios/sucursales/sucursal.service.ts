@@ -37,9 +37,13 @@ export class SucursalService {
     return this.http.get(`${environment.url}/sucursales`);
   }
 
-  // METODO PARA ELIMINAR REGISTRO 
-  EliminarRegistro(id: any) {
-    return this.http.delete(`${environment.url}/sucursales/eliminar/${id}`).pipe(catchError(id));
+  // METODO PARA ELIMINAR REGISTRO
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${environment.url}/sucursales/eliminar/${id}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
   }
 
   // METODO PARA CREAR ARCHIVO XML
@@ -52,7 +56,7 @@ export class SucursalService {
     return this.http.get(`${environment.url}/sucursales/unaSucursal/${id}`);
   }
 
-  
+
   RevisarFormato(formData) {
     return this.http.post<any>(environment.url + '/sucursales/upload/revision', formData);
   }

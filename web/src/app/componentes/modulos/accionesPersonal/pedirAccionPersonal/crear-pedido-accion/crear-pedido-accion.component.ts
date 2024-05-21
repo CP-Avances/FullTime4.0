@@ -49,6 +49,10 @@ export class CrearPedidoAccionComponent implements OnInit {
   filtroCiudad: Observable<any[]>;
   seleccionarCiudad: any;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // EVENTOS RELACIONADOS A SELECCION E INGRESO DE ACUERDOS - DECRETOS - RESOLUCIONES
   ingresoAcuerdo: boolean = false;
   vistaAcuerdo: boolean = true;
@@ -165,6 +169,9 @@ export class CrearPedidoAccionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem("usuario");
+    this.ip = localStorage.getItem("ip");
+
     if (this.habilitarAccion === false) {
       let mensaje = {
         access: false,
@@ -476,6 +483,8 @@ export class CrearPedidoAccionComponent implements OnInit {
               )) : null,
               posesion_notificacion: form4.posesionNotificacionForm,
               descripcion_pose_noti: form4.descripcionPForm,
+              user_name: this.user_name,
+              ip: this.ip,
             };
             // VALIDAR QUE FECHAS SE ENCUENTREN BIEN INGRESADA
             if (form4.fechaReempForm === "" || form4.fechaReempForm === null) {
@@ -583,6 +592,8 @@ export class CrearPedidoAccionComponent implements OnInit {
     if (form1.otroDecretoForm != "") {
       let acuerdo = {
         descripcion: form1.otroDecretoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       };
       this.restAccion.IngresarDecreto(acuerdo).subscribe((resol) => {
         // BUSCAR ID DE ULTIMO REGISTRO DE DECRETOS - ACUERDOS - RESOLUCIÓN - OTROS
@@ -618,6 +629,8 @@ export class CrearPedidoAccionComponent implements OnInit {
     if (form2.otroCargoForm != "") {
       let cargo = {
         descripcion: form2.otroCargoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       };
       this.restAccion.IngresarCargoPropuesto(cargo).subscribe((resol) => {
         // BUSCAR ID DE ULTIMO REGISTRO DE CARGOS PROPUESTOS

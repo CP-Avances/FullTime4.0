@@ -1,12 +1,14 @@
 import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import moment from 'moment';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
 
 import excel from 'xlsx';
+import { use } from 'echarts';
 
 class EmpleadoCargosControlador {
 
@@ -36,33 +38,106 @@ class EmpleadoCargosControlador {
 
   // METODO DE REGISTRO DE CARGO
   public async Crear(req: Request, res: Response): Promise<void> {
-    const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo,
-      jefe } = req.body;
-    await pool.query(
-      `
-      INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal,
-         sueldo, hora_trabaja, id_tipo_cargo, jefe) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      `
-      , [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe]);
+    try {
+      const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo,
+        jefe, user_name, ip } = req.body;
+      
+      const datosNuevos = req.body;
+      
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-    res.jsonp({ message: 'Registro guardado.' });
+      await pool.query(
+        `
+        INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal,
+           sueldo, hora_trabaja, id_tipo_cargo, jefe) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        `
+        , [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe]);
+
+      delete datosNuevos.user_name;
+      delete datosNuevos.ip;
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_empleado_cargos',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: JSON.stringify(datosNuevos),
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+  
+      res.jsonp({ message: 'Registro guardado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      res.status(500).jsonp({ message: 'Error al guardar el registro.' });
+    }
   }
 
   // METODO PARA ACTUALIZAR REGISTRO
-  public async EditarCargo(req: Request, res: Response): Promise<any> {
-    const { id_empl_contrato, id } = req.params;
-    const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe } = req.body;
+  public async EditarCargo(req: Request, res: Response): Promise<Response> {
+    try {
+      const { id_empl_contrato, id } = req.params;
+      const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe, user_name, ip } = req.body;
+  
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-    await pool.query(
-      `
-      UPDATE eu_empleado_cargos SET id_departamento = $1, fecha_inicio = $2, fecha_final = $3, id_sucursal = $4, 
-        sueldo = $5, hora_trabaja = $6, id_tipo_cargo = $7, jefe = $8  
-      WHERE id_contrato = $9 AND id = $10
-      `
-      , [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe,
-        id_empl_contrato, id]);
-    res.jsonp({ message: 'Registro actualizado exitosamente.' });
+      // CONSULTAR DATOSORIGINALES
+      const cargoConsulta = await pool.query('SELECT * FROM eu_empleado_cargos WHERE id = $1', [id]);
+      const [datosOriginales] = cargoConsulta.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_empleado_cargos',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar el cargo con id ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+      }
+
+      await pool.query(
+        `
+        UPDATE eu_empleado_cargos SET id_departamento = $1, fecha_inicio = $2, fecha_final = $3, id_sucursal = $4, 
+          sueldo = $5, hora_trabaja = $6, id_tipo_cargo = $7, jefe = $8  
+        WHERE id_contrato = $9 AND id = $10
+        `
+        , [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe,
+          id_empl_contrato, id]);
+        
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_empleado_cargos',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{id_departamento: ${id_departamento}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, id_sucursal: ${id_sucursal}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, cargo: ${cargo}, jefe: ${jefe}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro actualizado exitosamente.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+    }
   }
 
   // METODO PARA BUSCAR DATOS DE CARGO POR ID CONTRATO
@@ -176,7 +251,6 @@ class EmpleadoCargosControlador {
   }
 
 
-
   public async EncontrarIdCargo(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
     const CARGO = await pool.query(
@@ -211,13 +285,6 @@ class EmpleadoCargosControlador {
       return res.status(404).jsonp({ text: 'Registro no encontrado.' });
     }
   }
-
-
-
-
-
-
-
 
   public async BuscarUnTipo(req: Request, res: Response) {
     const id = req.params.id;
@@ -288,13 +355,6 @@ class EmpleadoCargosControlador {
     }
   }
 
-
-
-
-
-
-
-
   /** **************************************************************************************** **
    ** **                  METODOS DE CONSULTA DE TIPOS DE CARGOS                            ** ** 
    ** **************************************************************************************** **/
@@ -316,20 +376,44 @@ class EmpleadoCargosControlador {
 
   // METODO DE REGISTRO DE TIPO DE CARGO
   public async CrearTipoCargo(req: Request, res: Response): Promise<Response> {
-    const { cargo } = req.body;
-    const response: QueryResult = await pool.query(
-      `
-      INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
-      `
-      , [cargo]);
+    try {
+      const { cargo, user_name, ip } = req.body;
+      
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-    const [tipo_cargo] = response.rows;
+      const response: QueryResult = await pool.query(
+        `
+        INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
+        `
+        , [cargo]);
+  
+      const [tipo_cargo] = response.rows;
 
-    if (tipo_cargo) {
-      return res.status(200).jsonp(tipo_cargo)
-    }
-    else {
-      return res.status(404).jsonp({ message: 'error' })
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'e_cat_tipo_cargo',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{cargo: ${cargo}}`,
+        ip,
+        observacion: null
+      });
+  
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
+      if (tipo_cargo) {
+        return res.status(200).jsonp(tipo_cargo)
+      }
+      else {
+        return res.status(404).jsonp({ message: 'error' })
+      }
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' })
     }
   }
 

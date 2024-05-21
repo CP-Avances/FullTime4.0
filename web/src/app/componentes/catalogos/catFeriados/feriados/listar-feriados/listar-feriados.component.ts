@@ -1,8 +1,6 @@
 // IMPORTACION DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { ThemePalette } from '@angular/material/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
@@ -26,9 +24,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
 import { Router } from '@angular/router';
-
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableFeriados } from 'src/app/model/reportes.model';
@@ -85,11 +81,9 @@ export class ListarFeriadosComponent implements OnInit {
 
   expansion: boolean = false;
 
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
@@ -105,7 +99,6 @@ export class ListarFeriadosComponent implements OnInit {
     public ventana: MatDialog, // VARIABLE DE USO DE VENTANAS DE DIÁLOGO
     public validar: ValidacionesService,
     public parametro: ParametrosService,
-    public spinnerService: SpinnerService,
     private router: Router,
 
   ) {
@@ -113,6 +106,9 @@ export class ListarFeriadosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.BuscarParametro();
   }
@@ -271,15 +267,15 @@ export class ListarFeriadosComponent implements OnInit {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 8);
+    let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'feriados') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
         //this.Revisarplantilla_feriado_ciudad();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre Feriados', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
         this.nameFile = '';
@@ -306,8 +302,6 @@ export class ListarFeriadosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-
-    this.progreso = true;
 
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
@@ -342,9 +336,8 @@ export class ListarFeriadosComponent implements OnInit {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
-      this.progreso = false;
     }, () => {
-      this.progreso = false;
+
     });
   }
 
@@ -373,7 +366,9 @@ export class ListarFeriadosComponent implements OnInit {
     var data = {
       fecha: '',
       descripcion: '',
-      fec_recuperacion: ''
+      fec_recuperacion: '',
+      user_name: this.user_name,
+      ip: this.ip
     }
 
     if (this.listFeriadosCorrectos.length > 0) {
@@ -692,7 +687,7 @@ export class ListarFeriadosComponent implements OnInit {
     this.BuscarParametro();
   }
 
-  
+
   // METODOS PARA LA SELECCION MULTIPLE
 
   plan_multiple: boolean = false;
@@ -745,7 +740,11 @@ export class ListarFeriadosComponent implements OnInit {
 
 
   Eliminar(id_feriado: number) {
-    this.rest.EliminarFeriado(id_feriado).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarFeriado(id_feriado, datos).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('No se puede eliminar.', '', {
           timeOut: 6000,
@@ -777,18 +776,22 @@ export class ListarFeriadosComponent implements OnInit {
 
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   contador: number = 0;
   ingresar: boolean = false;
 
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ingresar = false;
     this.contador = 0;
     this.feriadosEliminar = this.selectionFeriados.selected;
     this.feriadosEliminar.forEach((datos: any) => {
       this.feriados = this.feriados.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.rest.EliminarFeriado(datos.id).subscribe(res => {
+      this.rest.EliminarFeriado(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
             timeOut: 6000,

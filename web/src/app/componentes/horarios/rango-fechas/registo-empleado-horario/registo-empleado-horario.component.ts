@@ -59,6 +59,10 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
   btn_guardar: boolean = true;
   btn_nuevo: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // INICIALIZACION DE CAMPOS DE FORMULARIOS
   fechaInicioF = new FormControl('', Validators.required);
   fechaFinalF = new FormControl('', [Validators.required]);
@@ -103,6 +107,9 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.BuscarHorarios();
     this.ObtenerEmpleado(this.data_horario.idEmpleado);
   }
@@ -172,7 +179,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     })
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   empleado: any = [];
   ObtenerEmpleado(idemploy: any) {
     this.empleado = [];
@@ -456,6 +463,13 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     // METODO PARA ELIMINAR HORARIOS DE DESCANSO
     let verificador = 0;
     this.eliminar_horarios = [];
+
+    let datos = {
+      id_plan: [],
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
     this.lista_descanso.forEach((obj: any) => {
       let data_eliminar = {
         id: obj.id_horario,
@@ -469,32 +483,37 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         fec_inicio: form.fechaInicioForm,
         id_horario: h.id,
       };
-      this.restP.BuscarFechas(plan_fecha).subscribe(res => {
+      this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
+        datos.id_plan = res;
         // METODO PARA ELIMINAR DE LA BASE DE DATOS
-        this.restP.EliminarRegistro(res).subscribe(datos => {
+        this.restP.EliminarRegistro(datos).subscribe(datos => {
           verificador = verificador + 1;
           if (verificador === this.eliminar_horarios.length) {
-            this.RegistrarPlanGeneral();
+            this.RegistrarPlanGeneral(datos);
           }
         }, error => {
           verificador = verificador + 1;
           if (verificador === this.eliminar_horarios.length) {
-            this.RegistrarPlanGeneral();
+            this.RegistrarPlanGeneral(datos);
           }
         })
       }, error => {
         verificador = verificador + 1;
         if (verificador === this.eliminar_horarios.length) {
-          this.RegistrarPlanGeneral();
+          this.RegistrarPlanGeneral(datos);
         }
       })
     })
   }
 
-  // METODO PARA REGISTRAR PLAN GENERAL 
-  RegistrarPlanGeneral() {
-    //---console.log('ingresa aqui ****')
-    this.restP.CrearPlanGeneral(this.plan_general).subscribe(res => {
+  // METODO PARA REGISTRAR PLAN GENERAL
+  RegistrarPlanGeneral(form: any) {
+    const datos = {
+      plan_general: this.plan_general,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+    this.restP.CrearPlanGeneral(datos).subscribe(res => {
       if (res.message === 'OK') {
         this.progreso = false;
         this.toastr.success('Operación exitosa.', 'Registro guardado.', {
@@ -572,7 +591,8 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     if (!obj_res) return this.toastr.warning('Horario no válido.');
     const { default_ } = obj_res;
     this.plan_general = [];
-    this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO 
+
+    this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
     this.inicioDate = moment(form.fechaInicioForm).format('YYYY-MM-DD');
     this.finDate = moment(form.fechaFinalForm).format('YYYY-MM-DD');
     // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIAS DEL PERIODO INDICADO
@@ -648,8 +668,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         origen = 'H' + default_;
       }
       else {
-        //---console.log('ingresa feriados ', this.feriados)
-        // BUSCAR FERIADOS 
+
         if (this.feriados.length != 0) {
           for (let i = 0; i < this.feriados.length; i++) {
             //---console.log('fecha feriados ', moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
@@ -800,6 +819,11 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     let fechas = 0;
     let verificador = 0;
     this.progreso = true;
+    let datos = {
+      id_plan: [],
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     this.existencias.forEach((he: any) => {
       if (he.default_ === 'N' || he.default_ === 'DHA' || he.default_ === 'L' || he.default_ === 'FD') {
         sumaN = sumaN + 1;
@@ -832,12 +856,13 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         fec_inicio: form.fechaInicioForm,
         id_horario: h.id,
       };
-      this.restP.BuscarFechas(plan_fecha).subscribe(res => {
-        //---console.log('ids ', res)
+      this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
+        //console.log('ids ', res)
         fechas = fechas + 1;
+        datos.id_plan = res;
         // METODO PARA ELIMINAR DE LA BASE DE DATOS
-        this.restP.EliminarRegistro(res).subscribe(datos => {
-          //---console.log('ver datos de eliminacion ', datos)
+        this.restP.EliminarRegistro(datos).subscribe(datos => {
+          //console.log('ver datos de eliminacion ', datos)
           verificador = verificador + 1;
           if (datos.message === 'OK') {
             eliminar = eliminar + 1;
@@ -946,8 +971,13 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
 
   // METODO PARA ELIMINAR HORARIOS PARA REGISTRAR LIBRES
   EliminarRegistrosH(existe: any, obj: any) {
-    existe.forEach((h: any) => {
-      //---console.log(' ver valor h ..... ', h)
+    let datos = {
+      id_plan: [],
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+    existe.forEach(h => {
+      //console.log(' ver valor h ..... ', h)
       if (h.default_ === 'N' || h.default_ === 'DHA' || h.default_ === 'L' || h.default_ === 'FD') {
         let plan_fecha = {
           codigo: this.data_horario.codigo,
@@ -955,10 +985,11 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
           fec_inicio: obj,
           id_horario: h.id_horario,
         };
-        //----console.log(' ingresa eliminar  ..... ', plan_fecha)
-        this.restP.BuscarFechas(plan_fecha).subscribe(res => {
+        //console.log(' ingresa eliminar  ..... ', plan_fecha)
+        this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
+          datos.id_plan = res;
           // METODO PARA ELIMINAR DE LA BASE DE DATOS
-          this.restP.EliminarRegistro(res).subscribe(datos => {
+          this.restP.EliminarRegistro(datos).subscribe(datos => {
           })
         })
       }

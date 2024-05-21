@@ -25,10 +25,14 @@ export class EmpleadoProcesosService {
     return this.http.put(`${environment.url}/empleadoProcesos`, datos);
   }
 
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/empleadoProcesos/eliminar/${id}`);
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${environment.url}/empleadoProcesos/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
-  
+
 
 }

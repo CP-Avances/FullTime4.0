@@ -47,7 +47,7 @@ export class ListarTipoComidasComponent implements OnInit {
     tipoForm: this.tipoF
   });
 
-  // ALMACENAMIENTO DE DATOS CONSULTADOS  
+  // ALMACENAMIENTO DE DATOS CONSULTADOS
   tipoComidas: any = [];
   empleado: any = [];
 
@@ -61,7 +61,11 @@ export class ListarTipoComidasComponent implements OnInit {
   numero_pagina: number = 1;
 
   // VARIABLE DE NAVEGACION ENTRE RUTAS
-  hipervinculo: string = environment.url
+  hipervinculo: string = environment.url;
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
@@ -96,6 +100,9 @@ export class ListarTipoComidasComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
+
       this.ObtenerEmpleados(this.idEmpleado);
       this.BuscarHora();
     }
@@ -103,7 +110,7 @@ export class ListarTipoComidasComponent implements OnInit {
 
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_hora: string = 'HH:mm:ss';
@@ -120,7 +127,7 @@ export class ListarTipoComidasComponent implements OnInit {
       });
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -197,9 +204,13 @@ export class ListarTipoComidasComponent implements OnInit {
     this.BuscarHora();
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_tipo: number) {
-    this.rest.EliminarRegistro(id_tipo).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistro(id_tipo, datos).subscribe((res: any) => {
 
       if (res.message === 'error') {
         this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
@@ -216,7 +227,7 @@ export class ListarTipoComidasComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -332,7 +343,7 @@ export class ListarTipoComidasComponent implements OnInit {
     };
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   ExportToExcel() {
@@ -360,7 +371,7 @@ export class ListarTipoComidasComponent implements OnInit {
     xlsx.writeFile(wb, "Comidas" + new Date().getTime() + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
    ** ************************************************************************************************** **/
   ExportToCVS() {

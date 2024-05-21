@@ -461,7 +461,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     VerDipositivoComponent,
     ProcesosEmpleadoComponent,
     AutorizaEmpleadoComponent,
-    ConfigurarCodigoComponent,
+    //ConfigurarCodigoComponent,
     EditarPermisoEmpleadoComponent,
     CancelarHoraExtraComponent,
     EditarHoraExtraEmpleadoComponent,

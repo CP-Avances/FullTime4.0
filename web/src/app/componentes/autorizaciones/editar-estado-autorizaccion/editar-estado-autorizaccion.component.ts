@@ -37,13 +37,17 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
   NotifiRes: any;
   FechaActual: any;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   public ArrayAutorizacionTipos: any = []
   public autorizacion: any []
   public lectura: any;
   public estado_auto: any;
   public empleado_estado: any = [];
   public listaEnvioCorreo: any = [];
-  
+
   constructor(
     public restA: AutorizacionService,
     private restP: PermisosService,
@@ -60,7 +64,9 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
   }
 
   ngOnInit(): void {
-   
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     if (this.data.permiso.estado === 1) {
       this.toastr.info('Solicitud pendiente de aprobación.', '', {
         timeOut: 6000,
@@ -80,7 +86,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
   ObtenerTiempo() {
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
-  }   
+  }
 
   /** ***************************************************************************************** **
    ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                          ** **
@@ -135,7 +141,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
       }
     );
 
-    
+
   }
 
   BuscarHora() {
@@ -171,10 +177,10 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
         this.BusquedayFiltroDepartamentos();
       }
     )
-  } 
+  }
 
   /** ************************************************************************************************************************************** **
-    ** **  BUSQUEDA DE LISTA DE LOS DEPARTAMENTOS CONFIGURADOS PARA REALIZAR LA APROBACION Y FILTRADO PARA TENER SOLO LOS DEPARTAMENTOS  ** ** 
+    ** **  BUSQUEDA DE LISTA DE LOS DEPARTAMENTOS CONFIGURADOS PARA REALIZAR LA APROBACION Y FILTRADO PARA TENER SOLO LOS DEPARTAMENTOS  ** **
   ** *************************************************************************************************************************************** **/
   FilDepartamentosAprueban: any = [];
   BusquedayFiltroDepartamentos(){
@@ -201,13 +207,15 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
     let aprobacion = {
       id_documento: this.data.auto.id_autoriza_estado + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     this.restA.ActualizarAprobacion(this.data.auto.id, aprobacion).subscribe(res => {
       this.EditarEstadoPermiso(this.data.auto.id_permiso, form.estadoF);
       this.NotificarAprobacion(form.estadoF);
     })
-    
+
   }
 
   // METODO DE ACTUALIZACION DE ESTADO DE PERMISO
@@ -215,6 +223,8 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
   EditarEstadoPermiso(id_permiso: number, estado_permiso: any) {
     let datosPermiso = {
       estado: estado_permiso,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restP.ActualizarEstado(id_permiso, datosPermiso).subscribe(res => {
     });
@@ -262,7 +272,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
     let solicitud = this.validar.FormatearFecha(permiso.fec_creacion, this.formato_fecha, this.validar.dia_completo);
     let desde = this.validar.FormatearFecha(permiso.fec_inicio, this.formato_fecha, this.validar.dia_completo);
     let hasta = this.validar.FormatearFecha(permiso.fec_final, this.formato_fecha, this.validar.dia_completo);
-    
+
     this.listaEnvioCorreo = [];
     this.id_departamento = this.solInfo.id_departamento;
     this.lectura = 1;
@@ -298,7 +308,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
               console.log('this.listaEnvioCorreo PRE: ',this.listaEnvioCorreo);
               this.EnviarNotificacion(permiso, this.listaEnvioCorreo, estado_p);
               this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
-              
+
             }else if(estado_p === 'Autorizado' || estado_p === 'Negado'){
               if(estado_p === 'Autorizado'){
                 this.listadoDepaAutoriza.forEach(item => {
@@ -312,11 +322,11 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
                 //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada antes
                 this.listaEnvioCorreo = this.listadoDepaAutoriza;
               }
-              
+
               console.log('this.listaEnvioCorreo AUTO - Nega: ',this.listaEnvioCorreo);
               this.EnviarNotificacion(permiso, this.listaEnvioCorreo, estado_p);
               this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
-              
+
             }
           }
         }else if(autorizaciones.length < 2){
@@ -326,17 +336,17 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
           }else{
             this.listadoDepaAutoriza.filter(item => {
               if(item.nivel < 3 ){
-                return this.listaEnvioCorreo.push(item);  
+                return this.listaEnvioCorreo.push(item);
               }
             });
           }
-          
+
           console.log('this.listaEnvioCorreo PEND: ',this.listaEnvioCorreo);
           this.EnviarNotificacion(permiso, this.listaEnvioCorreo, estado_p);
           this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
         }
       })
-    });   
+    });
 
   }
 
@@ -347,7 +357,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
     permiso.EmpleadosSendNotiEmail.push(this.solInfo);
     console.log('nueva lista C: ',permiso.EmpleadosSendNotiEmail);
 
-    
+
     // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
     permiso.EmpleadosSendNotiEmail.forEach(e => {
 
@@ -412,7 +422,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
         }
       }
     })
-    
+
   }
 
   EnviarNotificacion(permiso: any, listaEnvioCorreo: any, estado_p: string) {
@@ -447,6 +457,8 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
         this.solInfo.fullname + ' desde ' +
         desde + ' ' + h_inicio + ' hasta ' +
         hasta + ' ' + h_fin,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     //ForEach para enviar la notificacion a cada usuario dentro de la nueva lista filtrada

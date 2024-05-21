@@ -16,6 +16,10 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 
 export class EditarParametroComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   descripcion = new FormControl('', Validators.required);
 
@@ -33,6 +37,9 @@ export class EditarParametroComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.MostrarInformacion();
   }
 
@@ -47,7 +54,9 @@ export class EditarParametroComponent implements OnInit {
   GuardarDatos(form: any) {
     let datos = {
       id: this.data.parametros.id,
-      descripcion: form.descripcionForm
+      descripcion: form.descripcionForm,
+      user_name: this.user_name,
+      ip: this.ip
     };
     this.rest.ActualizarTipoParametro(datos).subscribe(response => {
       this.toastr.success('Registro actualizado exitosamente.',

@@ -9,6 +9,7 @@ import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCat
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { hora } from '../../../../../model/reportes.model';
 
 const OPTIONS_HORARIOS = [
   { orden: 1, accion: 'E', view_option: 'Entrada' },
@@ -63,6 +64,10 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
 
   acciones: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public ventana: MatDialogRef<EditarDetalleCatHorarioComponent>,
     public validar: ValidacionesService,
@@ -74,6 +79,9 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.VerEmpresa();
     this.ListarDetalles(this.data.detalle.id_horario);
     this.BuscarDatosHorario(this.data.detalle.id_horario);
@@ -193,9 +201,11 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
       id_horario: this.data.detalle.id_horario,
       orden: form.ordenForm,
       hora: form.horaForm,
-      min_antes: this.data.detalle.minutos_antes,
-      min_despues: this.data.detalle.minutos_despues,
-      id: this.data.detalle.id
+      min_antes: this.data.detalle.min_antes,
+      min_despues: this.data.detalle.min_despues,
+      id: this.data.detalle.id,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     if (this.acciones === true) {
       detalle.min_antes = parseInt(form.min_antesForm);
@@ -214,7 +224,13 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
   // METODO PARA ACTUALIZAR HORARIO
   EditarHorario() {
     let horasT = this.data.horario.hora_trabajo.split(':')[0] + ':' + this.data.horario.hora_trabajo.split(':')[1];
-    this.restH.ActualizarHorasTrabaja(this.data.horario.id, { hora_trabajo: horasT }).subscribe(res => {
+    const datos = {
+      hora_trabajo: horasT,
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.restH.ActualizarHorasTrabaja(this.data.horario.id, datos).subscribe(res => {
     }, err => {
       this.toastr.error(err.message)
     })
@@ -386,7 +402,7 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
-  // METODO PARA LIMPIAR FORMULARIO   
+  // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
     this.formulario.reset();
     this.segundoF.setValue(false);

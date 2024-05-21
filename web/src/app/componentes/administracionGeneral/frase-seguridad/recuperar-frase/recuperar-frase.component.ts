@@ -18,6 +18,10 @@ export class RecuperarFraseComponent implements OnInit {
 
   mensaje: any = [];
 
+   // VARIABLES PARA AUDITORIA
+   user_name: string | null;
+   ip: string | null;
+
   // CAMPOS DEL FORMULARIO
   NuevaFrase = new FormControl('', Validators.maxLength(100));
 
@@ -37,12 +41,16 @@ export class RecuperarFraseComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   IngresarFrase(form: any) {
     let data = {
       token: this.token,
-      frase: form.nFrase
+      frase: form.nFrase,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.rest.CambiarFrase(data).subscribe(res => {
       this.mensaje = res;

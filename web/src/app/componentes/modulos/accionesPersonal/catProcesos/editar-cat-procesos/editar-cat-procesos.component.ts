@@ -20,6 +20,10 @@ interface Nivel {
 
 export class EditarCatProcesosComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   procesoPadre = new FormControl('', Validators.required);
   nombre = new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z ]*')]);
@@ -57,6 +61,8 @@ export class EditarCatProcesosComponent implements OnInit {
   ngOnInit(): void {
     this.ObtenerProcesos();
     this.ImprimirDatos();
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   // METODO PARA MOSTRAR DATOS DEL REGISTRO
@@ -97,6 +103,8 @@ export class EditarCatProcesosComponent implements OnInit {
         id: this.data.datosP.id,
         nombre: form.procesoNombreForm,
         nivel: form.procesoNivelForm,
+        user_name: this.user_name,
+        ip: this.ip
       };
       this.ActualizarDatos(dataProceso);
       this.ObtenerProcesos();
@@ -107,7 +115,9 @@ export class EditarCatProcesosComponent implements OnInit {
           id: this.data.datosP.id,
           nombre: form.procesoNombreForm,
           nivel: form.procesoNivelForm,
-          proc_padre: procesoPadreId
+          proc_padre: procesoPadreId,
+          user_name: this.user_name,
+          ip: this.ip
         };
         this.ActualizarDatos(dataProceso);
         this.ObtenerProcesos();

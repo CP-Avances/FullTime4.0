@@ -40,6 +40,10 @@ export class ListarTipoAccionComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.minLength(2)]);
 
@@ -64,6 +68,9 @@ export class ListarTipoAccionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     if (this.habilitarAccion === false) {
       let mensaje = {
         access: false,
@@ -81,7 +88,7 @@ export class ListarTipoAccionComponent implements OnInit {
     }
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -97,7 +104,7 @@ export class ListarTipoAccionComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -125,7 +132,11 @@ export class ListarTipoAccionComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTROS
   Eliminar(id_accion: number) {
-    this.rest.EliminarRegistro(id_accion).subscribe(res => {
+    let datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistro(id_accion, datos).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
@@ -188,7 +199,7 @@ export class ListarTipoAccionComponent implements OnInit {
     this.accion_id = id;
   }
 
-  /****************************************************************************************************** 
+  /******************************************************************************************************
  *                                         METODO PARA EXPORTAR A PDF
  ******************************************************************************************************/
   generarPdf(action = 'open') {
@@ -284,7 +295,7 @@ export class ListarTipoAccionComponent implements OnInit {
     };
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   exportToExcel() {
@@ -294,7 +305,7 @@ export class ListarTipoAccionComponent implements OnInit {
     xlsx.writeFile(wb, "TipoAccionesPersonalEXCEL" + new Date().getTime() + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
    ** ************************************************************************************************** **/
 

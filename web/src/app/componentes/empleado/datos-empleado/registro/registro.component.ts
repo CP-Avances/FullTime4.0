@@ -14,6 +14,7 @@ import { Md5 } from 'ts-md5/dist/md5';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-registro',
@@ -47,6 +48,10 @@ export class RegistroComponent implements OnInit {
   NacionalidadControl = new FormControl('', Validators.required);
   filteredOptions: Observable<any[]>;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private rol: RolesService,
     private rest: EmpleadoService,
@@ -58,6 +63,9 @@ export class RegistroComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.CargarRoles();
     this.VerificarCodigo();
     this.AsignarFormulario();
@@ -133,9 +141,9 @@ export class RegistroComponent implements OnInit {
       }
       else {
         this.escritura = false;
-        
+
       }
-     
+
     }, error => {
       this.toastr.info('Configurar ingreso de código de usuarios.', '', {
         timeOut: 6000,
@@ -193,6 +201,8 @@ export class RegistroComponent implements OnInit {
       correo: form1.emailForm,
       codigo: form1.codigoForm,
       estado: 1,
+      user_name: this.user_name,
+      ip: this.ip
     };
 
     // CONTADOR 0 EL REGISTRO SE REALIZA UNA SOL VEZ, CONTADOR 1 SE DIO UN ERROR Y SE REALIZA NUEVAMENTE EL PROCESO
@@ -227,6 +237,8 @@ export class RegistroComponent implements OnInit {
       usuario: form3.userForm,
       id_rol: form3.rolForm,
       estado: true,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.user.RegistrarUsuario(dataUser).subscribe(data => {
       if (data.message === 'error') {
@@ -257,7 +269,9 @@ export class RegistroComponent implements OnInit {
     if (this.datosCodigo.automatico === true) {
       let dataCodigo = {
         valor: codigo,
-        id: 1
+        id: 1,
+        user_name: this.user_name,
+        ip: this.ip
       }
       this.rest.ActualizarCodigo(dataCodigo).subscribe(res => {
       })
@@ -276,7 +290,7 @@ export class RegistroComponent implements OnInit {
       return false;
     }
   }
-  
+
 
   // METODO DE VALIDACION DE INGRESO DE NUMEROS
   IngresarSoloNumeros(evt: any) {
@@ -312,21 +326,21 @@ export class RegistroComponent implements OnInit {
     }
 
     // this.LlenarCodigo(cedula,form1,tecla)
-    
+
   }
 
   LlenarCodigo(form1: any){
-   
+
     if (this.cedula) {
       let codigo:number = form1.cedulaForm;
 
         this.primeroFormGroup.patchValue({
-          codigoForm: codigo 
+          codigoForm: codigo
         })
-      
+
     }
   }
-  
+
 
   // METODO PARA LIMPIAR FORMULARIOS
   LimpiarCampos() {

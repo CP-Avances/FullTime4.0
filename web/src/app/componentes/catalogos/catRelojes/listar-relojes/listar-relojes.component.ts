@@ -69,6 +69,10 @@ export class ListarRelojesComponent implements OnInit {
 
   hipervinculo: string = environment.url;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restEmpre: EmpresaService,
     public ventana: MatDialog,
@@ -81,13 +85,16 @@ export class ListarRelojesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
     this.ObtenerReloj();
     this.ObtenerLogo();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -103,7 +110,7 @@ export class ListarRelojesComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -262,6 +269,8 @@ export class ListarRelojesComponent implements OnInit {
             this.archivoForm.reset();
             this.nameFile = '';
           } else {
+            formData.append('user_name', this.user_name as string);
+            formData.append('user_ip', this.ip as string);
             this.rest.subirArchivoExcel(formData).subscribe(datos_reloj => {
               this.toastr.success('Operación exitosa.', 'Plantilla de Relojes importada.', {
                 timeOut: 10000,
@@ -401,7 +410,7 @@ export class ListarRelojesComponent implements OnInit {
     xlsx.writeFile(wb, "RelojesEXCEL" + new Date().getTime() + '.xlsx');
   }
 
-  /** ********************************************************************************************** ** 
+  /** ********************************************************************************************** **
    ** **                              METODO PARA EXPORTAR A CSV                                  ** **
    ** ********************************************************************************************** **/
 
@@ -531,7 +540,11 @@ export class ListarRelojesComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   EliminarRelojes(id_reloj: number) {
-    this.rest.EliminarRegistro(id_reloj).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistro(id_reloj, datos).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('No se puede eliminar.', '', {
           timeOut: 6000,
@@ -567,14 +580,18 @@ export class ListarRelojesComponent implements OnInit {
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ingresar = false;
     this.contador = 0;
     this.dispositivosEliminar = this.selectionDispositivos.selected;
     this.dispositivosEliminar.forEach((datos: any) => {
       this.relojes = this.relojes.filter((item: any) => item.id !== datos.id);
-      //AQUI MODIFICAR EL METODO 
+      //AQUI MODIFICAR EL METODO
       this.contador = this.contador + 1;
-      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+      this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,

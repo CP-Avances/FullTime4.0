@@ -29,8 +29,12 @@ export class AccionPersonalService {
     return this.http.put(`${environment.url}/accionPersonal`, datos);
   }
 
-  EliminarRegistro(id: any) {
-    return this.http.delete(`${environment.url}/accionPersonal/eliminar/${id}`).pipe(catchError(id));
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${environment.url}/accionPersonal/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   BuscarDatosTipoEdicion(id: any) {

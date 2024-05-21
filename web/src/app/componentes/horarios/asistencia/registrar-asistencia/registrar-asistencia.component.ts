@@ -35,6 +35,11 @@ export class RegistrarAsistenciaComponent implements OnInit {
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
+
   constructor(
     public componneteb: BuscarAsistenciaComponent,
     public parametro: ParametrosService,
@@ -46,13 +51,15 @@ export class RegistrarAsistenciaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('ver seleccion ', this.informacion);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.BuscarFecha();
     this.BuscarHora();
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -145,9 +152,11 @@ export class RegistrarAsistenciaComponent implements OnInit {
     let datos = {
       id: this.informacion.detalle.id,
       codigo: this.informacion.detalle.codigo,
-      fecha: moment(seleccionado.fecha_hora_timbre_servidor).format('YYYY-MM-DD HH:mm:ss'),
-      accion: this.informacion.detalle.tipo_accion,
-      id_timbre: seleccionado.id
+      fecha: moment(seleccionado.fec_hora_timbre_servidor).format('YYYY-MM-DD HH:mm:ss'),
+      accion: this.informacion.detalle.tipo_entr_salida,
+      id_timbre: seleccionado.id,
+      user_name: this.user_name,
+      ip: this.ip
     }
     console.log('datos enviados ', datos)
     this.asistir.ActualizarAsistenciaManual(datos).subscribe(data => {

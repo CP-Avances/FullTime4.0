@@ -1,27 +1,49 @@
-import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import excel from 'xlsx';
 import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
 
+
 class DepartamentoControlador {
 
   // REGISTRAR DEPARTAMENTO
-  public async CrearDepartamento(req: Request, res: Response) {
+  public async CrearDepartamento(req: Request, res: Response): Promise<Response> {
     try {
-      const { nombre, id_sucursal } = req.body;
+      const { nombre, id_sucursal, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCIÓN
+      await pool.query('BEGIN');
+
       await pool.query(
         `
         INSERT INTO ed_departamentos (nombre, id_sucursal ) VALUES ($1, $2)
         `
         , [nombre, id_sucursal]);
+      
+      // INSERTAR AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_departamentos',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{Nombre: ${nombre}, Sucursal: ${id_sucursal}}`,
+        ip: ip,
+        observacion: null
+      });
 
-      res.jsonp({ message: 'Registro guardado.' });
+      // FINALIZAR TRANSACCIÓN
+      await pool.query('COMMIT');
+
+      return res.jsonp({ message: 'Registro guardado.' });
     }
     catch (error) {
-      return res.jsonp({ message: 'error' });
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -29,19 +51,58 @@ class DepartamentoControlador {
   // ACTUALIZAR REGISTRO DE DEPARTAMENTO   --**VERIFICADO
   public async ActualizarDepartamento(req: Request, res: Response) {
     try {
-      const { nombre, id_sucursal } = req.body;
+      const { nombre, id_sucursal, user_name, ip } = req.body;
       const id = req.params.id;
-      console.log(id);
+      
+      // INICIAR TRANSACCIÓN
+      await pool.query('BEGIN');
+
+      // OBTENER DATOS ANTES DE ACTUALIZAR
+      const response = await pool.query('SELECT * FROM ed_departamentos WHERE id = $1', [id]);
+      const datos = response.rows[0];
+
+      if (!datos) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'ed_departamentos',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          observacion: `Error al actualizar el departamento con ID: ${id}`,
+        });
+
+        // FINALIZAR TRANSACCIÓN
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
+      
       await pool.query(
         `
         UPDATE ed_departamentos set nombre = $1, id_sucursal = $2 
         WHERE id = $3
         `
         , [nombre, id_sucursal, id]);
-      res.jsonp({ message: 'Registro actualizado.' });
+      
+      // INSERTAR AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_departamentos',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datos),
+        datosNuevos: `{Nombre: ${nombre}, Sucursal: ${id_sucursal}}`,
+        ip: ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCIÓN
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro actualizado.' });
     }
     catch (error) {
-      return res.jsonp({ message: 'error' });
+      // REVERTIR TRANSACCIÓN
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -191,34 +252,69 @@ class DepartamentoControlador {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  public async EliminarRegistros(req: Request, res: Response) {
-
-
+  public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
-
       const id = req.params.id;
+      const { user_name, ip } = req.body;
+
+      // INICIAR TRANSACCIÓN
+      await pool.query('BEGIN');
+
+      // OBTENER DATOS ANTES DE ELIMINAR
+      const response = await pool.query('SELECT * FROM ed_departamentos WHERE id = $1', [id]);
+      const datos = response.rows[0];
+
+      if (!datos) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'ed_departamentos',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          observacion: `Error al eliminar el departamento con ID: ${id}. Registro no encontrado.`,
+        });
+
+        // FINALIZAR TRANSACCIÓN
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
+
       await pool.query(
         `
         DELETE FROM ed_departamentos WHERE id = $1
         `
         , [id]);
-      res.jsonp({ message: 'Registro eliminado.' });
+      
+      // INSERTAR AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ed_departamentos',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datos),
+        datosNuevos: '',
+        ip: ip,
+        observacion: null
+      });
 
-
+      // FINALIZAR TRANSACCIÓN
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
     } catch (error) {
-
-      return res.jsonp({ message: 'error' });
-
-
+      // REVERTIR TRANSACCIÓN
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
-
   }
 
   //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
   public async CrearNivelDepa(req: Request, res: Response): Promise<any> {
     try {
       const { id_departamento, departamento, nivel, dep_nivel, dep_nivel_nombre, id_establecimiento,
-        id_suc_dep_nivel } = req.body;
+        id_suc_dep_nivel, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCIÓN
+      await pool.query('BEGIN');
 
       await pool.query(
         `
@@ -228,11 +324,27 @@ class DepartamentoControlador {
         `
         , [departamento, id_departamento, nivel, dep_nivel_nombre, dep_nivel, id_establecimiento, id_suc_dep_nivel]);
 
-      res.jsonp({ message: 'Registro guardado.' });
+      // INSERTAR AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ed_niveles_departamento',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{Departamento: ${departamento}, Nivel: ${nivel}, Departamento Nivel: ${dep_nivel_nombre}}`,
+        ip: ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCIÓN
+      await pool.query('COMMIT');
+
+      return res.jsonp({ message: 'Registro guardado.' });
 
     }
     catch (error) {
-      return res.jsonp({ message: 'error' });
+      // REVERTIR TRANSACCIÓN
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -258,46 +370,144 @@ class DepartamentoControlador {
   // ACTUALIZAR REGISTRO DE NIVEL DE DEPARTAMENTO DE TABLA NIVEL_JERARQUICO   --**VERIFICADO
   public async ActualizarNivelDepa(req: Request, res: Response) {
     try {
-      const { nivel } = req.body;
+      const { nivel, user_name, ip } = req.body;
       const id = req.params.id;
+
+      // INICIAR TRANSACCIÓN
+      await pool.query('BEGIN');
+
+      // OBTENER DATOS ANTES DE ACTUALIZAR
+      const response = await pool.query('SELECT * FROM ed_niveles_departamento WHERE id = $1', [id]);
+      const datos = response.rows[0];
+
+      if (!datos) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'ed_niveles_departamento',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          observacion: `Error al actualizar el nivel de departamento con ID: ${id}, Registro no encontrado.`,
+        });
+
+        // FINALIZAR TRANSACCIÓN
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado' });
+      }
+
       await pool.query(
         `
         UPDATE ed_niveles_departamento set nivel = $1 
         WHERE id = $2
         `
         , [nivel, id]);
-      res.jsonp({ message: 'Registro actualizado.' });
+      
+      // INSERTAR AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ed_niveles_departamento',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datos),
+        datosNuevos: `{Nivel: ${nivel}}`,
+        ip: ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCIÓN
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro actualizado.' });
     }
     catch (error) {
-      return res.jsonp({ message: 'error' });
+      // REVERTIR TRANSACCIÓN
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
   // METODO PARA ELIMINAR REGISTRO DE NIVEL DE DEPARTAMENTO   --**VERIFICADO
-  public async EliminarRegistroNivelDepa(req: Request, res: Response) {
-
+  public async EliminarRegistroNivelDepa(req: Request, res: Response): Promise<Response> {
     try {
       const id = req.params.id;
+      const { user_name, ip } = req.body;
+
+      // INICIAR TRANSACCIÓN
+      await pool.query('BEGIN');
+
+      // OBTENER DATOS ANTES DE ELIMINAR
+      const response = await pool.query('SELECT * FROM ed_niveles_departamento WHERE id = $1', [id]);
+      const datos = response.rows[0];
+
+      if (!datos) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'ed_niveles_departamento',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          observacion: `Error al eliminar el nivel de departamento con ID: ${id}`,
+        });
+
+        // FINALIZAR TRANSACCIÓN
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
+
       await pool.query(
         `
         DELETE FROM ed_niveles_departamento WHERE id = $1
         `
         , [id]);
-      res.jsonp({ message: 'Registro eliminado.' });
 
+      // INSERTAR AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ed_niveles_departamento',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datos),
+        datosNuevos: '',
+        ip: ip,
+        observacion: null
+      });
 
+      // FINALIZAR TRANSACCIÓN
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
     } catch (error) {
-      return res.jsonp({ message: 'error' });
-
-
+      // REVERTIR TRANSACCIÓN
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
-
   }
 
   //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
   public async ActualizarNombreNivel(req: Request, res: Response): Promise<any> {
     try {
-      const { id_departamento, departamento } = req.body;
+      const { id_departamento, departamento, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCIÓN
+      await pool.query('BEGIN');
+
+      // OBTENER DATOS ANTES DE ACTUALIZAR
+      const response = await pool.query('SELECT * FROM nivel_jerarquicodep WHERE id_departamento = $1', [id_departamento]);
+      const [datos] = response.rows;
+
+      if (!datos) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'nivel_jerarquicodep',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          observacion: `Error al actualizar el nombre de nivel del departamento con ID: ${id_departamento}. Registro no encontrado.`,
+        });
+
+        // FINALIZAR TRANSACCIÓN
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado' });
+      }
 
       await pool.query(
         `
@@ -305,6 +515,17 @@ class DepartamentoControlador {
         WHERE id_departamento = $2
         `
         , [departamento, id_departamento]);
+      
+      // INSERTAR AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'nivel_jerarquicodep',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datos),
+        datosNuevos: `{departamento: ${departamento}}`,
+        ip: ip,
+        observacion: null
+      });
 
       await pool.query(
         `
@@ -313,11 +534,26 @@ class DepartamentoControlador {
         `
         , [departamento, id_departamento]);
 
-      res.jsonp({ message: 'Registro guardado.' });
+      // INSERTAR AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'nivel_jerarquicodep',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datos),
+        datosNuevos: `{dep_nivel_nombre: ${departamento}}`,
+        ip: ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCIÓN
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro guardado.' });
 
     }
     catch (error) {
-      return res.jsonp({ message: 'error' });
+      // REVERTIR TRANSACCIÓN
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -580,13 +816,6 @@ class DepartamentoControlador {
     res.status(404).jsonp({ text: 'Registro no encontrado' });
   }
 
-
-
-
-
-
-
-
   public async BuscarDepartamentoPorCargo(req: Request, res: Response) {
     const id = req.params.id_cargo
     const departamento = await pool.query(
@@ -603,10 +832,6 @@ class DepartamentoControlador {
       return res.status(404).json({ text: 'No se encuentran registros' });
     }
   }
-
-
-
-
 
   public async ListarDepartamentosRegimen(req: Request, res: Response) {
     const id = req.params.id;

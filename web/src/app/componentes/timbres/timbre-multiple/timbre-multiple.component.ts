@@ -98,6 +98,10 @@ export class TimbreMultipleComponent implements OnInit {
   tamanio_pagina_emp: number = 5;
   numero_pagina_emp: number = 1;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // FILTROS SUCURSALES
   filtroNombreSuc_: string = '';
   get filtroNombreSuc() { return this.restR.filtroNombreSuc }
@@ -141,6 +145,9 @@ export class TimbreMultipleComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'd' }, { opcion: 'c' }, { opcion: 'e' }]);
     this.PresentarInformacion();
   }
@@ -456,13 +463,13 @@ export class TimbreMultipleComponent implements OnInit {
    ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
    ** ************************************************************************************** **/
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
     const numSelected = this.selectionSuc.selected.length;
     return numSelected === this.sucursales.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
@@ -477,13 +484,13 @@ export class TimbreMultipleComponent implements OnInit {
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedReg() {
     const numSelected = this.selectionReg.selected.length;
     return numSelected === this.regimen.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleReg() {
     this.isAllSelectedReg() ?
       this.selectionReg.clear() :
@@ -498,13 +505,13 @@ export class TimbreMultipleComponent implements OnInit {
     return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedCarg() {
     const numSelected = this.selectionCarg.selected.length;
     return numSelected === this.cargos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleCarg() {
     this.isAllSelectedCarg() ?
       this.selectionCarg.clear() :
@@ -519,13 +526,13 @@ export class TimbreMultipleComponent implements OnInit {
     return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedDep() {
     const numSelected = this.selectionDep.selected.length;
     return numSelected === this.departamentos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
@@ -540,13 +547,13 @@ export class TimbreMultipleComponent implements OnInit {
     return `${this.selectionDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedEmp() {
     const numSelected = this.selectionEmp.selected.length;
     return numSelected === this.empleados.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
@@ -688,10 +695,10 @@ export class TimbreMultipleComponent implements OnInit {
   }
 
   /** ************************************************************************************** **
-   ** **                         METODOS DE REGISTRO DE TIMBRES                           ** ** 
+   ** **                         METODOS DE REGISTRO DE TIMBRES                           ** **
    ** ************************************************************************************** **/
 
-  // FUNCION PARA CONFIRMAR CREACION DE TIMBRE 
+  // FUNCION PARA CONFIRMAR CREACION DE TIMBRE
   ConfirmarTimbre(empleado: any) {
     this.restEmpresa.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string))
       .subscribe(datos => {
@@ -740,6 +747,8 @@ export class TimbreMultipleComponent implements OnInit {
       .afterClosed().subscribe(dataT => {
         if (dataT) {
           if (!dataT.close) {
+            dataT.append('user_name', this.user_name as string);
+            dataT.append('ip', this.ip as string);
             this.restTimbres.RegistrarTimbreAdmin(dataT).subscribe(res => {
               this.toastr.success(res.message)
             }, err => {

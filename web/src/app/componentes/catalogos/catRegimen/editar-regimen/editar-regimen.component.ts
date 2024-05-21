@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
 import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.component';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-editar-regimen',
@@ -17,6 +18,10 @@ import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.compone
 })
 
 export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterContentChecked {
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // CONTROL DE FORMULARIOS
   isLinear = true;
@@ -93,6 +98,9 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerPaises();
     this.ObtenerRegimen();
     this.ValidarFormulario();
@@ -373,7 +381,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
   }
 
   /** *********************************************************************************************** **
-   ** **                              TIEMPO LIMITE DE SERVICIOS                                   ** ** 
+   ** **                              TIEMPO LIMITE DE SERVICIOS                                   ** **
    ** *********************************************************************************************** **/
 
   // BOTON CERRAR REGISTRO DE TIEMPO MINIMO DE SERVICIO
@@ -412,7 +420,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
 
 
   /** *********************************************************************************************** **
-   ** **                          VALIDACIONES DE DIAS DE VACACIONES                               ** ** 
+   ** **                          VALIDACIONES DE DIAS DE VACACIONES                               ** **
    ** *********************************************************************************************** **/
 
   // BOTONES DE VALIDACION DE DIAS INGRESADOS
@@ -579,7 +587,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
 
 
   /** *********************************************************************************************** **
-   ** **                              ACUMULACION DE VACACIONES                                    ** ** 
+   ** **                              ACUMULACION DE VACACIONES                                    ** **
    ** *********************************************************************************************** **/
 
   // ACTIVAR ACUMULACION DE VACACIONES
@@ -597,7 +605,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
 
 
   /** *********************************************************************************************** **
-   ** **                               PERIODOS DE VACACIONES                                      ** ** 
+   ** **                               PERIODOS DE VACACIONES                                      ** **
    ** *********************************************************************************************** **/
 
   nuevo_periodo: boolean = false; // ------------------------ Booton crear registro periodo inactivo (false)
@@ -851,7 +859,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
 
 
   /** *********************************************************************************************** **
-   ** **                              ANTIGUEDAD DE VACACIONES                                     ** ** 
+   ** **                              ANTIGUEDAD DE VACACIONES                                     ** **
    ** *********************************************************************************************** **/
 
   // BOTONES DE ACTIVACION DE REGISTRO DE ANTIGUEDAD
@@ -862,7 +870,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
   validar_antiguo: boolean = false; // ----------------- Botones inactivos de validaciones (false)
   correcto_antiguo: boolean = false;
   escritura_antiguo: boolean = false;
-  // BOTON GUARDAR DE FROMULARIO ANTIGUEDAD 
+  // BOTON GUARDAR DE FROMULARIO ANTIGUEDAD
   activar_guardar: boolean = true; // ------------------ Boton inactivo (true)
 
   // METODO DE ACTIVACION DE REGISTRO DE ANTIGUEDDA
@@ -1323,7 +1331,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
 
 
   /** *********************************************************************************************** **
-   ** **                       INSERCION DE DATOS DE REGIMEN LABORAL                               ** ** 
+   ** **                       INSERCION DE DATOS DE REGIMEN LABORAL                               ** **
    ** *********************************************************************************************** **/
 
   // VERIFICAR NOMBRES DUPLICADOS
@@ -1409,6 +1417,8 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
         calendario_dias: form3.dias_CalendarioForm,
         laboral_dias: form3.dias_LaborableForm,
         meses_calculo: form3.meses_calculoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       };
 
       this.ValidarInformacion(form1, form2, form3, regimen);
@@ -1480,6 +1490,8 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
       id_regimen: regimen,
       descripcion: '',
       dias_vacacion: 0,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.GuardarBDDPeriodo(periodo, form2);
   }
@@ -1597,7 +1609,12 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
 
   // METODO PARA ELIMINAR DE BASE DE DATOS REGISTRO DE PERIODOS DE VACACIONES
   EliminarBDDPeriodo(id: number) {
-    this.rest.EliminarPeriodo(id).subscribe(registro => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
+    this.rest.EliminarPeriodo(id, datos).subscribe(registro => {
     }, error => {
       this.toastr.error('Ups!!! algo salio mal en periodo de vacaciones.', '', {
         timeOut: 6000,
@@ -1615,7 +1632,9 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
       anio_desde: 0,
       anio_hasta: 0,
       dias_antiguedad: 0,
-      id_regimen: regimen
+      id_regimen: regimen,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.RegistrarBDDAntiguedad(antiguedad, form3);
   }
@@ -1779,7 +1798,12 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
 
   // METODO PARA ELIMINAR DE BASE DE DATOS REGISTRO DE ANTIGUEDAD DE VACACIONES
   EliminarBDDAntiguedad(id: number) {
-    this.rest.EliminarAntiguedad(id).subscribe(registro => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
+    this.rest.EliminarAntiguedad(id, datos).subscribe(registro => {
     }, error => {
       this.toastr.error('Ups!!! algo salio mal en antiguedad de vacaciones.', '', {
         timeOut: 6000,

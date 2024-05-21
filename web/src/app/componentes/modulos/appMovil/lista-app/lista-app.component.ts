@@ -110,7 +110,7 @@ export class ListaAppComponent implements OnInit {
 
 
   /** ********************************************************************************************************************** **
-   ** **                         INICIALIZAR VARIABLES DE USUARIOS DESHABILITADOS TIMBRE WEB                              ** ** 
+   ** **                         INICIALIZAR VARIABLES DE USUARIOS DESHABILITADOS TIMBRE WEB                              ** **
    ** ********************************************************************************************************************** **/
 
   // CONTROL DE CRITERIOS DE BUSQUEDA
@@ -199,6 +199,10 @@ export class ListaAppComponent implements OnInit {
   individual: boolean = true;
   individual_dh: boolean = true;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   get habilitarMovil(): boolean { return this.funciones.app_movil; }
 
   constructor(
@@ -223,6 +227,8 @@ export class ListaAppComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
       this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
       this.check_dh = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);;
       this.PresentarInformacion();
@@ -706,13 +712,13 @@ export class ListaAppComponent implements OnInit {
    ** **            METODOS DE SELECCION DE DATOS DE USUARIOS DESHABILITADOS              ** **
    ** ************************************************************************************** **/
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc_DH() {
     const numSelected = this.selectionSuc_dh.selected.length;
     return numSelected === this.sucursales_dh.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleSuc_DH() {
     this.isAllSelectedSuc_DH() ?
       this.selectionSuc_dh.clear() :
@@ -727,13 +733,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionSuc_dh.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedReg_DH() {
     const numSelected = this.selectionReg_dh.selected.length;
     return numSelected === this.regimen_dh.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleReg_DH() {
     this.isAllSelectedReg_DH() ?
       this.selectionReg_dh.clear() :
@@ -748,13 +754,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionReg_dh.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedCarg_DH() {
     const numSelected = this.selectionCarg_dh.selected.length;
     return numSelected === this.cargos_dh.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleCarg_DH() {
     this.isAllSelectedCarg_DH() ?
       this.selectionCarg_dh.clear() :
@@ -769,13 +775,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionCarg_dh.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedDep_DH() {
     const numSelected = this.selectionDep_dh.selected.length;
     return numSelected === this.departamentos_dh.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDep_DH() {
     this.isAllSelectedDep_DH() ?
       this.selectionDep_dh.clear() :
@@ -790,13 +796,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionDep_dh.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedEmp_DH() {
     const numSelected = this.selectionEmp_dh.selected.length;
     return numSelected === this.empleados_dh.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleEmp_DH() {
     this.isAllSelectedEmp_DH() ?
       this.selectionEmp_dh.clear() :
@@ -951,13 +957,13 @@ export class ListaAppComponent implements OnInit {
    ** **            METODOS DE SELECCION DE DATOS DE USUARIOS HABILITADOS                 ** **
    ** ************************************************************************************** **/
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
     const numSelected = this.selectionSuc.selected.length;
     return numSelected === this.sucursales.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
@@ -972,13 +978,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedReg() {
     const numSelected = this.selectionReg.selected.length;
     return numSelected === this.regimen.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleReg() {
     this.isAllSelectedReg() ?
       this.selectionReg.clear() :
@@ -993,13 +999,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedCarg() {
     const numSelected = this.selectionCarg.selected.length;
     return numSelected === this.cargos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleCarg() {
     this.isAllSelectedCarg() ?
       this.selectionCarg.clear() :
@@ -1014,13 +1020,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedDep() {
     const numSelected = this.selectionDep.selected.length;
     return numSelected === this.departamentos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
@@ -1035,13 +1041,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedEmp() {
     const numSelected = this.selectionEmp.selected.length;
     return numSelected === this.empleados.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
@@ -1183,7 +1189,7 @@ export class ListaAppComponent implements OnInit {
 
 
   /** ************************************************************************************** **
-   ** **               METODOS DE ACTUALIZACION DE ESTADO DE TIMBRE WEB                   ** ** 
+   ** **               METODOS DE ACTUALIZACION DE ESTADO DE TIMBRE WEB                   ** **
    ** ************************************************************************************** **/
 
   RegistrarConfiguracion(usuario: any, tipo: number) {
@@ -1208,7 +1214,14 @@ export class ListaAppComponent implements OnInit {
     if (seleccionados.length === undefined) {
       seleccionados = [seleccionados];
     }
-    this.informacion.ActualizarEstadoTimbreMovil(seleccionados).subscribe(res => {
+
+    const datos = {
+      array: seleccionados,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
+    this.informacion.ActualizarEstadoTimbreMovil(datos).subscribe(res => {
       this.toastr.success(res.message)
       this.individual = true;
       this.individual_dh = true;
