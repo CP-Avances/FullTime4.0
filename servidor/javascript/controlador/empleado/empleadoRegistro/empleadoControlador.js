@@ -671,7 +671,6 @@ class EmpleadoControlador {
                 fec_nacimiento: '',
                 latitud: '',
                 longitud: '',
-                mail_alternativo: '',
                 domicilio: '',
                 telefono: '',
                 nacionalidad: '',
@@ -687,13 +686,13 @@ class EmpleadoControlador {
             var mensaje = 'correcto';
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
                 // Datos que se leen de la plantilla ingresada
-                var { item, cedula, apellido, nombre, estado_civil, genero, correo, fec_nacimiento, latitud, longitud, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, rol } = dato;
+                var { item, cedula, apellido, nombre, estado_civil, genero, correo, fec_nacimiento, latitud, longitud, domicilio, telefono, nacionalidad, usuario, contrasena, rol } = dato;
                 //Verificar que el registo no tenga datos vacios
                 if ((item != undefined && item != '') &&
                     (cedula != undefined) && (apellido != undefined) &&
                     (nombre != undefined) && (estado_civil != undefined) &&
                     (genero != undefined) && (correo != undefined) &&
-                    (fec_nacimiento != undefined) && (mail_alternativo != undefined) &&
+                    (fec_nacimiento != undefined) &&
                     (latitud != undefined) && (longitud != undefined) &&
                     (domicilio != undefined) && (telefono != undefined) &&
                     (nacionalidad != undefined) && (usuario != undefined) &&
@@ -711,7 +710,6 @@ class EmpleadoControlador {
                     data.fec_nacimiento = fec_nacimiento;
                     data.latitud = latitud;
                     data.longitud = longitud;
-                    data.mail_alternativo = mail_alternativo;
                     data.domicilio = domicilio;
                     data.telefono = telefono;
                     data.nacionalidad = nacionalidad;
@@ -778,7 +776,6 @@ class EmpleadoControlador {
                     data.fec_nacimiento = fec_nacimiento;
                     data.latitud = latitud;
                     data.longitud = longitud;
-                    data.mail_alternativo = mail_alternativo;
                     data.domicilio = domicilio;
                     data.telefono = telefono;
                     data.nacionalidad = nacionalidad;
@@ -816,9 +813,6 @@ class EmpleadoControlador {
                     }
                     if (longitud == undefined) {
                         data.longitud = 'No registrado';
-                    }
-                    if (mail_alternativo == undefined) {
-                        data.mail_alternativo = 'No registrado';
                     }
                     if (domicilio == undefined) {
                         data.domicilio = 'No registrado';
@@ -1185,7 +1179,6 @@ class EmpleadoControlador {
                 fec_nacimiento: '',
                 latitud: '',
                 longitud: '',
-                mail_alternativo: '',
                 domicilio: '',
                 telefono: '',
                 nacionalidad: '',
@@ -1202,13 +1195,13 @@ class EmpleadoControlador {
             var mensaje = 'correcto';
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
                 // Datos que se leen de la plantilla ingresada
-                var { item, cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, latitud, longitud, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
+                var { item, cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, latitud, longitud, domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
                 //Verificar que el registo no tenga datos vacios
                 if ((item != undefined && item != '') &&
                     (cedula != undefined) && (apellido != undefined) &&
                     (nombre != undefined) && (codigo != undefined) && (estado_civil != undefined) &&
                     (genero != undefined) && (correo != undefined) &&
-                    (fec_nacimiento != undefined) && (mail_alternativo != undefined) &&
+                    (fec_nacimiento != undefined) &&
                     (latitud != undefined) && (longitud != undefined) &&
                     (domicilio != undefined) && (telefono != undefined) &&
                     (nacionalidad != undefined) && (usuario != undefined) &&
@@ -1227,7 +1220,6 @@ class EmpleadoControlador {
                     data.fec_nacimiento = fec_nacimiento;
                     data.latitud = latitud;
                     data.longitud = longitud;
-                    data.mail_alternativo = mail_alternativo;
                     data.domicilio = domicilio;
                     data.telefono = telefono;
                     data.nacionalidad = nacionalidad;
@@ -1301,7 +1293,6 @@ class EmpleadoControlador {
                     data.fec_nacimiento = fec_nacimiento;
                     data.latitud = latitud;
                     data.longitud = longitud;
-                    data.mail_alternativo = mail_alternativo;
                     data.domicilio = domicilio;
                     data.telefono = telefono;
                     data.nacionalidad = nacionalidad;
@@ -1343,9 +1334,6 @@ class EmpleadoControlador {
                     }
                     if (longitud == undefined) {
                         data.longitud = 'No registrado';
-                    }
-                    if (mail_alternativo == undefined) {
-                        data.mail_alternativo = 'No registrado';
                     }
                     if (domicilio == undefined) {
                         data.domicilio = 'No registrado';

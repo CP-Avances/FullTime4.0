@@ -106,17 +106,17 @@ export class HoraExtraRealComponent implements OnInit {
     })
   }
 
-    // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
-    p_color: any;
-    s_color: any;
-    frase: any;
-    ObtenerColores() {
-      this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-        this.p_color = res[0].color_principal;
-        this.s_color = res[0].color_secundario;
-        this.frase = res[0].marca_agua;
-      });
-    }
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  p_color: any;
+  s_color: any;
+  frase: any;
+  ObtenerColores() {
+    this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
+      this.frase = res[0].marca_agua;
+    });
+  }
 
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
@@ -137,7 +137,7 @@ export class HoraExtraRealComponent implements OnInit {
 
   CalcularEmpleado(id_seleccionado, form) {
     if (form.inicioForm === '' || form.finalForm === '') {
-      this.toastr.info('Ingresar fechas de periodo de búsqueda','', {
+      this.toastr.info('Ingresar fechas de periodo de búsqueda', '', {
         timeOut: 6000,
       })
     }
@@ -168,7 +168,7 @@ export class HoraExtraRealComponent implements OnInit {
 
   CalcularTodos(form: any) {
     if (form.inicioForm === '' || form.finalForm === '') {
-      this.toastr.info('Ingresar fechas de Inicio o Fin de periodo de búsqueda.','', {
+      this.toastr.info('Ingresar fechas de Inicio o Fin de periodo de búsqueda.', '', {
         timeOut: 6000,
       })
     }
@@ -370,7 +370,7 @@ export class HoraExtraRealComponent implements OnInit {
         } else if (f.getMonth() >= 10 && f.getDate() < 10) {
           fecha = f.getFullYear() + "-" + [f.getMonth() + 1] + "-0" + f.getDate();
         }
-         // Formato de hora actual
+        // Formato de hora actual
         if (f.getMinutes() < 10) {
           var time = f.getHours() + ':0' + f.getMinutes();
         }
@@ -618,7 +618,7 @@ export class HoraExtraRealComponent implements OnInit {
         } else if (f.getMonth() >= 10 && f.getDate() < 10) {
           fecha = f.getFullYear() + "-" + [f.getMonth() + 1] + "-0" + f.getDate();
         }
-         // Formato de hora actual
+        // Formato de hora actual
         if (f.getMinutes() < 10) {
           var time = f.getHours() + ':0' + f.getMinutes();
         }
@@ -692,7 +692,7 @@ export class HoraExtraRealComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: [30, 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: [30, 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
             body: [
               [
                 { text: 'Id', style: 'tableHeader' },
@@ -701,7 +701,6 @@ export class HoraExtraRealComponent implements OnInit {
                 { text: 'Cedula', style: 'tableHeader' },
                 { text: 'Fecha Nacimiento', style: 'tableHeader' },
                 { text: 'Correo', style: 'tableHeader' },
-                { text: 'Correo Alternativo', style: 'tableHeader' },
                 { text: 'Género', style: 'tableHeader' },
                 { text: 'Estado Civil', style: 'tableHeader' },
                 { text: 'Domicilio', style: 'tableHeader' },
