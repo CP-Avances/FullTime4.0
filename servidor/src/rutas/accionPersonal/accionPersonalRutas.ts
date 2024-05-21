@@ -22,7 +22,7 @@ class DepartamentoRutas {
         /** TABLA TIPO_ACCION */
         this.router.get('/accion/tipo', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarTipoAccion);
         this.router.post('/accion/tipo', TokenValidation, ACCION_PERSONAL_CONTROLADOR.CrearTipoAccion);
-        this.router.get('/ultimo/accion/tipo', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarUltimoTipoAccion);
+        
 
         /** TABLA CARGO_PROPUESTO */
         this.router.get('/cargo', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarCargoPropuestos);

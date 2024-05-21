@@ -111,11 +111,6 @@ class DepartamentoRutas {
         // BUSCAR MODALIDAD LABORAL POR SU NOMBRE
         this.router.post('/modalidad/trabajo/nombre', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.BuscarModalidadLaboralNombre);
 
-
-        this.router.get('/', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.ListarContratos);
-        this.router.get('/:id/get', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.ObtenerUnContrato);
-        this.router.get('/:id_empleado', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarIdContrato);
-
         this.router.post('/buscarFecha/contrato', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarFechaContratoId);
 
 

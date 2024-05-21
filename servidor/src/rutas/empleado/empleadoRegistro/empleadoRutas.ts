@@ -149,26 +149,9 @@ class EmpleadoRutas {
 
         // METODO PARA CONSULTAR COORDENADAS DEL DOMICILIO DEL USUARIO
         this.router.get('/ubicacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.BuscarCoordenadas);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         this.router.post('/buscar/informacion', TokenValidation, EMPLEADO_CONTROLADOR.BuscarEmpleadoNombre);
 
-
         // INFORMACIÓN TÍTULO PROFESIONALES
-
-
         this.router.post('/buscarDepartamento', TokenValidation, EMPLEADO_CONTROLADOR.ObtenerDepartamentoEmpleado);
 
         // INFORMACIÓN DE LA IMAGEN
@@ -176,8 +159,7 @@ class EmpleadoRutas {
 
         // INFORMACIÓN DE LA IMAGEN
         this.router.get('/img/codificado/:id/:imagen', EMPLEADO_CONTROLADOR.getImagenBase64);
-
-
+        
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMÁTICA 
         this.router.post('/verificar/automatico/plantillaExcel/', [TokenValidation, upload_plantilla.single('uploads')], EMPLEADO_CONTROLADOR.VerificarPlantilla_Automatica);
         //this.router.post('/verificar/datos/automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosAutomatico);

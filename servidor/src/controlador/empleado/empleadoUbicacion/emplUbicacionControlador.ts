@@ -87,20 +87,6 @@ class UbicacionControlador {
         }
     }
 
-    // BUSCAR ÚLTIMO REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
-    public async BuscarUltimoRegistro(req: Request, res: Response) {
-        const UBICACIONES = await pool.query(
-            `
-            SELECT MAX(id) AS id FROM mg_cat_ubicaciones
-            `
-        );
-        if (UBICACIONES.rowCount > 0) {
-            return res.jsonp(UBICACIONES.rows)
-        }
-        else {
-            res.status(404).jsonp({ text: 'Registro no encontrado.' });
-        }
-    }
 
     // ELIMINAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
     public async EliminarCoordenadas(req: Request, res: Response): Promise<void> {

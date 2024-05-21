@@ -51,11 +51,4 @@ export class ParametrosService {
     return this.http.post<any>(`${environment.url}/parametrizacion/coordenadas`, data);;
   }
 
-
-  CrearXML(data: any) {
-    return this.http.post(`${environment.url}/parametrizacion/xmlDownload`, data);
-  }
-
-
-
 }

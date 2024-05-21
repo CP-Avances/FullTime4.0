@@ -87,64 +87,11 @@ export class EmpresaService {
   ActualizarAccionesTimbres(formData: any) {
     return this.http.put<any>(`${environment.url}/empresas/acciones-timbre`, formData);
   }
-
-
-
-
-
-
-
   
-
   //Empresas
 
   ConsultarEmpresas() {
     return this.http.get(`${environment.url}/empresas`);
   }
-
-  IngresarEmpresas(datos: any) {
-    return this.http.post(`${environment.url}/empresas`, datos);
-  }
-
-
-
-  ConsultarUnaEmpresa(nombre: string) {
-    return this.http.get(`${environment.url}/empresas/buscar/${nombre}`);
-  }
-
-  CrearXML(data: any) {
-    return this.http.post(`${environment.url}/empresas/xmlDownload`, data);
-  }
-
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/empresas/eliminar/${id}`);
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

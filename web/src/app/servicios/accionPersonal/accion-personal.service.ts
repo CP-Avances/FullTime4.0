@@ -46,10 +46,6 @@ export class AccionPersonalService {
     return this.http.post<any>(`${environment.url}/accionPersonal/accion/tipo`, datos);
   }
 
-  BuscarIdTipoAccion() {
-    return this.http.get(`${environment.url}/accionPersonal/ultimo/accion/tipo`);
-  }
-
   /** SERVICIOS PARA TABLA CARGO_PROPUESTO*/
   ConsultarCargoPropuesto() {
     return this.http.get(`${environment.url}/accionPersonal/cargo`);

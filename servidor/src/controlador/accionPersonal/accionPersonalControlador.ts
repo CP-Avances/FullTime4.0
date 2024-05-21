@@ -60,19 +60,7 @@ class AccionPersonalControlador {
         }
     }
 
-    public async EncontrarUltimoTipoAccion(req: Request, res: Response) {
-        const ACCION = await pool.query(
-            `
-            SELECT MAX(id) AS id FROM map_tipo_accion_personal
-            `
-        );
-        if (ACCION.rowCount > 0) {
-            return res.jsonp(ACCION.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
+    
 
     // TABLA CARGO_PROPUESTO
     public async ListarCargoPropuestos(req: Request, res: Response) {

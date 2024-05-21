@@ -22,7 +22,6 @@ class DepartamentoRutas {
         /** TABLA TIPO_ACCION */
         this.router.get('/accion/tipo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarTipoAccion);
         this.router.post('/accion/tipo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.CrearTipoAccion);
-        this.router.get('/ultimo/accion/tipo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarUltimoTipoAccion);
         /** TABLA CARGO_PROPUESTO */
         this.router.get('/cargo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarCargoPropuestos);
         this.router.post('/cargo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.CrearCargoPropuesto);

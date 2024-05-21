@@ -60,19 +60,6 @@ class AccionPersonalControlador {
             }
         });
     }
-    EncontrarUltimoTipoAccion(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const ACCION = yield database_1.default.query(`
-            SELECT MAX(id) AS id FROM map_tipo_accion_personal
-            `);
-            if (ACCION.rowCount > 0) {
-                return res.jsonp(ACCION.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
     // TABLA CARGO_PROPUESTO
     ListarCargoPropuestos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

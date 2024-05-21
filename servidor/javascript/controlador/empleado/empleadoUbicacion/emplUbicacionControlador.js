@@ -90,20 +90,6 @@ class UbicacionControlador {
             }
         });
     }
-    // BUSCAR ÚLTIMO REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
-    BuscarUltimoRegistro(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const UBICACIONES = yield database_1.default.query(`
-            SELECT MAX(id) AS id FROM mg_cat_ubicaciones
-            `);
-            if (UBICACIONES.rowCount > 0) {
-                return res.jsonp(UBICACIONES.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
     // ELIMINAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
     EliminarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
