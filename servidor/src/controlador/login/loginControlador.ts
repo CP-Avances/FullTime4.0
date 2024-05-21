@@ -37,6 +37,7 @@ class LoginControlador {
     try {
 
       const { nombre_usuario, pass } = req.body;
+      console.log('usuario: ', nombre_usuario, ' pass: ', pass)
 
       // BUSQUEDA DE USUARIO
       const USUARIO = await pool.query(

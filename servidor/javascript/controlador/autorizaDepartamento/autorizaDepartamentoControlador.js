@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AUTORIZA_DEPARTAMENTO_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 class AutorizaDepartamentoControlador {
     // METODO PARA BUSCAR USUARIO AUTORIZA
     EncontrarAutorizacionEmple(req, res) {
@@ -64,35 +65,132 @@ class AutorizaDepartamentoControlador {
     // METODO PARA REGISTRAR AUTORIZACION
     CrearAutorizaDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar } = req.body;
-            yield database_1.default.query(`
-            INSERT INTO ed_autoriza_departamento (id_departamento, id_empleado_cargo, estado, id_empleado, autorizar, 
-                preautorizar)
-            VALUES ($1, $2, $3, $4, $5, $6)
-            `, [id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar]);
-            res.jsonp({ message: 'Registro guardado.' });
+            try {
+                const { id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query(`
+                INSERT INTO ed_autoriza_departamento (id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar)
+                VALUES ($1, $2, $3, $4, $5, $6)
+                `, [id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar]);
+                // INSERTAR REGISTRO DE AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ed_autoriza_departamento',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{id_departamento: ${id_departamento}, id_empl_cargo: ${id_empl_cargo}, estado: ${estado}, id_empleado: ${id_empleado}, autorizar: ${autorizar}, preautorizar: ${preautorizar}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // CANCELAR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al guardar registro.' });
+            }
         });
     }
     // METODO PARA ACTUALIZAR REGISTRO
     ActualizarAutorizaDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_departamento, id_empl_cargo, estado, id, autorizar, preautorizar } = req.body;
-            yield database_1.default.query(`
-            UPDATE ed_autoriza_departamento SET id_departamento = $1, id_empleado_cargo = $2, estado = $3, autorizar = $5, 
-                preautorizar = $6
-            WHERE id = $4
-            `, [id_departamento, id_empl_cargo, estado, id, autorizar, preautorizar]);
-            res.jsonp({ message: 'Registro actualizado.' });
+            try {
+                const { id_departamento, id_empl_cargo, estado, id, autorizar, preautorizar, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOS ANTES DE ACTUALIZAR
+                const response = yield database_1.default.query('SELECT * FROM ed_autoriza_departamento WHERE id = $1', [id]);
+                const [datos] = response.rows;
+                if (!datos) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ed_autoriza_departamento',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar registro con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+                UPDATE ed_autoriza_departamento SET id_departamento = $1, id_empleado_cargo = $2, estado = $3, autorizar = $5, 
+                    preautorizar = $6
+                WHERE id = $4
+                `, [id_departamento, id_empl_cargo, estado, id, autorizar, preautorizar]);
+                // INSERTAR REGISTRO DE AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ed_autoriza_departamento',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: `{id_departamento: ${id_departamento}, id_empl_cargo: ${id_empl_cargo}, estado: ${estado}, autorizar: ${autorizar}, preautorizar: ${preautorizar}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                // CANCELAR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar registro.' });
+            }
         });
     }
     // METODO PARA ELIMINAR REGISTROS
     EliminarAutorizacionDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-            DELETE FROM ed_autoriza_departamento WHERE id = $1
-            `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                const id = req.params.id;
+                const { user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOS ANTES DE ELIMINAR
+                const response = yield database_1.default.query('SELECT * FROM ed_autoriza_departamento WHERE id = $1', [id]);
+                const [datos] = response.rows;
+                if (!datos) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ed_autoriza_departamento',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar registro con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+                DELETE FROM ed_autoriza_departamento WHERE id = $1
+                `, [id]);
+                // INSERTAR REGISTRO DE AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ed_autoriza_departamento',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // CANCELAR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
+            }
         });
     }
     ListarAutorizaDepartamento(req, res) {

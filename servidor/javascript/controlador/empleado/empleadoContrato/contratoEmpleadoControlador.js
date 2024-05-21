@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
+const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const moment_1 = __importDefault(require("moment"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../../database"));
@@ -23,19 +24,40 @@ class ContratoEmpleadoControlador {
     // REGISTRAR CONTRATOS
     CrearContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen, id_tipo_contrato } = req.body;
-            const response = yield database_1.default.query(`
-            INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
-            controlar_asistencia, id_regimen, id_modalidad_laboral) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-            `, [id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
-                id_tipo_contrato]);
-            const [contrato] = response.rows;
-            if (contrato) {
-                return res.status(200).jsonp(contrato);
+            try {
+                const { id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen, id_tipo_contrato, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query(`
+                INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
+                controlar_asistencia, id_regimen, id_modalidad_laboral) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+                `, [id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
+                    id_tipo_contrato]);
+                const [contrato] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_contratos',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{id_empleado: ${id_empleado}, fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (contrato) {
+                    return res.status(200).jsonp(contrato);
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
             }
-            else {
-                return res.status(404).jsonp({ message: 'error' });
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al guardar el registro.' });
             }
         });
     }
@@ -43,21 +65,58 @@ class ContratoEmpleadoControlador {
     GuardarDocumentoContrato(req, res) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            // FECHA DEL SISTEMA
-            var fecha = (0, moment_1.default)();
-            var anio = fecha.format('YYYY');
-            var mes = fecha.format('MM');
-            var dia = fecha.format('DD');
-            let id = req.params.id;
-            const response = yield database_1.default.query(`
-            SELECT codigo FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
-            `, [id]);
-            const [empleado] = response.rows;
-            let documento = empleado.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
-            yield database_1.default.query(`
-            UPDATE eu_empleado_contratos SET documento = $2 WHERE id = $1
-            `, [id, documento]);
-            res.jsonp({ message: 'Documento actualizado.' });
+            try {
+                // FECHA DEL SISTEMA
+                var fecha = (0, moment_1.default)();
+                var anio = fecha.format('YYYY');
+                var mes = fecha.format('MM');
+                var dia = fecha.format('DD');
+                const { user_name, ip } = req.body;
+                let id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query(`
+                SELECT codigo FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+                `, [id]);
+                const [empleado] = response.rows;
+                let documento = empleado.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
+                if (!empleado) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_contratos',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el documento del contrato con id ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al guardar el documento.' });
+                }
+                yield database_1.default.query(`
+                UPDATE eu_empleado_contratos SET documento = $2 WHERE id = $1
+                `, [id, documento]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_contratos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(empleado),
+                    datosNuevos: `{documento: ${documento}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Documento actualizado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al guardar el documento.' });
+            }
         });
     }
     // METODO PARA VER DOCUMENTO
@@ -96,39 +155,117 @@ class ContratoEmpleadoControlador {
     // EDITAR DATOS DE CONTRATO
     EditarContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const { fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen, id_tipo_contrato } = req.body;
-            yield database_1.default.query(`
-            UPDATE eu_empleado_contratos SET fecha_ingreso = $1, fecha_salida = $2, controlar_vacacion = $3,
-            controlar_asistencia = $4, id_regimen = $5, id_modalidad_laboral = $6 
-            WHERE id = $7
-            `, [fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
-                id_tipo_contrato, id]);
-            res.jsonp({ message: 'Registro actualizado exitosamente.' });
+            try {
+                const { id } = req.params;
+                const { fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen, id_tipo_contrato, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOS ORIGINALES
+                const contrato = yield database_1.default.query('SELECT * FROM eu_empleado_contratos WHERE id = $1', [id]);
+                const [datosOriginales] = contrato.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_contratos',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el contrato con id ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+                }
+                yield database_1.default.query(`
+                UPDATE eu_empleado_contratos SET fecha_ingreso = $1, fecha_salida = $2, controlar_vacacion = $3,
+                controlar_asistencia = $4, id_regimen = $5, id_modalidad_laboral = $6 
+                WHERE id = $7
+                `, [fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
+                    id_tipo_contrato, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_contratos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado exitosamente.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+            }
         });
     }
     // ELIMINAR DOCUMENTO CONTRATO BASE DE DATOS - SERVIDOR
     EliminarDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let { documento, id } = req.body;
-            let separador = path_1.default.sep;
-            const response = yield database_1.default.query(`
-            UPDATE eu_empleado_contratos SET documento = null WHERE id = $1 RETURNING *
-            `, [id]);
-            const [contrato] = response.rows;
-            if (documento != 'null' && documento != '' && documento != null) {
-                let ruta = (yield (0, accesoCarpetas_2.ObtenerRutaContrato)(contrato.id_empleado)) + separador + documento;
-                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                    if (err) {
-                    }
-                    else {
-                        // ELIMINAR DEL SERVIDOR
-                        fs_1.default.unlinkSync(ruta);
-                    }
+            try {
+                let { documento, id, user_name, ip } = req.body;
+                let separador = path_1.default.sep;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOS ORIGINALES
+                const contratoConsulta = yield database_1.default.query('SELECT * FROM eu_empleado_contratos WHERE id = $1', [id]);
+                const [datosOriginales] = contratoConsulta.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_contratos',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar el documento del contrato con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al eliminar el documento.' });
+                }
+                const response = yield database_1.default.query(`
+                UPDATE eu_empleado_contratos SET documento = null WHERE id = $1 RETURNING *
+                `, [id]);
+                const [contrato] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_contratos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{documento: null}`,
+                    ip,
+                    observacion: null
                 });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (documento != 'null' && documento != '' && documento != null) {
+                    let ruta = (yield (0, accesoCarpetas_2.ObtenerRutaContrato)(contrato.id_empleado)) + separador + documento;
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                        if (err) {
+                        }
+                        else {
+                            // ELIMINAR DEL SERVIDOR
+                            fs_1.default.unlinkSync(ruta);
+                        }
+                    });
+                }
+                return res.jsonp({ message: 'Documento actualizado.' });
             }
-            res.jsonp({ message: 'Documento actualizado.' });
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al eliminar el documento.' });
+            }
         });
     }
     // ELIMINAR DOCUMENTO CONTRATO DEL SERVIDOR
@@ -229,16 +366,35 @@ class ContratoEmpleadoControlador {
     // REGISTRAR MODALIDAD DE TRABAJO
     CrearTipoContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { descripcion } = req.body;
-            const response = yield database_1.default.query(`
-            INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1) RETURNING *
-            `, [descripcion]);
-            const [contrato] = response.rows;
-            if (contrato) {
-                return res.status(200).jsonp(contrato);
+            try {
+                const { descripcion, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query(`
+                INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1) RETURNING *
+                `, [descripcion]);
+                const [contrato] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'e_cat_modalidad_trabajo',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{descripcion: ${descripcion}}`,
+                    ip,
+                    observacion: null
+                });
+                if (contrato) {
+                    return res.status(200).jsonp(contrato);
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
             }
-            else {
-                return res.status(404).jsonp({ message: 'error' });
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al guardar el registro.' });
             }
         });
     }

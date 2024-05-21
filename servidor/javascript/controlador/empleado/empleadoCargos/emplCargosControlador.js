@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPLEADO_CARGO_CONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const moment_1 = __importDefault(require("moment"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
@@ -45,27 +46,90 @@ class EmpleadoCargosControlador {
     // METODO DE REGISTRO DE CARGO
     Crear(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe } = req.body;
-            yield database_1.default.query(`
-      INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal,
-         sueldo, hora_trabaja, id_tipo_cargo, jefe) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      `, [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe]);
-            res.jsonp({ message: 'Registro guardado.' });
+            try {
+                const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe, user_name, ip } = req.body;
+                const datosNuevos = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query(`
+        INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal,
+           sueldo, hora_trabaja, id_tipo_cargo, jefe) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        `, [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe]);
+                delete datosNuevos.user_name;
+                delete datosNuevos.ip;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_cargos',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(datosNuevos),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'Error al guardar el registro.' });
+            }
         });
     }
     // METODO PARA ACTUALIZAR REGISTRO
     EditarCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empl_contrato, id } = req.params;
-            const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe } = req.body;
-            yield database_1.default.query(`
-      UPDATE eu_empleado_cargos SET id_departamento = $1, fecha_inicio = $2, fecha_final = $3, id_sucursal = $4, 
-        sueldo = $5, hora_trabaja = $6, id_tipo_cargo = $7, jefe = $8  
-      WHERE id_contrato = $9 AND id = $10
-      `, [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe,
-                id_empl_contrato, id]);
-            res.jsonp({ message: 'Registro actualizado exitosamente.' });
+            try {
+                const { id_empl_contrato, id } = req.params;
+                const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const cargoConsulta = yield database_1.default.query('SELECT * FROM eu_empleado_cargos WHERE id = $1', [id]);
+                const [datosOriginales] = cargoConsulta.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_cargos',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el cargo con id ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+                }
+                yield database_1.default.query(`
+        UPDATE eu_empleado_cargos SET id_departamento = $1, fecha_inicio = $2, fecha_final = $3, id_sucursal = $4, 
+          sueldo = $5, hora_trabaja = $6, id_tipo_cargo = $7, jefe = $8  
+        WHERE id_contrato = $9 AND id = $10
+        `, [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe,
+                    id_empl_contrato, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_cargos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{id_departamento: ${id_departamento}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, id_sucursal: ${id_sucursal}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, cargo: ${cargo}, jefe: ${jefe}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado exitosamente.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+            }
         });
     }
     // METODO PARA BUSCAR DATOS DE CARGO POR ID CONTRATO
@@ -268,16 +332,37 @@ class EmpleadoCargosControlador {
     // METODO DE REGISTRO DE TIPO DE CARGO
     CrearTipoCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { cargo } = req.body;
-            const response = yield database_1.default.query(`
-      INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
-      `, [cargo]);
-            const [tipo_cargo] = response.rows;
-            if (tipo_cargo) {
-                return res.status(200).jsonp(tipo_cargo);
+            try {
+                const { cargo, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query(`
+        INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
+        `, [cargo]);
+                const [tipo_cargo] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'e_cat_tipo_cargo',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{cargo: ${cargo}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (tipo_cargo) {
+                    return res.status(200).jsonp(tipo_cargo);
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
             }
-            else {
-                return res.status(404).jsonp({ message: 'error' });
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }

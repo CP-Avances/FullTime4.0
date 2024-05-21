@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DEPARTAMENTO_CONTROLADOR = void 0;
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
@@ -23,14 +24,30 @@ class DepartamentoControlador {
     CrearDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id_sucursal } = req.body;
+                const { nombre, id_sucursal, user_name, ip } = req.body;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
         INSERT INTO ed_departamentos (nombre, id_sucursal ) VALUES ($1, $2)
         `, [nombre, id_sucursal]);
-                res.jsonp({ message: 'Registro guardado.' });
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_departamentos',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{Nombre: ${nombre}, Sucursal: ${id_sucursal}}`,
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -38,17 +55,49 @@ class DepartamentoControlador {
     ActualizarDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, id_sucursal } = req.body;
+                const { nombre, id_sucursal, user_name, ip } = req.body;
                 const id = req.params.id;
-                console.log(id);
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOS ANTES DE ACTUALIZAR
+                const response = yield database_1.default.query('SELECT * FROM ed_departamentos WHERE id = $1', [id]);
+                const datos = response.rows[0];
+                if (!datos) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ed_departamentos',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        observacion: `Error al actualizar el departamento con ID: ${id}`,
+                    });
+                    // FINALIZAR TRANSACCIÓN
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
                 yield database_1.default.query(`
         UPDATE ed_departamentos set nombre = $1, id_sucursal = $2 
         WHERE id = $3
         `, [nombre, id_sucursal, id]);
-                res.jsonp({ message: 'Registro actualizado.' });
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_departamentos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: `{Nombre: ${nombre}, Sucursal: ${id_sucursal}}`,
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -172,13 +221,47 @@ class DepartamentoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
+                const { user_name, ip } = req.body;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOS ANTES DE ELIMINAR
+                const response = yield database_1.default.query('SELECT * FROM ed_departamentos WHERE id = $1', [id]);
+                const datos = response.rows[0];
+                if (!datos) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ed_departamentos',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        observacion: `Error al eliminar el departamento con ID: ${id}. Registro no encontrado.`,
+                    });
+                    // FINALIZAR TRANSACCIÓN
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
                 yield database_1.default.query(`
         DELETE FROM ed_departamentos WHERE id = $1
         `, [id]);
-                res.jsonp({ message: 'Registro eliminado.' });
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ed_departamentos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: '',
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -186,16 +269,32 @@ class DepartamentoControlador {
     CrearNivelDepa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_departamento, departamento, nivel, dep_nivel, dep_nivel_nombre, id_establecimiento, id_suc_dep_nivel } = req.body;
+                const { id_departamento, departamento, nivel, dep_nivel, dep_nivel_nombre, id_establecimiento, id_suc_dep_nivel, user_name, ip } = req.body;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
         INSERT INTO ed_niveles_departamento (departamento, id_departamento, nivel, departamento_nombre_nivel, 
           id_departamento_nivel, id_sucursal, id_sucursal_departamento_nivel ) 
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         `, [departamento, id_departamento, nivel, dep_nivel_nombre, dep_nivel, id_establecimiento, id_suc_dep_nivel]);
-                res.jsonp({ message: 'Registro guardado.' });
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ed_niveles_departamento',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{Departamento: ${departamento}, Nivel: ${nivel}, Departamento Nivel: ${dep_nivel_nombre}}`,
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -220,16 +319,49 @@ class DepartamentoControlador {
     ActualizarNivelDepa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nivel } = req.body;
+                const { nivel, user_name, ip } = req.body;
                 const id = req.params.id;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOS ANTES DE ACTUALIZAR
+                const response = yield database_1.default.query('SELECT * FROM ed_niveles_departamento WHERE id = $1', [id]);
+                const datos = response.rows[0];
+                if (!datos) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ed_niveles_departamento',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        observacion: `Error al actualizar el nivel de departamento con ID: ${id}, Registro no encontrado.`,
+                    });
+                    // FINALIZAR TRANSACCIÓN
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado' });
+                }
                 yield database_1.default.query(`
         UPDATE ed_niveles_departamento set nivel = $1 
         WHERE id = $2
         `, [nivel, id]);
-                res.jsonp({ message: 'Registro actualizado.' });
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ed_niveles_departamento',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: `{Nivel: ${nivel}}`,
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -238,13 +370,47 @@ class DepartamentoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
+                const { user_name, ip } = req.body;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOS ANTES DE ELIMINAR
+                const response = yield database_1.default.query('SELECT * FROM ed_niveles_departamento WHERE id = $1', [id]);
+                const datos = response.rows[0];
+                if (!datos) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ed_niveles_departamento',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        observacion: `Error al eliminar el nivel de departamento con ID: ${id}`,
+                    });
+                    // FINALIZAR TRANSACCIÓN
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
                 yield database_1.default.query(`
         DELETE FROM ed_niveles_departamento WHERE id = $1
         `, [id]);
-                res.jsonp({ message: 'Registro eliminado.' });
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ed_niveles_departamento',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: '',
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -252,19 +418,62 @@ class DepartamentoControlador {
     ActualizarNombreNivel(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_departamento, departamento } = req.body;
+                const { id_departamento, departamento, user_name, ip } = req.body;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOS ANTES DE ACTUALIZAR
+                const response = yield database_1.default.query('SELECT * FROM nivel_jerarquicodep WHERE id_departamento = $1', [id_departamento]);
+                const [datos] = response.rows;
+                if (!datos) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'nivel_jerarquicodep',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        observacion: `Error al actualizar el nombre de nivel del departamento con ID: ${id_departamento}. Registro no encontrado.`,
+                    });
+                    // FINALIZAR TRANSACCIÓN
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado' });
+                }
                 yield database_1.default.query(`
         UPDATE ed_niveles_departamento SET departamento = $1
         WHERE id_departamento = $2
         `, [departamento, id_departamento]);
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'nivel_jerarquicodep',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: `{departamento: ${departamento}}`,
+                    ip: ip,
+                    observacion: null
+                });
                 yield database_1.default.query(`
         UPDATE ed_niveles_departamento SET departamento_nombre_nivel = $1
         WHERE id_departamento_nivel = $2
         `, [departamento, id_departamento]);
-                res.jsonp({ message: 'Registro guardado.' });
+                // INSERTAR AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'nivel_jerarquicodep',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: `{dep_nivel_nombre: ${departamento}}`,
+                    ip: ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }

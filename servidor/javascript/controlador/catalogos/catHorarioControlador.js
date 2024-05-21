@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HORARIO_CONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
@@ -23,13 +24,27 @@ class HorarioControlador {
     // REGISTRAR HORARIO
     CrearHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_ } = req.body;
+            const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, user_name, ip } = req.body;
             try {
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
       INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
         nocturno, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
       `, [nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_]);
                 const [horario] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eh_cat_horarios',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(horario),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 if (horario) {
                     return res.status(200).jsonp(horario);
                 }
@@ -38,8 +53,9 @@ class HorarioControlador {
                 }
             }
             catch (error) {
-                console.log('error ', error);
-                return res.status(400).jsonp({ message: error });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -64,33 +80,75 @@ class HorarioControlador {
     GuardarDocumentoHorario(req, res) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let id = req.params.id;
-            let { archivo, codigo } = req.params;
-            // FECHA DEL SISTEMA
-            var fecha = (0, moment_1.default)();
-            var anio = fecha.format('YYYY');
-            var mes = fecha.format('MM');
-            var dia = fecha.format('DD');
-            // LEER DATOS DE IMAGEN
-            let documento = id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
-            let separador = path_1.default.sep;
-            yield database_1.default.query(`
-      UPDATE eh_cat_horarios SET documento = $2 WHERE id = $1
-      `, [id, documento]);
-            res.jsonp({ message: 'Documento actualizado.' });
-            if (archivo != 'null' && archivo != '' && archivo != null) {
-                if (archivo != documento) {
-                    let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + archivo;
-                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                        if (err) {
-                        }
-                        else {
-                            // ELIMINAR DEL SERVIDOR
-                            fs_1.default.unlinkSync(ruta);
-                        }
+            try {
+                let id = req.params.id;
+                let { archivo, codigo } = req.params;
+                const { user_name, ip } = req.body;
+                // FECHA DEL SISTEMA
+                var fecha = (0, moment_1.default)();
+                var anio = fecha.format('YYYY');
+                var mes = fecha.format('MM');
+                var dia = fecha.format('DD');
+                // LEER DATOS DE IMAGEN
+                let documento = id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
+                let separador = path_1.default.sep;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const horario = yield database_1.default.query(`
+        SELECT * FROM eh_cat_horarios WHERE id = $1
+        `, [id]);
+                const [datosOriginales] = horario.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eh_cat_horarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el horario con id: ${id}. Registro no encontrado.`
                     });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
                 }
+                yield database_1.default.query(`
+        UPDATE eh_cat_horarios SET documento = $2 WHERE id = $1
+        `, [id, documento]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eh_cat_horarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify({ documento }),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (archivo != 'null' && archivo != '' && archivo != null) {
+                    if (archivo != documento) {
+                        let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + archivo;
+                        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                        fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                            if (err) {
+                            }
+                            else {
+                                // ELIMINAR DEL SERVIDOR
+                                fs_1.default.unlinkSync(ruta);
+                            }
+                        });
+                    }
+                }
+                return res.jsonp({ message: 'Documento actualizado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -98,31 +156,64 @@ class HorarioControlador {
     EditarHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_ } = req.body;
+            const { nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, user_name, ip } = req.body;
             try {
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const horario = yield database_1.default.query(`
+        SELECT * FROM cg_horarios WHERE id = $1
+        `, [id]);
+                const [datosOriginales] = horario.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'cg_horarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el horario con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
                 const respuesta = yield database_1.default.query(`
         UPDATE eh_cat_horarios SET nombre = $1, minutos_comida = $2, hora_trabajo = $3,  
           nocturno = $4, codigo = $5, default_ = $6
         WHERE id = $7 RETURNING *
         `, [nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, id,])
                     .then((result) => { return result.rows; });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eh_cat_horarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{nombre: ${nombre}, minutos_comida: ${min_almuerzo}, hora_trabajo: ${hora_trabajo}, nocturno: ${nocturno}, codigo: ${codigo}, default_: ${default_}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 if (respuesta.length === 0)
                     return res.status(400).jsonp({ message: 'error' });
                 return res.status(200).jsonp(respuesta);
             }
             catch (error) {
-                return res.status(400).jsonp({ message: error });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
     // ELIMINAR DOCUMENTO HORARIO BASE DE DATOS - SERVIDOR
     EliminarDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let { documento, id } = req.body;
+            let { documento, id, user_name, ip } = req.body;
             let separador = path_1.default.sep;
-            yield database_1.default.query(`
-      UPDATE eh_cat_horarios SET documento = null WHERE id = $1
-      `, [id]);
             if (documento != 'null' && documento != '' && documento != null) {
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + documento;
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
@@ -135,7 +226,51 @@ class HorarioControlador {
                     }
                 });
             }
-            res.jsonp({ message: 'Documento actualizado.' });
+            try {
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const horario = yield database_1.default.query(`
+        SELECT * FROM eh_cat_horarios WHERE id = $1
+        `, [id]);
+                const [datosOriginales] = horario.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eh_cat_horarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el horario con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+                yield database_1.default.query(`
+              UPDATE eh_cat_horarios SET documento = null WHERE id = $1
+              `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eh_cat_horarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{documento: null}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Documento actualizado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
+            }
         });
     }
     // ELIMINAR DOCUMENTO HORARIO DEL SERVIDOR
@@ -187,7 +322,7 @@ class HorarioControlador {
                 return res.status(404).jsonp({ message: 'No existe horario. Continua.' });
             }
             catch (error) {
-                return res.status(400).jsonp({ message: error });
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -195,14 +330,51 @@ class HorarioControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const { user_name, ip } = req.body;
                 const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const horario = yield database_1.default.query(`
+        SELECT * FROM eh_cat_horarios WHERE id = $1
+        `, [id]);
+                const [datosOriginales] = horario.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eh_cat_horarios',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar el horario con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
                 yield database_1.default.query(`
         DELETE FROM eh_cat_horarios WHERE id = $1
         `, [id]);
-                res.jsonp({ message: 'Registro eliminado.' });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eh_cat_horarios',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -225,18 +397,54 @@ class HorarioControlador {
     EditarHorasTrabaja(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const { hora_trabajo } = req.body;
+            const { hora_trabajo, user_name, ip } = req.body;
             try {
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const horario = yield database_1.default.query(`
+        SELECT * FROM eh_cat_horarios WHERE id = $1
+        `, [id]);
+                const [datosOriginales] = horario.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eh_cat_horarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el horario con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'No actualizado.' });
+                }
                 const respuesta = yield database_1.default.query(`
         UPDATE eh_cat_horarios SET hora_trabajo = $1 WHERE id = $2 RETURNING *
         `, [hora_trabajo, id])
                     .then((result) => { return result.rows; });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eh_cat_horarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{hora_trabajo: ${hora_trabajo}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 if (respuesta.length === 0)
                     return res.status(400).jsonp({ message: 'No actualizado.' });
                 return res.status(200).jsonp(respuesta);
             }
             catch (error) {
-                return res.status(400).jsonp({ message: error });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: error });
             }
         });
     }
@@ -260,7 +468,7 @@ class HorarioControlador {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { horarios, detalles } = req.body;
+                const { horarios, detalles, user_name, } = req.body;
                 let horariosCargados = true;
                 let detallesCargados = true;
                 let codigosHorariosCargados = [];
@@ -268,110 +476,151 @@ class HorarioControlador {
                 if (horarios.length > 0) {
                     // CARGAR HORARIOS
                     for (const horario of horarios) {
-                        let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = horario;
-                        horario.CODIGO_HORARIO = horario.CODIGO_HORARIO.toString();
-                        //CAMBIAR TIPO DE HORARIO Laborable = N, Libre = L, Feriado = FD
-                        switch (TIPO_HORARIO) {
-                            case 'Laborable':
-                                TIPO_HORARIO = 'N';
-                                break;
-                            case 'Libre':
-                                TIPO_HORARIO = 'L';
-                                break;
-                            case 'Feriado':
-                                TIPO_HORARIO = 'FD';
-                                break;
-                        }
-                        // CAMBIAR HORARIO_NOCTURNO
-                        switch (HORARIO_NOCTURNO) {
-                            case 'Si':
-                                HORARIO_NOCTURNO = true;
-                                break;
-                            case 'No':
-                                HORARIO_NOCTURNO = false;
-                                break;
-                            default:
-                                HORARIO_NOCTURNO = false;
-                                break;
-                        }
-                        // FORMATEAR HORAS_TOTALES
-                        HORAS_TOTALES = FormatearHoras(horario.HORAS_TOTALES.toString(), horario.DETALLE);
-                        // INSERTAR EN LA BASE DE DATOS
-                        const response = yield database_1.default.query(`
-            INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
+                        try {
+                            let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = horario;
+                            horario.CODIGO_HORARIO = horario.CODIGO_HORARIO.toString();
+                            //CAMBIAR TIPO DE HORARIO Laborable = N, Libre = L, Feriado = FD
+                            switch (TIPO_HORARIO) {
+                                case 'Laborable':
+                                    TIPO_HORARIO = 'N';
+                                    break;
+                                case 'Libre':
+                                    TIPO_HORARIO = 'L';
+                                    break;
+                                case 'Feriado':
+                                    TIPO_HORARIO = 'FD';
+                                    break;
+                            }
+                            // CAMBIAR HORARIO_NOCTURNO
+                            switch (HORARIO_NOCTURNO) {
+                                case 'Si':
+                                    HORARIO_NOCTURNO = true;
+                                    break;
+                                case 'No':
+                                    HORARIO_NOCTURNO = false;
+                                    break;
+                                default:
+                                    HORARIO_NOCTURNO = false;
+                                    break;
+                            }
+                            // FORMATEAR HORAS_TOTALES
+                            HORAS_TOTALES = FormatearHoras(horario.HORAS_TOTALES.toString(), horario.DETALLE);
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            // INSERTAR EN LA BASE DE DATOS
+                            const response = yield database_1.default.query(`
+              INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
               nocturno, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-            `, [DESCRIPCION, MIN_ALIMENTACION, HORAS_TOTALES, HORARIO_NOCTURNO, CODIGO_HORARIO, TIPO_HORARIO]);
-                        const [correcto] = response.rows;
-                        if (correcto) {
-                            horariosCargados = true;
+              `, [DESCRIPCION, MIN_ALIMENTACION, HORAS_TOTALES, HORARIO_NOCTURNO, true, CODIGO_HORARIO, TIPO_HORARIO]);
+                            const [correcto] = response.rows;
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'eh_cat_horarios',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(correcto),
+                                ip: '',
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            if (correcto) {
+                                horariosCargados = true;
+                            }
+                            else {
+                                horariosCargados = false;
+                            }
+                            const idHorario = correcto.id;
+                            const codigoHorario = correcto.codigo;
+                            codigosHorariosCargados.push({ codigoHorario, idHorario });
                         }
-                        else {
+                        catch (error) {
+                            // REVERTIR TRANSACCION
+                            yield database_1.default.query('ROLLBACK');
                             horariosCargados = false;
                         }
-                        const idHorario = correcto.id;
-                        const codigoHorario = correcto.codigo;
-                        codigosHorariosCargados.push({ codigoHorario, idHorario });
                     }
                 }
                 // SI DETALLES NO ESTA VACIO CARGAR EN LA BASE DE DATOS
                 if (detalles.length > 0) {
                     // CARGAR DETALLES
                     for (const detalle of detalles) {
-                        let { CODIGO_HORARIO, TIPO_ACCION, HORA, TOLERANCIA, ORDEN, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES } = detalle;
-                        CODIGO_HORARIO = CODIGO_HORARIO.toString();
-                        // CAMBIAR TIPO DE ACCION Entrada = E, Inicio alimentacion = I/A, Fin alimentacion = F/A, Salida = S
-                        switch (TIPO_ACCION) {
-                            case 'Entrada':
-                                TIPO_ACCION = 'E';
-                                break;
-                            case 'Inicio alimentación':
-                                TIPO_ACCION = 'I/A';
-                                break;
-                            case 'Fin alimentación':
-                                TIPO_ACCION = 'F/A';
-                                break;
-                            case 'Salida':
-                                TIPO_ACCION = 'S';
-                                break;
+                        try {
+                            let { CODIGO_HORARIO, TIPO_ACCION, HORA, TOLERANCIA, ORDEN, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES } = detalle;
+                            CODIGO_HORARIO = CODIGO_HORARIO.toString();
+                            // CAMBIAR TIPO DE ACCION Entrada = E, Inicio alimentacion = I/A, Fin alimentacion = F/A, Salida = S
+                            switch (TIPO_ACCION) {
+                                case 'Entrada':
+                                    TIPO_ACCION = 'E';
+                                    break;
+                                case 'Inicio alimentación':
+                                    TIPO_ACCION = 'I/A';
+                                    break;
+                                case 'Fin alimentación':
+                                    TIPO_ACCION = 'F/A';
+                                    break;
+                                case 'Salida':
+                                    TIPO_ACCION = 'S';
+                                    break;
+                            }
+                            // CAMBIAR SALIDA_SIGUIENTE_DIA
+                            switch (SALIDA_SIGUIENTE_DIA) {
+                                case 'Si':
+                                    SALIDA_SIGUIENTE_DIA = true;
+                                    break;
+                                case 'No':
+                                    SALIDA_SIGUIENTE_DIA = false;
+                                    break;
+                                default:
+                                    SALIDA_SIGUIENTE_DIA = false;
+                                    break;
+                            }
+                            // CAMBIAR SALIDA_TERCER_DIA
+                            switch (SALIDA_TERCER_DIA) {
+                                case 'Si':
+                                    SALIDA_TERCER_DIA = true;
+                                    break;
+                                case 'No':
+                                    SALIDA_TERCER_DIA = false;
+                                    break;
+                                default:
+                                    SALIDA_TERCER_DIA = false;
+                                    break;
+                            }
+                            // CAMBIAR TOLERANCIA
+                            TOLERANCIA = TIPO_ACCION.toLowerCase() === 'e' ? TOLERANCIA : null;
+                            // CAMBIAR CODIGO_HORARIO POR EL ID DEL HORARIO CORRESPONDIENTE
+                            const ID_HORARIO = (_a = (codigosHorariosCargados.find((codigo) => codigo.codigoHorario === CODIGO_HORARIO))) === null || _a === void 0 ? void 0 : _a.idHorario;
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            // INSERTAR EN LA BASE DE DATOS
+                            const response2 = yield database_1.default.query(`
+              INSERT INTO eh_detalle_horarios (orden, hora, tolerancia, id_horario, tipo_accion, segundo_dia, tercer_dia, 
+                minutos_antes, minutos_despues) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
+              `, [ORDEN, HORA, TOLERANCIA, ID_HORARIO, TIPO_ACCION, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES]);
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'eh_detalle_horarios',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: JSON.stringify(response2.rows),
+                                ip: '',
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            if (response2.rowCount > 0) {
+                                detallesCargados = true;
+                            }
+                            else {
+                                detallesCargados = false;
+                            }
                         }
-                        // CAMBIAR SALIDA_SIGUIENTE_DIA
-                        switch (SALIDA_SIGUIENTE_DIA) {
-                            case 'Si':
-                                SALIDA_SIGUIENTE_DIA = true;
-                                break;
-                            case 'No':
-                                SALIDA_SIGUIENTE_DIA = false;
-                                break;
-                            default:
-                                SALIDA_SIGUIENTE_DIA = false;
-                                break;
-                        }
-                        // CAMBIAR SALIDA_TERCER_DIA
-                        switch (SALIDA_TERCER_DIA) {
-                            case 'Si':
-                                SALIDA_TERCER_DIA = true;
-                                break;
-                            case 'No':
-                                SALIDA_TERCER_DIA = false;
-                                break;
-                            default:
-                                SALIDA_TERCER_DIA = false;
-                                break;
-                        }
-                        // CAMBIAR TOLERANCIA
-                        TOLERANCIA = TIPO_ACCION.toLowerCase() === 'e' ? TOLERANCIA : null;
-                        // CAMBIAR CODIGO_HORARIO POR EL ID DEL HORARIO CORRESPONDIENTE
-                        const ID_HORARIO = (_a = (codigosHorariosCargados.find((codigo) => codigo.codigoHorario === CODIGO_HORARIO))) === null || _a === void 0 ? void 0 : _a.idHorario;
-                        // INSERTAR EN LA BASE DE DATOS
-                        const response2 = yield database_1.default.query(`
-            INSERT INTO deta_horarios (orden, hora, tolerancia, id_horario, tipo_accion, segundo_dia, tercer_dia, 
-              minutos_antes, minutos_despues) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            `, [ORDEN, HORA, TOLERANCIA, ID_HORARIO, TIPO_ACCION, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES,
-                            MIN_DESPUES]);
-                        if (response2.rowCount > 0) {
-                            detallesCargados = true;
-                        }
-                        else {
+                        catch (error) {
+                            // REVERTIR TRANSACCION
+                            yield database_1.default.query('ROLLBACK');
                             detallesCargados = false;
                         }
                     }
@@ -380,11 +629,11 @@ class HorarioControlador {
                     return res.status(200).jsonp({ message: 'correcto' });
                 }
                 else {
-                    return res.status(400).jsonp({ message: 'error' });
+                    return res.status(500).jsonp({ message: 'error' });
                 }
             }
             catch (error) {
-                return res.status(400).jsonp({ message: error });
+                return res.status(500).jsonp({ message: error });
             }
         });
     }

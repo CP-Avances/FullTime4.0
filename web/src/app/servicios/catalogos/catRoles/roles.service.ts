@@ -40,8 +40,12 @@ export class RolesService {
   // Roles
   getOneRol(id: number) {
     return this.http.get<any>(`${environment.url}/rol/${id}`);
+  }
+
+  ListarRolesActualiza(id: number) {
     return this.http.get<any>(`${environment.url}/rol/actualiza/${id}`);
   }
+
   ActualizarRol(data: any) {
     return this.http.put(`${environment.url}/rol`, data);
   }
