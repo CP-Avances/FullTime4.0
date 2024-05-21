@@ -58,11 +58,6 @@ export class HorarioService {
     return this.http.delete(`${environment.url}/horario/eliminar/${id}`).pipe(catchError(id));
   }
 
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${environment.url}/horario/xmlDownload`, data);
-  }
-
   // BUSCAR DATOS DE UN HORARIO
   BuscarUnHorario(id: number) {
     return this.http.get(`${environment.url}/horario/${id}`);
@@ -73,23 +68,11 @@ export class HorarioService {
     return this.http.put(`${environment.url}/horario/update-horas-trabaja/${id}`, data);
   }
 
-
-
-
-
-
-
-
-
-
-
   // VERIFICAR DATOS DE LA PLANTILLA DE CATÁLOGO HORARIO Y CARGAR AL SISTEMA
   VerificarDatosHorario(formData) {
     return this.http.post<any>(`${environment.url}/horario/cargarHorario/verificarDatos/upload`, formData);
   }
-  VerificarPlantillaHorario(formData) {
-    return this.http.post<any>(`${environment.url}/horario/cargarHorario/verificarPlantilla/upload`, formData);
-  }
+
   CargarHorariosMultiples(formData) {
     return this.http.post<any>(`${environment.url}/horario/cargarHorario/upload`, formData);
   }

@@ -187,8 +187,7 @@ export class EmpleadoService {
   BuscarModalidadLaboralNombre(datos: any) {
     return this.http.post<any>(`${environment.url}/contratoEmpleado/modalidad/trabajo/nombre`, datos);
   }
-
-
+  
   /** ***************************************************************************************** ** 
    ** **                        MANEJO DE DATOS DE CONTRATOS                                 ** ** 
    ** ***************************************************************************************** **/

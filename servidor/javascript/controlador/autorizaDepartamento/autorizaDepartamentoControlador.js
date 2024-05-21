@@ -95,19 +95,6 @@ class AutorizaDepartamentoControlador {
             res.jsonp({ message: 'Registro eliminado.' });
         });
     }
-    ListarAutorizaDepartamento(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const AUTORIZA = yield database_1.default.query(`
-            SELECT * FROM ed_autoriza_departamento
-            `);
-            if (AUTORIZA.rowCount > 0) {
-                return res.jsonp(AUTORIZA.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
-            }
-        });
-    }
     // METODO PARA OBTENER LISTA DE USUARIOS QUE APRUEBAN SOLICITUDES     --**VERIFICADO
     ObtenerlistaEmpleadosAutorizan(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

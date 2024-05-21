@@ -21,22 +21,6 @@ class AutorizacionesControlador {
         }
     }
 
-
-    public async ListarAutorizaciones(req: Request, res: Response) {
-        const AUTORIZACIONES = await pool.query(
-            `
-            SELECT * FROM ecm_autorizaciones ORDER BY id
-            `
-        );
-        if (AUTORIZACIONES.rowCount > 0) {
-            return res.jsonp(AUTORIZACIONES.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
-
     public async ObtenerAutorizacionByVacacion(req: Request, res: Response) {
         const id = req.params.id_vacacion
         const AUTORIZACIONES = await pool.query(
@@ -97,36 +81,6 @@ class AutorizacionesControlador {
             , [estado, id_documento, id_permiso]);
         res.jsonp({ message: 'Autorización guardada.' });
     }
-
-
-
-    public async ActualizarEstadoPlanificacion(req: Request, res: Response): Promise<void> {
-
-        var tiempo = fechaHora();
-        var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
-        var hora = await FormatearHora(tiempo.hora);
-
-        const path_folder = path.resolve('logos');
-
-        var datos = await Credenciales(parseInt(req.params.id_empresa));
-
-        if (datos === 'ok') {
-            // IMPLEMENTAR ENVIO DE CORREO
-            const id = req.params.id_plan_hora_extra;
-            const { id_documento, estado } = req.body;
-            await pool.query(
-                `
-                UPDATE ecm_autorizaciones SET estado = $1, id_autoriza_estado = $2 
-                WHERE id_plan_hora_extra = $3
-                `
-                , [estado, id_documento, id]);
-            res.jsonp({ message: 'Autorización guardada.' });
-        }
-        else {
-            res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
-        }
-    }
-
 
     /** ***************************************************************************************************** ** 
      ** **                METODO DE CAMBIO DE ESTADO DE APROBACIONES DE SOLICITUDES                        ** ** 

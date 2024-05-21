@@ -39,11 +39,6 @@ export class ProvinciaService {
     return this.http.delete(`${environment.url}/provincia/eliminar/${id}`).pipe( catchError(id));
   }
 
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${environment.url}/provincia/xmlDownload`, data);
-  }
-
   // METODO PARA REGISTRAR PROVINCIA
   RegistrarProvincia(data: any) {
     return this.http.post(`${environment.url}/provincia`, data);
@@ -58,20 +53,6 @@ export class ProvinciaService {
   BuscarPaisId(id: number) {
     return this.http.get(`${environment.url}/provincia/buscar/pais/${id}`);
   }
-
-
-
-
-  
-  getIdProvinciaRest(nombre: string) {
-    return this.http.get(`${environment.url}/provincia/nombreProvincia/${nombre}`);
-  }
-
-  BuscarTodosPaises() {
-    return this.http.get(`${environment.url}/provincia/paises`);
-  }
-
-
 
 }
 

@@ -22,11 +22,6 @@ export class RelojesService {
     return this.http.delete(`${environment.url}/relojes/eliminar/${id}`).pipe(catchError(id));
   }
 
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${environment.url}/relojes/xmlDownload`, data);
-  }
-
   // METODO PARA REGISTRAR DISPOSITIVO
   CrearNuevoReloj(datos: any) {
     return this.http.post<any>(`${environment.url}/relojes`, datos);
@@ -47,30 +42,9 @@ export class RelojesService {
     return this.http.post(`${environment.url}/relojes/xmlDownloadIdDispositivos`, data);
   }
 
-
-
-
-
-
-
-
-
-
   ConsultarUnReloj(id: number) {
     return this.http.get(`${environment.url}/relojes/${id}`);
   }
-
-
-
-
-
-
-
-
-
-
-
-
 
   // METODOs para verificar datos de plantilla antes de registralos en el sistema
   subirArchivoExcel(formData) {

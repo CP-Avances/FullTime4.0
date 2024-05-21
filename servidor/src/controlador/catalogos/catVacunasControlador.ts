@@ -22,40 +22,6 @@ class VacunaControlador {
         }
     }
 
-    // METODO PARA REGISTRAR TIPO VACUNA
-    public async CrearVacuna(req: Request, res: Response): Promise<Response> {
-        try {
-            const { vacuna } = req.body;
-            var VERIFICAR_VACUNA = await pool.query(
-                `
-                SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
-                `, [vacuna.toUpperCase()])
-
-            if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
-
-                const vacunaInsertar = vacuna.charAt(0).toUpperCase() + vacuna.slice(1).toLowerCase();
-
-                const response: QueryResult = await pool.query(
-                    `
-                    INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
-                    `
-                    , [vacunaInsertar]);
-
-                const [vacunaInsertada] = response.rows;
-
-                if (vacunaInsertada) {
-                    return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' })
-                } else {
-                    return res.status(404).jsonp({ message: 'No se pudo guardar', status: '400' })
-                }
-            } else {
-                return res.jsonp({ message: 'Tipo vacuna ya existe en el sistema.', status: '300' })
-            }
-        }
-        catch (error) {
-            return res.status(500).jsonp({ message: 'error', status: '500' });
-        }
-    }
 
     // METODO PARA EDITAR VACUNA
     public async EditarVacuna(req: Request, res: Response): Promise<Response> {

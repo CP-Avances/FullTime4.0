@@ -12,16 +12,8 @@ export class CatVacunasService {
     private http: HttpClient,
   ) { }
 
-  
-
   listaVacuna(){
     return this.http.get<any>(environment.url + '/vacunasTipos');
-  }
-  CrearVacuna(Vacuna: any){
-    console.log('Vacuna: ',Vacuna)
-    return this.http.post(`${environment.url}/vacunasTipos/crearVacunas`, Vacuna).pipe(
-      catchError(Vacuna)
-    );
   }
   // METODO PARA ACTUALIZAR REGISTRO
   ActualizarVacuna(datos: any) {
@@ -32,5 +24,4 @@ export class CatVacunasService {
     return this.http.delete<any>(`${environment.url}/vacunasTipos/eliminar/${id}`).pipe( catchError(id));
   }
  
-
 }

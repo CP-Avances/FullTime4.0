@@ -106,17 +106,7 @@ export class RegimenService {
   EliminarAntiguedad(id: number) {
     return this.http.delete(`${environment.url}/regimenLaboral/antiguedad-vacaciones/eliminar/${id}`);
   }
-
-
-
-
-
-
-
-
-
   
-
   ConsultarRegimenSucursal(id: number) {
     return this.http.get(`${environment.url}/regimenLaboral/sucursal-regimen/${id}`);
   }

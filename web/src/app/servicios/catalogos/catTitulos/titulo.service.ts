@@ -28,10 +28,6 @@ export class TituloService {
     return this.http.delete(`${environment.url}/titulo/eliminar/${id}`).pipe(catchError(id));
   }
 
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${environment.url}/titulo/xmlDownload`, data);
-  }
 
   // METODO PARA REGISTRAR TITULO
   RegistrarTitulo(data: any) {
@@ -46,19 +42,6 @@ export class TituloService {
   RevisarFormato(formData) {
     return this.http.post<any>(environment.url + '/titulo/upload/revision', formData);
   }
-
-
-  // Catálogo de títulos
-
-  getOneTituloRest(id: number) {
-    return this.http.get(`${environment.url}/titulo/${id}`);
-  }
-
-
-
-
-
-
 
 
 }

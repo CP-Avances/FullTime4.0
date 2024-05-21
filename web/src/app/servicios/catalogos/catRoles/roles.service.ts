@@ -21,11 +21,6 @@ export class RolesService {
     return this.http.delete(`${environment.url}/rol/eliminar/${id}`).pipe(catchError(id));
   }
 
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${environment.url}/rol/xmlDownload`, data);
-  }
-
   // METODO PARA REGISTRAR ROL
   RegistraRol(data: any) {
     console.log(data);
