@@ -20,54 +20,46 @@
         </div>
 
         <!--  *******************************  REGISTRO MULTIPLE DE MODALIDAD LABORAL  *****************************  -->
-        <div class="col-md">
+        <div class="col-12 col-md-6">
             <div id="titulo">
                 <span>REGISTRO MULTIPLE</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
-                <div class="row">
-                    <div class="col-12 col-md" style="padding-top: 5px; padding-bottom: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around"
-                            style="text-align: center; justify-content: center;">
-                            <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
-                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
-                                    style="height: 65px; padding-top: 25px"
-                                    matTooltip="Dar click para selecionar plantilla y cargar registros.">
-                                    Subir plantilla
-                                </label>
-                                <label for="file" matSuffix matTooltipPosition="right"
-                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
-                                    style="height: 64px; padding-top: 25px;"
-                                    matTooltip="Presionar para seleccionar Plantilla con nombre Modalidad.">
-                                    Subir nueva plantilla
-                                </label>
-                            </form>
-                        </div>
+                <div class="row m-auto">
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <form method="post" class="btn-2" enctype="multipart/form-data">
+                            <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                            <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                style="height: 65px; padding-top: 25px"
+                                matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                Subir plantilla
+                            </label>
+                            <label for="file" matSuffix matTooltipPosition="right"
+                                *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                style="height: 65px; padding-top: 25px;"
+                                matTooltip="Presionar para seleccionar Plantilla con nombre Modalidad.">
+                                Subir nueva plantilla
+                           </label>
+                        </form>
                     </div>
-                    <div class="col-12 col-md" *ngIf="!Datos_modalidad_laboral"
-                        style="padding-top: 5px; padding-bottom: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around">
-                            <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
-                                style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div *ngIf="!Datos_modalidad_laboral" class="d-flex flex-wrap justify-content-around">
+                            <a id="descargar" class="btn m-auto"  matSuffix matTooltipPosition="right"
+                                matTooltip="Dar click para ver o descargar el documento."
                                 href="{{hipervinculo}}/plantillaD/documento/Modalidad.xlsx">
                                 <br>
                                 Descargar plantilla usuarios
                             </a>
                         </div>
-                    </div>
-                    <div class="col-12 col-md" style="padding-top: 5px; padding-bottom: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around"
-                            style="text-align: center; justify-content: center;">
+                        <div class="d-flex flex-wrap justify-content-center m-auto w-auto">
                             <button *ngIf="Datos_modalidad_laboral && messajeExcel != 'error'" id="descargar"
-                                class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
+                                class="btn m-auto" (click)="ConfirmarRegistroMultiple()" matSuffix
                                 matTooltipPosition="right" matTooltip="Guardar registro multiple.">
                                 Registrar
                             </button>
                         </div>
                     </div>
-
                 </div>
             </mat-card>
         </div>
