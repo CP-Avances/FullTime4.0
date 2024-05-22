@@ -13,11 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DISCAPACIDADCONTROLADOR = void 0;
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const xlsx_1 = __importDefault(require("xlsx"));
-const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 class DiscapacidadControlador {
     // METODO PARA LISTAR TIPO DE DISCAPACIDAD
     ListarDiscapacidad(req, res) {
@@ -42,16 +43,30 @@ class DiscapacidadControlador {
     CrearDiscapacidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { discapacidad } = req.body;
+                const { discapacidad, user_name, ip } = req.body;
                 var VERIFICAR_DISCAPACIDAD = yield database_1.default.query(`
                 SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1
                 `, [discapacidad.toUpperCase()]);
                 if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
                     const discapacidadInsertar = discapacidad.charAt(0).toUpperCase() + discapacidad.slice(1).toLowerCase();
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
                     INSERT INTO e_cat_discapacidad (nombre) VALUES ($1) RETURNING *
                     `, [discapacidadInsertar]);
                     const [discapacidadInsertada] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_cat_discapacidad',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(discapacidadInsertada),
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                     if (discapacidadInsertada) {
                         return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' });
                     }
@@ -64,6 +79,8 @@ class DiscapacidadControlador {
                 }
             }
             catch (error) {
+                // ROLLBACK
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error', status: '500' });
             }
         });
@@ -72,17 +89,31 @@ class DiscapacidadControlador {
     EditarDiscapacidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, nombre } = req.body;
+                const { id, nombre, user_name, ip } = req.body;
                 var VERIFICAR_DISCAPACIDAD = yield database_1.default.query(`
                 SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1 AND NOT id = $2
                 `, [nombre.toUpperCase(), id]);
                 if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
                     const nombreConFormato = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
                     UPDATE e_cat_discapacidad SET nombre = $2
                     WHERE id = $1 RETURNING *
                     `, [id, nombreConFormato]);
                     const [discapacidadEditada] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_cat_discapacidad',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: JSON.stringify(VERIFICAR_DISCAPACIDAD.rows),
+                        datosNuevos: JSON.stringify(discapacidadEditada),
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                     if (discapacidadEditada) {
                         return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' });
                     }
@@ -95,6 +126,8 @@ class DiscapacidadControlador {
                 }
             }
             catch (error) {
+                // ROLLBACK
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error', status: '500' });
             }
         });
@@ -104,12 +137,48 @@ class DiscapacidadControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
+                const { user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                //CONSULTAR DATOS DE LA DISCAPACIDAD A ELIMINAR
+                const DISCAPACIDAD = yield database_1.default.query(`
+                SELECT * FROM e_cat_discapacidad WHERE id = $1
+                `, [id]);
+                const [datosOriginales] = DISCAPACIDAD.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_cat_discapacidad',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
                 yield database_1.default.query(`
                 DELETE FROM e_cat_discapacidad WHERE id = $1
                 `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'e_cat_discapacidad',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
+                // ROLLBACK
+                yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });
             }
         });
@@ -233,19 +302,32 @@ class DiscapacidadControlador {
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const plantilla = req.body;
-                console.log('datos Discapacidad: ', plantilla);
+                const { plantilla, user_name, ip } = req.body;
                 var contador = 1;
                 var respuesta;
                 plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                     // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                     const { item, discapacidad, observacion } = data;
                     const disca = discapacidad.charAt(0).toUpperCase() + discapacidad.slice(1).toLowerCase();
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
                     // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
                     const response = yield database_1.default.query(`
                     INSERT INTO e_cat_discapacidad (nombre) VALUES ($1) RETURNING *
                     `, [disca]);
                     const [discapacidad_emp] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_cat_discapacidad',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(discapacidad_emp),
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                     if (contador === plantilla.length) {
                         if (discapacidad_emp) {
                             return respuesta = res.status(200).jsonp({ message: 'ok', status: '200' });
@@ -258,6 +340,8 @@ class DiscapacidadControlador {
                 }));
             }
             catch (error) {
+                // ROLLBACK
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'Error con el servidor metodo CargarPlantilla', status: '500' });
             }
         });
