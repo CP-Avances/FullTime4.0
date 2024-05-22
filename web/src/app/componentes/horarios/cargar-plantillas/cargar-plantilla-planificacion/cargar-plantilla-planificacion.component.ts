@@ -152,7 +152,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
       let itemName = arrayItems[0];
 
       if (itemExtencion === 'xlsx' || itemExtencion === 'xls') {
-        if (itemName === 'plantillaPlanificacionMultiple') {
+        if (itemName.startsWith('plantillaPlanificacionMultiple')) {
           this.VerificarPlantilla();
         } else {
           this.toastr.error('Solo se acepta plantillaPlanificacionMultiple', 'Plantilla seleccionada incorrecta', {
@@ -239,6 +239,10 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   // METODO PARA REGISTRAR PLANIFICACIONES
   RegistrarPlanificaciones() {
+    this.planificacionesHorarias = this.planificacionesHorarias.filter((planificacion) => {
+      return planificacion.observacion !== 'Usuario no válido' && planificacion.observacion !== 'No tiene un cargo asignado';
+    });
+
     this.planificacionesCorrectas = JSON.parse(JSON.stringify(this.planificacionesHorarias)).map((planificacion: any) => {
       planificacion.dias = planificacion.dias.map((dia: any) => {
         if (dia.observacion !== 'OK') {
@@ -359,8 +363,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   // METODO PARA OBTENER EL COLOR DE LA OBSERVACION
   ObtenerColorObservacion(observacion: string) {
-
-    if(observacion.startsWith('Jornada superada')) return 'rgb(19, 192, 163)';
+    if(observacion && observacion.startsWith('Jornada superada')) return 'rgb(19, 192, 163)';
 
     switch (observacion) {
       case 'OK':
@@ -368,6 +371,16 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
       default:
         return 'rgb(242, 21, 21)';
     }
+  }
+
+  // METODO PARA OBTENER EL COLOR DEL USUARIO
+  ObtenerColorUsuario(observacion: string) {
+    if(observacion === 'Usuario no válido' || observacion === 'No tiene un cargo asignado') return 'rgb(242, 21, 21)';
+  }
+
+  // OBTENER NOMBRE DE USUARIO
+  ObtenerNombreUsuario(nombre: any, usuario: any) {
+    return nombre ? nombre : usuario + '\nUsuario no válido';
   }
 
   ManejarPaginaResultados(e: PageEvent) {

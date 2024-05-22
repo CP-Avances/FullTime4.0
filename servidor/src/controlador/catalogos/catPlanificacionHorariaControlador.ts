@@ -64,7 +64,6 @@ class PlanificacionHorariaControlador {
             return nuevoObjeto;
         });
 
-
         // VERIFICAR USUARIO, HORARIOS Y SOBREPOSICION DE HORARIOS
         for (const [index, data] of plantillaPlanificacionHorariaEstructurada.entries()) {
             let { usuario } = data;
@@ -88,6 +87,7 @@ class PlanificacionHorariaControlador {
 
             if (!usuarioVerificado[0]) {
                 data.observacion = usuarioVerificado[2];
+                data.dias = {};
                 continue;
             } else {
                 data.codigo_usuario = usuarioVerificado[1].codigo;
@@ -515,7 +515,6 @@ async function VerificarSuperposicionHorarios(datos: DatosVerificacionSuperposic
                     const horario = horarios[i];
                     if (horario.observacion === 'OK') {
                         const detalles = await pool.query('SELECT * FROM eh_detalle_horarios WHERE id_horario = $1', [horario.id]);
-
                         horario.entrada = detalles.rows.find((detalle: any) => detalle.tipo_accion === 'E');
                         horario.salida = detalles.rows.find((detalle: any) => detalle.tipo_accion === 'S');
 
@@ -647,7 +646,7 @@ async function ListarPlanificacionHoraria(codigo: string, fecha_inicio: string, 
     try {
 
         const horario = await pool.query(`
-            SELECT p_g.codigo AS codigo_e, fec_horario AS fecha, id_horario AS id, 
+            SELECT p_g.codigo AS codigo_e, fecha_horario AS fecha, id_horario AS id, 
             horario.codigo AS codigo_dia 
             FROM eu_asistencia_general p_g 
             INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo = $3 
