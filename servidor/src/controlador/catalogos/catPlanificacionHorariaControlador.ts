@@ -702,9 +702,9 @@ async function ConsultarHorarioDefault(codigo:string): Promise<any> {
     try {
         const horario: any = await pool.query(
         `
-        SELECT h.id AS id_horario, h.nombre, h.hora_trabajo, h.default_, h.min_almuerzo, d.id AS id_det_horario, d.*
+        SELECT h.id AS id_horario, h.nombre, h.hora_trabajo, h.default_, h.minutos_comida, d.id AS id_det_horario, d.*
         FROM eh_cat_horarios AS h
-        INNER JOIN deta_horarios AS d ON h.id = d.id_horario
+        INNER JOIN eh_detalle_horarios AS d ON h.id = d.id_horario
         WHERE h.codigo = $1
         `, [codigo]
         );
@@ -751,11 +751,11 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
         await pool.query('BEGIN');
 
         // CREAR ENTRADA
-        await pool.query(
+        const registroEntrada = await pool.query(
             `
-            INSERT INTO eu_asistencia_general (codigo, id_empl_cargo, id_horario, fecha_horario, fec_hora_horario, 
-                tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
-                estado_origen, min_alimentacion)
+            INSERT INTO eu_asistencia_general (codigo, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
+                tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
+                estado_origen, minutos_alimentacion)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
             `, [entrada.codigo, entrada.id_empl_cargo, entrada.id_horario, entrada.fec_horario, entrada.fec_hora_horario, entrada.tolerancia, 
                 entrada.id_det_horario, entrada.tipo_entr_salida, entrada.tipo_dia, entrada.salida_otro_dia, entrada.min_antes, entrada.min_despues, 
@@ -764,22 +764,22 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
 
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'plan_general',
+            tabla: 'eu_asistencia_general',
             usuario: user_name,
             accion: 'I',
             datosOriginales: '',
-            datosNuevos: JSON.stringify(entrada),
+            datosNuevos: JSON.stringify(registroEntrada.rows),
             ip,
             observacion: null
         });
 
         // CREAR INICIO ALIMENTACION
         if (inicioAlimentacion) {
-            await pool.query(
+            const registroInicioAlimentacion = await pool.query(
                 `
-                INSERT INTO eu_asistencia_general (codigo, id_empl_cargo, id_horario, fecha_horario, fec_hora_horario, 
-                    tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
-                    estado_origen, min_alimentacion)
+                INSERT INTO eu_asistencia_general (codigo, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
+                    tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
+                    estado_origen, minutos_alimentacion)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
                 `, [inicioAlimentacion.codigo, inicioAlimentacion.id_empl_cargo, inicioAlimentacion.id_horario, inicioAlimentacion.fec_horario, inicioAlimentacion.fec_hora_horario, inicioAlimentacion.tolerancia, 
                     inicioAlimentacion.id_det_horario, inicioAlimentacion.tipo_entr_salida, inicioAlimentacion.tipo_dia, inicioAlimentacion.salida_otro_dia, inicioAlimentacion.min_antes, inicioAlimentacion.min_despues, 
@@ -792,7 +792,7 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: JSON.stringify(inicioAlimentacion),
+                datosNuevos: JSON.stringify(registroInicioAlimentacion.rows),
                 ip,
                 observacion: null
             });
@@ -800,11 +800,11 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
 
         // CREAR FIN ALIMENTACION
         if (finAlimentacion) {
-            await pool.query(
+            const registroFinAlimentacion = await pool.query(
                 `
-                INSERT INTO eu_asistencia_general (codigo, id_empl_cargo, id_horario, fecha_horario, fec_hora_horario, 
-                    tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
-                    estado_origen, min_alimentacion)
+                INSERT INTO eu_asistencia_general (codigo, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
+                    tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
+                    estado_origen, minutos_alimentacion)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
                 `, [finAlimentacion.codigo, finAlimentacion.id_empl_cargo, finAlimentacion.id_horario, finAlimentacion.fec_horario, finAlimentacion.fec_hora_horario, finAlimentacion.tolerancia, 
                     finAlimentacion.id_det_horario, finAlimentacion.tipo_entr_salida, finAlimentacion.tipo_dia, finAlimentacion.salida_otro_dia, finAlimentacion.min_antes, finAlimentacion.min_despues, 
@@ -817,18 +817,18 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: JSON.stringify(finAlimentacion),
+                datosNuevos: JSON.stringify(registroFinAlimentacion.rows),
                 ip,
                 observacion: null
             });
         }
 
         // CREAR SALIDA
-        await pool.query(
+        const registroSalida = await pool.query(
             `
-            INSERT INTO eu_asistencia_general (codigo, id_empl_cargo, id_horario, fecha_horario, fec_hora_horario, 
-                tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
-                estado_origen, min_alimentacion)
+            INSERT INTO eu_asistencia_general (codigo, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
+                tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
+                estado_origen, minutos_alimentacion)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
             `, [salida.codigo, salida.id_empl_cargo, salida.id_horario, salida.fec_horario, salida.fec_hora_horario, salida.tolerancia, 
                 salida.id_det_horario, salida.tipo_entr_salida, salida.tipo_dia, salida.salida_otro_dia, salida.min_antes, salida.min_despues, 
@@ -841,7 +841,7 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
             usuario: user_name,
             accion: 'I',
             datosOriginales: '',
-            datosNuevos: JSON.stringify(salida),
+            datosNuevos: JSON.stringify(registroSalida.rows),
             ip,
             observacion: null
         });
