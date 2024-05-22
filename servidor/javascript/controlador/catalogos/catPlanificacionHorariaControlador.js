@@ -649,7 +649,7 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
             // INICIAR TRANSACCION
             yield database_1.default.query('BEGIN');
             // CREAR ENTRADA
-            yield database_1.default.query(`
+            const registroEntrada = yield database_1.default.query(`
             INSERT INTO eu_asistencia_general (codigo, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
                 tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
                 estado_origen, minutos_alimentacion)
@@ -663,13 +663,13 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: JSON.stringify(entrada),
+                datosNuevos: JSON.stringify(registroEntrada.rows),
                 ip,
                 observacion: null
             });
             // CREAR INICIO ALIMENTACION
             if (inicioAlimentacion) {
-                yield database_1.default.query(`
+                const registroInicioAlimentacion = yield database_1.default.query(`
                 INSERT INTO eu_asistencia_general (codigo, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
                     tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
                     estado_origen, minutos_alimentacion)
@@ -683,14 +683,14 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(inicioAlimentacion),
+                    datosNuevos: JSON.stringify(registroInicioAlimentacion.rows),
                     ip,
                     observacion: null
                 });
             }
             // CREAR FIN ALIMENTACION
             if (finAlimentacion) {
-                yield database_1.default.query(`
+                const registroFinAlimentacion = yield database_1.default.query(`
                 INSERT INTO eu_asistencia_general (codigo, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
                     tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
                     estado_origen, minutos_alimentacion)
@@ -704,13 +704,13 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(finAlimentacion),
+                    datosNuevos: JSON.stringify(registroFinAlimentacion.rows),
                     ip,
                     observacion: null
                 });
             }
             // CREAR SALIDA
-            yield database_1.default.query(`
+            const registroSalida = yield database_1.default.query(`
             INSERT INTO eu_asistencia_general (codigo, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
                 tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
                 estado_origen, minutos_alimentacion)
@@ -724,7 +724,7 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: JSON.stringify(salida),
+                datosNuevos: JSON.stringify(registroSalida.rows),
                 ip,
                 observacion: null
             });
