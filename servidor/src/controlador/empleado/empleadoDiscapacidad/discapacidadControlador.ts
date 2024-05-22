@@ -112,16 +112,6 @@ class DiscapacidadControlador {
     }
   }
 
-
-
-
-
-
-
-
-
-
-
   public async list(req: Request, res: Response) {
     const DISCAPACIDAD = await pool.query(
       `
@@ -136,44 +126,7 @@ class DiscapacidadControlador {
     }
   }
 
-
-
-
-
-
-
-
-  /* TIPO DISCAPACIDAD */
-
-
-
-  public async ObtenerUnTipoD(req: Request, res: Response): Promise<any> {
-    const { id } = req.params;
-    const TIPO_DISCAPACIDAD = await pool.query(
-      `
-      SELECT * FROM e_cat_discapacidad WHERE id = $1
-      `
-      , [id]);
-    if (TIPO_DISCAPACIDAD.rowCount > 0) {
-      return res.jsonp(TIPO_DISCAPACIDAD.rows)
-    }
-    else {
-      res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-  }
-
-  public async ActualizarTipoD(req: Request, res: Response): Promise<void> {
-    const id = req.params;
-    const { nombre } = req.body;
-    await pool.query(
-      `
-      UPDATE e_cat_discapacidad SET nombre = $1 WHERE id = $2
-      `
-      , [nombre, id]);
-    res.jsonp({ message: 'Registro actualizado.' });
-  }
-
-
+  
 }
 
 export const DISCAPACIDAD_CONTROLADOR = new DiscapacidadControlador();

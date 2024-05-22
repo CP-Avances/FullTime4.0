@@ -32,16 +32,4 @@ export class DetalleCatHorariosService {
   }
 
 
-
-
-
-
-  // VERIFICAR DATOS DE LA PLANTILLA DE DETALLES DE HORRAIO Y CARGARLOS AL SISTEMA
-  CargarPlantillaDetalles(formData) {
-    return this.http.post<any>(environment.url + '/detalleHorario/upload', formData)
-  }
-
-  VerificarDatosDetalles(formData) {
-    return this.http.post<any>(environment.url + '/detalleHorario/verificarDatos/upload', formData)
-  }
 }

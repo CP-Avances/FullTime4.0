@@ -53,15 +53,6 @@ export class DatosGeneralesService {
     return this.http.post<any>(`${environment.url}/generalidades/datos_generales_comunicados-jefe/${estado}`, data);
   }
 
-
-
-
-
-
-
-
-
-
   // METODO PARA CONSULTAR DATOS DEL USUARIO
   ObtenerDatosActuales(id_empleado: number) {
     return this.http.get(`${environment.url}/generalidades/datos-actuales/${id_empleado}`);
@@ -77,10 +68,6 @@ export class DatosGeneralesService {
   ObtenerInformacionCargo(estado: any, sucursales: any) {
     return this.http.post<any>(`${environment.url}/generalidades/informacion-general-cargo/${estado}`, sucursales);
   }
-
-
-
-
 
   // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR ASIGNADOS UBICACION
   ObtenerInformacionUbicacion(estado: any, ubicacion: any) {
@@ -117,8 +104,5 @@ export class DatosGeneralesService {
   ObtenerAdminJefes(datos: any) {
     return this.http.post(`${environment.url}/generalidades/datos-actuales-sucursales`, datos);
   }
-
-
-
 
 }

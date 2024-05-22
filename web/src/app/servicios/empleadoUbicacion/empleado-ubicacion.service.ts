@@ -59,10 +59,7 @@ export class EmpleadoUbicacionService {
     return this.http.get<any>(`${environment.url}/ubicacion/determinada/${id}`);
   }
 
-  ConsultarUltimoRegistro() {
-    return this.http.get(`${environment.url}/ubicacion/ultimo-registro`);
-  }
-
+ 
   EliminarCoordenadas(id: number) {
     return this.http.delete<any>(`${environment.url}/ubicacion/eliminar/${id}`);
   }

@@ -40,19 +40,7 @@ class EmpleadoProcesoControlador {
     res.status(404).jsonp({ text: 'Registro no encontrado.' });
   }
 
-  public async ListarEmpleProcesos(req: Request, res: Response) {
-    const PROCESOS = await pool.query(
-      `
-      SELECT * FROM map_empleado_procesos
-      `
-    );
-    if (PROCESOS.rowCount > 0) {
-      return res.jsonp(PROCESOS.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-    }
-  }
+ 
 
   public async EliminarRegistros(req: Request, res: Response): Promise<void> {
     const id = req.params.id;

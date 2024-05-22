@@ -125,31 +125,6 @@ class DiscapacidadControlador {
             }
         });
     }
-    /* TIPO DISCAPACIDAD */
-    ObtenerUnTipoD(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const TIPO_DISCAPACIDAD = yield database_1.default.query(`
-      SELECT * FROM e_cat_discapacidad WHERE id = $1
-      `, [id]);
-            if (TIPO_DISCAPACIDAD.rowCount > 0) {
-                return res.jsonp(TIPO_DISCAPACIDAD.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    ActualizarTipoD(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params;
-            const { nombre } = req.body;
-            yield database_1.default.query(`
-      UPDATE e_cat_discapacidad SET nombre = $1 WHERE id = $2
-      `, [nombre, id]);
-            res.jsonp({ message: 'Registro actualizado.' });
-        });
-    }
 }
 exports.DISCAPACIDAD_CONTROLADOR = new DiscapacidadControlador();
 exports.default = exports.DISCAPACIDAD_CONTROLADOR;
