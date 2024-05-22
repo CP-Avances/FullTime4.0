@@ -1,10 +1,11 @@
+import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 import fs from 'fs';
 import path from 'path';
 import excel from 'xlsx';
-import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 
 class VacunaControlador {
 
@@ -29,7 +30,7 @@ class VacunaControlador {
     // METODO PARA REGISTRAR TIPO VACUNA
     public async CrearVacuna(req: Request, res: Response): Promise<Response> {
         try {
-            const { vacuna } = req.body;
+            const { vacuna, user_name, ip } = req.body;
             var VERIFICAR_VACUNA = await pool.query(
                 `
                 SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
@@ -39,6 +40,9 @@ class VacunaControlador {
 
                 const vacunaInsertar = vacuna.charAt(0).toUpperCase() + vacuna.slice(1).toLowerCase();
 
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
                 const response: QueryResult = await pool.query(
                     `
                     INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
@@ -46,6 +50,20 @@ class VacunaControlador {
                     , [vacunaInsertar]);
 
                 const [vacunaInsertada] = response.rows;
+
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_vacuna',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(vacunaInsertada),
+                    ip,
+                    observacion: null
+                })
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
 
                 if (vacunaInsertada) {
                     return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' })
@@ -57,6 +75,8 @@ class VacunaControlador {
             }
         }
         catch (error) {
+            // ROLLBACK
+            await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error', status: '500' });
         }
     }
@@ -64,14 +84,13 @@ class VacunaControlador {
     // METODO PARA EDITAR VACUNA
     public async EditarVacuna(req: Request, res: Response): Promise<Response> {
         try {
-            const { id, nombre } = req.body;
+            const { id, nombre, user_name, ip } = req.body;
 
             var VERIFICAR_VACUNA = await pool.query(
                 `
                 SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1 AND NOT id = $2
                 `
-                , [nombre.toUpperCase(), id])
-
+                , [nombre.toUpperCase(), id]);
 
             if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
                 const vacunaEditar = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
@@ -84,6 +103,21 @@ class VacunaControlador {
                     , [id, vacunaEditar]);
 
                 const [vacunaInsertada] = response.rows;
+
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_vacuna',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(VERIFICAR_VACUNA.rows),
+                    datosNuevos: JSON.stringify(vacunaInsertada),
+                    ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
                 if (vacunaInsertada) {
                     return res.status(200).jsonp({ message: 'Registro editado.', status: '200' })
                 } else {
@@ -95,6 +129,8 @@ class VacunaControlador {
 
         }
         catch (error) {
+            // ROLLBACK
+            await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error', status: '500' });
         }
     }
@@ -103,14 +139,60 @@ class VacunaControlador {
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
+            const { user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOS ANTES DE ELIMINAR
+            const vacuna = await pool.query(
+                `
+                SELECT * FROM e_cat_vacuna WHERE id = $1
+                `
+                , [id]);
+            
+            const [datosVacuna] = vacuna.rows;
+
+            if (!datosVacuna) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_vacuna',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+            }
+
             await pool.query(
                 `
                 DELETE FROM e_cat_vacuna WHERE id = $1
                 `
                 , [id]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'e_cat_vacuna',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datosVacuna),
+                datosNuevos: '',
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
             res.jsonp({ message: 'Registro eliminado.' });
 
         } catch (error) {
+            // ROLLBACK
+            await pool.query('ROLLBACK');
             return res.jsonp({ message: 'error' });
         }
     }
@@ -250,8 +332,8 @@ class VacunaControlador {
          // REGISTRAR PLANTILLA MODALIDAD_CARGO 
          public async CargarPlantilla(req: Request, res: Response) {
             try {
-                const plantilla = req.body;
-                console.log('datos vacunas: ', plantilla);
+                const {plantilla, user_name, ip} = req.body;
+
                 var contador = 1;
                 var respuesta: any
 
@@ -259,6 +341,9 @@ class VacunaControlador {
                     // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                     const { item, vacuna, observacion } = data;
                     const vacu = vacuna.charAt(0).toUpperCase() + vacuna.slice(1).toLowerCase();
+
+                    // INICIAR TRANSACCION
+                    await pool.query('BEGIN');
     
                     // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
                     const response: QueryResult = await pool.query(
@@ -268,6 +353,20 @@ class VacunaControlador {
                         , [vacu]);
     
                     const [vacuna_emp] = response.rows;
+
+                    // AUDITORIA
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'e_cat_vacuna',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(vacuna_emp),
+                        ip,
+                        observacion: null
+                    });
+
+                    // FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
     
                     if (contador === plantilla.length) {
                         if (vacuna_emp) {
@@ -283,6 +382,8 @@ class VacunaControlador {
     
     
             }catch(error){
+                // ROLLBACK
+                await pool.query('ROLLBACK');
                 return res.status(500).jsonp({message: 'Error con el servidor metodo CargarPlantilla', status: '500'});
             }
          }

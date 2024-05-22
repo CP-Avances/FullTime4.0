@@ -13,11 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TIPO_VACUNAS_CONTROLADOR = void 0;
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const xlsx_1 = __importDefault(require("xlsx"));
-const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 class VacunaControlador {
     // METODO PARA LISTAR TIPO VACUNAS
     ListaVacuna(req, res) {
@@ -42,16 +43,30 @@ class VacunaControlador {
     CrearVacuna(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { vacuna } = req.body;
+                const { vacuna, user_name, ip } = req.body;
                 var VERIFICAR_VACUNA = yield database_1.default.query(`
                 SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
                 `, [vacuna.toUpperCase()]);
                 if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
                     const vacunaInsertar = vacuna.charAt(0).toUpperCase() + vacuna.slice(1).toLowerCase();
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
                     INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
                     `, [vacunaInsertar]);
                     const [vacunaInsertada] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_cat_vacuna',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(vacunaInsertada),
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                     if (vacunaInsertada) {
                         return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' });
                     }
@@ -64,6 +79,8 @@ class VacunaControlador {
                 }
             }
             catch (error) {
+                // ROLLBACK
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error', status: '500' });
             }
         });
@@ -72,7 +89,7 @@ class VacunaControlador {
     EditarVacuna(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, nombre } = req.body;
+                const { id, nombre, user_name, ip } = req.body;
                 var VERIFICAR_VACUNA = yield database_1.default.query(`
                 SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1 AND NOT id = $2
                 `, [nombre.toUpperCase(), id]);
@@ -83,6 +100,18 @@ class VacunaControlador {
                 WHERE id = $1 RETURNING *
                 `, [id, vacunaEditar]);
                     const [vacunaInsertada] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_cat_vacuna',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: JSON.stringify(VERIFICAR_VACUNA.rows),
+                        datosNuevos: JSON.stringify(vacunaInsertada),
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                     if (vacunaInsertada) {
                         return res.status(200).jsonp({ message: 'Registro editado.', status: '200' });
                     }
@@ -95,6 +124,8 @@ class VacunaControlador {
                 }
             }
             catch (error) {
+                // ROLLBACK
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error', status: '500' });
             }
         });
@@ -104,12 +135,48 @@ class VacunaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
+                const { user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOS ANTES DE ELIMINAR
+                const vacuna = yield database_1.default.query(`
+                SELECT * FROM e_cat_vacuna WHERE id = $1
+                `, [id]);
+                const [datosVacuna] = vacuna.rows;
+                if (!datosVacuna) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_cat_vacuna',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
                 yield database_1.default.query(`
                 DELETE FROM e_cat_vacuna WHERE id = $1
                 `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'e_cat_vacuna',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosVacuna),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
+                // ROLLBACK
+                yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });
             }
         });
@@ -233,19 +300,32 @@ class VacunaControlador {
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const plantilla = req.body;
-                console.log('datos vacunas: ', plantilla);
+                const { plantilla, user_name, ip } = req.body;
                 var contador = 1;
                 var respuesta;
                 plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                     // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                     const { item, vacuna, observacion } = data;
                     const vacu = vacuna.charAt(0).toUpperCase() + vacuna.slice(1).toLowerCase();
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
                     // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
                     const response = yield database_1.default.query(`
                         INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
                         `, [vacu]);
                     const [vacuna_emp] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_cat_vacuna',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(vacuna_emp),
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                     if (contador === plantilla.length) {
                         if (vacuna_emp) {
                             return respuesta = res.status(200).jsonp({ message: 'ok', status: '200' });
@@ -258,6 +338,8 @@ class VacunaControlador {
                 }));
             }
             catch (error) {
+                // ROLLBACK
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'Error con el servidor metodo CargarPlantilla', status: '500' });
             }
         });
