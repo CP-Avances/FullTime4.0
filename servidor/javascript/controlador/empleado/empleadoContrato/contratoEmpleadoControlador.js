@@ -413,50 +413,6 @@ class ContratoEmpleadoControlador {
             }
         });
     }
-    ListarContratos(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const CONTRATOS = yield database_1.default.query(`
-            SELECT * FROM eu_empleado_contratos
-            `);
-            if (CONTRATOS.rowCount > 0) {
-                return res.jsonp(CONTRATOS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    ObtenerUnContrato(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const CONTRATOS = yield database_1.default.query(`
-            SELECT * FROM eu_empleado_contratos WHERE id = $1
-            `, [id]);
-            if (CONTRATOS.rowCount > 0) {
-                return res.jsonp(CONTRATOS.rows[0]);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    EncontrarIdContrato(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
-            const CONTRATO = yield database_1.default.query(`
-            SELECT ec.id 
-            FROM eu_empleado_contratos AS ec, eu_empleados AS e 
-            WHERE ec.id_empleado = e.id AND e.id = $1 
-            ORDER BY ec.fecha_ingreso DESC 
-            `, [id_empleado]);
-            if (CONTRATO.rowCount > 0) {
-                return res.jsonp(CONTRATO.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
     EncontrarFechaContratoId(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_contrato } = req.body;

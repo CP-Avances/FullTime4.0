@@ -118,17 +118,7 @@ export class RegimenService {
     };
     return this.http.request('delete', url, httpOtions);
   }
-
-
-
-
-
-
-
-
-
-
-
+  
   ConsultarRegimenSucursal(id: number) {
     return this.http.get(`${environment.url}/regimenLaboral/sucursal-regimen/${id}`);
   }

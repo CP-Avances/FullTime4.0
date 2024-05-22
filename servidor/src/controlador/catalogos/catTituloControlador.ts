@@ -152,19 +152,6 @@ class TituloControlador {
     }
   }
 
-  public async getOne(req: Request, res: Response): Promise<any> {
-    const { id } = req.params;
-    const unTitulo = await pool.query(
-      `
-      SELECT * FROM et_titulos WHERE id = $1
-      `
-      , [id]);
-    if (unTitulo.rowCount > 0) {
-      return res.jsonp(unTitulo.rows)
-    }
-    res.status(404).jsonp({ text: 'Registro no encontrado.' });
-  }
-
   public async create(req: Request, res: Response): Promise<void> {
     try {
       const { nombre, id_nivel, user_name, ip } = req.body;

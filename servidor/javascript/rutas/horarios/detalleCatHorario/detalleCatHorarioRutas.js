@@ -24,9 +24,6 @@ class PermisosRutas {
         this.router.post('/', verificarToken_1.TokenValidation, detalleCatHorarioControlador_1.default.CrearDetalleHorarios);
         // METODO PARA ACTUALIZAR REGISTRO
         this.router.put('/', verificarToken_1.TokenValidation, detalleCatHorarioControlador_1.default.ActualizarDetalleHorarios);
-        // VERIFICAR LOS DATOS DE LA PLANTILLA DE DETALLES DE HORARIO Y SUBIRLOS AL SISTEMA
-        this.router.post('/verificarDatos/upload', [verificarToken_1.TokenValidation, multipartMiddleware], detalleCatHorarioControlador_1.default.VerificarDatosDetalles);
-        this.router.post('/upload', [verificarToken_1.TokenValidation, multipartMiddleware], detalleCatHorarioControlador_1.default.CrearDetallePlantilla);
     }
 }
 const DETALLE_CATALOGO_HORARIO_RUTAS = new PermisosRutas();

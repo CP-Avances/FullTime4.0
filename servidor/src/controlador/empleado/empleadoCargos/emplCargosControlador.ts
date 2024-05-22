@@ -8,7 +8,7 @@ import path from 'path';
 import fs from 'fs';
 
 import excel from 'xlsx';
-import { use } from 'echarts';
+
 
 class EmpleadoCargosControlador {
 
@@ -198,59 +198,6 @@ class EmpleadoCargosControlador {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  public async list(req: Request, res: Response) {
-    const Cargos = await pool.query(
-      `
-      SELECT * FROM eu_empleado_cargos
-      `
-    );
-    if (Cargos.rowCount > 0) {
-      return res.jsonp(Cargos.rows);
-    }
-    else {
-      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-  }
-
-  public async ListarCargoEmpleado(req: Request, res: Response) {
-    const empleadoCargos = await pool.query(
-      `
-      SELECT cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, e.id AS empleado, e.nombre, e.apellido 
-      FROM ed_autoriza_departamento AS da, eu_empleado_cargos AS ecr, ed_departamentos AS cg, e_sucursales AS s, 
-        eu_empleado_contratos AS ecn, eu_empleados AS e 
-      WHERE da.id_empleado_cargo = ecr.id AND da.id_departamento = cg.id AND cg.id_sucursal = s.id 
-        AND ecr.id_contrato = ecn.id AND ecn.id_empleado = e.id 
-      ORDER BY nombre ASC
-      `
-    );
-    if (empleadoCargos.rowCount > 0) {
-      return res.jsonp(empleadoCargos.rows);
-    }
-    else {
-      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-  }
-
-
   public async EncontrarIdCargo(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
     const CARGO = await pool.query(
@@ -286,20 +233,14 @@ class EmpleadoCargosControlador {
     }
   }
 
-  public async BuscarUnTipo(req: Request, res: Response) {
-    const id = req.params.id;
-    const Cargos = await pool.query(
-      `
-      SELECT * FROM e_cat_tipo_cargo WHERE id = $1
-      `
-      , [id]);
-    if (Cargos.rowCount > 0) {
-      return res.jsonp(Cargos.rows);
-    }
-    else {
-      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-  }
+
+
+
+
+
+
+
+ 
 
   public async BuscarTipoDepartamento(req: Request, res: Response) {
     const id = req.params.id;

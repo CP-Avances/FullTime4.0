@@ -61,12 +61,6 @@ export class DepartamentosService {
     return this.http.request('delete', url, httpOtions);
   }
 
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${environment.url}/departamento/xmlDownload`, data);
-  }
-
-
   // REGISTRAR NIVELDEPARTAMENTO  --**VERIFICADO
   RegistrarNivelDepartamento(data: any) {
     return this.http.post(`${environment.url}/departamento/crearnivel`, data).pipe(
@@ -101,38 +95,10 @@ export class DepartamentosService {
       catchError(data)
     );
   }
-
-
-
-
-
   // catalogo de departamentos
   ConsultarDepartamentoPorContrato(id_cargo: number) {
     return this.http.get(`${environment.url}/departamento/busqueda-cargo/${id_cargo}`);
   }
-
-  ConsultarNombreDepartamentos() {
-    return this.http.get(`${environment.url}/departamento/nombreDepartamento`);
-  }
-
-  ConsultarIdNombreDepartamentos(nombreDepartamento: string) {
-    return this.http.get(`${environment.url}/departamento/idDepartamento/${nombreDepartamento}`);
-  }
-
-
-
-  getIdDepartamentoPadre(departamentoPadre: string) {
-    return this.http.get(`${environment.url}/departamento/busqueda/${departamentoPadre}`);
-  }
-
-
-
-  EncontrarUnDepartamento(id: number) {
-    return this.http.get(`${environment.url}/departamento/${id}`);
-  }
-
-
-
 
   RevisarFormato(formData) {
     console.log('formDataDepartamentos: ',formData);
@@ -141,7 +107,6 @@ export class DepartamentosService {
   subirArchivoExcel(formData) {
     return this.http.post<any>(`${environment.url}/departamento/cargar_plantilla/`, formData);
   }
-
 
   BuscarDepartamentoRegimen(id: number) {
     return this.http.get(`${environment.url}/departamento/buscar/regimen-departamento/${id}`);

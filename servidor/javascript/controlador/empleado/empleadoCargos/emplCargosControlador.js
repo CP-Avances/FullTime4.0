@@ -184,37 +184,6 @@ class EmpleadoCargosControlador {
             }
         });
     }
-    list(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const Cargos = yield database_1.default.query(`
-      SELECT * FROM eu_empleado_cargos
-      `);
-            if (Cargos.rowCount > 0) {
-                return res.jsonp(Cargos.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    ListarCargoEmpleado(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const empleadoCargos = yield database_1.default.query(`
-      SELECT cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, e.id AS empleado, e.nombre, e.apellido 
-      FROM ed_autoriza_departamento AS da, eu_empleado_cargos AS ecr, ed_departamentos AS cg, e_sucursales AS s, 
-        eu_empleado_contratos AS ecn, eu_empleados AS e 
-      WHERE da.id_empleado_cargo = ecr.id AND da.id_departamento = cg.id AND cg.id_sucursal = s.id 
-        AND ecr.id_contrato = ecn.id AND ecn.id_empleado = e.id 
-      ORDER BY nombre ASC
-      `);
-            if (empleadoCargos.rowCount > 0) {
-                return res.jsonp(empleadoCargos.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
     EncontrarIdCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
@@ -241,20 +210,6 @@ class EmpleadoCargosControlador {
       `, [id_empleado]);
             if (CARGO.rowCount > 0 && CARGO.rows[0]['max'] != null) {
                 return res.jsonp(CARGO.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    BuscarUnTipo(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const Cargos = yield database_1.default.query(`
-      SELECT * FROM e_cat_tipo_cargo WHERE id = $1
-      `, [id]);
-            if (Cargos.rowCount > 0) {
-                return res.jsonp(Cargos.rows);
             }
             else {
                 return res.status(404).jsonp({ text: 'Registro no encontrado.' });

@@ -28,8 +28,6 @@ class ProvinciaRutas {
         this.router.get('/buscar/:id', verificarToken_1.TokenValidation, catProvinciaControlador_1.default.ObtenerProvincia);
         // METODO PARA BUSCAR DATOS DE UN PAIS
         this.router.get('/buscar/pais/:id', verificarToken_1.TokenValidation, catProvinciaControlador_1.default.ObtenerPais);
-        this.router.get('/paises', verificarToken_1.TokenValidation, catProvinciaControlador_1.default.ListarTodoPais);
-        this.router.get('/nombreProvincia/:nombre', verificarToken_1.TokenValidation, catProvinciaControlador_1.default.ObtenerIdProvincia);
     }
 }
 const PROVINCIA_RUTAS = new ProvinciaRutas();

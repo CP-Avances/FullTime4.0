@@ -30,9 +30,6 @@ export class PedHoraExtraService {
     return this.http.get(`${environment.url}/horas-extras-pedidas/observaciones`);
   }
 
-
-
-
   GuardarHoraExtra(datos: any) {
     return this.http.post<any>(`${environment.url}/horas-extras-pedidas`, datos);
   }

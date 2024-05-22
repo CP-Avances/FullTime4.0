@@ -36,11 +36,7 @@ class TituloRutas {
         this.router.delete('/eliminar/:id', TokenValidation, TITULO_CONTROLADOR.EliminarRegistros);
         // METODO PARA ACTUALIZAR REGISTRO DE TITULO
         this.router.put('/', TokenValidation, TITULO_CONTROLADOR.ActualizarTitulo);
-
-
-        this.router.get('/:id', TokenValidation, TITULO_CONTROLADOR.getOne);
         this.router.post('/', TokenValidation, TITULO_CONTROLADOR.create);
-
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], TITULO_CONTROLADOR.RevisarDatos);
 
     }

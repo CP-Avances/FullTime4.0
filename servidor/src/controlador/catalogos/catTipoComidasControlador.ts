@@ -237,19 +237,6 @@ class TipoComidasControlador {
     }
   }
 
-    public async VerUltimoRegistro(req: Request, res: Response) {
-        const TIPO_COMIDAS = await pool.query(
-            `
-            SELECT MAX (id) FROM ma_horario_comidas
-            `
-        );
-        if (TIPO_COMIDAS.rowCount > 0) {
-            return res.jsonp(TIPO_COMIDAS.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros,' });
-        }
-    }
 
   // Registro de detalle de menú - desglose de platos
   public async CrearDetalleMenu(req: Request, res: Response): Promise<void> {
@@ -260,6 +247,7 @@ class TipoComidasControlador {
       await pool.query("BEGIN");
 
       await pool.query(
+
             `
             INSERT INTO ma_detalle_comida (nombre, valor, observacion, id_horario_comida)
             VALUES ($1, $2, $3, $4)

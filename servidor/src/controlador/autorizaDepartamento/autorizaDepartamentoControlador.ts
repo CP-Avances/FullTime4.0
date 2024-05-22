@@ -204,20 +204,6 @@ class AutorizaDepartamentoControlador {
         }
     }
 
-    public async ListarAutorizaDepartamento(req: Request, res: Response) {
-        const AUTORIZA = await pool.query(
-            `
-            SELECT * FROM ed_autoriza_departamento
-            `
-        );
-        if (AUTORIZA.rowCount > 0) {
-            return res.jsonp(AUTORIZA.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros' });
-        }
-    }
-
 
     // METODO PARA OBTENER LISTA DE USUARIOS QUE APRUEBAN SOLICITUDES     --**VERIFICADO
     public async ObtenerlistaEmpleadosAutorizan(req: Request, res: Response): Promise<any> {

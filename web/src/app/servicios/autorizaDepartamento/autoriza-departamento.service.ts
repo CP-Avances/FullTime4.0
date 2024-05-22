@@ -43,27 +43,9 @@ export class AutorizaDepartamentoService {
   }
 
 
-
-
-
-
-
-
-
-
-
-
-  //Empleado que autoriza en un departamento
-
-  ConsultarAutorizaDepartamento() {
-    return this.http.get(`${environment.url}/autorizaDepartamento`);
-  }
-
-
   BuscarEmpleadosAutorizan(id: any) {
     return this.http.get(`${environment.url}/autorizaDepartamento/empleadosAutorizan/${id}`);
   }
-
 
   // METODO PARA LISTAR USUARIOS QUE APRUEBAN EN UN DEPARTAMENTO    --**VERIFICADO
   BuscarListaEmpleadosAutorizan(id: any) {

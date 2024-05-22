@@ -186,33 +186,6 @@ class ProvinciaControlador {
             }
         });
     }
-    ObtenerIdProvincia(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { nombre } = req.params;
-            const UNA_PROVINCIA = yield database_1.default.query(`
-      SELECT * FROM e_provincias WHERE nombre = $1
-      `, [nombre]);
-            if (UNA_PROVINCIA.rowCount > 0) {
-                return res.jsonp(UNA_PROVINCIA.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'El registro no ha sido encontrada.' });
-            }
-        });
-    }
-    ListarTodoPais(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const PAIS = yield database_1.default.query(`
-      SELECT * FROM e_cat_paises
-      `);
-            if (PAIS.rowCount > 0) {
-                return res.jsonp(PAIS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
 }
 exports.PROVINCIA_CONTROLADOR = new ProvinciaControlador();
 exports.default = exports.PROVINCIA_CONTROLADOR;

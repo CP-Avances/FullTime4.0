@@ -33,7 +33,6 @@ class UbicacionRutas {
         this.router.get('/', verificarToken_1.TokenValidation, emplUbicacionControlador_1.default.ListarCoordenadas);
         this.router.get('/especifico/:id', verificarToken_1.TokenValidation, emplUbicacionControlador_1.default.ListarCoordenadasDefinidas);
         this.router.get('/determinada/:id', emplUbicacionControlador_1.default.ListarUnaCoordenada);
-        this.router.get('/ultimo-registro', emplUbicacionControlador_1.default.BuscarUltimoRegistro);
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, emplUbicacionControlador_1.default.EliminarCoordenadas);
     }
 }

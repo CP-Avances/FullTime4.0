@@ -163,11 +163,7 @@ export class ListarCoordenadasComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id: number) {
-    const datos = {
-      user_name: this.user_name,
-      ip: this.ip
-    }
-    this.restU.EliminarCoordenadas(id, datos).subscribe((res: any) => {
+    this.restU.EliminarCoordenadas(id).subscribe((res: any) => {
       if (res.message === 'false') {
         this.toastr.warning('No es posible eliminar registro.', 'Verificar dependencias.', {
           timeOut: 6000,

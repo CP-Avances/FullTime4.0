@@ -356,7 +356,7 @@ export class ListarTipoComidasComponent implements OnInit {
         VALOR: obj.valor,
         HORA_INICIA: obj.hora_inicio,
         HORA_FINALIZA: obj.hora_fin,
-        OBSERVACIONES: obj.observa_menu
+        OBSERVACIONES: obj.observacion
       }
     }));
     // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE

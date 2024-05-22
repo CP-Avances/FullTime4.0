@@ -639,57 +639,6 @@ class DepartamentoControlador {
             }
         });
     }
-    ListarNombreDepartamentos(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const DEPARTAMENTOS = yield database_1.default.query(`
-      SELECT * FROM ed_departamentos
-      `);
-            if (DEPARTAMENTOS.rowCount > 0) {
-                return res.jsonp(DEPARTAMENTOS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    ListarIdDepartamentoNombre(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { nombre } = req.params;
-            const DEPARTAMENTOS = yield database_1.default.query(`
-      SELECT * FROM ed_departamentos WHERE nombre = $1
-      `, [nombre]);
-            if (DEPARTAMENTOS.rowCount > 0) {
-                return res.jsonp(DEPARTAMENTOS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    ObtenerIdDepartamento(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { nombre } = req.params;
-            const DEPARTAMENTO = yield database_1.default.query(`
-      SELECT id FROM ed_departamentos WHERE nombre = $1
-      `, [nombre]);
-            if (DEPARTAMENTO.rowCount > 0) {
-                return res.jsonp(DEPARTAMENTO.rows);
-            }
-            res.status(404).jsonp({ text: 'Registro no encontrado.' });
-        });
-    }
-    ObtenerUnDepartamento(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const DEPARTAMENTO = yield database_1.default.query(`
-      SELECT * FROM ed_departamentos WHERE id = $1
-      `, [id]);
-            if (DEPARTAMENTO.rowCount > 0) {
-                return res.jsonp(DEPARTAMENTO.rows[0]);
-            }
-            res.status(404).jsonp({ text: 'Registro no encontrado' });
-        });
-    }
     BuscarDepartamentoPorCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id_cargo;

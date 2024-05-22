@@ -146,18 +146,6 @@ class TituloControlador {
             }
         });
     }
-    getOne(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const unTitulo = yield database_1.default.query(`
-      SELECT * FROM et_titulos WHERE id = $1
-      `, [id]);
-            if (unTitulo.rowCount > 0) {
-                return res.jsonp(unTitulo.rows);
-            }
-            res.status(404).jsonp({ text: 'Registro no encontrado.' });
-        });
-    }
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

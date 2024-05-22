@@ -13,12 +13,10 @@ class DepartamentoRutas {
     }
     configuracion() {
         this.router.get('/by-permiso/:id_permiso', verificarToken_1.TokenValidation, autorizacionesControlador_1.default.ObtenerAutorizacionPermiso);
-        this.router.get('/', verificarToken_1.TokenValidation, autorizacionesControlador_1.default.ListarAutorizaciones);
         this.router.get('/by-vacacion/:id_vacacion', verificarToken_1.TokenValidation, autorizacionesControlador_1.default.ObtenerAutorizacionByVacacion);
         this.router.get('/by-hora-extra/:id_hora_extra', autorizacionesControlador_1.default.ObtenerAutorizacionByHoraExtra);
         this.router.post('/', verificarToken_1.TokenValidation, autorizacionesControlador_1.default.CrearAutorizacion);
         this.router.put('/estado-permiso/multiple', verificarToken_1.TokenValidation, autorizacionesControlador_1.default.ActualizarEstadoAutorizacionPermiso);
-        this.router.put('/:id_plan_hora_extra/estado-plan-hora-extra', verificarToken_1.TokenValidation, autorizacionesControlador_1.default.ActualizarEstadoPlanificacion);
         // ACTUALIZAR ESTADO DE APROBACION DE SOLICITUDES
         this.router.put('/:id/estado-aprobacion', verificarToken_1.TokenValidation, autorizacionesControlador_1.default.ActualizarEstadoSolicitudes);
     }

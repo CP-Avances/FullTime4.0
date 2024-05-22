@@ -46,11 +46,6 @@ export class CiudadService {
     return this.http.request('delete', url, httpOtions);
   }
 
-   // METODO PARA CREAR ARCHIVO XML
-   CrearXML(data: any) {
-    return this.http.post(`${environment.url}/ciudades/xmlDownload`, data);
-  }
-
   // METODO PARA BUSCAR INFORMACION DE UNA CIUDAD
   BuscarUnaCiudad(id: number) {
     return this.http.get(`${environment.url}/ciudades/${id}`);

@@ -36,7 +36,6 @@ export class DiscapacidadService {
     return this.http.request('delete', url, httpOtions);
   }
 
-
   /** *************************************************************************************** **
    ** **                METODO PARA MANEJO DE DATOS DE TIPO DISCAPACIDAD                   ** **
    ** *************************************************************************************** **/
@@ -55,34 +54,5 @@ export class DiscapacidadService {
   BuscarDiscapacidadNombre(data: any) {
     return this.http.post<any>(`${environment.url}/discapacidad/buscarTipo/nombre`, data);
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // TIPO DE DISCAPACIDAD
-
-
-
-  BuscarTipoD(id: number) {
-    return this.http.get(`${environment.url}/discapacidad/buscarTipo/tipo/${id}`);
-  }
-
-
-
-  ActualizarTipoD(id: number, data: any) {
-    return this.http.put(`${environment.url}/discapacidad/buscarTipo/${id}`, data);
-  }
-
-
 
 }

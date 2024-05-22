@@ -22,22 +22,6 @@ class AutorizacionesControlador {
         }
     }
 
-
-    public async ListarAutorizaciones(req: Request, res: Response) {
-        const AUTORIZACIONES = await pool.query(
-            `
-            SELECT * FROM ecm_autorizaciones ORDER BY id
-            `
-        );
-        if (AUTORIZACIONES.rowCount > 0) {
-            return res.jsonp(AUTORIZACIONES.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
-
     public async ObtenerAutorizacionByVacacion(req: Request, res: Response) {
         const id = req.params.id_vacacion
         const AUTORIZACIONES = await pool.query(
@@ -162,86 +146,6 @@ class AutorizacionesControlador {
             return res.status(500).jsonp({ text: 'error' });
         }
     }
-
-
-
-    public async ActualizarEstadoPlanificacion(req: Request, res: Response): Promise<Response> {
-
-        var tiempo = fechaHora();
-        var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
-        var hora = await FormatearHora(tiempo.hora);
-
-        const path_folder = path.resolve('logos');
-
-        var datos = await Credenciales(parseInt(req.params.id_empresa));
-
-        if (datos === 'ok') {
-
-
-            try {
-                const id = req.params.id_plan_hora_extra;
-                //const { id_documento, estado, id_hora_extra, id_departamento } = req.body;
-                const { id_documento, estado, user_name, ip } = req.body;
-
-                // INICIAR TRANSACCION
-                await pool.query('BEGIN');
-
-                // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REGISTRAR AUDITORIA
-                const response = await pool.query('SELECT * FROM ecm_autorizaciones WHERE id_plan_hora_extra = $1', [id]);
-                const [datos] = response.rows;
-
-                if (!datos) {
-                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                        tabla: 'ecm_autorizaciones',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: `Estado: ${estado}, Documento: ${id_documento}`,
-                        ip: ip,
-                        observacion: `Error al actualizar el registro de autorizaciones con id_plan_hora_extra: ${id}`
-                    });
-
-                    // FINALIZAR TRANSACCION
-                    await pool.query('COMMIT');
-                    return res.status(404).jsonp({ text: 'error' });
-                }
-
-                await pool.query(
-                    `
-                    UPDATE ecm_autorizaciones SET estado = $1, id_autoriza_estado = $2 
-                    WHERE id_plan_hora_extra = $3
-                    `
-                    , [estado, id_documento, id]);
-
-                // REGISTRAR AUDITORIA
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'ecm_autorizaciones',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: `Estado: ${datos.estado}, Documento: ${datos.id_documento}`,
-                    datosNuevos: `Estado: ${estado}, Documento: ${id_documento}`,
-                    ip: ip,
-                    observacion: null
-                });
-
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-                return res.jsonp({ message: 'Autorizacion guardada.' });
-    
-            } catch (error) {
-                // CANCELAR TRANSACCION
-                await pool.query('ROLLBACK');
-                return res.status(500).jsonp({ text: 'error' });
-            }
-        }
-        else {
-            res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
-        }
-
-        return res.jsonp({ message: 'Autorizacion guardado' });
-        
-    }
-
 
     /** ***************************************************************************************************** ** 
      ** **                METODO DE CAMBIO DE ESTADO DE APROBACIONES DE SOLICITUDES                        ** ** 

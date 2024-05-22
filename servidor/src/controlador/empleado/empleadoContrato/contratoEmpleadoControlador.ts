@@ -451,64 +451,6 @@ class ContratoEmpleadoControlador {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-    public async ListarContratos(req: Request, res: Response) {
-        const CONTRATOS = await pool.query(
-            `
-            SELECT * FROM eu_empleado_contratos
-            `
-        );
-        if (CONTRATOS.rowCount > 0) {
-            return res.jsonp(CONTRATOS.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
-    public async ObtenerUnContrato(req: Request, res: Response) {
-        const id = req.params.id;
-        const CONTRATOS = await pool.query(
-            `
-            SELECT * FROM eu_empleado_contratos WHERE id = $1
-            `
-            , [id]);
-        if (CONTRATOS.rowCount > 0) {
-            return res.jsonp(CONTRATOS.rows[0])
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
-    public async EncontrarIdContrato(req: Request, res: Response): Promise<any> {
-        const { id_empleado } = req.params;
-        const CONTRATO = await pool.query(
-            `
-            SELECT ec.id 
-            FROM eu_empleado_contratos AS ec, eu_empleados AS e 
-            WHERE ec.id_empleado = e.id AND e.id = $1 
-            ORDER BY ec.fecha_ingreso DESC 
-            `
-            , [id_empleado]);
-        if (CONTRATO.rowCount > 0) {
-            return res.jsonp(CONTRATO.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-        }
-    }
-
-
     public async EncontrarFechaContratoId(req: Request, res: Response): Promise<any> {
         const { id_contrato } = req.body;
         const FECHA = await pool.query(
@@ -524,10 +466,7 @@ class ContratoEmpleadoControlador {
             return res.status(404).jsonp({ text: 'Registro no encontrado.' });
         }
     }
-
-
-
-
+    
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
     public async RevisarDatos(req: Request, res: Response): Promise<any> {
         const documento = req.file?.originalname;

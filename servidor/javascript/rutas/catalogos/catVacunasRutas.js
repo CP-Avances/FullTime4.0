@@ -26,8 +26,6 @@ class VacunasRutas {
     configuracion() {
         // METODO PARA LISTAR TIPO VACUNAS
         this.router.get('/', verificarToken_1.TokenValidation, catVacunasControlador_1.default.ListaVacuna);
-        // METODO PARA CREAR TIPO VACUNAS
-        this.router.post('/crearVacunas', verificarToken_1.TokenValidation, catVacunasControlador_1.default.CrearVacuna);
         // METODO PARA EDITAR TIPO VACUNAS
         this.router.put('/', verificarToken_1.TokenValidation, catVacunasControlador_1.default.EditarVacuna);
         // METODO PARA ELIMINAR REGISTRO
