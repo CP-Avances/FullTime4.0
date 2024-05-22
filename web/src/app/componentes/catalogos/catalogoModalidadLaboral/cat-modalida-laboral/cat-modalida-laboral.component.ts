@@ -58,6 +58,10 @@ export class CatModalidaLaboralComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   filtroModalidad = ''; // VARIABLE DE BUSQUEDA DE DATOS
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   buscarModalidad = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
@@ -85,6 +89,9 @@ export class CatModalidaLaboralComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.listaModalida_Laboral = [];
     this.ObtenerEmpleados(this.idEmpleado);
     this.BuscarParametro();
@@ -290,7 +297,12 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   subirDatosPlantillaModal() {
     if (this.listaModalidadCorrectas.length > 0) {
-      this._ModalidaLaboral.subirArchivoExcel(this.listaModalidadCorrectas).subscribe(response => {
+      const data = {
+        plantilla: this.listaModalidadCorrectas,
+        user_name: this.user_name,
+        ip: this.ip
+      }
+      this._ModalidaLaboral.SubirArchivoExcel(data).subscribe(response => {
         console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de Modalidad laboral importada.', {
           timeOut: 3000,
@@ -552,10 +564,14 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   ConfirmarDelete(modalidad: any) {
     const mensaje = 'eliminar';
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this._ModalidaLaboral.eliminar(modalidad.id).subscribe(res => {
+          this._ModalidaLaboral.Eliminar(modalidad.id, data).subscribe((res: any) => {
             if (res.message === 'error') {
               this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
                 timeOut: 6000,
@@ -580,13 +596,17 @@ export class CatModalidaLaboralComponent implements OnInit {
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
     this.ingresar = false;
     this.contador = 0;
     this.modalidadesEliminar = this.selectionModalidad.selected;
     this.modalidadesEliminar.forEach((datos: any) => {
       this.listaModalida_Laboral = this.listaModalida_Laboral.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this._ModalidaLaboral.eliminar(datos.id).subscribe(res => {
+      this._ModalidaLaboral.Eliminar(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
