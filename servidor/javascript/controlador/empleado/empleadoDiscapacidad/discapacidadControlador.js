@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DISCAPACIDAD_CONTROLADOR = void 0;
+const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../../database"));
 class DiscapacidadControlador {
     // METODO PARA BUSCAR DATOS DISCAPACIDAD USUARIO
@@ -35,33 +36,127 @@ class DiscapacidadControlador {
     // METODO PARA REGISTRAR DISCAPACIDAD
     RegistrarDiscapacidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado, carn_conadis, porcentaje, tipo } = req.body;
-            yield database_1.default.query(`
-      INSERT INTO eu_empleado_discapacidad (id_empleado, carnet_conadis, porcentaje, id_discapacidad) 
-      VALUES ($1, $2, $3, $4)
-      `, [id_empleado, carn_conadis, porcentaje, tipo]);
-            res.jsonp({ message: 'Registro guardado.' });
+            try {
+                const { id_empleado, carn_conadis, porcentaje, tipo, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query(`
+        INSERT INTO eu_empleado_discapacidad (id_empleado, carnet_conadis, porcentaje, id_discapacidad) 
+        VALUES ($1, $2, $3, $4)
+        `, [id_empleado, carn_conadis, porcentaje, tipo]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'cg_discapacidades',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{id_empleado: ${id_empleado}, carn_conadis: ${carn_conadis}, porcentaje: ${porcentaje}, tipo: ${tipo}}`,
+                    ip, observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Discapacidad guardada' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'Error al guardar discapacidad.' });
+            }
         });
     }
     // METODO PARA ACTUALIZAR DATOS DE REGISTRO
     ActualizarDiscapacidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id_empleado = req.params.id_empleado;
-            const { carn_conadis, porcentaje, tipo } = req.body;
-            yield database_1.default.query(`
-      UPDATE eu_empleado_discapacidad SET carnet_conadis = $1, porcentaje = $2, id_discapacidad = $3 
-      WHERE id_empleado = $4
-      `, [carn_conadis, porcentaje, tipo, id_empleado]);
-            res.jsonp({ message: 'Registro actualizado.' });
+            try {
+                const id_empleado = req.params.id_empleado;
+                const { carn_conadis, porcentaje, tipo, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const discapacidad = yield database_1.default.query('SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1', [id_empleado]);
+                const [datosOriginales] = discapacidad.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_discapacidad',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar discapacidad con id_empleado: ${id_empleado}`
+                    });
+                }
+                yield database_1.default.query(`
+        UPDATE eu_empleado_discapacidad SET carnet_conadis = $1, porcentaje = $2, id_discapacidad = $3 
+        WHERE id_empleado = $4
+        `, [carn_conadis, porcentaje, tipo, id_empleado]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_discapacidad',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{carnet_conadis: ${carn_conadis}, porcentaje: ${porcentaje}, tipo: ${tipo}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar registro.' });
+            }
         });
     }
     EliminarDiscapacidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id_empleado = req.params.id_empleado;
-            yield database_1.default.query(`
-      DELETE FROM eu_empleado_discapacidad WHERE id_empleado = $1
-      `, [id_empleado]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                const { user_name, ip } = req.body;
+                const id_empleado = req.params.id_empleado;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const discapacidad = yield database_1.default.query('SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1', [id_empleado]);
+                const [datosOriginales] = discapacidad.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_discapacidad',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar discapacidad con id_empleado: ${id_empleado}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM eu_empleado_discapacidad WHERE id_empleado = $1
+        `, [id_empleado]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_discapacidad',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
+            }
         });
     }
     /** *************************************************************************************** **
@@ -70,16 +165,37 @@ class DiscapacidadControlador {
     // METODO PARA CREAR TIPO DE DISCAPACIDAD
     RegistrarTipo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre } = req.body;
-            const response = yield database_1.default.query(`
-      INSERT INTO e_cat_discapacidad (nombre) VALUES ($1) RETURNING *
-      `, [nombre]);
-            const [tipo] = response.rows;
-            if (tipo) {
-                return res.status(200).jsonp(tipo);
+            try {
+                const { nombre, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query(`
+        INSERT INTO e_cat_discapacidad (nombre) VALUES ($1) RETURNING *
+        `, [nombre]);
+                const [tipo] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'e_cat_discapacidad',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{nombre: ${nombre}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (tipo) {
+                    return res.status(200).jsonp(tipo);
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+                }
             }
-            else {
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al guardar registro.' });
             }
         });
     }
@@ -142,12 +258,50 @@ class DiscapacidadControlador {
     }
     ActualizarTipoD(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params;
-            const { nombre } = req.body;
-            yield database_1.default.query(`
-      UPDATE e_cat_discapacidad SET nombre = $1 WHERE id = $2
-      `, [nombre, id]);
-            res.jsonp({ message: 'Registro actualizado.' });
+            try {
+                const id = req.params;
+                const { nombre, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const tipoDiscapacidad = yield database_1.default.query('SELECT * FROM e_cat_discapacidad WHERE id = $1', [id]);
+                const [datosOriginales] = tipoDiscapacidad.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_cat_discapacidad',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar tipo de discapacidad con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        UPDATE e_cat_discapacidad SET nombre = $1 WHERE id = $2
+        `, [nombre, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'e_cat_discapacidad',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{nombre: ${nombre}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Tipo de Discapacidad actualizado exitosamente' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar registro.' });
+            }
         });
     }
 }

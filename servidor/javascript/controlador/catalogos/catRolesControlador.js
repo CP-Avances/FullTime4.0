@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class RolesControlador {
     // METODO PARA LISTAR ROLES DEL SISTEMA
@@ -32,25 +33,81 @@ class RolesControlador {
     EliminarRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const { user_name, ip } = req.body;
                 const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const rol = yield database_1.default.query('SELECT * FROM ero_cat_roles WHERE id = $1', [id]);
+                const [datosOriginales] = rol.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ero_cat_roles',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar el rol con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+                }
                 yield database_1.default.query(`
         DELETE FROM ero_cat_roles WHERE id = $1
         `, [id]);
-                res.jsonp({ message: 'Registro eliminado.' });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ero_cat_roles',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
             }
         });
     }
     // METODO PARA REGISTRAR ROL
     CrearRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre } = req.body;
-            yield database_1.default.query(`
-       INSERT INTO ero_cat_roles (nombre) VALUES ($1)
-       `, [nombre]);
-            res.jsonp({ message: 'Registro guardado.' });
+            try {
+                const { nombre, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query(`
+        INSERT INTO ero_cat_roles (nombre) VALUES ($1)
+         `, [nombre]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ero_cat_roles',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{nombre: ${nombre}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'Error al guardar el registro.' });
+            }
         });
     }
     ListarRolesActualiza(req, res) {
@@ -83,11 +140,48 @@ class RolesControlador {
     }
     ActualizarRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, id } = req.body;
-            yield database_1.default.query(`
-      UPDATE ero_cat_roles SET nombre = $1 WHERE id = $2
-      `, [nombre, id]);
-            res.jsonp({ message: 'Registro actualizado.' });
+            try {
+                const { nombre, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOS ORIGINALES
+                const rol = yield database_1.default.query('SELECT * FROM ero_cat_roles WHERE id = $1', [id]);
+                const [datosOriginales] = rol.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ero_cat_roles',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el rol con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+                }
+                yield database_1.default.query('UPDATE ero_cat_roles SET nombre = $1 WHERE id = $2', [nombre, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ero_cat_roles',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{nombre: ${nombre}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro Actualizado' });
+            }
+            catch (error) {
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+            }
         });
     }
 }

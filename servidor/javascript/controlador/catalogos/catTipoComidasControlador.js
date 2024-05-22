@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../../database"));
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 class TipoComidasControlador {
     ListarTipoComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -84,41 +85,136 @@ class TipoComidasControlador {
     }
     CrearTipoComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, tipo_comida, hora_inicio, hora_fin } = req.body;
-            const response = yield database_1.default.query(`
-            INSERT INTO ma_horario_comidas (nombre, id_comida, hora_inicio, hora_fin)
-            VALUES ($1, $2, $3, $4) RETURNING *
-            `, [nombre, tipo_comida, hora_inicio, hora_fin]);
-            const [tipos_comida] = response.rows;
-            if (!tipos_comida) {
-                return res.status(404).jsonp({ message: 'error' });
+            try {
+                const { nombre, tipo_comida, hora_inicio, hora_fin, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query("BEGIN");
+                const response = yield database_1.default.query(`
+        INSERT INTO ma_horario_comidas (nombre, id_comida, hora_inicio, hora_fin)
+        VALUES ($1, $2, $3, $4) RETURNING *
+              `, [nombre, tipo_comida, hora_inicio, hora_fin]);
+                const [tipos_comida] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "ma_horario_comidas",
+                    usuario: user_name,
+                    accion: "I",
+                    datosOriginales: "",
+                    datosNuevos: `{nombre: ${nombre}, tipo_comida: ${tipo_comida}, hora_inicio: ${hora_inicio}, hora_fin: ${hora_fin}}`,
+                    ip,
+                    observacion: null,
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query("COMMIT");
+                if (!tipos_comida) {
+                    return res.status(404).jsonp({ message: "error" });
+                }
+                else {
+                    return res.status(200).jsonp({ message: "OK", info: tipos_comida });
+                }
             }
-            else {
-                return res.status(200).jsonp({ message: 'OK', info: tipos_comida });
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query("ROLLBACK");
+                res.status(404).jsonp({ message: "Error al guardar el registro." });
             }
         });
     }
     ActualizarComida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, tipo_comida, hora_inicio, hora_fin, id } = req.body;
-            yield database_1.default.query(`
-            UPDATE ma_horario_comidas SET nombre = $1, id_comida = $2, hora_inicio = $3, hora_fin = $4
-            WHERE id = $5
-            `, [nombre, tipo_comida, hora_inicio, hora_fin, id]);
-            res.jsonp({ message: 'Registro actualizado exitosamente.' });
+            try {
+                const { nombre, tipo_comida, hora_inicio, hora_fin, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query("BEGIN");
+                // CONSULTAR DATOSORIGINALES
+                const datosOriginales = yield database_1.default.query("SELECT * FROM ma_horario_comidas WHERE id = $1", [id]);
+                const [datos] = datosOriginales.rows;
+                if (!datos) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: "ma_horario_comidas",
+                        usuario: user_name,
+                        accion: "U",
+                        datosOriginales: "",
+                        datosNuevos: "",
+                        ip,
+                        observacion: `Error al actualizar el registro con id ${id}. Registro no encontrado.`,
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query("COMMIT");
+                    return res.status(404).jsonp({ message: "error" });
+                }
+                yield database_1.default.query(`
+        UPDATE ma_horario_comidas SET nombre = $1, id_comida = $2, hora_inicio = $3, hora_fin = $4
+        WHERE id = $5'
+        `, [nombre, tipo_comida, hora_inicio, hora_fin, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "ma_horario_comidas",
+                    usuario: user_name,
+                    accion: "U",
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: `{nombre: ${nombre}, tipo_comida: ${tipo_comida}, hora_inicio: ${hora_inicio}, hora_fin: ${hora_fin}}`,
+                    ip,
+                    observacion: null,
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query("COMMIT");
+                return res.jsonp({ message: "Registro actualizado exitosamente" });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query("ROLLBACK");
+                return res.status(404).jsonp({ message: "Error al actualizar el registro." });
+            }
         });
     }
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const { user_name, ip } = req.body;
                 const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query("BEGIN");
+                // CONSULTAR DATOSORIGINALES
+                const datosOriginales = yield database_1.default.query("SELECT * FROM ma_horario_comidas WHERE id = $1", [id]);
+                const [datos] = datosOriginales.rows;
+                if (!datos) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: "ma_horario_comidas",
+                        usuario: user_name,
+                        accion: "D",
+                        datosOriginales: "",
+                        datosNuevos: "",
+                        ip,
+                        observacion: `Error al eliminar el registro con id ${id}. Registro no encontrado.`,
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query("COMMIT");
+                    return res.status(404).jsonp({ message: "error" });
+                }
                 yield database_1.default.query(`
-            DELETE FROM ma_horario_comidas WHERE id = $1
-            `, [id]);
-                res.jsonp({ message: 'Registro eliminado.' });
+        DELETE FROM ma_horario_comidas WHERE id = $1
+        `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "ma_horario_comidas",
+                    usuario: user_name,
+                    accion: "D",
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: "",
+                    ip,
+                    observacion: null,
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query("COMMIT");
+                return res.jsonp({ message: "Registro eliminado." });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query("ROLLBACK");
+                return res.status(404).jsonp({ message: "Error al eliminar el registro." });
             }
         });
     }
@@ -138,12 +234,33 @@ class TipoComidasControlador {
     // Registro de detalle de menú - desglose de platos
     CrearDetalleMenu(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, valor, observacion, id_menu } = req.body;
-            yield database_1.default.query(`
+            try {
+                const { nombre, valor, observacion, id_menu, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query("BEGIN");
+                yield database_1.default.query(`
             INSERT INTO ma_detalle_comida (nombre, valor, observacion, id_horario_comida)
             VALUES ($1, $2, $3, $4)
             `, [nombre, valor, observacion, id_menu]);
-            res.jsonp({ message: 'Registro guardado.' });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "detalle_menu",
+                    usuario: user_name,
+                    accion: "I",
+                    datosOriginales: "",
+                    datosNuevos: `{nombre: ${nombre}, valor: ${valor}, observacion: ${observacion}, id_menu: ${id_menu}}`,
+                    ip,
+                    observacion: null,
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query("COMMIT");
+                res.jsonp({ message: "Detalle de menú registrada" });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query("ROLLBACK");
+                res.status(404).jsonp({ message: "Error al guardar el detalle de menú." });
+            }
         });
     }
     VerUnDetalleMenu(req, res) {
@@ -166,21 +283,100 @@ class TipoComidasControlador {
     }
     ActualizarDetalleMenu(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, valor, observacion, id } = req.body;
-            yield database_1.default.query(`
+            try {
+                const { nombre, valor, observacion, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query("BEGIN");
+                // CONSULTAR DATOSORIGINALES
+                const datosOriginales = yield database_1.default.query("SELECT * FROM ma_detalle_comida WHERE id = $1", [id]);
+                const [datos] = datosOriginales.rows;
+                if (!datos) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: "ma_detalle_comida",
+                        usuario: user_name,
+                        accion: "U",
+                        datosOriginales: "",
+                        datosNuevos: "",
+                        ip,
+                        observacion: `Error al actualizar el registro con id ${id}. Registro no encontrado.`,
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query("COMMIT");
+                    return res.status(404).jsonp({ message: "error" });
+                }
+                yield database_1.default.query(`
             UPDATE ma_detalle_comida SET nombre = $1, valor = $2, observacion = $3
             WHERE id = $4
             `, [nombre, valor, observacion, id]);
-            res.jsonp({ message: 'Registro actualizado.' });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "ma_detalle_comida",
+                    usuario: user_name,
+                    accion: "U",
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: `{nombre: ${nombre}, valor: ${valor}, observacion: ${observacion}}`,
+                    ip,
+                    observacion: null,
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query("COMMIT");
+                return res.jsonp({ message: "Detalle de menú actualizado" });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query("ROLLBACK");
+                return res.status(404).jsonp({ message: "Error al actualizar el registro." });
+            }
         });
     }
     EliminarDetalle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
+            try {
+                const { user_name, ip } = req.body;
+                const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query("BEGIN");
+                // CONSULTAR DATOSORIGINALES
+                const datosOriginales = yield database_1.default.query("SELECT * FROM ma_detalle_comida WHERE id = $1", [id]);
+                const [datos] = datosOriginales.rows;
+                if (!datos) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: "ma_detalle_comida",
+                        usuario: user_name,
+                        accion: "D",
+                        datosOriginales: "",
+                        datosNuevos: "",
+                        ip,
+                        observacion: `Error al eliminar el registro con id ${id}`,
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query("COMMIT");
+                    return res.status(404).jsonp({ message: "Registro no encontrado" });
+                }
+                yield database_1.default.query(`
             DELETE FROM ma_detalle_comida WHERE id = $1
             `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "ma_detalle_comida",
+                    usuario: user_name,
+                    accion: "D",
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: "",
+                    ip,
+                    observacion: null,
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query("COMMIT");
+                return res.jsonp({ message: "Registro eliminado." });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query("ROLLBACK");
+                return res.status(500).jsonp({ message: "Error al eliminar el registro." });
+            }
         });
     }
 }

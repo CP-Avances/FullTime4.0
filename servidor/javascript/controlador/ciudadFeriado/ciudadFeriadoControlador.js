@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CIUDAD_FERIADO_CONTROLADOR = void 0;
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class CiudadFeriadoControlador {
     // METODO PARA BUSCAR CIUDADES - PROVINCIA POR NOMBRE
@@ -53,11 +54,51 @@ class CiudadFeriadoControlador {
     // METODO PARA ELIMINAR REGISTRO
     EliminarCiudadFeriado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-            DELETE FROM ef_ciudad_feriado WHERE id = $1
-            `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                const { user_name, ip } = req.body;
+                const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOS ORIGINALES
+                const ciudad = yield database_1.default.query('SELECT * FROM ef_ciudad_feriado WHERE id = $1', [id]);
+                const [datosOriginales] = ciudad.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ef_ciudad_feriado',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar la ciudad con id ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+                }
+                yield database_1.default.query(`
+                DELETE FROM ef_ciudad_feriado WHERE id = $1
+                `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ef_ciudad_feriado',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+            }
         });
     }
     // METODO PARA BUSCAR ID DE CIUDADES
@@ -79,11 +120,25 @@ class CiudadFeriadoControlador {
     AsignarCiudadFeriado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_feriado, id_ciudad } = req.body;
+                const { id_feriado, id_ciudad, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
                 INSERT INTO ef_ciudad_feriado (id_feriado, id_ciudad) VALUES ($1, $2) RETURNING *
                 `, [id_feriado, id_ciudad]);
                 const [feriado] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ef_ciudad_feriado',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{id_feriado: ${id_feriado}, id_ciudad: ${id_ciudad}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 if (feriado) {
                     return res.status(200).jsonp({ message: 'OK', reloj: feriado });
                 }
@@ -92,6 +147,8 @@ class CiudadFeriadoControlador {
                 }
             }
             catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }
         });
@@ -99,11 +156,50 @@ class CiudadFeriadoControlador {
     // METODO PARA ACTUALIZAR REGISTRO
     ActualizarCiudadFeriado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_feriado, id_ciudad, id } = req.body;
-            yield database_1.default.query(`
-            UPDATE ef_ciudad_feriado SET id_feriado = $1, id_ciudad = $2 WHERE id = $3
-            `, [id_feriado, id_ciudad, id]);
-            res.jsonp({ message: 'Registro actualizado.' });
+            try {
+                const { id_feriado, id_ciudad, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOS ORIGINALES
+                const ciudad = yield database_1.default.query('SELECT * FROM ef_ciudad_feriado WHERE id = $1', [id]);
+                const [datosOriginales] = ciudad.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ef_ciudad_feriado',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar la ciudad con id ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+                }
+                yield database_1.default.query(`
+                UPDATE ef_ciudad_feriado SET id_feriado = $1, id_ciudad = $2 WHERE id = $3
+                `, [id_feriado, id_ciudad, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ef_ciudad_feriado',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{id_feriado: ${id_feriado}, id_ciudad: ${id_ciudad}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+            }
         });
     }
     ObtenerFeriadosCiudad(req, res) {

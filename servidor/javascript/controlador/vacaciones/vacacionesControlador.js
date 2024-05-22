@@ -13,8 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VACACIONES_CONTROLADOR = void 0;
-const settingsMail_1 = require("../../libs/settingsMail");
 const CargarVacacion_1 = require("../../libs/CargarVacacion");
+const settingsMail_1 = require("../../libs/settingsMail");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 class VacacionesControlador {
@@ -132,7 +133,9 @@ class VacacionesControlador {
     CrearVacaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado, id_peri_vacacion, depa_user_loggin, id_empl_cargo, codigo } = req.body;
+                const { fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado, id_peri_vacacion, depa_user_loggin, id_empl_cargo, codigo, user_name, ip } = req.body;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
         INSERT INTO mv_solicitud_vacacion (fecha_inicio, fecha_final, fecha_ingreso, estado, dia_libre, dia_laborable, 
           legalizado, id_periodo_vacacion, id_empleado_cargo, codigo)
@@ -140,6 +143,18 @@ class VacacionesControlador {
         `, [fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado, id_peri_vacacion,
                     id_empl_cargo, codigo]);
                 const [objetoVacacion] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'mv_solicitud_vacacion',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(objetoVacacion),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
                 if (!objetoVacacion)
                     return res.status(400)
                         .jsonp({ message: 'Upps!!! algo salio mal. Solicitud de vacación no ingresada.' });
@@ -147,6 +162,8 @@ class VacacionesControlador {
                 return res.status(200).jsonp(vacacion);
             }
             catch (error) {
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500).
                     jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
             }
@@ -157,12 +174,43 @@ class VacacionesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
-                const { fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, depa_user_loggin } = req.body;
+                const { fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, depa_user_loggin, user_name, ip } = req.body;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query('SELECT * FROM mv_solicitud_vacacion WHERE id = $1', [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'mv_solicitud_vacacion',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al intentar actualizar registro de vacación con id ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCIÓN
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
                 const response = yield database_1.default.query(`
         UPDATE mv_solicitud_vacacion SET fecha_inicio = $1, fecha_final = $2, fecha_ingreso = $3, dia_libre = $4, 
         dia_laborable = $5 WHERE id = $6 RETURNING *
         `, [fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, id]);
                 const [objetoVacacion] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'mv_solicitud_vacacion',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(objetoVacacion),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
                 if (!objetoVacacion)
                     return res.status(400)
                         .jsonp({ message: 'Upps !!! algo salio mal. Solicitud de vacación no ingresada.' });
@@ -170,6 +218,8 @@ class VacacionesControlador {
                 return res.status(200).jsonp(vacacion);
             }
             catch (error) {
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500)
                     .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
             }
@@ -178,22 +228,109 @@ class VacacionesControlador {
     // ELIMINAR SOLICITUD DE VACACION
     EliminarVacaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let { id_vacacion } = req.params;
-            yield database_1.default.query(`
-      DELETE FROM ecm_realtime_notificacion WHERE id_vacaciones = $1
-      `, [id_vacacion]);
-            yield database_1.default.query(`
-      DELETE FROM ecm_autorizaciones WHERE id_vacacion = $1
-      `, [id_vacacion]);
-            const response = yield database_1.default.query(`
-      DELETE FROM mv_solicitud_vacacion WHERE id = $1 RETURNING *
-      `, [id_vacacion]);
-            const [objetoVacacion] = response.rows;
-            if (objetoVacacion) {
-                return res.status(200).jsonp(objetoVacacion);
+            try {
+                const { user_name, ip } = req.body;
+                let { id_vacacion } = req.params;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query('SELECT * FROM ecm_realtime_notificacion WHERE id_vacaciones = $1', [id_vacacion]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ecm_realtime_notificacion',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al intentar eliminar registro con id_vacaciones ${id_vacacion}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCIÓN
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM ecm_realtime_notificacion WHERE id_vacaciones = $1
+        `, [id_vacacion]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ecm_realtime_notificacion',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // CONSULTAR DATOSORIGINALESAUTORIZACIONES
+                const consultaAutorizaciones = yield database_1.default.query('SELECT * FROM ecm_autorizaciones WHERE id_vacacion = $1', [id_vacacion]);
+                const [datosOriginalesAutorizaciones] = consultaAutorizaciones.rows;
+                if (!datosOriginalesAutorizaciones) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ecm_autorizaciones',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al intentar eliminar registro con id_vacacion ${id_vacacion}. Registro no encontrado.`
+                    });
+                }
+                yield database_1.default.query(`
+        DELETE FROM ecm_autorizaciones WHERE id_vacacion = $1
+        `, [id_vacacion]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ecm_autorizaciones',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginalesAutorizaciones),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // CONSULTAR DATOSORIGINALESVACACIONES
+                const consultaVacaciones = yield database_1.default.query('SELECT * FROM mv_solicitud_vacacion WHERE id = $1', [id_vacacion]);
+                const [datosOriginalesVacaciones] = consultaVacaciones.rows;
+                if (!datosOriginalesVacaciones) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'mv_solicitud_vacacion',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al intentar eliminar registro con id ${id_vacacion}. Registro no encontrado.`
+                    });
+                }
+                const response = yield database_1.default.query(`
+        DELETE FROM mv_solicitud_vacacion WHERE id = $1 RETURNING *
+        `, [id_vacacion]);
+                const [objetoVacacion] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'mv_solicitud_vacacion',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginalesVacaciones),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                if (objetoVacacion) {
+                    return res.status(200).jsonp(objetoVacacion);
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'Solicitud no eliminada.' });
+                }
             }
-            else {
-                return res.status(404).jsonp({ message: 'Solicitud no eliminada.' });
+            catch (error) {
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
@@ -219,13 +356,51 @@ class VacacionesControlador {
     // ACTUALIZAR ESTADO DE SOLICITUD DE VACACIONES
     ActualizarEstado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const { estado } = req.body;
-            yield database_1.default.query(`
-      UPDATE mv_solicitud_vacacion SET estado = $1 WHERE id = $2
-      `, [estado, id]);
-            if (3 === estado) {
-                (0, CargarVacacion_1.RestarPeriodoVacacionAutorizada)(parseInt(id));
+            try {
+                const id = req.params.id;
+                const { estado, user_name, ip } = req.body;
+                // INICIAR TRANSACCIÓN
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query('SELECT * FROM mv_solicitud_vacacion WHERE id = $1', [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'mv_solicitud_vacacion',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al intentar actualizar registro de vacación con id ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCIÓN
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        UPDATE mv_solicitud_vacacion SET estado = $1 WHERE id = $2
+        `, [estado, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'mv_solicitud_vacacion',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCIÓN
+                yield database_1.default.query('COMMIT');
+                if (3 === estado) {
+                    (0, CargarVacacion_1.RestarPeriodoVacacionAutorizada)(parseInt(id), user_name, ip);
+                }
+            }
+            catch (error) {
+                // REVERTIR TRANSACCIÓN
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
