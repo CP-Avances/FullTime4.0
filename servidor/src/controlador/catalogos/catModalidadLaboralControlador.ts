@@ -1,6 +1,7 @@
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import fs from 'fs';
 import path from 'path';
 import pool from '../../database';
@@ -29,7 +30,7 @@ class ModalidaLaboralControlador {
     // METODO PARA REGISTRAR MODALIDAD LABORAL
     public async CrearMadalidadLaboral(req: Request, res: Response): Promise<Response> {
         try {
-            const { modalidad } = req.body;
+            const { modalidad, user_name, ip } = req.body;
             var VERIFICAR_MODALIDAD = await pool.query(
                 `
                 SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
@@ -40,6 +41,9 @@ class ModalidaLaboralControlador {
 
                 const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
 
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
                 const response: QueryResult = await pool.query(
                     `
                     INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1) RETURNING *
@@ -47,6 +51,21 @@ class ModalidaLaboralControlador {
                     , [modali]);
 
                 const [modalidadLaboral] = response.rows;
+
+                // REGISTRAR AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_modalidad_trabajo',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(modalidadLaboral),
+                    ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
 
                 if (modalidadLaboral) {
                     return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' })
@@ -58,6 +77,8 @@ class ModalidaLaboralControlador {
             }
         }
         catch (error) {
+            // ROLLBACK SI HAY ERROR
+            await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error', status: '500' });
         }
     }
@@ -65,7 +86,7 @@ class ModalidaLaboralControlador {
     // METODO PARA EDITAR MODALIDAD LABORAL
     public async EditarModalidadLaboral(req: Request, res: Response): Promise<Response> {
         try {
-            const { id, modalidad } = req.body;
+            const { id, modalidad, user_name, ip } = req.body;
             const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
             const modalExiste = await pool.query(
                 `
@@ -76,6 +97,9 @@ class ModalidaLaboralControlador {
             if (modalExiste.rows[0] != undefined && modalExiste.rows[0].descripcion != '' && modalExiste.rows[0].descripcion != null) {
                 return res.status(200).jsonp({ message: 'Modalidad Laboral ya esiste en el sistema.', status: '300' })
             } else {
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE e_cat_modalidad_trabajo SET descripcion = $2
@@ -85,6 +109,20 @@ class ModalidaLaboralControlador {
 
                 const [modalidadLaboral] = response.rows;
 
+                // REGISTRAR AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_modalidad_trabajo',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(modalExiste.rows),
+                    datosNuevos: JSON.stringify(modalidadLaboral),
+                    ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
                 if (modalidadLaboral) {
                     return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' })
                 } else {
@@ -93,6 +131,8 @@ class ModalidaLaboralControlador {
             }
         }
         catch (error) {
+            // ROLLBACK SI HAY ERROR
+            await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error', status: '500' });
         }
     }
@@ -101,14 +141,60 @@ class ModalidaLaboralControlador {
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
+            const { user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOS ANTES DE ELIMINAR
+            const modalidad = await pool.query(
+                `
+                SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1
+                `
+                , [id]);
+
+            const [modalidadLaboral] = modalidad.rows;
+
+            if (!modalidadLaboral) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_modalidad_trabajo',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar el registro con id: ${id}, no se encuentra el registro.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+            }
+
             await pool.query(
                 `
                 DELETE FROM e_cat_modalidad_trabajo WHERE id = $1
                 `
                 , [id]);
+
+            // REGISTRAR AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'e_cat_modalidad_trabajo',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(modalidadLaboral),
+                datosNuevos: '',
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
             res.jsonp({ message: 'Registro eliminado.' });
 
         } catch (error) {
+            // ROLLBACK SI HAY ERROR
+            await pool.query('ROLLBACK');
             return res.jsonp({ message: 'error' });
         }
     }
@@ -243,8 +329,8 @@ class ModalidaLaboralControlador {
     // REGISTRAR PLANTILLA MODALIDAD_CARGO 
     public async CargarPlantilla(req: Request, res: Response) {
         try {
-            const plantilla = req.body;
-            console.log('datos Modalidad laboral: ', plantilla);
+            const {plantilla, user_name, ip} = req.body;
+
             var contador = 1;
             var respuesta: any
 
@@ -252,6 +338,9 @@ class ModalidaLaboralControlador {
                 // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                 const { item, modalida_laboral, observacion } = data;
                 const modalidad = modalida_laboral.charAt(0).toUpperCase() + modalida_laboral.slice(1).toLowerCase();
+
+                // INICIO DE TRANSACCION
+                await pool.query('BEGIN');
 
                 // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
                 const response: QueryResult = await pool.query(
@@ -261,6 +350,20 @@ class ModalidaLaboralControlador {
                     , [modalidad]);
 
                 const [modalidad_la] = response.rows;
+
+                // REGISTRAR AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_modalidad_trabajo',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(modalidad_la),
+                    ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
 
                 if (contador === plantilla.length) {
                     if (modalidad_la) {
@@ -276,6 +379,8 @@ class ModalidaLaboralControlador {
 
 
         } catch (error) {
+            // ROLLBACK SI HAY ERROR
+            await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: error });
         }
     }

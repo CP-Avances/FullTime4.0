@@ -12,25 +12,37 @@ export class CatVacunasService {
     private http: HttpClient,
   ) { }
 
+
+
   listaVacuna(){
     return this.http.get<any>(environment.url + '/vacunasTipos');
+  }
+  CrearVacuna(Vacuna: any){
+    return this.http.post(`${environment.url}/vacunasTipos/crearVacunas`, Vacuna).pipe(
+      catchError(Vacuna)
+    );
   }
   // METODO PARA ACTUALIZAR REGISTRO
   ActualizarVacuna(datos: any) {
     return this.http.put(`${environment.url}/vacunasTipos`, datos)
     .pipe(catchError(datos));
   }
-  eliminar(id: any){
-    return this.http.delete<any>(`${environment.url}/vacunasTipos/eliminar/${id}`).pipe( catchError(id));
+
+  Eliminar(id: any, datos: any) {
+    const url = `${environment.url}/vacunasTipos/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
- 
+
    // METODO PARA LEER LOS DATOS DE LA PLANTILLA DE EXCEL
    RevisarFormato(formData) {
     return this.http.post<any>(environment.url + '/vacunasTipos/upload/revision', formData);
   }
 
   // METODO PARA INGRESAR O GUARDAR LOS DATOS OK EN LA BASE DE DATOS
-  subirArchivoExcel(formData) {
+  SubirArchivoExcel(formData) {
     return this.http.post<any>(`${environment.url}/vacunasTipos/cargar_plantilla`, formData);
   }
 

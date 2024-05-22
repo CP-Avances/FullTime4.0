@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TIPOSCARGOSCONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
@@ -57,16 +58,30 @@ class TiposCargosControlador {
     CrearCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { cargo } = req.body;
+                const { cargo, user_name, ip } = req.body;
                 var VERIFICAR_CARGO = yield database_1.default.query(`
                 SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
                 `, [cargo.toUpperCase()]);
                 if (VERIFICAR_CARGO.rows[0] == undefined || VERIFICAR_CARGO.rows[0] == '') {
                     const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
                     INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
                     `, [tipoCargo]);
                     const [TipoCargos] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_cat_tipo_cargo',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(TipoCargos),
+                        ip,
+                        observacion: null
+                    });
+                    // FIN DE TRANSACCION
+                    yield database_1.default.query('COMMIT');
                     if (TipoCargos) {
                         return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' });
                     }
@@ -79,6 +94,8 @@ class TiposCargosControlador {
                 }
             }
             catch (error) {
+                // ROLLBACK
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error', status: '500' });
             }
         });
@@ -97,11 +114,25 @@ class TiposCargosControlador {
                     return res.status(200).jsonp({ message: 'Ya existe el cargo', status: '300' });
                 }
                 else {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
                     UPDATE e_cat_tipo_cargo SET cargo = $2
                     WHERE id = $1 RETURNING *
                     `, [id, tipoCargo]);
                     const [TipoCargos] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_cat_tipo_cargo',
+                        usuario: req.body.user_name,
+                        accion: 'U',
+                        datosOriginales: JSON.stringify(tipoCargoExiste.rows),
+                        datosNuevos: JSON.stringify(TipoCargos),
+                        ip: req.body.ip,
+                        observacion: null
+                    });
+                    // FIN DE TRANSACCION
+                    yield database_1.default.query('COMMIT');
                     if (TipoCargos) {
                         return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' });
                     }
@@ -111,6 +142,8 @@ class TiposCargosControlador {
                 }
             }
             catch (error) {
+                // ROLLBACK
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error', status: '500' });
             }
         });
@@ -120,12 +153,48 @@ class TiposCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
+                const { user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOS ANTES DE ELIMINAR
+                const TIPO_CARGO = yield database_1.default.query(`
+                SELECT * FROM e_cat_tipo_cargo WHERE id = $1
+                `, [id]);
+                const [datosTiposCargos] = TIPO_CARGO.rows;
+                if (!datosTiposCargos) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_cat_tipo_cargo',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'No se encuentra el registro.', status: '404' });
+                }
                 yield database_1.default.query(`
                 DELETE FROM e_cat_tipo_cargo WHERE id = $1
                 `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'e_cat_tipo_cargo',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosTiposCargos),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 res.jsonp({ message: 'Registro eliminado.', code: '200' });
             }
             catch (error) {
+                // ROLLBACK
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: error.detail, code: error.code });
             }
         });
@@ -248,18 +317,32 @@ class TiposCargosControlador {
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const plantilla = req.body;
+                const { plantilla, user_name, ip } = req.body;
                 var contador = 1;
                 var respuesta;
                 plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                     // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                     const { item, tipo_cargo, observacion } = data;
                     const cargo = tipo_cargo.charAt(0).toUpperCase() + tipo_cargo.slice(1).toLowerCase();
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
                     // REGISTRO DE LOS DATOS DE TIPO CARGO
                     const response = yield database_1.default.query(`
                     INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
                     `, [cargo]);
                     const [cargos] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_cat_tipo_cargo',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(cargos),
+                        ip,
+                        observacion: null
+                    });
+                    // FIN DE TRANSACCION
+                    yield database_1.default.query('COMMIT');
                     if (contador === plantilla.length) {
                         if (cargos) {
                             return respuesta = res.status(200).jsonp({ message: 'ok' });
@@ -272,6 +355,8 @@ class TiposCargosControlador {
                 }));
             }
             catch (error) {
+                // ROLLBACK
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: error });
             }
         });

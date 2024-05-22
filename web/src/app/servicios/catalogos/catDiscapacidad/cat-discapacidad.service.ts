@@ -31,8 +31,12 @@ export class CatDiscapacidadService {
   }
 
   // METODO PARA ELIMINAR UN TIPO DE DISCAPACIDAD
-  Eliminar(id: any) {
-    return this.http.delete<any>(`${environment.url}/discapacidades/eliminar/${id}`).pipe(catchError(id));
+  Eliminar(id: any, datos: any) {
+    const url = `${environment.url}/discapacidades/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA LEER LOS DATOS DE LA PLANTILLA DE EXCEL

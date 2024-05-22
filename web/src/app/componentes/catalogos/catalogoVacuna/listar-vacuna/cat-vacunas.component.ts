@@ -69,6 +69,10 @@ export class CatVacunasComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
   get p_color(): string { return this.plantillaPDF.color_Primary }
@@ -86,6 +90,9 @@ export class CatVacunasComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.vacunas = [];
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerVacuna();
@@ -159,7 +166,7 @@ export class CatVacunasComponent implements OnInit {
     this.numero_paginaMul = e.pageIndex + 1
   }
 
-  
+
   // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
@@ -197,14 +204,14 @@ export class CatVacunasComponent implements OnInit {
          this.toastr.error('Seleccione plantilla con nombre discapacidad_vacunas', 'Plantilla seleccionada incorrecta', {
            timeOut: 6000,
          });
- 
+
          this.nameFile = '';
        }
      } else {
        this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
          timeOut: 6000,
        });
- 
+
        this.nameFile = '';
      }
      this.archivoForm.reset();
@@ -292,7 +299,12 @@ export class CatVacunasComponent implements OnInit {
 
   subirDatosPlantilla() {
     if (this.listaVacunasCorrectas.length > 0) {
-      this.rest.subirArchivoExcel(this.listaVacunasCorrectas).subscribe(response => {
+      const data = {
+        plantilla: this.listaVacunasCorrectas,
+        user_name: this.user_name,
+        ip: this.ip,
+      }
+      this.rest.SubirArchivoExcel(data).subscribe(response => {
         console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de vacunas importada.', {
           timeOut: 3000,
@@ -531,10 +543,14 @@ export class CatVacunasComponent implements OnInit {
   // METODO PARA CONFIRMAR ELIMINAR REGISTRO
   ConfirmarDelete(vacuna: any) {
     const mensaje = 'eliminar';
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.rest.eliminar(vacuna.id).subscribe(res => {
+          this.rest.Eliminar(vacuna.id, data).subscribe((res: any) => {
             if (res.message === 'error') {
               this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
                 timeOut: 6000,
@@ -560,13 +576,17 @@ export class CatVacunasComponent implements OnInit {
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     this.ingresar = false;
     this.contador = 0;
     this.vacunasEliminar = this.selectionVacuna.selected;
     this.vacunasEliminar.forEach((datos: any) => {
       this.vacunas = this.vacunas.filter((item: any) => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.rest.eliminar(datos.id).subscribe(res => {
+      this.rest.Eliminar(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,

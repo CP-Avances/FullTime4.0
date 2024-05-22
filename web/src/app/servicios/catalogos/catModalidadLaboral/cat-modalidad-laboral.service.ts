@@ -17,7 +17,6 @@ export class CatModalidadLaboralService {
   }
   
   CrearModalidadLaboral(modalidad: any){
-    console.log('modalidad: ',modalidad)
     return this.http.post(`${environment.url}/modalidadLaboral/crearModalidad`, modalidad).pipe(
       catchError(modalidad)
     );
@@ -27,13 +26,19 @@ export class CatModalidadLaboralService {
     return this.http.put(`${environment.url}/modalidadLaboral`, datos)
     .pipe(catchError(datos));
   }
-  eliminar(id: any){
-    return this.http.delete<any>(`${environment.url}/modalidadLaboral/eliminar/${id}`).pipe( catchError(id));
+  Eliminar(id: any, datos: any){
+    const url = `${environment.url}/modalidadLaboral/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
+
   RevisarFormato(formData) {
     return this.http.post<any>(environment.url + '/modalidadLaboral/upload/revision', formData);
   }
-  subirArchivoExcel(formData) {
+
+  SubirArchivoExcel(formData) {
     return this.http.post<any>(`${environment.url}/modalidadLaboral/cargar_plantilla`, formData);
   }
 

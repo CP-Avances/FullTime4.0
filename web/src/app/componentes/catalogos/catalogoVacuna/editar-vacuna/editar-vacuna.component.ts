@@ -11,6 +11,10 @@ import { CatVacunasService } from 'src/app/servicios/catalogos/catVacunas/cat-va
 })
 export class EditarVacunasComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   vacuna = new FormControl('', Validators.required)
 
   public formulario = new FormGroup({
@@ -25,6 +29,9 @@ export class EditarVacunasComponent implements OnInit {
   ){}
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ImprimirDatos();
   }
 
@@ -45,9 +52,9 @@ export class EditarVacunasComponent implements OnInit {
     let vacuna = {
       id: this.data.id,
       nombre: form.vacuna,
+
     };
     this.rest.ActualizarVacuna(vacuna).subscribe(response => {
-      console.log('response: ',response);
       if(response.status == '200'){
         this.toastr.success(response.message, 'Operación exitosa.', {
           timeOut: 4000,
@@ -62,15 +69,15 @@ export class EditarVacunasComponent implements OnInit {
           timeOut: 4000,
         });
       }
-      
+
     }, error => {
       this.toastr.info(error, 'Error', {
         timeOut: 4000,
       })
     });
   }
-  
-  
+
+
     // METODO PARA VALIDAR INGRESO DE LETRAS
     IngresarSoloLetras(e: any) {
       let key = e.keyCode || e.which;
@@ -93,8 +100,8 @@ export class EditarVacunasComponent implements OnInit {
         return false;
       }
     }
-    
-  
+
+
     // METODO PARA CERRAR VENTANA DE REGISTRO
     CerrarVentana() {
       this.LimpiarCampos();
