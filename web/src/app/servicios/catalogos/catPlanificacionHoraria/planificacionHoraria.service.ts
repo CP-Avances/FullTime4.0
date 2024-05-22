@@ -13,6 +13,7 @@ export class PlanificacionHorariaService {
 
   // VERIFICAR DATOS DE LA PLANIFICACION HORARIA
   VerificarDatosPlanificacionHoraria(formData: any) {
+    console.log(formData);
     return this.http.post<any>(`${environment.url}/planificacionHoraria/verificarDatos`, formData);
   }
 

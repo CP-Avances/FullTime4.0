@@ -64,6 +64,8 @@ class PlanificacionHorariaControlador {
             return nuevoObjeto;
         });
 
+        console.log(plantillaPlanificacionHorariaEstructurada);
+
         
         // VERIFICAR USUARIO, HORARIOS Y SOBREPOSICION DE HORARIOS
         for (const [index, data] of plantillaPlanificacionHorariaEstructurada.entries() ) {
@@ -88,6 +90,7 @@ class PlanificacionHorariaControlador {
 
             if (!usuarioVerificado[0]) {
                 data.observacion = usuarioVerificado[2];
+                data.dias = {};
                 continue;
             } else {
                 data.codigo_usuario = usuarioVerificado[1].codigo;
@@ -242,7 +245,7 @@ class PlanificacionHorariaControlador {
 
                         // VERIFICIAR SI YA ESTA REGISTRADO EL HORARIO DEFAULT-LIBRE PARA EL USUARIO EN ESA FECHA
                         const horarioRegistrado = await pool.query(`
-                            SELECT * FROM plan_general WHERE codigo = $1 AND fec_horario = $2 AND id_horario = $3
+                            SELECT * FROM eu_asistencia_general WHERE codigo = $1 AND fecha_horario = $2 AND id_horario = $3
                         `, [data.codigo_usuario, horario.dia, horarioDefaultLibre.entrada.id_horario]);
 
                         if (horarioRegistrado.rowCount > 0) {
@@ -302,7 +305,7 @@ class PlanificacionHorariaControlador {
 
                         // VERIFICIAR SI YA ESTA REGISTRADO EL HORARIO DEFAULT-FERIADO PARA EL USUARIO EN ESA FECHA
                         const horarioRegistrado = await pool.query(`
-                            SELECT * FROM plan_general WHERE codigo = $1 AND fec_horario = $2 AND id_horario = $3
+                            SELECT * FROM eu_asistencia_general WHERE codigo = $1 AND fecha_horario = $2 AND id_horario = $3
                         `, [data.codigo_usuario, horario.dia, horarioDefaultFeriado.entrada.id_horario]);
 
                         if (horarioRegistrado.rowCount > 0) {
@@ -386,9 +389,9 @@ async function VerificarUsuario(cedula: string): Promise<[boolean, any, string]>
     
         const usuario = await pool.query(`
             SELECT e.*, dae.id_cargo, ec.hora_trabaja 
-            FROM empleados e 
+            FROM eu_empleados e 
             LEFT JOIN datos_actuales_empleado dae ON e.cedula = dae.cedula 
-            LEFT JOIN empl_cargos ec ON dae.id_cargo = ec.id 
+            LEFT JOIN eu_empleado_cargos ec ON dae.id_cargo = ec.id 
             WHERE LOWER(e.cedula) = $1
         `, [cedula.toLowerCase()]);
     
@@ -481,7 +484,7 @@ async function VerificarHorarios(datos: DatosVerificacionHorarios) :Promise<any>
 // FUNCION PARA VERIFICAR EXISTENCIA DE HORARIO EN LA BASE DE DATOS
 async function VerificarHorario(codigo: any): Promise<[boolean,any]>{
     try {
-        const horario = await pool.query('SELECT * FROM cg_horarios WHERE LOWER(codigo) = $1',
+        const horario = await pool.query('SELECT * FROM eh_cat_horarios WHERE LOWER(codigo) = $1',
          [codigo.toLowerCase()]);
     
         // SI EXISTE HORARIO VERIFICAR SI HORARIO.HORA_TRABAJO ESTE EN FORMATO HH:MM:SS
@@ -514,7 +517,7 @@ async function VerificarSuperposicionHorarios(datos: DatosVerificacionSuperposic
                 for (let i = 0; i < horarios.length; i++) {
                     const horario = horarios[i];
                     if (horario.observacion === 'OK') {
-                        const detalles = await pool.query('SELECT * FROM deta_horarios WHERE id_horario = $1', [horario.id]);
+                        const detalles = await pool.query('SELECT * FROM eh_detalle_horarios WHERE id_horario = $1', [horario.id]);
     
                         horario.entrada = detalles.rows.find((detalle: any) => detalle.tipo_accion === 'E');
                         horario.salida = detalles.rows.find((detalle: any) => detalle.tipo_accion === 'S');
@@ -558,7 +561,7 @@ async function VerificarSuperposicionHorarios(datos: DatosVerificacionSuperposic
             for (let i = 0; i < planificacion.length; i++) {
                 const horario = planificacion[i];
     
-                const detalles = await pool.query('SELECT * FROM deta_horarios WHERE id_horario = $1', [horario.id]);
+                const detalles = await pool.query('SELECT * FROM eh_detalle_horarios WHERE id_horario = $1', [horario.id]);
     
                 horario.entrada = detalles.rows.find((detalle: any) => detalle.tipo_accion === 'E');
                 horario.salida = detalles.rows.find((detalle: any) => detalle.tipo_accion === 'S');
@@ -647,12 +650,12 @@ async function ListarPlanificacionHoraria(codigo: string, fecha_inicio: string, 
     try {
 
         const horario = await pool.query(`
-            SELECT p_g.codigo AS codigo_e, fec_horario AS fecha, id_horario AS id, 
+            SELECT p_g.codigo AS codigo_e, fecha_horario AS fecha, id_horario AS id, 
             horario.codigo AS codigo_dia 
-            FROM plan_general p_g 
-            INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo = $3 
-            INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario 
-            WHERE fec_horario BETWEEN $1 AND $2 
+            FROM eu_asistencia_general p_g 
+            INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo = $3 
+            INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario 
+            WHERE fecha_horario BETWEEN $1 AND $2 
             GROUP BY codigo_e, fecha, codigo_dia, p_g.id_horario 
             ORDER BY p_g.codigo, fecha, p_g.id_horario
         `, [fecha_inicio, fecha_final, codigo]);
@@ -676,7 +679,7 @@ async function ConsultarFeriados(fecha_inicio: string, fecha_final: string, id_u
         const FERIADO = await pool.query(
             `
             SELECT TO_CHAR(f.fecha, 'YYYY-MM-DD') AS fecha, cf.id_ciudad, c.descripcion, s.nombre
-            FROM cg_feriados AS f, ciud_feriados AS cf, ciudades AS c, sucursales AS s, datos_actuales_empleado AS de
+            FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s, datos_actuales_empleado AS de
             WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
                 AND s.id_ciudad = cf.id_ciudad AND de.id_sucursal = s.id AND de.id = $3
             `
@@ -700,7 +703,7 @@ async function ConsultarHorarioDefault(codigo:string): Promise<any> {
         const horario: any = await pool.query(
         `
         SELECT h.id AS id_horario, h.nombre, h.hora_trabajo, h.default_, h.min_almuerzo, d.id AS id_det_horario, d.*
-        FROM cg_horarios AS h
+        FROM eh_cat_horarios AS h
         INNER JOIN deta_horarios AS d ON h.id = d.id_horario
         WHERE h.codigo = $1
         `, [codigo]
@@ -750,7 +753,7 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
         // CREAR ENTRADA
         await pool.query(
             `
-            INSERT INTO plan_general (codigo, id_empl_cargo, id_horario, fec_horario, fec_hora_horario, 
+            INSERT INTO eu_asistencia_general (codigo, id_empl_cargo, id_horario, fecha_horario, fec_hora_horario, 
                 tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
                 estado_origen, min_alimentacion)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
@@ -774,7 +777,7 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
         if (inicioAlimentacion) {
             await pool.query(
                 `
-                INSERT INTO plan_general (codigo, id_empl_cargo, id_horario, fec_horario, fec_hora_horario, 
+                INSERT INTO eu_asistencia_general (codigo, id_empl_cargo, id_horario, fecha_horario, fec_hora_horario, 
                     tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
                     estado_origen, min_alimentacion)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
@@ -785,7 +788,7 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'plan_general',
+                tabla: 'eu_asistencia_general',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
@@ -799,7 +802,7 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
         if (finAlimentacion) {
             await pool.query(
                 `
-                INSERT INTO plan_general (codigo, id_empl_cargo, id_horario, fec_horario, fec_hora_horario, 
+                INSERT INTO eu_asistencia_general (codigo, id_empl_cargo, id_horario, fecha_horario, fec_hora_horario, 
                     tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
                     estado_origen, min_alimentacion)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
@@ -810,7 +813,7 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'plan_general',
+                tabla: 'eu_asistencia_general',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
@@ -823,7 +826,7 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
         // CREAR SALIDA
         await pool.query(
             `
-            INSERT INTO plan_general (codigo, id_empl_cargo, id_horario, fec_horario, fec_hora_horario, 
+            INSERT INTO eu_asistencia_general (codigo, id_empl_cargo, id_horario, fecha_horario, fec_hora_horario, 
                 tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
                 estado_origen, min_alimentacion)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
@@ -834,7 +837,7 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, da
 
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            tabla: 'plan_general',
+            tabla: 'eu_asistencia_general',
             usuario: user_name,
             accion: 'I',
             datosOriginales: '',

@@ -11,6 +11,7 @@
               <div class="nota" style="margin-left: 15px; padding-top: 15px;" *ngIf="datosSeleccionados.usuariosSeleccionados.length > 0">
                   <span>
                       NOTA: Para generar la plantilla debe seleccionar el mes de inicio.
+                      No modificar el campo usuario y los dias del mes en la plantilla.
                   </span>
               </div>
               <div class="col-md" *ngIf="datosSeleccionados.usuariosSeleccionados.length > 0">
@@ -105,7 +106,7 @@
               <tbody>
                   <tr *ngFor="let usuario of planificacionesHorarias | paginate:tamanio_pagina_planificacion:numero_pagina_planificacion">
                       <td class="sticky colum_1 td_horarios">{{usuario.codigo_usuario}}</td>
-                      <td class="sticky-2 colum_1 td_horarios">{{usuario.nombre_usuario}}</td>
+                      <td class="sticky-2 colum_1 td_horarios" [style.color]="ObtenerColorUsuario(usuario.observacion)">{{ObtenerNombreUsuario(usuario.nombre_usuario, usuario.usuario)}}</td>
                       <td *ngFor="let dia of usuario.dias" class="td_observaciones">
                         <div *ngFor="let horario of dia.horarios">
                             {{horario.codigo}}

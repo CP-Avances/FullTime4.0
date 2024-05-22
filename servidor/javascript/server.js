@@ -34,6 +34,7 @@ const catVacunasRutas_1 = __importDefault(require("./rutas/catalogos/catVacunasR
 const catDiscapacidadRutas_1 = __importDefault(require("./rutas/catalogos/catDiscapacidadRutas"));
 const catHorarioRutas_1 = __importDefault(require("./rutas/catalogos/catHorarioRutas"));
 const detalleCatHorarioRutas_1 = __importDefault(require("./rutas/horarios/detalleCatHorario/detalleCatHorarioRutas"));
+const catPlanificacionHorariaRutas_1 = __importDefault(require("./rutas/catalogos/catPlanificacionHorariaRutas"));
 //EMPLEADOS
 const loginRuta_1 = __importDefault(require("./rutas/login/loginRuta"));
 const empleadoRutas_1 = __importDefault(require("./rutas/empleado/empleadoRegistro/empleadoRutas"));
@@ -139,6 +140,7 @@ class Servidor {
         this.app.use('/titulo', catTituloRutas_1.default);
         this.app.use('/horario', catHorarioRutas_1.default);
         this.app.use('/detalleHorario', detalleCatHorarioRutas_1.default);
+        this.app.use('/planificacionHoraria', catPlanificacionHorariaRutas_1.default);
         this.app.use('/rol', catRolesRutas_1.default);
         this.app.use('/rolPermisos', catRolPermisosRutas_1.default);
         this.app.use('/relojes', catRelojesRuta_1.default);

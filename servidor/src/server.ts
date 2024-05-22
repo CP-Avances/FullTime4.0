@@ -31,6 +31,8 @@ import TIPO_VACUNAS_RUTAS from './rutas/catalogos/catVacunasRutas';
 import DISCAPACIDADES_RUTAS from './rutas/catalogos/catDiscapacidadRutas';
 import HORARIO_RUTA from './rutas/catalogos/catHorarioRutas';
 import DETALLE_CATALOGO_HORARIO_RUTAS from './rutas/horarios/detalleCatHorario/detalleCatHorarioRutas';
+import PLANIFICACION_HORARIA_RUTAS from './rutas/catalogos/catPlanificacionHorariaRutas';
+
 //EMPLEADOS
 import LOGIN_RUTA from './rutas/login/loginRuta';
 import EMPLEADO_RUTAS from './rutas/empleado/empleadoRegistro/empleadoRutas';
@@ -146,6 +148,7 @@ class Servidor {
         this.app.use('/titulo', TITULO_RUTAS);
         this.app.use('/horario', HORARIO_RUTA);
         this.app.use('/detalleHorario', DETALLE_CATALOGO_HORARIO_RUTAS);
+        this.app.use('/planificacionHoraria', PLANIFICACION_HORARIA_RUTAS);
         this.app.use('/rol', ROLES_RUTAS);
         this.app.use('/rolPermisos', ROL_PERMISOS_RUTAS);
         this.app.use('/relojes', RELOJES_RUTA);

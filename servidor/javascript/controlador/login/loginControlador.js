@@ -33,7 +33,6 @@ class LoginControlador {
             }
             try {
                 const { nombre_usuario, pass } = req.body;
-                console.log('usuario: ', nombre_usuario, ' pass: ', pass);
                 // BUSQUEDA DE USUARIO
                 const USUARIO = yield database_1.default.query(`
         SELECT id, usuario, id_rol, id_empleado FROM accesoUsuarios($1, $2)
