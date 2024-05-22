@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AUTORIZA_DEPARTAMENTO_CONTROLADOR = void 0;
-const database_1 = __importDefault(require("../../database"));
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
+const database_1 = __importDefault(require("../../database"));
 class AutorizaDepartamentoControlador {
     // METODO PARA BUSCAR USUARIO AUTORIZA
     EncontrarAutorizacionEmple(req, res) {

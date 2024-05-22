@@ -1,8 +1,6 @@
-import { Credenciales, fechaHora, FormatearFecha, FormatearHora, dia_completo } from '../../libs/settingsMail';
 import { Request, Response } from 'express';
 import { AUDITORIA_CONTROLADOR } from '../auditoria/auditoriaControlador';
 import pool from '../../database';
-import path from 'path';
 
 class AutorizacionesControlador {
 

@@ -38,8 +38,11 @@ class AuditoriaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion } = data;
-                yield database_1.default.query('INSERT INTO audit.auditoria (schema_name, table_name, user_name, action_tstamp, ' +
-                    'action, original_data, new_data, ip, observacion) VALUES ($1, $2, $3, now(), $4, $5, $6, $7, $8)', ['public', tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion]);
+                yield database_1.default.query(`
+                INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
+                    action, original_data, new_data, ip_address, observacion) 
+                VALUES ($1, $2, $3, now(), $4, $5, $6, $7, $8)'
+                `, ['public', tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion]);
             }
             catch (error) {
                 throw error;

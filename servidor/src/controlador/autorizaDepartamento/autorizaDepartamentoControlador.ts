@@ -1,6 +1,6 @@
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { Request, Response } from 'express';
 import pool from '../../database';
-import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 
 class AutorizaDepartamentoControlador {
 
