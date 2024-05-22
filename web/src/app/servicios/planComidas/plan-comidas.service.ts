@@ -28,15 +28,6 @@ export class PlanComidasService {
     return this.http.get<any>(`${environment.url}/planComidas/infoComida/estado/expirada`)
   }
 
-  /** BUSCAR JEFES */
-  obtenerJefes(id_departamento: number) {
-    return this.http.get<any>(`${environment.url}/planComidas/enviar/notificacion/${id_departamento}`)
-  }
-
-  ObtenerUltimaPlanificacion() {
-    return this.http.get<any>(`${environment.url}/planComidas/fin_registro`)
-  }
-
   ObtenerPlanComidaPorIdEmpleado(id_empleado: number) {
     return this.http.get<any>(`${environment.url}/planComidas/infoComida/plan/${id_empleado}`)
   }
@@ -44,13 +35,6 @@ export class PlanComidasService {
   ObtenerPlanComidaPorIdPlan(id: number) {
     return this.http.get<any>(`${environment.url}/planComidas/comida-empleado/plan/${id}`)
   }
-
-
-  ActualizarDatos(datos: any) {
-    return this.http.put(`${environment.url}/planComidas`, datos);
-  }
-
-
 
   EncontrarPlanComidaEmpleadoConsumido(datos: any) {
     return this.http.post(`${environment.url}/planComidas/empleado/plan/consumido`, datos);
@@ -83,17 +67,10 @@ export class PlanComidasService {
     return this.http.get<any>(`${environment.url}/planComidas/tipo_comida`)
   }
 
-  ObtenerUltimoTipoComidas() {
-    return this.http.get<any>(`${environment.url}/planComidas/tipo_comida/ultimo`)
-  }
-
-
-
+  
   ObtenerPlanComidas() {
     return this.http.get<any>(`${environment.url}/planComidas`)
   }
-
-
 
   /** ********************************************************************************************* **
    ** **              METODOS DE MANEJO DE SOLICTUDES DE SERVICIO DE ALIMENTACION                ** **

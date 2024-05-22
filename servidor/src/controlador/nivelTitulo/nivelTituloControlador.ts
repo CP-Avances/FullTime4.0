@@ -197,21 +197,7 @@ class NivelTituloControlador {
     }
   }
 
-  public async getOne(req: Request, res: Response): Promise<any> {
-    const { id } = req.params;
-    const unNivelTitulo = await pool.query(
-      `
-      SELECT * FROM et_cat_nivel_titulo WHERE id = $1
-      `
-      , [id]);
-    if (unNivelTitulo.rowCount > 0) {
-      return res.jsonp(unNivelTitulo.rows)
-    }
-    else {
-      res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-
-  }
+  
 
   // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
   public async RevisarDatos(req: Request, res: Response): Promise<any> {

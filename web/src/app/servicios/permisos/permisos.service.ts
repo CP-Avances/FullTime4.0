@@ -117,17 +117,7 @@ export class PermisosService {
     return this.http.post<any>(`${environment.url}/empleadoPermiso/mail-noti/solicitud-multiple`, datos);
   }
 
-
-
-
-
-
-
-
-
-
   // Permisos Empleado
-
   obtenerAllPermisos() {
     return this.http.get(`${environment.url}/empleadoPermiso/lista`);
   }
@@ -144,22 +134,8 @@ export class PermisosService {
     return this.http.put(`${environment.url}/empleadoPermiso/${id}/estado`, datos);
   }
 
-  ConsultarEmpleadoPermisos() {
-    return this.http.get(`${environment.url}/empleadoPermiso`);
-  }
-
-
-  ObtenerUnPermiso(id: number) {
-    return this.http.get(`${environment.url}/empleadoPermiso/${id}`)
-  }
-
   ObtenerUnPermisoEditar(id: number) {
     return this.http.get(`${environment.url}/empleadoPermiso/permiso/editar/${id}`)
-  }
-
-
-  BuscarPermisoContrato(id: any) {
-    return this.http.get(`${environment.url}/empleadoPermiso/permisoContrato/${id}`);
   }
 
   BuscarDatosSolicitud(id_emple_permiso: number) {
@@ -169,24 +145,5 @@ export class PermisosService {
   BuscarDatosAutorizacion(id_permiso: number) {
     return this.http.get(`${environment.url}/empleadoPermiso/datosAutorizacion/${id_permiso}`);
   }
-
-
-
-  BuscarFechasPermiso(datos: any, codigo: number) {
-    return this.http.post(`${environment.url}/empleadoPermiso/fechas_permiso/${codigo}`, datos);
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

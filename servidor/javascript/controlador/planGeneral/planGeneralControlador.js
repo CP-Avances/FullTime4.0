@@ -318,28 +318,6 @@ class PlanGeneralControlador {
         });
     }
     // METODO PARA LISTAR PLANIFICACIONES DE DIAS LIBRES Y FERIADOS   --**VERIFICADO
-    ListarHorariosDescanso(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { fecha_inicio, fecha_final, codigo } = req.body;
-                const HORARIO = yield database_1.default.query("SELECT p_g.id_horario, horario.codigo  AS codigo_horario, horario.default " +
-                    "FROM eu_asistencia_general p_g " +
-                    "INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
-                    "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
-                    "WHERE fecha_horario BETWEEN $1 AND $2 AND (horario.default = 'FD' OR horario.default = 'L') " +
-                    "GROUP BY codigo_horario, p_g.id_horario, horario.default", [fecha_inicio, fecha_final]);
-                if (HORARIO.rowCount > 0) {
-                    return res.jsonp({ message: 'OK', data: HORARIO.rows });
-                }
-                else {
-                    return res.jsonp({ message: 'vacio', data: HORARIO.rows });
-                }
-            }
-            catch (error) {
-                return res.jsonp({ message: 'error', error: error });
-            }
-        });
-    }
     // METODO PARA BUSCAR ASISTENCIAS
     BuscarAsistencia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

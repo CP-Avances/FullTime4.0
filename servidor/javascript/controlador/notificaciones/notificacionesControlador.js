@@ -145,41 +145,6 @@ class NotificacionTiempoRealControlador {
             }
         });
     }
-    ListarNotificacion(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const REAL_TIME_NOTIFICACION = yield database_1.default.query(`
-      SELECT * FROM ecm_realtime_notificacion ORDER BY id DESC
-      `);
-            if (REAL_TIME_NOTIFICACION.rowCount > 0) {
-                return res.jsonp(REAL_TIME_NOTIFICACION.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    ListaPorEmpleado(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id_send;
-            const REAL_TIME_NOTIFICACION = yield database_1.default.query(`
-      SELECT * FROM ecm_realtime_notificacion 
-      WHERE id_empleado_envia = $1 ' +
-      ORDER BY id DESC
-      `, [id]).
-                then((result) => {
-                return result.rows.map((obj) => {
-                    obj;
-                    return obj;
-                });
-            });
-            if (REAL_TIME_NOTIFICACION.length > 0) {
-                return res.jsonp(REAL_TIME_NOTIFICACION);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
     ListaNotificacionesRecibidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id_receive;

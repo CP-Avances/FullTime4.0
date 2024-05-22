@@ -19,8 +19,6 @@ class DepartamentoRutas {
         /** PLANIFICACIÓN DE ALIMENTACIÓN */
         this.router.get('/', verificarToken_1.TokenValidation, planComidasControlador_1.default.ListarPlanComidas);
         this.router.post('/', verificarToken_1.TokenValidation, planComidasControlador_1.default.CrearPlanComidas);
-        this.router.get('/fin_registro', verificarToken_1.TokenValidation, planComidasControlador_1.default.ObtenerUltimaPlanificacion);
-        this.router.put('/', verificarToken_1.TokenValidation, planComidasControlador_1.default.ActualizarPlanComidas);
         this.router.post('/duplicidad/plan', verificarToken_1.TokenValidation, planComidasControlador_1.default.BuscarPlanComidaEmpleadoFechas);
         this.router.post('/duplicidad/solicitud', verificarToken_1.TokenValidation, planComidasControlador_1.default.BuscarSolEmpleadoFechasActualizar);
         this.router.post('/duplicidad/actualizar/plan', verificarToken_1.TokenValidation, planComidasControlador_1.default.ActualizarPlanComidaEmpleadoFechas);
@@ -29,7 +27,6 @@ class DepartamentoRutas {
         // Registrar en tabla tipo_comida
         this.router.post('/tipo_comida', verificarToken_1.TokenValidation, planComidasControlador_1.default.CrearTipoComidas);
         this.router.get('/tipo_comida', verificarToken_1.TokenValidation, planComidasControlador_1.default.ListarTipoComidas);
-        this.router.get('/tipo_comida/ultimo', verificarToken_1.TokenValidation, planComidasControlador_1.default.VerUltimoTipoComidas);
         /** ************************************************************************************************ **
          ** **                   METODOS DE MANEJO DE SOLICTUDES DE ALIMENTACIÓN                          ** **
          ** ************************************************************************************************ **/

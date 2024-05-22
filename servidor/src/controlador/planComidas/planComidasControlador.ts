@@ -182,80 +182,6 @@ class PlanComidasControlador {
     }
   }
 
-  public async ObtenerUltimaPlanificacion(req: Request, res: Response) {
-    const PLAN_COMIDAS = await pool.query(
-      `
-      SELECT MAX(id) AS ultimo FROM ma_detalle_plan_comida
-      `
-    );
-    if (PLAN_COMIDAS.rowCount > 0) {
-      return res.jsonp(PLAN_COMIDAS.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-    }
-  }
-
-  public async ActualizarPlanComidas(req: Request, res: Response): Promise<Response> {
-    try {
-      const {
-        id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin,
-        extra, id, user_name, ip
-      } = req.body;
-
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
-
-      // CONSULTAR DATOSORIGINALES
-      const planComida = await pool.query('SELECT * FROM ma_detalle_plan_comida WHERE id = $1', [id]);
-      const [datosOriginales] = planComida.rows;
-
-      if (!datosOriginales) {
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'ma_detalle_plan_comida',
-          usuario: user_name,
-          accion: 'U',
-          datosOriginales: '',
-          datosNuevos: '',
-          ip,
-          observacion: `Error al actualizar planificación de comidas con id: ${id}. Registro no encontrado`
-        });
-
-        // FINALIZAR TRANSACCION
-        await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'Registro no encontrado' });
-      }
-
-      await pool.query(
-        `
-        UPDATE ma_detalle_plan_comida SET id_empleado = $1, fecha = $2, id_comida = $3,
-          observacion = $4, fecha_comida = $5, hora_inicio = $6, hora_fin = $7, extra = $8
-        WHERE id = $9
-        `
-        ,
-        [id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id]);
-
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'ma_detalle_plan_comida',
-        usuario: user_name,
-        accion: 'U',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{"id_empleado": ${id_empleado}, "fecha": "${fecha}", "id_comida": ${id_comida}, "observacion": "${observacion}", "fecha_comida": "${fec_comida}", "hora_inicio": "${hora_inicio}", "hora_fin": "${hora_fin}", "extra": "${extra}"}`,
-        ip,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-      return res.jsonp({ message: 'Planificación del almuerzo ha sido guardado con éxito' });
-    } catch (error) {
-      // REVERTIR TRANSACCION
-      await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'error' });
-    }
-  }
-
   public async EncontrarPlanComidaEmpleadoConsumido(req: Request, res: Response): Promise<any> {
     const { id_plan_comida, id_empleado } = req.body;
     const PLAN_COMIDAS = await pool.query(
@@ -378,19 +304,6 @@ class PlanComidasControlador {
     }
   }
 
-  public async VerUltimoTipoComidas(req: Request, res: Response) {
-    const PLAN_COMIDAS = await pool.query(
-      `
-      SELECT MAX(id) FROM ma_cat_comidas
-      `
-    );
-    if (PLAN_COMIDAS.rowCount > 0) {
-      return res.jsonp(PLAN_COMIDAS.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-    }
-  }
 
   /** **************************************************************************************************** **
    ** **                          METODOS DE CREACION DE SOLICITUD DE COMIDAS                           ** ** 
