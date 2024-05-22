@@ -26,7 +26,7 @@ class DepartamentoControlador {
       
       // INSERTAR AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_departamentos',
+        tabla: 'ed_departamentos',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
@@ -86,7 +86,7 @@ class DepartamentoControlador {
       
       // INSERTAR AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'cg_departamentos',
+        tabla: 'ed_departamentos',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datos),
@@ -490,12 +490,12 @@ class DepartamentoControlador {
       await pool.query('BEGIN');
 
       // OBTENER DATOS ANTES DE ACTUALIZAR
-      const response = await pool.query('SELECT * FROM nivel_jerarquicodep WHERE id_departamento = $1', [id_departamento]);
+      const response = await pool.query('SELECT * FROM ed_niveles_departamento WHERE id_departamento = $1', [id_departamento]);
       const [datos] = response.rows;
 
       if (!datos) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'nivel_jerarquicodep',
+          tabla: 'ed_niveles_departamento',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -518,7 +518,7 @@ class DepartamentoControlador {
       
       // INSERTAR AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'nivel_jerarquicodep',
+        tabla: 'ed_niveles_departamento',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datos),
@@ -536,11 +536,11 @@ class DepartamentoControlador {
 
       // INSERTAR AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'nivel_jerarquicodep',
+        tabla: 'ed_niveles_departamento',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datos),
-        datosNuevos: `{dep_nivel_nombre: ${departamento}}`,
+        datosNuevos: `{departamento_nombre_nivel: ${departamento}}`,
         ip: ip,
         observacion: null
       });

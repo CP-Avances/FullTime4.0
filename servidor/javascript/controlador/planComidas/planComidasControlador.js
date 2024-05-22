@@ -636,7 +636,7 @@ class PlanComidasControlador {
                 const [objetoAlimento] = response.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'plan_comida_empleado',
+                    tabla: 'ma_empleado_plan_comida_general',
                     usuario: user_name,
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),

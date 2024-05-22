@@ -30,7 +30,7 @@ class DepartamentoRutas {
         this.router.get('/tipo/cargo', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarUltimoCargoP);
         this.router.get('/cargo/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarUnCargoPropuestos);
 
-        /** TABLA DECRETO_ACUERDO_RESOL */
+        /** TABLA CONTEXTO LEGAL */
         this.router.get('/decreto', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarDecretos);
         this.router.get('/decreto/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.ListarUnDecreto);
         this.router.post('/decreto', TokenValidation, ACCION_PERSONAL_CONTROLADOR.CrearDecreto);

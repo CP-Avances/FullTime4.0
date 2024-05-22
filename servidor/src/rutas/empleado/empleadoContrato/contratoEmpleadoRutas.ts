@@ -101,7 +101,7 @@ class DepartamentoRutas {
 
 
         /** ********************************************************************************************* **
-         ** **            METODOS PARA SER USADOS EN LA TABLA MODAL_TRABAJO O TIPO DE CONTRATOS        ** **
+         ** **            METODOS PARA SER USADOS EN LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS        ** **
          ** ********************************************************************************************* **/
 
         // REGISTRAR MODALIDAD DE TRABAJO

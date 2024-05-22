@@ -17,7 +17,7 @@ const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditori
 const database_1 = __importDefault(require("../../../database"));
 class UbicacionControlador {
     /** ************************************************************************************************ **
-     ** **        REGISTRO TABLA CATALOGO DE UBICACIONES - COORDENADAS (cg_ubicaciones)               ** **
+     ** **        REGISTRO TABLA CATALOGO DE UBICACIONES - COORDENADAS (cat_ubicaciones)               ** **
      ** ************************************************************************************************ **/
     // CREAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
     RegistrarCoordenadas(req, res) {
@@ -214,7 +214,7 @@ class UbicacionControlador {
         });
     }
     /** **************************************************************************************** **
-     ** **        COORDENADAS DE UBICACION ASIGNADAS A UN USUARIO (empl_ubicacion)            ** **
+     ** **        COORDENADAS DE UBICACION ASIGNADAS A UN USUARIO (empleado_ubicacion)            ** **
      ** **************************************************************************************** **/
     // LISTAR REGISTROS DE COORDENADAS GENERALES DE UBICACION DE UN USUARIO
     ListarRegistroUsuario(req, res) {

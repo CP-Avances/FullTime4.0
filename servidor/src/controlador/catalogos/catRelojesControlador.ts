@@ -116,7 +116,7 @@ class RelojesControlador {
 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_relojes',
+                    tabla: 'ed_relojes',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
@@ -169,13 +169,13 @@ class RelojesControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const reloj = await pool.query('SELECT * FROM cg_relojes WHERE codigo = $1', [codigo]);
+            const reloj = await pool.query('SELECT * FROM ed_relojes WHERE codigo = $1', [codigo]);
             const [datosOriginales] = reloj.rows;
 
             if (!datosOriginales) {
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_relojes',
+                    tabla: 'ed_relojes',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
@@ -317,7 +317,7 @@ class RelojesControlador {
                 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_relojes',
+                    tabla: 'ed_relojes',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',

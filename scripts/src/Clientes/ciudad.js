@@ -10,7 +10,7 @@ class Ciudades {
     }
 
     async BusquedaIdCiudad(ciudad, provincia) {
-        let ids = await bdd.fulltime.query('SELECT c.id AS id_ciudad, upper(c.descripcion) AS ciudad, p.id AS id_provincia, upper(p.nombre) AS provincia FROM cg_provincias AS p, ciudades AS c WHERE UPPER(c.descripcion) like $1 AND UPPER(p.nombre) like $2',[ciudad, provincia])
+        let ids = await bdd.fulltime.query('SELECT c.id AS id_ciudad, upper(c.descripcion) AS ciudad, p.id AS id_provincia, upper(p.nombre) AS provincia FROM e_provincias AS p, e_ciudades AS c WHERE UPPER(c.descripcion) like $1 AND UPPER(p.nombre) like $2',[ciudad, provincia])
                 .then(result => { return result.rows});
         // console.log(ids);
         if (ids.length === 0) return 0;

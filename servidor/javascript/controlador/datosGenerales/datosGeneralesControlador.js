@@ -1315,8 +1315,8 @@ class DatosGeneralesControlador {
                         (e.nombre || ' ' || e.apellido) as fullname, e.cedula, e.correo, c.permiso_mail,
                         c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail,
                         c.hora_extra_noti, c.comida_mail, c.comida_noti
-                    FROM ed_autoriza_departamento AS da, empl_cargos AS ecr, ed_departamentos AS cg,
-                        sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c
+                    FROM ed_autoriza_departamento AS da, eu_empleado_cargos AS ecr, ed_departamentos AS cg,
+                        e_sucursales AS s, eu_empleado_contratos AS ecn,empleados AS e, eu_configurar_alertas AS c
                     WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND
                         da.id_departamento = cg.id AND
                         da.estado = true AND cg.id_sucursal = s.id AND ecr.id_contrato = ecn.id AND

@@ -200,7 +200,7 @@ class ParametrosControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT descripcion FROM detalle_tipo_parametro WHERE id = $1`, [id]);
+                const consulta = yield database_1.default.query(`SELECT descripcion FROM ep_detalle_parametro WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({

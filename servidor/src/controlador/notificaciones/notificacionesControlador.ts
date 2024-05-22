@@ -300,7 +300,7 @@ class NotificacionTiempoRealControlador {
 
 
   /** *********************************************************************************************** **
-   **                         METODOS PARA LA TABLA DE CONFIG_NOTI                                    **
+   **                         METODOS PARA LA TABLA DE CONFIGURAR_ALERTAS                                    **
    ** *********************************************************************************************** **/
 
   // METODO PARA REGISTRAR CONFIGURACIÓN DE RECEPCIÓN DE NOTIFICACIONES

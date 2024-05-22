@@ -418,11 +418,11 @@ class PlanGeneralControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM plan_general WHERE id = $1`, [id]);
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'plan_general',
+                        tabla: 'eu_asistencia_general',
                         usuario: user_name,
                         accion: 'U',
                         datosOriginales: '',

@@ -71,7 +71,7 @@ export class AccionPersonalService {
     return this.http.get(`${environment.url}/accionPersonal/tipo/cargo`);
   }
 
-  /** SERVICIOS PARA TABLA DECRETO_ACUERDO_RESOLUCION*/
+  /** SERVICIOS PARA TABLA CONTEXTO LEGAL*/
   ConsultarDecreto() {
     return this.http.get(`${environment.url}/accionPersonal/decreto`);
   }

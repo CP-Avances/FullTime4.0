@@ -217,7 +217,7 @@ class VacunasControlador {
             
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'empl_vacunas',
+                tabla: 'eu_empleado_vacunas',
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
