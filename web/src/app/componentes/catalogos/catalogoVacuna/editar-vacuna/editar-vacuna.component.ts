@@ -29,7 +29,7 @@ export class EditarVacunasComponent implements OnInit {
   ){}
 
   ngOnInit(): void {
-    this.user_name = localStorage.getItem('user');
+    this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
     this.ImprimirDatos();

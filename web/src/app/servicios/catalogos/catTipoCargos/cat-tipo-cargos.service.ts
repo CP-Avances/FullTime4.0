@@ -24,7 +24,6 @@ export class CatTipoCargosService {
   }
 
   CrearCargo(cargo: any) {
-    console.log('cargo: ', cargo)
     return this.http.post(`${environment.url}/tipoCargos/crearCargo`, cargo)
       .pipe(catchError(cargo));
   }
@@ -33,14 +32,18 @@ export class CatTipoCargosService {
     return this.http.put(`${environment.url}/tipoCargos`, datos)
       .pipe(catchError(datos));
   }
-  eliminar(id: any) {
-    return this.http.delete<any>(`${environment.url}/tipoCargos/eliminar/${id}`)
+  Eliminar(id: any, datos: any) {
+    const url = `${environment.url}/tipoCargos/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   RevisarFormato(formData: any) {
     return this.http.post<any>(environment.url + '/tipoCargos/upload/revision', formData);
   }
-  subirArchivoExcel(formData: any) {
+  SubirArchivoExcel(formData: any) {
     return this.http.post<any>(`${environment.url}/tipoCargos/cargar_plantilla`, formData);
   }
 

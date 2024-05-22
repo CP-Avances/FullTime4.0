@@ -58,6 +58,10 @@ export class CatTipoCargosComponent {
   empleado: any = [];
   idEmpleado: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   filtroCargo = ''; // VARIABLE DE BUSQUEDA DE DATOS
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   buscarCargo = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
@@ -85,6 +89,9 @@ export class CatTipoCargosComponent {
   }
 
   ngOnInit() {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.listaTipoCargos = [];
     this.ObtenerEmpleados(this.idEmpleado);
     this.BuscarParametro();
@@ -114,7 +121,7 @@ export class CatTipoCargosComponent {
   }
 
   obtenerCargos(){
-    
+
     this._TipoCargos.listaCargos().subscribe(res =>{
       console.log('lista ',res);
       this.listaTipoCargos = res
@@ -157,10 +164,14 @@ export class CatTipoCargosComponent {
 
   ConfirmarDelete(cargo: any) {
     const mensaje = 'eliminar';
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this._TipoCargos.eliminar(cargo.id).subscribe(res => {
+          this._TipoCargos.Eliminar(cargo.id, data).subscribe(res => {
             console.log('res eliminado: ', res);
             this.toastr.error('Registro eliminado.', '', {
               timeOut: 4000,
@@ -320,7 +331,12 @@ export class CatTipoCargosComponent {
 
   subirDatosPlantillaModal() {
     if (this.listaCargosCorrectas.length > 0) {
-      this._TipoCargos.subirArchivoExcel(this.listaCargosCorrectas).subscribe(response => {
+      const data = {
+        plantilla: this.listaCargosCorrectas,
+        user_name: this.user_name,
+        ip: this.ip,
+      }
+      this._TipoCargos.SubirArchivoExcel(data).subscribe(response => {
         console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de Tipo Cargos importada.', {
           timeOut: 3000,
@@ -579,14 +595,17 @@ export class CatTipoCargosComponent {
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     this.ingresar = false;
     this.contador = 0;
     this.tiposCargoEliminar = this.selectionTipoCargo.selected;
     this.tiposCargoEliminar.forEach((datos: any) => {
       this.listaTipoCargos = this.listaTipoCargos.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this._TipoCargos.eliminar(datos.id).subscribe(res => {
-        console.log('res eliminado: ', res);
+      this._TipoCargos.Eliminar(datos.id, data).subscribe(res => {
         if (!this.ingresar) {
           this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
             timeOut: 6000,

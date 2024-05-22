@@ -1,6 +1,7 @@
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import fs from 'fs';
 import path from 'path';
 import pool from '../../database';
@@ -46,7 +47,7 @@ class TiposCargosControlador {
     // METODO PARA REGISTRAR TIPO CARGO
     public async CrearCargo(req: Request, res: Response): Promise<Response> {
         try {
-            const { cargo } = req.body;
+            const { cargo, user_name, ip } = req.body;
             var VERIFICAR_CARGO = await pool.query(
                 `
                 SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
@@ -57,6 +58,9 @@ class TiposCargosControlador {
 
                 const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
 
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
                 const response: QueryResult = await pool.query(
                     `
                     INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
@@ -64,6 +68,21 @@ class TiposCargosControlador {
                     , [tipoCargo]);
 
                 const [TipoCargos] = response.rows;
+
+                // AUDITORIA
+
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_tipo_cargo',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(TipoCargos),
+                    ip,
+                    observacion: null
+                });
+
+                // FIN DE TRANSACCION
+                await pool.query('COMMIT');
 
                 if (TipoCargos) {
                     return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' })
@@ -75,6 +94,8 @@ class TiposCargosControlador {
             }
         }
         catch (error) {
+            // ROLLBACK
+            await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error', status: '500' });
         }
     }
@@ -95,6 +116,9 @@ class TiposCargosControlador {
             if (tipoCargoExiste.rows[0] != undefined && tipoCargoExiste.rows[0].cargo != '' && tipoCargoExiste.rows[0].cargo != null) {
                 return res.status(200).jsonp({ message: 'Ya existe el cargo', status: '300' })
             } else {
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE e_cat_tipo_cargo SET cargo = $2
@@ -104,6 +128,20 @@ class TiposCargosControlador {
 
                 const [TipoCargos] = response.rows;
 
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_tipo_cargo',
+                    usuario: req.body.user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(tipoCargoExiste.rows),
+                    datosNuevos: JSON.stringify(TipoCargos),
+                    ip: req.body.ip,
+                    observacion: null
+                });
+
+                // FIN DE TRANSACCION
+                await pool.query('COMMIT');
+
                 if (TipoCargos) {
                     return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' })
                 } else {
@@ -112,6 +150,8 @@ class TiposCargosControlador {
             }
         }
         catch (error) {
+            // ROLLBACK
+            await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error', status: '500' });
         }
     }
@@ -120,14 +160,59 @@ class TiposCargosControlador {
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
+            const { user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOS ANTES DE ELIMINAR
+            const TIPO_CARGO = await pool.query(
+                `
+                SELECT * FROM e_cat_tipo_cargo WHERE id = $1
+                `
+                , [id]);
+
+            const [datosTiposCargos] = TIPO_CARGO.rows;
+
+            if (!datosTiposCargos) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_tipo_cargo',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'No se encuentra el registro.', status: '404' });
+            }
             await pool.query(
                 `
                 DELETE FROM e_cat_tipo_cargo WHERE id = $1
                 `
                 , [id]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'e_cat_tipo_cargo',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datosTiposCargos),
+                datosNuevos: '',
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
             res.jsonp({ message: 'Registro eliminado.', code: '200' });
 
         } catch (error) {
+            // ROLLBACK
+            await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: error.detail, code: error.code });
         }
     }
@@ -267,7 +352,7 @@ class TiposCargosControlador {
     // REGISTRAR PLANTILLA TIPO CARGO 
     public async CargarPlantilla(req: Request, res: Response) {
         try {
-            const plantilla = req.body;
+            const {plantilla, user_name, ip} = req.body;
             var contador = 1;
             var respuesta: any
 
@@ -275,6 +360,9 @@ class TiposCargosControlador {
                 // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                 const { item, tipo_cargo, observacion } = data;
                 const cargo = tipo_cargo.charAt(0).toUpperCase() + tipo_cargo.slice(1).toLowerCase();
+
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
 
                 // REGISTRO DE LOS DATOS DE TIPO CARGO
                 const response: QueryResult = await pool.query(
@@ -284,6 +372,20 @@ class TiposCargosControlador {
                     , [cargo]);
 
                 const [cargos] = response.rows;
+
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_tipo_cargo',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(cargos),
+                    ip,
+                    observacion: null
+                });
+
+                // FIN DE TRANSACCION
+                await pool.query('COMMIT');
 
                 if (contador === plantilla.length) {
                     if (cargos) {
@@ -295,6 +397,8 @@ class TiposCargosControlador {
                 contador = contador + 1;
             });
         } catch (error) {
+            // ROLLBACK
+            await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: error });
         }
     }
