@@ -184,20 +184,6 @@ class NivelTituloControlador {
             }
         });
     }
-    getOne(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const unNivelTitulo = yield database_1.default.query(`
-      SELECT * FROM et_cat_nivel_titulo WHERE id = $1
-      `, [id]);
-            if (unNivelTitulo.rowCount > 0) {
-                return res.jsonp(unNivelTitulo.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
     RevisarDatos(req, res) {
         var _a;

@@ -170,54 +170,6 @@ class PlanHoraExtraControlador {
             }
         });
     }
-    ActualizarObservacion(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const id = req.params.id;
-                const { observacion, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const consulta = yield database_1.default.query('SELECT observacion FROM mhe_empleado_plan_hora_extra WHERE id = $1', [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'mhe_empleado_plan_hora_extra',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al actualizar observacion en plan_hora_extra_empleado con id ${id}. Registro no encontrado`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado' });
-                }
-                yield database_1.default.query(`
-        UPDATE mhe_empleado_plan_hora_extra SET observacion = $1 WHERE id = $2
-        `, [observacion, id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'mhe_empleado_plan_hora_extra',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"observacion": "${observacion}"}`,
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Planificación Actualizada' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al actualizar observacion' });
-            }
-        });
-    }
     ActualizarEstado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

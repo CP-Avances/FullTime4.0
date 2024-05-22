@@ -34,7 +34,6 @@ class NivelTituloRutas {
         this.router.put('/', verificarToken_1.TokenValidation, nivelTituloControlador_1.default.ActualizarNivelTitulo);
         // METODO PARA BUSCAR NIVEL POR SU NOMBRE
         this.router.get('/buscar/:nombre', verificarToken_1.TokenValidation, nivelTituloControlador_1.default.ObtenerNivelNombre);
-        this.router.get('/:id', verificarToken_1.TokenValidation, nivelTituloControlador_1.default.getOne);
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], nivelTituloControlador_1.default.RevisarDatos);
     }
 }

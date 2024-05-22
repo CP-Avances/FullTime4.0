@@ -25,12 +25,6 @@ export class NivelTitulosService {
     };
     return this.http.request('delete', url, httpOtions);
   }
-
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${environment.url}/nivel-titulo/xmlDownload`, data);
-  }
-
   // METODO PARA REGISTRAR NIVEL DE TITULO
   RegistrarNivel(data: any) {
     return this.http.post<any>(`${environment.url}/nivel-titulo`, data);
@@ -50,23 +44,5 @@ export class NivelTitulosService {
   RevisarFormato(formData) {
     return this.http.post<any>(environment.url + '/nivel-titulo/upload/revision', formData);
   }
-
-
-
-
-
-
-  // Niveles de titulos
-  getOneNivelTituloRest(id: number) {
-    return this.http.get<any>(`${environment.url}/nivel-titulo/${id}`);
-  }
-
-
-
-
-
-
-
-
 
 }
