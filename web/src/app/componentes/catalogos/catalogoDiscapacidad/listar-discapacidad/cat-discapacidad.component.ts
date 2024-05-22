@@ -199,22 +199,22 @@ export class CatDiscapacidadComponent implements OnInit {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 25);
+    let itemName = arrayItems[0];
     console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'discapacidad_vacunas') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre discapacidad_vacunas', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta.', {
           timeOut: 6000,
         });
 
         this.nameFile = '';
       }
     } else {
-      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+      this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
         timeOut: 6000,
       });
 
@@ -236,8 +236,8 @@ export class CatDiscapacidadComponent implements OnInit {
 
     this.progreso = true;
 
-     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
-     this.rest.RevisarFormato(formData).subscribe(res => {
+    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    this.rest.RevisarFormato(formData).subscribe(res => {
       this.Datos_discapacidad = res.data;
       this.messajeExcel = res.message;
       console.log('probando plantilla discapacidad', this.Datos_discapacidad);
@@ -247,8 +247,15 @@ export class CatDiscapacidadComponent implements OnInit {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
-        this.Datos_discapacidad.forEach(item => {
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña TIPO_DISCAPACIDAD en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.Datos_discapacidad.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaDiscapacidadCorrectas.push(item);
           }
@@ -265,34 +272,34 @@ export class CatDiscapacidadComponent implements OnInit {
     });
   }
 
-    // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
-    colorCelda: string = ''
-    stiloCelda(observacion: string): string {
-      let arrayObservacion = observacion.split(" ");
-      if (observacion == 'Registro duplicado') {
-        return 'rgb(156, 214, 255)';
-      } else if (observacion == 'ok') {
-        return 'rgb(159, 221, 154)';
-      } else if (observacion == 'Ya existe en el sistema') {
-        return 'rgb(239, 203, 106)';
-      } else if (arrayObservacion[0] == 'Discapacidad ') {
-        return 'rgb(242, 21, 21)';
-      } else {
-        return 'rgb(242, 21, 21)';
-      }
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
+  colorCelda: string = ''
+  stiloCelda(observacion: string): string {
+    let arrayObservacion = observacion.split(" ");
+    if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya existe en el sistema') {
+      return 'rgb(239, 203, 106)';
+    } else if (arrayObservacion[0] == 'Discapacidad ') {
+      return 'rgb(242, 21, 21)';
+    } else {
+      return 'rgb(242, 21, 21)';
     }
-    colorTexto: string = '';
-    stiloTextoCelda(texto: string): string {
-      let arrayObservacion = texto.split(" ");
-      if (arrayObservacion[0] == 'No') {
-        return 'rgb(255, 80, 80)';
-      } else {
-        return 'black'
-      }
+  }
+  colorTexto: string = '';
+  stiloTextoCelda(texto: string): string {
+    let arrayObservacion = texto.split(" ");
+    if (arrayObservacion[0] == 'No') {
+      return 'rgb(255, 80, 80)';
+    } else {
+      return 'black'
     }
+  }
 
-   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
-   ConfirmarRegistroMultiple() {
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -554,7 +561,7 @@ export class CatDiscapacidadComponent implements OnInit {
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.rest.Eliminar(discapacidad.id, data).subscribe((res:any) => {
+          this.rest.Eliminar(discapacidad.id, data).subscribe((res: any) => {
             if (res.message === 'error') {
               this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
                 timeOut: 6000,

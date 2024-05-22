@@ -33,7 +33,7 @@ class AuditoriaControlador {
                 VALUES ($1, $2, $3, now(), $4, $5, $6, $7, $8)'
                 `
                 ,
-                ['public', tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion]);
+                ['aplicacion web', tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion]);
         } catch (error) {
             throw error;
         }

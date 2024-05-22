@@ -132,7 +132,7 @@ export class CargarPlantillaComponent {
         });
         this.mostrarbtnsubir = false;
       } else {
-        this.DatosContrato.forEach(item => {
+        this.DatosContrato.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaContratosCorrectas.push(item);
           }
@@ -308,7 +308,7 @@ export class CargarPlantillaComponent {
         });
         this.mostrarbtnsubir = false;
       } else {
-        this.DatosCargos.forEach(item => {
+        this.DatosCargos.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaCargosCorrectas.push(item);
           }

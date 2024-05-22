@@ -242,7 +242,7 @@ export class CatVacunasComponent implements OnInit {
         });
         this.mostrarbtnsubir = false;
       } else {
-        this.Datos_vacunas.forEach(item => {
+        this.Datos_vacunas.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaVacunasCorrectas.push(item);
           }

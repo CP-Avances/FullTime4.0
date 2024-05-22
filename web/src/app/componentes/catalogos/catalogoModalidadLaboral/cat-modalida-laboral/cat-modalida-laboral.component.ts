@@ -239,7 +239,7 @@ export class CatModalidaLaboralComponent implements OnInit {
         });
         this.mostrarbtnsubir = false;
       } else {
-        this.Datos_modalidad_laboral.forEach(item => {
+        this.Datos_modalidad_laboral.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaModalidadCorrectas.push(item);
           }

@@ -301,7 +301,7 @@ export class AutorizacionesComponent implements OnInit {
                       //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
                       this.restAutoriza.BuscarListaAutorizaDepa(autorizacion[0].id_departamento).subscribe(res => {
                         this.listadoDepaAutoriza = res;
-                        this.listadoDepaAutoriza.forEach(item => {
+                        this.listadoDepaAutoriza.forEach((item: any) => {
                           if((this.id_empleado_loggin == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
                             this.obtenerPlanificacionHoraria(o.fecha_inicio, o.fecha_final, o.codigo, o);
                             this.listafiltrada.push(o);
@@ -669,7 +669,7 @@ export class AutorizacionesComponent implements OnInit {
     this.info_correo = this.info_correo + ', ' + this.CorreosUsuariosAutorizanDepa;
 
 
-    this.listafiltrada.forEach(item => {
+    this.listafiltrada.forEach((item: any) => {
       if(item.aprobar == "SI"){
         item.estado = estado_letras;
       }

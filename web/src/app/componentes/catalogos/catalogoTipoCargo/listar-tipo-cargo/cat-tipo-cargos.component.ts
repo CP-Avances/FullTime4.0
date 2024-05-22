@@ -274,7 +274,7 @@ export class CatTipoCargosComponent {
         });
         this.mostrarbtnsubir = false;
       } else {
-        this.Datos_tipo_cargos.forEach(item => {
+        this.Datos_tipo_cargos.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaCargosCorrectas.push(item);
           }

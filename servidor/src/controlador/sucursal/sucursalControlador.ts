@@ -1,4 +1,4 @@
-import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 
@@ -36,13 +36,13 @@ class SucursalControlador {
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
-  
+
       const response: QueryResult = await pool.query(
         `
         INSERT INTO e_sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
         `
         , [nombre, id_ciudad, id_empresa]);
-  
+
       const [sucursal] = response.rows;
 
       // AUDITORIA
@@ -58,7 +58,7 @@ class SucursalControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-  
+
       if (sucursal) {
         return res.status(200).jsonp(sucursal)
       }
@@ -105,7 +105,7 @@ class SucursalControlador {
         UPDATE e_sucursales SET nombre = $1, id_ciudad = $2 WHERE id = $3
         `
         , [nombre, id_ciudad, id]);
-  
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'e_sucursales',
@@ -243,68 +243,85 @@ class SucursalControlador {
     const documento = req.file?.originalname;
     let separador = path.sep;
     let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-
     const workbook = excel.readFile(ruta);
-    const sheet_name_list = workbook.SheetNames;
-    const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[3]]);
+    let verificador = ObtenerIndicePlantilla(workbook, 'SUCURSALES');
+    if (verificador === false) {
+      return res.jsonp({ message: 'no_existe', data: undefined });
+    }
+    else {
+      const sheet_name_list = workbook.SheetNames;
+      const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+      let data: any = {
+        fila: '',
+        nom_sucursal: '',
+        ciudad: '',
+        observacion: ''
+      };
 
-    let data: any = {
-      fila: '',
-      nom_sucursal: '',
-      ciudad: '',
-      observacion: ''
-    };
+      var mensaje: string = 'correcto';
 
-    var mensaje: string = 'correcto';
+      var listSucursales: any = [];
+      var duplicados: any = [];
 
-    var listSucursales: any = [];
-    var duplicados: any = [];
+      // LECTURA DE LOS DATOS DE LA PLANTILLA
+      plantilla.forEach(async (dato: any, indice: any, array: any) => {
+        var { item, nombre, ciudad } = dato;
 
-    // LECTURA DE LOS DATOS DE LA PLANTILLA
-    plantilla.forEach(async (dato: any, indice: any, array: any) => {
-      var { item, nombre, ciudad } = dato;
+        data.fila = dato.item
+        data.nom_sucursal = dato.nombre;
+        data.ciudad = dato.ciudad;
 
-      data.fila = dato.item
-      data.nom_sucursal = dato.nombre;
-      data.ciudad = dato.ciudad;
+        if ((data.fila != undefined && data.fila != '') &&
+          (data.nom_sucursal != undefined && data.nom_sucursal != '') &&
+          (data.ciudad != undefined && data.ciudad != '')) {
 
-      if ((data.fila != undefined && data.fila != '') &&
-        (data.nom_sucursal != undefined && data.nom_sucursal != '') &&
-        (data.ciudad != undefined && data.ciudad != '')) {
-
-        //Validar primero que exista la ciudad en la tabla ciudades
-        const existe_ciudad = await pool.query(
-          `
-          SELECT id FROM e_ciudades WHERE UPPER(descripcion) = UPPER($1)
-          `
-          , [ciudad]);
-        var id_ciudad = existe_ciudad.rows[0];
-        if (id_ciudad != undefined && id_ciudad != '') {
-          // VERIFICACIÓN SI LA SUCURSAL NO ESTE REGISTRADA EN EL SISTEMA
-          const VERIFICAR_SUCURSAL = await pool.query(
+          //Validar primero que exista la ciudad en la tabla ciudades
+          const existe_ciudad = await pool.query(
             `
-            SELECT * FROM e_sucursales 
-            WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2
-            `
-            , [nombre, id_ciudad.id]);
-          if (VERIFICAR_SUCURSAL.rowCount === 0) {
-            data.fila = item
-            data.nom_sucursal = nombre;
-            data.ciudad = ciudad;
-            // Discriminación de elementos iguales
-            if (duplicados.find((p: any) => p.nombre.toLowerCase() === dato.nombre.toLowerCase() &&
-              p.ciudad.toLowerCase() === dato.ciudad.toLowerCase()) == undefined) {
-              data.observacion = 'ok';
-              duplicados.push(dato);
+        SELECT id FROM e_ciudades WHERE UPPER(descripcion) = UPPER($1)
+        `
+            , [ciudad]);
+          var id_ciudad = existe_ciudad.rows[0];
+          if (id_ciudad != undefined && id_ciudad != '') {
+            // VERIFICACIÓN SI LA SUCURSAL NO ESTE REGISTRADA EN EL SISTEMA
+            const VERIFICAR_SUCURSAL = await pool.query(
+              `
+          SELECT * FROM e_sucursales 
+          WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2
+          `
+              , [nombre, id_ciudad.id]);
+            if (VERIFICAR_SUCURSAL.rowCount === 0) {
+              data.fila = item
+              data.nom_sucursal = nombre;
+              data.ciudad = ciudad;
+              // Discriminación de elementos iguales
+              if (duplicados.find((p: any) => p.nombre.toLowerCase() === dato.nombre.toLowerCase() &&
+                p.ciudad.toLowerCase() === dato.ciudad.toLowerCase()) == undefined) {
+                data.observacion = 'ok';
+                duplicados.push(dato);
+              }
+
+              listSucursales.push(data);
+
+            } else {
+              data.fila = item
+              data.nom_sucursal = nombre;
+              data.ciudad = ciudad;
+              data.observacion = 'Ya existe en el sistema';
+
+              listSucursales.push(data);
             }
-
-            listSucursales.push(data);
 
           } else {
             data.fila = item
-            data.nom_sucursal = nombre;
-            data.ciudad = ciudad;
-            data.observacion = 'Ya existe en el sistema';
+            data.nom_sucursal = dato.nombre;
+            data.ciudad = dato.ciudad;
+
+            if (data.ciudad == '' || data.ciudad == undefined) {
+              data.ciudad = 'No registrado';
+            }
+
+            data.observacion = 'Ciudad no existe en el sistema';
 
             listSucursales.push(data);
           }
@@ -314,96 +331,84 @@ class SucursalControlador {
           data.nom_sucursal = dato.nombre;
           data.ciudad = dato.ciudad;
 
-          if (data.ciudad == '' || data.ciudad == undefined) {
-            data.ciudad = 'No registrado';
+          if (data.fila == '' || data.fila == undefined) {
+            data.fila = 'error';
+            mensaje = 'error'
           }
 
-          data.observacion = 'Ciudad no existe en el sistema';
+          if (data.nom_sucursal == '' || data.nom_sucursal == undefined) {
+            data.nom_sucursal = 'No registrado';
+            data.observacion = 'Sucursal no registrada';
+          }
+
+          if (data.ciudad == '' || data.ciudad == undefined) {
+            data.ciudad = 'No registrado';
+            data.observacion = 'Ciudad no registrada';
+          }
+
+          if ((data.nom_sucursal == '' || data.nom_sucursal == undefined) && (data.ciudad == '' || data.ciudad == undefined)) {
+            data.observacion = 'Sucursal y ciudad no registrado';
+          }
 
           listSucursales.push(data);
         }
 
-      } else {
-        data.fila = item
-        data.nom_sucursal = dato.nombre;
-        data.ciudad = dato.ciudad;
+        data = {};
 
-        if (data.fila == '' || data.fila == undefined) {
-          data.fila = 'error';
-          mensaje = 'error'
-        }
-
-        if (data.nom_sucursal == '' || data.nom_sucursal == undefined) {
-          data.nom_sucursal = 'No registrado';
-          data.observacion = 'Sucursal no registrada';
-        }
-
-        if (data.ciudad == '' || data.ciudad == undefined) {
-          data.ciudad = 'No registrado';
-          data.observacion = 'Ciudad no registrada';
-        }
-
-        if ((data.nom_sucursal == '' || data.nom_sucursal == undefined) && (data.ciudad == '' || data.ciudad == undefined)) {
-          data.observacion = 'Sucursal y ciudad no registrado';
-        }
-
-        listSucursales.push(data);
-      }
-
-      data = {};
-
-    });
-
-    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-    fs.access(ruta, fs.constants.F_OK, (err) => {
-      if (err) {
-      } else {
-        // ELIMINAR DEL SERVIDOR
-        fs.unlinkSync(ruta);
-      }
-    });
-
-    setTimeout(() => {
-
-      listSucursales.sort((a: any, b: any) => {
-        // Compara los números de los objetos
-        if (a.fila < b.fila) {
-          return -1;
-        }
-        if (a.fila > b.fila) {
-          return 1;
-        }
-        return 0; // Son iguales
       });
 
-      var filaDuplicada: number = 0;
-
-      listSucursales.forEach((item: any) => {
-        if (item.observacion == undefined || item.observacion == null || item.observacion == '') {
-          item.observacion = 'Registro duplicado'
-        }
-
-        //Valida si los datos de la columna N son numeros.
-        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-          //Condicion para validar si en la numeracion existe un numero que se repite dara error.
-          if (item.fila == filaDuplicada) {
-            mensaje = 'error';
-          }
+      // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+      fs.access(ruta, fs.constants.F_OK, (err) => {
+        if (err) {
         } else {
-          return mensaje = 'error';
+          // ELIMINAR DEL SERVIDOR
+          fs.unlinkSync(ruta);
         }
-
-        filaDuplicada = item.fila;
-
       });
 
-      if (mensaje == 'error') {
-        listSucursales = undefined;
-      }
+      setTimeout(() => {
 
-      return res.jsonp({ message: mensaje, data: listSucursales });
+        listSucursales.sort((a: any, b: any) => {
+          // Compara los números de los objetos
+          if (a.fila < b.fila) {
+            return -1;
+          }
+          if (a.fila > b.fila) {
+            return 1;
+          }
+          return 0; // Son iguales
+        });
 
-    }, 1500)
+        var filaDuplicada: number = 0;
+
+        listSucursales.forEach((item: any) => {
+          if (item.observacion == undefined || item.observacion == null || item.observacion == '') {
+            item.observacion = 'Registro duplicado'
+          }
+
+          //Valida si los datos de la columna N son numeros.
+          if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+            if (item.fila == filaDuplicada) {
+              mensaje = 'error';
+            }
+          } else {
+            return mensaje = 'error';
+          }
+
+          filaDuplicada = item.fila;
+
+        });
+
+        if (mensaje == 'error') {
+          listSucursales = undefined;
+        }
+
+        return res.jsonp({ message: mensaje, data: listSucursales });
+
+      }, 1500)
+
+    }
   }
 
 }

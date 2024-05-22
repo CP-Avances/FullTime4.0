@@ -206,7 +206,7 @@ export class ListarTitulosComponent implements OnInit {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 25);
+    let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
@@ -251,21 +251,28 @@ export class ListarTitulosComponent implements OnInit {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
-        this.DataTitulosProfesionales.forEach(item => {
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña TITULOS en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      } 
+      else {
+        this.DataTitulosProfesionales.forEach((item: any) => {
           if (item.observacion.toLowerCase() === 'ok') {
             this.listTitulosCorrectos.push(item);
           }
         });
       }
 
-    },error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ',error);
+    }, error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
 
-    },() => {
+    }, () => {
 
     });
 
@@ -282,21 +289,21 @@ export class ListarTitulosComponent implements OnInit {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'Nivel no existe en el sistema') {
       return 'rgb(255, 192, 203)';
-     }else{
-       return 'rgb(251, 73, 18)';
-     }
-   }
+    } else {
+      return 'rgb(251, 73, 18)';
+    }
+  }
 
-   colorTexto: string = '';
-   stiloTextoCelda(texto: string): any{
+  colorTexto: string = '';
+  stiloTextoCelda(texto: string): any {
     let arrayObservacion = texto.split(" ");
-    if(arrayObservacion[0] == 'No'){
-       return 'rgb(255, 80, 80)';
-    }else{
-       return 'black'
+    if (arrayObservacion[0] == 'No') {
+      return 'rgb(255, 80, 80)';
+    } else {
+      return 'black'
     }
 
-   }
+  }
 
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
@@ -318,7 +325,7 @@ export class ListarTitulosComponent implements OnInit {
     }
     if (this.listTitulosCorrectos.length > 0) {
       var cont = 0;
-      this.listTitulosCorrectos.forEach(item => {
+      this.listTitulosCorrectos.forEach((item: any) => {
         this.nivelTitulos.forEach(valor => {
           if (item.nivel.toLowerCase() == valor.nombre.toLowerCase()) {
             data.nombre = item.titulo;
