@@ -19,8 +19,8 @@ export class CatModalidadLaboralService {
   RegistrarNivel(data: any) {
     return this.http.post<any>(`${environment.url}/nivel-titulo`, data);
   }
+
   CrearModalidadLaboral(modalidad: any){
-    console.log('modalidad: ',modalidad)
     return this.http.post(`${environment.url}/modalidadLaboral/crearModalidad`, modalidad).pipe(
       catchError(modalidad)
     );
