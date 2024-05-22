@@ -304,12 +304,12 @@ class HorasExtrasPedidasControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const datosOriginales = await pool.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id]);
+      const datosOriginales = await pool.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id]);
       const [objetoHoraExtraOriginal] = datosOriginales.rows;
 
       if (!objetoHoraExtraOriginal) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'hora_extr_pedidos',
+          tabla: 'mhe_solicitud_hora_extra',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -437,7 +437,7 @@ class HorasExtrasPedidasControlador {
         observacion: null
       });
   
-      // CONSULTAR DATOSORIGINALES HORA_EXTR_PEDIDOS
+      // CONSULTAR DATOS ORIGINALES SOLICITUD DE HORA EXTRA
       const datosOriginalesHoraExtra = await pool.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id_hora_extra]);
       const [objetoHoraExtraOriginal] = datosOriginalesHoraExtra.rows;
 

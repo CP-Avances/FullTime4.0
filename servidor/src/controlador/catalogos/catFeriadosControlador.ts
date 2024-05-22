@@ -113,7 +113,7 @@ class FeriadosControlador {
 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_feriados',
+                    tabla: 'ef_cat_feriados',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
@@ -829,7 +829,7 @@ class FeriadosControlador {
 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'cg_feriados',
+                    tabla: 'ef_cat_feriados',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',

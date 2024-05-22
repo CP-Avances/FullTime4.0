@@ -258,7 +258,7 @@ export class CrearPedidoAccionComponent implements OnInit {
       });
   }
 
-  // BUSQUEDA DE DATOS DE LA TABLA CG_PROCESOS
+  // BUSQUEDA DE DATOS DE LA TABLA PROCESOS
   procesos: any = [];
   ObtenerProcesos() {
     this.procesos = [];

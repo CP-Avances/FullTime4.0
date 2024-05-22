@@ -421,7 +421,7 @@ class AccionPersonalControlador {
         }
     }
 
-    // TABLA ACCION_PERSONAL_EMPLEADO
+    // TABLA SOLICITUD ACCION PERSONAL
 
     public async CrearPedidoAccionPersonal(req: Request, res: Response): Promise<Response> {
         try {

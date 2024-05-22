@@ -347,7 +347,7 @@ class ContratoEmpleadoControlador {
         });
     }
     /** **************************************************************************** **
-     ** **          METODOS PARA LA TABLA MODAL_TRABAJO O TIPO DE CONTRATOS       ** **
+     ** **          METODOS PARA LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS       ** **
      ** **************************************************************************** **/
     // LISTAR TIPOS DE MODALIDAD DE TRABAJO
     ListarTiposContratos(req, res) {

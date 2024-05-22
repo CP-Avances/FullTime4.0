@@ -108,7 +108,7 @@ class RelojesControlador {
                     const [reloj] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'cg_relojes',
+                        tabla: 'ed_relojes',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
@@ -156,12 +156,12 @@ class RelojesControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const reloj = yield database_1.default.query('SELECT * FROM cg_relojes WHERE codigo = $1', [codigo]);
+                const reloj = yield database_1.default.query('SELECT * FROM ed_relojes WHERE codigo = $1', [codigo]);
                 const [datosOriginales] = reloj.rows;
                 if (!datosOriginales) {
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'cg_relojes',
+                        tabla: 'ed_relojes',
                         usuario: user_name,
                         accion: 'U',
                         datosOriginales: '',
@@ -280,7 +280,7 @@ class RelojesControlador {
                         tiene_funciones, id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], codigo_reloj, accion]);
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'cg_relojes',
+                        tabla: 'ed_relojes',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',

@@ -46,7 +46,7 @@ class DiscapacidadControlador {
         `, [id_empleado, carn_conadis, porcentaje, tipo]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'cg_discapacidades',
+                    tabla: 'eu_empleado_discapacidad',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',

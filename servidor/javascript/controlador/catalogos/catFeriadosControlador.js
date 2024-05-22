@@ -105,7 +105,7 @@ class FeriadosControlador {
                     const [feriado] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'cg_feriados',
+                        tabla: 'ef_cat_feriados',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
@@ -734,7 +734,7 @@ class FeriadosControlador {
                     `, [fecha, descripcion, recuperar]);
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'cg_feriados',
+                        tabla: 'ef_cat_feriados',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',

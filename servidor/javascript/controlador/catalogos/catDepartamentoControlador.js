@@ -32,7 +32,7 @@ class DepartamentoControlador {
         `, [nombre, id_sucursal]);
                 // INSERTAR AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'cg_departamentos',
+                    tabla: 'ed_departamentos',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
@@ -82,7 +82,7 @@ class DepartamentoControlador {
         `, [nombre, id_sucursal, id]);
                 // INSERTAR AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'cg_departamentos',
+                    tabla: 'ed_departamentos',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datos),
@@ -422,11 +422,11 @@ class DepartamentoControlador {
                 // INICIAR TRANSACCIÓN
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOS ANTES DE ACTUALIZAR
-                const response = yield database_1.default.query('SELECT * FROM nivel_jerarquicodep WHERE id_departamento = $1', [id_departamento]);
+                const response = yield database_1.default.query('SELECT * FROM ed_niveles_departamento WHERE id_departamento = $1', [id_departamento]);
                 const [datos] = response.rows;
                 if (!datos) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'nivel_jerarquicodep',
+                        tabla: 'ed_niveles_departamento',
                         usuario: user_name,
                         accion: 'U',
                         datosOriginales: '',
@@ -444,7 +444,7 @@ class DepartamentoControlador {
         `, [departamento, id_departamento]);
                 // INSERTAR AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'nivel_jerarquicodep',
+                    tabla: 'ed_niveles_departamento',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datos),
@@ -458,11 +458,11 @@ class DepartamentoControlador {
         `, [departamento, id_departamento]);
                 // INSERTAR AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'nivel_jerarquicodep',
+                    tabla: 'ed_niveles_departamento',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datos),
-                    datosNuevos: `{dep_nivel_nombre: ${departamento}}`,
+                    datosNuevos: `{departamento_nombre_nivel: ${departamento}}`,
                     ip: ip,
                     observacion: null
                 });

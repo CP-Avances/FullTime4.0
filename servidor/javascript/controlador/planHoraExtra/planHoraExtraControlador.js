@@ -622,7 +622,7 @@ class PlanHoraExtraControlador {
                 const [notificiacion] = response.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'realtime_timbres',
+                    tabla: 'ecm_realtime_timbres',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',

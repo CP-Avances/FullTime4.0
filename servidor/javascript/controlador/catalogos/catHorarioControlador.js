@@ -162,13 +162,13 @@ class HorarioControlador {
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
                 const horario = yield database_1.default.query(`
-        SELECT * FROM cg_horarios WHERE id = $1
+        SELECT * FROM eh_cat_horarios WHERE id = $1
         `, [id]);
                 const [datosOriginales] = horario.rows;
                 if (!datosOriginales) {
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'cg_horarios',
+                        tabla: 'eh_cat_horarios',
                         usuario: user_name,
                         accion: 'U',
                         datosOriginales: '',

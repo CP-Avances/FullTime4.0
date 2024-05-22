@@ -197,7 +197,7 @@ class VacunasControlador {
                 `, [id_empleado, descripcion, fecha, id_tipo_vacuna, id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'empl_vacunas',
+                    tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),

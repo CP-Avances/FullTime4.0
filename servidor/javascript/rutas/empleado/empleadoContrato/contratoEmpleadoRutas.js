@@ -93,7 +93,7 @@ class DepartamentoRutas {
         // METODO PARA BUSCAR FECHAS DE CONTRATOS    --**VERIFICADO
         this.router.post('/buscarFecha', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EncontrarFechaContrato);
         /** ********************************************************************************************* **
-         ** **            METODOS PARA SER USADOS EN LA TABLA MODAL_TRABAJO O TIPO DE CONTRATOS        ** **
+         ** **            METODOS PARA SER USADOS EN LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS        ** **
          ** ********************************************************************************************* **/
         // REGISTRAR MODALIDAD DE TRABAJO
         this.router.post('/modalidad/trabajo', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.CrearTipoContrato);

@@ -466,12 +466,12 @@ class PlanGeneralControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const consulta = await pool.query(`SELECT * FROM plan_general WHERE id = $1`, [id]);
+            const consulta = await pool.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
 
             if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'plan_general',
+                    tabla: 'eu_asistencia_general',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',

@@ -174,7 +174,7 @@ class HorarioControlador {
       // CONSULTAR DATOSORIGINALES
       const horario = await pool.query(
         `
-        SELECT * FROM cg_horarios WHERE id = $1
+        SELECT * FROM eh_cat_horarios WHERE id = $1
         `
         , [id]);
       const [datosOriginales] = horario.rows;
@@ -182,7 +182,7 @@ class HorarioControlador {
       if (!datosOriginales) {
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'cg_horarios',
+          tabla: 'eh_cat_horarios',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',

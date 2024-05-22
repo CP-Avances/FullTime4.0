@@ -733,7 +733,7 @@ class PlanComidasControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'plan_comida_empleado',
+        tabla: 'ma_empleado_plan_comida_general',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),

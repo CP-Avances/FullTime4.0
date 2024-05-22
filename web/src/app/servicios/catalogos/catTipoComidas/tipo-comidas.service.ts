@@ -54,7 +54,7 @@ export class TipoComidasService {
     return this.http.get(`${environment.url}/tipoComidas/registro/ultimo`);
   }
 
-  // Servicio para consultar datos de tabla detalle_menu
+  // Servicio para consultar datos de tabla detalle_comida
   ConsultarUnDetalleMenu(id: number) {
     return this.http.get(`${environment.url}/tipoComidas/detalle/menu/${id}`);
   }

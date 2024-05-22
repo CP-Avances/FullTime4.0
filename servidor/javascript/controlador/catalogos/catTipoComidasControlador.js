@@ -244,7 +244,7 @@ class TipoComidasControlador {
             `, [nombre, valor, observacion, id_menu]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: "detalle_menu",
+                    tabla: "ma_detalle_comida",
                     usuario: user_name,
                     accion: "I",
                     datosOriginales: "",

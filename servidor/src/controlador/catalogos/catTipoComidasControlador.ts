@@ -269,7 +269,7 @@ class TipoComidasControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: "detalle_menu",
+        tabla: "ma_detalle_comida",
         usuario: user_name,
         accion: "I",
         datosOriginales: "",

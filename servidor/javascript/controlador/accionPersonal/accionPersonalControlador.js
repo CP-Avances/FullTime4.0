@@ -391,7 +391,7 @@ class AccionPersonalControlador {
             }
         });
     }
-    // TABLA ACCION_PERSONAL_EMPLEADO
+    // TABLA SOLICITUD ACCION PERSONAL
     CrearPedidoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

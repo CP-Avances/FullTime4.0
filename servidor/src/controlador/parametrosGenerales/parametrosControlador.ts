@@ -212,7 +212,7 @@ class ParametrosControlador {
             await pool.query('BEGIN');
 
             // OBTENER DATOSORIGINALES
-            const consulta = await pool.query(`SELECT descripcion FROM detalle_tipo_parametro WHERE id = $1`, [id]);
+            const consulta = await pool.query(`SELECT descripcion FROM ep_detalle_parametro WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
 
             if (!datosOriginales) {

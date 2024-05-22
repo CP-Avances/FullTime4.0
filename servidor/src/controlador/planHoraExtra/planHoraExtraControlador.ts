@@ -703,7 +703,7 @@ class PlanHoraExtraControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'realtime_timbres',
+        tabla: 'ecm_realtime_timbres',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',

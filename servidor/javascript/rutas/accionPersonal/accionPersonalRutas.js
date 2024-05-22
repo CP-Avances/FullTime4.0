@@ -28,7 +28,7 @@ class DepartamentoRutas {
         this.router.post('/cargo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.CrearCargoPropuesto);
         this.router.get('/tipo/cargo', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.EncontrarUltimoCargoP);
         this.router.get('/cargo/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarUnCargoPropuestos);
-        /** TABLA DECRETO_ACUERDO_RESOL */
+        /** TABLA CONTEXTO LEGAL */
         this.router.get('/decreto', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarDecretos);
         this.router.get('/decreto/:id', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.ListarUnDecreto);
         this.router.post('/decreto', verificarToken_1.TokenValidation, accionPersonalControlador_1.default.CrearDecreto);

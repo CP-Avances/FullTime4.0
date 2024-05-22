@@ -217,7 +217,7 @@ class PlanificacionHorariaControlador {
                             else if (horario.observacion === 'DEFAULT-LIBRE') {
                                 // VERIFICIAR SI YA ESTA REGISTRADO EL HORARIO DEFAULT-LIBRE PARA EL USUARIO EN ESA FECHA
                                 const horarioRegistrado = yield database_1.default.query(`
-                            SELECT * FROM plan_general WHERE codigo = $1 AND fec_horario = $2 AND id_horario = $3
+                            SELECT * FROM eu_asistencia_general WHERE codigo = $1 AND fecha_horario = $2 AND id_horario = $3
                         `, [data.codigo_usuario, horario.dia, horarioDefaultLibre.entrada.id_horario]);
                                 if (horarioRegistrado.rowCount > 0) {
                                     continue;
@@ -268,7 +268,7 @@ class PlanificacionHorariaControlador {
                             else if (horario.observacion === 'DEFAULT-FERIADO') {
                                 // VERIFICIAR SI YA ESTA REGISTRADO EL HORARIO DEFAULT-FERIADO PARA EL USUARIO EN ESA FECHA
                                 const horarioRegistrado = yield database_1.default.query(`
-                            SELECT * FROM plan_general WHERE codigo = $1 AND fec_horario = $2 AND id_horario = $3
+                            SELECT * FROM eu_asistencia_general WHERE codigo = $1 AND fecha_horario = $2 AND id_horario = $3
                         `, [data.codigo_usuario, horario.dia, horarioDefaultFeriado.entrada.id_horario]);
                                 if (horarioRegistrado.rowCount > 0) {
                                     continue;
@@ -338,9 +338,9 @@ function VerificarUsuario(cedula) {
             let usuarioValido = false;
             const usuario = yield database_1.default.query(`
             SELECT e.*, dae.id_cargo, ec.hora_trabaja 
-            FROM empleados e 
+            FROM eu_empleados e 
             LEFT JOIN datos_actuales_empleado dae ON e.cedula = dae.cedula 
-            LEFT JOIN empl_cargos ec ON dae.id_cargo = ec.id 
+            LEFT JOIN eu_empleado_cargos ec ON dae.id_cargo = ec.id 
             WHERE LOWER(e.cedula) = $1
         `, [cedula.toLowerCase()]);
             if (usuario.rowCount === 0) {
@@ -425,7 +425,7 @@ function VerificarHorarios(datos) {
 function VerificarHorario(codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const horario = yield database_1.default.query('SELECT * FROM cg_horarios WHERE LOWER(codigo) = $1', [codigo.toLowerCase()]);
+            const horario = yield database_1.default.query('SELECT * FROM eh_cat_horarios WHERE LOWER(codigo) = $1', [codigo.toLowerCase()]);
             // SI EXISTE HORARIO VERIFICAR SI HORARIO.HORA_TRABAJO ESTE EN FORMATO HH:MM:SS
             const existe = horario.rowCount > 0;
             if (existe) {
@@ -453,7 +453,7 @@ function VerificarSuperposicionHorarios(datos) {
                     for (let i = 0; i < horarios.length; i++) {
                         const horario = horarios[i];
                         if (horario.observacion === 'OK') {
-                            const detalles = yield database_1.default.query('SELECT * FROM deta_horarios WHERE id_horario = $1', [horario.id]);
+                            const detalles = yield database_1.default.query('SELECT * FROM eh_detalle_horarios WHERE id_horario = $1', [horario.id]);
                             horario.entrada = detalles.rows.find((detalle) => detalle.tipo_accion === 'E');
                             horario.salida = detalles.rows.find((detalle) => detalle.tipo_accion === 'S');
                             horario.inicioAlimentacion = detalles.rows.find((detalle) => detalle.tipo_accion === 'I/A');
@@ -487,7 +487,7 @@ function VerificarSuperposicionHorarios(datos) {
             if (planificacion) {
                 for (let i = 0; i < planificacion.length; i++) {
                     const horario = planificacion[i];
-                    const detalles = yield database_1.default.query('SELECT * FROM deta_horarios WHERE id_horario = $1', [horario.id]);
+                    const detalles = yield database_1.default.query('SELECT * FROM eh_detalle_horarios WHERE id_horario = $1', [horario.id]);
                     horario.entrada = detalles.rows.find((detalle) => detalle.tipo_accion === 'E');
                     horario.salida = detalles.rows.find((detalle) => detalle.tipo_accion === 'S');
                     let fecha = moment_1.default.utc(horario.fecha).format('YYYY-MM-DD');
@@ -565,10 +565,10 @@ function ListarPlanificacionHoraria(codigo, fecha_inicio, fecha_final) {
             const horario = yield database_1.default.query(`
             SELECT p_g.codigo AS codigo_e, fec_horario AS fecha, id_horario AS id, 
             horario.codigo AS codigo_dia 
-            FROM plan_general p_g 
-            INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo = $3 
-            INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario 
-            WHERE fec_horario BETWEEN $1 AND $2 
+            FROM eu_asistencia_general p_g 
+            INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo = $3 
+            INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario 
+            WHERE fecha_horario BETWEEN $1 AND $2 
             GROUP BY codigo_e, fecha, codigo_dia, p_g.id_horario 
             ORDER BY p_g.codigo, fecha, p_g.id_horario
         `, [fecha_inicio, fecha_final, codigo]);
@@ -590,7 +590,8 @@ function ConsultarFeriados(fecha_inicio, fecha_final, id_usuario) {
         try {
             const FERIADO = yield database_1.default.query(`
             SELECT TO_CHAR(f.fecha, 'YYYY-MM-DD') AS fecha, cf.id_ciudad, c.descripcion, s.nombre
-            FROM cg_feriados AS f, ciud_feriados AS cf, ciudades AS c, sucursales AS s, datos_actuales_empleado AS de
+            FROM ef_cat_feriados AS f, ef_ciudad_feriados AS cf, e_ciudades AS c, e_sucursales AS s, 
+                datos_actuales_empleado AS de
             WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
                 AND s.id_ciudad = cf.id_ciudad AND de.id_sucursal = s.id AND de.id = $3
             `, [fecha_inicio, fecha_final, id_usuario]);
@@ -611,9 +612,9 @@ function ConsultarHorarioDefault(codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const horario = yield database_1.default.query(`
-        SELECT h.id AS id_horario, h.nombre, h.hora_trabajo, h.default_, h.min_almuerzo, d.id AS id_det_horario, d.*
-        FROM cg_horarios AS h
-        INNER JOIN deta_horarios AS d ON h.id = d.id_horario
+        SELECT h.id AS id_horario, h.nombre, h.hora_trabajo, h.default_, h.minutos_comida, d.id AS id_det_horario, d.*
+        FROM eh_cat_horarios AS h
+        INNER JOIN eh_detalle_horarios AS d ON h.id = d.id_horario
         WHERE h.codigo = $1
         `, [codigo]);
             if (horario.rowCount > 0) {
@@ -648,16 +649,16 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
             yield database_1.default.query('BEGIN');
             // CREAR ENTRADA
             yield database_1.default.query(`
-            INSERT INTO plan_general (codigo, id_empl_cargo, id_horario, fec_horario, fec_hora_horario, 
-                tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
-                estado_origen, min_alimentacion)
+            INSERT INTO eu_asistencia_general (codigo, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
+                tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
+                estado_origen, minutos_alimentacion)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
             `, [entrada.codigo, entrada.id_empl_cargo, entrada.id_horario, entrada.fec_horario, entrada.fec_hora_horario, entrada.tolerancia,
                 entrada.id_det_horario, entrada.tipo_entr_salida, entrada.tipo_dia, entrada.salida_otro_dia, entrada.min_antes, entrada.min_despues,
                 entrada.estado_origen, entrada.min_alimentacion]);
             // AUDITORIA
             yield auditoriaControlador_1.default.InsertarAuditoria({
-                tabla: 'plan_general',
+                tabla: 'eu_asistencia_general',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
@@ -668,16 +669,16 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
             // CREAR INICIO ALIMENTACION
             if (inicioAlimentacion) {
                 yield database_1.default.query(`
-                INSERT INTO plan_general (codigo, id_empl_cargo, id_horario, fec_horario, fec_hora_horario, 
-                    tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
-                    estado_origen, min_alimentacion)
+                INSERT INTO eu_asistencia_general (codigo, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
+                    tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
+                    estado_origen, minutos_alimentacion)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
                 `, [inicioAlimentacion.codigo, inicioAlimentacion.id_empl_cargo, inicioAlimentacion.id_horario, inicioAlimentacion.fec_horario, inicioAlimentacion.fec_hora_horario, inicioAlimentacion.tolerancia,
                     inicioAlimentacion.id_det_horario, inicioAlimentacion.tipo_entr_salida, inicioAlimentacion.tipo_dia, inicioAlimentacion.salida_otro_dia, inicioAlimentacion.min_antes, inicioAlimentacion.min_despues,
                     inicioAlimentacion.estado_origen, inicioAlimentacion.min_alimentacion]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'plan_general',
+                    tabla: 'eu_asistencia_general',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
@@ -689,16 +690,16 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
             // CREAR FIN ALIMENTACION
             if (finAlimentacion) {
                 yield database_1.default.query(`
-                INSERT INTO plan_general (codigo, id_empl_cargo, id_horario, fec_horario, fec_hora_horario, 
-                    tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
-                    estado_origen, min_alimentacion)
+                INSERT INTO eu_asistencia_general (codigo, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
+                    tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
+                    estado_origen, minutos_alimentacion)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
                 `, [finAlimentacion.codigo, finAlimentacion.id_empl_cargo, finAlimentacion.id_horario, finAlimentacion.fec_horario, finAlimentacion.fec_hora_horario, finAlimentacion.tolerancia,
                     finAlimentacion.id_det_horario, finAlimentacion.tipo_entr_salida, finAlimentacion.tipo_dia, finAlimentacion.salida_otro_dia, finAlimentacion.min_antes, finAlimentacion.min_despues,
                     finAlimentacion.estado_origen, finAlimentacion.min_alimentacion]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'plan_general',
+                    tabla: 'eu_asistencia_general',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
@@ -709,16 +710,16 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
             }
             // CREAR SALIDA
             yield database_1.default.query(`
-            INSERT INTO plan_general (codigo, id_empl_cargo, id_horario, fec_horario, fec_hora_horario, 
-                tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
-                estado_origen, min_alimentacion)
+            INSERT INTO eu_asistencia_general (codigo, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
+                tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
+                estado_origen, minutos_alimentacion)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
             `, [salida.codigo, salida.id_empl_cargo, salida.id_horario, salida.fec_horario, salida.fec_hora_horario, salida.tolerancia,
                 salida.id_det_horario, salida.tipo_entr_salida, salida.tipo_dia, salida.salida_otro_dia, salida.min_antes, salida.min_despues,
                 salida.estado_origen, salida.min_alimentacion]);
             // AUDITORIA
             yield auditoriaControlador_1.default.InsertarAuditoria({
-                tabla: 'plan_general',
+                tabla: 'eu_asistencia_general',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
