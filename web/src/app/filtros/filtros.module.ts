@@ -53,6 +53,9 @@ import { FiltroProvinciaPipe } from './catProvincias/filtro-provincia/filtro-pro
 import { FiltroCodigoPipe } from './catHorarios/filtro-codigo/filtro-codigo.pipe';
 import { FiltroDescripcionPipe } from './catHorarios/filtro-descripcion/filtro-descripcion.pipe';
 import { ModalidadLaboralPipe } from './catModalidadLaboral/modalidad-laboral.pipe';
+import { SucNomEmpleadoPipe } from './sucursales/filtroSucNomEmpleado/suc-nom-empleado.pipe';
+import { SucRolEmpleadoPipe } from './sucursales/filtroSucRolEmpleado/suc-rol-empleado.pipe';
+import { SucDepEmpleadoPipe } from './sucursales/filtroSucDepEmpleado/suc-dep-empleado.pipe';
 
 @NgModule({
   declarations: [
@@ -110,6 +113,9 @@ import { ModalidadLaboralPipe } from './catModalidadLaboral/modalidad-laboral.pi
     FiltroCodigoPipe,
     FiltroDescripcionPipe,
     ModalidadLaboralPipe,
+    SucNomEmpleadoPipe,
+    SucRolEmpleadoPipe,
+    SucDepEmpleadoPipe,
   ],
   exports: [
     DepartamentoPipe,
@@ -166,6 +172,9 @@ import { ModalidadLaboralPipe } from './catModalidadLaboral/modalidad-laboral.pi
     NombreApellidoPipe,
     FiltroProvinciaPipe,
     ModalidadLaboralPipe,
+    SucNomEmpleadoPipe,
+    SucRolEmpleadoPipe,
+    SucDepEmpleadoPipe,
   ],
   providers: [
     { provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl },

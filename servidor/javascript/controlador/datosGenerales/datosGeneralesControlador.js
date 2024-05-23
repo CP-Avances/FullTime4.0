@@ -1364,14 +1364,19 @@ class DatosGeneralesControlador {
     BuscarAdminJefes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { lista_sucursales, estado } = req.body;
-            console.log('ver ', lista_sucursales);
-            const DATOS = yield database_1.default.query("SELECT da.id, da.nombre, da.apellido, da.id_sucursal AS suc_pertenece, s.nombre AS sucursal, " +
-                "   ce.jefe, r.nombre AS rol, us.id_sucursal, us.principal, us.id AS id_usucursal " +
-                "FROM datos_actuales_empleado AS da, eu_empleado_cargos AS ce, ero_cat_roles AS r, eu_usuario_sucursal AS us, " +
-                "   e_sucursales AS s " +
-                "WHERE da.id_cargo = ce.id AND da.id_rol = r.id AND NOT da.id_rol = 2 AND s.id = da.id_sucursal " +
-                "   AND da.estado = $1 AND us.id_empleado = da.id AND us.id_sucursal IN (" + lista_sucursales + ") " +
-                "ORDER BY da.apellido ASC ", [estado]);
+            console.log('lista_sucursales', lista_sucursales);
+            const DATOS = yield database_1.default.query(`SELECT da.id, da.nombre, da.apellido, da.id_sucursal AS suc_pertenece, s.nombre AS sucursal,ce.jefe, r.nombre AS rol, 
+            us.id_sucursal, us.principal, us.id AS id_usucursal, d.nombre AS departamento 
+        FROM datos_actuales_empleado AS da
+        JOIN eu_empleado_cargos AS ce ON da.id_cargo = ce.id
+        JOIN ero_cat_roles AS r ON da.id_rol = r.id
+        JOIN eu_usuario_sucursal AS us ON us.id_empleado = da.id
+        JOIN e_sucursales AS s ON s.id = da.id_sucursal
+        JOIN ed_departamentos AS d ON d.id = da.id_departamento
+        WHERE NOT da.id_rol = 2 
+            AND da.estado = $1 AND us.id_sucursal IN (${lista_sucursales})
+        ORDER BY 
+            da.apellido ASC`, [estado]);
             if (DATOS.rowCount > 0) {
                 return res.jsonp(DATOS.rows);
             }

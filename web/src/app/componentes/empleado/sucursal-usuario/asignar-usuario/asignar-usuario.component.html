@@ -19,20 +19,34 @@
                                 <table class="table table-hover table-sm">
                                     <thead class="thead-light">
                                         <tr style="text-align: center;">
-                                            <th scope="col">Usuario</th>
                                             <th scope="col">Rol</th>
-                                            <th scope="col">Jefe/Coordinador</th>
+                                            <th scope="col">Nombre</th>
+                                            <th scope="col">Departamento</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr *ngFor="let p of principales">
-                                            <td>{{p.apellido}} {{p.nombre}} </td>
-                                            <td>{{p.rol}}</td>
-                                            <td>
-                                                <mat-checkbox *ngIf="p.jefe === true" matSuffix
-                                                    matTooltipPosition="right" disabled [checked]="p.jefe">
-                                                </mat-checkbox>
-                                            </td>
+                                      <tr>
+                                        <td>
+                                          <mat-form-field class="input-tables">
+                                            <input matInput placeholder="Buscar" [(ngModel)]="filtroRol" type="text" [formControl]="rol">
+                                          </mat-form-field>
+                                        </td>
+                                        <td>
+                                          <mat-form-field class="input-tables">
+                                            <input matInput placeholder="Buscar" [(ngModel)]="filtroNombre" type="text" [formControl]="nombre">
+                                          </mat-form-field>
+                                        </td>
+                                        <td>
+                                          <mat-form-field class="input-tables">
+                                            <input matInput placeholder="Buscar" [(ngModel)]="filtroDepartamento" type="text" [formControl]="departamento">
+                                          </mat-form-field>
+                                        </td>
+                                      </tr>
+                                        <tr *ngFor="let p of principales | sucRolEmpleado: filtroRol | sucNomEmpleado: filtroNombre | sucDepEmpleado: filtroDepartamento">
+                                          <td><mat-checkbox [(ngModel)]="p.seleccionado" (change)="SeleccionarEmpleado(p)"></mat-checkbox> </td>
+                                          <td>{{p.rol}}</td>
+                                          <td>{{p.apellido}} {{p.nombre}} </td>
+                                          <td>{{p.departamento}}</td>
                                         </tr>
                                     </tbody>
                                 </table>
