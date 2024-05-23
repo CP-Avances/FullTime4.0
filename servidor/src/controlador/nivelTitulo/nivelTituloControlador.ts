@@ -224,9 +224,9 @@ class NivelTituloControlador {
 
       // LECTURA DE LOS DATOS DE LA PLANTILLA
       plantilla.forEach(async (dato: any, indice: any, array: any) => {
-        var { item, nombre } = dato;
-        data.fila = dato.item
-        data.nombre = dato.nombre;
+        var { ITEM, NOMBRE } = dato;
+        data.fila = dato.ITEM
+        data.nombre = dato.NOMBRE;
 
         if ((data.fila != undefined && data.fila != '') &&
           (data.nombre != undefined && data.nombre != '' && data.nombre != null)) {
@@ -237,8 +237,8 @@ class NivelTituloControlador {
             `
             , [data.nombre]);
           if (existe_nivelProfecional.rowCount == 0) {
-            data.fila = item
-            data.nombre = nombre;
+            data.fila = ITEM
+            data.nombre = NOMBRE;
             if (duplicados.find((p: any) => p.nombre.toLowerCase() === data.nombre.toLowerCase()) == undefined) {
               data.observacion = 'ok';
               duplicados.push(dato);
@@ -246,14 +246,14 @@ class NivelTituloControlador {
 
             listNivelesProfesionales.push(data);
           } else {
-            data.fila = item
-            data.nombre = nombre;
+            data.fila = ITEM
+            data.nombre = NOMBRE;
             data.observacion = 'Ya existe en el sistema';
 
             listNivelesProfesionales.push(data);
           }
         } else {
-          data.fila = item
+          data.fila = ITEM
           data.nombre = 'No registrado';
           data.observacion = 'Nivel no registrado';
 

@@ -275,7 +275,7 @@ export class ListarFeriadosComponent implements OnInit {
         this.Revisarplantilla();
         //this.Revisarplantilla_feriado_ciudad();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
         this.nameFile = '';
@@ -308,7 +308,7 @@ export class ListarFeriadosComponent implements OnInit {
       this.DataFeriados = res.data;
       this.DataFerieados_ciudades = res.datafc;
 
-      console.log('Feriados ciudades: ',this.DataFerieados_ciudades);
+      console.log('Feriados ciudades: ', this.DataFerieados_ciudades);
 
       this.messajeExcel = res.message;
       if (this.messajeExcel == 'error') {
@@ -316,7 +316,20 @@ export class ListarFeriadosComponent implements OnInit {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
+      }
+      else if (this.messajeExcel == 'no_existe_feriado') {
+        this.toastr.error('No se ha encontrado pestaña FERIADOS en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else if (this.messajeExcel == 'no_existe_ciudad') {
+        this.toastr.error('No se ha encontrado pestaña CIUDAD_FERIADOS en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
         this.DataFeriados.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listFeriadosCorrectos.push(item);
@@ -403,7 +416,7 @@ export class ListarFeriadosComponent implements OnInit {
       })
 
     } else {
-      this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
       });
       this.archivoForm.reset();
@@ -480,7 +493,7 @@ export class ListarFeriadosComponent implements OnInit {
       || arrayObservacion[0] == 'Feriado'
     ) {
       return 'rgb(242, 21, 21)';
-    } else if (observacion == 'feriado invalido') {
+    } else if (observacion == 'Feriado no válido') {
       return 'rgb(238, 34, 207)';
     } else {
       return 'white'

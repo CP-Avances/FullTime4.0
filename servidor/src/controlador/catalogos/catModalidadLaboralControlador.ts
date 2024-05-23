@@ -1,4 +1,4 @@
-import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
@@ -205,122 +205,127 @@ class ModalidaLaboralControlador {
             const documento = req.file?.originalname;
             let separador = path.sep;
             let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-
             const workbook = excel.readFile(ruta);
-            const sheet_name_list = workbook.SheetNames;
-            const plantilla_modalidad_laboral = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            let verificador = ObtenerIndicePlantilla(workbook, 'MODALIDAD_LABORAL');
+            if (verificador === false) {
+                return res.jsonp({ message: 'no_existe', data: undefined });
+            }
+            else {
+                const sheet_name_list = workbook.SheetNames;
+                const plantilla_modalidad_laboral = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                let data: any = {
+                    fila: '',
+                    modalida_laboral: '',
+                    observacion: ''
+                };
 
-            let data: any = {
-                fila: '',
-                modalida_laboral: '',
-                observacion: ''
-            };
+                var listModalidad: any = [];
+                var duplicados: any = [];
+                var mensaje: string = 'correcto';
 
-            var listModalidad: any = [];
-            var duplicados: any = [];
-            var mensaje: string = 'correcto';
+                // LECTURA DE LOS DATOS DE LA PLANTILLA
+                plantilla_modalidad_laboral.forEach(async (dato: any, indice: any, array: any) => {
+                    var { ITEM, MODALIDA_LABORAL } = dato;
+                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                    if ((ITEM != undefined && ITEM != '') &&
+                        (MODALIDA_LABORAL != undefined && MODALIDA_LABORAL != '')) {
+                        data.fila = ITEM;
+                        data.modalida_laboral = MODALIDA_LABORAL;
+                        data.observacion = 'no registrada';
 
-            // LECTURA DE LOS DATOS DE LA PLANTILLA
-            plantilla_modalidad_laboral.forEach(async (dato: any, indice: any, array: any) => {
-                var { item, modalida_laboral } = dato;
-                // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                if ((item != undefined && item != '') &&
-                    (modalida_laboral != undefined && modalida_laboral != '')) {
-                    data.fila = item;
-                    data.modalida_laboral = modalida_laboral;
-                    data.observacion = 'no registrada';
-
-                    listModalidad.push(data);
-                } else {
-                    data.fila = item;
-                    data.modalida_laboral = modalida_laboral;
-                    data.observacion = 'no registrada';
-
-                    if (data.fila == '' || data.fila == undefined) {
-                        data.fila = 'error';
-                        mensaje = 'error'
-                    }
-
-                    if (modalida_laboral == undefined) {
-                        data.modalida_laboral = 'No registrado';
-                        data.observacion = 'Modalidad Laboral ' + data.observacion;
-                    }
-
-                    listModalidad.push(data);
-                }
-                data = {};
-            });
-
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs.access(ruta, fs.constants.F_OK, (err) => {
-                if (err) {
-                } else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs.unlinkSync(ruta);
-                }
-            });
-
-            listModalidad.forEach(async (item: any) => {
-                if (item.observacion == 'no registrada') {
-                    var VERIFICAR_MODALIDAD = await pool.query(
-                        `
-                        SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
-                        `
-                        , [item.modalida_laboral.toUpperCase()])
-                    if (VERIFICAR_MODALIDAD.rows[0] == undefined || VERIFICAR_MODALIDAD.rows[0] == '') {
-                        item.observacion = 'ok'
+                        listModalidad.push(data);
                     } else {
-                        item.observacion = 'Ya existe en el sistema'
-                    }
+                        data.fila = ITEM;
+                        data.modalida_laboral = MODALIDA_LABORAL;
+                        data.observacion = 'no registrada';
 
-                    // Discriminación de elementos iguales
-                    if (duplicados.find((p: any) => p.modalida_laboral.toLowerCase() === item.modalida_laboral.toLowerCase()) == undefined) {
-                        duplicados.push(item);
-                    } else {
-                        item.observacion = '1';
-                    }
-                }
-            });
+                        if (data.fila == '' || data.fila == undefined) {
+                            data.fila = 'error';
+                            mensaje = 'error'
+                        }
 
-            setTimeout(() => {
-                listModalidad.sort((a: any, b: any) => {
-                    // COMPARA LOS NUMEROS DE LOS OBJETOS
-                    if (a.fila < b.fila) {
-                        return -1;
+                        if (MODALIDA_LABORAL == undefined) {
+                            data.modalida_laboral = 'No registrado';
+                            data.observacion = 'Modalidad Laboral ' + data.observacion;
+                        }
+
+                        listModalidad.push(data);
                     }
-                    if (a.fila > b.fila) {
-                        return 1;
-                    }
-                    return 0; // SON IGUALES
+                    data = {};
                 });
 
-                var filaDuplicada: number = 0;
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs.access(ruta, fs.constants.F_OK, (err) => {
+                    if (err) {
+                    } else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs.unlinkSync(ruta);
+                    }
+                });
 
                 listModalidad.forEach(async (item: any) => {
-                    if (item.observacion == '1') {
-                        item.observacion = 'Registro duplicado'
-                    }
-
-                    // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
-                    if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                        // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
-                        if (item.fila == filaDuplicada) {
-                            mensaje = 'error';
+                    if (item.observacion == 'no registrada') {
+                        var VERIFICAR_MODALIDAD = await pool.query(
+                            `
+                        SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                        `
+                            , [item.modalida_laboral.toUpperCase()])
+                        if (VERIFICAR_MODALIDAD.rows[0] == undefined || VERIFICAR_MODALIDAD.rows[0] == '') {
+                            item.observacion = 'ok'
+                        } else {
+                            item.observacion = 'Ya existe en el sistema'
                         }
-                    } else {
-                        return mensaje = 'error';
+
+                        // Discriminación de elementos iguales
+                        if (duplicados.find((p: any) => p.modalida_laboral.toLowerCase() === item.modalida_laboral.toLowerCase()) == undefined) {
+                            duplicados.push(item);
+                        } else {
+                            item.observacion = '1';
+                        }
                     }
-
-                    filaDuplicada = item.fila;
-
                 });
 
-                if (mensaje == 'error') {
-                    listModalidad = undefined;
-                }
-                return res.jsonp({ message: mensaje, data: listModalidad });
-            }, 1000)
-            
+                setTimeout(() => {
+                    listModalidad.sort((a: any, b: any) => {
+                        // COMPARA LOS NUMEROS DE LOS OBJETOS
+                        if (a.fila < b.fila) {
+                            return -1;
+                        }
+                        if (a.fila > b.fila) {
+                            return 1;
+                        }
+                        return 0; // SON IGUALES
+                    });
+
+                    var filaDuplicada: number = 0;
+
+                    listModalidad.forEach(async (item: any) => {
+                        if (item.observacion == '1') {
+                            item.observacion = 'Registro duplicado'
+                        }
+
+                        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+                        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+                            if (item.fila == filaDuplicada) {
+                                mensaje = 'error';
+                            }
+                        } else {
+                            return mensaje = 'error';
+                        }
+
+                        filaDuplicada = item.fila;
+
+                    });
+
+                    if (mensaje == 'error') {
+                        listModalidad = undefined;
+                    }
+                    return res.jsonp({ message: mensaje, data: listModalidad });
+                }, 1000)
+            }
+
+
         } catch (error) {
             return res.status(500).jsonp({ message: error });
         }
@@ -329,7 +334,7 @@ class ModalidaLaboralControlador {
     // REGISTRAR PLANTILLA MODALIDAD_CARGO 
     public async CargarPlantilla(req: Request, res: Response) {
         try {
-            const {plantilla, user_name, ip} = req.body;
+            const { plantilla, user_name, ip } = req.body;
 
             var contador = 1;
             var respuesta: any

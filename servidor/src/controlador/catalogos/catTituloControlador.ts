@@ -212,16 +212,16 @@ class TituloControlador {
 
       // LECTURA DE LOS DATOS DE LA PLANTILLA
       plantilla.forEach(async (dato: any, indice: any, array: any) => {
-        var { item, nombre, nivel } = dato;
-        data.fila = dato.item
-        data.titulo = dato.nombre;
-        data.nivel = dato.nivel;
+        var { ITEM, NOMBRE, NIVEL } = dato;
+        data.fila = dato.ITEM
+        data.titulo = dato.NOMBRE;
+        data.nivel = dato.NIVEL;
 
         if ((data.fila != undefined && data.fila != '') &&
           (data.titulo != undefined && data.titulo != '') &&
           (data.nivel != undefined && data.nivel != '')) {
           // VALIDAR PRIMERO QUE EXISTA NIVELES EN LA TABLA NIVELES
-          const existe_nivel = await pool.query('SELECT id FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [nivel]);
+          const existe_nivel = await pool.query('SELECT id FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [NIVEL]);
           var id_nivel = existe_nivel.rows[0];
           if (id_nivel != undefined && id_nivel != '') {
             // VERIFICACIÓN SI LA SUCURSAL NO ESTE REGISTRADA EN EL SISTEMA
@@ -230,12 +230,12 @@ class TituloControlador {
               SELECT * FROM et_titulos
               WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2
               `
-              , [nombre, id_nivel.id]);
+              , [NOMBRE, id_nivel.id]);
             if (VERIFICAR_Titulos.rowCount == 0) {
-              data.fila = dato.item
-              data.titulo = dato.nombre;
-              data.nivel = dato.nivel
-              if (duplicados.find((p: any) => p.nombre.toLowerCase() === dato.nombre.toLowerCase() && p.nivel.toLowerCase() === dato.nivel.toLowerCase()) == undefined) {
+              data.fila = dato.ITEM
+              data.titulo = dato.NOMBRE;
+              data.nivel = dato.NIVEL
+              if (duplicados.find((p: any) => p.nombre.toLowerCase() === dato.NOMBRE.toLowerCase() && p.nivel.toLowerCase() === dato.NIVEL.toLowerCase()) == undefined) {
                 data.observacion = 'ok';
                 duplicados.push(dato);
               }
@@ -243,17 +243,17 @@ class TituloControlador {
               listTitulosProfesionales.push(data);
 
             } else {
-              data.fila = dato.item
-              data.titulo = nombre;
-              data.nivel = nivel
+              data.fila = dato.ITEM
+              data.titulo = NOMBRE;
+              data.nivel = NIVEL
               data.observacion = 'Ya esta registrado en base';
 
               listTitulosProfesionales.push(data);
             }
           } else {
-            data.fila = dato.item
-            data.titulo = dato.nombre;
-            data.nivel = dato.nivel;
+            data.fila = dato.ITEM
+            data.titulo = dato.NOMBRE;
+            data.nivel = dato.NIVEL;
 
             if (data.nivel == '' || data.nivel == undefined) {
               data.nivel = 'No registrado';
@@ -266,9 +266,9 @@ class TituloControlador {
           }
 
         } else {
-          data.fila = dato.item
-          data.titulo = dato.nombre;
-          data.nivel = dato.nivel;
+          data.fila = dato.ITEM
+          data.titulo = dato.NOMBRE;
+          data.nivel = dato.NIVEL;
 
           if (data.fila == '' || data.fila == undefined) {
             data.fila = 'error';

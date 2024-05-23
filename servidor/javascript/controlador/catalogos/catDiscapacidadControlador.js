@@ -209,24 +209,24 @@ class DiscapacidadControlador {
                     var mensaje = 'correcto';
                     // LECTURA DE LOS DATOS DE LA PLANTILLA
                     plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                        var { item, discapacidad } = dato;
+                        var { ITEM, DISCAPACIDAD } = dato;
                         // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                        if ((item != undefined && item != '') &&
-                            (discapacidad != undefined && discapacidad != '')) {
-                            data.fila = item;
-                            data.discapacidad = discapacidad;
+                        if ((ITEM != undefined && ITEM != '') &&
+                            (DISCAPACIDAD != undefined && DISCAPACIDAD != '')) {
+                            data.fila = ITEM;
+                            data.discapacidad = DISCAPACIDAD;
                             data.observacion = 'no registrada';
                             listaDiscapacidad.push(data);
                         }
                         else {
-                            data.fila = item;
-                            data.discapacidad = discapacidad;
+                            data.fila = ITEM;
+                            data.discapacidad = DISCAPACIDAD;
                             data.observacion = 'no registrada';
                             if (data.fila == '' || data.fila == undefined) {
                                 data.fila = 'error';
                                 mensaje = 'error';
                             }
-                            if (discapacidad == undefined) {
+                            if (DISCAPACIDAD == undefined) {
                                 data.discapacidad = 'No registrado';
                                 data.observacion = 'Discapacidad ' + data.observacion;
                             }

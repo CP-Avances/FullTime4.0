@@ -213,7 +213,7 @@ export class ListarTitulosComponent implements OnInit {
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
 

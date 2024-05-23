@@ -265,11 +265,11 @@ class SucursalControlador {
 
       // LECTURA DE LOS DATOS DE LA PLANTILLA
       plantilla.forEach(async (dato: any, indice: any, array: any) => {
-        var { item, nombre, ciudad } = dato;
+        var { ITEM, NOMBRE, CIUDAD } = dato;
 
-        data.fila = dato.item
-        data.nom_sucursal = dato.nombre;
-        data.ciudad = dato.ciudad;
+        data.fila = dato.ITEM
+        data.nom_sucursal = dato.NOMBRE;
+        data.ciudad = dato.CIUDAD;
 
         if ((data.fila != undefined && data.fila != '') &&
           (data.nom_sucursal != undefined && data.nom_sucursal != '') &&
@@ -280,7 +280,7 @@ class SucursalControlador {
             `
         SELECT id FROM e_ciudades WHERE UPPER(descripcion) = UPPER($1)
         `
-            , [ciudad]);
+            , [CIUDAD]);
           var id_ciudad = existe_ciudad.rows[0];
           if (id_ciudad != undefined && id_ciudad != '') {
             // VERIFICACIÓN SI LA SUCURSAL NO ESTE REGISTRADA EN EL SISTEMA
@@ -289,14 +289,14 @@ class SucursalControlador {
           SELECT * FROM e_sucursales 
           WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2
           `
-              , [nombre, id_ciudad.id]);
+              , [NOMBRE, id_ciudad.id]);
             if (VERIFICAR_SUCURSAL.rowCount === 0) {
-              data.fila = item
-              data.nom_sucursal = nombre;
-              data.ciudad = ciudad;
+              data.fila = ITEM
+              data.nom_sucursal = NOMBRE;
+              data.ciudad = CIUDAD;
               // Discriminación de elementos iguales
-              if (duplicados.find((p: any) => p.nombre.toLowerCase() === dato.nombre.toLowerCase() &&
-                p.ciudad.toLowerCase() === dato.ciudad.toLowerCase()) == undefined) {
+              if (duplicados.find((p: any) => p.nombre.toLowerCase() === dato.NOMBRE.toLowerCase() &&
+                p.ciudad.toLowerCase() === dato.CIUDAD.toLowerCase()) == undefined) {
                 data.observacion = 'ok';
                 duplicados.push(dato);
               }
@@ -304,18 +304,18 @@ class SucursalControlador {
               listSucursales.push(data);
 
             } else {
-              data.fila = item
-              data.nom_sucursal = nombre;
-              data.ciudad = ciudad;
+              data.fila = ITEM
+              data.nom_sucursal = NOMBRE;
+              data.ciudad = CIUDAD;
               data.observacion = 'Ya existe en el sistema';
 
               listSucursales.push(data);
             }
 
           } else {
-            data.fila = item
-            data.nom_sucursal = dato.nombre;
-            data.ciudad = dato.ciudad;
+            data.fila = ITEM
+            data.nom_sucursal = dato.NOMBRE;
+            data.ciudad = dato.CIUDAD;
 
             if (data.ciudad == '' || data.ciudad == undefined) {
               data.ciudad = 'No registrado';
@@ -327,9 +327,9 @@ class SucursalControlador {
           }
 
         } else {
-          data.fila = item
-          data.nom_sucursal = dato.nombre;
-          data.ciudad = dato.ciudad;
+          data.fila = ITEM
+          data.nom_sucursal = dato.NOMBRE;
+          data.ciudad = dato.CIUDAD;
 
           if (data.fila == '' || data.fila == undefined) {
             data.fila = 'error';

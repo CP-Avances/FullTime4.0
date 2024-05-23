@@ -588,18 +588,18 @@ class DepartamentoControlador {
 
       // LECTURA DE LOS DATOS DE LA PLANTILLA
       plantilla.forEach(async (dato: any, indice: any, array: any) => {
-        var { item, nombre, sucursal } = dato;
+        var { ITEM, NOMBRE, SUCURSAL } = dato;
         //Verificar que el registo no tenga datos vacios
-        if ((item != undefined && item != '') &&
-          (nombre != undefined) && (sucursal != undefined)) {
-          data.fila = item;
-          data.nombre = nombre; data.sucursal = sucursal;
+        if ((ITEM != undefined && ITEM != '') &&
+          (NOMBRE != undefined) && (SUCURSAL != undefined)) {
+          data.fila = ITEM;
+          data.nombre = NOMBRE; data.sucursal = SUCURSAL;
           data.observacion = 'no registrado';
 
           listDepartamentos.push(data);
         } else {
-          data.fila = item;
-          data.nombre = nombre; data.sucursal = sucursal;
+          data.fila = ITEM;
+          data.nombre = NOMBRE; data.sucursal = SUCURSAL;
           data.observacion = 'no registrado';
 
           if (data.fila == '' || data.fila == undefined) {
@@ -607,11 +607,11 @@ class DepartamentoControlador {
             mensaje = 'error'
           }
 
-          if (nombre == undefined) {
+          if (NOMBRE == undefined) {
             data.nombre = 'No registrado';
             data.observacion = 'Departamento ' + data.observacion;
           }
-          if (sucursal == undefined) {
+          if (SUCURSAL == undefined) {
             data.sucursal = 'No registrado';
             data.observacion = 'Sucursal ' + data.observacion;
           }

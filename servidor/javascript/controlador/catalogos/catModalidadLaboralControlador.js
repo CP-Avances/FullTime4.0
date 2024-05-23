@@ -192,105 +192,111 @@ class ModalidaLaboralControlador {
                 let separador = path_1.default.sep;
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
                 const workbook = xlsx_1.default.readFile(ruta);
-                const sheet_name_list = workbook.SheetNames;
-                const plantilla_modalidad_laboral = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-                let data = {
-                    fila: '',
-                    modalida_laboral: '',
-                    observacion: ''
-                };
-                var listModalidad = [];
-                var duplicados = [];
-                var mensaje = 'correcto';
-                // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla_modalidad_laboral.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                    var { item, modalida_laboral } = dato;
-                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                    if ((item != undefined && item != '') &&
-                        (modalida_laboral != undefined && modalida_laboral != '')) {
-                        data.fila = item;
-                        data.modalida_laboral = modalida_laboral;
-                        data.observacion = 'no registrada';
-                        listModalidad.push(data);
-                    }
-                    else {
-                        data.fila = item;
-                        data.modalida_laboral = modalida_laboral;
-                        data.observacion = 'no registrada';
-                        if (data.fila == '' || data.fila == undefined) {
-                            data.fila = 'error';
-                            mensaje = 'error';
-                        }
-                        if (modalida_laboral == undefined) {
-                            data.modalida_laboral = 'No registrado';
-                            data.observacion = 'Modalidad Laboral ' + data.observacion;
-                        }
-                        listModalidad.push(data);
-                    }
-                    data = {};
-                }));
-                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                    if (err) {
-                    }
-                    else {
-                        // ELIMINAR DEL SERVIDOR
-                        fs_1.default.unlinkSync(ruta);
-                    }
-                });
-                listModalidad.forEach((item) => __awaiter(this, void 0, void 0, function* () {
-                    if (item.observacion == 'no registrada') {
-                        var VERIFICAR_MODALIDAD = yield database_1.default.query(`
-                        SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
-                        `, [item.modalida_laboral.toUpperCase()]);
-                        if (VERIFICAR_MODALIDAD.rows[0] == undefined || VERIFICAR_MODALIDAD.rows[0] == '') {
-                            item.observacion = 'ok';
+                let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'MODALIDAD_LABORAL');
+                if (verificador === false) {
+                    return res.jsonp({ message: 'no_existe', data: undefined });
+                }
+                else {
+                    const sheet_name_list = workbook.SheetNames;
+                    const plantilla_modalidad_laboral = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                    let data = {
+                        fila: '',
+                        modalida_laboral: '',
+                        observacion: ''
+                    };
+                    var listModalidad = [];
+                    var duplicados = [];
+                    var mensaje = 'correcto';
+                    // LECTURA DE LOS DATOS DE LA PLANTILLA
+                    plantilla_modalidad_laboral.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                        var { ITEM, MODALIDA_LABORAL } = dato;
+                        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                        if ((ITEM != undefined && ITEM != '') &&
+                            (MODALIDA_LABORAL != undefined && MODALIDA_LABORAL != '')) {
+                            data.fila = ITEM;
+                            data.modalida_laboral = MODALIDA_LABORAL;
+                            data.observacion = 'no registrada';
+                            listModalidad.push(data);
                         }
                         else {
-                            item.observacion = 'Ya existe en el sistema';
-                        }
-                        // Discriminación de elementos iguales
-                        if (duplicados.find((p) => p.modalida_laboral.toLowerCase() === item.modalida_laboral.toLowerCase()) == undefined) {
-                            duplicados.push(item);
-                        }
-                        else {
-                            item.observacion = '1';
-                        }
-                    }
-                }));
-                setTimeout(() => {
-                    listModalidad.sort((a, b) => {
-                        // COMPARA LOS NUMEROS DE LOS OBJETOS
-                        if (a.fila < b.fila) {
-                            return -1;
-                        }
-                        if (a.fila > b.fila) {
-                            return 1;
-                        }
-                        return 0; // SON IGUALES
-                    });
-                    var filaDuplicada = 0;
-                    listModalidad.forEach((item) => __awaiter(this, void 0, void 0, function* () {
-                        if (item.observacion == '1') {
-                            item.observacion = 'Registro duplicado';
-                        }
-                        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
-                        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
-                            if (item.fila == filaDuplicada) {
+                            data.fila = ITEM;
+                            data.modalida_laboral = MODALIDA_LABORAL;
+                            data.observacion = 'no registrada';
+                            if (data.fila == '' || data.fila == undefined) {
+                                data.fila = 'error';
                                 mensaje = 'error';
                             }
+                            if (MODALIDA_LABORAL == undefined) {
+                                data.modalida_laboral = 'No registrado';
+                                data.observacion = 'Modalidad Laboral ' + data.observacion;
+                            }
+                            listModalidad.push(data);
+                        }
+                        data = {};
+                    }));
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                        if (err) {
                         }
                         else {
-                            return mensaje = 'error';
+                            // ELIMINAR DEL SERVIDOR
+                            fs_1.default.unlinkSync(ruta);
                         }
-                        filaDuplicada = item.fila;
+                    });
+                    listModalidad.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                        if (item.observacion == 'no registrada') {
+                            var VERIFICAR_MODALIDAD = yield database_1.default.query(`
+                        SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                        `, [item.modalida_laboral.toUpperCase()]);
+                            if (VERIFICAR_MODALIDAD.rows[0] == undefined || VERIFICAR_MODALIDAD.rows[0] == '') {
+                                item.observacion = 'ok';
+                            }
+                            else {
+                                item.observacion = 'Ya existe en el sistema';
+                            }
+                            // Discriminación de elementos iguales
+                            if (duplicados.find((p) => p.modalida_laboral.toLowerCase() === item.modalida_laboral.toLowerCase()) == undefined) {
+                                duplicados.push(item);
+                            }
+                            else {
+                                item.observacion = '1';
+                            }
+                        }
                     }));
-                    if (mensaje == 'error') {
-                        listModalidad = undefined;
-                    }
-                    return res.jsonp({ message: mensaje, data: listModalidad });
-                }, 1000);
+                    setTimeout(() => {
+                        listModalidad.sort((a, b) => {
+                            // COMPARA LOS NUMEROS DE LOS OBJETOS
+                            if (a.fila < b.fila) {
+                                return -1;
+                            }
+                            if (a.fila > b.fila) {
+                                return 1;
+                            }
+                            return 0; // SON IGUALES
+                        });
+                        var filaDuplicada = 0;
+                        listModalidad.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                            if (item.observacion == '1') {
+                                item.observacion = 'Registro duplicado';
+                            }
+                            // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+                            if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                                // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+                                if (item.fila == filaDuplicada) {
+                                    mensaje = 'error';
+                                }
+                            }
+                            else {
+                                return mensaje = 'error';
+                            }
+                            filaDuplicada = item.fila;
+                        }));
+                        if (mensaje == 'error') {
+                            listModalidad = undefined;
+                        }
+                        return res.jsonp({ message: mensaje, data: listModalidad });
+                    }, 1000);
+                }
             }
             catch (error) {
                 return res.status(500).jsonp({ message: error });

@@ -209,9 +209,9 @@ class NivelTituloControlador {
                 var mensaje = 'correcto';
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
                 plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                    var { item, nombre } = dato;
-                    data.fila = dato.item;
-                    data.nombre = dato.nombre;
+                    var { ITEM, NOMBRE } = dato;
+                    data.fila = dato.ITEM;
+                    data.nombre = dato.NOMBRE;
                     if ((data.fila != undefined && data.fila != '') &&
                         (data.nombre != undefined && data.nombre != '' && data.nombre != null)) {
                         //Validar primero que exista la ciudad en la tabla ciudades
@@ -219,8 +219,8 @@ class NivelTituloControlador {
             SELECT nombre FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
             `, [data.nombre]);
                         if (existe_nivelProfecional.rowCount == 0) {
-                            data.fila = item;
-                            data.nombre = nombre;
+                            data.fila = ITEM;
+                            data.nombre = NOMBRE;
                             if (duplicados.find((p) => p.nombre.toLowerCase() === data.nombre.toLowerCase()) == undefined) {
                                 data.observacion = 'ok';
                                 duplicados.push(dato);
@@ -228,14 +228,14 @@ class NivelTituloControlador {
                             listNivelesProfesionales.push(data);
                         }
                         else {
-                            data.fila = item;
-                            data.nombre = nombre;
+                            data.fila = ITEM;
+                            data.nombre = NOMBRE;
                             data.observacion = 'Ya existe en el sistema';
                             listNivelesProfesionales.push(data);
                         }
                     }
                     else {
-                        data.fila = item;
+                        data.fila = ITEM;
                         data.nombre = 'No registrado';
                         data.observacion = 'Nivel no registrado';
                         if (data.fila == '' || data.fila == undefined) {

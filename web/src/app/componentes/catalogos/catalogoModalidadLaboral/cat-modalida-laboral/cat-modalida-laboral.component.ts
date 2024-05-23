@@ -190,15 +190,15 @@ export class CatModalidaLaboralComponent implements OnInit {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 25);
+    let itemName = arrayItems[0];
     console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'modalidad_cargo') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre modalidad_cargo', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
 
@@ -238,7 +238,14 @@ export class CatModalidaLaboralComponent implements OnInit {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña MODALIDAD_LABORAL en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      } 
+      else {
         this.Datos_modalidad_laboral.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaModalidadCorrectas.push(item);
