@@ -7,16 +7,16 @@
                 <h6 id="items" (click)="LimpiarCampos()">Cargar Contratos</h6>
             </ng-template>
             <div class="container" style="padding-top: 15px;">
-                <div class="row">
+                <div class="row m-auto">
                     <div class="col-md">
                         <div id="titulo">
                             <span>CARGAR PLANTILLAS</span>
                         </div>
                         <mat-card class="example-card mat-elevation-z9">
                             <div class="row">
-                                <div class="col-md" style="padding-top: 5px;">
+                                <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                                     <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
-                                        <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
+                                        <form method="post" class="btn-2" enctype="multipart/form-data">
                                             <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                                 accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                             <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
@@ -33,19 +33,17 @@
                                         </form>
                                     </div>
                                 </div>
-                                <div class="col-md" *ngIf="DatosContrato.length == 0">
-                                    <div class="d-flex flex-wrap justify-content-around">
+                                <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                                    <div *ngIf="DatosContrato.length == 0" class="d-flex flex-wrap justify-content-around">
                                         <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
-                                            style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
+                                            matTooltip="Dar click para ver o descargar el documento."
                                             href="{{hipervinculo}}/plantillaD/documento/Feriados.xlsx">
                                             <!--span class="material-icons">cloud_download</span-->
                                             <br>
                                             Descargar plantilla usuarios
                                         </a>
                                     </div>
-                                </div>
-                                <div class="col-md" *ngIf="DatosContrato.length > 0" style="padding-top: 5px; padding-bottom: 5px;" >
-                                    <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                                    <div *ngIf="DatosContrato.length > 0" class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
                                         <button id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()"
                                              matSuffix matTooltipPosition="right"
                                              matTooltip="Guardar registro multiple.">
@@ -53,7 +51,6 @@
                                         </button>
                                     </div>
                                 </div>
-                                
                             </div>
                         </mat-card>
                     </div>
@@ -125,16 +122,15 @@
                 <h6 id="items" (click)="LimpiarCampos()">Cargar Cargos</h6>
             </ng-template>
             <div class="container" style="padding-top: 15px;">
-                <div class="row">
+                <div class="row m-auto">
                     <div class="col-md">
                         <div id="titulo">
                             <span>CARGAR PLANTILLAS</span>
                         </div>
                         <mat-card class="example-card mat-elevation-z9">
                             <div class="row">
-                                <div class="col-md" style="padding-top: 5px;">
-                                    <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
-                                        <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
+                                <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                                        <form method="post" class="btn-2" enctype="multipart/form-data">
                                             <input (change)="FileChangeCargo($event)" type="file" [formControl]="archivoForm" id="file"
                                                 accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                             <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
@@ -144,34 +140,30 @@
                                             </label>
                                             <label for="file"  matSuffix matTooltipPosition="right"
                                                 *ngIf="mostrarbtnsubir && messajeExcelCargos != 'error'"
-                                                style="height: 64px; padding-top: 25px;"
+                                                style="height: 65px; padding-top: 25px;"
                                                 matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
                                                 Subir nueva plantilla
                                             </label>
                                         </form>
-                                    </div>
                                 </div>
-                                <div class="col-md" *ngIf="DatosCargos.length == 0">
-                                    <div class="d-flex flex-wrap justify-content-around">
+                                <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                                    <div *ngIf="DatosCargos.length == 0" class="d-flex flex-wrap justify-content-around">
                                         <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
-                                            style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
+                                            matTooltip="Dar click para ver o descargar el documento."
                                             href="{{hipervinculo}}/plantillaD/documento/Feriados.xlsx">
                                             <!--span class="material-icons">cloud_download</span-->
                                             <br>
                                             Descargar plantilla usuarios
                                         </a>
                                     </div>
-                                </div> 
-                                <div class="col-md" *ngIf="DatosCargos.length > 0" style="padding-top: 5px; padding-bottom: 5px;" >
-                                    <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                                    <div *ngIf="DatosCargos.length > 0" class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
                                         <button id="descargar" class="btn btn-sm"
                                              matSuffix matTooltipPosition="right" (click)="ConfirmarRegistroMultipleCargos()"
                                              matTooltip="Guardar registro multiple.">
                                             Registrar
                                         </button>
                                     </div>
-                                </div>
-                                
+                                </div>                                 
                             </div>
                         </mat-card>
                     </div>

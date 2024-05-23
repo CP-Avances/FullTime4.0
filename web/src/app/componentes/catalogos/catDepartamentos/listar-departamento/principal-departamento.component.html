@@ -6,7 +6,7 @@
 <div class="div" *ngIf="ver_departamentos">
     <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
         <div class="row">
-            <div class="col-md">
+            <div class="col-12 col-md-6">
                 <div id="titulo">
                     <span>DEPARTAMENTOS</span>
                 </div>
@@ -25,35 +25,31 @@
                     </div>
                 </mat-card>
             </div>
-            <div class="col-md">
+            <div class="col-12 col-md-6">
                 <div id="titulo">
                     <span>REGISTRO MULTIPLE DE DEPARTAMENTOS</span>
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
-                    <div class="row">
-                        <div class="col-md" style="padding-top: 5px;">
-                            <div class="d-flex flex-wrap justify-content-around"
-                                style="text-align: center; justify-content: center;">
-                                <form method="post" enctype="multipart/form-data" style="width: max-content;">
-                                    <input (change)="FileChange($event)" type="file" [formControl]="archivoForm"
-                                        id="file"
-                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                    <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
-                                        style="height: 64px;  padding-top: 25px;"
-                                        matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                        Subir plantilla
-                                    </label>
-                                    <label for="file" matSuffix matTooltipPosition="right"
-                                        *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
-                                        style="height: 64px;  padding-top: 25px;"
-                                        matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                        Subir nueva plantilla
-                                    </label>
-                                </form>
-                            </div>
+                    <div class="row m-auto">
+                        <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                            <form method="post" class="btn-2" enctype="multipart/form-data">
+                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm"
+                                    id="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                    style="height: 65px;  padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                    Subir plantilla
+                                </label>
+                                <label for="file" matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                    style="height: 65px;  padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                    Subir nueva plantilla
+                                </label>
+                            </form>
                         </div>
-                        <div class="col-md" *ngIf="!DataDepartamentos" style="padding-top: 5px; padding-bottom: 5px;">
-                            <div class="d-flex flex-wrap justify-content-around"
+                        <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                            <div *ngIf="!DataDepartamentos" class="d-flex flex-wrap justify-content-around"
                                 style="text-align: center; justify-content: center;">
                                 <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                     matTooltip="Dar click para ver o descargar el documento."
@@ -62,10 +58,7 @@
                                     Descargar plantilla
                                 </a>
                             </div>
-                        </div>
-                        <div class="col-md" *ngIf="mostrarbtnsubir" style="padding-top: 5px; padding-bottom: 5px;">
-                            <div class="d-flex flex-wrap justify-content-around"
-                                style="text-align: center; justify-content: center;">
+                            <div class="d-flex flex-wrap justify-content-center m-auto w-auto">
                                 <button *ngIf="DataDepartamentos && messajeExcel != 'error'" id="descargar"
                                     class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
                                     matTooltipPosition="right" matTooltip="Guardar registro multiple.">
