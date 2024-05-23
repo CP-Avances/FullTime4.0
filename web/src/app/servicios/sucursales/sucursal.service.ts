@@ -46,11 +46,6 @@ export class SucursalService {
     return this.http.request('delete', url, httpOptions);
   }
 
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${environment.url}/sucursales/xmlDownload`, data);
-  }
-
   // METODO PARA BUSCAR DATOS DE UNA SUCURSAL
   BuscarUnaSucursal(id: number) {
     return this.http.get(`${environment.url}/sucursales/unaSucursal/${id}`);

@@ -4,13 +4,7 @@ import { Consultar } from '../../libs/ListaEmpleados';
 
 class AsistenciaControlador {
 
-    public async ObtenerListaEmpresa(req: Request, res: Response) {
-        var { id_empresa } = req.params
-
-        let c = await Consultar(parseInt(id_empresa));
-
-        res.jsonp(c)
-    }
+  
 
 }
 

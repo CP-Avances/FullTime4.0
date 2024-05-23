@@ -61,12 +61,6 @@ export class UsuarioService {
   }
 
 
-
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
-  UsuariosTimbreMovilCargos(estado: any, habilitado: boolean) {
-    return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil-cargos/${estado}/activo/${habilitado}`);
-  }
-
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
   ActualizarEstadoTimbreMovil(data: any) {
     return this.http.put<any>(`${environment.url}/usuarios/lista-app-movil/`, data);
@@ -170,41 +164,5 @@ export class UsuarioService {
     };
     return this.http.request('delete', url, httpOptions);
   }
-
-
-
-
-
-
-
-
-
-
-  // catalogo de usuarios
-
-  getUsuariosRest() {
-    return this.http.get(`${environment.url}/usuarios`);
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-  BuscarUsersNoEnrolados() {
-    return this.http.get(`${environment.url}/usuarios/noEnrolados`);
-  }
-
-  getIdByUsuarioRest(usuario: string) {
-    return this.http.get(`${environment.url}/usuarios/busqueda/${usuario}`);
-  }
-
 
 }

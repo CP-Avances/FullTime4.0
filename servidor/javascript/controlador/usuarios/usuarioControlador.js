@@ -1390,33 +1390,6 @@ class UsuarioControlador {
             }
         });
     }
-    list(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const USUARIOS = yield database_1.default.query(`
-      SELECT * FROM eu_usuarios
-      `);
-            if (USUARIOS.rowCount > 0) {
-                return res.jsonp(USUARIOS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    getIdByUsuario(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { usuario } = req.params;
-            const unUsuario = yield database_1.default.query(`
-      SELECT id FROM eu_usuarios WHERE usuario = $1
-      `, [usuario]);
-            if (unUsuario.rowCount > 0) {
-                return res.jsonp(unUsuario.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'No se ha encontrado el usuario.' });
-            }
-        });
-    }
     /** ************************************************************************************************** **
      ** **                           METODOS TABLA USUARIO - SUCURSAL                                   ** **
      ** ************************************************************************************************** */

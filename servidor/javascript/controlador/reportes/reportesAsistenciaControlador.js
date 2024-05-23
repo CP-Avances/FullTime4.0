@@ -128,79 +128,6 @@ class ReportesAsistenciaControlador {
             return res.status(200).jsonp(respuesta);
         });
     }
-    DatosGeneralesCargo(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let estado = req.params.estado;
-            // CONSULTA DE BUSQUEDA DE CARGOS
-            let cargo = yield database_1.default.query(`
-            SELECT tc.id AS id_cargo, tc.cargo AS name_cargo
-            FROM e_cat_tipo_cargo AS tc 
-            ORDER BY tc.cargo ASC
-            `).then((result) => { return result.rows; });
-            if (cargo.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            // CONSULTA DE BUSQUEDA DE EMPLEADOS
-            let empleados = yield Promise.all(cargo.map((empl) => __awaiter(this, void 0, void 0, function* () {
-                if (estado === '1') {
-                    empl.empleados = yield database_1.default.query(`
-                    SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
-                        e.cedula, e.correo, ca.id AS id_cargo, tc.cargo,
-                        co.id AS id_contrato, d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
-                        s.nombre AS sucursal, ca.hora_trabaja, r.id AS id_regimen, r.descripcion AS regimen, c.descripcion AS ciudad,  
-					    CASE 
-						    WHEN e.genero = 1 THEN 'Masculino'
-						    WHEN e.genero = 2 THEN 'Femenino'
-					    END AS genero
-                    FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, eu_empleados AS e, e_ciudades AS c,
-                        e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s, ere_cat_regimenes AS r
-                    WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE da.id = e.id) 
-                        AND tc.id = ca.id_tipo_cargo
-                        AND ca.id_departamento = d.id
-                        AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.id = e.id)
-                        AND co.id_regimen = r.id 
-                        AND s.id = d.id_sucursal
-                        AND s.id_ciudad = c.id
-                        AND ca.id_tipo_cargo = $1
-                        AND e.estado = $2
-                    ORDER BY name_empleado ASC
-                    `, [empl.id_cargo, estado]).then((result) => { return result.rows; });
-                }
-                else {
-                    empl.empleados = yield database_1.default.query(`
-                    SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
-                        e.cedula, e.correo, e.estado, ca.id AS id_cargo, tc.cargo,
-                        d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
-                        s.nombre AS sucursal, ca.hora_trabaja, c.descripcion AS ciudad, r.id AS id_regimen, r.descripcion AS regimen,
-						 CASE 
-							WHEN e.genero = 1 THEN 'Masculino'
-							WHEN e.genero = 2 THEN 'Femenino'
-						END AS genero
-                    FROM eu_empleados e, eu_empleado_cargos AS ca, eu_empleado_contratos AS co, e_cat_tipo_cargo AS tc,
-                        ed_departamentos AS d, e_sucursales AS s, e_ciudades AS c, ere_cat_regimenes AS r
-                    WHERE ca.id = (SELECT de.cargo_id FROM datos_empleado_cargo AS de WHERE de.empl_id = e.id)
-                        AND ca.id = (SELECT de.contrato_id FROM datos_empleado_cargo AS de WHERE de.empl_id = e.id) 
-						AND ca.id_contrato = co.id
-						AND co.id_regimen = r.id
-                        AND ca.id_departamento = d.id
-                        AND s.id = d.id_sucursal
-                        AND s.id_ciudad = c.id
-                        AND tc.id = ca.id_tipo_cargo
-                        AND ca.id_tipo_cargo = $1
-                        AND e.estado = $2
-                    ORDER BY name_empleado ASC
-                    `, [empl.id_cargo, estado])
-                        .then((result) => { return result.rows; });
-                }
-                return empl;
-            })));
-            let respuesta = empleados.filter((obj) => {
-                return obj.empleados.length > 0;
-            });
-            if (respuesta.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            return res.status(200).jsonp(respuesta);
-        });
-    }
     ReporteTimbresMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { desde, hasta } = req.params;
@@ -456,36 +383,6 @@ class ReportesAsistenciaControlador {
             if (nuevo.length === 0)
                 return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' });
             return res.status(200).jsonp(nuevo);
-        });
-    }
-    ReporteTimbresAbiertos(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { data, desde, hasta } = req.query;
-            try {
-                const array = JSON.parse(data);
-                if (array.length === 0)
-                    return res.status(400).jsonp({ message: 'No existe datos de consulta.' });
-                const resultado = yield Promise.all(array.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    return {
-                        id: o.id,
-                        codigo: o.codigo,
-                        fullname: o.fullname,
-                        cedula: o.cedula,
-                        timbres: yield database_1.default.query(`
-                        SELECT CAST(fecha_hora_timbre AS VARCHAR), accion, observacion, latitud, longitud, 
-                            CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre 
-                        FROM eu_timbres WHERE codigo = $1 AND accion = \'HA\' AND fecha_hora_timbre BETWEEN $2 AND $3 
-                        ORDER BY fecha_hora_timbre DESC 
-                        `, [o.codigo, new Date(desde), new Date(hasta)])
-                            .then(result => { return result.rows; })
-                    };
-                })));
-                const nuevo = resultado.filter((obj) => { return obj.timbres.length > 0; });
-                return res.status(200).jsonp(nuevo);
-            }
-            catch (error) {
-                return res.status(500).jsonp({ message: error });
-            }
         });
     }
 }

@@ -1618,34 +1618,7 @@ class UsuarioControlador {
     }
   }
 
-  public async list(req: Request, res: Response) {
-    const USUARIOS = await pool.query(
-      `
-      SELECT * FROM eu_usuarios
-      `
-    );
-    if (USUARIOS.rowCount > 0) {
-      return res.jsonp(USUARIOS.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-    }
-  }
-
-  public async getIdByUsuario(req: Request, res: Response): Promise<any> {
-    const { usuario } = req.params;
-    const unUsuario = await pool.query(
-      `
-      SELECT id FROM eu_usuarios WHERE usuario = $1
-      `
-      , [usuario]);
-    if (unUsuario.rowCount > 0) {
-      return res.jsonp(unUsuario.rows);
-    }
-    else {
-      res.status(404).jsonp({ text: 'No se ha encontrado el usuario.' });
-    }
-  }
+  
 
   /** ************************************************************************************************** **
    ** **                           METODOS TABLA USUARIO - SUCURSAL                                   ** **

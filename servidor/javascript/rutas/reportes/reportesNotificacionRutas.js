@@ -34,7 +34,6 @@ class NotificacionesRutas {
         this.router.get('/usuario_vacaciones_enviados_todas/:envia/:id_empleado', reporteNotificacionControlador_1.default.ListarVacacionesEnviadas_Usuario);
         this.router.get('/usuario_vacaciones_recibidos_todas/:recibe/:id_empleado', reporteNotificacionControlador_1.default.ListarVacacionesRecibidas_Usuario);
         this.router.get('/usuario_extras_enviados_todas/:envia/:id_empleado', reporteNotificacionControlador_1.default.ListarSolicitudHoraExtraEnviadas_Usuario);
-        this.router.get('/usuario_extras_recibidos_todas/:recibe/:id_empleado', reporteNotificacionControlador_1.default.ListarSolicitudHoraExtraRecibidas_Usuario);
         this.router.get('/usuario_comidas_enviados_todas/:envia/:id_empleado', reporteNotificacionControlador_1.default.ListarPlanificaComidaEnviadas_Usuario);
         //  this.router.get('/usuario_comidas_recibidos/:recibe', NOTIFICACIONES_CONTROLADOR.ListarUsuariosComidasRecibidas);
         // NOTIFICACIONES TOTALES POR USUARIO
@@ -43,7 +42,6 @@ class NotificacionesRutas {
         this.router.get('/usuario_vacaciones_enviados_fecha/:envia/:id_empleado/:fec_inicio/:fec_final', reporteNotificacionControlador_1.default.ListarVacacionesEnviadas_UsuarioFecha);
         this.router.get('/usuario_vacaciones_recibidos_fecha/:recibe/:id_empleado/:fec_inicio/:fec_final', reporteNotificacionControlador_1.default.ListarVacacionesRecibidas_UsuarioFecha);
         this.router.get('/usuario_extras_enviados_fecha/:envia/:id_empleado/:fec_inicio/:fec_final', reporteNotificacionControlador_1.default.ListarSolicitudHoraExtraEnviadas_UsuarioFecha);
-        this.router.get('/usuario_extras_recibidos_fecha/:recibe/:id_empleado/:fec_inicio/:fec_final', reporteNotificacionControlador_1.default.ListarSolicitudHoraExtraRecibidas_UsuarioFecha);
         this.router.get('/usuario_comidas_enviados_fecha/:envia/:id_empleado/:fec_inicio/:fec_final', reporteNotificacionControlador_1.default.ListarPlanificaComidaEnviadas_UsuarioFecha);
         //  this.router.get('/usuario_comidas_recibidos/:recibe', NOTIFICACIONES_CONTROLADOR.ListarUsuariosComidasRecibidas);
     }

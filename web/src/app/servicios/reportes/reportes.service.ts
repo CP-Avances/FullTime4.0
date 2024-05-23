@@ -13,28 +13,8 @@ export class ReportesService {
     private http: HttpClient,
   ) { }
 
-  ObtenerTimbres(empleado_id: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/reporteTimbres/listaTimbres/${empleado_id}`, data);
-  }
-
   ObtenerPermisosHorarios(codigo: any) {
     return this.http.get(`${environment.url}/reporte/reportePermisos/horarios/${codigo}`);
-  }
-
-  ObtenerPermisosPlanificacion(empleado_id: any) {
-    return this.http.get(`${environment.url}/reporte/reportePermisos/planificacion/${empleado_id}`);
-  }
-
-  ObtenerAutorizacionPermiso(empleado_id: any) {
-    return this.http.get(`${environment.url}/reporte/reportePermisos/autorizaciones/${empleado_id}`);
-  }
-
-  ObtenerTimbresAtrasosHorario(empleado_id: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/reporteAtrasos/horarios/${empleado_id}`, data);
-  }
-
-  ObtenerTimbresAtrasosPlanificacion(empleado_id: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/reporteAtrasos/planificacion/${empleado_id}`, data);
   }
 
   ObtenerEntradaSalidaHorario(codigo: any, data: any) {
@@ -47,14 +27,6 @@ export class ReportesService {
 
   ObtenerPermisosHorariosFechas(codigo: any, data: any) {
     return this.http.post(`${environment.url}/reporte/reportePermisos/fechas/horarios/${codigo}`, data);
-  }
-
-  ObtenerPermisosPlanificacionFechas(empleado_id: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/reportePermisos/fechas/planificacion/${empleado_id}`, data);
-  }
-
-  ObtenerPlanificacionEmpleado(codigo: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/reporteTimbres/buscarPlan/${codigo}`, data);
   }
 
   /**
