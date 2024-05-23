@@ -84,24 +84,6 @@ class PlanHoraExtraControlador {
             }
         });
     }
-    EncontrarUltimoPlan(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const PLAN = yield database_1.default.query(`
-      SELECT MAX(id) AS id_plan_hora FROM mhe_detalle_plan_hora_extra
-      `);
-            if (PLAN.rowCount > 0) {
-                if (PLAN.rows[0]['id_plan_hora'] != null) {
-                    return res.jsonp(PLAN.rows);
-                }
-                else {
-                    return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-                }
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
     ObtenerDatosAutorizacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id_plan_extra;

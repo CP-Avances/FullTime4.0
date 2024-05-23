@@ -14,9 +14,7 @@ export class KardexService {
   /**
    * METODOS QUE OBTIENEN LA INFORMACION DEL KARDEX DE VACACIONES DIAS CALENDARIO.
    */
-  ObtenerKardexVacacionDiasCalendarioByIdToken() {
-    return this.http.get(`${environment.url}/reportes/vacacion`);
-  }
+
   
   ObtenerKardexVacacionDiasCalendarioByIdEmpleado(id_empleado: number, desde: string, hasta: string) {
     return this.http.get<any>(`${environment.url}/reportes/vacacion/${id_empleado}/${desde}/${hasta}`);
@@ -36,9 +34,6 @@ export class KardexService {
    * Metodo para listar a los empleados con su cargo, departamento y regimen laboral
    * @param id_empresa Id de la empresa que pertenecen los empleados
    */
-  ListadoEmpleadosConDepartamentoRegimen(id_empresa: number) {
-    return this.http.get<any>(`${environment.url}/asistencia/lista-empleados/${id_empresa}`)
-  }
 
   ReporteHorasExtras(id_empleado: number, desde: string, hasta: string) {
     return this.http.get<any>(`${environment.url}/reportes/hora-extra/${id_empleado}/${desde}/${hasta}`)

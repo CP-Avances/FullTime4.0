@@ -14,8 +14,6 @@ class ReportesAsistenciasRutas {
     configuracion() {
         // LISTA DEPARTAMENTOS CON EMPLEADOS ACTIVOS O INACTIVOS
         this.router.get('/datos_generales/:estado', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.DatosGeneralesUsuarios);
-        // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR CARGOS
-        this.router.get(`/informacion-general-cargo/:estado`, verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.DatosGeneralesCargo);
         // REPORTES DE TIMBRES MULTIPLE
         this.router.put('/timbres/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresMultiple);
         this.router.put('/timbres-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresMultipleRegimenCargo);
@@ -28,8 +26,6 @@ class ReportesAsistenciasRutas {
         // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL 
         this.router.put('/timbres-horario-abierto/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreHorarioAbierto);
         this.router.put('/timbres-horario-abierto-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreHorarioAbiertoRegimenCargo);
-        // REPORTES DE TIMBRES DE HORARIO ABIERTO
-        this.router.get('/timbres-abiertos', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresAbiertos);
         // REPORTES DE TIMBRES INCOMPLETOS
         this.router.put('/timbres-incompletos/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresIncompletos);
         this.router.put('/timbres-incompletos-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresIncompletosRegimenCargo);

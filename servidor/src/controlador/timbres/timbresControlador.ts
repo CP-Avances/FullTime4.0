@@ -608,41 +608,6 @@ class TimbresControlador {
         }
     }
 
-    public async ObtenerUltimoTimbreEmpleado(req: Request, res: Response): Promise<any> {
-        try {
-            const codigo = req.userCodigo
-            let timbre = await pool.query(
-                `
-                SELECT CAST(fecha_hora_timbre AS VARCHAR) as timbre, accion 
-                FROM eu_timbres 
-                WHERE codigo = $1 
-                ORDER BY fecha_hora_timbre DESC LIMIT 1
-                `
-                , [codigo])
-                .then((result: any) => {
-                    return result.rows.map((obj: any) => {
-                        switch (obj.accion) {
-                            case 'EoS': obj.accion = 'Entrada o salida'; break;
-                            case 'AES': obj.accion = 'Inicio o fin alimentación'; break;
-                            case 'PES': obj.accion = 'Inicio o fin permiso'; break;
-                            case 'E': obj.accion = 'Entrada'; break;
-                            case 'S': obj.accion = 'Salida'; break;
-                            case 'I/A': obj.accion = 'Inicio alimentación'; break;
-                            case 'F/A': obj.accion = 'Fin alimentación'; break;
-                            case 'I/P': obj.accion = 'Inicio permiso'; break;
-                            case 'F/P': obj.accion = 'Fin permiso'; break;
-                            case 'HA': obj.accion = 'Timbre libre'; break;
-                            default: obj.accion = 'Desconocido'; break;
-                        }
-                        return obj
-                    })
-                });
-            if (timbre.length === 0) return res.status(400).jsonp({ mensaje: 'No ha timbrado.' });
-            return res.status(200).jsonp(timbre[0]);
-        } catch (error) {
-            return res.status(400).jsonp({ message: error });
-        }
-    }
 
 
 

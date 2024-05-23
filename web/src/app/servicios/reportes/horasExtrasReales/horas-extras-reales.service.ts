@@ -12,15 +12,6 @@ export class HorasExtrasRealesService {
     private http: HttpClient,
   ) { }
 
-  ObtenerDatosContratoA() {
-    return this.http.get(`${environment.url}/reporte/horasExtrasReales`);
-  }
-
-  ObtenerDatosCargoA(empleado_id: any) {
-    return this.http.get(`${environment.url}/reporte/horasExtrasReales/${empleado_id}`).pipe(
-      catchError(empleado_id));
-  }
-
   ObtenerEntradaSalida(empleado_id: any, data: any) {
     return this.http.post(`${environment.url}/reporte/horasExtrasReales/entradaSalida/${empleado_id}`, data)
   }

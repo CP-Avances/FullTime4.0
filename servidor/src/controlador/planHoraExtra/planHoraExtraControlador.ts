@@ -83,26 +83,6 @@ class PlanHoraExtraControlador {
     }
   }
 
-  public async EncontrarUltimoPlan(req: Request, res: Response): Promise<any> {
-    const PLAN = await pool.query(
-      `
-      SELECT MAX(id) AS id_plan_hora FROM mhe_detalle_plan_hora_extra
-      `
-    );
-    if (PLAN.rowCount > 0) {
-      if (PLAN.rows[0]['id_plan_hora'] != null) {
-        return res.jsonp(PLAN.rows)
-      }
-      else {
-        return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-      }
-    }
-    else {
-      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-  }
-
-
 
   public async ObtenerDatosAutorizacion(req: Request, res: Response) {
     const id = req.params.id_plan_extra;
