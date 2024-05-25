@@ -810,15 +810,14 @@ class EmpleadoControlador {
             data.observacion = 'La cédula ingresada no es válida';
           } else {
             if(!valiContra.test(data.contrasena.toString())){
-              data.observacion = 'La contraseña ingresada no es válida';
-            }else{
-              console.log('entro ',data.contraseña.length);
-              if(data.contraseña.toString().length < 10){
+              console.log('entro ',data.contrasena.toString().length);
+              if(data.contrasena.toString().length < 10){
                 // Verificar si la variable tiene el formato de fecha correcto con moment
                 if (moment(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
                   //Valida si los datos de la columna telefono son numeros.
                   if (telefono != undefined) {
-                    if (regex.test(data.telefono)) {
+                    console.log(data.telefono,' entro ',regex.test(telefono));
+                    if (regex.test(data.telefono.toString())) {
                       if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                         data.observacion = 'El teléfono ingresada no es válido';
                       } else {
@@ -826,6 +825,7 @@ class EmpleadoControlador {
                           data.observacion = 'ok';
                           duplicados.push(dato);
                         }
+                        console.log(data.telefono);
                       }
                     } else {
                       data.observacion = 'El teléfono ingresada no es válido';
@@ -838,7 +838,8 @@ class EmpleadoControlador {
               }else{
                 data.observacion = 'La contraseña debe ser maximo de 10 caracteres';
               }
-
+            }else{
+              data.observacion = 'La contraseña ingresada no es válida';
             }
             
           }
@@ -898,12 +899,12 @@ class EmpleadoControlador {
           data.longitud = 'No registrado';
         }
         if (domicilio == undefined) {
-          data.domicilio = 'No registrado';
-          data.observacion = 'Domicilio ' + data.observacion;
+          data.domicilio = '-';
+          data.observacion = " ";
         }
         if (telefono == undefined) {
-          data.telefono = 'No registrado';
-          data.observacion = 'Teléfono ' + data.observacion;
+          data.telefono = '-';
+          data.observacion = " ";
         }
         if (nacionalidad == undefined) {
           data.nacionalidad = 'No registrado';
@@ -935,32 +936,35 @@ class EmpleadoControlador {
             }else{
               if(data.contrasena != 'No registrado'){
                 if(!valiContra.test(data.contrasena.toString())){
-                  data.observacion = 'La contraseña ingresada no es válida';
-                }else{
-                  console.log('entro ',data.contraseña.length);
-                  if(data.contraseña.toString().length < 10){
+                  
+                  if(data.contrasena.toString().length < 10){
                     // Verificar si la variable tiene el formato de fecha correcto con moment
                     if (data.fec_nacimiento != 'No registrado') {
-                      if (moment(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) { } else {
-                        data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
-                      }
-                    }else{
-                      //Valida si los datos de la columna telefono son numeros.
-                      if (telefono != undefined) {
-                        const regex = /^[0-9]+$/;
-                        if (regex.test(telefono)) {
-                          if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                      if (moment(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) { 
+                        //Valida si los datos de la columna telefono son numeros.
+                        if (telefono != undefined) {
+                          const regex = /^[0-9]+$/;
+                          console.log(data.telefono,' entro ',regex.test(telefono));
+                          if (regex.test(data.telefono.toString())) {
+                            if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                              console.log('ent: ',data.telefono);
+                              data.observacion = 'El teléfono ingresado no es válido';
+                            }
+                            console.log(data.telefono);
+                          } else {
+                            console.log(' entr ',data.telefono);
                             data.observacion = 'El teléfono ingresado no es válido';
                           }
-                        } else {
-                          data.observacion = 'El teléfono ingresado no es válido';
                         }
+                      } else {
+                        data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                       }
                     }
                   }else{
                     data.observacion = 'La contraseña debe ser maximo de 10 caracteres';
                   }
-                  
+                }else{
+                  data.observacion = 'La contraseña ingresada no es válida';
                 }
               }
             }
@@ -1075,7 +1079,7 @@ class EmpleadoControlador {
 
         if (item.observacion != undefined) {
           let arrayObservacion = item.observacion.split(" ");
-          if (arrayObservacion[0] == 'no') {
+          if (arrayObservacion[0] == 'no' || item.observacion == " ") {
             item.observacion = 'ok'
           }
         } else {
@@ -1382,10 +1386,10 @@ class EmpleadoControlador {
             if (rege.test(data.codigo)) {
               console.log(!valiContra.test(data.contrasena));
               if(!valiContra.test(data.contrasena.toString())){
-                data.observacion = 'La contraseña ingresada no es válida';
-              }else{
-                console.log('entro ',data.contraseña.length);
+                console.log('entro ',data.contrasena.toString().length);
                 if(data.contrasena.toString().length > 10){
+                  data.observacion = 'La contraseña debe ser maximo de 10 caracteres';
+                }else{
                   // Verificar si la variable tiene el formato de fecha correcto con moment
                   if (moment(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
                     //Valida si los datos de la columna telefono son numeros.
@@ -1407,10 +1411,9 @@ class EmpleadoControlador {
                   } else {
                     data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                   }
-
-                }else{
-                  data.observacion = 'La contraseña debe ser maximo de 10 caracteres';
                 }
+              }else{
+                data.observacion = 'La contraseña ingresada no es válida';
               }
               
             } else {
@@ -1476,12 +1479,12 @@ class EmpleadoControlador {
           data.longitud = 'No registrado';
         }
         if (domicilio == undefined) {
-          data.domicilio = 'No registrado';
-          data.observacion = 'Domicilio ' + data.observacion;
+          data.domicilio = '-';
+          data.observacion = " ";
         }
         if (telefono == undefined) {
-          data.telefono = 'No registrado';
-          data.observacion = 'Teléfono ' + data.observacion;
+          data.telefono = '-';
+          data.observacion = " ";
         }
         if (nacionalidad == undefined) {
           data.nacionalidad = 'No registrado';
@@ -1492,7 +1495,7 @@ class EmpleadoControlador {
           data.observacion = 'Usuario ' + data.observacion;
         }
         if (contrasena == undefined) {
-          data.contrasena = contrasena;
+          data.contrasena = 'No registrado';
           data.observacion = 'Contraseña ' + data.observacion;
         }
         if (rol == undefined) {
@@ -1507,6 +1510,8 @@ class EmpleadoControlador {
           if (!rege.test(data.codigo)) {
             data.observacion = 'Formato de código incorrecto';
           }else{
+            if(contrasena != undefined){
+              console.log('data: ',data.contrasena);
             if(!valiContra.test(data.contrasena.toString())){
               console.log(data.contrasena,' entro ',data.contrasena.toString().length);
               if(data.contrasena.toString().length > 10){
@@ -1535,6 +1540,8 @@ class EmpleadoControlador {
             }else{
               data.observacion = 'La contraseña ingresada no es válida';
             }
+          }
+            
           }
         }
 
@@ -1684,7 +1691,7 @@ class EmpleadoControlador {
 
         if (item.observacion != undefined) {
           let arrayObservacion = item.observacion.split(" ");
-          if (arrayObservacion[0] == 'no') {
+          if (arrayObservacion[0] == 'no' || item.observacion == " ") {
             item.observacion = 'ok'
           }
         }

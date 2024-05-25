@@ -205,18 +205,15 @@
                     <thead class="thead-light">
                         <tr style="text-align: center;">
                             <th scope="col">Item</th>
+                            <th scope="col">Observación</th>
                             <th scope="col">Establecimiento</th>
                             <th scope="col">Ciudad</th>
-
-                            <th scope="col">Observación</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr
                             *ngFor="let data of Datasucursales | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
                             <td style="width: 50px;" align="center">{{data.fila}}</td>
-                            <td [style.color]="stiloTextoCelda(data.nom_sucursal)">{{ data.nom_sucursal}}</td>
-                            <td [style.color]="stiloTextoCelda(data.ciudad)">{{ data.ciudad}}</td>
                             <td>
                                 <div style="width: 270px; margin: auto;">
                                     <div id="t-editar" class="circulo"
@@ -224,6 +221,9 @@
                                     {{ data.observacion}}
                                 </div>
                             </td>
+                            <td [style.color]="stiloTextoCelda(data.nom_sucursal)">{{ data.nom_sucursal}}</td>
+                            <td [style.color]="stiloTextoCelda(data.ciudad)">{{ data.ciudad}}</td>
+                            
                         </tr>
                     </tbody>
                 </table>
