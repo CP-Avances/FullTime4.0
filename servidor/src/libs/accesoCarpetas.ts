@@ -108,3 +108,24 @@ export const ObtenerRutaLeerPlantillas1 = function () {
     ruta = path.join(__dirname, `..${separador}..`);
     return ruta + separador + 'leerPlantillas';
 }
+
+// METODO PARA OBTENER POSICION DE PLANTILLA
+export const ObtenerIndicePlantilla = function (libroExcel: any, hoja: string) {
+    const sheet_name_list = libroExcel.SheetNames;
+    let indice: number = 0;
+    let verificador: number = 0;
+    for (var i = 0; i < sheet_name_list.length; i++) {
+        if ((sheet_name_list[i]).toUpperCase() === hoja) {
+            indice = i;
+            verificador = 1;
+            break;
+        }
+    }
+    if (verificador === 1) {
+        return indice;
+    }
+    else {
+        return false;
+    }
+
+}

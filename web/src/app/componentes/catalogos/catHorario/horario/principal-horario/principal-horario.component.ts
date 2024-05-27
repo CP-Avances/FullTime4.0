@@ -298,20 +298,20 @@ export class PrincipalHorarioComponent implements OnInit {
       let itemName = arrayItems[0];
 
       if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-        if (itemName.toLowerCase() == 'plantillageneral') {
+        if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
           this.VerificarPlantilla();
         } else {
-          this.toastr.error('Solo se acepta plantillaGeneral', 'Plantilla seleccionada incorrecta', {
+          this.toastr.error('Solo se acepta plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
             timeOut: 6000,
           });
         }
       } else {
-        this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+        this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
           timeOut: 6000,
         });
       }
     } else {
-      this.toastr.error('Error al cargar el archivo', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Error al cargar el archivo.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       });
     }
@@ -373,7 +373,22 @@ export class PrincipalHorarioComponent implements OnInit {
           });
           this.archivo1Form.reset();
           this.nameFile = '';
-        } else {
+        }
+        else if (res.mensaje === 'no_existe_horario') {
+          this.toastr.error('No se ha encontrado pestaña HORARIOS en la plantilla.', 'Plantilla no aceptada.', {
+            timeOut: 4500,
+          });
+          this.archivo1Form.reset();
+          this.nameFile = '';
+        }
+        else if (res.mensaje === 'no_existe_detalle') {
+          this.toastr.error('No se ha encontrado pestaña DETALLE_HORARIOS en la plantilla.', 'Plantilla no aceptada.', {
+            timeOut: 4500,
+          });
+          this.archivo1Form.reset();
+          this.nameFile = '';
+        }
+        else {
           this.toastr.success('Plantilla de horarios importada', 'Operación exitosa.', {
             timeOut: 6000,
           });
@@ -675,7 +690,7 @@ export class PrincipalHorarioComponent implements OnInit {
       });
   }
 
-// METODO PARA ELIMINAR REGISTROS
+  // METODO PARA ELIMINAR REGISTROS
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
@@ -689,7 +704,7 @@ export class PrincipalHorarioComponent implements OnInit {
     this.horariosEliminar.forEach((datos: any) => {
       this.horarios = this.horarios.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.rest.EliminarRegistro(datos.id, data).subscribe((res:any) => {
+      this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.codigo + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -709,7 +724,7 @@ export class PrincipalHorarioComponent implements OnInit {
     )
   }
 
-// METODO PARA CONFIRMAR ELIMINACION MULTIPLE
+  // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {

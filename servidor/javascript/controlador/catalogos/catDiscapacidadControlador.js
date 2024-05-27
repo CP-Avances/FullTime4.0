@@ -192,106 +192,112 @@ class DiscapacidadControlador {
                 let separador = path_1.default.sep;
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
                 const workbook = xlsx_1.default.readFile(ruta);
-                const sheet_name_list = workbook.SheetNames;
-                const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-                let data = {
-                    fila: '',
-                    discapacidad: '',
-                    observacion: ''
-                };
-                var listaDiscapacidad = [];
-                var duplicados = [];
-                var mensaje = 'correcto';
-                // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                    var { item, discapacidad } = dato;
-                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                    if ((item != undefined && item != '') &&
-                        (discapacidad != undefined && discapacidad != '')) {
-                        data.fila = item;
-                        data.discapacidad = discapacidad;
-                        data.observacion = 'no registrada';
-                        listaDiscapacidad.push(data);
-                    }
-                    else {
-                        data.fila = item;
-                        data.discapacidad = discapacidad;
-                        data.observacion = 'no registrada';
-                        if (data.fila == '' || data.fila == undefined) {
-                            data.fila = 'error';
-                            mensaje = 'error';
-                        }
-                        if (discapacidad == undefined) {
-                            data.discapacidad = 'No registrado';
-                            data.observacion = 'Discapacidad ' + data.observacion;
-                        }
-                        listaDiscapacidad.push(data);
-                    }
-                    data = {};
-                }));
-                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                    if (err) {
-                    }
-                    else {
-                        // ELIMINAR DEL SERVIDOR
-                        fs_1.default.unlinkSync(ruta);
-                    }
-                });
-                // VALIDACINES DE LOS DATOS DE LA PLANTILLA
-                listaDiscapacidad.forEach((item) => __awaiter(this, void 0, void 0, function* () {
-                    if (item.observacion == 'no registrada') {
-                        var VERIFICAR_DISCAPACIDAD = yield database_1.default.query(`
-                        SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1
-                        `, [item.discapacidad.toUpperCase()]);
-                        if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
-                            item.observacion = 'ok';
+                let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'TIPO_DISCAPACIDAD');
+                if (verificador === false) {
+                    return res.jsonp({ message: 'no_existe', data: undefined });
+                }
+                else {
+                    const sheet_name_list = workbook.SheetNames;
+                    const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                    let data = {
+                        fila: '',
+                        discapacidad: '',
+                        observacion: ''
+                    };
+                    var listaDiscapacidad = [];
+                    var duplicados = [];
+                    var mensaje = 'correcto';
+                    // LECTURA DE LOS DATOS DE LA PLANTILLA
+                    plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                        var { ITEM, DISCAPACIDAD } = dato;
+                        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                        if ((ITEM != undefined && ITEM != '') &&
+                            (DISCAPACIDAD != undefined && DISCAPACIDAD != '')) {
+                            data.fila = ITEM;
+                            data.discapacidad = DISCAPACIDAD;
+                            data.observacion = 'no registrada';
+                            listaDiscapacidad.push(data);
                         }
                         else {
-                            item.observacion = 'Ya existe en el sistema';
-                        }
-                        // Discriminación de elementos iguales
-                        if (duplicados.find((p) => p.discapacidad.toLowerCase() === item.discapacidad.toLowerCase()) == undefined) {
-                            duplicados.push(item);
-                        }
-                        else {
-                            item.observacion = '1';
-                        }
-                    }
-                }));
-                setTimeout(() => {
-                    listaDiscapacidad.sort((a, b) => {
-                        // COMPARA LOS NUMEROS DE LOS OBJETOS
-                        if (a.fila < b.fila) {
-                            return -1;
-                        }
-                        if (a.fila > b.fila) {
-                            return 1;
-                        }
-                        return 0; // SON IGUALES
-                    });
-                    var filaDuplicada = 0;
-                    listaDiscapacidad.forEach((item) => __awaiter(this, void 0, void 0, function* () {
-                        if (item.observacion == '1') {
-                            item.observacion = 'Registro duplicado';
-                        }
-                        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
-                        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
-                            if (item.fila == filaDuplicada) {
+                            data.fila = ITEM;
+                            data.discapacidad = DISCAPACIDAD;
+                            data.observacion = 'no registrada';
+                            if (data.fila == '' || data.fila == undefined) {
+                                data.fila = 'error';
                                 mensaje = 'error';
                             }
+                            if (DISCAPACIDAD == undefined) {
+                                data.discapacidad = 'No registrado';
+                                data.observacion = 'Discapacidad ' + data.observacion;
+                            }
+                            listaDiscapacidad.push(data);
+                        }
+                        data = {};
+                    }));
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                        if (err) {
                         }
                         else {
-                            return mensaje = 'error';
+                            // ELIMINAR DEL SERVIDOR
+                            fs_1.default.unlinkSync(ruta);
                         }
-                        filaDuplicada = item.fila;
+                    });
+                    // VALIDACINES DE LOS DATOS DE LA PLANTILLA
+                    listaDiscapacidad.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                        if (item.observacion == 'no registrada') {
+                            var VERIFICAR_DISCAPACIDAD = yield database_1.default.query(`
+                            SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1
+                            `, [item.discapacidad.toUpperCase()]);
+                            if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
+                                item.observacion = 'ok';
+                            }
+                            else {
+                                item.observacion = 'Ya existe en el sistema';
+                            }
+                            // Discriminación de elementos iguales
+                            if (duplicados.find((p) => p.discapacidad.toLowerCase() === item.discapacidad.toLowerCase()) == undefined) {
+                                duplicados.push(item);
+                            }
+                            else {
+                                item.observacion = '1';
+                            }
+                        }
                     }));
-                    if (mensaje == 'error') {
-                        listaDiscapacidad = undefined;
-                    }
-                    return res.jsonp({ message: mensaje, data: listaDiscapacidad });
-                }, 1000);
+                    setTimeout(() => {
+                        listaDiscapacidad.sort((a, b) => {
+                            // COMPARA LOS NUMEROS DE LOS OBJETOS
+                            if (a.fila < b.fila) {
+                                return -1;
+                            }
+                            if (a.fila > b.fila) {
+                                return 1;
+                            }
+                            return 0; // SON IGUALES
+                        });
+                        var filaDuplicada = 0;
+                        listaDiscapacidad.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                            if (item.observacion == '1') {
+                                item.observacion = 'Registro duplicado';
+                            }
+                            // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+                            if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                                // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+                                if (item.fila == filaDuplicada) {
+                                    mensaje = 'error';
+                                }
+                            }
+                            else {
+                                return mensaje = 'error';
+                            }
+                            filaDuplicada = item.fila;
+                        }));
+                        if (mensaje == 'error') {
+                            listaDiscapacidad = undefined;
+                        }
+                        return res.jsonp({ message: mensaje, data: listaDiscapacidad });
+                    }, 1000);
+                }
             }
             catch (error) {
                 return res.status(500).jsonp({ message: 'Error con el servidor metodo revisar datos', status: '500' });

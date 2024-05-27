@@ -433,7 +433,7 @@ export class ListaEmpleadosComponent implements OnInit {
         });
         this.mostrarbtnsubir = false;
       } else {
-        this.DataEmpleados.forEach(item => {
+        this.DataEmpleados.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listUsuariosCorrectas.push(item);
           }
@@ -480,7 +480,7 @@ export class ListaEmpleadosComponent implements OnInit {
         });
         this.mostrarbtnsubir = false;
       } else {
-        this.DataEmpleados.forEach(item => {
+        this.DataEmpleados.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listUsuariosCorrectas.push(item);
           }

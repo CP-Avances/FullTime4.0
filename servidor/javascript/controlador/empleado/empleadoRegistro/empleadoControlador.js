@@ -66,6 +66,7 @@ class EmpleadoControlador {
                 res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
+                console.log('error ---- ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 res.status(500).jsonp({ message: 'Error al guardar código.' });
@@ -87,6 +88,7 @@ class EmpleadoControlador {
                 }
             }
             catch (error) {
+                console.log('error ---- ', error);
                 return res.status(404).jsonp({ text: 'Error al obtener código máximo.' });
             }
         });
@@ -96,6 +98,7 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { valor, automatico, manual, cedula, id, user_name, ip } = req.body;
+                console.log('***** ', req.body);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -133,6 +136,7 @@ class EmpleadoControlador {
                 return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
+                console.log('error ---- ', error);
                 //REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'Error al actualizar código.' });
@@ -426,6 +430,7 @@ class EmpleadoControlador {
                 }
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });

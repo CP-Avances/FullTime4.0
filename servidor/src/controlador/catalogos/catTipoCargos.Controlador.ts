@@ -1,4 +1,4 @@
-import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
@@ -223,12 +223,15 @@ class TiposCargosControlador {
             const documento = req.file?.originalname;
             let separador = path.sep;
             let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-
             const workbook = excel.readFile(ruta);
-            const sheet_name_list = workbook.SheetNames;
-            const plantilla_cargo = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[1]]);
-
-            let data: any = {
+            let verificador = ObtenerIndicePlantilla(workbook, 'TIPO_CARGO');
+            if (verificador === false) {
+              return res.jsonp({ message: 'no_existe', data: undefined });
+            }
+            else {
+              const sheet_name_list = workbook.SheetNames;
+              const plantilla_cargo = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+              let data: any = {
                 fila: '',
                 tipo_cargo: '',
                 observacion: ''
@@ -240,18 +243,18 @@ class TiposCargosControlador {
 
             // LECTURA DE LOS DATOS DE LA PLANTILLA
             plantilla_cargo.forEach(async (dato: any, indice: any, array: any) => {
-                var { item, cargo } = dato;
+                var { ITEM, CARGO } = dato;
                 // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                if ((item != undefined && item != '') &&
-                    (cargo != undefined && cargo != '')) {
-                    data.fila = item;
-                    data.tipo_cargo = cargo;
+                if ((ITEM != undefined && ITEM != '') &&
+                    (CARGO != undefined && CARGO != '')) {
+                    data.fila = ITEM;
+                    data.tipo_cargo = CARGO;
                     data.observacion = 'no registrado';
 
                     listCargos.push(data);
                 } else {
-                    data.fila = item;
-                    data.tipo_cargo = cargo;
+                    data.fila = ITEM;
+                    data.tipo_cargo = CARGO;
                     data.observacion = 'no registrado';
 
                     if (data.fila == '' || data.fila == undefined) {
@@ -344,6 +347,8 @@ class TiposCargosControlador {
 
             }, 1000)
 
+            }
+            
         } catch (error) {
             return res.status(500).jsonp({ message: error });
         }

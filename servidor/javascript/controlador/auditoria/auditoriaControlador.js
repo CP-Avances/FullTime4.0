@@ -38,11 +38,12 @@ class AuditoriaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion } = data;
+                let plataforma = "APLICACION WEB";
                 yield database_1.default.query(`
                 INSERT INTO audit.auditoria (plataforma, table_name, user_name, fecha_hora,
                     action, original_data, new_data, ip_address, observacion) 
-                VALUES ($1, $2, $3, now(), $4, $5, $6, $7, $8)'
-                `, ['public', tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion]);
+                VALUES ($1, $2, $3, now(), $4, $5, $6, $7, $8)
+                `, [plataforma, tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion]);
             }
             catch (error) {
                 throw error;

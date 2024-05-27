@@ -1,4 +1,4 @@
-import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
@@ -151,7 +151,7 @@ class DiscapacidadControlador {
                 SELECT * FROM e_cat_discapacidad WHERE id = $1
                 `
                 , [id]);
-            
+
             const [datosOriginales] = DISCAPACIDAD.rows;
 
             if (!datosOriginales) {
@@ -201,140 +201,142 @@ class DiscapacidadControlador {
 
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
     public async RevisarDatos(req: Request, res: Response): Promise<any> {
-        try{
+        try {
             const documento = req.file?.originalname;
             let separador = path.sep;
             let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-
             const workbook = excel.readFile(ruta);
-            const sheet_name_list = workbook.SheetNames;
-            const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            let verificador = ObtenerIndicePlantilla(workbook, 'TIPO_DISCAPACIDAD');
+            if (verificador === false) {
+                return res.jsonp({ message: 'no_existe', data: undefined });
+            }
+            else {
+                const sheet_name_list = workbook.SheetNames;
+                const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                let data: any = {
+                    fila: '',
+                    discapacidad: '',
+                    observacion: ''
+                };
 
-            let data: any = {
-                fila: '',
-                discapacidad: '',
-                observacion: ''
-            };
+                var listaDiscapacidad: any = [];
+                var duplicados: any = [];
+                var mensaje: string = 'correcto';
 
-            var listaDiscapacidad: any = [];
-            var duplicados: any = [];
-            var mensaje: string = 'correcto';
+                // LECTURA DE LOS DATOS DE LA PLANTILLA
+                plantilla.forEach(async (dato: any, indice: any, array: any) => {
+                    var { ITEM, DISCAPACIDAD } = dato;
+                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                    if ((ITEM != undefined && ITEM != '') &&
+                        (DISCAPACIDAD != undefined && DISCAPACIDAD != '')) {
+                        data.fila = ITEM;
+                        data.discapacidad = DISCAPACIDAD;
+                        data.observacion = 'no registrada';
 
-            // LECTURA DE LOS DATOS DE LA PLANTILLA
-            plantilla.forEach(async (dato: any, indice: any, array: any) => {
-                var { item, discapacidad } = dato;
-                // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                if ((item != undefined && item != '') &&
-                    (discapacidad != undefined && discapacidad != '')) {
-                    data.fila = item;
-                    data.discapacidad = discapacidad;
-                    data.observacion = 'no registrada';
+                        listaDiscapacidad.push(data);
 
-                    listaDiscapacidad.push(data);
-
-                } else {
-                    data.fila = item;
-                    data.discapacidad = discapacidad;
-                    data.observacion = 'no registrada';
-
-                    if (data.fila == '' || data.fila == undefined) {
-                        data.fila = 'error';
-                        mensaje = 'error'
-                    }
-
-                    if (discapacidad == undefined) {
-                        data.discapacidad = 'No registrado';
-                        data.observacion = 'Discapacidad ' + data.observacion;
-                    }
-
-                    listaDiscapacidad.push(data);
-                }
-
-                data = {};
-
-            });
-
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs.access(ruta, fs.constants.F_OK, (err) => {
-                if (err) {
-                } else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs.unlinkSync(ruta);
-                }
-            });
-
-            // VALIDACINES DE LOS DATOS DE LA PLANTILLA
-            listaDiscapacidad.forEach(async (item: any) => {
-                if (item.observacion == 'no registrada') {
-                    var VERIFICAR_DISCAPACIDAD = await pool.query(
-                        `
-                        SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1
-                        `
-                        , [item.discapacidad.toUpperCase()])
-                    if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
-                        item.observacion = 'ok'
                     } else {
-                        item.observacion = 'Ya existe en el sistema'
-                    }
+                        data.fila = ITEM;
+                        data.discapacidad = DISCAPACIDAD;
+                        data.observacion = 'no registrada';
 
-                    // Discriminación de elementos iguales
-                    if (duplicados.find((p: any) => p.discapacidad.toLowerCase() === item.discapacidad.toLowerCase()) == undefined) {
-                        duplicados.push(item);
-                    } else {
-                        item.observacion = '1';
-                    }
-                }
-            });
-
-            setTimeout(() => {
-                listaDiscapacidad.sort((a: any, b: any) => {
-                    // COMPARA LOS NUMEROS DE LOS OBJETOS
-                    if (a.fila < b.fila) {
-                        return -1;
-                    }
-                    if (a.fila > b.fila) {
-                        return 1;
-                    }
-                    return 0; // SON IGUALES
-                });
-
-                var filaDuplicada: number = 0;
-
-                listaDiscapacidad.forEach(async (item: any) => {
-                    if (item.observacion == '1') {
-                        item.observacion = 'Registro duplicado'
-                    }
-
-                    // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
-                    if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                        // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
-                        if (item.fila == filaDuplicada) {
-                            mensaje = 'error';
+                        if (data.fila == '' || data.fila == undefined) {
+                            data.fila = 'error';
+                            mensaje = 'error'
                         }
-                    } else {
-                        return mensaje = 'error';
+
+                        if (DISCAPACIDAD == undefined) {
+                            data.discapacidad = 'No registrado';
+                            data.observacion = 'Discapacidad ' + data.observacion;
+                        }
+
+                        listaDiscapacidad.push(data);
                     }
 
-                    filaDuplicada = item.fila;
+                    data = {};
 
                 });
 
-                if (mensaje == 'error') {
-                    listaDiscapacidad = undefined;
-                }
-                return res.jsonp({ message: mensaje, data: listaDiscapacidad });
-            }, 1000)
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs.access(ruta, fs.constants.F_OK, (err) => {
+                    if (err) {
+                    } else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs.unlinkSync(ruta);
+                    }
+                });
 
+                // VALIDACINES DE LOS DATOS DE LA PLANTILLA
+                listaDiscapacidad.forEach(async (item: any) => {
+                    if (item.observacion == 'no registrada') {
+                        var VERIFICAR_DISCAPACIDAD = await pool.query(
+                            `
+                            SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1
+                            `
+                            , [item.discapacidad.toUpperCase()])
+                        if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
+                            item.observacion = 'ok'
+                        } else {
+                            item.observacion = 'Ya existe en el sistema'
+                        }
 
-        }catch(error){
+                        // Discriminación de elementos iguales
+                        if (duplicados.find((p: any) => p.discapacidad.toLowerCase() === item.discapacidad.toLowerCase()) == undefined) {
+                            duplicados.push(item);
+                        } else {
+                            item.observacion = '1';
+                        }
+                    }
+                });
+
+                setTimeout(() => {
+                    listaDiscapacidad.sort((a: any, b: any) => {
+                        // COMPARA LOS NUMEROS DE LOS OBJETOS
+                        if (a.fila < b.fila) {
+                            return -1;
+                        }
+                        if (a.fila > b.fila) {
+                            return 1;
+                        }
+                        return 0; // SON IGUALES
+                    });
+
+                    var filaDuplicada: number = 0;
+
+                    listaDiscapacidad.forEach(async (item: any) => {
+                        if (item.observacion == '1') {
+                            item.observacion = 'Registro duplicado'
+                        }
+
+                        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+                        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+                            if (item.fila == filaDuplicada) {
+                                mensaje = 'error';
+                            }
+                        } else {
+                            return mensaje = 'error';
+                        }
+
+                        filaDuplicada = item.fila;
+
+                    });
+
+                    if (mensaje == 'error') {
+                        listaDiscapacidad = undefined;
+                    }
+                    return res.jsonp({ message: mensaje, data: listaDiscapacidad });
+                }, 1000)
+            }
+        } catch (error) {
             return res.status(500).jsonp({ message: 'Error con el servidor metodo revisar datos', status: '500' });
         }
     }
 
-     // REGISTRAR PLANTILLA MODALIDAD_CARGO 
-     public async CargarPlantilla(req: Request, res: Response) {
+    // REGISTRAR PLANTILLA MODALIDAD_CARGO 
+    public async CargarPlantilla(req: Request, res: Response) {
         try {
-            const {plantilla, user_name, ip} = req.body;
+            const { plantilla, user_name, ip } = req.body;
             var contador = 1;
             var respuesta: any
 
@@ -371,24 +373,24 @@ class DiscapacidadControlador {
 
                 if (contador === plantilla.length) {
                     if (discapacidad_emp) {
-                        return respuesta = res.status(200).jsonp({ message: 'ok', status: '200'})
+                        return respuesta = res.status(200).jsonp({ message: 'ok', status: '200' })
                     } else {
                         return respuesta = res.status(404).jsonp({ message: 'error', status: '400' })
                     }
                 }
 
                 contador = contador + 1;
-            
+
             });
 
-        }catch(error){
+        } catch (error) {
             // ROLLBACK
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({message: 'Error con el servidor metodo CargarPlantilla', status: '500'});
+            return res.status(500).jsonp({ message: 'Error con el servidor metodo CargarPlantilla', status: '500' });
         }
-     }
+    }
 
-        
+
 
 }
 

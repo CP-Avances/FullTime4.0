@@ -61,6 +61,7 @@ class EmpleadoControlador {
       await pool.query('COMMIT');
       res.jsonp({ message: 'Registro guardado.' });
     } catch (error) {
+      console.log('error ---- ', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       res.status(500).jsonp({ message: 'Error al guardar código.' });
@@ -82,6 +83,7 @@ class EmpleadoControlador {
         return res.status(404).jsonp({ text: 'Registros no encontrados.' });
       }
     } catch (error) {
+      console.log('error ---- ', error)
       return res.status(404).jsonp({ text: 'Error al obtener código máximo.' });
     }
 
@@ -90,8 +92,9 @@ class EmpleadoControlador {
   // METODO PARA ACTUALIZAR INFORMACION DE CODIGOS
   public async ActualizarCodigoTotal(req: Request, res: Response): Promise<Response> {
     try {
+ 
       const { valor, automatico, manual, cedula, id, user_name, ip } = req.body;
-      
+      console.log('***** ', req.body)
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
   
@@ -136,6 +139,7 @@ class EmpleadoControlador {
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
     } catch (error) {
+      console.log('error ---- ', error)
       //REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'Error al actualizar código.' });
@@ -468,6 +472,7 @@ class EmpleadoControlador {
 
     }
     catch (error) {
+      console.log('error ', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });

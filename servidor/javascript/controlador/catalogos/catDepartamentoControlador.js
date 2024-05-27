@@ -488,119 +488,125 @@ class DepartamentoControlador {
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
             const workbook = xlsx_1.default.readFile(ruta);
-            const sheet_name_list = workbook.SheetNames;
-            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-            let data = {
-                fila: '',
-                nombre: '',
-                sucursal: '',
-                observacion: ''
-            };
-            var listDepartamentos = [];
-            var duplicados = [];
-            var mensaje = 'correcto';
-            // LECTURA DE LOS DATOS DE LA PLANTILLA
-            plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                var { item, nombre, sucursal } = dato;
-                //Verificar que el registo no tenga datos vacios
-                if ((item != undefined && item != '') &&
-                    (nombre != undefined) && (sucursal != undefined)) {
-                    data.fila = item;
-                    data.nombre = nombre;
-                    data.sucursal = sucursal;
-                    data.observacion = 'no registrado';
-                    listDepartamentos.push(data);
-                }
-                else {
-                    data.fila = item;
-                    data.nombre = nombre;
-                    data.sucursal = sucursal;
-                    data.observacion = 'no registrado';
-                    if (data.fila == '' || data.fila == undefined) {
-                        data.fila = 'error';
-                        mensaje = 'error';
-                    }
-                    if (nombre == undefined) {
-                        data.nombre = 'No registrado';
-                        data.observacion = 'Departamento ' + data.observacion;
-                    }
-                    if (sucursal == undefined) {
-                        data.sucursal = 'No registrado';
-                        data.observacion = 'Sucursal ' + data.observacion;
-                    }
-                    listDepartamentos.push(data);
-                }
-                data = {};
-            }));
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                if (err) {
-                }
-                else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs_1.default.unlinkSync(ruta);
-                }
-            });
-            listDepartamentos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
-                if (item.observacion == 'no registrado') {
-                    var VERIFICAR_SUCURSAL = yield database_1.default.query(`
-          SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
-          `, [item.sucursal.toUpperCase()]);
-                    if (VERIFICAR_SUCURSAL.rows[0] != undefined && VERIFICAR_SUCURSAL.rows[0] != '') {
-                        var VERIFICAR_DEPARTAMENTO = yield database_1.default.query(`
-            SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2
-            `, [VERIFICAR_SUCURSAL.rows[0].id, item.nombre.toUpperCase()]);
-                        if (VERIFICAR_DEPARTAMENTO.rows[0] == undefined || VERIFICAR_DEPARTAMENTO.rows[0] == '') {
-                            item.observacion = 'ok';
-                        }
-                        else {
-                            item.observacion = 'Ya existe en el sistema';
-                        }
+            let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'DEPARTAMENTOS');
+            if (verificador === false) {
+                return res.jsonp({ message: 'no_existe', data: undefined });
+            }
+            else {
+                const sheet_name_list = workbook.SheetNames;
+                const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                let data = {
+                    fila: '',
+                    nombre: '',
+                    sucursal: '',
+                    observacion: ''
+                };
+                var listDepartamentos = [];
+                var duplicados = [];
+                var mensaje = 'correcto';
+                // LECTURA DE LOS DATOS DE LA PLANTILLA
+                plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                    var { ITEM, NOMBRE, SUCURSAL } = dato;
+                    //Verificar que el registo no tenga datos vacios
+                    if ((ITEM != undefined && ITEM != '') &&
+                        (NOMBRE != undefined) && (SUCURSAL != undefined)) {
+                        data.fila = ITEM;
+                        data.nombre = NOMBRE;
+                        data.sucursal = SUCURSAL;
+                        data.observacion = 'no registrado';
+                        listDepartamentos.push(data);
                     }
                     else {
-                        item.observacion = 'Sucursal no existe en el sistema';
-                    }
-                }
-            }));
-            setTimeout(() => {
-                listDepartamentos.sort((a, b) => {
-                    // Compara los números de los objetos
-                    if (a.fila < b.fila) {
-                        return -1;
-                    }
-                    if (a.fila > b.fila) {
-                        return 1;
-                    }
-                    return 0; // Son iguales
-                });
-                var filaDuplicada = 0;
-                listDepartamentos.forEach((item) => {
-                    // Discriminación de elementos iguales
-                    item.nombre.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                    item.sucursal.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                    if (duplicados.find((p) => p.nombre.toLowerCase() === item.nombre.toLowerCase() && p.sucursal.toLowerCase() === item.sucursal.toLowerCase()) == undefined) {
-                        duplicados.push(item);
-                    }
-                    else {
-                        item.observacion = 'Registro duplicado';
-                    }
-                    //Valida si los datos de la columna N son numeros.
-                    if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                        //Condicion para validar si en la numeracion existe un numero que se repite dara error.
-                        if (item.fila == filaDuplicada) {
+                        data.fila = ITEM;
+                        data.nombre = NOMBRE;
+                        data.sucursal = SUCURSAL;
+                        data.observacion = 'no registrado';
+                        if (data.fila == '' || data.fila == undefined) {
+                            data.fila = 'error';
                             mensaje = 'error';
                         }
+                        if (NOMBRE == undefined) {
+                            data.nombre = 'No registrado';
+                            data.observacion = 'Departamento ' + data.observacion;
+                        }
+                        if (SUCURSAL == undefined) {
+                            data.sucursal = 'No registrado';
+                            data.observacion = 'Sucursal ' + data.observacion;
+                        }
+                        listDepartamentos.push(data);
+                    }
+                    data = {};
+                }));
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
                     }
                     else {
-                        return mensaje = 'error';
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(ruta);
                     }
-                    filaDuplicada = item.fila;
                 });
-                if (mensaje == 'error') {
-                    listDepartamentos = undefined;
-                }
-                return res.jsonp({ message: mensaje, data: listDepartamentos });
-            }, 1000);
+                listDepartamentos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                    if (item.observacion == 'no registrado') {
+                        var VERIFICAR_SUCURSAL = yield database_1.default.query(`
+            SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
+            `, [item.sucursal.toUpperCase()]);
+                        if (VERIFICAR_SUCURSAL.rows[0] != undefined && VERIFICAR_SUCURSAL.rows[0] != '') {
+                            var VERIFICAR_DEPARTAMENTO = yield database_1.default.query(`
+              SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2
+              `, [VERIFICAR_SUCURSAL.rows[0].id, item.nombre.toUpperCase()]);
+                            if (VERIFICAR_DEPARTAMENTO.rows[0] == undefined || VERIFICAR_DEPARTAMENTO.rows[0] == '') {
+                                item.observacion = 'ok';
+                            }
+                            else {
+                                item.observacion = 'Ya existe en el sistema';
+                            }
+                        }
+                        else {
+                            item.observacion = 'Sucursal no existe en el sistema';
+                        }
+                    }
+                }));
+                setTimeout(() => {
+                    listDepartamentos.sort((a, b) => {
+                        // Compara los números de los objetos
+                        if (a.fila < b.fila) {
+                            return -1;
+                        }
+                        if (a.fila > b.fila) {
+                            return 1;
+                        }
+                        return 0; // Son iguales
+                    });
+                    var filaDuplicada = 0;
+                    listDepartamentos.forEach((item) => {
+                        // Discriminación de elementos iguales
+                        item.nombre.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                        item.sucursal.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                        if (duplicados.find((p) => p.nombre.toLowerCase() === item.nombre.toLowerCase() && p.sucursal.toLowerCase() === item.sucursal.toLowerCase()) == undefined) {
+                            duplicados.push(item);
+                        }
+                        else {
+                            item.observacion = 'Registro duplicado';
+                        }
+                        //Valida si los datos de la columna N son numeros.
+                        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                            if (item.fila == filaDuplicada) {
+                                mensaje = 'error';
+                            }
+                        }
+                        else {
+                            return mensaje = 'error';
+                        }
+                        filaDuplicada = item.fila;
+                    });
+                    if (mensaje == 'error') {
+                        listDepartamentos = undefined;
+                    }
+                    return res.jsonp({ message: mensaje, data: listDepartamentos });
+                }, 1000);
+            }
         });
     }
     CargarPlantilla(req, res) {

@@ -84,7 +84,7 @@ export class CatTipoCargosComponent {
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
     public parametro: ParametrosService,
     private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
-  ){
+  ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
@@ -120,10 +120,10 @@ export class CatTipoCargosComponent {
       });
   }
 
-  obtenerCargos(){
+  obtenerCargos() {
 
-    this._TipoCargos.listaCargos().subscribe(res =>{
-      console.log('lista ',res);
+    this._TipoCargos.listaCargos().subscribe(res => {
+      console.log('lista ', res);
       this.listaTipoCargos = res
     }, error => {
       console.log('Serivicio rest -> metodo RevisarFormato - ', error);
@@ -149,11 +149,11 @@ export class CatTipoCargosComponent {
       .afterClosed().subscribe(items => {
         this.ngOnInit();
       });
-      this.activar_seleccion = true;
-      this.plan_multiple = false;
-      this.plan_multiple_ = false;
-      this.selectionTipoCargo.clear();
-      this.tiposCargoEliminar = [];
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionTipoCargo.clear();
+    this.tiposCargoEliminar = [];
   }
   AbrirEditar(item_cargo: any): void {
     this.ventana.open(EditarTipoCargoComponent, { width: '450px', data: item_cargo })
@@ -224,15 +224,15 @@ export class CatTipoCargosComponent {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 25);
+    let itemName = arrayItems[0];
     console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'modalidad_cargo') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre modalidad_cargo', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
 
@@ -273,8 +273,15 @@ export class CatTipoCargosComponent {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
-        this.Datos_tipo_cargos.forEach(item => {
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña TIPO_CARGO en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.Datos_tipo_cargos.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaCargosCorrectas.push(item);
           }
@@ -369,14 +376,14 @@ export class CatTipoCargosComponent {
     array.sort(compare);
   }
 
-    /** ************************************************************************************************* **
-   ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
-   ** ************************************************************************************************* **/
+  /** ************************************************************************************************* **
+ ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
+ ** ************************************************************************************************* **/
 
-   GenerarPdf(action = 'open') {
+  GenerarPdf(action = 'open') {
     this.OrdenarDatos(this.listaTipoCargos);
     const documentDefinition = this.GetDocumentDefinicion();
-    console.log('this.listaTipoCargos: ',this.listaTipoCargos)
+    console.log('this.listaTipoCargos: ', this.listaTipoCargos)
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
