@@ -14,7 +14,6 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { PrincipalSucursalUsuarioComponent } from '../principal-sucursal-usuario/principal-sucursal-usuario.component';
-import { use } from 'echarts';
 
 @Component({
   selector: 'app-asignar-usuario',
@@ -44,6 +43,15 @@ export class AsignarUsuarioComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+  filtroRol = '';
+  filtroNombre = '';
+  filtroDepartamento = '';
+
+  rol = new FormControl('', [Validators.minLength(2)]);
+  nombre = new FormControl('', [Validators.minLength(2)]);
+  departamento = new FormControl('', [Validators.minLength(2)]);
+
+
   constructor(
     public ventanasu: PrincipalSucursalUsuarioComponent,
     public sucursal: SucursalService,
@@ -63,6 +71,7 @@ export class AsignarUsuarioComponent implements OnInit {
     this.name_sucursal = this.data.nombre.toUpperCase();
     this.BuscarAdministradoresJefes();
     this.ObtenerSucursales();
+    console.log('ver datos ', this.data)
   }
 
   // METODO PARA VER PANTALLA PRINCIPAL SUCURSAL USUARIO
@@ -128,6 +137,8 @@ export class AsignarUsuarioComponent implements OnInit {
       }
       //console.log('ver sucursal ', this.usuarios)
     });
+
+    console.log('ver datos ', this.principales)
 
   }
 
@@ -427,6 +438,20 @@ export class AsignarUsuarioComponent implements OnInit {
     this.selectionAsignados.clear();
     this.InhabilitarSeleccion();
     this.BuscarAdministradoresJefes();
+  }
+
+  usuariosSeleccionados: any = [];
+  // METODO PARA SELECCIONAR USUARIOS
+  SeleccionarEmpleado(p) {
+    if (p.seleccionado) {
+      this.usuariosSeleccionados.push(p);
+    } else {
+      const index = this.usuariosSeleccionados.indexOf(p);
+      if (index > -1) {
+        this.usuariosSeleccionados.splice(index, 1);
+      }
+    }
+    console.log('ver datos seleccionados ', this.usuariosSeleccionados)
   }
 
 }

@@ -110,6 +110,22 @@ class TiposCargosControlador {
                 const tipoCargoExiste = yield database_1.default.query(`
                 SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
                 `, [cargo.toUpperCase()]);
+                const consulta = yield database_1.default.query('SELECT * FROM e_cat_tipo_cargo WHERE id = $1', [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'et_cat_nivel_titulo',
+                        usuario: req.body.user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: req.body.ip,
+                        observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
                 if (tipoCargoExiste.rows[0] != undefined && tipoCargoExiste.rows[0].cargo != '' && tipoCargoExiste.rows[0].cargo != null) {
                     return res.status(200).jsonp({ message: 'Ya existe el cargo', status: '300' });
                 }
@@ -126,7 +142,7 @@ class TiposCargosControlador {
                         tabla: 'e_cat_tipo_cargo',
                         usuario: req.body.user_name,
                         accion: 'U',
-                        datosOriginales: JSON.stringify(tipoCargoExiste.rows),
+                        datosOriginales: JSON.stringify(datosOriginales),
                         datosNuevos: JSON.stringify(TipoCargos),
                         ip: req.body.ip,
                         observacion: null

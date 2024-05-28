@@ -92,6 +92,24 @@ class VacunaControlador {
                 `
                 , [nombre.toUpperCase(), id]);
 
+                const consulta = await pool.query('SELECT * FROM e_cat_tipo_cargo WHERE id = $1', [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'e_cat_vacuna',
+                        usuario: req.body.user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: req.body.ip,
+                        observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
+                    });
+    
+                    // FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+
             if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
                 const vacunaEditar = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
@@ -107,9 +125,9 @@ class VacunaControlador {
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'e_cat_vacuna',
-                    usuario: user_name,
+                    usuario: req.body.user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(VERIFICAR_VACUNA.rows),
+                    datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(vacunaInsertada),
                     ip,
                     observacion: null

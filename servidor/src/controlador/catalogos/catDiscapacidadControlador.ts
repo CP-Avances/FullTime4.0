@@ -92,8 +92,31 @@ class DiscapacidadControlador {
                 `
                 , [nombre.toUpperCase(), id])
 
+            const consulta = await pool.query('SELECT * FROM e_cat_discapacidad WHERE id = $1', [id]);
+            const [datosOriginales] = consulta.rows;
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_discapacidad',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+            }
+
+
+
             if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
                 const nombreConFormato = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
+
+
 
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
@@ -111,7 +134,7 @@ class DiscapacidadControlador {
                     tabla: 'e_cat_discapacidad',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(VERIFICAR_DISCAPACIDAD.rows),
+                    datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(discapacidadEditada),
                     ip,
                     observacion: null

@@ -157,7 +157,7 @@ class NivelTituloControlador {
 
       await pool.query(
         `
-        UPDATE et_cat_nivel_titulo SET nombre = $1 WHERE id = $2
+        UPDATE et_cat_nivel_titulo SET nombre = $1 WHERE id = $2 
         `
         , [nombre, id]);
 

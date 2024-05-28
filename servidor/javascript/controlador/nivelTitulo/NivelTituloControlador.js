@@ -147,7 +147,7 @@ class NivelTituloControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
                 yield database_1.default.query(`
-        UPDATE et_cat_nivel_titulo SET nombre = $1 WHERE id = $2
+        UPDATE et_cat_nivel_titulo SET nombre = $1 WHERE id = $2 
         `, [nombre, id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({

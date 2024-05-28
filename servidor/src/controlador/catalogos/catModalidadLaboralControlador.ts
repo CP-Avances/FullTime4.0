@@ -94,6 +94,25 @@ class ModalidaLaboralControlador {
                 `
                 , [modali.toUpperCase()]);
 
+            const consulta = await pool.query('SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1', [id]);
+            const [datosOriginales] = consulta.rows;
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_modalidad_trabajo',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+            }
+
+
             if (modalExiste.rows[0] != undefined && modalExiste.rows[0].descripcion != '' && modalExiste.rows[0].descripcion != null) {
                 return res.status(200).jsonp({ message: 'Modalidad Laboral ya esiste en el sistema.', status: '300' })
             } else {
@@ -114,7 +133,7 @@ class ModalidaLaboralControlador {
                     tabla: 'e_cat_modalidad_trabajo',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(modalExiste.rows),
+                    datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(modalidadLaboral),
                     ip,
                     observacion: null
