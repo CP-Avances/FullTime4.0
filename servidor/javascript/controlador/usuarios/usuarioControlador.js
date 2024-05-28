@@ -91,7 +91,7 @@ class UsuarioControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -112,7 +112,7 @@ class UsuarioControlador {
         `, [usuario, contrasena, id_rol, id_empleado]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'usuarios',
+                    tabla: 'eu_usuarios',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
@@ -125,6 +125,7 @@ class UsuarioControlador {
                 return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
+                console.log('error *** ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
