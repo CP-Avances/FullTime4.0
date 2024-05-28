@@ -225,18 +225,18 @@ class ModalidaLaboralControlador {
 
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
                 plantilla_modalidad_laboral.forEach(async (dato: any, indice: any, array: any) => {
-                    var { ITEM, MODALIDA_LABORAL } = dato;
+                    var { ITEM, MODALIDAD_LABORAL } = dato;
                     // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                     if ((ITEM != undefined && ITEM != '') &&
-                        (MODALIDA_LABORAL != undefined && MODALIDA_LABORAL != '')) {
+                        (MODALIDAD_LABORAL != undefined && MODALIDAD_LABORAL != '')) {
                         data.fila = ITEM;
-                        data.modalida_laboral = MODALIDA_LABORAL;
+                        data.modalida_laboral = MODALIDAD_LABORAL;
                         data.observacion = 'no registrada';
 
                         listModalidad.push(data);
                     } else {
                         data.fila = ITEM;
-                        data.modalida_laboral = MODALIDA_LABORAL;
+                        data.modalida_laboral = MODALIDAD_LABORAL;
                         data.observacion = 'no registrada';
 
                         if (data.fila == '' || data.fila == undefined) {
@@ -244,7 +244,7 @@ class ModalidaLaboralControlador {
                             mensaje = 'error'
                         }
 
-                        if (MODALIDA_LABORAL == undefined) {
+                        if (MODALIDAD_LABORAL == undefined) {
                             data.modalida_laboral = 'No registrado';
                             data.observacion = 'Modalidad Laboral ' + data.observacion;
                         }
