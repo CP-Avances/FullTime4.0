@@ -303,7 +303,9 @@ class DepartamentoControlador {
     } catch (error) {
       // REVERTIR TRANSACCIÓN
       await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'error' });
+      //return res.status(500).jsonp({ message: 'error' });
+      return res.jsonp({ message: 'error' });
+
     }
   }
 
@@ -477,7 +479,9 @@ class DepartamentoControlador {
     } catch (error) {
       // REVERTIR TRANSACCIÓN
       await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'error' });
+      //return res.status(500).jsonp({ message: 'error' });
+      return res.jsonp({ message: 'error' });
+
     }
   }
 

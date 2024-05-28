@@ -92,7 +92,9 @@ class TituloControlador {
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+      //return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+      return res.jsonp({ message: 'error' });
+
     }
   }
 

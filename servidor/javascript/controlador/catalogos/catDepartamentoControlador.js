@@ -261,7 +261,8 @@ class DepartamentoControlador {
             catch (error) {
                 // REVERTIR TRANSACCIÓN
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
+                //return res.status(500).jsonp({ message: 'error' });
+                return res.jsonp({ message: 'error' });
             }
         });
     }
@@ -410,7 +411,8 @@ class DepartamentoControlador {
             catch (error) {
                 // REVERTIR TRANSACCIÓN
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
+                //return res.status(500).jsonp({ message: 'error' });
+                return res.jsonp({ message: 'error' });
             }
         });
     }

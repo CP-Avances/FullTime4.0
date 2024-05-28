@@ -96,12 +96,12 @@ class UsuarioControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+      const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'usuarios',
+          tabla: 'eu_usuarios',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -123,7 +123,7 @@ class UsuarioControlador {
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'usuarios',
+        tabla: 'eu_usuarios',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
@@ -138,6 +138,7 @@ class UsuarioControlador {
     }
     catch (error) {
       // REVERTIR TRANSACCION
+      console.log(error);
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
     }
