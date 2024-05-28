@@ -188,14 +188,16 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center; font-size: 13px;">
-                        <th scope="col">Observación</th>
                         <th scope="col">Item</th>
+                        <th scope="col">Observación</th>
                         <th scope="col">Discapacidad</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
                         *ngFor="let dis of Datos_discapacidad | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                            {{dis.fila}}</td>
                         <td style="font-size: 12px;">
                             <div style="width: 270px; margin: auto;">
                                 <div id="t-editar" class="circulo"
@@ -203,8 +205,6 @@
                                 {{dis.observacion}}
                             </div>
                         </td>
-                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
-                            {{dis.fila}}</td>
                         <td [style.color]="stiloTextoCelda(dis.discapacidad)" style="font-size: 12px;">
                             {{dis.discapacidad}}</td>
                     </tr>

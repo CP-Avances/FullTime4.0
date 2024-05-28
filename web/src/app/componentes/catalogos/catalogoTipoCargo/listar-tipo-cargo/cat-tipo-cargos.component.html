@@ -1,6 +1,6 @@
 <div class="container" style="padding-bottom: 15px; padding-top: 15px;">
     <div class="row">
-        <div class="col-md">
+        <div class="col-12 col-md-6">
             <div id="titulo">
                 <span>TIPOS CARGOS</span>
             </div>
@@ -20,16 +20,14 @@
         </div>
 
         <!--  ***************************  REGISTRO MULTIPLE DE TIPO CARGOS ************************* -->
-        <div class="col-md">
+        <div class="col-12 col-md-6">
             <div id="titulo">
                 <span>REGISTRO MULTIPLE</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
-                <div class="row">
-                    <div class="col-md" style="padding-top: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around"
-                            style="text-align: center; justify-content: center;">
-                            <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
+                <div class="row m-auto">
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                            <form method="post" class="btn-2" enctype="multipart/form-data">
                                 <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                 <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
@@ -39,15 +37,14 @@
                                 </label>
                                 <label for="file" matSuffix matTooltipPosition="right"
                                     *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
-                                    style="height: 64px; padding-top: 25px;"
+                                    style="height: 65px; padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre Modalidad.">
                                     Subir nueva plantilla
                                 </label>
                             </form>
-                        </div>
                     </div>
-                    <div class="col-md" *ngIf="!Datos_tipo_cargos" style="padding-top: 5px; padding-bottom: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around">
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div *ngIf="!Datos_tipo_cargos" class="d-flex flex-wrap justify-content-around">
                             <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                 style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
                                 href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">>
@@ -55,10 +52,7 @@
                                 Descargar plantilla usuarios
                             </a>
                         </div>
-                    </div>
-                    <div class="col-md" style="padding-top: 5px; padding-bottom: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around"
-                            style="text-align: center; justify-content: center;">
+                        <div class="d-flex flex-wrap justify-content-center m-auto w-auto">
                             <button *ngIf="Datos_tipo_cargos && messajeExcel != 'error'" id="descargar"
                                 class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
                                 matTooltipPosition="right" matTooltip="Guardar registro multiple.">
@@ -192,14 +186,16 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center; font-size: 13px;">
-                        <th scope="col">Observación</th>
                         <th scope="col">Item</th>
+                        <th scope="col">Observación</th>
                         <th scope="col">Cargos</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
                         *ngFor="let ct of Datos_tipo_cargos | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                            {{ct.fila}}</td>
                         <td style="font-size: 12px;">
                             <div style="width: 270px; margin: auto;">
                                 <div id="t-editar" class="circulo"
@@ -207,8 +203,6 @@
                                 {{ct.observacion}}
                             </div>
                         </td>
-                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
-                            {{ct.fila}}</td>
                         <td [style.color]="stiloTextoCelda(ct.tipo_cargo)" style="font-size: 12px;">{{ct.tipo_cargo}}
                         </td>
                     </tr>
