@@ -19,13 +19,21 @@
                                 <table class="table table-hover table-sm">
                                     <thead class="thead-light">
                                         <tr style="text-align: center;">
-                                            <th scope="col">Rol</th>
-                                            <th scope="col">Nombre</th>
-                                            <th scope="col">Departamento</th>
+                                          <th>
+                                            <mat-checkbox (change)="$event ? masterToggleU() : null"
+                                                [checked]="usuariosSeleccionados.hasValue() && isAllSelectedU()"
+                                                [indeterminate]="usuariosSeleccionados.hasValue() && !isAllSelectedU()"
+                                                [aria-label]="checkboxLabelU()">
+                                            </mat-checkbox>
+                                          </th>
+                                          <th scope="col">Rol</th>
+                                          <th scope="col">Nombre</th>
+                                          <th scope="col">Departamento</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                       <tr>
+                                        <td></td>
                                         <td>
                                           <mat-form-field class="input-tables">
                                             <input matInput placeholder="Buscar" [(ngModel)]="filtroRol" type="text" [formControl]="rol">
@@ -42,8 +50,13 @@
                                           </mat-form-field>
                                         </td>
                                       </tr>
-                                        <tr *ngFor="let p of principales | sucRolEmpleado: filtroRol | sucNomEmpleado: filtroNombre | sucDepEmpleado: filtroDepartamento">
-                                          <td><mat-checkbox [(ngModel)]="p.seleccionado" (change)="SeleccionarEmpleado(p)"></mat-checkbox> </td>
+                                        <tr *ngFor="let p of principales | sucRolEmpleado: filtroRol | sucNomEmpleado: filtroNombre | sucDepEmpleado: filtroDepartamento | paginate: tamanio_pagina_p:numero_pagina_p">
+                                          <td>
+                                            <mat-checkbox (click)="$event.stopPropagation()"
+                                                change="$event ? selectionUno.toggle(e) : null" [checked]="usuariosSeleccionados.isSelected(p)"
+                                                [aria-label]="checkboxLabelU(p)">
+                                            </mat-checkbox>
+                                          </td>
                                           <td>{{p.rol}}</td>
                                           <td>{{p.apellido}} {{p.nombre}} </td>
                                           <td>{{p.departamento}}</td>

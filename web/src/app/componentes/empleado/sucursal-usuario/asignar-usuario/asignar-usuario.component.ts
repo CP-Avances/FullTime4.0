@@ -51,6 +51,9 @@ export class AsignarUsuarioComponent implements OnInit {
   nombre = new FormControl('', [Validators.minLength(2)]);
   departamento = new FormControl('', [Validators.minLength(2)]);
 
+  // VARIABLE PARA SELECCION MULTIPLE USUARIOS
+  usuariosSeleccionados = new SelectionModel<any>(true, []);
+
 
   constructor(
     public ventanasu: PrincipalSucursalUsuarioComponent,
@@ -372,6 +375,26 @@ export class AsignarUsuarioComponent implements OnInit {
     return `${this.selectionAsignados.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
+  isAllSelectedU() {
+    const numSelected = this.usuariosSeleccionados.selected.length;
+    return numSelected === this.principales.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS
+  masterToggleU() {
+    this.isAllSelectedU() ?
+      this.usuariosSeleccionados.clear() :
+      this.principales.forEach((row: any) => this.usuariosSeleccionados.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelU(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedU() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.usuariosSeleccionados.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
   // METODO PARA ACTIVAR SELECCION MULTIPLE
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
@@ -439,19 +462,4 @@ export class AsignarUsuarioComponent implements OnInit {
     this.InhabilitarSeleccion();
     this.BuscarAdministradoresJefes();
   }
-
-  usuariosSeleccionados: any = [];
-  // METODO PARA SELECCIONAR USUARIOS
-  SeleccionarEmpleado(p) {
-    if (p.seleccionado) {
-      this.usuariosSeleccionados.push(p);
-    } else {
-      const index = this.usuariosSeleccionados.indexOf(p);
-      if (index > -1) {
-        this.usuariosSeleccionados.splice(index, 1);
-      }
-    }
-    console.log('ver datos seleccionados ', this.usuariosSeleccionados)
-  }
-
 }
