@@ -57,7 +57,7 @@ export class EditarTipoComidasComponent implements OnInit {
   ImprimirDatos() {
     this.TipoComidaForm.patchValue({
       nombreForm: this.data.nombre,
-      tipoForm: this.data.tipo_comida,
+      tipoForm: this.data.tipo,
       horaInicioForm: this.data.hora_inicio,
       horaFinForm: this.data.hora_fin
     })
