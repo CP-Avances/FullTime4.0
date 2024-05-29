@@ -7,6 +7,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
+import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
@@ -14,6 +15,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { PrincipalSucursalUsuarioComponent } from '../principal-sucursal-usuario/principal-sucursal-usuario.component';
+import { dep } from '../../../../model/reportes.model';
 
 @Component({
   selector: 'app-asignar-usuario',
@@ -54,10 +56,16 @@ export class AsignarUsuarioComponent implements OnInit {
   // VARIABLE PARA SELECCION MULTIPLE USUARIOS
   usuariosSeleccionados = new SelectionModel<any>(true, []);
 
+  // VARIABLE PARA SELECCION MULTIPLE DE DEPARTAMENTOS
+  departamentosSeleccionados: any = [];
+  ver_departamentos: boolean = false;
+  deshabilitar: boolean = false;
+
 
   constructor(
     public ventanasu: PrincipalSucursalUsuarioComponent,
     public sucursal: SucursalService,
+    public departamentoService: DepartamentosService,
     public ventana: MatDialog,
     public general: DatosGeneralesService,
     public toastr: ToastrService,
@@ -167,7 +175,9 @@ export class AsignarUsuarioComponent implements OnInit {
     this.sucursal.BuscarSucursal().subscribe(res => {
       this.sucursales = res;
       // OMITIR SUCURSAL SELECCIONADA
-      this.sucursales = this.sucursales.filter(elemento => elemento.id !== this.data.id);
+      //TODO: CONSULTAR SI SE DEBE O NO MOSTAR SUCURSAL SELECCIONADA
+      // LA LINEA A CONTINUACION OMITIRA LA SUCURSAL SELECCIONADA
+      //this.sucursales = this.sucursales.filter(elemento => elemento.id !== this.data.id);
       // APLICACION DE BUSQUEDA CON FILTROS
       this.filteredOptions = this.sucursalForm.valueChanges
         .pipe(
@@ -177,6 +187,24 @@ export class AsignarUsuarioComponent implements OnInit {
     });
   }
 
+  // METODO PARA OBTENER DEPARTAMENTOS DEL ESTABLECIMIENTO SELECCIONADO
+  departamentos: any = [];
+  ObtenerDepartamentos() {
+    this.ver_seleccion = true;
+    //console.log('ver datos ', this.sucursalForm.value)
+    const [elemento] = this.sucursales.filter((o: any) => {
+      return o.nombre === this.sucursalForm.value
+    })
+    //console.log('ver elementos ', elemento)
+    this.departamentos = [];
+    const id_sucursal = elemento.id;
+    this.departamentoService.BuscarDepartamentoSucursal(id_sucursal).subscribe(datos => {
+      this.departamentos = datos;
+      this.ver_departamentos = true;
+      console.log('Departamentos ', this.departamentos)
+    })
+  }
+
   // VARIABLES DE ACTIVACION DE FUNCIONES
   ver_seleccion: boolean = false;
   administradores: any = [];
@@ -184,66 +212,76 @@ export class AsignarUsuarioComponent implements OnInit {
 
   // METODO PARA LISTAR USUARIOS
   adminSeleccionados: any = [];
-  ObtenerUsuarios() {
-    this.ver_seleccion = true;
-    //console.log('ver datos ', this.sucursalForm.value)
-    // RETORNAR DATOS DE SUCURSAL SELECCIONADA
-    const [elemento] = this.sucursales.filter((o: any) => {
-      return o.nombre === this.sucursalForm.value
-    })
-    //console.log('ver elementos ', elemento)
-    this.administradores = [];
-    let data = {
-      lista_sucursales: '\'' + elemento.id + '\'',
-      estado: 1
-    }
-    this.general.ObtenerAdminJefes(data).subscribe(datos => {
-      let respuesta: any = [];
-      respuesta = datos;
-      respuesta.forEach((obj: any) => {
-        if (obj.jefe === false) {
-          this.administradores.push(obj);
-        }
-      })
-      this.ver_administradores = true;
-      this.ver_guardar = false;
-      if (this.administradores.length != 0) {
-        (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
-      }
+  // ObtenerUsuarios() {
+  //   this.ver_seleccion = true;
+  //   //console.log('ver datos ', this.sucursalForm.value)
+  //   // RETORNAR DATOS DE SUCURSAL SELECCIONADA
+  //   const [elemento] = this.sucursales.filter((o: any) => {
+  //     return o.nombre === this.sucursalForm.value
+  //   })
+  //   //console.log('ver elementos ', elemento)
+  //   this.administradores = [];
+  //   let data = {
+  //     lista_sucursales: '\'' + elemento.id + '\'',
+  //     estado: 1
+  //   }
+  //   this.general.ObtenerAdminJefes(data).subscribe(datos => {
+  //     let respuesta: any = [];
+  //     respuesta = datos;
+  //     respuesta.forEach((obj: any) => {
+  //       if (obj.jefe === false) {
+  //         this.administradores.push(obj);
+  //       }
+  //     })
+  //     this.ver_administradores = true;
+  //     this.ver_guardar = false;
+  //     if (this.administradores.length != 0) {
+  //       (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
+  //     }
 
-    }, error => {
-      this.toastr.info('No se han encontrado registros.', '', {
-        timeOut: 6000,
-      });
-      this.ver_seleccion = false
-    })
+  //   }, error => {
+  //     this.toastr.info('No se han encontrado registros.', '', {
+  //       timeOut: 6000,
+  //     });
+  //     this.ver_seleccion = false
+  //   })
+  // }
+
+  // // METODO PARA SELECCIONAR AGREGAR CIUDADES
+  // AgregarCiudad(data: string) {
+  //   this.adminSeleccionados.push(data);
+  // }
+
+  // // METODO PARA RETIRAR CIUDADES
+  // QuitarCiudad(data: any) {
+  //   this.adminSeleccionados = this.adminSeleccionados.filter(s => s !== data);
+  // }
+
+  // METODO PARA SELECCIONAR DEPARTAMENTOS
+  SeleccionarDepartamento(data: any) {
+    this.departamentosSeleccionados.push(data);
   }
 
-  // METODO PARA SELECCIONAR AGREGAR CIUDADES
-  AgregarCiudad(data: string) {
-    this.adminSeleccionados.push(data);
-  }
-
-  // METODO PARA RETIRAR CIUDADES
-  QuitarCiudad(data: any) {
-    this.adminSeleccionados = this.adminSeleccionados.filter(s => s !== data);
+  // METODO PARA RETIRAR DEPARTAMENTOS
+  QuitarDepartamento(data: any) {
+    this.departamentosSeleccionados = this.departamentosSeleccionados.filter((d: any) => d !== data);
   }
 
   // AGREGAR DATOS MULTIPLES DE CIUDADES DE LA PROVINCIA INDICADA
   AgregarTodos() {
-    this.adminSeleccionados = this.administradores;
+    this.departamentosSeleccionados = this.departamentos;
     for (var i = 0; i <= this.administradores.length - 1; i++) {
-      (<HTMLInputElement>document.getElementById('adminSeleccionados' + i)).checked = true;
+      (<HTMLInputElement>document.getElementById('departamentosSeleccionados' + i)).checked = true;
     }
   }
 
   // QUITAR TODOS LOS DATOS SELECCIONADOS DE LA PROVINCIA INDICADA
   limpiarData: any = [];
   QuitarTodos() {
-    this.limpiarData = this.administradores;
+    this.limpiarData = this.departamentos;
     for (var i = 0; i <= this.limpiarData.length - 1; i++) {
-      (<HTMLInputElement>document.getElementById('adminSeleccionados' + i)).checked = false;
-      this.adminSeleccionados = this.adminSeleccionados.filter(s => s !== this.administradores[i]);
+      (<HTMLInputElement>document.getElementById('departamentosSeleccionados' + i)).checked = false;
+      this.departamentosSeleccionados = this.departamentosSeleccionados.filter((d:any) => d !== this.departamentos[i]);
     }
   }
 
@@ -262,16 +300,21 @@ export class AsignarUsuarioComponent implements OnInit {
   SeleccionarIndividual(event: any, valor: any) {
     const target = event.target as HTMLInputElement;
     if (target.checked === true) {
-      this.AgregarCiudad(valor);
+      this.SeleccionarDepartamento(valor);
     }
     else {
-      this.QuitarCiudad(valor);
+      this.QuitarDepartamento(valor);
     }
+  }
+
+  // METODO PARA DESHABILITAR OPCIONES DEPARTAMENTOS
+  DeshabilitarOpciones() {
+    this.deshabilitar = !this.deshabilitar;
   }
 
   // METODO PARA RETIRAR DE LISTA DE SELECCIONADOS
   RetirarLista(seleccionado: any) {
-    this.adminSeleccionados = this.adminSeleccionados.filter(elemento => elemento.id !== seleccionado);
+    this.departamentosSeleccionados = this.departamentosSeleccionados.filter(elemento => elemento.id !== seleccionado);
     //console.log('ver seleccionados ', this.adminSeleccionados)
   }
 
@@ -348,6 +391,7 @@ export class AsignarUsuarioComponent implements OnInit {
   LimpiarDatos() {
     this.sucursalForm.setValue('');
     this.administradores = [];
+    this.departamentos = [];
     this.ver_seleccion = false;
   }
 
