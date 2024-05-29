@@ -170,68 +170,6 @@ class PlanComidasControlador {
             }
         });
     }
-    ObtenerUltimaPlanificacion(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const PLAN_COMIDAS = yield database_1.default.query(`
-      SELECT MAX(id) AS ultimo FROM ma_detalle_plan_comida
-      `);
-            if (PLAN_COMIDAS.rowCount > 0) {
-                return res.jsonp(PLAN_COMIDAS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    ActualizarPlanComidas(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const planComida = yield database_1.default.query('SELECT * FROM ma_detalle_plan_comida WHERE id = $1', [id]);
-                const [datosOriginales] = planComida.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'ma_detalle_plan_comida',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al actualizar planificación de comidas con id: ${id}. Registro no encontrado`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado' });
-                }
-                yield database_1.default.query(`
-        UPDATE ma_detalle_plan_comida SET id_empleado = $1, fecha = $2, id_comida = $3,
-          observacion = $4, fecha_comida = $5, hora_inicio = $6, hora_fin = $7, extra = $8
-        WHERE id = $9
-        `, [id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'ma_detalle_plan_comida',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"id_empleado": ${id_empleado}, "fecha": "${fecha}", "id_comida": ${id_comida}, "observacion": "${observacion}", "fecha_comida": "${fec_comida}", "hora_inicio": "${hora_inicio}", "hora_fin": "${hora_fin}", "extra": "${extra}"}`,
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Planificación del almuerzo ha sido guardado con éxito' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
     EncontrarPlanComidaEmpleadoConsumido(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_plan_comida, id_empleado } = req.body;
@@ -341,19 +279,6 @@ class PlanComidasControlador {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
-    VerUltimoTipoComidas(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const PLAN_COMIDAS = yield database_1.default.query(`
-      SELECT MAX(id) FROM ma_cat_comidas
-      `);
-            if (PLAN_COMIDAS.rowCount > 0) {
-                return res.jsonp(PLAN_COMIDAS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }

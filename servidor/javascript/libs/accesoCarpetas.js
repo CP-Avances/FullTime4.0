@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ObtenerRutaLeerPlantillas1 = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaContrato = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = void 0;
+exports.ObtenerIndicePlantilla = exports.ObtenerRutaLeerPlantillas1 = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaContrato = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = void 0;
 const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE IMAGENES DE USUARIO
@@ -122,3 +122,23 @@ const ObtenerRutaLeerPlantillas1 = function () {
     return ruta + separador + 'leerPlantillas';
 };
 exports.ObtenerRutaLeerPlantillas1 = ObtenerRutaLeerPlantillas1;
+// METODO PARA OBTENER POSICION DE PLANTILLA
+const ObtenerIndicePlantilla = function (libroExcel, hoja) {
+    const sheet_name_list = libroExcel.SheetNames;
+    let indice = 0;
+    let verificador = 0;
+    for (var i = 0; i < sheet_name_list.length; i++) {
+        if ((sheet_name_list[i]).toUpperCase() === hoja) {
+            indice = i;
+            verificador = 1;
+            break;
+        }
+    }
+    if (verificador === 1) {
+        return indice;
+    }
+    else {
+        return false;
+    }
+};
+exports.ObtenerIndicePlantilla = ObtenerIndicePlantilla;

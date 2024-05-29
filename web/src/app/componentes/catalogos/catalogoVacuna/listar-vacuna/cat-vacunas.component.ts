@@ -181,42 +181,42 @@ export class CatVacunasComponent implements OnInit {
     array.sort(compare);
   }
 
-   // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
-   nameFile: string;
-   archivoSubido: Array<File>;
-   mostrarbtnsubir: boolean = false;
-   // METODO PARA SELECCIONAR PLANTILLA DE DATOS -----------------------------------------------------------------
-   FileChange(element: any) {
-     this.archivoSubido = [];
-     this.nameFile = '';
-     this.archivoSubido = element.target.files;
-     this.nameFile = this.archivoSubido[0].name;
-     let arrayItems = this.nameFile.split(".");
-     let itemExtencion = arrayItems[arrayItems.length - 1];
-     let itemName = arrayItems[0].slice(0, 25);
-     console.log('itemName: ', itemName);
-     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-       if (itemName.toLowerCase() == 'discapacidad_vacunas') {
-         this.numero_paginaMul = 1;
-         this.tamanio_paginaMul = 5;
-         this.Revisarplantilla();
-       } else {
-         this.toastr.error('Seleccione plantilla con nombre discapacidad_vacunas', 'Plantilla seleccionada incorrecta', {
-           timeOut: 6000,
-         });
+  // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
+  nameFile: string;
+  archivoSubido: Array<File>;
+  mostrarbtnsubir: boolean = false;
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS -----------------------------------------------------------------
+  FileChange(element: any) {
+    this.archivoSubido = [];
+    this.nameFile = '';
+    this.archivoSubido = element.target.files;
+    this.nameFile = this.archivoSubido[0].name;
+    let arrayItems = this.nameFile.split(".");
+    let itemExtencion = arrayItems[arrayItems.length - 1];
+    let itemName = arrayItems[0];
+    console.log('itemName: ', itemName);
+    if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
+        this.numero_paginaMul = 1;
+        this.tamanio_paginaMul = 5;
+        this.Revisarplantilla();
+      } else {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
+          timeOut: 6000,
+        });
 
-         this.nameFile = '';
-       }
-     } else {
-       this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
-         timeOut: 6000,
-       });
+        this.nameFile = '';
+      }
+    } else {
+      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+        timeOut: 6000,
+      });
 
-       this.nameFile = '';
-     }
-     this.archivoForm.reset();
-     this.mostrarbtnsubir = true;
-   }
+      this.nameFile = '';
+    }
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = true;
+  }
 
   Datos_vacunas: any
   listaVacunasCorrectas: any = [];
@@ -230,19 +230,26 @@ export class CatVacunasComponent implements OnInit {
 
     this.progreso = true;
 
-     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
-     this.rest.RevisarFormato(formData).subscribe(res => {
+    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    this.rest.RevisarFormato(formData).subscribe(res => {
       this.Datos_vacunas = res.data;
       this.messajeExcel = res.message;
-      console.log('probando plantilla vacunas', this.Datos_vacunas, ' -  ',this.messajeExcel);
+      console.log('probando plantilla vacunas', this.Datos_vacunas, ' -  ', this.messajeExcel);
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
-        this.Datos_vacunas.forEach(item => {
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña TIPO_VACUNA en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.Datos_vacunas.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaVacunasCorrectas.push(item);
           }

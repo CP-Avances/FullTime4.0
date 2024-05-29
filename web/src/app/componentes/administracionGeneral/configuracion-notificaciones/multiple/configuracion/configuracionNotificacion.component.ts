@@ -132,7 +132,7 @@ export class ConfiguracionNotificacionComponent implements OnInit {
     contador: number = 0;
     ConfigurarMultiple(form: any) {
         this.contador = 0;
-        this.empleados.forEach(item => {
+        this.empleados.forEach((item: any) => {
             let data = {
                 vaca_mail: form.vacaMail,
                 vaca_noti: form.vacaNoti,

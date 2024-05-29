@@ -147,7 +147,7 @@ export class ListarNivelTitulosComponent implements OnInit {
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
         this.nameFile = '';
@@ -183,15 +183,22 @@ export class ListarNivelTitulosComponent implements OnInit {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
-        this.DataNivelesProfesionales.forEach(item => {
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña NIVELES_TITULOS en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.DataNivelesProfesionales.forEach((item: any) => {
           if (item.observacion.toLowerCase() === 'ok') {
             this.listNivelesCorrectos.push(item);
           }
         });
       }
     }, error => {
-      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+      this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
 
@@ -220,7 +227,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     }
     if (this.listNivelesCorrectos.length > 0) {
       var cont = 0;
-      this.listNivelesCorrectos.forEach(item => {
+      this.listNivelesCorrectos.forEach((item: any) => {
         data.nombre = item.nombre;
         // CAPITALIZAR LA PRIMERA LETRA DE LA PRIMERA PALABRA
         const textoNivel = item.nombre.charAt(0).toUpperCase();

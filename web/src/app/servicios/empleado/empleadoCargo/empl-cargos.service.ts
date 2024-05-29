@@ -59,48 +59,12 @@ export class EmplCargosService {
     return this.http.post(`${environment.url}/empleadoCargos/fecha_cargo/editar`, data);
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-  getEmpleadoCargosRest() {
-    return this.http.get(`${environment.url}/empleadoCargos`);
-  }
-
-  getListaEmpleadoCargosRest() {
-    return this.http.get(`${environment.url}/empleadoCargos/lista-empleados`);
-  }
-
-
-
-
-
-
   BuscarIDCargo(id: number) {
     return this.http.get(`${environment.url}/empleadoCargos/buscar/${id}`);
   }
 
   BuscarIDCargoActual(id: number) {
     return this.http.get(`${environment.url}/empleadoCargos/buscar/cargoActual/${id}`);
-  }
-
-
-
-  ListarEmpleadosAutorizacion(id: number) {
-    return this.http.get(`${environment.url}/empleadoCargos/empleadosAutorizan/${id}`);
-  }
-
-
-  ObtenerUnTipoCargo(id: number) {
-    return this.http.get(`${environment.url}/empleadoCargos/buscar/ultimoTipo/nombreCargo/${id}`);
   }
 
   ObtenerCargoDepartamento(id: number) {

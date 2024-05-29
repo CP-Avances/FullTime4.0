@@ -16,27 +16,4 @@ export class FuncionesService {
   ListarFunciones() {
     return this.http.get<any>(`${environment.url}/administracion/funcionalidad`)
   }
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-  CrearFunciones(data: any) {
-    return this.http.post(`${environment.url}/administracion`, data);
-  }
-
-  EditarFunciones(id: number, data: any) {
-    return this.http.put(`${environment.url}/administracion/funcion/${id}`, data);
-  }
-
-
 }

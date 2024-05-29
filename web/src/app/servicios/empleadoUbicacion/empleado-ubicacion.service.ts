@@ -63,16 +63,9 @@ export class EmpleadoUbicacionService {
     return this.http.get<any>(`${environment.url}/ubicacion/determinada/${id}`);
   }
 
-  ConsultarUltimoRegistro() {
-    return this.http.get(`${environment.url}/ubicacion/ultimo-registro`);
-  }
-
-  EliminarCoordenadas(id: number, datos: any) {
-    const url = `${environment.url}/ubicacion/eliminar/${id}`;
-    const httpOtions = {
-      body: datos
-    };
-    return this.http.request('delete', url, httpOtions);
+ 
+  EliminarCoordenadas(id: number) {
+    return this.http.delete<any>(`${environment.url}/ubicacion/eliminar/${id}`);
   }
 
   // METODO PARA CREAR ARCHIVO XML

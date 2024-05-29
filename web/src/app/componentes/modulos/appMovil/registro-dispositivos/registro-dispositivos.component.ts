@@ -208,7 +208,7 @@ export class RegistroDispositivosComponent implements OnInit {
     this.ventana.open(DeleteRegistroDispositivoComponent,
       { width: '400px', data: array }).afterClosed().subscribe(result => {
         if (result) {
-          result.forEach(item => {
+          result.forEach((item: any) => {
             this.dispositivo.push(item.id_dispositivo);
           });
           this.usuariosService.EliminarDispositivoMovil(this.dispositivo, datos).subscribe(res => {

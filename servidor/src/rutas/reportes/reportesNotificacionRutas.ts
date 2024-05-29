@@ -39,8 +39,6 @@ class NotificacionesRutas {
         this.router.get('/usuario_vacaciones_recibidos_todas/:recibe/:id_empleado', NOTIFICACIONES_CONTROLADOR.ListarVacacionesRecibidas_Usuario);
 
         this.router.get('/usuario_extras_enviados_todas/:envia/:id_empleado', NOTIFICACIONES_CONTROLADOR.ListarSolicitudHoraExtraEnviadas_Usuario);
-        this.router.get('/usuario_extras_recibidos_todas/:recibe/:id_empleado', NOTIFICACIONES_CONTROLADOR.ListarSolicitudHoraExtraRecibidas_Usuario);
-
         this.router.get('/usuario_comidas_enviados_todas/:envia/:id_empleado', NOTIFICACIONES_CONTROLADOR.ListarPlanificaComidaEnviadas_Usuario);
         //  this.router.get('/usuario_comidas_recibidos/:recibe', NOTIFICACIONES_CONTROLADOR.ListarUsuariosComidasRecibidas);
 
@@ -52,7 +50,6 @@ class NotificacionesRutas {
         this.router.get('/usuario_vacaciones_recibidos_fecha/:recibe/:id_empleado/:fec_inicio/:fec_final', NOTIFICACIONES_CONTROLADOR.ListarVacacionesRecibidas_UsuarioFecha);
 
         this.router.get('/usuario_extras_enviados_fecha/:envia/:id_empleado/:fec_inicio/:fec_final', NOTIFICACIONES_CONTROLADOR.ListarSolicitudHoraExtraEnviadas_UsuarioFecha);
-        this.router.get('/usuario_extras_recibidos_fecha/:recibe/:id_empleado/:fec_inicio/:fec_final', NOTIFICACIONES_CONTROLADOR.ListarSolicitudHoraExtraRecibidas_UsuarioFecha);
 
         this.router.get('/usuario_comidas_enviados_fecha/:envia/:id_empleado/:fec_inicio/:fec_final', NOTIFICACIONES_CONTROLADOR.ListarPlanificaComidaEnviadas_UsuarioFecha);
         //  this.router.get('/usuario_comidas_recibidos/:recibe', NOTIFICACIONES_CONTROLADOR.ListarUsuariosComidasRecibidas);

@@ -1124,24 +1124,6 @@ class PermisosControlador {
         }
     }
 
-
-
-
-
-    public async ListarPermisos(req: Request, res: Response) {
-        const PERMISOS = await pool.query(
-            `
-            SELECT * FROM mp_solicitud_permiso
-            `
-        );
-        if (PERMISOS.rowCount > 0) {
-            return res.jsonp(PERMISOS.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
     // verificar estado
     public async ListarEstadosPermisos(req: Request, res: Response) {
         const PERMISOS = await pool.query(
@@ -1189,40 +1171,6 @@ class PermisosControlador {
         }
     }
 
-    public async ObtenerUnPermiso(req: Request, res: Response) {
-        const id = req.params.id;
-        const PERMISOS = await pool.query(
-            `
-            SELECT * FROM mp_solicitud_permiso WHERE id = $1
-            `
-            , [id]);
-        if (PERMISOS.rowCount > 0) {
-            return res.jsonp(PERMISOS.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
-
-
-    public async ObtenerPermisoContrato(req: Request, res: Response) {
-        try {
-            const { id_empl_contrato } = req.params;
-            const PERMISO = await pool.query(
-                `
-                SELECT p.id, p.fecha_creacion, p.descripcion, p.fecha_inicio, p.fecha_final, p.dias_permiso, 
-                    p.horas_permiso, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso, p.id_empleado_contrato, 
-                    p.id_periodo_vacacion, p.numero_permiso, p.documento, t.descripcion AS nom_permiso 
-                FROM mp_solicitud_permiso AS p, e_cat_tipo_permisos AS t 
-                WHERE p.id_tipo_permiso = t.id AND p.id_empleado_contrato = $1
-                `
-                , [id_empl_contrato]);
-            return res.jsonp(PERMISO.rows)
-        } catch (error) {
-            return res.jsonp(null);
-        }
-    }
 
     public async ObtenerPermisoEditar(req: Request, res: Response) {
         try {
@@ -1280,27 +1228,6 @@ class PermisosControlador {
             return res.status(404).json({ text: 'No se encuentran registros.' });
         }
     }
-
-
-    public async ObtenerFechasPermiso(req: Request, res: Response) {
-        const codigo = req.params.codigo;
-        const { fec_inicio, fec_final } = req.body;
-        const PERMISOS = await pool.query(
-            `
-            SELECT pg.fecha_hora_horario::date AS fecha, pg.fecha_hora_horario::time AS hora, pg.tipo_accion 
-            FROM eu_asistencia_generall AS pg 
-            WHERE (pg.tipo_accion = \'E\' OR pg.tipo_accion = \'S\') AND pg.codigo = $3 
-                AND (pg.fecha_hora_horario:: date = $1 OR pg.fecha_hora_horario:: date = $2)
-            `
-            , [fec_inicio, fec_final, codigo]);
-        if (PERMISOS.rowCount > 0) {
-            return res.jsonp(PERMISOS.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-        }
-    }
-
 
 
 

@@ -296,7 +296,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
           // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
           if (this.lectura === autorizaciones.length) {
             if((estado_p === 'Preautorizado')){
-              this.listadoDepaAutoriza.forEach(item => {
+              this.listadoDepaAutoriza.forEach((item: any) => {
                 console.log(item.nivel === autorizaciones.length,' || ',item.nivel, ' === ',(autorizaciones.length + 1))
                 if((item.nivel === autorizaciones.length) && (item.nivel === this.FilDepartamentosAprueban.length)){
                   return this.listaEnvioCorreo.push(item);
@@ -311,7 +311,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
 
             }else if(estado_p === 'Autorizado' || estado_p === 'Negado'){
               if(estado_p === 'Autorizado'){
-                this.listadoDepaAutoriza.forEach(item => {
+                this.listadoDepaAutoriza.forEach((item: any) => {
                   if((item.nivel === this.InfoListaAutoriza.nivel) && (item.nivel === this.FilDepartamentosAprueban.length)){
                     return this.listaEnvioCorreo.push(item);
                   }else if((item.nivel === this.InfoListaAutoriza.nivel) || (item.nivel === autorizaciones.length + 1)){

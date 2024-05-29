@@ -80,17 +80,8 @@ export class TimbresService {
     return this.http.put<any>(`${environment.url}/timbres/eliminar-multiples/avisos`, Seleccionados); //Eliminacion de datos seleccionados.
   }
 
-
-
-
-
-
   ObtenerTimbresEmpleado(id: number) {
     return this.http.get<any>(`${environment.url}/timbres/ver/timbres/${id}`);
-  }
-
-  UltimoTimbreEmpleado() {
-    return this.http.get<any>(`${environment.url}/timbres/ultimo-timbre`);
   }
 
 }

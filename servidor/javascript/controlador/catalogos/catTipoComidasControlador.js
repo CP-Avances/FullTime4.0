@@ -218,19 +218,6 @@ class TipoComidasControlador {
             }
         });
     }
-    VerUltimoRegistro(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const TIPO_COMIDAS = yield database_1.default.query(`
-            SELECT MAX (id) FROM ma_horario_comidas
-            `);
-            if (TIPO_COMIDAS.rowCount > 0) {
-                return res.jsonp(TIPO_COMIDAS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros,' });
-            }
-        });
-    }
     // Registro de detalle de menú - desglose de platos
     CrearDetalleMenu(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

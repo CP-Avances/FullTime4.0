@@ -24,18 +24,14 @@ export class TituloService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarRegistro(id: number, datos:any) {
+  EliminarRegistro(id: any, datos:any) {
     const url = `${environment.url}/titulo/eliminar/${id}`;
     const httpOtions = {
       body: datos
     };
-    return this.http.request('delete', url, httpOtions);
+    return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
 
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${environment.url}/titulo/xmlDownload`, data);
-  }
 
   // METODO PARA REGISTRAR TITULO
   RegistrarTitulo(data: any) {
@@ -50,19 +46,6 @@ export class TituloService {
   RevisarFormato(formData) {
     return this.http.post<any>(environment.url + '/titulo/upload/revision', formData);
   }
-
-
-  // Catálogo de títulos
-
-  getOneTituloRest(id: number) {
-    return this.http.get(`${environment.url}/titulo/${id}`);
-  }
-
-
-
-
-
-
 
 
 }

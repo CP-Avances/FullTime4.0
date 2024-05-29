@@ -302,7 +302,8 @@ class RegimenControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query("ROLLBACK");
-                return res.status(500).jsonp({ message: error });
+                //return res.status(500).jsonp({ message:'error'});
+                return res.jsonp({ message: 'error' });
             }
         });
     }

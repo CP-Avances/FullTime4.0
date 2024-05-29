@@ -68,16 +68,6 @@ class UsuarioRutas {
         // METODO PARA ELIMINAR REGISTRO USUARIO - SUCURSAL
         this.router.delete('/eliminar-usuario-sucursal/:id', TokenValidation, USUARIO_CONTROLADOR.EliminarUsuarioSucursal);
 
-
-
-
-
-
-
-
-        this.router.get('/', TokenValidation, USUARIO_CONTROLADOR.list);
-        this.router.get('/busqueda/:usuario', TokenValidation, USUARIO_CONTROLADOR.getIdByUsuario);
-
     }
 }
 

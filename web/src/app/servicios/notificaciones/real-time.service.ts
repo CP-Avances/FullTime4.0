@@ -28,20 +28,9 @@ export class RealTimeService {
     return this.http.post<any>(`${environment.url}/noti-real-time`, datos);
   }
 
-
-  ObtenerTodasNotificaciones() {
-    return this.http.get(`${environment.url}/noti-real-time/`);
-  }
-
   ObtenerUnaNotificacion(id: number) {
     return this.http.get<any>(`${environment.url}/noti-real-time/one/${id}`);
   }
-
-  ObtenerNotificacionesSend(id_empleado: number) {
-    return this.http.get(`${environment.url}/noti-real-time/send/${id_empleado}`);
-  }
-
-
 
   ObtenerNotificacionesAllReceives(id_empleado: number) {
     return this.http.get(`${environment.url}/noti-real-time/all-receives/${id_empleado}`);
@@ -80,15 +69,6 @@ export class RealTimeService {
   EnviarCorreoMultiple(datos: any) {
     return this.http.post<any>(`${environment.url}/noti-real-time/mail-multiple`, datos);
   }
-
-
-
-
-
-
-
-
-
 
   /** ************************************************************************************ **
    ** **                 METODOS DE CONSULTA DE DATOS DE COMUNICADOS                    ** **

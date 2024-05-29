@@ -47,7 +47,7 @@ export class CargarPlantillaComponent {
     this.DatosCargos = [];
   }
 
-   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
   ManejarPaginaMulti(e: PageEvent) {
     this.tamanio_paginaMul = e.pageSize;
     this.numero_paginaMul = e.pageIndex + 1
@@ -74,7 +74,12 @@ export class CargarPlantillaComponent {
   nameFile: string;
   archivoSubido: Array<File>;
   mostrarbtnsubir: boolean = false;
-  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE FERIADOS -----------------------------------------------------------------
+
+  /** ************************************************************************************************************* **
+   ** **                       TRATAMIENTO DE PLANTILLA DE CONTRATOS DE EMPLEADOS                                ** **
+   ** ************************************************************************************************************* **/
+
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE CONTRATOS EMPLEADOS
   FileChange(element: any) {
     this.archivoSubido = [];
     this.nameFile = '';
@@ -82,15 +87,15 @@ export class CargarPlantillaComponent {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 25);
+    let itemName = arrayItems[0];
     console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'contratos') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre Contratos', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
 
@@ -110,7 +115,7 @@ export class CargarPlantillaComponent {
   DatosContrato: any
   listaContratosCorrectas: any = [];
   messajeExcel: string = '';
-  Revisarplantilla(){
+  Revisarplantilla() {
     this.listaContratosCorrectas = [];
     this.DatosContrato = [];
     let formData = new FormData();
@@ -131,8 +136,16 @@ export class CargarPlantillaComponent {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
-        this.DatosContrato.forEach(item => {
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.DatosContrato = [];
+        this.toastr.error('No se ha encontrado pestaña EMPLEADOS_CONTRATOS en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.DatosContrato.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaContratosCorrectas.push(item);
           }
@@ -162,10 +175,10 @@ export class CargarPlantillaComponent {
       });
   }
 
-  registroContratos(){
+  registroContratos() {
     if (this.listaContratosCorrectas.length > 0) {
       this.restE.subirArchivoExcelContrato(this.listaContratosCorrectas).subscribe(response => {
-        console.log('respuesta: ',response);
+        console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
           timeOut: 3000,
         });
@@ -173,7 +186,7 @@ export class CargarPlantillaComponent {
         this.archivoForm.reset();
         this.nameFile = '';
       });
-    }else {
+    } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
       });
@@ -201,24 +214,24 @@ export class CargarPlantillaComponent {
       return 'rgb(230, 176, 96)';
     } else if (observacion == 'Pais ingresado no se encuentra registrado' ||
       observacion == 'Régimen Laboral no existe en el sistema' ||
-      observacion == 'Modalidad Laboral no existe en el sistema' 
+      observacion == 'Modalidad Laboral no existe en el sistema'
     ) {
       return 'rgb(255, 192, 203)';
-    }else if(observacion == 'Existe un cargo vigente en esas fechas' || 
-    observacion == 'Existe un contrato vigente en esas fechas'){
+    } else if (observacion == 'Existe un cargo vigente en esas fechas' ||
+      observacion == 'Existe un contrato vigente en esas fechas') {
       return 'rgb(239, 203, 106)';
-    }else if (observacion == 'País no corresponde con el Régimen Laboral' ||
+    } else if (observacion == 'País no corresponde con el Régimen Laboral' ||
       observacion == 'La fecha de ingreso no puede ser menor o igual a la fecha salida' ||
       observacion == 'La fecha de inicio no puede ser menor o igual a la fecha salida'
-    ){
+    ) {
       return 'rgb(238, 34, 207)';
-    }else if (arrayObservacion[1]+' '+arrayObservacion[2] == 'no registrado'){
+    } else if (arrayObservacion[1] + ' ' + arrayObservacion[2] == 'no registrado') {
       return 'rgb(242, 21, 21)';
-    }else if(observacion == 'Regimen laboral no registrado' ||
-    observacion == 'Modalidad laboral no registrado'
-    ){
+    } else if (observacion == 'Regimen laboral no registrado' ||
+      observacion == 'Modalidad laboral no registrado'
+    ) {
       return 'rgb(242, 21, 21)';
-    }else {
+    } else {
       return 'rgb(242, 21, 21)';
     }
   }
@@ -231,40 +244,40 @@ export class CargarPlantillaComponent {
       return 'black'
     }
   }
-      
 
+  /** ************************************************************************************************************* **
+   ** **                        TRATAMIENTO DE PLANTILLA DE CARGOS DE EMPLEADOS                                  ** **
+   ** ************************************************************************************************************* **/
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE CARGOS EMPLEADOS
+  nameFileCargo: string;
+  archivoSubidoCargo: Array<File>;
 
-  //CARGOS
-   // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE FERIADOS -----------------------------------------------------------------
-   nameFileCargo: string;
-   archivoSubidoCargo: Array<File>;
-
-    DatosCargos: any
-    listaCargosCorrectas: any = [];
-    messajeExcelCargos: string = '';
-   FileChangeCargo(element: any) {
+  DatosCargos: any
+  listaCargosCorrectas: any = [];
+  messajeExcelCargos: string = '';
+  FileChangeCargo(element: any) {
     this.archivoSubidoCargo = [];
     this.nameFileCargo = '';
     this.archivoSubidoCargo = element.target.files;
     this.nameFileCargo = this.archivoSubidoCargo[0].name;
     let arrayItems = this.nameFileCargo.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 25);
+    let itemName = arrayItems[0];
     console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'cargos') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.RevisarplantillaCargo();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre Cargos', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta.', {
           timeOut: 6000,
         });
 
         this.nameFile = '';
       }
     } else {
-      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+      this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
         timeOut: 6000,
       });
 
@@ -275,9 +288,9 @@ export class CargarPlantillaComponent {
   }
 
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
-  ConfirmarRegistroMultipleCargos(){
+  ConfirmarRegistroMultipleCargos() {
     const mensaje = 'registro';
-    console.log('listaCargosCorrectas: ',this.listaCargosCorrectas.length);
+    console.log('listaCargosCorrectas: ', this.listaCargosCorrectas.length);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -286,7 +299,7 @@ export class CargarPlantillaComponent {
       });
   }
 
-  RevisarplantillaCargo(){
+  RevisarplantillaCargo() {
     this.listaCargosCorrectas = [];
     this.DatosCargos = [];
     let formData = new FormData();
@@ -307,8 +320,17 @@ export class CargarPlantillaComponent {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
-        this.DatosCargos.forEach(item => {
+
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.DatosContrato = [];
+        this.toastr.error('No se ha encontrado pestaña EMPLEADOS_CARGOS en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.DatosCargos.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaCargosCorrectas.push(item);
           }
@@ -327,10 +349,10 @@ export class CargarPlantillaComponent {
 
   }
 
-  registroCargos(){
+  registroCargos() {
     if (this.listaCargosCorrectas.length > 0) {
       this.restCa.subirArchivoExcelCargo(this.listaCargosCorrectas).subscribe(response => {
-        console.log('respuesta: ',response);
+        console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
           timeOut: 3000,
         });
@@ -338,7 +360,7 @@ export class CargarPlantillaComponent {
         this.archivoForm.reset();
         this.nameFile = '';
       });
-    }else {
+    } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
       });

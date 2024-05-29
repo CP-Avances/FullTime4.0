@@ -91,11 +91,11 @@ class UsuarioControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'usuarios',
+                        tabla: 'eu_usuarios',
                         usuario: user_name,
                         accion: 'U',
                         datosOriginales: '',
@@ -112,7 +112,7 @@ class UsuarioControlador {
         `, [usuario, contrasena, id_rol, id_empleado]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'usuarios',
+                    tabla: 'eu_usuarios',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
@@ -126,6 +126,7 @@ class UsuarioControlador {
             }
             catch (error) {
                 // REVERTIR TRANSACCION
+                console.log(error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }
@@ -1387,33 +1388,6 @@ class UsuarioControlador {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ expiro: 'si', message: "Tiempo para cambiar su frase de seguridad ha expirado." });
-            }
-        });
-    }
-    list(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const USUARIOS = yield database_1.default.query(`
-      SELECT * FROM eu_usuarios
-      `);
-            if (USUARIOS.rowCount > 0) {
-                return res.jsonp(USUARIOS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    getIdByUsuario(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { usuario } = req.params;
-            const unUsuario = yield database_1.default.query(`
-      SELECT id FROM eu_usuarios WHERE usuario = $1
-      `, [usuario]);
-            if (unUsuario.rowCount > 0) {
-                return res.jsonp(unUsuario.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'No se ha encontrado el usuario.' });
             }
         });
     }

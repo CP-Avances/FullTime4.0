@@ -12,7 +12,7 @@ export class FeriadosService {
     private http: HttpClient
   ) { }
 
-  // METODO PARA BUSCAR LISTA DE FERIADOS
+  // METODO PARA BUSCAR LISTA DE FERI-	CrearFeriadoPlantillaOS
   ConsultarFeriado() {
     return this.http.get(`${environment.url}/feriados`);
   }
@@ -24,11 +24,6 @@ export class FeriadosService {
       body: datos
     };
     return this.http.request('delete', url, httpOtions);
-  }
-
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${environment.url}/feriados/xmlDownload`, data);
   }
 
   // METODO PARA CREAR NUEVO REGISTRO DE FERIADO
@@ -65,20 +60,10 @@ export class FeriadosService {
     return this.http.post<any>(`${environment.url}/feriados/listar-feriados-recuperar/ciudad`, datos);
   }
 
-
-  subirArchivoExcel(formData) {
-    return this.http.post<any>(environment.url + '/feriados/upload', formData);
-  }
-
   RevisarFormato(formData) {
     console.log('formDataferiados: ',formData);
     return this.http.post<any>(environment.url + '/feriados/upload/revision', formData);
   }
-
-  RevisarDuplicidad(formData) {
-    return this.http.post<any>(environment.url + '/feriados/upload/revision_data', formData);
-  }
-
 
   Crear_feriados_ciudad(form){
     console.log('form: ',form);

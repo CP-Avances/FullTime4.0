@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ACCION_PERSONAL_CONTROLADOR = void 0;
-const ImagenCodificacion_1 = require("../../libs/ImagenCodificacion");
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
+const ImagenCodificacion_1 = require("../../libs/ImagenCodificacion");
 const database_1 = __importDefault(require("../../database"));
 class AccionPersonalControlador {
     ListarTipoAccion(req, res) {
@@ -84,8 +84,13 @@ class AccionPersonalControlador {
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{"id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}", 
-                        "tipo_permiso": "${tipo_permiso}", "tipo_vacacion": "${tipo_vacacion}", "tipo_situacion_propuesta": "${tipo_situacion_propuesta}"}`,
+                        datosNuevos: `
+                        {
+                            "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}", 
+                            "tipo_permiso": "${tipo_permiso}", "tipo_vacacion": "${tipo_vacacion}", 
+                            "tipo_situacion_propuesta": "${tipo_situacion_propuesta}"
+                        }
+                        `,
                         ip,
                         observacion: null
                     });
@@ -101,19 +106,6 @@ class AccionPersonalControlador {
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
-    EncontrarUltimoTipoAccion(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const ACCION = yield database_1.default.query(`
-            SELECT MAX(id) AS id FROM map_tipo_accion_personal
-            `);
-            if (ACCION.rowCount > 0) {
-                return res.jsonp(ACCION.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -137,7 +129,9 @@ class AccionPersonalControlador {
                 const { descripcion, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                yield database_1.default.query('INSERT INTO map_cargo_propuesto (descripcion) VALUES($1)', [descripcion]);
+                yield database_1.default.query(`
+                INSERT INTO map_cargo_propuesto (descripcion) VALUES($1)
+                `, [descripcion]);
                 // INSERTAR REGISTRO DE AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_cargo_propuesto',
@@ -150,7 +144,7 @@ class AccionPersonalControlador {
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro guardado' });
+                return res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
@@ -167,7 +161,7 @@ class AccionPersonalControlador {
                 return res.jsonp(ACCION.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -181,7 +175,7 @@ class AccionPersonalControlador {
                 return res.jsonp(ACCION.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -195,7 +189,7 @@ class AccionPersonalControlador {
                 return res.jsonp(ACCION.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -205,7 +199,9 @@ class AccionPersonalControlador {
                 const { descripcion, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                yield database_1.default.query('INSERT INTO map_contexto_legal (descripcion) VALUES($1)', [descripcion]);
+                yield database_1.default.query(`
+                INSERT INTO map_contexto_legal (descripcion) VALUES($1)
+                `, [descripcion]);
                 // INSERTAR REGISTRO DE AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_contexto_legal',
@@ -218,7 +214,7 @@ class AccionPersonalControlador {
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro guardado' });
+                return res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
@@ -297,7 +293,7 @@ class AccionPersonalControlador {
                 return res.jsonp(ACCION.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -308,7 +304,9 @@ class AccionPersonalControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
-                const response = yield database_1.default.query('SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1', [id]);
+                const response = yield database_1.default.query(`
+                SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
+                `, [id]);
                 const [datos] = response.rows;
                 if (!datos) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -324,21 +322,29 @@ class AccionPersonalControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'error' });
                 }
-                yield database_1.default.query(`UPDATE map_detalle_tipo_accion_personal SET id_tipo_accion_personal = $1, descripcion = $2, base_legal = $3, 
-                            tipo_permiso = $4, tipo_vacacion = $5, tipo_situacion_propuesta = $6 WHERE id = $7`, [id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, id]);
+                yield database_1.default.query(`
+                UPDATE map_detalle_tipo_accion_personal SET id_tipo_accion_personal = $1, descripcion = $2, base_legal = $3, 
+                    tipo_permiso = $4, tipo_vacacion = $5, tipo_situacion_propuesta = $6 WHERE id = $7
+                `, [id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, id]);
                 // INSERTAR REGISTRO DE AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_detalle_tipo_accion_personal',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datos),
-                    datosNuevos: `{"id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}", "tipo_permiso": "${tipo_permiso}", "tipo_vacacion": "${tipo_vacacion}", "tipo_situacion_propuesta": "${tipo_situacion_propuesta}"}`,
+                    datosNuevos: `
+                    {
+                        "id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}", 
+                        "tipo_permiso": "${tipo_permiso}", "tipo_vacacion": "${tipo_vacacion}", 
+                        "tipo_situacion_propuesta": "${tipo_situacion_propuesta}"
+                    }
+                    `,
                     ip,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                return res.status(200).jsonp({ message: 'Registro actualizado' });
+                return res.status(200).jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
@@ -354,7 +360,9 @@ class AccionPersonalControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ANTES DE ELIMINAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
-                const response = yield database_1.default.query('SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1', [id]);
+                const response = yield database_1.default.query(`
+                SELECT * FROM map_detalle_tipo_accion_personal WHERE id = $1
+                `, [id]);
                 const [datos] = response.rows;
                 if (!datos) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -370,7 +378,9 @@ class AccionPersonalControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'error' });
                 }
-                yield database_1.default.query('DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1', [id]);
+                yield database_1.default.query(`
+                DELETE FROM map_detalle_tipo_accion_personal WHERE id = $1
+                `, [id]);
                 // INSERTAR REGISTRO DE AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_detalle_tipo_accion_personal',
@@ -383,7 +393,7 @@ class AccionPersonalControlador {
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                return res.status(200).jsonp({ message: 'Registro eliminado' });
+                return res.status(200).jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
@@ -399,16 +409,18 @@ class AccionPersonalControlador {
                 let datosNuevos = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`INSERT INTO map_solicitud_accion_personal (id_empleado, fecha_creacion, fecha_rige_desde, 
-                fecha_rige_hasta, identificacion_accion_personal, numero_partida_empresa, id_contexto_legal, 
-                titulo_empleado_uno, firma_empleado_uno, titulo_empleado_dos, firma_empleado_dos, adicion_legal, 
-                id_detalle_tipo_accion_personal, id_cargo_propuesto, id_proceso_propuesto, numero_partida_propuesta, 
-                salario_propuesto, id_ciudad, id_empleado_responsable, numero_partida_individual, acta_final_concurso, 
-                fecha_acta_final_concurso, nombre_reemplazo, puesto_reemplazo, funciones_reemplazo, numero_accion_reemplazo,
-                primera_fecha_reemplazo, posesion_notificacion, descripcion_posesion_notificacion) 
-            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, 
-                $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)
-            `, [id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
+                yield database_1.default.query(`
+                INSERT INTO map_solicitud_accion_personal (id_empleado, fecha_creacion, fecha_rige_desde, 
+                    fecha_rige_hasta, identificacion_accion_personal, numero_partida_empresa, id_contexto_legal, 
+                    titulo_empleado_uno, firma_empleado_uno, titulo_empleado_dos, firma_empleado_dos, adicion_legal, 
+                    id_detalle_tipo_accion_personal, id_cargo_propuesto, id_proceso_propuesto, numero_partida_propuesta, 
+                    salario_propuesto, id_ciudad, id_empleado_responsable, numero_partida_individual, acta_final_concurso, 
+                    fecha_acta_final_concurso, nombre_reemplazo, puesto_reemplazo, funciones_reemplazo, 
+                    numero_accion_reemplazo,primera_fecha_reemplazo, posesion_notificacion, 
+                    descripcion_posesion_notificacion) 
+                VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, 
+                    $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)
+                `, [id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
                     decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal,
                     tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad,
                     id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp,
@@ -428,7 +440,7 @@ class AccionPersonalControlador {
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro realizado con éxito' });
+                return res.jsonp({ message: 'Registro realizado con éxito.' });
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
@@ -444,7 +456,9 @@ class AccionPersonalControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
-                const response = yield database_1.default.query('SELECT * FROM map_solicitud_accion_personal WHERE id = $1', [id]);
+                const response = yield database_1.default.query(`
+                SELECT * FROM map_solicitud_accion_personal WHERE id = $1
+                `, [id]);
                 const [datos] = response.rows;
                 if (!datos) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -460,15 +474,18 @@ class AccionPersonalControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'error' });
                 }
-                yield database_1.default.query(`UPDATE map_solicitud_accion_personal SET id_empleado = $1, fecha_creacion = $2, fecha_rige_desde = $3, 
-                fecha_rige_hasta = $4, identificacion_accion_personal = $5, numero_partida_empresa = $6, 
-                id_contexto_legal = $7, titulo_empleado_uno = $8, firma_empleado_uno = $9, titulo_empleado_dos = $10, 
-                firma_empleado_dos = $11, adicion_legal = $12, id_detalle_tipo_accion_personal = $13, 
-                id_cargo_propuesto = $14, id_proceso_propuesto = $15, numero_partida_propuesta = $16, 
-                salario_propuesto = $17, id_ciudad = $18, id_empleado_responsable = $19, numero_partida_individual = $20,
-                acta_final_concurso = $21, fecha_acta_final_concurso = $22, nombre_reemplazo = $23, puesto_reemplazo = $24, 
-                funciones_reemplazo = $25, numero_accion_reemplazo = $26, primera_fecha_reemplazo = $27, 
-                posesion_notificacion = $28, descripcion_posesion_notificacion = $29 WHERE id = $30`, [id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
+                yield database_1.default.query(`
+                UPDATE map_solicitud_accion_personal SET id_empleado = $1, fecha_creacion = $2, fecha_rige_desde = $3, 
+                    fecha_rige_hasta = $4, identificacion_accion_personal = $5, numero_partida_empresa = $6, 
+                    id_contexto_legal = $7, titulo_empleado_uno = $8, firma_empleado_uno = $9, titulo_empleado_dos = $10, 
+                    firma_empleado_dos = $11, adicion_legal = $12, id_detalle_tipo_accion_personal = $13, 
+                    id_cargo_propuesto = $14, id_proceso_propuesto = $15, numero_partida_propuesta = $16, 
+                    salario_propuesto = $17, id_ciudad = $18, id_empleado_responsable = $19, numero_partida_individual = $20,
+                    acta_final_concurso = $21, fecha_acta_final_concurso = $22, nombre_reemplazo = $23, 
+                    puesto_reemplazo = $24, funciones_reemplazo = $25, numero_accion_reemplazo = $26, 
+                    primera_fecha_reemplazo = $27, posesion_notificacion = $28, descripcion_posesion_notificacion = $29 
+                WHERE id = $30
+                `, [id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
                     decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal,
                     tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
                     salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso,
@@ -488,7 +505,7 @@ class AccionPersonalControlador {
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro actualizado' });
+                return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
                 yield database_1.default.query('ROLLBACK');
@@ -570,7 +587,7 @@ class AccionPersonalControlador {
             SELECT ap.id, ap.id_empleado, ap.fecha_creacion, ap.fecha_rige_desde,
                 ap.fecha_rige_hasta, ap.identificacion_accion_personal, ap.numero_partida_empresa, ap.id_contexto_legal, 
                 ap.titulo_empleado_uno, ap.firma_empleado_uno, ap.titulo_empleado_dos, ap.firma_empleado_dos, 
-                ap.id_contexto_legal, ap.id_detalle_tipo_accion_personal, ap.id_cargo_propuesto, ap.id_proceso_propuesto, 
+                ap.adicion_legal, ap.id_detalle_tipo_accion_personal, ap.id_cargo_propuesto, ap.id_proceso_propuesto, 
                 ap.numero_partida_propuesta, ap.salario_propuesto, ap.id_ciudad, ap.id_empleado_responsable, 
                 ap.numero_partida_individual, ap.acta_final_concurso, ap.fecha_acta_final_concurso, ap.nombre_reemplazo, 
                 ap.puesto_reemplazo, ap.funciones_reemplazo, ap.numero_accion_reemplazo, ap.primera_fecha_reemplazo, 

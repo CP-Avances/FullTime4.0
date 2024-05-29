@@ -47,25 +47,6 @@ export class CiudadFeriadosService {
     return this.http.put(`${environment.url}/ciudadFeriados`, data);
   }
 
-
-
-
-
-
-  // Asignar Ciudad Feriado
-
-
-
-
-
-
-
-
-
-
-
-
-
   BuscarFeriados(id_ciudad: number) {
     return this.http.get(`${environment.url}/ciudadFeriados/ciudad/${id_ciudad}`);
   }

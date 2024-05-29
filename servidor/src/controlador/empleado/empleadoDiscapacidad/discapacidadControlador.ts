@@ -261,78 +261,7 @@ class DiscapacidadControlador {
     }
   }
 
-  /* TIPO DISCAPACIDAD */
-
-  public async ObtenerUnTipoD(req: Request, res: Response): Promise<any> {
-    const { id } = req.params;
-    const TIPO_DISCAPACIDAD = await pool.query(
-      `
-      SELECT * FROM e_cat_discapacidad WHERE id = $1
-      `
-      , [id]);
-    if (TIPO_DISCAPACIDAD.rowCount > 0) {
-      return res.jsonp(TIPO_DISCAPACIDAD.rows)
-    }
-    else {
-      res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-  }
-
-  public async ActualizarTipoD(req: Request, res: Response): Promise<Response> {
-    try {
-      const id = req.params;
-      const { nombre, user_name,ip } = req.body;
-
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
-
-      // CONSULTAR DATOSORIGINALES
-      const tipoDiscapacidad = await pool.query('SELECT * FROM e_cat_discapacidad WHERE id = $1', [id]);
-      const [datosOriginales] = tipoDiscapacidad.rows;
-
-      if (!datosOriginales) {
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'e_cat_discapacidad',
-          usuario: user_name,
-          accion: 'U',
-          datosOriginales: '',
-          datosNuevos:'',
-          ip, 
-          observacion: `Error al actualizar tipo de discapacidad con id: ${id}`
-        });
-
-        // FINALIZAR TRANSACCION
-        await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-      }
-      
-      await pool.query(
-        `
-        UPDATE e_cat_discapacidad SET nombre = $1 WHERE id = $2
-        `
-        , [nombre, id]);
-
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'e_cat_discapacidad',
-        usuario: user_name,
-        accion: 'U',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{nombre: ${nombre}}`,
-        ip, 
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-      return res.jsonp({ message: 'Tipo de Discapacidad actualizado exitosamente' });
-    } catch (error) {
-      // REVERTIR TRANSACCION
-      await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'Error al actualizar registro.' });
-    }
-  }
-
+  
 }
 
 export const DISCAPACIDAD_CONTROLADOR = new DiscapacidadControlador();

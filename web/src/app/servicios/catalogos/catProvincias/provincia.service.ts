@@ -35,17 +35,12 @@ export class ProvinciaService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarProvincia(id: number, datos: any) {
+  EliminarProvincia(id: any, datos: any) {
     const url = `${environment.url}/provincia/eliminar/${id}`;
     const httpOtions = {
       body: datos
     };
-    return this.http.request('delete', url, httpOtions);
-  }
-
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${environment.url}/provincia/xmlDownload`, data);
+    return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
 
   // METODO PARA REGISTRAR PROVINCIA
@@ -62,20 +57,6 @@ export class ProvinciaService {
   BuscarPaisId(id: number) {
     return this.http.get(`${environment.url}/provincia/buscar/pais/${id}`);
   }
-
-
-
-
-
-  getIdProvinciaRest(nombre: string) {
-    return this.http.get(`${environment.url}/provincia/nombreProvincia/${nombre}`);
-  }
-
-  BuscarTodosPaises() {
-    return this.http.get(`${environment.url}/provincia/paises`);
-  }
-
-
 
 }
 

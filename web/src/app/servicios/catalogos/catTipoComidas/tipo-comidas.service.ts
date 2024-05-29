@@ -21,10 +21,6 @@ export class TipoComidasService {
     return this.http.get(`${environment.url}/tipoComidas`);
   }
 
-  ConsultarTipoComidaDetalle() {
-    return this.http.get(`${environment.url}/tipoComidas/detalle`);
-  }
-
   ConsultarUnServicio(id: number) {
     return this.http.get(`${environment.url}/tipoComidas/${id}`);
   }
@@ -49,12 +45,7 @@ export class TipoComidasService {
     };
     return this.http.request('delete', url, httpOtions);
   }
-
-  ObtenerUltimoId() {
-    return this.http.get(`${environment.url}/tipoComidas/registro/ultimo`);
-  }
-
-  // Servicio para consultar datos de tabla detalle_comida
+  // Servicio para consultar datos de tabla detalle_menu
   ConsultarUnDetalleMenu(id: number) {
     return this.http.get(`${environment.url}/tipoComidas/detalle/menu/${id}`);
   }
@@ -75,16 +66,4 @@ export class TipoComidasService {
     return this.http.request('delete', url, httpOtions);
   }
 
-  // Servicios para verificar y subir datos
-  subirArchivoExcel(formData) {
-    return this.http.post<any>(environment.url + '/tipoComidas/upload', formData)
-  }
-
-  Verificar_Datos_ArchivoExcel(formData) {
-    return this.http.post<any>(environment.url + '/tipoComidas/verificar_datos/upload', formData)
-  }
-
-  VerificarArchivoExcel(formData) {
-    return this.http.post<any>(environment.url + '/tipoComidas/verificar_plantilla/upload', formData)
-  }
 }

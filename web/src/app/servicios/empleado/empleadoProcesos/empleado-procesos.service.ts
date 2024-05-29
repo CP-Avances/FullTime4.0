@@ -9,10 +9,6 @@ export class EmpleadoProcesosService {
 
   constructor(private http: HttpClient) { }
 
-  ObtenerListaEmpleProcesos() {
-    return this.http.get(`${environment.url}/empleadoProcesos`);
-  }
-
   RegistrarEmpleProcesos(datos: any) {
     return this.http.post(`${environment.url}/empleadoProcesos`, datos);
   }
@@ -33,6 +29,5 @@ export class EmpleadoProcesosService {
     return this.http.request('delete', url, httpOtions);
   }
 
-
-
+  
 }

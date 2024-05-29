@@ -52,6 +52,8 @@ export class EditarVacunasComponent implements OnInit {
     let vacuna = {
       id: this.data.id,
       nombre: form.vacuna,
+      user_name: this.user_name,
+      ip: this.ip,
 
     };
     this.rest.ActualizarVacuna(vacuna).subscribe(response => {

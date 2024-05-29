@@ -30,12 +30,6 @@ export class VacacionesService {
     return this.http.get(`${environment.url}/vacaciones/estado-solicitud`);
   }
 
-
-
-
-
-
-
   ObtenerVacacionesPorIdPeriodo(id_peri_perido: number) {
     return this.http.get<any>(`${environment.url}/vacaciones/${id_peri_perido}`)
   }
@@ -59,11 +53,6 @@ export class VacacionesService {
     };
     return this.http.request('delete', url, httpOptions);
   }
-
-
-
-
-
   // REPORTE DE VACACIONES DE FORMA MÚLTIPLE
   BuscarSolicitudVacacion(datos: any, desde: string, hasta: string) {
     return this.http.put(`${environment.url}/empleado-vacaciones-solicitudes/vacaciones-solicitudes/${desde}/${hasta}`, datos);

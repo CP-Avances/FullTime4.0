@@ -13,10 +13,6 @@ class ReportesAsistenciasRutas {
 
         // LISTA DEPARTAMENTOS CON EMPLEADOS ACTIVOS O INACTIVOS
         this.router.get('/datos_generales/:estado', TokenValidation, REPORTE_A_CONTROLADOR.DatosGeneralesUsuarios);
-
-        // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR CARGOS
-        this.router.get(`/informacion-general-cargo/:estado`, TokenValidation, REPORTE_A_CONTROLADOR.DatosGeneralesCargo);
-
         // REPORTES DE TIMBRES MULTIPLE
         this.router.put('/timbres/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresMultiple);
         this.router.put('/timbres-regimen-cargo/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresMultipleRegimenCargo);
@@ -32,9 +28,6 @@ class ReportesAsistenciasRutas {
         // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL 
         this.router.put('/timbres-horario-abierto/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbreHorarioAbierto);
         this.router.put('/timbres-horario-abierto-regimen-cargo/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbreHorarioAbiertoRegimenCargo);
-
-        // REPORTES DE TIMBRES DE HORARIO ABIERTO
-        this.router.get('/timbres-abiertos', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresAbiertos);
 
         // REPORTES DE TIMBRES INCOMPLETOS
         this.router.put('/timbres-incompletos/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresIncompletos);

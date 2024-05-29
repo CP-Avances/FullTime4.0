@@ -109,19 +109,6 @@ class EmpleadoProcesoControlador {
             res.status(404).jsonp({ text: 'Registro no encontrado.' });
         });
     }
-    ListarEmpleProcesos(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const PROCESOS = yield database_1.default.query(`
-      SELECT * FROM map_empleado_procesos
-      `);
-            if (PROCESOS.rowCount > 0) {
-                return res.jsonp(PROCESOS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

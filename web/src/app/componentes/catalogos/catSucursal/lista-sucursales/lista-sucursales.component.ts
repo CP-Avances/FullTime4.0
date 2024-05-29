@@ -450,9 +450,16 @@ export class ListaSucursalesComponent implements OnInit {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña SUCURSALES en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
         //Separa llas filas que estan con la observacion OK para luego registrar en la base.
-        this.Datasucursales.forEach(item => {
+        this.Datasucursales.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listSucursalesCorrectas.push(item);
           }
@@ -513,7 +520,7 @@ export class ListaSucursalesComponent implements OnInit {
     if (this.listSucursalesCorrectas.length > 0) {
       console.log('lista sucursales correctas: ', this.listSucursalesCorrectas.length);
       var cont = 0;
-      this.listSucursalesCorrectas.forEach(item => {
+      this.listSucursalesCorrectas.forEach((item: any) => {
         this.datosCiudades.forEach(valor => {
           if (item.ciudad.toLowerCase() == valor.nombre.toLowerCase()) {
             data.nombre = item.nom_sucursal;

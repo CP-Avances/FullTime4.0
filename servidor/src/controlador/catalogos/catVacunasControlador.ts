@@ -1,4 +1,4 @@
-import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
@@ -92,6 +92,24 @@ class VacunaControlador {
                 `
                 , [nombre.toUpperCase(), id]);
 
+                const consulta = await pool.query('SELECT * FROM e_cat_tipo_cargo WHERE id = $1', [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'e_cat_vacuna',
+                        usuario: req.body.user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: req.body.ip,
+                        observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
+                    });
+    
+                    // FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+
             if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
                 const vacunaEditar = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
@@ -107,9 +125,9 @@ class VacunaControlador {
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'e_cat_vacuna',
-                    usuario: user_name,
+                    usuario: req.body.user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(VERIFICAR_VACUNA.rows),
+                    datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(vacunaInsertada),
                     ip,
                     observacion: null
@@ -150,7 +168,7 @@ class VacunaControlador {
                 SELECT * FROM e_cat_vacuna WHERE id = $1
                 `
                 , [id]);
-            
+
             const [datosVacuna] = vacuna.rows;
 
             if (!datosVacuna) {
@@ -197,42 +215,47 @@ class VacunaControlador {
         }
     }
 
-        // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
-        public async RevisarDatos(req: Request, res: Response): Promise<any> {
-            try{
-                const documento = req.file?.originalname;
-                let separador = path.sep;
-                let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-    
-                const workbook = excel.readFile(ruta);
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    public async RevisarDatos(req: Request, res: Response): Promise<any> {
+        try {
+            const documento = req.file?.originalname;
+            let separador = path.sep;
+            let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+
+            const workbook = excel.readFile(ruta);
+            let verificador = ObtenerIndicePlantilla(workbook, 'TIPO_VACUNA');
+            if (verificador === false) {
+                return res.jsonp({ message: 'no_existe', data: undefined });
+            }
+            else {
                 const sheet_name_list = workbook.SheetNames;
-                const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[1]]);
+                const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
 
                 let data: any = {
                     fila: '',
                     vacuna: '',
                     observacion: ''
                 };
-    
+
                 var listaVacunas: any = [];
                 var duplicados: any = [];
                 var mensaje: string = 'correcto';
 
-                 // LECTURA DE LOS DATOS DE LA PLANTILLA
+                // LECTURA DE LOS DATOS DE LA PLANTILLA
                 plantilla.forEach(async (dato: any, indice: any, array: any) => {
-                    var { item, vacuna } = dato;
+                    var { ITEM, VACUNA } = dato;
                     // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                    if ((item != undefined && item != '') &&
-                        (vacuna != undefined && vacuna != '')) {
-                            data.fila = item;
-                            data.vacuna = vacuna;
-                            data.observacion = 'no registrada';
+                    if ((ITEM != undefined && ITEM != '') &&
+                        (VACUNA != undefined && VACUNA != '')) {
+                        data.fila = ITEM;
+                        data.vacuna = VACUNA;
+                        data.observacion = 'no registrada';
 
-                            listaVacunas.push(data);
+                        listaVacunas.push(data);
 
                     } else {
-                        data.fila = item;
-                        data.vacuna = vacuna;
+                        data.fila = ITEM;
+                        data.vacuna = VACUNA;
                         data.observacion = 'no registrada';
 
                         if (data.fila == '' || data.fila == undefined) {
@@ -240,7 +263,7 @@ class VacunaControlador {
                             mensaje = 'error'
                         }
 
-                        if (vacuna == undefined) {
+                        if (VACUNA == undefined) {
                             data.vacuna = 'No registrado';
                             data.observacion = 'Vacuna ' + data.observacion;
                         }
@@ -274,7 +297,7 @@ class VacunaControlador {
                         } else {
                             item.observacion = 'Ya existe en el sistema'
                         }
-    
+
                         // Discriminación de elementos iguales
                         if (duplicados.find((p: any) => p.vacuna.toLowerCase() === item.vacuna.toLowerCase()) == undefined) {
                             duplicados.push(item);
@@ -295,14 +318,14 @@ class VacunaControlador {
                         }
                         return 0; // SON IGUALES
                     });
-    
+
                     var filaDuplicada: number = 0;
-    
+
                     listaVacunas.forEach(async (item: any) => {
                         if (item.observacion == '1') {
                             item.observacion = 'Registro duplicado'
                         }
-    
+
                         // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
                             // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
@@ -312,81 +335,81 @@ class VacunaControlador {
                         } else {
                             return mensaje = 'error';
                         }
-    
+
                         filaDuplicada = item.fila;
-    
+
                     });
-    
+
                     if (mensaje == 'error') {
                         listaVacunas = undefined;
                     }
                     return res.jsonp({ message: mensaje, data: listaVacunas });
                 }, 1000)
-    
-    
-            }catch(error){
-                return res.status(500).jsonp({ message: 'Error con el servidor metodo RevisarDatos', status: '500' });
             }
+
+        } catch (error) {
+            return res.status(500).jsonp({ message: 'Error con el servidor metodo RevisarDatos', status: '500' });
         }
-    
-         // REGISTRAR PLANTILLA MODALIDAD_CARGO 
-         public async CargarPlantilla(req: Request, res: Response) {
-            try {
-                const {plantilla, user_name, ip} = req.body;
+    }
 
-                var contador = 1;
-                var respuesta: any
+    // REGISTRAR PLANTILLA MODALIDAD_CARGO 
+    public async CargarPlantilla(req: Request, res: Response) {
+        try {
+            const { plantilla, user_name, ip } = req.body;
 
-                plantilla.forEach(async (data: any) => {
-                    // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
-                    const { item, vacuna, observacion } = data;
-                    const vacu = vacuna.charAt(0).toUpperCase() + vacuna.slice(1).toLowerCase();
+            var contador = 1;
+            var respuesta: any
 
-                    // INICIAR TRANSACCION
-                    await pool.query('BEGIN');
-    
-                    // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
-                    const response: QueryResult = await pool.query(
-                        `
+            plantilla.forEach(async (data: any) => {
+                // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
+                const { item, vacuna, observacion } = data;
+                const vacu = vacuna.charAt(0).toUpperCase() + vacuna.slice(1).toLowerCase();
+
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
+                // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
+                const response: QueryResult = await pool.query(
+                    `
                         INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
                         `
-                        , [vacu]);
-    
-                    const [vacuna_emp] = response.rows;
+                    , [vacu]);
 
-                    // AUDITORIA
-                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                        tabla: 'e_cat_vacuna',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: JSON.stringify(vacuna_emp),
-                        ip,
-                        observacion: null
-                    });
+                const [vacuna_emp] = response.rows;
 
-                    // FINALIZAR TRANSACCION
-                    await pool.query('COMMIT');
-    
-                    if (contador === plantilla.length) {
-                        if (vacuna_emp) {
-                            return respuesta = res.status(200).jsonp({ message: 'ok', status: '200'})
-                        } else {
-                            return respuesta = res.status(404).jsonp({ message: 'error', status: '400' })
-                        }
-                    }
-    
-                    contador = contador + 1;
-                
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_vacuna',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(vacuna_emp),
+                    ip,
+                    observacion: null
                 });
-    
-    
-            }catch(error){
-                // ROLLBACK
-                await pool.query('ROLLBACK');
-                return res.status(500).jsonp({message: 'Error con el servidor metodo CargarPlantilla', status: '500'});
-            }
-         }
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
+                if (contador === plantilla.length) {
+                    if (vacuna_emp) {
+                        return respuesta = res.status(200).jsonp({ message: 'ok', status: '200' })
+                    } else {
+                        return respuesta = res.status(404).jsonp({ message: 'error', status: '400' })
+                    }
+                }
+
+                contador = contador + 1;
+
+            });
+
+
+        } catch (error) {
+            // ROLLBACK
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'Error con el servidor metodo CargarPlantilla', status: '500' });
+        }
+    }
 
 }
 

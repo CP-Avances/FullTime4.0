@@ -11,7 +11,6 @@ class AsistenciaRutas {
     }
 
     configuracion(): void {
-        this.router.get('/lista-empleados/:id_empresa', TokenValidation, ASISTENCIA_CONTROLADOR.ObtenerListaEmpresa)
     }
 
 }

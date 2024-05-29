@@ -17,8 +17,7 @@ export class EmpleadoService {
   constructor(
     private http: HttpClient
   ) { }
-
-
+  
   /** ** ********************************************************************************************* **
    ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
    ** ** ********************************************************************************************* **/
@@ -191,10 +190,9 @@ export class EmpleadoService {
   BuscarModalidadLaboralNombre(datos: any) {
     return this.http.post<any>(`${environment.url}/contratoEmpleado/modalidad/trabajo/nombre`, datos);
   }
-
-
-  /** ***************************************************************************************** **
-   ** **                        MANEJO DE DATOS DE CONTRATOS                                 ** **
+  
+  /** ***************************************************************************************** ** 
+   ** **                        MANEJO DE DATOS DE CONTRATOS                                 ** ** 
    ** ***************************************************************************************** **/
 
   // REGISTRO DE DATOS DE CONTRATO
@@ -227,11 +225,6 @@ export class EmpleadoService {
     return this.http.put(`${environment.url}/contratoEmpleado/eliminar_contrato/servidor`, datos)
   }
 
-  // VISUALIZAR DOCUMENTO CONTRATO
-  ObtenerUnContrato(id: number) {
-    return this.http.get(`${environment.url}/contratoEmpleado/${id}/get`);
-  }
-
   // METODO PARA BUSCAR ID DE CONTRATO ACTUAL
   BuscarIDContratoActual(id: number) {
     return this.http.get(`${environment.url}/contratoEmpleado/contratoActual/${id}`);
@@ -247,31 +240,10 @@ export class EmpleadoService {
     return this.http.post(`${environment.url}/contratoEmpleado/buscarFecha`, datos);
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // BUSQUEDA DE EMPLEADOS INGRESANDO NOMBRE Y APELLIDO
+  // BUSQUEDA DE EMPLEADOS INGRESANDO NOMBRE Y APELLIDO 
   BuscarEmpleadoNombre(data: any) {
     return this.http.post(`${environment.url}/empleado/buscar/informacion`, data);
   }
-
-
-
-
-
-
 
   /** Verificar datos de la plantilla de datos con código generado de forma automática */
   verificarArchivoExcel_Automatico(formData) {
@@ -299,59 +271,9 @@ export class EmpleadoService {
     return this.http.post<any>(`${environment.url}/empleado/cargar_manual/plantillaExcel/`, formData);
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  BuscarIDContrato(id: number) {
-    return this.http.get(`${environment.url}/contratoEmpleado/${id}`);
-  }
-
-
-
-
-
-
-
-
-
-
-
   BuscarFechaIdContrato(datos: any) {
     return this.http.post(`${environment.url}/contratoEmpleado/buscarFecha/contrato`, datos);
   }
-
-  ObtenerContratos() {
-    return this.http.get<any>(`${environment.url}/contratoEmpleado`);
-  }
-
-
-
-
-
-
-
-
-  BuscarUltimoTiposContratos() {
-    return this.http.get<any>(`${environment.url}/contratoEmpleado/modalidad/trabajo/ultimo`);
-  }
-
 
   RevisarFormato(formData) {
     return this.http.post<any>(`${environment.url}/contratoEmpleado/upload/revision`, formData);
@@ -361,84 +283,7 @@ export class EmpleadoService {
     return this.http.post<any>(`${environment.url}/contratoEmpleado/cargar_plantilla/`, formData);
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   BuscarDepartamentoEmpleado(datos: any) {
     return this.http.post(`${environment.url}/empleado/buscarDepartamento`, datos);
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  InsertarUbicacion(id: number, codigo: number, data: any) {
-    return this.http.post<any>(`${environment.url}/empleado/geolocalizacion-domicilio/${id}/${codigo}`, data)
-  }
-
-  ActualizarUbicacionTrabajo(id: number, data: any) {
-    return this.http.put<any>(`${environment.url}/empleado/geolocalizacion-trabajo/${id}`, data)
-  }
-
-  ActualizarUbicacionDomicilio(id: number, data: any) {
-    return this.http.put<any>(`${environment.url}/empleado/geolocalizacion-nuevo-domicilio/${id}`, data)
-  }
-
-
-
-  ActualizarUbicacion(id: number, data: any) {
-    return this.http.put<any>(`${environment.url}/empleado/actualizar-geolocalizacion/${id}`, data);
-  }
-
 }

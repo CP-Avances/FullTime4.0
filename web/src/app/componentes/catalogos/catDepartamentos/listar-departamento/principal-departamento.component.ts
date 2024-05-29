@@ -243,20 +243,20 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 13);
+    let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'departamentos') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre Departamentos', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta.', {
           timeOut: 6000,
         });
         this.nameFile = '';
       }
     } else {
-      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+      this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
         timeOut: 6000,
       });
       this.nameFile = '';
@@ -285,8 +285,15 @@ export class PrincipalDepartamentoComponent implements OnInit {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
-        this.DataDepartamentos.forEach(item => {
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña DEPARTAMENTOS en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.DataDepartamentos.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listDepartamentosCorrectos.push(item);
           }
@@ -294,7 +301,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       }
     }, error => {
       console.log('Serivicio rest -> metodo RevisarFormato - ', error);
-      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+      this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
       this.progreso = false;
@@ -656,7 +663,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.departamentosEliminar.forEach((datos: any) => {
       this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.rest.EliminarRegistro(datos.id, datos).subscribe((res:any) => {
+      this.rest.EliminarRegistro(datos.id, datos).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -673,7 +680,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
                 this.rest.EliminarRegistroNivelDepa(item.id, datos).subscribe(
                   (res: any) => {
                     if (res.message === 'error') {
-                      this.toastr.error('Existen datos relacionados con ' + item.nombre + '.', 'No fue posible eliminar.',  {
+                      this.toastr.error('Existen datos relacionados con ' + item.nombre + '.', 'No fue posible eliminar.', {
                         timeOut: 6000,
                       });
                     } else {

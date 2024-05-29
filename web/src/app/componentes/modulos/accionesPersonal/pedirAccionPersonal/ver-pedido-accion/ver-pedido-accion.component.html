@@ -20,7 +20,7 @@
                                 <span>ACCIÓN DE PERSONAL</span>
                             </div>
                             <label class="col-sm col-form-label"><b>Identificación:</b>
-                                {{d.identi_accion_p.toUpperCase()}}
+                                {{d.identificacion_accion_personal.toUpperCase()}}
                             </label>
                             <label class="col-sm col-form-label"><b>Fecha Registro:</b>
                                 {{d.fec_creacion_}}
@@ -79,13 +79,13 @@
                                 {{d.fec_rige_desde_}}
                             </label>
                             <label class="col-sm col-form-label"><b>Rige hasta:</b>
-                                {{d.fec_rige_desde_}}
+                                {{d.fec_rige_hasta_}}
                             </label>
                             <div class="subtitulo">
                                 <span>SITUACIÓN ACTUAL (Datos tomados desde la ficha del empleado)</span>
                             </div>
                             <label class="col-sm col-form-label"><b>Número partida:</b>
-                                {{d.num_partida}}
+                                {{d.numero_partida_empresa}}
                             </label>
                         </div>
                         <div class="col-sm" id="verticalLine">
@@ -105,10 +105,10 @@
                                 {{d.salario_propuesto}}
                             </label>
                             <label class="col-sm col-form-label"><b>Número partida propuesta:</b>
-                                {{d.num_partida_propuesta}}
+                                {{d.numero_partida_propuesta}}
                             </label>
                             <label class="col-sm col-form-label"><b>Número partida individual:</b>
-                                {{d.num_partida_individual}}
+                                {{d.numero_partida_individual}}
                             </label>
                         </div>
                     </div>
@@ -126,7 +126,7 @@
                                 <span>ACTA FINAL DEL CONCURSO</span>
                             </div>
                             <label class="col-sm col-form-label"><b>Acta final del concurso No.:</b>
-                                {{d.act_final_concurso}}
+                                {{d.acta_final_concurso}}
                             </label>
                             <label class="col-sm col-form-label"><b>Fecha:</b>
                                 {{d.fec_act_final_concurso_}}
@@ -140,11 +140,14 @@
                             </div>
                             <label class="col-sm col-form-label"><b>Firman:</b></label>
                             <label class="col-sm col-form-label">
-                                {{d.abrev_empl_uno.toUpperCase()}}. {{datoEmpleadoH.toUpperCase()}} <br>
-                                <b>{{cargoH.toUpperCase()}}</b>
+                                    {{d.firma_empleado_uno}}. {{datoEmpleadoH.toUpperCase()}} <br>
+                                    <b>{{cargoH.toUpperCase()}}</b>
+
                             </label>
+
+
                             <label class="col-sm col-form-label">
-                                {{d.abrev_empl_dos.toUpperCase()}}. {{datoEmpleadoG.toUpperCase()}} <br>
+                                {{d.firma_empleado_dos}}. {{datoEmpleadoG.toUpperCase()}} <br>
                                 <b>{{cargoG.toUpperCase()}}</b>
                             </label>
                         </div>
@@ -171,16 +174,16 @@
                                 <span>LA PERSONA REEMPLAZA A</span>
                             </div>
                             <label class="col-sm col-form-label"><b>Nombre:</b>
-                                {{d.nombre_reemp}}
+                                {{d.nombre_reemplazo}}
                             </label>
                             <label class="col-sm col-form-label"><b>Puesto:</b>
-                                {{d.puesto_reemp}}
+                                {{d.puesto_reemplazo}}
                             </label>
                             <label class="col-sm col-form-label"><b>Funciones:</b>
-                                {{d.funciones_reemp}}
+                                {{d.funciones_reemplazo}}
                             </label>
                             <label class="col-sm col-form-label"><b>Número de acción:</b>
-                                {{d.num_accion_reemp}}
+                                {{d.numero_accion_reemplazo}}
                             </label>
                             <label class="col-sm col-form-label"><b>Primera fecha:</b>
                                 {{d.primera_fecha_reemp_}}
@@ -197,7 +200,7 @@
                             </div>
                             <div class="col-sm">
                                 <label class="col-sm col-form-label"><b>Descripción:</b>
-                                    {{d.descripcion_pose_noti}}
+                                    {{d.descripcion_posesion_notificacion}}
                                 </label>
                             </div>
                         </div>

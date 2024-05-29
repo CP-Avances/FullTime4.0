@@ -20,10 +20,6 @@ export class PlanHoraExtraService {
     return this.http.get(`${environment.url}/planificacionHoraExtra`);
   }
 
-  ConsultarUltimoPlanHora() {
-    return this.http.get(`${environment.url}/planificacionHoraExtra/id_plan_hora`);
-  }
-
   ConsultarPlanHoraExtraObservacion() {
     return this.http.get(`${environment.url}/planificacionHoraExtra/justificar`);
   }
@@ -32,9 +28,6 @@ export class PlanHoraExtraService {
     return this.http.get(`${environment.url}/planificacionHoraExtra/autorizacion`);
   }
 
-  EditarObservacion(id: number, datos: any) {
-    return this.http.put<any>(`${environment.url}/planificacionHoraExtra/observacion/${id}`, datos);
-  }
 
   EditarEstado(id: number, datos: any) {
     return this.http.put<any>(`${environment.url}/planificacionHoraExtra/estado/${id}`, datos);

@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AUTORIZA_DEPARTAMENTO_CONTROLADOR = void 0;
-const database_1 = __importDefault(require("../../database"));
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
+const database_1 = __importDefault(require("../../database"));
 class AutorizaDepartamentoControlador {
     // METODO PARA BUSCAR USUARIO AUTORIZA
     EncontrarAutorizacionEmple(req, res) {
@@ -190,19 +190,6 @@ class AutorizaDepartamentoControlador {
                 // CANCELAR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
-            }
-        });
-    }
-    ListarAutorizaDepartamento(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const AUTORIZA = yield database_1.default.query(`
-            SELECT * FROM ed_autoriza_departamento
-            `);
-            if (AUTORIZA.rowCount > 0) {
-                return res.jsonp(AUTORIZA.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
             }
         });
     }

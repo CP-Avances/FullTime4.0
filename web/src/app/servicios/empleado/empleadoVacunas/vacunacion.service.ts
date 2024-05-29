@@ -67,9 +67,5 @@ export class VacunacionService {
     return this.http.post<any>(`${environment.url}/vacunas/tipo_vacuna`, data).pipe(catchError(data));
   }
 
-  // METODO DE REGISTROS DE TIPO DE VACUNACION
-  BuscarVacunaNombre(data: any) {
-    return this.http.post<any>(`${environment.url}/vacunas/tipo_vacuna/nombre`, data);
-  }
 
 }

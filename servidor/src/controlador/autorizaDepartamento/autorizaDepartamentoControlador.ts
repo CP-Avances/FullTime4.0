@@ -1,6 +1,6 @@
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { Request, Response } from 'express';
 import pool from '../../database';
-import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 
 class AutorizaDepartamentoControlador {
 
@@ -201,20 +201,6 @@ class AutorizaDepartamentoControlador {
             // CANCELAR TRANSACCION
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
-        }
-    }
-
-    public async ListarAutorizaDepartamento(req: Request, res: Response) {
-        const AUTORIZA = await pool.query(
-            `
-            SELECT * FROM ed_autoriza_departamento
-            `
-        );
-        if (AUTORIZA.rowCount > 0) {
-            return res.jsonp(AUTORIZA.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros' });
         }
     }
 

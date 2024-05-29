@@ -57,8 +57,6 @@ class UsuarioRutas {
         this.router.put('/actualizar-usuario-sucursal', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ActualizarUsuarioSucursalPrincipal);
         // METODO PARA ELIMINAR REGISTRO USUARIO - SUCURSAL
         this.router.delete('/eliminar-usuario-sucursal/:id', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.EliminarUsuarioSucursal);
-        this.router.get('/', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.list);
-        this.router.get('/busqueda/:usuario', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getIdByUsuario);
     }
 }
 const USUARIO_RUTA = new UsuarioRutas();

@@ -31,12 +31,6 @@ class ProvinciaRutas {
 
 
 
-        this.router.get('/paises', TokenValidation, PROVINCIA_CONTROLADOR.ListarTodoPais);
-        this.router.get('/nombreProvincia/:nombre', TokenValidation, PROVINCIA_CONTROLADOR.ObtenerIdProvincia);
-
-
-
-
 
     }
 }

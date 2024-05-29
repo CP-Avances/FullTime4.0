@@ -17,8 +17,6 @@ export class CatTipoCargosService {
     return this.http.post<any>(`${environment.url}/tipoCargos/buscar/tipo_cargo/nombre`, datos);
   }
 
-
-
   listaCargos() {
     return this.http.get<any>(environment.url + '/tipoCargos');
   }
@@ -46,8 +44,5 @@ export class CatTipoCargosService {
   SubirArchivoExcel(formData: any) {
     return this.http.post<any>(`${environment.url}/tipoCargos/cargar_plantilla`, formData);
   }
-
-
-
 
 }

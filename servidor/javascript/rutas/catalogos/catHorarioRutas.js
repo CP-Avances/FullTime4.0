@@ -55,7 +55,6 @@ class HorarioRutas {
         this.router.put('/update-horas-trabaja/:id', verificarToken_1.TokenValidation, catHorarioControlador_1.default.EditarHorasTrabaja);
         // VERIFICAR DATOS DE LA PLANTILLA DE CATÁLOGO HORARIO Y LUEGO SUBIR AL SISTEMA
         this.router.post('/cargarHorario/verificarDatos/upload', [verificarToken_1.TokenValidation, upload.single('uploads')], catHorarioControlador_1.default.VerificarDatos);
-        // this.router.post('/cargarHorario/verificarPlantilla/upload', [TokenValidation, upload.single('uploads')], HORARIO_CONTROLADOR.VerificarPlantilla);
         this.router.post('/cargarHorario/upload', [verificarToken_1.TokenValidation, upload.single('uploads')], catHorarioControlador_1.default.CargarHorarioPlantilla);
     }
 }

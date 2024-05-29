@@ -18,14 +18,9 @@ class DepartamentoRutas {
     configuracion() {
         // METODO PARA BUSCAR PERIODO DE VACACIONES
         this.router.get('/buscar/:id_empleado', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.EncontrarIdPerVacaciones);
-        this.router.get('/', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.ListarPerVacaciones);
         this.router.get('/infoPeriodo/:codigo', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.EncontrarPerVacaciones);
         this.router.post('/', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.CrearPerVacaciones);
         this.router.put('/', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.ActualizarPeriodo);
-        // Verificar datos de la plantilla de de periodo de vacaciones antes de subir al sistema
-        this.router.post('/cargarPeriodo/upload', [verificarToken_1.TokenValidation, multipartMiddleware], periodoVacacionControlador_1.default.CargarPeriodoVacaciones);
-        this.router.post('/cargarPeriodo/verificarDatos/upload', [verificarToken_1.TokenValidation, multipartMiddleware], periodoVacacionControlador_1.default.VerificarDatos);
-        this.router.post('/cargarPeriodo/verificarPlantilla/upload', [verificarToken_1.TokenValidation, multipartMiddleware], periodoVacacionControlador_1.default.VerificarPlantilla);
     }
 }
 const PERIODO_VACACION__RUTAS = new DepartamentoRutas();

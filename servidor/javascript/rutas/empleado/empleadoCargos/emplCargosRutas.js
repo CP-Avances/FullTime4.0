@@ -36,8 +36,6 @@ class EmpleadosCargpsRutas {
         this.router.post('/fecha_cargo', verificarToken_1.TokenValidation, emplCargosControlador_1.default.BuscarCargosFecha);
         // METODO PARA BUSCAR CARGOS POR FECHA EDICION
         this.router.post('/fecha_cargo/editar', verificarToken_1.TokenValidation, emplCargosControlador_1.default.BuscarCargosFechaEditar);
-        this.router.get('/', verificarToken_1.TokenValidation, emplCargosControlador_1.default.list);
-        this.router.get('/lista-empleados/', verificarToken_1.TokenValidation, emplCargosControlador_1.default.ListarCargoEmpleado);
         this.router.get('/buscar/:id_empleado', verificarToken_1.TokenValidation, emplCargosControlador_1.default.EncontrarIdCargo);
         this.router.get('/buscar/cargoActual/:id_empleado', verificarToken_1.TokenValidation, emplCargosControlador_1.default.EncontrarIdCargoActual);
         /** ****************************************************************************************** **
@@ -48,7 +46,6 @@ class EmpleadosCargpsRutas {
         // METODO PARA REGISTRAR TIPO DE CARGO
         this.router.post('/tipo_cargo', verificarToken_1.TokenValidation, emplCargosControlador_1.default.CrearTipoCargo);
         // Crear tipo cargo
-        this.router.get('/buscar/ultimoTipo/nombreCargo/:id', verificarToken_1.TokenValidation, emplCargosControlador_1.default.BuscarUnTipo);
         this.router.get('/buscar/cargo-departamento/:id', verificarToken_1.TokenValidation, emplCargosControlador_1.default.BuscarTipoDepartamento);
         this.router.get('/buscar/cargo-sucursal/:id', verificarToken_1.TokenValidation, emplCargosControlador_1.default.BuscarTipoSucursal);
         this.router.get('/buscar/cargo-regimen/:id', verificarToken_1.TokenValidation, emplCargosControlador_1.default.BuscarTipoRegimen);

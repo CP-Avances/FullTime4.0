@@ -121,7 +121,8 @@ class ProvinciaControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: error });
+      //return res.status(500).jsonp({ message: error });
+      return res.jsonp({ message: "error" });
     }
   }
 
@@ -189,35 +190,6 @@ class ProvinciaControlador {
     }
     else {
       return res.status(404).jsonp({ text: 'El registro no ha sido encontrada.' });
-    }
-  }
-
-  public async ObtenerIdProvincia(req: Request, res: Response): Promise<any> {
-    const { nombre } = req.params;
-    const UNA_PROVINCIA = await pool.query(
-      `
-      SELECT * FROM e_provincias WHERE nombre = $1
-      `
-      , [nombre]);
-    if (UNA_PROVINCIA.rowCount > 0) {
-      return res.jsonp(UNA_PROVINCIA.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'El registro no ha sido encontrada.' });
-    }
-  }
-
-  public async ListarTodoPais(req: Request, res: Response) {
-    const PAIS = await pool.query(
-      `
-      SELECT * FROM e_cat_paises
-      `
-    );
-    if (PAIS.rowCount > 0) {
-      return res.jsonp(PAIS.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 

@@ -30,16 +30,6 @@ export class LoginService {
   }
 
 
-
-
-
-
-
-
-
-
-
-
   loggedIn() {
     return !!localStorage.getItem('token');
   }
@@ -78,13 +68,5 @@ export class LoginService {
     sessionStorage.clear();
     this.router.navigate(['/'], { relativeTo: this.route, skipLocationChange: false });
   }
-
-
-
-
-
-  // AUDITAR
-  Auditar(data: any) {
-    return this.http.post(`${environment.url}/login/auditar`, data)
-  }
+ 
 }

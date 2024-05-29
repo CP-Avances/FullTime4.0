@@ -16,39 +16,7 @@ export class ReportesAsistenciasService {
     const estado = 1; // 1 = activo 
     return this.http.get<any>(`${environment.url}/reportes-asistencias/datos_generales/${estado}`);
   }
-
-
-
-
-  DepartamentosByEmplEstado(estado: any) {
-    return this.http.get<any>(`${environment.url}/reportes-asistencias/datos_generales/${estado}`);
-  }
-
-  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR CARGOS
-  ObtenerInformacionCargo(estado: any) {
-    return this.http.get<any>(`${environment.url}/reportes-asistencias/informacion-general-cargo/${estado}`);
-  }
-
-  ReporteFaltasMultiples(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/faltas-empleados/${desde}/${hasta}`, data);
-  }
-
-  ReporteFaltasMultiplesTabulado(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/faltas-tabulado/${desde}/${hasta}`, data);
-  }
-
-  ReporteHorasTrabajadasMultiple(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/horas-trabaja/${desde}/${hasta}`, data);
-  }
-
-  ReporteTimbresAbiertos(dataArray: any, desde: string, hasta: string) {
-    const params = new HttpParams()
-      .set('data', JSON.stringify(dataArray))
-      .set('desde', desde)
-      .set('hasta', hasta);
-    return this.http.get<any>(`${environment.url}/reportes-asistencias/timbres-abiertos`, { params });
-  }
-
+  
   ReportePuntualidadMultiple(data: any, desde: string, hasta: string, parametros: any) {
     const params = new HttpParams()
       .set('menor', parametros.menor)
@@ -95,14 +63,6 @@ export class ReportesAsistenciasService {
 
   ReporteTimbresIncompletosRegimenCargo(data: any, desde: string, hasta: string) {
     return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-incompletos-regimen-cargo/${desde}/${hasta}`, data);
-  }
-
-  ReporteTimbrestabulados(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-tabulados/${desde}/${hasta}`, data);
-  }
-
-  ReporteTabuladoTimbresIncompletos(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-tabulados-incompletos/${desde}/${hasta}`, data);
   }
 
 }

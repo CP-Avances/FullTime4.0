@@ -477,7 +477,7 @@ class HorarioControlador {
                     // CARGAR HORARIOS
                     for (const horario of horarios) {
                         try {
-                            let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = horario;
+                            let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MINUTOS_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = horario;
                             horario.CODIGO_HORARIO = horario.CODIGO_HORARIO.toString();
                             //CAMBIAR TIPO DE HORARIO Laborable = N, Libre = L, Feriado = FD
                             switch (TIPO_HORARIO) {
@@ -511,7 +511,7 @@ class HorarioControlador {
                             const response = yield database_1.default.query(`
               INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
               nocturno, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-              `, [DESCRIPCION, MIN_ALIMENTACION, HORAS_TOTALES, HORARIO_NOCTURNO, true, CODIGO_HORARIO, TIPO_HORARIO]);
+              `, [DESCRIPCION, MINUTOS_ALIMENTACION, HORAS_TOTALES, HORARIO_NOCTURNO, true, CODIGO_HORARIO, TIPO_HORARIO]);
                             const [correcto] = response.rows;
                             // AUDITORIA
                             yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -547,7 +547,7 @@ class HorarioControlador {
                     // CARGAR DETALLES
                     for (const detalle of detalles) {
                         try {
-                            let { CODIGO_HORARIO, TIPO_ACCION, HORA, TOLERANCIA, ORDEN, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES } = detalle;
+                            let { CODIGO_HORARIO, TIPO_ACCION, HORA, TOLERANCIA, ORDEN, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MINUTOS_ANTES, MINUTOS_DESPUES } = detalle;
                             CODIGO_HORARIO = CODIGO_HORARIO.toString();
                             // CAMBIAR TIPO DE ACCION Entrada = E, Inicio alimentacion = I/A, Fin alimentacion = F/A, Salida = S
                             switch (TIPO_ACCION) {
@@ -598,7 +598,7 @@ class HorarioControlador {
                             const response2 = yield database_1.default.query(`
               INSERT INTO eh_detalle_horarios (orden, hora, tolerancia, id_horario, tipo_accion, segundo_dia, tercer_dia, 
                 minutos_antes, minutos_despues) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
-              `, [ORDEN, HORA, TOLERANCIA, ID_HORARIO, TIPO_ACCION, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES]);
+              `, [ORDEN, HORA, TOLERANCIA, ID_HORARIO, TIPO_ACCION, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MINUTOS_ANTES, MINUTOS_DESPUES]);
                             // AUDITORIA
                             yield auditoriaControlador_1.default.InsertarAuditoria({
                                 tabla: 'eh_detalle_horarios',
@@ -645,149 +645,161 @@ class HorarioControlador {
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
             const workbook = xlsx_1.default.readFile(ruta);
-            const sheet_name_list = workbook.SheetNames;
-            const plantillaHorarios = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-            let plantillaDetalles = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[1]]);
-            let codigos = [];
-            for (const [index, data] of plantillaHorarios.entries()) {
-                let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = data;
-                if (MIN_ALIMENTACION === undefined) {
-                    data.MIN_ALIMENTACION = 0;
-                }
-                if (HORARIO_NOCTURNO === undefined) {
-                    data.HORARIO_NOCTURNO = 'No';
-                }
-                // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
-                const requiredValues = ['DESCRIPCION', 'CODIGO_HORARIO', 'TIPO_HORARIO', 'HORAS_TOTALES', 'HORARIO_NOCTURNO'];
-                let faltanDatos = false;
-                let datosFaltantes = [];
-                // MAPEO DE CLAVES A DESCRIPCIONES
-                let descripciones = {
-                    DESCRIPCION: 'descripción',
-                    CODIGO_HORARIO: 'código',
-                    TIPO_HORARIO: 'tipo',
-                    HORAS_TOTALES: 'horas totales',
-                    HORARIO_NOTURNO: 'horario noturno'
-                };
-                for (const key of requiredValues) {
-                    if (data[key] === undefined) {
-                        data[key] = 'No registrado';
-                        datosFaltantes.push(descripciones[key]);
-                        faltanDatos = true;
+            let verificador_horario = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'HORARIOS');
+            let verificador_detalle = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'DETALLE_HORARIOS');
+            if (verificador_horario === false) {
+                const mensaje = 'no_existe_horario';
+                res.json({ mensaje });
+            }
+            else if (verificador_detalle === false) {
+                const mensaje = 'no_existe_detalle';
+                res.json({ mensaje });
+            }
+            else if (verificador_horario != false && verificador_detalle != false) {
+                const sheet_name_list = workbook.SheetNames;
+                const plantillaHorarios = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador_horario]]);
+                let plantillaDetalles = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador_detalle]]);
+                let codigos = [];
+                for (const [index, data] of plantillaHorarios.entries()) {
+                    let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MINUTOS_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = data;
+                    if (MINUTOS_ALIMENTACION === undefined) {
+                        data.MINUTOS_ALIMENTACION = 0;
+                    }
+                    if (HORARIO_NOCTURNO === undefined) {
+                        data.HORARIO_NOCTURNO = 'No';
+                    }
+                    // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
+                    const requiredValues = ['DESCRIPCION', 'CODIGO_HORARIO', 'TIPO_HORARIO', 'HORAS_TOTALES', 'HORARIO_NOCTURNO'];
+                    let faltanDatos = false;
+                    let datosFaltantes = [];
+                    // MAPEO DE CLAVES A DESCRIPCIONES
+                    let descripciones = {
+                        DESCRIPCION: 'descripción',
+                        CODIGO_HORARIO: 'código',
+                        TIPO_HORARIO: 'tipo',
+                        HORAS_TOTALES: 'horas totales',
+                        HORARIO_NOTURNO: 'horario noturno'
+                    };
+                    for (const key of requiredValues) {
+                        if (data[key] === undefined) {
+                            data[key] = 'No registrado';
+                            datosFaltantes.push(descripciones[key]);
+                            faltanDatos = true;
+                        }
+                    }
+                    if (faltanDatos) {
+                        data.OBSERVACION = 'Datos no registrados: ' + datosFaltantes.join(', ');
+                        continue;
+                    }
+                    codigos.push(CODIGO_HORARIO.toString());
+                    if (VerificarDuplicado(codigos, CODIGO_HORARIO.toString())) {
+                        data.OBSERVACION = 'Registro duplicado dentro de la plantilla';
+                        continue;
+                    }
+                    const verificacion = VerificarFormatoDatos(data);
+                    if (verificacion[0]) {
+                        data.OBSERVACION = verificacion[1];
+                        continue;
+                    }
+                    if (yield VerificarDuplicadoBase(CODIGO_HORARIO.toString())) {
+                        data.OBSERVACION = 'Ya existe en el sistema';
+                        continue;
+                    }
+                    data.OBSERVACION = 'Ok';
+                    if (data.OBSERVACION === 'Ok') {
+                        plantillaHorarios[index] = ValidarHorasTotales(data);
                     }
                 }
-                if (faltanDatos) {
-                    data.OBSERVACION = 'Datos no registrados: ' + datosFaltantes.join(', ');
-                    continue;
+                ;
+                for (const data of plantillaDetalles) {
+                    let { CODIGO_HORARIO, TIPO_ACCION, HORA, TOLERANCIA, SALIDA_SIGUIENTE_DIA, MINUTOS_ANTES, MINUTOS_DESPUES } = data;
+                    let orden = 0;
+                    // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
+                    // const requiredValues = [CODIGO_HORARIO, TIPO_ACCION, HORA];
+                    const requeridos = ['CODIGO_HORARIO', 'TIPO_ACCION', 'HORA'];
+                    let faltanDatosDetalles = false;
+                    let datosFaltantesDetalles = [];
+                    // MAPEO DE CLAVES A DESCRIPCIONES
+                    let descripciones = {
+                        CODIGO_HORARIO: 'código',
+                        TIPO_ACCION: 'tipo de acción',
+                        HORA: 'hora'
+                    };
+                    for (const key of requeridos) {
+                        if (data[key] === undefined) {
+                            data[key] = 'No registrado';
+                            datosFaltantesDetalles.push(descripciones[key]);
+                            faltanDatosDetalles = true;
+                        }
+                    }
+                    if (faltanDatosDetalles) {
+                        data.OBSERVACION = 'Datos no registrados: ' + datosFaltantesDetalles.join(', ');
+                        continue;
+                    }
+                    switch (TIPO_ACCION.toLowerCase()) {
+                        case 'entrada':
+                            orden = 1;
+                            break;
+                        case 'inicio alimentación':
+                        case 'inicio alimentacion':
+                            orden = 2;
+                            break;
+                        case 'fin alimentación':
+                        case 'fin alimentacion':
+                            orden = 3;
+                            break;
+                        case 'salida':
+                            orden = 4;
+                            break;
+                    }
+                    data.ORDEN = orden;
+                    data.MINUTOS_ANTES = MINUTOS_ANTES !== null && MINUTOS_ANTES !== void 0 ? MINUTOS_ANTES : 0;
+                    data.MINUTOS_DESPUES = MINUTOS_DESPUES !== null && MINUTOS_DESPUES !== void 0 ? MINUTOS_DESPUES : 0;
+                    data.SALIDA_SIGUIENTE_DIA = SALIDA_SIGUIENTE_DIA !== null && SALIDA_SIGUIENTE_DIA !== void 0 ? SALIDA_SIGUIENTE_DIA : 'No';
+                    data.TOLERANCIA = TIPO_ACCION.toLowerCase() === 'entrada' ? (TOLERANCIA !== null && TOLERANCIA !== void 0 ? TOLERANCIA : 0) : '';
+                    if (!VerificarCodigoHorarioDetalleHorario(CODIGO_HORARIO.toString(), plantillaHorarios)) {
+                        data.OBSERVACION = 'Requerido codigo de horario existente';
+                        continue;
+                    }
+                    const verificacion = VerificarFormatoDetalleHorario(data);
+                    if (verificacion[0]) {
+                        data.OBSERVACION = verificacion[1];
+                        continue;
+                    }
+                    data.OBSERVACION = 'Ok';
                 }
-                codigos.push(CODIGO_HORARIO.toString());
-                if (VerificarDuplicado(codigos, CODIGO_HORARIO.toString())) {
-                    data.OBSERVACION = 'Registro duplicado dentro de la plantilla';
-                    continue;
-                }
-                const verificacion = VerificarFormatoDatos(data);
-                if (verificacion[0]) {
-                    data.OBSERVACION = verificacion[1];
-                    continue;
-                }
-                if (yield VerificarDuplicadoBase(CODIGO_HORARIO.toString())) {
-                    data.OBSERVACION = 'Ya existe en el sistema';
-                    continue;
-                }
-                data.OBSERVACION = 'Ok';
-                if (data.OBSERVACION === 'Ok') {
-                    plantillaHorarios[index] = ValidarHorasTotales(data);
-                }
-            }
-            ;
-            for (const data of plantillaDetalles) {
-                let { CODIGO_HORARIO, TIPO_ACCION, HORA, TOLERANCIA, SALIDA_SIGUIENTE_DIA, MIN_ANTES, MIN_DESPUES } = data;
-                let orden = 0;
-                // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
-                // const requiredValues = [CODIGO_HORARIO, TIPO_ACCION, HORA];
-                const requeridos = ['CODIGO_HORARIO', 'TIPO_ACCION', 'HORA'];
-                let faltanDatosDetalles = false;
-                let datosFaltantesDetalles = [];
-                // MAPEO DE CLAVES A DESCRIPCIONES
-                let descripciones = {
-                    CODIGO_HORARIO: 'código',
-                    TIPO_ACCION: 'tipo de acción',
-                    HORA: 'hora'
-                };
-                for (const key of requeridos) {
-                    if (data[key] === undefined) {
-                        data[key] = 'No registrado';
-                        datosFaltantesDetalles.push(descripciones[key]);
-                        faltanDatosDetalles = true;
+                ;
+                const detallesAgrupados = AgruparDetalles(plantillaDetalles);
+                const detallesAgrupadosVerificados = VerificarDetallesAgrupados(detallesAgrupados, plantillaHorarios);
+                // CAMBIAR OBSERVACIONES DE PLANTILLADETALLES SEGUN LOS CODIGOS QUE NO CUMPLAN CON LOS REQUISITOS
+                for (const codigo of detallesAgrupadosVerificados) {
+                    const detalles = plantillaDetalles.filter((detalle) => detalle.CODIGO_HORARIO.toString() === codigo.codigo);
+                    for (const detalle of detalles) {
+                        if (detalle.OBSERVACION === 'Ok') {
+                            detalle.OBSERVACION = codigo.observacion;
+                        }
                     }
                 }
-                if (faltanDatosDetalles) {
-                    data.OBSERVACION = 'Datos no registrados: ' + datosFaltantesDetalles.join(', ');
-                    continue;
-                }
-                switch (TIPO_ACCION.toLowerCase()) {
-                    case 'entrada':
-                        orden = 1;
-                        break;
-                    case 'inicio alimentación':
-                    case 'inicio alimentacion':
-                        orden = 2;
-                        break;
-                    case 'fin alimentación':
-                    case 'fin alimentacion':
-                        orden = 3;
-                        break;
-                    case 'salida':
-                        orden = 4;
-                        break;
-                }
-                data.ORDEN = orden;
-                data.MIN_ANTES = MIN_ANTES !== null && MIN_ANTES !== void 0 ? MIN_ANTES : 0;
-                data.MIN_DESPUES = MIN_DESPUES !== null && MIN_DESPUES !== void 0 ? MIN_DESPUES : 0;
-                data.SALIDA_SIGUIENTE_DIA = SALIDA_SIGUIENTE_DIA !== null && SALIDA_SIGUIENTE_DIA !== void 0 ? SALIDA_SIGUIENTE_DIA : 'No';
-                data.TOLERANCIA = TIPO_ACCION.toLowerCase() === 'entrada' ? (TOLERANCIA !== null && TOLERANCIA !== void 0 ? TOLERANCIA : 0) : '';
-                if (!VerificarCodigoHorarioDetalleHorario(CODIGO_HORARIO.toString(), plantillaHorarios)) {
-                    data.OBSERVACION = 'Requerido codigo de horario existente';
-                    continue;
-                }
-                const verificacion = VerificarFormatoDetalleHorario(data);
-                if (verificacion[0]) {
-                    data.OBSERVACION = verificacion[1];
-                    continue;
-                }
-                data.OBSERVACION = 'Ok';
-            }
-            ;
-            const detallesAgrupados = AgruparDetalles(plantillaDetalles);
-            const detallesAgrupadosVerificados = VerificarDetallesAgrupados(detallesAgrupados, plantillaHorarios);
-            // CAMBIAR OBSERVACIONES DE PLANTILLADETALLES SEGUN LOS CODIGOS QUE NO CUMPLAN CON LOS REQUISITOS
-            for (const codigo of detallesAgrupadosVerificados) {
-                const detalles = plantillaDetalles.filter((detalle) => detalle.CODIGO_HORARIO.toString() === codigo.codigo);
-                for (const detalle of detalles) {
-                    if (detalle.OBSERVACION === 'Ok') {
-                        detalle.OBSERVACION = codigo.observacion;
+                // VERIFICAR EXISTENCIA DE DETALLES PARA CADA HORARIO
+                plantillaHorarios.forEach((horario) => {
+                    if (horario.OBSERVACION === 'Ok') {
+                        const detallesCorrespondientes = plantillaDetalles.filter((detalle) => detalle.CODIGO_HORARIO === horario.CODIGO_HORARIO && detalle.OBSERVACION === 'Ok');
+                        horario.DETALLE = detallesCorrespondientes.length > 0;
                     }
-                }
+                });
+                const horariosOk = plantillaHorarios.filter((horario) => horario.OBSERVACION === 'Ok');
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(ruta);
+                    }
+                });
+                const mensaje = horariosOk.length > 0 ? 'correcto' : 'error';
+                res.json({ plantillaHorarios, plantillaDetalles, mensaje });
             }
-            // VERIFICAR EXISTENCIA DE DETALLES PARA CADA HORARIO
-            plantillaHorarios.forEach((horario) => {
-                if (horario.OBSERVACION === 'Ok') {
-                    const detallesCorrespondientes = plantillaDetalles.filter((detalle) => detalle.CODIGO_HORARIO === horario.CODIGO_HORARIO && detalle.OBSERVACION === 'Ok');
-                    horario.DETALLE = detallesCorrespondientes.length > 0;
-                }
-            });
-            const horariosOk = plantillaHorarios.filter((horario) => horario.OBSERVACION === 'Ok');
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                if (err) {
-                }
-                else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs_1.default.unlinkSync(ruta);
-                }
-            });
-            const mensaje = horariosOk.length > 0 ? 'correcto' : 'error';
-            res.json({ plantillaHorarios, plantillaDetalles, mensaje });
         });
     }
 }
@@ -801,9 +813,9 @@ function VerificarDuplicado(codigos, codigo) {
 function VerificarFormatoDatos(data) {
     let observacion = '';
     let error = true;
-    const { HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = data;
+    const { HORAS_TOTALES, MINUTOS_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = data;
     const horasTotalesFormatoCorrecto = /^(\d+)$|^(\d{1,2}:\d{2})$|^(\d{1,2}:\d{2}:\d{2})$/.test(HORAS_TOTALES);
-    const minAlimentacionFormatoCorrecto = /^\d+$/.test(MIN_ALIMENTACION);
+    const minAlimentacionFormatoCorrecto = /^\d+$/.test(MINUTOS_ALIMENTACION);
     const tipoHorarioValido = ['Laborable', 'Libre', 'Feriado'].includes(TIPO_HORARIO);
     const tipoHorarioNocturnoValido = ['Si', 'No'].includes(HORARIO_NOCTURNO);
     horasTotalesFormatoCorrecto ? null : observacion = 'Formato de horas totales incorrecto (HH:mm)';
@@ -831,10 +843,10 @@ function VerificarCodigoHorarioDetalleHorario(codigo, plantillaHorarios) {
 function VerificarFormatoDetalleHorario(data) {
     let observacion = '';
     let error = true;
-    const { TIPO_ACCION, HORA, TOLERANCIA, MIN_ANTES, MIN_DESPUES } = data;
+    const { TIPO_ACCION, HORA, TOLERANCIA, MINUTOS_ANTES, MINUTOS_DESPUES } = data;
     const horaFormatoCorrecto = /^(\d{1,2}:\d{2})$|^(\d{1,2}:\d{2}:\d{2})$/.test(HORA);
-    const minAntesFormatoCorrecto = /^\d+$/.test(MIN_ANTES);
-    const minDespuesFormatoCorrecto = /^\d+$/.test(MIN_DESPUES);
+    const minAntesFormatoCorrecto = /^\d+$/.test(MINUTOS_ANTES);
+    const minDespuesFormatoCorrecto = /^\d+$/.test(MINUTOS_DESPUES);
     let toleranciaFormatoCorrecto = true;
     if (TIPO_ACCION.toLowerCase() === 'entrada') {
         toleranciaFormatoCorrecto = /^\d+$/.test(TOLERANCIA);
@@ -870,7 +882,7 @@ function VerificarDetallesAgrupados(detallesAgrupados, horarios) {
         const detalles = detallesAgrupados[codigoHorario].filter((detalle) => detalle.OBSERVACION === 'Ok');
         const horario = horarios.find(h => h.CODIGO_HORARIO.toString() === codigoHorario);
         if (horario) {
-            const tieneAlimentacion = horario.MIN_ALIMENTACION > 0;
+            const tieneAlimentacion = horario.MINUTOS_ALIMENTACION > 0;
             const tiposAccionRequeridos = tieneAlimentacion ? ['Entrada', 'Inicio alimentación', 'Fin alimentación', 'Salida'] : ['Entrada', 'Salida'];
             const tiposAccionExistentes = detalles.map((detalle) => detalle.TIPO_ACCION);
             if (tiposAccionExistentes.length < tiposAccionRequeridos.length) {
@@ -899,7 +911,7 @@ function VerificarDetallesAgrupados(detallesAgrupados, horarios) {
                     const horaInicioAlimentacion = getHora(inicioAlimentacion);
                     const horaFinAlimentacion = getHora(finAlimentacion);
                     diferenciaAlimentacion = horaFinAlimentacion.diff(horaInicioAlimentacion, 'minutes');
-                    minutosAlimentacion = Number(horario.MIN_ALIMENTACION.toString());
+                    minutosAlimentacion = Number(horario.MINUTOS_ALIMENTACION.toString());
                     if (diferenciaAlimentacion < minutosAlimentacion) {
                         codigosDetalles.push({ codigo: codigoHorario, observacion: 'Minutos de alimentación no corresponden a los asignados' });
                         return codigosDetalles;
@@ -949,7 +961,7 @@ function ValidarHorasTotales(horario) {
         (hora >= '24:00:00' && hora < '72:00:00') ||
         hora >= '72:00' ||
         hora >= '72:00:00') {
-        horario.MIN_ALIMENTACION = 0;
+        horario.MINUTOS_ALIMENTACION = 0;
     }
     return horario;
 }

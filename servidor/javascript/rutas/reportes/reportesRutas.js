@@ -12,17 +12,11 @@ class CiudadRutas {
         this.configuracion();
     }
     configuracion() {
-        this.router.get('/horasExtrasReales', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarDatosContractoA);
-        this.router.get('/horasExtrasReales/:empleado_id', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarDatosCargoA);
         this.router.post('/horasExtrasReales/entradaSalida/:id_empleado', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarEntradaSalidaEmpleado);
         this.router.post('/horasExtrasReales/listaPedidos/:id_usua_solicita', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarPedidosEmpleado);
         this.router.post('/horasExtrasReales/entradaSalida/total/timbres', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarEntradaSalidaTodos);
         this.router.post('/horasExtrasReales/listaPedidos/total/solicitudes', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarPedidosTodos);
-        this.router.post('/reporteTimbres/listaTimbres/:id_empleado', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarTimbres);
         this.router.get('/reportePermisos/horarios/:codigo', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarPermisoHorarioEmpleado);
-        this.router.get('/reportePermisos/autorizaciones/:id_empleado', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarPermisoAutorizaEmpleado);
-        this.router.post('/reportePermisos/fechas/horarios/:codigo', verificarToken_1.TokenValidation, reportesControlador_1.default.ListarPermisoHorarioEmpleadoFechas);
-        this.router.post('/reporteTimbres/buscarPlan/:codigo', verificarToken_1.TokenValidation, reportesControlador_1.default.BuscarPlan);
     }
 }
 const REPORTES_RUTAS = new CiudadRutas();

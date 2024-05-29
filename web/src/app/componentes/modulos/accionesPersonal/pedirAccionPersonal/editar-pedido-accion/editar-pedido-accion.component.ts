@@ -241,49 +241,49 @@ export class EditarPedidoAccionComponent implements OnInit {
         console.log("datos", this.datosPedido);
         this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empleado)
           .subscribe((data1) => {
-            this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empl_uno)
+            this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empleado_uno)
               .subscribe((data2) => {
-                this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empl_dos)
+                this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empleado_dos)
                   .subscribe((data3) => {
-                    this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empl_responsable)
+                    this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empleado_responsable)
                       .subscribe((data4) => {
                         this.restAccion.BuscarDatosPedidoCiudades(this.datosPedido[0].id_ciudad)
                           .subscribe((data5) => {
                             this.firstFormGroup.patchValue({
-                              identificacionForm: this.datosPedido[0].identi_accion_p,
-                              tipoDecretoForm: this.datosPedido[0].decre_acue_resol,
+                              identificacionForm: this.datosPedido[0].identificacion_accion_personal,
+                              tipoDecretoForm: this.datosPedido[0].id_contexto_legal,
                               baseForm: this.datosPedido[0].adicion_legal,
-                              accionForm: this.datosPedido[0].tipo_accion,
+                              accionForm: this.datosPedido[0].id_detalle_tipo_accion_personal,
                             });
                             this.secondFormGroup.patchValue({
                               idEmpleadoForm: data1[0].apellido + " " + data1[0].nombre,
-                              fechaDesdeForm: this.datosPedido[0].fec_rige_desde,
-                              fechaHastaForm: this.datosPedido[0].fec_rige_hasta,
-                              numPartidaForm: this.datosPedido[0].num_partida,
-                              tipoProcesoForm: this.datosPedido[0].proceso_propuesto,
+                              fechaDesdeForm: this.datosPedido[0].fecha_rige_desde,
+                              fechaHastaForm: this.datosPedido[0].fecha_rige_hasta,
+                              numPartidaForm: this.datosPedido[0].numero_partida_empresa,
+                              tipoProcesoForm: this.datosPedido[0].id_proceso_propuesto,
                               idCiudad: data5[0].descripcion,
-                              tipoCargoForm: this.datosPedido[0].cargo_propuesto,
+                              tipoCargoForm: this.datosPedido[0].id_cargo_propuesto,
                               sueldoForm: this.datosPedido[0].salario_propuesto,
-                              numPropuestaForm: this.datosPedido[0].num_partida_propuesta,
-                              numPartidaIForm: this.datosPedido[0].num_partida_individual,
+                              numPropuestaForm: this.datosPedido[0].numero_partida_propuesta,
+                              numPartidaIForm: this.datosPedido[0].numero_partida_individual,
                             });
                             this.thirdFormGroup.patchValue({
-                              actaForm: this.datosPedido[0].act_final_concurso,
-                              fechaActaForm: this.datosPedido[0].fec_act_final_concurso,
+                              actaForm: this.datosPedido[0].acta_final_concurso,
+                              fechaActaForm: this.datosPedido[0].fecha_acta_final_concurso,
                               idEmpleadoHForm: data2[0].apellido + " " + data2[0].nombre,
                               idEmpleadoGForm: data3[0].apellido + " " + data3[0].nombre,
                               idEmpleadoRForm: data4[0].apellido + " " + data4[0].nombre,
-                              abrevHForm: this.datosPedido[0].abrev_empl_uno,
-                              abrevGForm: this.datosPedido[0].abrev_empl_dos,
+                              abrevHForm: this.datosPedido[0].titulo_empleado_uno,
+                              abrevGForm: this.datosPedido[0].titulo_empleado_dos,
                             });
                             this.fourthFormGroup.patchValue({
-                              funcionesReempForm: this.datosPedido[0].funciones_reemp,
-                              nombreReempForm: this.datosPedido[0].nombre_reemp,
-                              puestoReempForm: this.datosPedido[0].puesto_reemp,
-                              accionReempForm: this.datosPedido[0].num_accion_reemp,
-                              fechaReempForm: this.datosPedido[0].primera_fecha_reemp,
+                              funcionesReempForm: this.datosPedido[0].funciones_reemplazo,
+                              nombreReempForm: this.datosPedido[0].nombre_reemplazo,
+                              puestoReempForm: this.datosPedido[0].puesto_reemplazo,
+                              accionReempForm: this.datosPedido[0].numero_accion_reemplazo,
+                              fechaReempForm: this.datosPedido[0].primera_fecha_reemplazo,
                               posesionNotificacionForm: this.datosPedido[0].posesion_notificacion,
-                              descripcionPForm: this.datosPedido[0].descripcion_pose_noti,
+                              descripcionPForm: this.datosPedido[0].descripcion_posesion_notificacion,
                             });
                           });
                       });
