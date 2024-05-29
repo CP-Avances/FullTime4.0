@@ -8,7 +8,6 @@ import path from 'path';
 import fs from 'fs';
 
 import excel from 'xlsx';
-import { use } from 'echarts';
 
 class EmpleadoCargosControlador {
 
