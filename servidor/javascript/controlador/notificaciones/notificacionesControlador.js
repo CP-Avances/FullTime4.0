@@ -252,7 +252,7 @@ class NotificacionTiempoRealControlador {
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_configurar_alertas',
                     usuario: user_name,
-                    accion: 'C',
+                    accion: 'I',
                     datosOriginales: '',
                     datosNuevos: `{"id_empleado": "${id_empleado}", "vacacion_mail": "${vaca_mail}", "vacacion_notificacion": "${vaca_noti}", permiso_mail: "${permiso_mail}", permiso_notificacion: "${permiso_noti}", hora_extra_mail: "${hora_extra_mail}", hora_extra_notificacion: "${hora_extra_noti}", comida_mail: "${comida_mail}", comida_notificacion: "${comida_noti}", comunicado_mail: "${comunicado_mail}", comunicado_notificacion: "${comunicado_noti}"}`,
                     ip,
