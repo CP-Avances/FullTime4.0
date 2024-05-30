@@ -17,19 +17,19 @@ const database_1 = __importDefault(require("../../database"));
 class AuditoriaControlador {
     BuscarDatosAuditoria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { tabla, desde, hasta } = req.body;
+            const { tabla, desde, hasta, action } = req.body;
             const DATOS = yield database_1.default.query(`
-            SELECT plataforma, table_name, user_name, fecha_hora, 
-                action, original_data, new_data, ip_address 
+            SELECT *
             FROM audit.auditoria 
-            WHERE table_name = $1 AND fecha_hora::date BETWEEN $2 AND $3 
+            WHERE table_name = $1 AND action= $4 AND fecha_hora BETWEEN $2 AND $3 
             ORDER BY fecha_hora::date DESC
-            `, [tabla, desde, hasta]);
+            `, [tabla, desde, hasta, action]);
             if (DATOS.rowCount > 0) {
                 return res.jsonp(DATOS.rows);
+                //return res.status(200).jsonp({ text: 'No se encuentran registros', status:'404' });
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ message: 'error', status: '404' });
             }
         });
     }

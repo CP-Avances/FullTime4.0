@@ -552,3 +552,5 @@ export interface ITableDiscapacidad {
 export interface ITableVacuna {
     nombre: string,
 }
+
+

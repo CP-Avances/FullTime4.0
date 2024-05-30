@@ -1,0 +1,91 @@
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;">
+    <div id="titulo">
+        <span>REPORTE DE AUDITORIA</span>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-lg-5" style="padding-bottom: 10px;">
+            <app-rango-fechas [limitarFecha]="true"></app-rango-fechas>
+        </div>
+        <div class="col-lg-7">
+            <div id="resultados">
+                <span>OPCIONES DE DESCARGA</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
+                    <button mat-icon-button (click)="ValidarReporte()"    matTooltipPosition="right"
+                        matTooltip="Previsualizar reporte en el navegador.">
+                        <mat-icon class="ver">visibility</mat-icon>
+                    </button>
+                    <button mat-icon-button matTooltipPosition="right"
+                        matTooltip="Previsualizar reporte en el navegador en fomato PDF.">
+                        <mat-icon class="i-pdf">picture_as_pdf</mat-icon>
+                    </button>
+                    <button mat-icon-button matTooltipPosition="right" matTooltip="Descargar reporte en formato EXCEL.">
+                        <mat-icon class="fas fa-file-excel i-excel"></mat-icon>
+                    </button>
+                    <button mat-icon-button matTooltipPosition="right" matTooltip="Imprimir reporte en formato PDF.">
+                        <mat-icon class="i-print">local_printshop</mat-icon>
+                    </button>
+                    <button mat-icon-button matTooltipPosition="right" matTooltip="Descargar reporte en formato PDF.">
+                        <mat-icon class="i-download">cloud_download</mat-icon>
+                    </button>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+
+
+</div>
+
+
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px; padding-top: 30px;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <div class="w-100 bd-highlight">
+                <h5>
+                    RESULTADO DE BÚSQUEDA
+                </h5>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+
+                        <th>
+                            <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                                id="SelectCheck" (click)="HabilitarSeleccion()">
+                                library_add_check
+                            </mat-icon>
+                            <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                                [checked]="selectionAuditoria.hasValue() && isAllSelectedPag()"
+                                [indeterminate]="selectionAuditoria.hasValue() && !isAllSelectedPag()"
+                                [aria-label]="checkboxLabelPag()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Tablas</th>
+                        <th scope="col">Modulo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let tabla of tablas | paginate:tamanio_pagina:numero_pagina">
+
+                        <td>
+                            <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionAuditoria.toggle(tabla) : null"
+                                [checked]="selectionAuditoria.isSelected(tabla)" [aria-label]="checkboxLabelPag(tabla)">
+                            </mat-checkbox>
+                        </td>
+                        <td style="font-size: 14px;">{{tabla.nombre}}</td>
+                        <td style="font-size: 14px;">{{tabla.modulo}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="tablas.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
