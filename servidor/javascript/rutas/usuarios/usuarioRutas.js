@@ -51,6 +51,8 @@ class UsuarioRutas {
         this.router.post('/buscar-usuario-sucursal', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.BuscarUsuarioSucursal);
         // CREAR REGISTRO DE USUARIOS - SUCURSAL
         this.router.post('/usuario-sucursal', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.CrearUsuarioSucursal);
+        // CREAR REGISTRO DE USUARIOS - DEPARTAMENTOS
+        this.router.post('/usuario-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.CrearUsuarioDepartamento);
         // METODO PARA BUSCAR DATOS DE USUARIO SUCURSAL PRINCIPAL (TRUE)
         this.router.post('/principal-usuario-sucursal', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.BuscarUsuarioSucursalPrincipal);
         // METODO PARA ACTUALIZAR DATOS DE USUARIO - SUCURSAL

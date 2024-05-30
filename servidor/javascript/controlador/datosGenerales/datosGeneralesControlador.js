@@ -1366,7 +1366,7 @@ class DatosGeneralesControlador {
             const { lista_sucursales, estado } = req.body;
             console.log('lista_sucursales', lista_sucursales);
             const DATOS = yield database_1.default.query(`SELECT da.id, da.nombre, da.apellido, da.id_sucursal AS suc_pertenece, s.nombre AS sucursal,ce.jefe, r.nombre AS rol, 
-            us.id_sucursal, us.principal, us.id AS id_usucursal, d.nombre AS departamento 
+            us.id_sucursal, us.principal, us.id AS id_usucursal, d.nombre AS departamento, d.id AS id_departamento
         FROM datos_actuales_empleado AS da
         JOIN eu_empleado_cargos AS ce ON da.id_cargo = ce.id
         JOIN ero_cat_roles AS r ON da.id_rol = r.id

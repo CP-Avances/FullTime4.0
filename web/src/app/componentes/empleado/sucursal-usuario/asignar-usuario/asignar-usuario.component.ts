@@ -15,7 +15,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { PrincipalSucursalUsuarioComponent } from '../principal-sucursal-usuario/principal-sucursal-usuario.component';
-import { dep } from '../../../../model/reportes.model';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-asignar-usuario',
@@ -58,8 +58,12 @@ export class AsignarUsuarioComponent implements OnInit {
 
   // VARIABLE PARA SELECCION MULTIPLE DE DEPARTAMENTOS
   departamentosSeleccionados: any = [];
-  ver_departamentos: boolean = false;
   deshabilitar: boolean = false;
+
+  // VARIABLES PARA VISUALIZAR DATOS
+  ver_guardar: boolean = false;
+  ver_departamentos: boolean = false;
+  isPersonal: boolean = false;
 
 
   constructor(
@@ -149,7 +153,7 @@ export class AsignarUsuarioComponent implements OnInit {
       //console.log('ver sucursal ', this.usuarios)
     });
 
-    console.log('ver datos ', this.principales)
+    console.log('ver datos principales', this.principales)
 
   }
 
@@ -201,8 +205,12 @@ export class AsignarUsuarioComponent implements OnInit {
     this.departamentoService.BuscarDepartamentoSucursal(id_sucursal).subscribe(datos => {
       this.departamentos = datos;
       this.ver_departamentos = true;
-      console.log('Departamentos ', this.departamentos)
-    })
+    });
+
+    // GREGAR PROPIEDAD SELECCIONADO A TODOS LOS DEPARTAMENTOS
+    this.departamentos.forEach((obj: any) => {
+      obj.seleccionado = false;
+    });
   }
 
   // VARIABLES DE ACTIVACION DE FUNCIONES
@@ -290,10 +298,13 @@ export class AsignarUsuarioComponent implements OnInit {
   SeleccionarTodas(event: any) {
     if (event === true) {
       this.AgregarTodos();
+      this.ver_guardar = true;
     }
     else {
       this.QuitarTodos();
+      this.ver_guardar = false;
     }
+
   }
 
   // METODO PARA VERIFICAR SELECCION DE CIUDADES
@@ -305,17 +316,44 @@ export class AsignarUsuarioComponent implements OnInit {
     else {
       this.QuitarDepartamento(valor);
     }
+    if (this.departamentosSeleccionados.length != 0) {
+      this.ver_guardar = true;
+    } else {
+      this.ver_guardar = false;
+    }
   }
 
   // METODO PARA DESHABILITAR OPCIONES DEPARTAMENTOS
-  DeshabilitarOpciones() {
+  DeshabilitarOpciones(event: any) {
     this.deshabilitar = !this.deshabilitar;
+    this.departamentos.forEach((obj: any) => {
+      obj.seleccionado = false;
+    });
+
+    this.departamentosSeleccionados = [];
+    const target = event.target as HTMLInputElement;
+    this.isPersonal = target.checked;
+
+    if (this.isPersonal === true) {
+      this.ver_guardar = true;
+    } else {
+      this.ver_guardar = false;
+    }
+
   }
 
   // METODO PARA RETIRAR DE LISTA DE SELECCIONADOS
   RetirarLista(seleccionado: any) {
     this.departamentosSeleccionados = this.departamentosSeleccionados.filter(elemento => elemento.id !== seleccionado);
-    //console.log('ver seleccionados ', this.adminSeleccionados)
+
+    const departamento = this.departamentos.find((departamento: any) => departamento.id === seleccionado);
+    if (departamento) {
+      departamento.seleccionado = false;
+    }
+    if (this.departamentosSeleccionados.length === 0) {
+      this.ver_guardar = false;
+      this.isChecked = false;
+    }
   }
 
   // METODO PARA VERIFICAR QUE NO SE ENCUENTREN DATOS DUPLICADOS
@@ -357,34 +395,84 @@ export class AsignarUsuarioComponent implements OnInit {
   }
 
   // METODO PARA ASIGNAR ADMINISTRACION DE DATOS A OTROS USUARIOS
-  ver_guardar: boolean = false;
-  IngresarUsuarioSucursal() {
-    let cont = 0;
-    let datos = {
+
+  // IngresarUsuarioSucursal() {
+  //   let cont = 0;
+  //   let datos = {
+  //     id_empleado: '',
+  //     id_sucursal: this.data.id,
+  //     principal: false,
+  //     user_name: this.user_name,
+  //     ip: this.ip,
+  //   }
+  //   this.adminSeleccionados.forEach(objeto => {
+  //     datos.id_empleado = objeto.id;
+  //     this.usuario.RegistrarUsuarioSucursal(datos).subscribe(res => {
+  //       //console.log('res', res)
+  //       cont = cont + 1;
+  //       if (cont === this.adminSeleccionados.length) {
+  //         this.toastr.success('Registros guardados exitosamente.', 'PROCESO EXITOSO.', {
+  //           timeOut: 6000,
+  //         });
+  //         // LIMPIAR DATOS Y REFRESCAR LAS CONSULTAS
+  //         this.LimpiarDatos();
+  //         this.adminSeleccionados = [];
+  //         this.ver_guardar = false;
+  //         this.ver_administradores = false;
+  //         this.BuscarAdministradoresJefes();
+  //       }
+  //     });
+  //   })
+  // }
+
+  // METODO PARA ASIGNAR ADMINISTRACION DE DATOS A OTROS USUARIOS - DEPARTAMENTOS
+  IngresarUsuarioDepartamento() {
+    let datos: any = {
       id_empleado: '',
-      id_sucursal: this.data.id,
+      id_departamento: '',
       principal: false,
       user_name: this.user_name,
       ip: this.ip,
-    }
-    this.adminSeleccionados.forEach(objeto => {
-      datos.id_empleado = objeto.id;
-      this.usuario.RegistrarUsuarioSucursal(datos).subscribe(res => {
-        //console.log('res', res)
-        cont = cont + 1;
-        if (cont === this.adminSeleccionados.length) {
-          this.toastr.success('Registros guardados exitosamente.', 'PROCESO EXITOSO.', {
-            timeOut: 6000,
-          });
-          // LIMPIAR DATOS Y REFRESCAR LAS CONSULTAS
-          this.LimpiarDatos();
-          this.adminSeleccionados = [];
-          this.ver_guardar = false;
-          this.ver_administradores = false;
-          this.BuscarAdministradoresJefes();
-        }
+    };
+
+    if (this.usuariosSeleccionados.selected.length === 0) {
+      this.toastr.warning('No se han seleccionado usuarios.', 'VERIFICAR PROCESO.', {
+        timeOut: 6000,
       });
-    })
+      return;
+    }
+
+    const requests: Promise<any>[] = [];
+
+    this.usuariosSeleccionados.selected.forEach((objeto: any) => {
+      datos.id_empleado = objeto.id;
+      if (this.isPersonal) {
+        datos.id_departamento = objeto.id_departamento;
+        requests.push(firstValueFrom(this.usuario.RegistrarUsuarioDepartamento(datos)));
+      } else {
+        this.departamentosSeleccionados.forEach((departamento: any) => {
+          datos.id_departamento = departamento.id;
+          requests.push(firstValueFrom(this.usuario.RegistrarUsuarioDepartamento(datos)));
+        });
+      }
+    });
+
+    Promise.all(requests).then(() => {
+      this.toastr.success('Registros guardados exitosamente.', 'PROCESO EXITOSO.', {
+        timeOut: 6000,
+      });
+      // LIMPIAR DATOS Y REFRESCAR LAS CONSULTAS
+      this.LimpiarDatos();
+      this.usuariosSeleccionados.clear();
+      this.adminSeleccionados = [];
+      this.ver_guardar = false;
+      this.ver_administradores = false;
+      this.BuscarAdministradoresJefes();
+    }).catch(() => {
+      this.toastr.error('Error al guardar registros.', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
+      });
+    });
   }
 
   // METODO PARA LIMPIAR SELECCION DE USUARIOS
@@ -412,7 +500,7 @@ export class AsignarUsuarioComponent implements OnInit {
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
-  checkboxLabelDep(row?: ITableEmpleados): string {
+  checkboxLabelDep(row?: any): string {
     if (!row) {
       return `${this.isAllSelectedDep() ? 'select' : 'deselect'} all`;
     }

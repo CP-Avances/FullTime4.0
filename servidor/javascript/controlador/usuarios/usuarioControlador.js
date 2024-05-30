@@ -1441,6 +1441,38 @@ class UsuarioControlador {
             }
         });
     }
+    // CREAR REGISTRO DE USUARIOS - DEPARTAMENTO
+    CrearUsuarioDepartamento(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_empleado, id_departamento, principal, user_name, ip } = req.body;
+                // INICIA TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query(`
+        INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal) 
+        VALUES ($1, $2, $3)
+        `, [id_empleado, id_departamento, principal]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_usuario_departamento',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{"id_empleado": ${id_empleado}, "id_departamento": ${id_departamento}, "principal": ${principal}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.jsonp({ message: 'error' });
+            }
+        });
+    }
     // BUSCAR DATOS DE USUARIOS - SUCURSAL
     BuscarUsuarioSucursalPrincipal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

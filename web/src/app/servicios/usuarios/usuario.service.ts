@@ -145,6 +145,15 @@ export class UsuarioService {
       );
   }
 
+  //REGISTRAR USUARIO - DEPARTAMENTO
+  RegistrarUsuarioDepartamento(data: any) {
+    console.log('data', data);
+    return this.http.post(`${environment.url}/usuarios/usuario-departamento`, data)
+      .pipe(
+        catchError(data)
+      );
+  }
+
   // METODO DE BUSQUEDA DE DATOS DE USUARIO - SUCURSAL
   BuscarUsuarioSucursalPrincipal(id_empleado: any) {
     return this.http.post(`${environment.url}/usuarios/principal-usuario-sucursal`, id_empleado);

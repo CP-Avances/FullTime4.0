@@ -1679,6 +1679,43 @@ class UsuarioControlador {
     }
   }
 
+  // CREAR REGISTRO DE USUARIOS - DEPARTAMENTO
+  public async CrearUsuarioDepartamento(req: Request, res: Response) {
+    try {
+      const { id_empleado, id_departamento, principal, user_name, ip } = req.body
+
+      // INICIA TRANSACCION
+      await pool.query('BEGIN');
+
+      await pool.query(
+        `
+        INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal) 
+        VALUES ($1, $2, $3)
+        `
+        , [id_empleado, id_departamento, principal]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_usuario_departamento',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{"id_empleado": ${id_empleado}, "id_departamento": ${id_departamento}, "principal": ${principal}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      res.jsonp({ message: 'Registro guardado.' });
+    }
+    catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.jsonp({ message: 'error' });
+    }
+  }
+
   // BUSCAR DATOS DE USUARIOS - SUCURSAL
   public async BuscarUsuarioSucursalPrincipal(req: Request, res: Response) {
     const { id_empleado } = req.body;

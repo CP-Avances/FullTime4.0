@@ -53,7 +53,7 @@
                                         <tr *ngFor="let p of principales | sucRolEmpleado: filtroRol | sucNomEmpleado: filtroNombre | sucDepEmpleado: filtroDepartamento | paginate: tamanio_pagina_p:numero_pagina_p">
                                           <td>
                                             <mat-checkbox (click)="$event.stopPropagation()"
-                                                change="$event ? selectionUno.toggle(e) : null" [checked]="usuariosSeleccionados.isSelected(p)"
+                                                (change)="$event ? usuariosSeleccionados.toggle(p) : null" [checked]="usuariosSeleccionados.isSelected(p)"
                                                 [aria-label]="checkboxLabelU(p)">
                                             </mat-checkbox>
                                           </td>
@@ -169,8 +169,8 @@
                                           <div class="row" style="text-align: center; padding-top: 10px;">
                                             <div class="col-md-6 col-lg-6 col-6" style="text-align:left; padding-bottom: 10px;">
 
-                                              <input class="form-check-input" type="checkbox" id="personal"
-                                                   *ngIf="ver_seleccion" (change)="DeshabilitarOpciones()">
+                                              <input class="form-check-input" type="checkbox" id="personal" [(ngModel)]="isPersonal"
+                                                   *ngIf="ver_seleccion" (change)="DeshabilitarOpciones($event)">
                                               <label *ngIf="ver_seleccion" class="form-check-label" for="inlineCheckbox1"
                                                   style="margin-left: 10px; font-size: 12px; color: blue; font-weight: bold;">
                                                   PERSONAL
@@ -191,7 +191,7 @@
                                                 <div class="col-md-6 col-lg-6 col-6"
                                                     style="text-align:left; padding-bottom: 10px;"
                                                     *ngFor="let n of departamentos; index as i">
-                                                    <input class="form-check-input" type="checkbox"
+                                                    <input class="form-check-input" type="checkbox" [(ngModel)]="n.seleccionado"
                                                         name="departamentosSeleccionados" id="departamentosSeleccionados{{i}}"
                                                         (change)="SeleccionarIndividual($event, n)" [disabled]="deshabilitar">
                                                     <label style="margin-left: 10px; font-size: 11px;"
@@ -238,7 +238,7 @@
                                             Verificar
                                         </button>
                                         <button *ngIf="ver_guardar" id="btn-raised" class="btn btn-sm"
-                                            (click)="IngresarUsuarioSucursal()">
+                                            (click)="IngresarUsuarioDepartamento()">
                                             Guardar
                                         </button>
                                     </div>
