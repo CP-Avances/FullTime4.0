@@ -43,7 +43,7 @@ class BirthdayRutas {
         // METODO PARA DESCARGAR IMAGEN DE CUMPLEAÑOS
         this.router.get('/img/:imagen', BIRTHDAY_CONTROLADOR.getImagen);
         // METODO PARA ACTUALIZAR MENSAJE DE CUMPLEAÑOS
-        this.router.put('/editar/:id_mensaje', TokenValidation, BIRTHDAY_CONTROLADOR.EditarMensajeBirthday);
+        this.router.put('/editar/:id', TokenValidation, BIRTHDAY_CONTROLADOR.EditarMensajeBirthday);
     }
 }
 
