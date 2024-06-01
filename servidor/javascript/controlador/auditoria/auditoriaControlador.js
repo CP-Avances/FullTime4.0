@@ -15,21 +15,60 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AUDITORIA_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
 class AuditoriaControlador {
+    /*
+    public async BuscarDatosAuditoria(req: Request, res: Response) : Promise<Response>{
+      
+        const { tabla, desde, hasta, action } = req.body
+        const DATOS = await pool.query(
+            `
+            SELECT *
+            FROM audit.auditoria
+            WHERE table_name = $1 AND action= $4 AND fecha_hora BETWEEN $2 AND $3
+            ORDER BY fecha_hora::date DESC
+            `
+            , [tabla, desde, hasta, action]);
+        if (DATOS.rowCount > 0) {
+
+
+            return res.jsonp(DATOS.rows )
+            //return res.status(200).jsonp({ text: 'No se encuentran registros', status:'404' });
+
+        }
+        else {
+            return res.status(404).jsonp({ message: 'error', status:'404' });
+        }
+    }
+*/
     BuscarDatosAuditoria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { tabla, desde, hasta, action } = req.body;
-            const DATOS = yield database_1.default.query(`
-            SELECT *
-            FROM audit.auditoria 
-            WHERE table_name = $1 AND action= $4 AND fecha_hora BETWEEN $2 AND $3 
-            ORDER BY fecha_hora::date DESC
-            `, [tabla, desde, hasta, action]);
+            // Convertir las cadenas de tablas y acciones en arrays
+            const tablasArray = tabla.split(',').map((t) => t.trim().replace(/'/g, ''));
+            const actionsArray = action.split(',').map((a) => a.trim().replace(/'/g, ''));
+            // Construir cláusulas dinámicas IN
+            const tableNameClause = `table_name IN (${tablasArray.map((_, i) => `$${i + 1}`).join(', ')})`;
+            const actionClause = `action IN (${actionsArray.map((_, i) => `$${tablasArray.length + i + 1}`).join(', ')})`;
+            const params = [...tablasArray, ...actionsArray, desde, hasta];
+            const query = `
+       SELECT 
+           *
+       FROM 
+           audit.auditoria 
+       WHERE 
+           ${tableNameClause} 
+       AND 
+           ${actionClause} 
+       AND 
+           fecha_hora BETWEEN $${params.length - 1} AND $${params.length}
+       ORDER BY 
+           fecha_hora DESC;
+   `;
+            const DATOS = yield database_1.default.query(query, params);
             if (DATOS.rowCount > 0) {
                 return res.jsonp(DATOS.rows);
-                //return res.status(200).jsonp({ text: 'No se encuentran registros', status:'404' });
             }
             else {
-                return res.status(404).jsonp({ message: 'error', status: '404' });
+                return res.status(404).jsonp({ message: 'No se encuentran registros', status: '404' });
             }
         });
     }

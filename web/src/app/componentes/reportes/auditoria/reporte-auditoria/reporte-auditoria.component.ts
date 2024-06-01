@@ -29,6 +29,11 @@ interface Tablas {
     modulo: string;
     disponibilidad: boolean;
 }
+interface TablasD {
+    nombre: string;
+    modulo: string;
+}
+
 
 
 @Component({
@@ -40,6 +45,9 @@ interface Tablas {
 export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
     data_pdf: any = [];
+
+    accionesSeleccionadas = [];
+
 
     // CRITERIOS DE BUSQUEDA POR FECHAS
     get rangoFechas() { return this.reporteService.rangoFechas };
@@ -65,6 +73,13 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
     get permisos(): boolean { return this.varificarFunciones.permisos; }
     get acciones_personal(): boolean { return this.varificarFunciones.accionesPersonal; }
     get reloj_virtual(): boolean { return this.varificarFunciones.app_movil; }
+
+    ObtenerTipoAccion($event: any) {
+        this.accionesSeleccionadas = $event;
+        //console.log(this.accionesSeleccionadas);
+
+        return this.accionesSeleccionadas;
+    }
 
 
     // Inicialización directa de la lista de objetos Tablas
@@ -143,6 +158,25 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
     ];
 
+    tablasD: TablasD[] = [];
+
+    ContruirTablaDefinitiva(tabla: any) {
+
+
+
+        tabla.map(x=> {
+
+            if(x.disponibilidad == true){
+                this.tablasD.push({
+                    nombre: x.nombre,
+                    modulo: x.modulo,
+                })
+            }
+           
+        })
+
+    }
+
 
     constructor(
         private varificarFunciones: MainNavService,
@@ -161,95 +195,54 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
 
     // VALIDACIONES DE OPCIONES DE REPORTE
-    ValidarReporte() {
+    ValidarReporte(action: any) {
         if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
-        this.ModelarTablasAuditoria();
+        this.ModelarTablasAuditoria(action);
     }
 
 
     //BUSCAR REGISTROS AUDITORIA
 
-    ModelarTablasAuditoria() {
+    ModelarTablasAuditoria(accion: any) {
 
         this.data_pdf = [];
+        var tablas = '';
+        var acciones = '';
+        tablas = this.tablasSolicitadas.map(x => x.nombre).join(',');
+        acciones = this.accionesSeleccionadas.map(x => x).join(',');
 
-        // Crear un array de promesas para todas las consultas
-        const consultas1 = this.tablasSolicitadas.map(x => {
-            const buscarTabla = {
-                tabla: x.nombre,
-                desde: this.rangoFechas.fec_inico,
-                hasta: this.rangoFechas.fec_final,
-                action: 'I'
-            };
-            return new Promise((resolve, reject) => {
-                this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
-                    res => resolve(res), // Resuelve la promesa con el resultado
-                    error => {
-                        if (error.status == '404') {
-                            this.toastr.error('No existen registros en' + x.nombre, 'Ups!!! algo salio mal..', {
-                                timeOut: 6000,
-                            })
-                        }
-                    }
-                );
-            });
-        });
-
-        // Esperar a que todas las promesas se completen
-        Promise.all(consultas1)
-            .then(resultados => {
-                // Todos los resultados están disponibles aquí
-                this.data_pdf = resultados;
-                // Puedes hacer más cosas aquí después de obtener todos los resultados
-                this.GenerarPDF( this.data_pdf);
-                console.log(this.data_pdf[0][0].action)
-
-            })
-            .catch(error => {
-                // Manejar errores aquí
-                console.error('Error en una o más consultas:', error);
-            });
+        const buscarTabla = {
+            tabla: tablas,
+            desde: this.rangoFechas.fec_inico,
+            hasta: this.rangoFechas.fec_final,
+            action: acciones,
+        };
 
 
-        /////////////////////////////////////////
 
-        /*
-        this.data_pdf = [];
-                // Crear un array de promesas para todas las consultas
-                const consultas = this.tablasSolicitadas.map(x => {
-                    const buscarTabla = {
-                        tabla: x.nombre,
-                        desde: this.rangoFechas.fec_inico,
-                        hasta: this.rangoFechas.fec_final,
-                        action: 'I'
-                    };
-                    // return new Promise((resolve, reject) => {
-        
-        
-        
-                    this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
-                        res => {
-                            this.data_pdf.push(res)
-                            console.log(this.data_pdf);
-        
-        
-        
-        
-                        }, error => {
-                            if (error.status == '404') {
-                                this.toastr.error('No existen registros en' + x.nombre, 'Ups!!! algo salio mal..', {
-                                    timeOut: 6000,
-                                })
-                            }
-                        }
-                    )
-        
-        
-                });
-        
-                this.GenerarPDF();
-        
-                */
+        this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
+            res => {
+                this.data_pdf = res;
+                //this.GenerarPDF(this.data_pdf);
+                console.log(this.data_pdf)
+                console.log(this.accionesSeleccionadas)
+
+
+                switch (accion) {
+                    // case 'excel': this.ExportarExcelCargoRegimen(); break;
+                    // case 'ver': this.VerDatos(); break;
+                    default: this.GenerarPDF(this.data_pdf, accion); break;
+                }
+            }
+            , error => {
+                if (error.status == '404') {
+                    this.toastr.error('No existen registros en', 'Ups!!! algo salio mal..', {
+                        timeOut: 6000,
+                    })
+                }
+            }
+
+        )
 
     }
 
@@ -260,6 +253,8 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         //this.ModelarTablasAuditoria();
     }
     ngOnInit(): void {
+
+        this.ContruirTablaDefinitiva(this.tablas);
     }
     // METODO PARA MOSTRAR FILAS DETERMINADAS DE DATOS EN LA TABLA
     ManejarPagina(e: PageEvent) {
@@ -285,14 +280,14 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
     activar_seleccion: boolean = true;
     seleccion_vacia: boolean = true;
 
-    selectionAuditoria = new SelectionModel<Tablas>(true, []);
+    selectionAuditoria = new SelectionModel<TablasD>(true, []);
 
 
 
     // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
     isAllSelectedPag() {
         const numSelected = this.selectionAuditoria.selected.length;
-        return numSelected === this.tablas.length
+        return numSelected === this.tablasD.length
     }
 
 
@@ -300,12 +295,12 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
     masterTogglePag() {
         this.isAllSelectedPag() ?
             this.selectionAuditoria.clear() :
-            this.tablas.forEach((row: any) => this.selectionAuditoria.select(row));
+            this.tablasD.forEach((row: any) => this.selectionAuditoria.select(row));
     }
 
 
     // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
-    checkboxLabelPag(row?: Tablas): string {
+    checkboxLabelPag(row?: TablasD): string {
         if (!row) {
             return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
         }
@@ -346,11 +341,18 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
  **                                              PDF                                           **
  ** ****************************************************************************************** **/
 
-    GenerarPDF(data: any) {
+    GenerarPDF(data: any, action: any) {
         let documentDefinition: any;
         documentDefinition = this.GetDocumentDefinicion(data);
         let doc_name = `Auditoría.pdf`;
-        pdfMake.createPdf(documentDefinition).open();
+        switch (action) {
+            case 'open': pdfMake.createPdf(documentDefinition).open(); break;
+            case 'print': pdfMake.createPdf(documentDefinition).print(); break;
+            case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
+            default: pdfMake.createPdf(documentDefinition).open(); break;
+        }
+
+        //pdfMake.createPdf(documentDefinition).open();
 
     }
 
@@ -359,7 +361,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
     GetDocumentDefinicion(data: any) {
         return {
             pageSize: 'A4',
-            pageOrientation: 'portrait',
+            pageOrientation: 'landscape',
             pageMargins: [40, 50, 40, 50],
             watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
             header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -414,91 +416,13 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
     }
 
 
-/*
-    // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
+
+
     EstructurarDatosPDF(data: any[]): Array<any> {
         let n: any = []
 
-        let totalAuditotia = 0;
-
-
-        totalAuditotia = 0;
-        n.push({
-            style: 'tableMarginCabecera',
-            table: {
-                widths: ['*'],
-                headerRows: 1,
-                body: [
-                    [
-
-
-                        {
-                            border: [true, true, false, true],
-                            bold: true,
-                            text: 'PLATAFORMA: '+data[0][0].plataforma ,
-                            style: 'itemsTableInfo'
-                        },
-                    ]
-                ]
-            }
-        })
-
-
-        n.push({
-            style: 'tableMargin',
-            table: {
-                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', '*', '*', '*'],
-                headerRows: 1,
-                body: [
-                    [
-                        { text: 'ITEM', style: 'tableHeader' },
-                        { text: 'PLATAFORMA', style: 'tableHeader' },
-                        { text: 'USUARIO', style: 'tableHeader' },
-                        { text: 'IP', style: 'tableHeader' },
-                        { text: 'NOMBRE TABLA', style: 'tableHeader' },
-                        { text: 'ACCIÓN', style: 'tableHeader' },
-                        { text: 'FECHA', style: 'tableHeader' },
-                        { text: 'HORA', style: 'tableHeader' },
-                        { text: 'DATOS ORIGINALES', style: 'tableHeader' },
-                        { text: 'DATOS NUEVOS', style: 'tableHeader' }
-                    ],
-                    //  ...arr_emp.map((usu: any) => {
-                    // return
-
-                    ...data.map(audi => {
-
-                        return [
-                            { style: 'itemsTableCentrado', text: totalAuditotia + 1 },
-                            { style: 'itemsTable', text: audi.plataforma },
-                            { style: 'itemsTable', text: audi.user_name },
-                            { style: 'itemsTableCentrado', text: audi.ip_address },
-                            { style: 'itemsTableCentrado', text: audi.table_name },
-                            { style: 'itemsTable', text: audi.action },
-                            { style: 'itemsTable', text: audi.fecha_hora },
-                            { style: 'itemsTable', text: audi.fecha_hora },
-                            { style: 'itemsTable', text: audi.original_data },
-                            { style: 'itemsTable', text: audi.new_data },
-                        ]
-                    })
-
-                ]
-            },
-            layout: {
-                fillColor: function (rowIndex: any) {
-                    return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-                }
-            }
-        });
-
-        return n;
-    }
-*/
-
-    EstructurarDatosPDF(data: any[]): Array<any> {
-        let n: any = []
-    
         let totalAuditoria = 0;
-    
+
         // Añadir la cabecera con información de la plataforma
         n.push({
             style: 'tableMarginCabecera',
@@ -508,21 +432,21 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
                 body: [
                     [
                         {
-                            border: [true, true, false, true],
+                            border: [true, true, true, false],
                             bold: true,
-                            text: 'PLATAFORMA: ' + data[0][0].plataforma,
+                            text: 'PLATAFORMA: ',
                             style: 'itemsTableInfo'
                         },
                     ]
                 ]
             }
         });
-    
+
         // Añadir la tabla de datos
         n.push({
             style: 'tableMargin',
             table: {
-                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', '*'],
+                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 140, 140],
                 headerRows: 1,
                 body: [
                     [
@@ -541,15 +465,15 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
                         totalAuditoria += 1;
                         return [
                             { style: 'itemsTableCentrado', text: totalAuditoria },
-                            { style: 'itemsTable', text: audi[0].plataforma },
-                            { style: 'itemsTable', text: audi[0].user_name },
-                            { style: 'itemsTableCentrado', text: audi[0].ip_address },
-                            { style: 'itemsTableCentrado', text: audi[0].table_name },
-                            { style: 'itemsTable', text: audi[0].action },
-                            { style: 'itemsTable', text:  this.getDateFromISO(audi[0].fecha_hora)  },
-                            { style: 'itemsTable', text: this.getTimeFromISO(audi[0].fecha_hora)  },
-                            { style: 'itemsTable', text: audi[0].original_data },
-                            { style: 'itemsTable', text: audi[0].new_data },
+                            { style: 'itemsTable', text: audi.plataforma },
+                            { style: 'itemsTable', text: audi.user_name },
+                            { style: 'itemsTableCentrado', text: audi.ip_address },
+                            { style: 'itemsTableCentrado', text: audi.table_name },
+                            { style: 'itemsTable', text: audi.action },
+                            { style: 'itemsTable', text: this.getDateFromISO(audi.fecha_hora) },
+                            { style: 'itemsTable', text: this.getTimeFromISO(audi.fecha_hora) },
+                            { style: 'itemsTable', text: audi.original_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [0, 0, 7, 0] },
+                            { style: 'itemsTable', text: audi.new_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [0, 0, 7, 0] },
                         ]
                     })
                 ]
@@ -560,11 +484,11 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
                 }
             }
         });
-    
+
         return n;
     }
 
-     getDateFromISO(isoString: string): string {
+    getDateFromISO(isoString: string): string {
         const date = new Date(isoString);
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');

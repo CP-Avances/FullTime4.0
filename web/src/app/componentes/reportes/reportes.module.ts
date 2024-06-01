@@ -43,6 +43,8 @@ import { ReporteTiempoAlimentacionComponent } from './asistencia/reporte-tiempo-
 import { ReportePlanificacionHorariaComponent } from './asistencia/reporte-planificacion-horaria/reporte-planificacion-horaria.component';
 import { ReporteResumenAsistenciaComponent } from './asistencia/reporte-resumen-asistencia/reporte-resumen-asistencia.component';
 import { OpcionUsuarioComponent } from './configuracion-reportes/opcion-usuario/opcion-usuario.component';
+import { OpcionAccionComponent } from './configuracion-reportes/opcion-accion/opcion-accion.component';
+
 import { TimbreMrlComponent } from './timbres/timbre-mrl/timbre-mrl.component';
 import { AnalisisDatosComponent } from './analisis-datos/analisis-datos.component';
 
@@ -82,6 +84,7 @@ import { AnalisisDatosComponent } from './analisis-datos/analisis-datos.componen
     ReportePlanificacionHorariaComponent,
     ReporteResumenAsistenciaComponent,
     OpcionUsuarioComponent,
+    OpcionAccionComponent,
     TimbreMrlComponent,
     AnalisisDatosComponent,
   ],

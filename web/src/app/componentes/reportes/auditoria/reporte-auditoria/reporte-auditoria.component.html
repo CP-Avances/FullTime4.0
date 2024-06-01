@@ -13,23 +13,25 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
-                    <button mat-icon-button (click)="ValidarReporte()"    matTooltipPosition="right"
+                    <button mat-icon-button (click)="ValidarReporte('open')" matTooltipPosition="right"
                         matTooltip="Previsualizar reporte en el navegador.">
                         <mat-icon class="ver">visibility</mat-icon>
                     </button>
-                    <button mat-icon-button matTooltipPosition="right"
+                    <button mat-icon-button (click)="ValidarReporte('open')" matTooltipPosition="right"
                         matTooltip="Previsualizar reporte en el navegador en fomato PDF.">
                         <mat-icon class="i-pdf">picture_as_pdf</mat-icon>
                     </button>
-                    <button mat-icon-button matTooltipPosition="right" matTooltip="Descargar reporte en formato EXCEL.">
-                        <mat-icon class="fas fa-file-excel i-excel"></mat-icon>
-                    </button>
-                    <button mat-icon-button matTooltipPosition="right" matTooltip="Imprimir reporte en formato PDF.">
+                    <button mat-icon-button (click)="ValidarReporte('print')" matTooltipPosition="right"
+                        matTooltip="Imprimir reporte en formato PDF.">
                         <mat-icon class="i-print">local_printshop</mat-icon>
                     </button>
-                    <button mat-icon-button matTooltipPosition="right" matTooltip="Descargar reporte en formato PDF.">
+                    <button mat-icon-button (click)="ValidarReporte('download')" matTooltipPosition="right"
+                        matTooltip="Descargar reporte en formato PDF.">
                         <mat-icon class="i-download">cloud_download</mat-icon>
                     </button>
+                </div>
+                <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
+                    <app-opcion-accion (accionesSeleccionas)="ObtenerTipoAccion($event)"></app-opcion-accion>
                 </div>
             </mat-card>
         </div>
@@ -70,21 +72,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let tabla of tablas | paginate:tamanio_pagina:numero_pagina">
-
-                        <td>
-                            <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
-                                (change)="$event ? selectionAuditoria.toggle(tabla) : null"
-                                [checked]="selectionAuditoria.isSelected(tabla)" [aria-label]="checkboxLabelPag(tabla)">
-                            </mat-checkbox>
-                        </td>
-                        <td style="font-size: 14px;">{{tabla.nombre}}</td>
-                        <td style="font-size: 14px;">{{tabla.modulo}}</td>
-                    </tr>
+                    <ng-container *ngFor="let tabla of tablasD | paginate:tamanio_pagina:numero_pagina">
+                        <tr>
+                            <td>
+                                <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                    (change)="$event ? selectionAuditoria.toggle(tabla) : null"
+                                    [checked]="selectionAuditoria.isSelected(tabla)"
+                                    [aria-label]="checkboxLabelPag(tabla)">
+                                </mat-checkbox>
+                            </td>
+                            <td style="font-size: 14px;">{{tabla.nombre}}</td>
+                            <td style="font-size: 14px;">{{tabla.modulo}}</td>
+                        </tr>
+                    </ng-container>
                 </tbody>
             </table>
         </div>
-        <mat-paginator id="pagina" [length]="tablas.length" [pageSize]="tamanio_pagina"
+        <mat-paginator id="pagina" [length]="tablasD.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
     </div>
