@@ -178,4 +178,13 @@ export class UsuarioService {
     return this.http.request('delete', url, httpOptions);
   }
 
+  // METODO PARA ELIMINAR REGISTROS DE USUARIO - DEPARTAMENTO
+  EliminarUsuarioDepartamento(datos: any) {
+    const url = `${environment.url}/usuarios/eliminar-usuario-departamento`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
+  }
+
 }

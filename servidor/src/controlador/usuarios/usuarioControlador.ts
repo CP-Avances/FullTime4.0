@@ -1721,7 +1721,7 @@ class UsuarioControlador {
     const { id_empleado } = req.body;
     const USUARIOS = await pool.query(
       `
-      SELECT e.nombre, e.apellido, d.nombre AS departamento, s.nombre AS sucursal
+      SELECT ud.id, e.nombre, e.apellido, d.nombre AS departamento, s.nombre AS sucursal
       FROM eu_usuario_departamento AS ud
       INNER JOIN eu_empleados AS e ON ud.id_empleado=e.id
       INNER JOIN ed_departamentos AS d ON ud.id_departamento=d.id
@@ -1871,6 +1871,7 @@ class UsuarioControlador {
   public async EliminarUsuarioDepartamento(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip, id } = req.body;
+      console.log( 'id',id, 'user_name',user_name, 'ip', ip);
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -1887,7 +1888,7 @@ class UsuarioControlador {
           datosOriginales: '',
           datosNuevos: '',
           ip,
-          observacion: `Error al eliminar usuario_departamento con id: ${id}. Registro no encontrado.`
+          observacion: `Error al eliminar eu_usuario_departamento con id: ${id}. Registro no encontrado.`
         });
 
         // FINALIZAR TRANSACCION

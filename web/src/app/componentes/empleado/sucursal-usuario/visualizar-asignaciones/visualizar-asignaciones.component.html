@@ -29,9 +29,10 @@
                             <td>{{a.departamento}}</td>
                             <td class="justify-content-center">
                               <i matSuffix matTooltipPosition="right"
-                                  matTooltip="Eliminar asignación."
-                                  class="fas fa-trash" id="t-ver" >
-                                  <p>Eliminar</p>
+                                  matTooltip="Eliminar asignación"
+                                  class="fas fa-trash" id="t-eliminar"
+                                  (click)="ConfirmarDeleteProceso(a.id)"
+                                  >
                               </i>
                           </td>
                           </tr>

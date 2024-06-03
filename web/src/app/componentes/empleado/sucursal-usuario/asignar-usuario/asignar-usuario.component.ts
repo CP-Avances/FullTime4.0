@@ -354,37 +354,6 @@ export class AsignarUsuarioComponent implements OnInit {
     console.log('ver admin ', this.adminSeleccionados)
   }
 
-  // METODO PARA ASIGNAR ADMINISTRACION DE DATOS A OTROS USUARIOS
-
-  // IngresarUsuarioSucursal() {
-  //   let cont = 0;
-  //   let datos = {
-  //     id_empleado: '',
-  //     id_sucursal: this.data.id,
-  //     principal: false,
-  //     user_name: this.user_name,
-  //     ip: this.ip,
-  //   }
-  //   this.adminSeleccionados.forEach(objeto => {
-  //     datos.id_empleado = objeto.id;
-  //     this.usuario.RegistrarUsuarioSucursal(datos).subscribe(res => {
-  //       //console.log('res', res)
-  //       cont = cont + 1;
-  //       if (cont === this.adminSeleccionados.length) {
-  //         this.toastr.success('Registros guardados exitosamente.', 'PROCESO EXITOSO.', {
-  //           timeOut: 6000,
-  //         });
-  //         // LIMPIAR DATOS Y REFRESCAR LAS CONSULTAS
-  //         this.LimpiarDatos();
-  //         this.adminSeleccionados = [];
-  //         this.ver_guardar = false;
-  //         this.ver_administradores = false;
-  //         this.BuscarAdministradoresJefes();
-  //       }
-  //     });
-  //   })
-  // }
-
   // METODO PARA ASIGNAR ADMINISTRACION DE DATOS A OTROS USUARIOS - DEPARTAMENTOS
   IngresarUsuarioDepartamento() {
     let datos: any = {
@@ -424,9 +393,11 @@ export class AsignarUsuarioComponent implements OnInit {
       // LIMPIAR DATOS Y REFRESCAR LAS CONSULTAS
       this.LimpiarDatos();
       this.usuariosSeleccionados.clear();
+      this.departamentosSeleccionados = [];
       this.adminSeleccionados = [];
       this.ver_guardar = false;
       this.ver_administradores = false;
+      this.ver_departamentos = false;
       this.BuscarAdministradoresJefes();
     }).catch(() => {
       this.toastr.error('Error al guardar registros.', 'Ups!!! algo salio mal.', {
@@ -508,57 +479,29 @@ export class AsignarUsuarioComponent implements OnInit {
     //console.log('ver datos seleccionados ', this.selectionAsignados.selected.length)
   }
 
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDeleteProceso() {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.MetodoEliminar()
-        }
-      });
-  }
-
-  // METODO PARA ELIMINAR DATOS ASIGNADOS
-  MetodoEliminar() {
-    let cont = 0;
-
-    const datos = {
-      user_name: this.user_name,
-      ip: this.ip
-    }
-    let lista_eliminar = this.selectionAsignados.selected.map(obj => {
-      return {
-        id_usucursal: obj.id_usucursal
-      }
-    })
-    // PROCESO PARA ELIMINAR LOS REGISTROS SELECCIONADOS
-    lista_eliminar.forEach(obj => {
-      this.usuario.EliminarUsuarioSucursal(obj.id_usucursal, datos).subscribe(res => {
-        cont = cont + 1;
-
-        if (cont === lista_eliminar.length) {
-          this.toastr.error('Registros eliminados.', 'PROCESO EXITOSO.', {
-            timeOut: 6000,
-          });
-          this.LimpiarAsignados();
-        }
-      });
-    })
-    //console.log('ver datos ', lista_eliminar)
-  }
-
   VisualizarAsignaciones(usuario: any) {
     const datos = {
       nombre: `${usuario.nombre} ${usuario.apellido}`,
-      asignaciones: usuario.asignaciones
+      asignaciones: usuario.asignaciones,
+      user_name: this.user_name,
+      ip: this.ip,
+      id: usuario.id
     }
     this.ventana.open(VisualizarAsignacionesComponent, {
       data: datos,
       width: '700px',
       height: 'auto',
-    })
+    }).afterClosed().subscribe((datos: any) => {
+      if (datos) {
+        const usuarioIndex = this.usuarios.findIndex((u: any) => u.id === datos.id);
+        if (usuarioIndex !== -1) {
+          this.usuarios[usuarioIndex].asignaciones = datos.asignaciones;
+        }
+      }
+    }
+    );
   }
+
 
   // METODO PARA LIMPOIAR DATOS DE SELECCION MULTIPLE
   LimpiarAsignados() {

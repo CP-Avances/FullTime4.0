@@ -71,6 +71,8 @@ class UsuarioRutas {
         this.router.put('/actualizar-usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.ActualizarUsuarioSucursalPrincipal);
         // METODO PARA ELIMINAR REGISTRO USUARIO - SUCURSAL
         this.router.delete('/eliminar-usuario-sucursal/:id', TokenValidation, USUARIO_CONTROLADOR.EliminarUsuarioSucursal);
+        // METODO PARA ELIMINAR REGISTRO USUARIO - DEPARTAMENTO
+        this.router.delete('/eliminar-usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.EliminarUsuarioDepartamento);
 
     }
 }
