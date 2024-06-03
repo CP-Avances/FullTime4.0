@@ -16,6 +16,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { PrincipalSucursalUsuarioComponent } from '../principal-sucursal-usuario/principal-sucursal-usuario.component';
 import { firstValueFrom } from 'rxjs';
+import { VisualizarAsignacionesComponent } from '../visualizar-asignaciones/visualizar-asignaciones.component';
 
 @Component({
   selector: 'app-asignar-usuario',
@@ -59,10 +60,12 @@ export class AsignarUsuarioComponent implements OnInit {
   // VARIABLE PARA SELECCION MULTIPLE DE DEPARTAMENTOS
   departamentosSeleccionados: any = [];
   deshabilitar: boolean = false;
+  deshabilitarTodos: boolean = false;
 
   // VARIABLES PARA VISUALIZAR DATOS
   ver_guardar: boolean = false;
   ver_departamentos: boolean = false;
+  ver_personal: boolean = false;
   isPersonal: boolean = false;
 
 
@@ -117,7 +120,7 @@ export class AsignarUsuarioComponent implements OnInit {
   ver_asignados: boolean = false;
   BuscarAdministradoresJefes() {
     let data = {
-      lista_sucursales: '\'' + this.data.id + '\'',
+      lista_sucursales:  this.data.id,
       estado: 1
     }
     //console.log('ver datos ', data)
@@ -127,34 +130,20 @@ export class AsignarUsuarioComponent implements OnInit {
     this.general.ObtenerAdminJefes(data).subscribe(res => {
       this.usuarios = res;
       if (this.usuarios.length != 0) {
-        this.usuarios.forEach(elemento => {
-          if (elemento.principal !== false) {
-            this.principales.push(elemento);
+        this.usuarios.forEach((elemento: any) => {
+          const data = {
+            id_empleado: elemento.id,
           }
-          else {
-            this.asignados.push(elemento);
-          }
+          this.usuario.BuscarUsuarioDepartamento(data).subscribe(datos => {
+            elemento.asignaciones = datos;
+          });
         });
       }
-      // METODO PARA VER TABLAS DE USUARIOS
-      if (this.principales.length != 0) {
-        this.ver_principal = true;
-      }
-      else {
-        this.ver_principal = false;
-      }
 
-      if (this.asignados.length != 0) {
-        this.ver_asignados = true;
-      }
-      else {
-        this.ver_asignados = false;
-      }
-      //console.log('ver sucursal ', this.usuarios)
+      this.ver_principal = true;
+
+      console.log('ver sucursal ', this.usuarios)
     });
-
-    console.log('ver datos principales', this.principales)
-
   }
 
 
@@ -194,12 +183,17 @@ export class AsignarUsuarioComponent implements OnInit {
   // METODO PARA OBTENER DEPARTAMENTOS DEL ESTABLECIMIENTO SELECCIONADO
   departamentos: any = [];
   ObtenerDepartamentos() {
+    this.QuitarTodos();
     this.ver_seleccion = true;
+    this.isChecked = false;
+    this.isPersonal = false;
+    this.deshabilitar = false;
+    this.deshabilitarTodos = false;
     //console.log('ver datos ', this.sucursalForm.value)
     const [elemento] = this.sucursales.filter((o: any) => {
       return o.nombre === this.sucursalForm.value
     })
-    //console.log('ver elementos ', elemento)
+    console.log('ver elementos ', elemento)
     this.departamentos = [];
     const id_sucursal = elemento.id;
     this.departamentoService.BuscarDepartamentoSucursal(id_sucursal).subscribe(datos => {
@@ -211,6 +205,15 @@ export class AsignarUsuarioComponent implements OnInit {
     this.departamentos.forEach((obj: any) => {
       obj.seleccionado = false;
     });
+
+    if (elemento.nombre.toLowerCase() === this.name_sucursal.toLowerCase()) {
+      this.ver_personal = true;
+    }
+    else {
+      this.ver_personal = false;
+    }
+
+
   }
 
   // VARIABLES DE ACTIVACION DE FUNCIONES
@@ -220,50 +223,6 @@ export class AsignarUsuarioComponent implements OnInit {
 
   // METODO PARA LISTAR USUARIOS
   adminSeleccionados: any = [];
-  // ObtenerUsuarios() {
-  //   this.ver_seleccion = true;
-  //   //console.log('ver datos ', this.sucursalForm.value)
-  //   // RETORNAR DATOS DE SUCURSAL SELECCIONADA
-  //   const [elemento] = this.sucursales.filter((o: any) => {
-  //     return o.nombre === this.sucursalForm.value
-  //   })
-  //   //console.log('ver elementos ', elemento)
-  //   this.administradores = [];
-  //   let data = {
-  //     lista_sucursales: '\'' + elemento.id + '\'',
-  //     estado: 1
-  //   }
-  //   this.general.ObtenerAdminJefes(data).subscribe(datos => {
-  //     let respuesta: any = [];
-  //     respuesta = datos;
-  //     respuesta.forEach((obj: any) => {
-  //       if (obj.jefe === false) {
-  //         this.administradores.push(obj);
-  //       }
-  //     })
-  //     this.ver_administradores = true;
-  //     this.ver_guardar = false;
-  //     if (this.administradores.length != 0) {
-  //       (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
-  //     }
-
-  //   }, error => {
-  //     this.toastr.info('No se han encontrado registros.', '', {
-  //       timeOut: 6000,
-  //     });
-  //     this.ver_seleccion = false
-  //   })
-  // }
-
-  // // METODO PARA SELECCIONAR AGREGAR CIUDADES
-  // AgregarCiudad(data: string) {
-  //   this.adminSeleccionados.push(data);
-  // }
-
-  // // METODO PARA RETIRAR CIUDADES
-  // QuitarCiudad(data: any) {
-  //   this.adminSeleccionados = this.adminSeleccionados.filter(s => s !== data);
-  // }
 
   // METODO PARA SELECCIONAR DEPARTAMENTOS
   SeleccionarDepartamento(data: any) {
@@ -296,6 +255,7 @@ export class AsignarUsuarioComponent implements OnInit {
   // METODO PARA VERIFICAR SELECCION DE OPCION "Todas"
   isChecked: boolean = false;
   SeleccionarTodas(event: any) {
+    this.deshabilitarTodos = !this.deshabilitarTodos;
     if (event === true) {
       this.AgregarTodos();
       this.ver_guardar = true;
@@ -586,6 +546,18 @@ export class AsignarUsuarioComponent implements OnInit {
       });
     })
     //console.log('ver datos ', lista_eliminar)
+  }
+
+  VisualizarAsignaciones(usuario: any) {
+    const datos = {
+      nombre: `${usuario.nombre} ${usuario.apellido}`,
+      asignaciones: usuario.asignaciones
+    }
+    this.ventana.open(VisualizarAsignacionesComponent, {
+      data: datos,
+      width: '700px',
+      height: 'auto',
+    })
   }
 
   // METODO PARA LIMPOIAR DATOS DE SELECCION MULTIPLE

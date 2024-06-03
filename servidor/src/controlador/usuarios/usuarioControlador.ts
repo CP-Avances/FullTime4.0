@@ -1733,7 +1733,7 @@ class UsuarioControlador {
       return res.jsonp(USUARIOS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+      return res.jsonp(null);
     }
   }
 
@@ -1849,6 +1849,61 @@ class UsuarioControlador {
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eu_usuario_sucursal',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
+  }
+
+  // METODO PARA ELIMINAR ASIGNACIONES DE USUARIO - DEPARTAMENTO
+  public async EliminarUsuarioDepartamento(req: Request, res: Response): Promise<Response> {
+    try {
+      const { user_name, ip, id } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTA DATOSORIGINALES
+      const consulta = await pool.query(`SELECT * FROM eu_usuario_departamento WHERE id = $1`, [id]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_usuario_departamento',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar usuario_departamento con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      await pool.query(
+        `
+        DELETE FROM eu_usuario_departamento WHERE id = $1
+        `
+        , [id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_usuario_departamento',
         usuario: user_name,
         accion: 'D',
         datosOriginales: JSON.stringify(datosOriginales),

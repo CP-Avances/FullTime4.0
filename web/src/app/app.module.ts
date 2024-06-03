@@ -334,6 +334,7 @@ import { EditarDiscapacidadComponent } from './componentes/catalogos/catalogoDis
 import { CatVacunasComponent } from './componentes/catalogos/catalogoVacuna/listar-vacuna/cat-vacunas.component';
 import { EditarVacunasComponent } from './componentes/catalogos/catalogoVacuna/editar-vacuna/editar-vacuna.component';
 import { VisualizarObservacionComponent } from './componentes/horarios/cargar-plantillas/visualizar-observacion/visualizar-observacion/visualizar-observacion.component';
+import { VisualizarAsignacionesComponent } from './componentes/empleado/sucursal-usuario/visualizar-asignaciones/visualizar-asignaciones.component';
 
 
 
@@ -599,6 +600,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     CatVacunasComponent,
     EditarVacunasComponent,
     VisualizarObservacionComponent,
+    VisualizarAsignacionesComponent,
 
   ],
 

@@ -1489,7 +1489,7 @@ class UsuarioControlador {
                 return res.jsonp(USUARIOS.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+                return res.jsonp(null);
             }
         });
     }
@@ -1587,6 +1587,54 @@ class UsuarioControlador {
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_usuario_sucursal',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
+        });
+    }
+    // METODO PARA ELIMINAR ASIGNACIONES DE USUARIO - DEPARTAMENTO
+    EliminarUsuarioDepartamento(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { user_name, ip, id } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTA DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuario_departamento WHERE id = $1`, [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_usuario_departamento',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar usuario_departamento con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM eu_usuario_departamento WHERE id = $1
+        `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_usuario_departamento',
                     usuario: user_name,
                     accion: 'D',
                     datosOriginales: JSON.stringify(datosOriginales),

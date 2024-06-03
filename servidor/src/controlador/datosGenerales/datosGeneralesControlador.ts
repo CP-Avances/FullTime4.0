@@ -1633,7 +1633,6 @@ class DatosGeneralesControlador {
     // METODO PARA BUSCAR USUARIOS ADMINISTRADORES Y JEFES DE UNA SUCURSAL
     public async BuscarAdminJefes(req: Request, res: Response) {
         const { lista_sucursales, estado } = req.body;
-        console.log('lista_sucursales', lista_sucursales)
         const DATOS = await pool.query(
             `SELECT da.id, da.nombre, da.apellido, da.id_sucursal AS suc_pertenece, s.nombre AS sucursal,ce.jefe, r.nombre AS rol, 
             us.id_sucursal, us.principal, us.id AS id_usucursal, d.nombre AS departamento, d.id AS id_departamento

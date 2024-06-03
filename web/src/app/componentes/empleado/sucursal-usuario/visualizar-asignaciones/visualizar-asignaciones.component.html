@@ -1,0 +1,49 @@
+<div id="titulo">
+  <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+  <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+    {{nombre}}
+  </span>
+  <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+</div>
+
+
+<mat-card class="example-card mat-elevation-z8">
+  <mat-card-content>
+      <div class="mat-elevation-z8" style="background: white;"
+          style="padding-bottom: 5px; margin-bottom: 5px;">
+          <div class="row">
+            <div class="col-md">
+              <div id="resultados">Asignaciones</div>
+              <div class="table-responsive">
+                  <table class="table table-hover table-sm">
+                      <thead class="thead-light">
+                          <tr style="text-align: center;">
+                            <th scope="col">Sucursal</th>
+                            <th scope="col">Departamento</th>
+                            <th scope="col">Acción</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr *ngFor="let a of asignaciones | paginate: tamanio_pagina:numero_pagina">
+                            <td>{{a.sucursal}}</td>
+                            <td>{{a.departamento}}</td>
+                            <td class="justify-content-center">
+                              <i matSuffix matTooltipPosition="right"
+                                  matTooltip="Eliminar asignación."
+                                  class="fas fa-trash" id="t-ver" >
+                                  <p>Eliminar</p>
+                              </i>
+                          </td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+              <mat-paginator id="pagina" [length]="asignaciones.length" [pageSize]="tamanio_pagina"
+                  [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)"
+                  showFirstLastButtons>
+              </mat-paginator>
+            </div>
+          </div>
+        </div>
+    </mat-card-content>
+</mat-card>
