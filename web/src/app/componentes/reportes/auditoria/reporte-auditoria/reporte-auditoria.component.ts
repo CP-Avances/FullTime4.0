@@ -44,6 +44,9 @@ interface TablasD {
 
 export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
+    verDetalle: boolean = false;
+
+
     data_pdf: any = [];
 
     accionesSeleccionadas = [];
@@ -59,6 +62,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
     tablasSolicitadas: any = [];
     // ITEMS DE PAGINACION DE LA TABLA
+    @ViewChild('paginatorDetalle') paginatorDetalle: MatPaginator;
     pageSizeOptions = [5, 10, 20, 50];
     tamanio_pagina: number = 5;
     numero_pagina: number = 1;
@@ -164,15 +168,15 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
 
 
-        tabla.map(x=> {
+        tabla.map(x => {
 
-            if(x.disponibilidad == true){
+            if (x.disponibilidad == true) {
                 this.tablasD.push({
                     nombre: x.nombre,
                     modulo: x.modulo,
                 })
             }
-           
+
         })
 
     }
@@ -230,7 +234,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
                 switch (accion) {
                     // case 'excel': this.ExportarExcelCargoRegimen(); break;
-                    // case 'ver': this.VerDatos(); break;
+                    case 'ver': this.VerDatos(); break;
                     default: this.GenerarPDF(this.data_pdf, accion); break;
                 }
             }
@@ -503,6 +507,25 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         const minutes = String(date.getUTCMinutes()).padStart(2, '0');
         const seconds = String(date.getUTCSeconds()).padStart(2, '0');
         return `${hours}:${minutes}:${seconds}`;
+    }
+
+
+    // METODO PARA REGRESAR A LA PAGINA ANTERIOR
+    Regresar() {
+        this.verDetalle = false;
+        this.paginatorDetalle.firstPage();
+    }
+
+    // METODO DE CONTROL DE PAGINACION
+    ManejarPaginaDet(e: PageEvent) {
+        this.tamanio_pagina = e.pageSize;
+        this.numero_pagina = e.pageIndex + 1;
+    }
+
+
+    //ENVIAR DATOS A LA VENTANA DE DETALLE
+    VerDatos() {
+        this.verDetalle = true;
     }
 
 

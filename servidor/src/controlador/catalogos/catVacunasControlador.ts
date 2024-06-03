@@ -92,16 +92,16 @@ class VacunaControlador {
                 `
                 , [nombre.toUpperCase(), id]);
 
-                const consulta = await pool.query('SELECT * FROM e_cat_tipo_cargo WHERE id = $1', [id]);
+                const consulta = await pool.query('SELECT * FROM e_cat_vacuna WHERE id = $1', [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                         tabla: 'e_cat_vacuna',
-                        usuario: req.body.user_name,
+                        usuario: user_name,
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip: req.body.ip,
+                        ip: ip,
                         observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                     });
     
@@ -112,6 +112,9 @@ class VacunaControlador {
 
             if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
                 const vacunaEditar = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+                
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
 
                 const response: QueryResult = await pool.query(
                     `
@@ -148,6 +151,7 @@ class VacunaControlador {
         }
         catch (error) {
             // ROLLBACK
+            console.log(error);
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error', status: '500' });
         }

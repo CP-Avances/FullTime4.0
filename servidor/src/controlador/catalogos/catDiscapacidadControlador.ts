@@ -111,13 +111,8 @@ class DiscapacidadControlador {
             }
 
 
-
             if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
                 const nombreConFormato = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
-
-
-
-
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
 
