@@ -24,6 +24,8 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableDispositivos } from 'src/app/model/reportes.model';
+import { ThemePalette } from '@angular/material/core';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-listar-relojes',
@@ -67,11 +69,20 @@ export class ListarRelojesComponent implements OnInit {
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
+  tamanio_paginaMul: number = 5;
+  numero_paginaMul: number = 1;
+
   hipervinculo: string = environment.url;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
+
+  // VARIABLES PROGRESS SPINNER
+  progreso: boolean = false;
+  color: ThemePalette = 'primary';
+  mode: ProgressSpinnerMode = 'indeterminate';
+  value = 10;
 
   constructor(
     public restEmpre: EmpresaService,
@@ -158,6 +169,9 @@ export class ListarRelojesComponent implements OnInit {
 
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
+    this.DataDispositivos = null;
+    this.archivoSubido = [];
+    this.nameFile = '';
     this.formulario.setValue({
       nombreForm: '',
       ipForm: '',
@@ -166,6 +180,9 @@ export class ListarRelojesComponent implements OnInit {
       departamentoForm: ''
     });
     this.ObtenerReloj();
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = false;
+    this.messajeExcel = '';
   }
 
 
@@ -203,6 +220,12 @@ export class ListarRelojesComponent implements OnInit {
     this.pagina = 'editar-reloj';
   }
 
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
+  }
+
   /** ********************************************************************************* **
    ** **                 METODOS Y VARIABLES PARA SUBIR PLANTILLAS                   ** **
    ** ********************************************************************************* **/
@@ -210,33 +233,77 @@ export class ListarRelojesComponent implements OnInit {
   nameFile: string;
   archivoSubido: Array<File>;
   archivoForm = new FormControl('', Validators.required);
-
+  mostrarbtnsubir: boolean = false;
   fileChange(element: any) {
+    this.archivoSubido = [];
+    this.nameFile = '';
     this.archivoSubido = element.target.files;
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 12);
+    let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'dispositivos') {
-        this.plantilla();
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
+        this.numero_paginaMul = 1;
+        this.tamanio_paginaMul = 5;
+        this.Revisarplantilla();
       } else {
-        this.toastr.error(
-          'Solo se acepta plantilla con nombre Dispositivos.',
-          'Plantilla seleccionada incorrecta.', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta.', {
           timeOut: 6000,
         });
-        this.archivoForm.reset();
         this.nameFile = '';
       }
     } else {
       this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
         timeOut: 6000,
       });
-      this.archivoForm.reset();
       this.nameFile = '';
     }
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = true;
   }
+
+  DataDispositivos: any;
+  listaDispositivosCorrectos: any = [];
+  messajeExcel: string = '';
+  Revisarplantilla() {
+    this.listaDispositivosCorrectos = [];
+    let formData = new FormData();
+    for (var i = 0; i < this.archivoSubido.length; i++) {
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+    }
+    this.progreso = true;
+    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    this.rest.VerificarArchivoExcel(formData).subscribe(res => {
+      this.DataDispositivos = res.data;
+      this.messajeExcel = res.message;
+      console.log('probando plantilla1 dispositivos', this.DataDispositivos);
+
+
+    }, error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
+        timeOut: 4000,
+      });
+      this.progreso = false;
+    }, () => {
+      this.progreso = false;
+    });
+  }
+
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    console.log('listDepartamentosCorrectos: ', this.listaDispositivosCorrectos.length);
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.registrarDispositivos();
+        }
+      });
+  }
+
+  registrarDispositivos(){}
 
   plantilla() {
     let formData = new FormData();

@@ -1,12 +1,20 @@
 import { Router } from 'express';
 import RELOJES_CONTROLADOR from '../../controlador/catalogos/catRelojesControlador';
+import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { TokenValidation } from '../../libs/verificarToken';
+import multer from 'multer';
 
-const multipart = require('connect-multiparty');
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, ObtenerRutaLeerPlantillas())
+    },
+    filename: function (req, file, cb) {
+        let documento = file.originalname;
+        cb(null, documento);
+    }
+})
 
-const multipartMiddlewarePlantilla = multipart({
-    uploadDir: './plantillas',
-});
+const upload = multer({ storage: storage });
 
 class RelojesRuta {
     public router: Router = Router();
@@ -31,11 +39,12 @@ class RelojesRuta {
         this.router.get('/datosReloj/:id', TokenValidation, RELOJES_CONTROLADOR.ListarDatosUnReloj);
 
 
-        this.router.post('/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], RELOJES_CONTROLADOR.CargaPlantillaRelojes);
-        // METODO para verificar datos de plantilla antes de subirlos
-        this.router.post('/verificar_datos/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], RELOJES_CONTROLADOR.VerificarDatos);
-        this.router.post('/verificar_plantilla/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], RELOJES_CONTROLADOR.VerificarPlantilla);
-        this.router.post('/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], RELOJES_CONTROLADOR.CargaPlantillaRelojes);
+        //this.router.post('/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], RELOJES_CONTROLADOR.CargaPlantillaRelojes);
+        // METODO PARA LEER DATOS DE PLANTILLA
+        this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], RELOJES_CONTROLADOR.VerificarPlantilla);
+        //this.router.post('/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], RELOJES_CONTROLADOR.CargaPlantillaRelojes);
+
+
     }
 }
 

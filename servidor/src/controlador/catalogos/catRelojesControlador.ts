@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
+import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
-import excel from 'xlsx';
-import pool from '../../database';
 import fs from 'fs';
+import path from 'path';
+import pool from '../../database';
+import excel from 'xlsx';
 
 class RelojesControlador {
 
@@ -256,95 +258,7 @@ class RelojesControlador {
         }
     }
 
-    public async CargaPlantillaRelojes(req: Request, res: Response): Promise<void> {
-        let list: any = req.files;
-        let cadena = list.uploads[0].path;
-        let filename = cadena.split("\\")[1];
-        var filePath = `./plantillas/${filename}`
-
-        const workbook = excel.readFile(filePath);
-        const sheet_name_list = workbook.SheetNames;
-        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-
-        plantilla.forEach(async (data: any) => {
-            try {
-                // DATOS DE LA PLANTILLA INGRESADA
-                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante,
-                    mac, tiene_funciones, sucursal, departamento, codigo_reloj, numero_accion, user_name, user_ip } = data;
-
-                // INICIAR TRANSACCION
-                await pool.query('BEGIN');
-    
-                // BUSCAR ID DE LA SUCURSAL INGRESADA
-                const id_sucursal = await pool.query('SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
-                
-                const id_departamento = await pool.query('SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND ' +
-                    'id_sucursal = $2', [departamento.toUpperCase(), id_sucursal.rows[0]['id']]);
-
-                if (id_sucursal.rowCount === 0 || id_departamento.rowCount === 0) {
-                    // AUDITORIA
-                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                        tabla: 'ed_relojes',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: user_ip,
-                        observacion: `Error al guardar el reloj con nombre: ${nombre} e ip: ${ip}.`
-                    });
-
-                    // FINALIZAR TRANSACCION
-                    await pool.query('COMMIT');
-                    return;
-                }
-    
-                // VERIFICAR QUE SE HAYA INGRESADO NÚMERO DE ACCIONES SI EL DISPOSITIVO LAS TIENE
-                if (tiene_funciones === true) {
-                    var accion = numero_accion;
-                }
-                else {
-                    accion = 0;
-                }
-    
-                await pool.query(
-                    `
-                    INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                        id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, id, numero_accion) 
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-                    `
-                    , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                        tiene_funciones, id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], codigo_reloj, accion]);
-                
-                // AUDITORIA
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'ed_relojes',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tien_funciones": "${tiene_funciones}", "id_sucursal": "${id_sucursal.rows[0]['id']}", "id_departamento": "${id_departamento.rows[0]['id']}", "id": "${codigo_reloj}", "numero_accion": "${accion}"}`,
-                    ip: user_ip,
-                    observacion: null
-                });
-
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-                res.jsonp({ message: 'correcto' });
-            } catch (error) {
-                // REVERTIR TRANSACCION
-                await pool.query('ROLLBACK');
-                return;
-            }
-        });
-        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-        fs.access(filePath, fs.constants.F_OK, (err) => {
-            if (err) {
-            } else {
-                // ELIMINAR DEL SERVIDOR
-                fs.unlinkSync(filePath);
-            }
-        });
-
-    }
+   
 
     public async VerificarDatos(req: Request, res: Response): Promise<void> {
         let list: any = req.files;
@@ -463,6 +377,40 @@ class RelojesControlador {
     }
 
     public async VerificarPlantilla(req: Request, res: Response) {
+        try{  
+            const documento = req.file?.originalname;
+            let separador = path.sep;
+            let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+            const workbook = excel.readFile(ruta);
+            let verificador = ObtenerIndicePlantilla(workbook, 'BIOMETRICOS');
+            if (verificador === false) {
+              return res.jsonp({ message: 'no_existe', data: undefined });
+            }else {
+                const sheet_name_list = workbook.SheetNames;
+                const plantilla_dispositivos = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                console.log('plantilla_dispositivos: ',plantilla_dispositivos);
+                var listDispositivos: any = [];
+                var duplicados: any = [];
+                var mensaje: string = 'correcto';
+
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs.access(ruta, fs.constants.F_OK, (err) => {
+                    if (err) {
+                    } else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs.unlinkSync(ruta);
+                    }
+                });
+
+            }
+
+
+        } catch (error) {
+            return res.status(500).jsonp({ message: error });
+        }
+
+
+        /*
         let list: any = req.files;
         let cadena = list.uploads[0].path;
         let filename = cadena.split("\\")[1];
@@ -523,6 +471,97 @@ class RelojesControlador {
                 fs.unlinkSync(filePath);
             }
         });
+        */
+    }
+
+    public async CargaPlantillaRelojes(req: Request, res: Response): Promise<void> {
+        let list: any = req.files;
+        let cadena = list.uploads[0].path;
+        let filename = cadena.split("\\")[1];
+        var filePath = `./plantillas/${filename}`
+
+        const workbook = excel.readFile(filePath);
+        const sheet_name_list = workbook.SheetNames;
+        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+
+        plantilla.forEach(async (data: any) => {
+            try {
+                // DATOS DE LA PLANTILLA INGRESADA
+                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante,
+                    mac, tiene_funciones, sucursal, departamento, codigo_reloj, numero_accion, user_name, user_ip } = data;
+
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+    
+                // BUSCAR ID DE LA SUCURSAL INGRESADA
+                const id_sucursal = await pool.query('SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
+                
+                const id_departamento = await pool.query('SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND ' +
+                    'id_sucursal = $2', [departamento.toUpperCase(), id_sucursal.rows[0]['id']]);
+
+                if (id_sucursal.rowCount === 0 || id_departamento.rowCount === 0) {
+                    // AUDITORIA
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'ed_relojes',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: user_ip,
+                        observacion: `Error al guardar el reloj con nombre: ${nombre} e ip: ${ip}.`
+                    });
+
+                    // FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
+                    return;
+                }
+    
+                // VERIFICAR QUE SE HAYA INGRESADO NÚMERO DE ACCIONES SI EL DISPOSITIVO LAS TIENE
+                if (tiene_funciones === true) {
+                    var accion = numero_accion;
+                }
+                else {
+                    accion = 0;
+                }
+    
+                await pool.query(
+                    `
+                    INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
+                        id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, id, numero_accion) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+                    `
+                    , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
+                        tiene_funciones, id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], codigo_reloj, accion]);
+                
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'ed_relojes',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tien_funciones": "${tiene_funciones}", "id_sucursal": "${id_sucursal.rows[0]['id']}", "id_departamento": "${id_departamento.rows[0]['id']}", "id": "${codigo_reloj}", "numero_accion": "${accion}"}`,
+                    ip: user_ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                res.jsonp({ message: 'correcto' });
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                return;
+            }
+        });
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                // ELIMINAR DEL SERVIDOR
+                fs.unlinkSync(filePath);
+            }
+        });
+
     }
 }
 

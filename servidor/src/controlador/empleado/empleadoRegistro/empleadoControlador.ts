@@ -1,5 +1,5 @@
 // SECCION LIBRERIAS
-import { ObtenerRutaUsuario, ObtenerRutaVacuna, ObtenerRutaPermisos, ObtenerRutaContrato } from '../../../libs/accesoCarpetas';
+import { ObtenerRutaUsuario, ObtenerRutaVacuna, ObtenerRutaPermisos, ObtenerRutaContrato, ObtenerIndicePlantilla } from '../../../libs/accesoCarpetas';
 import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
@@ -1309,66 +1309,73 @@ class EmpleadoControlador {
    ** **                      CARGAR INFORMACIÓN MEDIANTE PLANTILLA                            ** 
    ** **************************************************************************************** **/
 
-  public async VerificarPlantilla_Automatica(req: Request, res: Response): Promise<void> {
-    const documento = req.file?.originalname;
-    let separador = path.sep;
-    let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+  public async VerificarPlantilla_Automatica(req: Request, res: Response) {
+    try{
+      const documento = req.file?.originalname;
+      let separador = path.sep;
+      let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+      const workbook = excel.readFile(ruta);
 
-    const workbook = excel.readFile(ruta);
-    const sheet_name_list = workbook.SheetNames;
-    const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+      let verificador = ObtenerIndicePlantilla(workbook, 'EMPLEADOS');
+      if (verificador === false) {
+        return res.jsonp({ message: 'no_existe', data: undefined });
+      }else {
+     
+        const sheet_name_list = workbook.SheetNames;
+        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
 
-    let data: any = {
-      fila: '',
-      cedula: '',
-      apellido: '',
-      nombre: '',
-      estado_civil: '',
-      genero: '',
-      correo: '',
-      fec_nacimiento: '',
-      latitud: '',
-      longitud: '',
-      domicilio: '',
-      telefono: '',
-      nacionalidad: '',
-      usuario: '',
-      contrasena: '',
-      rol: '',
-      observacion: '',
-    };
+        let data: any = {
+        fila: '',
+        cedula: '',
+        apellido: '',
+        nombre: '',
+        estado_civil: '',
+        genero: '',
+        correo: '',
+        fec_nacimiento: '',
+        latitud: '',
+        longitud: '',
+        domicilio: '',
+        telefono: '',
+        nacionalidad: '',
+        usuario: '',
+        contrasena: '',
+        rol: '',
+        observacion: '',
+        };
 
-    var listEmpleados: any = [];
-    var duplicados: any = [];
-    var duplicados1: any = [];
-    var duplicados2: any = [];
-    var mensaje: string = 'correcto';
+        var listEmpleados: any = [];
+        var duplicados: any = [];
+        var duplicados1: any = [];
+        var duplicados2: any = [];
+        var mensaje: string = 'correcto';
 
-    plantilla.forEach(async (dato: any, indice: any, array: any) => {
+        plantilla.forEach(async (dato: any, indice: any, array: any) => {
       // Datos que se leen de la plantilla ingresada
-      var { item, cedula, apellido, nombre, estado_civil, genero, correo, fec_nacimiento, latitud, longitud,
-        domicilio, telefono, nacionalidad, usuario, contrasena, rol } = dato;
+      var { ITEM, CEDULA, APELLIDO, NOMBRE, USUARIO, CONTRASENA, ROL, ESTADO_CIVIL, GENERO, CORREO, FECHA_NACIMIENTO, LATITUD, LONGITUD,
+        DOMICILIO, TELEFONO, NACIONALIDAD} = dato;
 
       //Verificar que el registo no tenga datos vacios
-      if ((item != undefined && item != '') &&
-        (cedula != undefined) && (apellido != undefined) &&
-        (nombre != undefined) && (estado_civil != undefined) &&
-        (genero != undefined) && (correo != undefined) &&
-        (fec_nacimiento != undefined) &&
-        (latitud != undefined) && (longitud != undefined) &&
-        (domicilio != undefined) && (telefono != undefined) &&
-        (nacionalidad != undefined) && (usuario != undefined) &&
-        (contrasena != undefined) && (rol != undefined)
+      if ((ITEM != undefined && ITEM != '') &&
+        (CEDULA != undefined) && (APELLIDO != undefined) &&
+        (NOMBRE != undefined) && (ESTADO_CIVIL != undefined) &&
+        (GENERO != undefined) && (CORREO != undefined) &&
+        (FECHA_NACIMIENTO != undefined) &&
+        (LATITUD != undefined) && (LONGITUD != undefined) &&
+        (DOMICILIO != undefined) && (TELEFONO != undefined) &&
+        (NACIONALIDAD != undefined) && (USUARIO != undefined) &&
+        (CONTRASENA != undefined) && (ROL != undefined)
       ) {
-        data.fila = item; data.cedula = cedula; 
-        data.nombre = nombre; data.apellido = apellido; 
-        data.usuario = usuario; data.contrasena = contrasena;
-        data.rol = rol; data.estado_civil = estado_civil;
-        data.genero = genero; data.correo = correo;
-        data.fec_nacimiento = fec_nacimiento; data.latitud = latitud;
-        data.longitud = longitud;
-        data.domicilio = domicilio; data.telefono = telefono;
-        data.nacionalidad = nacionalidad; 
+        data.fila = ITEM; data.cedula = CEDULA; 
+        data.nombre = NOMBRE; data.apellido = APELLIDO; 
+        data.usuario = USUARIO; data.contrasena = CONTRASENA;
+        data.rol = ROL; data.estado_civil = ESTADO_CIVIL;
+        data.genero = GENERO; data.correo = CORREO;
+        data.fec_nacimiento = FECHA_NACIMIENTO; data.latitud = LATITUD;
+        data.longitud = LONGITUD;
+        data.domicilio = DOMICILIO; data.telefono = TELEFONO;
+        data.nacionalidad = NACIONALIDAD; 
+        data.observacion = 'no registrado';
 
         //Valida si los datos de la columna cedula son numeros.
         const regex = /^[0-9]+$/;
@@ -1379,12 +1386,12 @@ class EmpleadoControlador {
           } else {
             if(!valiContra.test(data.contrasena.toString())){
               console.log('entro ',data.contrasena.toString().length);
-              if(data.contrasena.toString().length < 10){
+              if(data.contrasena.toString().length <= 10){
                 // Verificar si la variable tiene el formato de fecha correcto con moment
-                if (moment(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
+                if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
                   //Valida si los datos de la columna telefono son numeros.
-                  if (telefono != undefined) {
-                    console.log(data.telefono,' entro ',regex.test(telefono));
+                  if (TELEFONO != undefined) {
+                    console.log(data.telefono,' entro ',regex.test(TELEFONO));
                     if (regex.test(data.telefono.toString())) {
                       if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                         data.observacion = 'El teléfono ingresada no es válido';
@@ -1420,15 +1427,15 @@ class EmpleadoControlador {
         listEmpleados.push(data);
 
       } else {
-        data.fila = item; data.cedula = cedula; 
-        data.nombre = nombre; data.apellido = apellido; 
-        data.usuario = usuario; data.contrasena = contrasena;
-        data.rol = rol; data.estado_civil = estado_civil;
-        data.genero = genero; data.correo = correo;
-        data.fec_nacimiento = fec_nacimiento; data.latitud = latitud;
-        data.longitud = longitud;
-        data.domicilio = domicilio; data.telefono = telefono;
-        data.nacionalidad = nacionalidad; 
+        data.fila = ITEM; data.cedula = CEDULA; 
+        data.nombre = NOMBRE; data.apellido = APELLIDO; 
+        data.usuario = USUARIO; data.contrasena = CONTRASENA;
+        data.rol = ROL; data.estado_civil = ESTADO_CIVIL;
+        data.genero = GENERO; data.correo = CORREO;
+        data.fec_nacimiento = FECHA_NACIMIENTO; data.latitud = LATITUD;
+        data.longitud = LONGITUD;
+        data.domicilio = DOMICILIO; data.telefono = TELEFONO;
+        data.nacionalidad = NACIONALIDAD; 
         data.observacion = 'no registrado';
 
         if (data.fila == '' || data.fila == undefined) {
@@ -1436,62 +1443,62 @@ class EmpleadoControlador {
           mensaje = 'error'
         }
 
-        if (apellido == undefined) {
+        if (APELLIDO == undefined) {
           data.apellido = 'No registrado';
           data.observacion = 'Apellido ' + data.observacion;
         }
-        if (nombre == undefined) {
+        if (NOMBRE == undefined) {
           data.nombre = 'No registrado';
           data.observacion = 'Nombre ' + data.observacion;
         }
-        if (estado_civil == undefined) {
+        if (ESTADO_CIVIL == undefined) {
           data.estado_civil = 'No registrado';
           data.observacion = 'Estado civil ' + data.observacion;
         }
-        if (genero == undefined) {
+        if (GENERO == undefined) {
           data.genero = 'No registrado';
           data.observacion = 'Género ' + data.observacion;
         }
-        if (correo == undefined) {
+        if (CORREO == undefined) {
           data.correo = 'No registrado';
           data.observacion = 'Correo ' + data.observacion;
         }
-        if (fec_nacimiento == undefined) {
+        if (FECHA_NACIMIENTO == undefined) {
           data.fec_nacimiento = 'No registrado';
           data.observacion = 'Fecha de nacimiento ' + data.observacion;
         }
-        if (latitud == undefined) {
+        if (LATITUD == undefined) {
           data.latitud = 'No registrado';
         }
-        if (longitud == undefined) {
+        if (LONGITUD == undefined) {
           data.longitud = 'No registrado';
         }
-        if (domicilio == undefined) {
+        if (DOMICILIO == undefined) {
           data.domicilio = '-';
           data.observacion = " ";
         }
-        if (telefono == undefined) {
+        if (TELEFONO == undefined) {
           data.telefono = '-';
           data.observacion = " ";
         }
-        if (nacionalidad == undefined) {
+        if (NACIONALIDAD == undefined) {
           data.nacionalidad = 'No registrado';
           data.observacion = 'Nacionalidad ' + data.observacion;
         }
-        if (usuario == undefined) {
+        if (USUARIO == undefined) {
           data.usuario = 'No registrado';
           data.observacion = 'Usuario ' + data.observacion;
         }
-        if (contrasena == undefined) {
+        if (CONTRASENA == undefined) {
           data.contrasena = 'No registrado';
           data.observacion = 'Contraseña ' + data.observacion;
         }
-        if (rol == undefined) {
+        if (ROL == undefined) {
           data.rol = 'No registrado'
           data.observacion = 'Rol ' + data.observacion;
         }
         
-        if (cedula == undefined) {
+        if (CEDULA == undefined) {
           data.cedula = 'No registrado'
           data.observacion = 'Cédula ' + data.observacion;
         } else {
@@ -1505,14 +1512,14 @@ class EmpleadoControlador {
               if(data.contrasena != 'No registrado'){
                 if(!valiContra.test(data.contrasena.toString())){
                   
-                  if(data.contrasena.toString().length < 10){
+                  if(data.contrasena.toString().length <= 10){
                     // Verificar si la variable tiene el formato de fecha correcto con moment
                     if (data.fec_nacimiento != 'No registrado') {
-                      if (moment(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) { 
+                      if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) { 
                         //Valida si los datos de la columna telefono son numeros.
-                        if (telefono != undefined) {
+                        if (TELEFONO != undefined) {
                           const regex = /^[0-9]+$/;
-                          console.log(data.telefono,' entro ',regex.test(telefono));
+                          console.log(data.telefono,' entro ',regex.test(TELEFONO));
                           if (regex.test(data.telefono.toString())) {
                             if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                               console.log('ent: ',data.telefono);
@@ -1548,19 +1555,19 @@ class EmpleadoControlador {
 
       data = {}
 
-    });
+        });
 
 
-    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-    fs.access(ruta, fs.constants.F_OK, (err) => {
-      if (err) {
-      } else {
-        // ELIMINAR DEL SERVIDOR
-        fs.unlinkSync(ruta);
-      }
-    });
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(ruta, fs.constants.F_OK, (err) => {
+        if (err) {
+        } else {
+          // ELIMINAR DEL SERVIDOR
+          fs.unlinkSync(ruta);
+        }
+        });
 
-    listEmpleados.forEach(async (valor: any) => {
+        listEmpleados.forEach(async (valor: any) => {
       var VERIFICAR_CEDULA = await pool.query(
         `
         SELECT * FROM eu_empleados WHERE cedula = $1
@@ -1620,12 +1627,12 @@ class EmpleadoControlador {
         }
       }
 
-    })
+        })
 
 
-    setTimeout(() => {
+        setTimeout(() => {
 
-      listEmpleados.sort((a: any, b: any) => {
+        listEmpleados.sort((a: any, b: any) => {
         // Compara los números de los objetos
         if (a.fila < b.fila) {
           return -1;
@@ -1634,11 +1641,11 @@ class EmpleadoControlador {
           return 1;
         }
         return 0; // Son iguales
-      });
+        });
 
-      var filaDuplicada: number = 0;
+        var filaDuplicada: number = 0;
 
-      listEmpleados.forEach((item: any) => {
+        listEmpleados.forEach((item: any) => {
         if (item.observacion == '1') {
           item.observacion = 'Registro duplicado (cédula)'
         } else if (item.observacion == '2') {
@@ -1666,18 +1673,21 @@ class EmpleadoControlador {
 
         filaDuplicada = item.fila;
 
-      });
+        });
 
-      if (mensaje == 'error') {
-        listEmpleados = undefined;
+        if (mensaje == 'error') {
+          listEmpleados = undefined;
+        }
+
+        //console.log('empleados: ', listEmpleados);
+        return res.jsonp({ message: mensaje, data: listEmpleados });
+
+        }, 1500)
       }
 
-      //console.log('empleados: ', listEmpleados);
-
-      return res.jsonp({ message: mensaje, data: listEmpleados });
-
-    }, 1500)
-
+    }catch(error){
+      return res.status(500).jsonp({ message: error });
+    }
   }
 
   public async VerificarPlantilla_DatosAutomatico(req: Request, res: Response) {
@@ -1820,15 +1830,17 @@ class EmpleadoControlador {
   
   
         // REGISTRO DE NUEVO EMPLEADO
-        await pool.query(
+        const response: QueryResult = await pool.query(
           `
           INSERT INTO eu_empleados (cedula, apellido, nombre, estado_civil, genero, correo,
             fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) 
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
           `
           , [cedula, apellidoE, nombreE,
           id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
           domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud ]);
+
+        const [empleado] = response.rows;
 
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -1840,7 +1852,7 @@ class EmpleadoControlador {
           ip,
           observacion: null
         });
-  
+          
         // OBTENER EL ID DEL EMPLEADO INGRESADO
         const oneEmpley = await pool.query('SELECT id FROM eu_empleados WHERE cedula = $1', [cedula]);
         const id_empleado = oneEmpley.rows[0].id;
@@ -1865,8 +1877,67 @@ class EmpleadoControlador {
           observacion: null
         });
 
-       
-  
+        // CREACION DE CARPETAS DE LOS USUARIOS REGISTRADOS
+        if (empleado) {
+          let verificar = 0;
+          // RUTA DE LA CARPETA PRINCIPAL PERMISOS
+          const carpetaPermisos = await ObtenerRutaPermisos(codigo);
+
+          // METODO MKDIR PARA CREAR LA CARPETA
+          fs.mkdir(carpetaPermisos, { recursive: true }, (err: any) => {
+            if (err) {
+              verificar = 1;
+            } else {
+              verificar = 0;
+            }
+          });
+
+          // RUTA DE LA CARPETA PRINCIPAL PERMISOS
+          const carpetaImagenes = await ObtenerRutaUsuario(empleado.id);
+
+          // METODO MKDIR PARA CREAR LA CARPETA
+          fs.mkdir(carpetaImagenes, { recursive: true }, (err: any) => {
+            if (err) {
+              verificar = 1;
+            } else {
+              verificar = 0;
+            }
+          });
+
+          // RUTA DE LA CARPETA DE ALMACENAMIENTO DE VACUNAS
+          const carpetaVacunas = await ObtenerRutaVacuna(empleado.id);
+
+          // METODO MKDIR PARA CREAR LA CARPETA
+          fs.mkdir(carpetaVacunas, { recursive: true }, (err: any) => {
+            if (err) {
+              verificar = 1;
+            } else {
+              verificar = 0;
+            }
+          });
+
+          // RUTA DE LA CARPETA DE ALMACENAMIENTO DE CONTRATOS
+          const carpetaContratos = await ObtenerRutaContrato(empleado.id);
+
+          // METODO MKDIR PARA CREAR LA CARPETA
+          fs.mkdir(carpetaContratos, { recursive: true }, (err: any) => {
+            if (err) {
+              verificar = 1;
+            } else {
+              verificar = 0;
+            }
+          });
+
+          // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
+          if (verificar === 1) {
+            console.error('Error al crear las carpetas.');
+          }
+          
+        }
+        else {
+          return res.status(404).jsonp({ message: 'error' })
+        }
+
         if (contador === plantilla.length) {
           // ACTUALIZACIÓN DEL CÓDIGO
           if(codigo_dato != null && codigo_dato != undefined && codigo_dato != ''){
@@ -1908,75 +1979,82 @@ class EmpleadoControlador {
   }
 
   /** METODOS PARA VERIFICAR PLANTILLA CON CÓDIGO INGRESADO DE FORMA MANUAL */
-  public async VerificarPlantilla_Manual(req: Request, res: Response): Promise<void> {
-    const documento = req.file?.originalname;
-    let separador = path.sep;
-    let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+  public async VerificarPlantilla_Manual(req: Request, res: Response) {
+    try{
+      const documento = req.file?.originalname;
+      let separador = path.sep;
+      let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+      const workbook = excel.readFile(ruta);
 
-    const workbook = excel.readFile(ruta);
-    const sheet_name_list = workbook.SheetNames;
-    const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+      let verificador = ObtenerIndicePlantilla(workbook, 'EMPLEADOS');
+      if (verificador === false) {
+        return res.jsonp({ message: 'no_existe', data: undefined });
+      }else {
 
-    let data: any = {
-      fila: '',
-      cedula: '',
-      apellido: '',
-      nombre: '',
-      codigo: '',
-      estado_civil: '',
-      genero: '',
-      correo: '',
-      fec_nacimiento: '',
-      latitud: '',
-      longitud: '',
-      domicilio: '',
-      telefono: '',
-      nacionalidad: '',
-      usuario: '',
-      contrasena: '',
-      rol: '',
-      observacion: '',
-    };
+        const sheet_name_list = workbook.SheetNames;
+        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
 
-    var listEmpleadosManual: any = [];
-    var duplicados: any = [];
-    var duplicados1: any = [];
-    var duplicados2: any = [];
-    var duplicados3: any = [];
-    var mensaje: string = 'correcto';
+        let data: any = {
+          fila: '',
+          cedula: '',
+          apellido: '',
+          nombre: '',
+          codigo: '',
+          estado_civil: '',
+          genero: '',
+          correo: '',
+          fec_nacimiento: '',
+          latitud: '',
+          longitud: '',
+          domicilio: '',
+          telefono: '',
+          nacionalidad: '',
+          usuario: '',
+          contrasena: '',
+          rol: '',
+          observacion: '',
+        };
 
-    plantilla.forEach(async (dato: any, indice: any, array: any) => {
-      // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
-      var { item, cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, latitud, longitud,
-        domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
+        var listEmpleadosManual: any = [];
+        var duplicados: any = [];
+        var duplicados1: any = [];
+        var duplicados2: any = [];
+        var duplicados3: any = [];
+        var mensaje: string = 'correcto';
 
-      //VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-      if ((item != undefined && item != '') &&
-        (cedula != undefined) && (apellido != undefined) &&
-        (nombre != undefined) && (codigo != undefined) && (estado_civil != undefined) &&
-        (genero != undefined) && (correo != undefined) &&
-        (fec_nacimiento != undefined) &&
-        (latitud != undefined) && (longitud != undefined) &&
-        (domicilio != undefined) && (telefono != undefined) &&
-        (nacionalidad != undefined) && (usuario != undefined) &&
-        (contrasena != undefined) && (rol != undefined)
-      ) {
-        data.fila = item; data.cedula = cedula; 
-        data.apellido = apellido; data.nombre = nombre; 
-        data.codigo = codigo; data.usuario = usuario;
-        data.contrasena = contrasena; data.rol = rol;
-        data.estado_civil = estado_civil;
-        data.genero = genero; data.correo = correo;
-        data.fec_nacimiento = fec_nacimiento; data.latitud = latitud;
-        data.longitud = longitud; 
-        data.domicilio = domicilio; data.telefono = telefono;
-        data.nacionalidad = nacionalidad; 
+        plantilla.forEach(async (dato: any, indice: any, array: any) => {
+        // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
+        var { ITEM, CODIGO, CEDULA, APELLIDO, NOMBRE, USUARIO, CONTRASENA, ROL, ESTADO_CIVIL, GENERO, CORREO, FECHA_NACIMIENTO, LATITUD, LONGITUD,
+          DOMICILIO, TELEFONO, NACIONALIDAD, estado_user, app_habilita } = dato;
+
+        //VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+        if ((ITEM != undefined && ITEM != '') &&
+          (CEDULA != undefined) && (APELLIDO != undefined) &&
+          (NOMBRE != undefined) && (CODIGO != undefined) && (ESTADO_CIVIL != undefined) &&
+          (GENERO != undefined) && (CORREO != undefined) &&
+          (FECHA_NACIMIENTO != undefined) &&
+          (LATITUD != undefined) && (LONGITUD != undefined) &&
+          (DOMICILIO != undefined) && (TELEFONO != undefined) &&
+          (NACIONALIDAD != undefined) && (USUARIO != undefined) &&
+          (CONTRASENA != undefined) && (ROL != undefined)
+        ) {
+          data.fila = ITEM; data.cedula = CEDULA; 
+          data.apellido = APELLIDO; data.nombre = NOMBRE; 
+          data.codigo = CODIGO; data.usuario = USUARIO;
+          data.contrasena = CONTRASENA; data.rol = ROL;
+          data.estado_civil = ESTADO_CIVIL;
+          data.genero = GENERO; data.correo = CORREO;
+          data.fec_nacimiento = FECHA_NACIMIENTO; data.latitud = LATITUD;
+          data.longitud = LONGITUD; 
+          data.domicilio = DOMICILIO; data.telefono = TELEFONO;
+          data.nacionalidad = NACIONALIDAD; 
+          data.observacion = 'no registrado';
         
 
-        //VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
-        const rege = /^[0-9]+$/;
-        const valiContra = /\s/;
-        if (rege.test(data.cedula)) {
+          //VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
+          const rege = /^[0-9]+$/;
+          const valiContra = /\s/;
+          if (rege.test(data.cedula)) {
           if (data.cedula.toString().length > 10 || data.cedula.toString().length < 10) {
             data.observacion = 'La cédula ingresada no es válida';
           } else {
@@ -1988,9 +2066,9 @@ class EmpleadoControlador {
                   data.observacion = 'La contraseña debe ser maximo de 10 caracteres';
                 }else{
                   // Verificar si la variable tiene el formato de fecha correcto con moment
-                  if (moment(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
+                  if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
                     //Valida si los datos de la columna telefono son numeros.
-                    if (telefono != undefined) {
+                    if (TELEFONO != undefined) {
                       if (rege.test(data.telefono)) {
                         if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                           data.observacion = 'El teléfono ingresada no es válido';
@@ -2017,23 +2095,23 @@ class EmpleadoControlador {
               data.observacion = 'Formato de código incorrecto';
             }
           }
+          } else {
+            data.observacion = 'La cédula ingresada no es válida';
+          }
+
+          listEmpleadosManual.push(data);
+
         } else {
-          data.observacion = 'La cédula ingresada no es válida';
-        }
-
-        listEmpleadosManual.push(data);
-
-      } else {
-        data.fila = item; data.cedula = cedula; 
-        data.apellido = apellido; data.nombre = nombre; 
-        data.codigo = codigo; data.usuario = usuario;
-        data.contrasena = contrasena; data.rol = rol;
-        data.estado_civil = estado_civil;
-        data.genero = genero; data.correo = correo;
-        data.fec_nacimiento = fec_nacimiento; data.latitud = latitud;
-        data.longitud = longitud; 
-        data.domicilio = domicilio; data.telefono = telefono;
-        data.nacionalidad = nacionalidad;
+        data.fila = ITEM; data.cedula = CEDULA; 
+        data.apellido = APELLIDO; data.nombre = NOMBRE; 
+        data.codigo = CODIGO; data.usuario = USUARIO;
+        data.contrasena = CONTRASENA; data.rol = ROL;
+        data.estado_civil = ESTADO_CIVIL;
+        data.genero = GENERO; data.correo = CORREO;
+        data.fec_nacimiento = FECHA_NACIMIENTO; data.latitud = LATITUD;
+        data.longitud = LONGITUD; 
+        data.domicilio = DOMICILIO; data.telefono = TELEFONO;
+        data.nacionalidad = NACIONALIDAD;
         data.observacion = 'no registrado';
 
         if (data.fila == '' || data.fila == undefined) {
@@ -2041,73 +2119,73 @@ class EmpleadoControlador {
           mensaje = 'error'
         }
 
-        if (apellido == undefined) {
+        if (APELLIDO == undefined) {
           data.apellido = 'No registrado';
           data.observacion = 'Apellido ' + data.observacion;
         }
-        if (nombre == undefined) {
+        if (NOMBRE == undefined) {
           data.nombre = 'No registrado';
           data.observacion = 'Nombre ' + data.observacion;
         }
-        if (codigo == undefined) {
+        if (CODIGO == undefined) {
           data.codigo = 'No registrado';
           data.observacion = 'Código ' + data.observacion;
         }
-        if (estado_civil == undefined) {
+        if (ESTADO_CIVIL == undefined) {
           data.estado_civil = 'No registrado';
           data.observacion = 'Estado civil ' + data.observacion;
         }
-        if (genero == undefined) {
+        if (GENERO == undefined) {
           data.genero = 'No registrado';
           data.observacion = 'Género ' + data.observacion;
         }
-        if (correo == undefined) {
+        if (CORREO == undefined) {
           data.correo = 'No registrado';
           data.observacion = 'Correo ' + data.observacion;
         }
-        if (fec_nacimiento == undefined) {
+        if (FECHA_NACIMIENTO == undefined) {
           data.fec_nacimiento = 'No registrado';
           data.observacion = 'Fecha de nacimiento ' + data.observacion;
         }
-        if (latitud == undefined) {
+        if (LATITUD == undefined) {
           data.latitud = 'No registrado';
         }
-        if (longitud == undefined) {
+        if (LONGITUD == undefined) {
           data.longitud = 'No registrado';
         }
-        if (domicilio == undefined) {
+        if (DOMICILIO == undefined) {
           data.domicilio = '-';
           data.observacion = " ";
         }
-        if (telefono == undefined) {
+        if (TELEFONO == undefined) {
           data.telefono = '-';
           data.observacion = " ";
         }
-        if (nacionalidad == undefined) {
+        if (NACIONALIDAD == undefined) {
           data.nacionalidad = 'No registrado';
           data.observacion = 'Nacionalidad ' + data.observacion;
         }
-        if (usuario == undefined) {
+        if (USUARIO == undefined) {
           data.usuario = 'No registrado';
           data.observacion = 'Usuario ' + data.observacion;
         }
-        if (contrasena == undefined) {
+        if (CONTRASENA == undefined) {
           data.contrasena = 'No registrado';
           data.observacion = 'Contraseña ' + data.observacion;
         }
-        if (rol == undefined) {
+        if (ROL == undefined) {
           data.rol = 'No registrado'
           data.observacion = 'Rol ' + data.observacion;
         }
 
         
-        if (codigo != undefined) {
+        if (CODIGO != undefined) {
           const rege = /^[0-9]+$/;
           const valiContra = /\s/;
           if (!rege.test(data.codigo)) {
             data.observacion = 'Formato de código incorrecto';
           }else{
-            if(contrasena != undefined){
+            if(CONTRASENA != undefined){
               console.log('data: ',data.contrasena);
             if(!valiContra.test(data.contrasena.toString())){
               console.log(data.contrasena,' entro ',data.contrasena.toString().length);
@@ -2116,9 +2194,9 @@ class EmpleadoControlador {
               }else{
                 // Verificar si la variable tiene el formato de fecha correcto con moment
                 if (data.fec_nacimiento != 'No registrado') {
-                  if (moment(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) { 
+                  if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) { 
                     //Valida si los datos de la columna telefono son numeros.
-                    if (telefono != undefined) {
+                    if (TELEFONO != undefined) {
                       const regex = /^[0-9]+$/;
                       if (regex.test(data.telefono)) {
                         if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
@@ -2143,7 +2221,7 @@ class EmpleadoControlador {
         }
 
 
-        if (cedula == undefined) {
+        if (CEDULA == undefined) {
           data.cedula = 'No registrado'
           data.observacion = 'Cédula no registrada';
         } else {
@@ -2160,24 +2238,22 @@ class EmpleadoControlador {
         }
 
         listEmpleadosManual.push(data);
-      }
+        }
 
 
-      data = {}
-    });
+        data = {}
+        });
 
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(ruta, fs.constants.F_OK, (err) => {
+        if (err) {
+        } else {
+          // ELIMINAR DEL SERVIDOR
+          fs.unlinkSync(ruta);
+        }
+        });
 
-    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-    fs.access(ruta, fs.constants.F_OK, (err) => {
-      if (err) {
-      } else {
-        // ELIMINAR DEL SERVIDOR
-        fs.unlinkSync(ruta);
-      }
-    });
-
-
-    listEmpleadosManual.forEach(async (valor: any) => {
+        listEmpleadosManual.forEach(async (valor: any) => {
       var VERIFICAR_CEDULA = await pool.query(
         `
         SELECT * FROM eu_empleados WHERE cedula = $1
@@ -2259,10 +2335,9 @@ class EmpleadoControlador {
 
       }
 
-    })
+        })
 
-
-    setTimeout(() => {
+        setTimeout(() => {
 
       listEmpleadosManual.sort((a: any, b: any) => {
         // COMPARA LOS NÚMEROS DE LOS OBJETOS
@@ -2311,7 +2386,12 @@ class EmpleadoControlador {
       }
 
       return res.jsonp({ message: mensaje, data: listEmpleadosManual });
-    }, 1500)
+        }, 1500)
+      }
+
+    }catch(error){
+      return res.status(500).jsonp({ message: error });
+    }
 
   }
 
@@ -2479,17 +2559,25 @@ class EmpleadoControlador {
           SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
           `
           , [rol.toUpperCase()]);
+
+          console.log('codigo: ', codigo)
+          console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
+          console.log('nombre: ', nombreE, ' usuario: ', apellidoE, ' fecha nacimien: ', fec_nacimiento, ' estado civil: ', id_estado_civil);
+          console.log('genero: ', id_genero, ' estado: ', id_estado, ' nacionalidad: ', id_nacionalidad.rows, ' rol: ', id_rol.rows);
+          console.log('longitud: ', _longitud, ' latitud: ', _latitud)
   
         // REGISTRO DE NUEVO EMPLEADO
-        await pool.query(
+        const response: QueryResult = await pool.query(
         `
         INSERT INTO eu_empleados ( cedula, apellido, nombre, estado_civil, genero, correo,
           fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
         `
         , [cedula, apellidoE, nombreE,
           id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
           domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
+
+        const [empleado] = response.rows;
 
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -2525,6 +2613,67 @@ class EmpleadoControlador {
           ip,
           observacion: null
         });
+
+        // CREACION DE CARPETAS DE LOS USUARIOS REGISTRADOS
+        if (empleado) {
+          let verificar = 0;
+          // RUTA DE LA CARPETA PRINCIPAL PERMISOS
+          const carpetaPermisos = await ObtenerRutaPermisos(codigo);
+
+          // METODO MKDIR PARA CREAR LA CARPETA
+          fs.mkdir(carpetaPermisos, { recursive: true }, (err: any) => {
+            if (err) {
+              verificar = 1;
+            } else {
+              verificar = 0;
+            }
+          });
+
+          // RUTA DE LA CARPETA PRINCIPAL PERMISOS
+          const carpetaImagenes = await ObtenerRutaUsuario(empleado.id);
+
+          // METODO MKDIR PARA CREAR LA CARPETA
+          fs.mkdir(carpetaImagenes, { recursive: true }, (err: any) => {
+            if (err) {
+              verificar = 1;
+            } else {
+              verificar = 0;
+            }
+          });
+
+          // RUTA DE LA CARPETA DE ALMACENAMIENTO DE VACUNAS
+          const carpetaVacunas = await ObtenerRutaVacuna(empleado.id);
+
+          // METODO MKDIR PARA CREAR LA CARPETA
+          fs.mkdir(carpetaVacunas, { recursive: true }, (err: any) => {
+            if (err) {
+              verificar = 1;
+            } else {
+              verificar = 0;
+            }
+          });
+
+          // RUTA DE LA CARPETA DE ALMACENAMIENTO DE CONTRATOS
+          const carpetaContratos = await ObtenerRutaContrato(empleado.id);
+
+          // METODO MKDIR PARA CREAR LA CARPETA
+          fs.mkdir(carpetaContratos, { recursive: true }, (err: any) => {
+            if (err) {
+              verificar = 1;
+            } else {
+              verificar = 0;
+            }
+          });
+
+          // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
+          if (verificar === 1) {
+            console.error('Error al crear las carpetas.');
+          }
+          
+        }
+        else {
+          return res.status(404).jsonp({ message: 'error' })
+        }
 
         if (contador === plantilla.length) {
 
