@@ -282,7 +282,7 @@ export class AsignarUsuarioComponent implements OnInit {
   }
 
   // METODO PARA DESHABILITAR OPCIONES DEPARTAMENTOS
-  DeshabilitarOpciones(event: any) {
+  ModificarPersonal(event: any) {
 
     const target = event.target as HTMLInputElement;
     this.isPersonal = target.checked;
@@ -309,50 +309,13 @@ export class AsignarUsuarioComponent implements OnInit {
     }
   }
 
-  // METODO PARA VERIFICAR QUE NO SE ENCUENTREN DATOS DUPLICADOS
-  VerificarDatos() {
-    // FILTRA LOS ARRAYS PARA ELIMINAR OBJETOS DUPLICADOS
-    let verificados = this.adminSeleccionados.filter((objeto, indice, valor) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    // VERIFICAMOS QUE EXISTAN DATOS PARA VERIFICAR EXISTENCIAS EN LA BASE DE DATOS
-    if (verificados != 0) {
-      if (this.asignados != 0) {
-        // FILTRA LOS ELEMENTOS DEL PRIMER ARRAY QUE NO SE REPITEN EN EL SEGUNDO ARRAY
-        let noRegistradoas = verificados.filter(elemento => !this.asignados.find(item => item.id === elemento.id));
-        this.adminSeleccionados = noRegistradoas;
-      }
-      else {
-        // AHORA 'verificados' CONTIENE SOLO OBJETOS UNICOS
-        this.adminSeleccionados = verificados;
-      }
-    }
-    // ACTIVAR BOTON GUARDAR DATOS Y LIMPIAR LISTA SELECCION DE USUARIOS
-    if (this.adminSeleccionados.length != 0) {
-      this.ver_guardar = true;
-    }
-    else {
-      this.ver_guardar = false;
-      this.toastr.warning('Usuarios seleccionados ya se encuentran registrados en el sistema.', 'VERIFICAR PROCESO.', {
-        timeOut: 6000,
-      });
-    }
-    this.LimpiarDatos();
-    console.log('ver admin ', this.adminSeleccionados)
-  }
-
   // METODO PARA ASIGNAR ADMINISTRACION DE DATOS A OTROS USUARIOS - DEPARTAMENTOS
   IngresarUsuarioDepartamento() {
     let datos: any = {
       id_empleado: '',
       id_departamento: '',
       principal: false,
+      personal: this.isPersonal,
       user_name: this.user_name,
       ip: this.ip,
     };
@@ -370,13 +333,18 @@ export class AsignarUsuarioComponent implements OnInit {
       datos.id_empleado = objeto.id;
       if (this.isPersonal) {
         datos.id_departamento = objeto.id_departamento;
-        requests.push(firstValueFrom(this.usuario.RegistrarUsuarioDepartamento(datos)));
-      } else {
-        this.departamentosSeleccionados.forEach((departamento: any) => {
-          datos.id_departamento = departamento.id;
+        if (!this.VerificarAsignaciones(datos.id_empleado, datos.id_departamento)) {
           requests.push(firstValueFrom(this.usuario.RegistrarUsuarioDepartamento(datos)));
-        });
+        }
       }
+
+      this.departamentosSeleccionados.forEach((departamento: any) => {
+        datos.id_departamento = departamento.id;
+        if (!this.VerificarAsignaciones(datos.id_empleado, datos.id_departamento)) {
+          requests.push(firstValueFrom(this.usuario.RegistrarUsuarioDepartamento(datos)));
+        }
+      });
+      
     });
 
     Promise.all(requests).then(() => {
@@ -397,6 +365,22 @@ export class AsignarUsuarioComponent implements OnInit {
         timeOut: 6000,
       });
     });
+  }
+
+  // METODO PARA OMITIR ASIGNACIONES EXISTENTES
+  VerificarAsignaciones(id_empleado: number, id_departamento: number): boolean {
+    const usuarioIndex = this.usuarios.find((u: any) => u.id === id_empleado);
+    let existe: boolean = false;
+      if (usuarioIndex !== -1) {
+        if (usuarioIndex.asignaciones != null) {
+          usuarioIndex.asignaciones.forEach((asignacion: any) => {
+            if (asignacion.id_departamento == id_departamento) {
+              existe = true;
+            }
+          });
+        }
+      }
+    return existe;
   }
 
   // METODO PARA LIMPIAR SELECCION DE USUARIOS

@@ -1682,17 +1682,17 @@ class UsuarioControlador {
   // CREAR REGISTRO DE USUARIOS - DEPARTAMENTO
   public async CrearUsuarioDepartamento(req: Request, res: Response) {
     try {
-      const { id_empleado, id_departamento, principal, user_name, ip } = req.body
+      const { id_empleado, id_departamento, principal, personal, user_name, ip } = req.body
 
       // INICIA TRANSACCION
       await pool.query('BEGIN');
 
       await pool.query(
         `
-        INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal) 
-        VALUES ($1, $2, $3)
+        INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal) 
+        VALUES ($1, $2, $3, $4)
         `
-        , [id_empleado, id_departamento, principal]);
+        , [id_empleado, id_departamento, principal, personal]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -1700,7 +1700,7 @@ class UsuarioControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{"id_empleado": ${id_empleado}, "id_departamento": ${id_departamento}, "principal": ${principal}}`,
+        datosNuevos: `{"id_empleado": ${id_empleado}, "id_departamento": ${id_departamento}, "principal": ${principal}, "personal": ${personal}}`,
         ip,
         observacion: null
       });
@@ -1721,7 +1721,7 @@ class UsuarioControlador {
     const { id_empleado } = req.body;
     const USUARIOS = await pool.query(
       `
-      SELECT ud.id, e.nombre, e.apellido, d.nombre AS departamento, s.nombre AS sucursal
+      SELECT ud.id, e.nombre, e.apellido, d.nombre AS departamento, d.id AS id_departamento, s.nombre AS sucursal, ud.principal, ud.personal
       FROM eu_usuario_departamento AS ud
       INNER JOIN eu_empleados AS e ON ud.id_empleado=e.id
       INNER JOIN ed_departamentos AS d ON ud.id_departamento=d.id

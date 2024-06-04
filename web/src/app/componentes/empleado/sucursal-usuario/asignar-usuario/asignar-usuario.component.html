@@ -128,7 +128,7 @@
 
                                             <div class="col-md-6 col-lg-6 col-6" style="text-align:left; padding-bottom: 10px;">
                                               <input class="form-check-input" type="checkbox" id="personal" [(ngModel)]="isPersonal"
-                                                   *ngIf="ver_seleccion && ver_personal" (change)="DeshabilitarOpciones($event)">
+                                                   *ngIf="ver_seleccion && ver_personal" (change)="ModificarPersonal($event)">
                                               <label *ngIf="ver_seleccion && ver_personal" class="form-check-label" for="inlineCheckbox1"
                                                   style="margin-left: 10px; font-size: 12px; color: blue; font-weight: bold;">
                                                   PERSONAL
@@ -181,10 +181,6 @@
                                         </table>
                                     </div>
                                     <div class="container d-flex flex-wrap justify-content-center">
-                                        <button *ngIf="adminSeleccionados.length != 0" id="btn-raised"
-                                            class="btn btn-sm" (click)="VerificarDatos()">
-                                            Verificar
-                                        </button>
                                         <button *ngIf="ver_guardar" id="btn-raised" class="btn btn-sm"
                                             (click)="IngresarUsuarioDepartamento()">
                                             Guardar
