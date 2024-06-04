@@ -122,7 +122,7 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let e of data_pdf | paginate:tamanio_pagina:numero_pagina, let i = index">
-                                <td class="t_horarios">{{ i+1 }}</td>
+                                <td class="t_horarios">{{ (numero_pagina * tamanio_pagina) + i -tamanio_pagina +1  }}</td>
                                 <td class="t_horarios">{{ e.plataforma }}</td>
                                 <td class="t_horarios">{{ e.user_name }}</td>
                                 <td class="t_horarios">{{ e.ip_address }}</td>

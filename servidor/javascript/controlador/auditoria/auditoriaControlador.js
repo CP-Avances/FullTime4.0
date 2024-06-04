@@ -48,7 +48,7 @@ class AuditoriaControlador {
             // Construir cláusulas dinámicas IN
             const tableNameClause = `table_name IN (${tablasArray.map((_, i) => `$${i + 1}`).join(', ')})`;
             const actionClause = `action IN (${actionsArray.map((_, i) => `$${tablasArray.length + i + 1}`).join(', ')})`;
-            const params = [...tablasArray, ...actionsArray, desde, hasta];
+            const params = [...tablasArray, ...actionsArray, desde, `${hasta} 23:59:59`];
             const query = `
        SELECT 
            *

@@ -92,7 +92,8 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         { nombre: "e_provincias", modulo: "", disponibilidad: true },
         { nombre: "e_ciudades", modulo: "", disponibilidad: true },
         { nombre: "e_sucursales ", modulo: "", disponibilidad: true },
-        { nombre: "e_cat_cargo", modulo: "", disponibilidad: true },
+        //e_cat_tipo_cargo
+        { nombre: "e_cat_tipo_cargo", modulo: "", disponibilidad: true },
         { nombre: "e_cat_modalidad_trabajo", modulo: "", disponibilidad: true },
         { nombre: "e_message_birthday", modulo: "", disponibilidad: true },
         { nombre: "e_documentacion", modulo: "", disponibilidad: true },
@@ -141,20 +142,23 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         { nombre: "ma_invitados_comida", modulo: "alimentacion", disponibilidad: this.alimentacion },
         { nombre: "ma_solicitud_comida", modulo: "alimentacion", disponibilidad: this.alimentacion },
         { nombre: "map_cargo_propuesto", modulo: "acciones_personal", disponibilidad: this.acciones_personal },
-        { nombre: "map_cg_procesos", modulo: "acciones_personal", disponibilidad: this.acciones_personal },
+        //map_cat_procesos
+        { nombre: "map_cat_procesos", modulo: "acciones_personal", disponibilidad: this.acciones_personal },
         { nombre: "map_contexto_legal_accion_personal", modulo: "acciones_personal", disponibilidad: this.acciones_personal },
         { nombre: "map_detalle_tipo_accion_personal", modulo: "acciones_personal", disponibilidad: this.acciones_personal },
         { nombre: "map_empleado_procesos", modulo: " acciones_personal", disponibilidad: this.acciones_personal },
         { nombre: "map_solicitud_accion_personal", modulo: "acciones_personal", disponibilidad: this.acciones_personal },
         { nombre: "map_tipo_accion_personal", modulo: "acciones_personal", disponibilidad: this.acciones_personal },
-        { nombre: "mg_cg_ubicaiones", modulo: "geolocalizacion", disponibilidad: this.geolocalizacion },
+        //nombre diferente en excel
+        { nombre: "mg_cat_ubicaciones", modulo: "geolocalizacion", disponibilidad: this.geolocalizacion },
         { nombre: "mg_empleado_ubicacion", modulo: "geolocalizacion", disponibilidad: this.geolocalizacion },
         { nombre: "mhe_calcular_hora_extra", modulo: "horas_extras", disponibilidad: this.horas_extras },
         { nombre: "mhe_configurar_hora_extra", modulo: "horas_extras", disponibilidad: this.horas_extras },
         { nombre: "mhe_detalle_plan_hora_extra", modulo: "horas_extras", disponibilidad: this.horas_extras },
         { nombre: "mhe_empleado_plan_hora_extra", modulo: "horas_extras", disponibilidad: this.horas_extras },
         { nombre: "mhe_solicitud_hora_extra", modulo: "horas_extras", disponibilidad: this.horas_extras },
-        { nombre: "mp_cg_tipo_permisos", modulo: "permisos", disponibilidad: this.permisos },
+        //mp_cat_tipo_permisos
+        { nombre: "mp_cat_tipo_permisos", modulo: "permisos", disponibilidad: this.permisos },
         { nombre: "mp_solicitud_permiso", modulo: "permisos", disponibilidad: this.permisos },
         { nombre: "mrv_dispositivos", modulo: "reloj_virtual", disponibilidad: this.reloj_virtual },
         { nombre: "mv_periodo_vacacion", modulo: "vacaciones", disponibilidad: this.vacaciones },
@@ -200,7 +204,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
     // VALIDACIONES DE OPCIONES DE REPORTE
     ValidarReporte(action: any) {
-        if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
+        if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '' || this.accionesSeleccionadas.length == 0) return this.toastr.error('Primero valide fechas de búsqueda y acciones.');
         this.ModelarTablasAuditoria(action);
     }
 
@@ -240,7 +244,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
             }
             , error => {
                 if (error.status == '404') {
-                    this.toastr.error('No existen registros en', 'Ups!!! algo salio mal..', {
+                    this.toastr.error('No existen registros con las tablas y acciones seleccionadas', 'Ups!!! algo salio mal..', {
                         timeOut: 6000,
                     })
                 }
@@ -431,15 +435,20 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         n.push({
             style: 'tableMarginCabecera',
             table: {
-                widths: ['*'],
+                widths: ['*', '*'],
                 headerRows: 1,
                 body: [
                     [
                         {
-                            border: [true, true, true, false],
+                            border: [true, true, false, false],
                             bold: true,
-                            text: 'PLATAFORMA: ',
+                            text: 'PLATAFORMA: ' + data[0].plataforma,
                             style: 'itemsTableInfo'
+                        },
+                        {
+                            border: [false, true, true, false],
+                            text: 'N° Registros: ' + data.length,
+                            style: 'itemsTableInfo',
                         },
                     ]
                 ]
@@ -450,7 +459,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         n.push({
             style: 'tableMargin',
             table: {
-                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 140, 140],
+                widths: ['auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 140, 140],
                 headerRows: 1,
                 body: [
                     [
@@ -473,11 +482,11 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
                             { style: 'itemsTable', text: audi.user_name },
                             { style: 'itemsTableCentrado', text: audi.ip_address },
                             { style: 'itemsTableCentrado', text: audi.table_name },
-                            { style: 'itemsTable', text: audi.action },
+                            { style: 'itemsTableCentrado', text: audi.action },
                             { style: 'itemsTable', text: this.getDateFromISO(audi.fecha_hora) },
                             { style: 'itemsTable', text: this.getTimeFromISO(audi.fecha_hora) },
-                            { style: 'itemsTable', text: audi.original_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [0, 0, 7, 0] },
-                            { style: 'itemsTable', text: audi.new_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [0, 0, 7, 0] },
+                            { style: 'itemsTable', text: audi.original_data, fontSize: 6, noWrap: false, overflow: 'hidden' },
+                            { style: 'itemsTable', text: audi.new_data, fontSize: 6, noWrap: false, overflow: 'hidden' },
                         ]
                     })
                 ]
@@ -500,14 +509,29 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         return `${year}-${month}-${day}`;
     }
 
+    /*
+        getTimeFromISO(isoString: string): string {
+            const date = new Date(isoString);
+            const hours = String(date.getUTCHours()).padStart(2, '0');
+            const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+    
+    */
+
 
     getTimeFromISO(isoString: string): string {
         const date = new Date(isoString);
-        const hours = String(date.getUTCHours()).padStart(2, '0');
-        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
         return `${hours}:${minutes}:${seconds}`;
     }
+
+
+
+
 
 
     // METODO PARA REGRESAR A LA PAGINA ANTERIOR

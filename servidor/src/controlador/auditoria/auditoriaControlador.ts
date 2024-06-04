@@ -30,9 +30,6 @@ class AuditoriaControlador {
 */
 
     public async BuscarDatosAuditoria(req: Request, res: Response): Promise<Response> {
-
-
-
         const { tabla, desde, hasta, action } = req.body
         // Convertir las cadenas de tablas y acciones en arrays
         const tablasArray = tabla.split(',').map((t: any) => t.trim().replace(/'/g, ''));
@@ -40,7 +37,7 @@ class AuditoriaControlador {
         // Construir cláusulas dinámicas IN
         const tableNameClause = `table_name IN (${tablasArray.map((_: any, i: any) => `$${i + 1}`).join(', ')})`;
         const actionClause = `action IN (${actionsArray.map((_: any, i: any) => `$${tablasArray.length + i + 1}`).join(', ')})`;
-        const params = [...tablasArray, ...actionsArray, desde, hasta];
+        const params = [...tablasArray, ...actionsArray, desde,  `${hasta} 23:59:59`];
         const query = `
        SELECT 
            *
@@ -62,10 +59,6 @@ class AuditoriaControlador {
         } else {
             return res.status(404).jsonp({ message: 'No se encuentran registros', status: '404' });
         }
-
-
-
-
     }
 
     // INSERTAR REGISTRO DE AUDITORIA
