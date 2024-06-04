@@ -59,7 +59,6 @@ export class AsignarUsuarioComponent implements OnInit {
 
   // VARIABLE PARA SELECCION MULTIPLE DE DEPARTAMENTOS
   departamentosSeleccionados: any = [];
-  deshabilitar: boolean = false;
   deshabilitarTodos: boolean = false;
 
   // VARIABLES PARA VISUALIZAR DATOS
@@ -187,7 +186,6 @@ export class AsignarUsuarioComponent implements OnInit {
     this.ver_seleccion = true;
     this.isChecked = false;
     this.isPersonal = false;
-    this.deshabilitar = false;
     this.deshabilitarTodos = false;
     //console.log('ver datos ', this.sucursalForm.value)
     const [elemento] = this.sucursales.filter((o: any) => {
@@ -285,16 +283,11 @@ export class AsignarUsuarioComponent implements OnInit {
 
   // METODO PARA DESHABILITAR OPCIONES DEPARTAMENTOS
   DeshabilitarOpciones(event: any) {
-    this.deshabilitar = !this.deshabilitar;
-    this.departamentos.forEach((obj: any) => {
-      obj.seleccionado = false;
-    });
 
-    this.departamentosSeleccionados = [];
     const target = event.target as HTMLInputElement;
     this.isPersonal = target.checked;
 
-    if (this.isPersonal === true) {
+    if (this.isPersonal === true || this.departamentosSeleccionados.length != 0) {
       this.ver_guardar = true;
     } else {
       this.ver_guardar = false;
