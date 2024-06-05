@@ -184,9 +184,14 @@
                 library_add_check
             </mat-icon>
             <button *ngIf="btnCheckHabilitar" class="btn btn-primary btn-outline-light"
+                style="float: left; margin-left: 20px; padding-left: 10px;"  (click)="CrearCarpeta(1)">
+                Crear Carpeta
+            </button>
+            <button *ngIf="btnCheckHabilitar" class="btn btn-primary btn-outline-light"
                 style="float: left; margin-left: 20px; padding-left: 10px;" (click)="Deshabilitar(1)">
                 Confirmar
             </button>
+
             <span class="w-100 bd-highlight">
                 LISTA DE USUARIOS ACTIVOS
             </span>

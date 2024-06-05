@@ -17,6 +17,8 @@ import * as xml2js from 'xml2js';
 
 // IMPORTAR COMPONENTES
 import { ConfirmarDesactivadosComponent } from '../confirmar-desactivados/confirmar-desactivados.component';
+import { ConfirmarCrearCarpetaComponent } from '../confirmar-crearCarpeta/confirmar-crearCarpeta.component';
+
 
 // IMPORTAR SERVICIOS
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
@@ -26,6 +28,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ThemePalette } from '@angular/material/core';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { number } from 'echarts';
 
 @Component({
   selector: 'app-lista-empleados',
@@ -196,6 +199,53 @@ export class ListaEmpleadosComponent implements OnInit {
       return `${this.isAllSelectedDos() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionDos.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  CrearCarpeta(opcion: number) {
+    let EmpleadosSeleccionados: any;
+
+    if (opcion === 1) {
+
+      EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
+        return {
+          id: obj.id,
+          empleado: obj.nombre + ' ' + obj.apellido
+        }
+      })
+    }else if (opcion === 2 || opcion === 3) {
+      EmpleadosSeleccionados = this.selectionDos.selected.map(obj => {
+        return {
+          id: obj.id,
+          empleado: obj.nombre + ' ' + obj.apellido
+        }
+      })
+    }
+
+    // VERIFICAR QUE EXISTAN USUARIOS SELECCIONADOS
+    if (EmpleadosSeleccionados.length != 0) {
+      this.ventana.open(ConfirmarCrearCarpetaComponent, {
+        width: '500px',
+        data: { opcion: opcion, lista: EmpleadosSeleccionados }
+      })
+        .afterClosed().subscribe(item => {
+          if (item === true) {
+            this.GetEmpleados();
+            this.btnCheckHabilitar = false;
+            this.btnCheckDeshabilitado = false;
+            this.selectionUno.clear();
+            this.selectionDos.clear();
+            EmpleadosSeleccionados = [];
+          };
+        });
+    }
+    else {
+      this.toastr.info('No ha seleccionado usuarios.', '', {
+        timeOut: 6000,
+      })
+    }
+
+
+
   }
 
   // METODO PARA DESHABILITAR USUARIOS
@@ -575,12 +625,11 @@ export class ListaEmpleadosComponent implements OnInit {
     ) {
       return 'rgb(222, 162, 73)';
     } else if ((observacion == 'Rol no existe en el sistema') ||
-      (observacion == 'Nacionalidad no existe en el sistema'))
-    {
+      (observacion == 'Nacionalidad no existe en el sistema')) {
       return 'rgb(255, 192, 203)';
-    }else if (arrayObservacion[0] == 'Formato') {
+    } else if (arrayObservacion[0] == 'Formato') {
       return 'rgb(222, 162, 73)';
-    }else {
+    } else {
       return 'rgb(251, 73, 18)';
     }
 
@@ -1045,7 +1094,7 @@ export class ListaEmpleadosComponent implements OnInit {
         if (confirmado) {
           if (EliminarActivos.length != 0) {
 
-              //ELIMINAR EMPLEADO
+            //ELIMINAR EMPLEADO
 
             EliminarActivos.forEach((datos: any) => {
 
@@ -1071,7 +1120,7 @@ export class ListaEmpleadosComponent implements OnInit {
             }
             )
             this.btnCheckHabilitar = false;
-            this.empleadosEliminarActivos=[];
+            this.empleadosEliminarActivos = [];
             this.selectionUno.clear();
             this.GetEmpleados();
           } else {
@@ -1085,7 +1134,7 @@ export class ListaEmpleadosComponent implements OnInit {
         }
       }
       );
-      //this.GetEmpleados();
+    //this.GetEmpleados();
 
   }
 
@@ -1129,7 +1178,7 @@ export class ListaEmpleadosComponent implements OnInit {
             }
             )
             this.btnCheckDeshabilitado = false;
-            this.empleadosEliminarActivos=[];
+            this.empleadosEliminarActivos = [];
             this.selectionUno.clear();
             this.GetEmpleados();
           } else {

@@ -156,6 +156,9 @@ import { AuthGuard } from "./servicios/guards/auth.guard";
 
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { ConfirmarDesactivadosComponent } from './componentes/empleado/datos-empleado/confirmar-desactivados/confirmar-desactivados.component';
+import { ConfirmarCrearCarpetaComponent } from './componentes/empleado/datos-empleado/confirmar-crearCarpeta/confirmar-crearCarpeta.component';
+
+
 import { PlanHoraExtraAutorizaComponent } from './componentes/autorizaciones/plan-hora-extra-autoriza/plan-hora-extra-autoriza.component';
 import { ColoresEmpresaComponent } from './componentes/catalogos/catEmpresa/colores-empresa/colores-empresa.component';
 import { AyudaComponent } from './componentes/administracionGeneral/preferecias/ayuda/ayuda.component';
@@ -485,6 +488,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     ListaEmplePlanHoraEComponent,
     TiempoAutorizadoComponent,
     ConfirmarDesactivadosComponent,
+    ConfirmarCrearCarpetaComponent,
     RealtimeAvisosComponent,
     EliminarRealtimeComponent,
     ListaPlanHoraExtraComponent,
