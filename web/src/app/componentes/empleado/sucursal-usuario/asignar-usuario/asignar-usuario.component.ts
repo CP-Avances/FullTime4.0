@@ -344,7 +344,7 @@ export class AsignarUsuarioComponent implements OnInit {
           requests.push(firstValueFrom(this.usuario.RegistrarUsuarioDepartamento(datos)));
         }
       });
-      
+
     });
 
     Promise.all(requests).then(() => {
@@ -369,18 +369,13 @@ export class AsignarUsuarioComponent implements OnInit {
 
   // METODO PARA OMITIR ASIGNACIONES EXISTENTES
   VerificarAsignaciones(id_empleado: number, id_departamento: number): boolean {
-    const usuarioIndex = this.usuarios.find((u: any) => u.id === id_empleado);
-    let existe: boolean = false;
-      if (usuarioIndex !== -1) {
-        if (usuarioIndex.asignaciones != null) {
-          usuarioIndex.asignaciones.forEach((asignacion: any) => {
-            if (asignacion.id_departamento == id_departamento) {
-              existe = true;
-            }
-          });
-        }
-      }
-    return existe;
+    const usuario = this.usuarios.find((u: any) => u.id === id_empleado);
+
+    if (usuario && usuario.asignaciones) {
+      return usuario.asignaciones.some((asignacion: any) => asignacion.id_departamento == id_departamento);
+    }
+
+    return false;
   }
 
   // METODO PARA LIMPIAR SELECCION DE USUARIOS
