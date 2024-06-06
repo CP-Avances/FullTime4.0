@@ -83,6 +83,23 @@ class UsuarioControlador {
             }
         });
     }
+    ObtenerIdUsuariosDepartamento(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_departamento } = req.body;
+            console.log('id_departamento ', id_departamento);
+            const Ids = yield database_1.default.query(`
+      SELECT id
+      FROM datos_actuales_empleado
+      WHERE id_departamento = $1
+      `, [id_departamento]);
+            if (Ids.rowCount > 0) {
+                return res.jsonp(Ids.rows);
+            }
+            else {
+                return res.jsonp(null);
+            }
+        });
+    }
     // METODO PARA ACTUALIZAR DATOS DE USUARIO
     ActualizarUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

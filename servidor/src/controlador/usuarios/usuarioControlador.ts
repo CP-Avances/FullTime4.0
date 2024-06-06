@@ -86,6 +86,24 @@ class UsuarioControlador {
     }
   }
 
+  public async ObtenerIdUsuariosDepartamento(req: Request, res: Response) {
+    const { id_departamento } = req.body;
+    console.log('id_departamento ', id_departamento)
+    const Ids = await pool.query(
+      `
+      SELECT id
+      FROM datos_actuales_empleado
+      WHERE id_departamento = $1
+      `
+      , [id_departamento]);
+    if (Ids.rowCount > 0) {
+      return res.jsonp(Ids.rows)
+    }
+    else {
+      return res.jsonp(null);
+    }
+  }
+
 
   // METODO PARA ACTUALIZAR DATOS DE USUARIO
   public async ActualizarUsuario(req: Request, res: Response): Promise<Response> {

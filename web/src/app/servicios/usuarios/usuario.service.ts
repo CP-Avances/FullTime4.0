@@ -29,6 +29,11 @@ export class UsuarioService {
     return this.http.get(`${environment.url}/usuarios/dato/${id}`);
   }
 
+  // METODO PARA OBTENER IDS USUARIOS DEPARTAMENTO
+  ObtenerIdUsuariosDepartamento(data: any) {
+    return this.http.post(`${environment.url}/usuarios/buscar-ids-usuarios-departamento`, data);
+  }
+
   // METODO PARA ACTUALIZAR REGISTRO DE USUARIO
   ActualizarDatos(data: any) {
     return this.http.put(`${environment.url}/usuarios/actualizarDatos`, data).pipe(

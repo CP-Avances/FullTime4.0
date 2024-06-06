@@ -2,6 +2,7 @@
 import { Validators, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
+import { firstValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
@@ -26,6 +27,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ThemePalette } from '@angular/material/core';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-lista-empleados',
@@ -42,6 +44,7 @@ export class ListaEmpleadosComponent implements OnInit {
   nacionalidades: any = [];
   empleadoD: any = [];
   empleado: any = [];
+  idUsuariosAcceso: any = [];  // VARIABLE DE ALMACENAMIENTO DE IDs DE USUARIOS A LOS QUE TIENE ACCESO EL USURIO QUE INICIO SESION
 
   // CAMPOS DEL FORMULARIO
   apellido = new FormControl('', [Validators.minLength(2)]);
@@ -96,6 +99,7 @@ export class ListaEmpleadosComponent implements OnInit {
     public rest: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     private toastr: ToastrService, // VARIABLE DE MANEJO DE MENSAJES DE NOTIFICACIONES
     private validar: ValidacionesService,
+    private usuario: UsuarioService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -104,11 +108,11 @@ export class ListaEmpleadosComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
+    this.ObtenerAsignacionesUsuario(this.idEmpleado);
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerNacionalidades();
     this.DescargarPlantilla();
     this.ObtenerColores();
-    this.GetEmpleados();
     this.ObtenerLogo();
   }
 
@@ -249,6 +253,30 @@ export class ListaEmpleadosComponent implements OnInit {
     })
   }
 
+  async ObtenerAsignacionesUsuario(idEmpleado: any) {
+    const data = {
+      id_empleado: Number(idEmpleado)
+    }
+
+    const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(data));
+    this.empleadoD.asignaciones = res;
+
+    const promises = this.empleadoD.asignaciones.map((asignacion: any) => {
+      const data = {
+        id_departamento: asignacion.id_departamento
+      }
+      return firstValueFrom(this.usuario.ObtenerIdUsuariosDepartamento(data));
+    });
+
+    const results = await Promise.all(promises);
+
+    const ids = results.flat().map((res: any) => res.id);
+    this.idUsuariosAcceso.push(...ids);
+
+    this.GetEmpleados();
+
+  }
+
   // METODO PARA OBTENER LOGO DE EMPRESA
   logo: any = String;
   ObtenerLogo() {
@@ -302,11 +330,16 @@ export class ListaEmpleadosComponent implements OnInit {
     this.empleado = [];
     this.rest.ListarEmpleadosActivos().subscribe(data => {
       this.empleado = data;
+
+      // TODO: ANALIZAR QUE SUCEDE CON LOS ROLES ADMINISTRADOR Y SUPERADMINISTRADOR
+      this.empleado = this.empleado.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
       this.OrdenarDatos(this.empleado);
     })
     this.desactivados = [];
     this.rest.ListaEmpleadosDesactivados().subscribe(res => {
       this.desactivados = res;
+      this.desactivados = this.desactivados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
+      this.OrdenarDatos(this.desactivados);
     });
   }
 
@@ -367,7 +400,6 @@ export class ListaEmpleadosComponent implements OnInit {
       if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
         var itemName = arrayItems[0].slice(0, 18);
         if (itemName.toLowerCase() == 'empleadoautomatico') {
-          console.log('entra_automatico');
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;
           this.VerificarPlantillaAutomatico();

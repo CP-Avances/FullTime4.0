@@ -347,7 +347,7 @@ export class AsignarUsuarioComponent implements OnInit {
 
     });
 
-    Promise.all(requests).then(() => {
+    Promise.allSettled(requests).then(() => {
       this.toastr.success('Registros guardados exitosamente.', 'PROCESO EXITOSO.', {
         timeOut: 6000,
       });
