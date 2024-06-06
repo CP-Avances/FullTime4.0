@@ -482,7 +482,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
                             { style: 'itemsTable', text: audi.user_name },
                             { style: 'itemsTableCentrado', text: audi.ip_address },
                             { style: 'itemsTableCentrado', text: audi.table_name },
-                            { style: 'itemsTableCentrado', text: audi.action },
+                            { style: 'itemsTableCentrado', text: this.transformAction(audi.action) },
                             { style: 'itemsTable', text: this.getDateFromISO(audi.fecha_hora) },
                             { style: 'itemsTable', text: this.getTimeFromISO(audi.fecha_hora) },
                             { style: 'itemsTable', text: audi.original_data, fontSize: 6, noWrap: false, overflow: 'hidden' },
@@ -509,18 +509,6 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         return `${year}-${month}-${day}`;
     }
 
-    /*
-        getTimeFromISO(isoString: string): string {
-            const date = new Date(isoString);
-            const hours = String(date.getUTCHours()).padStart(2, '0');
-            const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-            const seconds = String(date.getUTCSeconds()).padStart(2, '0');
-            return `${hours}:${minutes}:${seconds}`;
-        }
-    
-    */
-
-
     getTimeFromISO(isoString: string): string {
         const date = new Date(isoString);
         const hours = String(date.getHours()).padStart(2, '0');
@@ -529,10 +517,18 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         return `${hours}:${minutes}:${seconds}`;
     }
 
-
-
-
-
+    transformAction(action: string): string {
+        switch (action) {
+            case 'U':
+                return 'Actualizar';
+            case 'I':
+                return 'Insertar';
+            case 'D':
+                return 'Eliminar';
+            default:
+                return action;
+        }
+    }
 
     // METODO PARA REGRESAR A LA PAGINA ANTERIOR
     Regresar() {

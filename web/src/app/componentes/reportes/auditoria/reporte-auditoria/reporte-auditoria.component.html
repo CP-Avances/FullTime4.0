@@ -127,7 +127,7 @@
                                 <td class="t_horarios">{{ e.user_name }}</td>
                                 <td class="t_horarios">{{ e.ip_address }}</td>
                                 <td class="t_horarios">{{ e.table_name }}</td>
-                                <td class="t_horarios">{{ e.action }}</td>
+                                <td class="t_horarios">{{ transformAction(e.action) }}</td>
                                 <td class="t_horarios">{{getDateFromISO(e.fecha_hora)  }}</td>
                                 <td class="t_horarios">{{ getTimeFromISO(e.fecha_hora)}}</td>
                                 <td class="t_horarios">{{ e.original_data }}</td>
