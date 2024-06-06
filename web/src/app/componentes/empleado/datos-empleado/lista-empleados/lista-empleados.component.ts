@@ -209,13 +209,15 @@ export class ListaEmpleadosComponent implements OnInit {
       EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
         return {
           id: obj.id,
+          codigo: obj.codigo,
           empleado: obj.nombre + ' ' + obj.apellido
         }
       })
-    }else if (opcion === 2 || opcion === 3) {
+    } else if (opcion === 2 || opcion === 3) {
       EmpleadosSeleccionados = this.selectionDos.selected.map(obj => {
         return {
           id: obj.id,
+          codigo: obj.codigo, 
           empleado: obj.nombre + ' ' + obj.apellido
         }
       })

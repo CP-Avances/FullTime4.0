@@ -55,7 +55,7 @@ export class ConfirmarCrearCarpetaComponent implements OnInit {
   }
 
   // METODO PARA GUARDAR CAMBIOS EN BASE DE DATOS
-  ConfirmarListaEmpleados() {
+  ConfirmarCrearCarpetaEmpleados() {
 
     this.empleados.map((e: any) => {
       const datos = {
