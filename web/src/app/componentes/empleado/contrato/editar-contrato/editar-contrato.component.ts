@@ -401,7 +401,7 @@ export class EditarContratoComponent implements OnInit {
       this.archivoForm.reset();
       this.nameFile = '';
     }, error => {
-      this.toastr.info('No se ha podido cargar el archivo', 'Verifique que este usuario tenga creadas capetas', {
+      this.toastr.info('Verifique que este usuario tenga creadas capetas', 'No se ha podido cargar el archivo.', {
         timeOut: 6000,
       });
     }

@@ -234,7 +234,14 @@ export class EditarVacunaComponent implements OnInit {
     this.restVacuna.SubirDocumento(formData, this.dvacuna.id, this.idEmploy).subscribe(res => {
       this.archivoF.reset();
       this.nameFile = '';
-    });
+    }, error => {
+      this.toastr.info('Verifique que este usuario tenga creadas capetas', 'No se ha podido cargar el archivo.', {
+        timeOut: 6000,
+      });
+
+    }
+
+    );
   }
 
   // METODOS DE ACTIVACION DE CARGA DE ARCHIVO

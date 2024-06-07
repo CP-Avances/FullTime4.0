@@ -746,7 +746,10 @@ class EmpleadoControlador {
                     var _a;
                     try {
                         const imagen = `${obj.codigo}_${anio}_${mes}_${dia}_${(_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname}`;
+                        console.log("imagen ", imagen);
                         if (obj.imagen && obj.imagen !== 'null') {
+                            console.log("a ver si imprime obj.id ", obj.id);
+                            console.log("a ver si imprime obj.imagen ", obj.imagen);
                             const ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(obj.id)) + separador + obj.imagen;
                             fs_2.default.access(ruta, fs_2.default.constants.F_OK, (err) => {
                                 if (!err) {
@@ -754,10 +757,13 @@ class EmpleadoControlador {
                                 }
                             });
                         }
+                        else {
+                            console.log("prueba 3");
+                        }
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
                         // CONSULTAR DATOSORIGINALES
-                        const empleado = yield database_1.default.query('SELECT * FROM empleados WHERE id = $1', [id]);
+                        const empleado = yield database_1.default.query('SELECT * FROM eu_empleados WHERE id = $1', [id]);
                         const [datosOriginales] = empleado.rows;
                         if (!datosOriginales) {
                             yield auditoriaControlador_1.default.InsertarAuditoria({

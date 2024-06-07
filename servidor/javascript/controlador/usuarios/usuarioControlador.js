@@ -1495,7 +1495,7 @@ class UsuarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
             const USUARIOS = yield database_1.default.query(`
-      SELECT ud.id, e.nombre, e.apellido, d.nombre AS departamento, d.id AS id_departamento, s.nombre AS sucursal, ud.principal, ud.personal
+      SELECT ud.id, e.nombre, e.apellido, d.nombre AS departamento, d.id AS id_departamento, s.id AS id_sucursal, s.nombre AS sucursal, ud.principal, ud.personal
       FROM eu_usuario_departamento AS ud
       INNER JOIN eu_empleados AS e ON ud.id_empleado=e.id
       INNER JOIN ed_departamentos AS d ON ud.id_departamento=d.id

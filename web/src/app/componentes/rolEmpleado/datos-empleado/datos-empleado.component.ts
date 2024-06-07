@@ -326,6 +326,11 @@ export class DatosEmpleadoComponent implements OnInit {
       this.archivoForm.reset();
       this.nameFile = '';
       this.ResetDataMain();
+    }, error => {
+        this.toastr.info('Verifique que este usuario tenga creadas capetas', 'No se ha podido cargar el archivo.', {
+        timeOut: 6000,
+      });
+
     });
   }
 
