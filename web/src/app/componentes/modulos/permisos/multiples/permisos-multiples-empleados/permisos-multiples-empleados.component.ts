@@ -2,6 +2,7 @@ import { Validators, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
+import { firstValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 
@@ -15,7 +16,6 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-permisos-multiples-empleados',
