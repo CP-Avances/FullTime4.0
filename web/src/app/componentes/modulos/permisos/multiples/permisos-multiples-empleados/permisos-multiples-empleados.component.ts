@@ -335,8 +335,8 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
       this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.includes(regimen.id_suc));
 
       this.empleados.forEach((empleado: any) => {
-        this.idCargosAcceso.push(empleado.id_cargo_);
-      })
+        this.idCargosAcceso = [...new Set([...this.idCargosAcceso, empleado.id_cargo_])];
+      });
             
       this.cargos = this.cargos.filter((cargo: any) => 
         this.idSucursalesAcceso.includes(cargo.id_suc) && this.idCargosAcceso.includes(cargo.id)
