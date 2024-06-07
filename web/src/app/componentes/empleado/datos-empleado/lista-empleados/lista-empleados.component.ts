@@ -74,6 +74,7 @@ export class ListaEmpleadosComponent implements OnInit {
   numero_paginaMul: number = 1;
 
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
+  rolEmpleado: number;
 
   // VARAIBLES DE SELECCION DE DATOS DE UNA TABLA
   selectionUno = new SelectionModel<EmpleadoElemento>(true, []);
@@ -107,10 +108,16 @@ export class ListaEmpleadosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
-    this.ObtenerAsignacionesUsuario(this.idEmpleado);
+    if (this.rolEmpleado != 1){
+      this.ObtenerAsignacionesUsuario(this.idEmpleado);
+    } else {
+      this.GetEmpleados();
+    }
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerNacionalidades();
     this.DescargarPlantilla();
@@ -321,7 +328,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
     const results = await Promise.all(promises);
 
-    const ids = results.flat().map((res: any) => res.id);
+    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
     this.idUsuariosAcceso.push(...ids);
 
     this.GetEmpleados();
@@ -383,13 +390,17 @@ export class ListaEmpleadosComponent implements OnInit {
       this.empleado = data;
 
       // TODO: ANALIZAR QUE SUCEDE CON LOS ROLES ADMINISTRADOR Y SUPERADMINISTRADOR
-      this.empleado = this.empleado.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
+      if (this.rolEmpleado != 1) {
+        this.empleado = this.empleado.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
+      }
       this.OrdenarDatos(this.empleado);
     })
     this.desactivados = [];
     this.rest.ListaEmpleadosDesactivados().subscribe(res => {
       this.desactivados = res;
-      this.desactivados = this.desactivados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
+      if (this.rolEmpleado != 1) {
+        this.desactivados = this.desactivados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
+      }
       this.OrdenarDatos(this.desactivados);
     });
   }
