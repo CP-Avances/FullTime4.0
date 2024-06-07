@@ -321,7 +321,9 @@ export class ListaEmpleadosComponent implements OnInit {
 
     const results = await Promise.all(promises);
 
-    const ids = results.flat().map((res: any) => res.id);
+    const ids = results.flat().map((res: any) => {
+      if (res!=null) return res.id;
+    });
     this.idUsuariosAcceso.push(...ids);
 
     this.GetEmpleados();
