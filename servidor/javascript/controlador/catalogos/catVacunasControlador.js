@@ -93,16 +93,16 @@ class VacunaControlador {
                 var VERIFICAR_VACUNA = yield database_1.default.query(`
                 SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1 AND NOT id = $2
                 `, [nombre.toUpperCase(), id]);
-                const consulta = yield database_1.default.query('SELECT * FROM e_cat_tipo_cargo WHERE id = $1', [id]);
+                const consulta = yield database_1.default.query('SELECT * FROM e_cat_vacuna WHERE id = $1', [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'e_cat_vacuna',
-                        usuario: req.body.user_name,
+                        usuario: user_name,
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
-                        ip: req.body.ip,
+                        ip: ip,
                         observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
                     });
                     // FINALIZAR TRANSACCION
@@ -111,6 +111,8 @@ class VacunaControlador {
                 }
                 if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
                     const vacunaEditar = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
                 UPDATE e_cat_vacuna SET nombre = $2
                 WHERE id = $1 RETURNING *
@@ -141,6 +143,7 @@ class VacunaControlador {
             }
             catch (error) {
                 // ROLLBACK
+                console.log(error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error', status: '500' });
             }

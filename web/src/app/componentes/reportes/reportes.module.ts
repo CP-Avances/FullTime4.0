@@ -8,6 +8,8 @@ import { FiltrosModule } from '../../filtros/filtros.module';
 
 import { RangoFechasComponent } from './configuracion-reportes/rango-fechas/rango-fechas.component';
 import { ReporteFaltasComponent } from './asistencia/reporte-faltas/reporte-faltas.component';
+import { ReporteAuditoriaComponent } from './auditoria/reporte-auditoria/reporte-auditoria.component';
+
 import { CriteriosBusquedaComponent } from './configuracion-reportes/criterios-busqueda/criterios-busqueda.component';
 import { ReporteTimbresMultiplesComponent } from './timbres/reporte-timbres-multiples/reporte-timbres-multiples.component';
 
@@ -41,6 +43,8 @@ import { ReporteTiempoAlimentacionComponent } from './asistencia/reporte-tiempo-
 import { ReportePlanificacionHorariaComponent } from './asistencia/reporte-planificacion-horaria/reporte-planificacion-horaria.component';
 import { ReporteResumenAsistenciaComponent } from './asistencia/reporte-resumen-asistencia/reporte-resumen-asistencia.component';
 import { OpcionUsuarioComponent } from './configuracion-reportes/opcion-usuario/opcion-usuario.component';
+import { OpcionAccionComponent } from './configuracion-reportes/opcion-accion/opcion-accion.component';
+
 import { TimbreMrlComponent } from './timbres/timbre-mrl/timbre-mrl.component';
 import { AnalisisDatosComponent } from './analisis-datos/analisis-datos.component';
 
@@ -50,6 +54,7 @@ import { AnalisisDatosComponent } from './analisis-datos/analisis-datos.componen
     CriteriosBusquedaComponent,
     ReporteTimbresMultiplesComponent,
     ReporteFaltasComponent,
+    ReporteAuditoriaComponent,
     ReporteEmpleadosComponent,
     ReporteKardexComponent,
     ReporteHorasPedidasComponent,
@@ -79,6 +84,7 @@ import { AnalisisDatosComponent } from './analisis-datos/analisis-datos.componen
     ReportePlanificacionHorariaComponent,
     ReporteResumenAsistenciaComponent,
     OpcionUsuarioComponent,
+    OpcionAccionComponent,
     TimbreMrlComponent,
     AnalisisDatosComponent,
   ],

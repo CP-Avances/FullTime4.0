@@ -286,4 +286,13 @@ export class EmpleadoService {
   BuscarDepartamentoEmpleado(datos: any) {
     return this.http.post(`${environment.url}/empleado/buscarDepartamento`, datos);
   }
+
+
+  // CREAR CARPETA PARA EMPLEADOS SELECCIONADOS
+  CrearCarpetasUsuarios(data: any) {
+    return this.http.post<any>(`${environment.url}/empleado/crear_carpetas`, data)
+  }
+
+   
+
 }

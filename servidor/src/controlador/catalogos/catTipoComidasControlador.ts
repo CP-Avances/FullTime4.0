@@ -155,7 +155,7 @@ class TipoComidasControlador {
       await pool.query(
         `
         UPDATE ma_horario_comidas SET nombre = $1, id_comida = $2, hora_inicio = $3, hora_fin = $4
-        WHERE id = $5'
+        WHERE id = $5
         `
 ,
         [nombre, tipo_comida, hora_inicio, hora_fin, id]
@@ -176,6 +176,7 @@ class TipoComidasControlador {
       await pool.query("COMMIT");
       return res.jsonp({ message: "Registro actualizado exitosamente" });
     } catch (error) {
+      console.log(error)
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
       return res.status(404).jsonp({ message: "Error al actualizar el registro." });

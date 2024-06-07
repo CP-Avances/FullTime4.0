@@ -146,6 +146,10 @@ class EmpleadoRutas {
         this.router.post('/verificar/manual/plantillaExcel/', [verificarToken_1.TokenValidation, upload_plantilla.single('uploads')], empleadoControlador_1.default.VerificarPlantilla_Manual);
         //this.router.post('/verificar/datos/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosManual);
         this.router.post('/cargar_manual/plantillaExcel/', verificarToken_1.TokenValidation, empleadoControlador_1.default.CargarPlantilla_Manual);
+        /** **************************************************************************************** **
+         ** **                CREACION DE CARPETAS DE LOS EMPLEADOS SELECCIONADOS                 ** **
+         ** **************************************************************************************** **/
+        this.router.post('/crear_carpetas/', verificarToken_1.TokenValidation, empleadoControlador_1.default.CrearCarpetasEmpleado);
     }
 }
 const EMPLEADO_RUTAS = new EmpleadoRutas();

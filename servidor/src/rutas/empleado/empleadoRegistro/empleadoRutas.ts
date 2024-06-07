@@ -171,6 +171,11 @@ class EmpleadoRutas {
         this.router.post('/cargar_manual/plantillaExcel/', TokenValidation, EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
 
 
+        /** **************************************************************************************** **
+         ** **                CREACION DE CARPETAS DE LOS EMPLEADOS SELECCIONADOS                 ** ** 
+         ** **************************************************************************************** **/
+        this.router.post('/crear_carpetas/', TokenValidation, EMPLEADO_CONTROLADOR.CrearCarpetasEmpleado);
+
     }
 
 }

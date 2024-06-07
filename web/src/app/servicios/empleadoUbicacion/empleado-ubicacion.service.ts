@@ -64,8 +64,14 @@ export class EmpleadoUbicacionService {
   }
 
  
-  EliminarCoordenadas(id: number) {
-    return this.http.delete<any>(`${environment.url}/ubicacion/eliminar/${id}`);
+  EliminarCoordenadas(id: number, datos: any) {
+    const url = `${environment.url}/ubicacion/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
+
+    //return this.http.delete<any>(`${environment.url}/ubicacion/eliminar/${id}`);
   }
 
   // METODO PARA CREAR ARCHIVO XML

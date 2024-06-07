@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPLEADO_CONTROLADOR = void 0;
 // SECCION LIBRERIAS
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const fs_1 = require("fs");
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 const ts_md5_1 = require("ts-md5");
 const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
@@ -22,7 +23,7 @@ const database_1 = __importDefault(require("../../../database"));
 const moment_1 = __importDefault(require("moment"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
+const fs_2 = __importDefault(require("fs"));
 class EmpleadoControlador {
     /** ** ********************************************************************************************* **
      ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
@@ -225,7 +226,7 @@ class EmpleadoControlador {
                     // RUTA DE LA CARPETA PRINCIPAL PERMISOS
                     const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
                     // METODO MKDIR PARA CREAR LA CARPETA
-                    fs_1.default.mkdir(carpetaPermisos, { recursive: true }, (err) => {
+                    fs_2.default.mkdir(carpetaPermisos, { recursive: true }, (err) => {
                         if (err) {
                             verificar = 1;
                         }
@@ -233,10 +234,10 @@ class EmpleadoControlador {
                             verificar = 0;
                         }
                     });
-                    // RUTA DE LA CARPETA PRINCIPAL PERMISOS
+                    // RUTA DE LA CARPETA PRINCIPAL IMAGENES
                     const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(empleado.id);
                     // METODO MKDIR PARA CREAR LA CARPETA
-                    fs_1.default.mkdir(carpetaImagenes, { recursive: true }, (err) => {
+                    fs_2.default.mkdir(carpetaImagenes, { recursive: true }, (err) => {
                         if (err) {
                             verificar = 1;
                         }
@@ -247,7 +248,7 @@ class EmpleadoControlador {
                     // RUTA DE LA CARPETA DE ALMACENAMIENTO DE VACUNAS
                     const carpetaVacunas = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(empleado.id);
                     // METODO MKDIR PARA CREAR LA CARPETA
-                    fs_1.default.mkdir(carpetaVacunas, { recursive: true }, (err) => {
+                    fs_2.default.mkdir(carpetaVacunas, { recursive: true }, (err) => {
                         if (err) {
                             verificar = 1;
                         }
@@ -258,7 +259,7 @@ class EmpleadoControlador {
                     // RUTA DE LA CARPETA DE ALMACENAMIENTO DE CONTRATOS
                     const carpetaContratos = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(empleado.id);
                     // METODO MKDIR PARA CREAR LA CARPETA
-                    fs_1.default.mkdir(carpetaContratos, { recursive: true }, (err) => {
+                    fs_2.default.mkdir(carpetaContratos, { recursive: true }, (err) => {
                         if (err) {
                             verificar = 1;
                         }
@@ -333,10 +334,10 @@ class EmpleadoControlador {
                 // RUTA DE LA CARPETA PERMISOS DEL USUARIO
                 const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
                 // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
-                fs_1.default.access(carpetaPermisos, fs_1.default.constants.F_OK, (err) => {
+                fs_2.default.access(carpetaPermisos, fs_2.default.constants.F_OK, (err) => {
                     if (err) {
                         // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_1.default.mkdir(carpetaPermisos, { recursive: true }, (err) => {
+                        fs_2.default.mkdir(carpetaPermisos, { recursive: true }, (err) => {
                             if (err) {
                                 verificar_permisos = 1;
                             }
@@ -353,10 +354,10 @@ class EmpleadoControlador {
                 // RUTA DE LA CARPETA IMAGENES DEL USUARIO
                 const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id);
                 // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
-                fs_1.default.access(carpetaImagenes, fs_1.default.constants.F_OK, (err) => {
+                fs_2.default.access(carpetaImagenes, fs_2.default.constants.F_OK, (err) => {
                     if (err) {
                         // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_1.default.mkdir(carpetaImagenes, { recursive: true }, (err) => {
+                        fs_2.default.mkdir(carpetaImagenes, { recursive: true }, (err) => {
                             if (err) {
                                 verificar_imagen = 1;
                             }
@@ -373,10 +374,10 @@ class EmpleadoControlador {
                 // RUTA DE LA CARPETA VACUNAS DEL USUARIO
                 const carpetaVacunas = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(id);
                 // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
-                fs_1.default.access(carpetaVacunas, fs_1.default.constants.F_OK, (err) => {
+                fs_2.default.access(carpetaVacunas, fs_2.default.constants.F_OK, (err) => {
                     if (err) {
                         // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_1.default.mkdir(carpetaVacunas, { recursive: true }, (err) => {
+                        fs_2.default.mkdir(carpetaVacunas, { recursive: true }, (err) => {
                             if (err) {
                                 verificar_vacunas = 1;
                             }
@@ -393,10 +394,10 @@ class EmpleadoControlador {
                 // RUTA DE LA CARPETA CONTRATOS DEL USUARIO
                 const carpetaContratos = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(id);
                 // VERIFICACION DE EXISTENCIA CARPETA CONTRATOS DE USUARIO
-                fs_1.default.access(carpetaContratos, fs_1.default.constants.F_OK, (err) => {
+                fs_2.default.access(carpetaContratos, fs_2.default.constants.F_OK, (err) => {
                     if (err) {
                         // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_1.default.mkdir(carpetaContratos, { recursive: true }, (err) => {
+                        fs_2.default.mkdir(carpetaContratos, { recursive: true }, (err) => {
                             if (err) {
                                 verificar_contrato = 1;
                             }
@@ -747,9 +748,9 @@ class EmpleadoControlador {
                         const imagen = `${obj.codigo}_${anio}_${mes}_${dia}_${(_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname}`;
                         if (obj.imagen && obj.imagen !== 'null') {
                             const ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(obj.id)) + separador + obj.imagen;
-                            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                            fs_2.default.access(ruta, fs_2.default.constants.F_OK, (err) => {
                                 if (!err) {
-                                    fs_1.default.unlinkSync(ruta);
+                                    fs_2.default.unlinkSync(ruta);
                                 }
                             });
                         }
@@ -1058,7 +1059,7 @@ class EmpleadoControlador {
             let separador = path_1.default.sep;
             let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id)) + separador + imagen;
             console.log('ver file ', ruta);
-            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+            fs_2.default.access(ruta, fs_2.default.constants.F_OK, (err) => {
                 if (err) {
                 }
                 else {
@@ -1073,13 +1074,13 @@ class EmpleadoControlador {
             const id = req.params.id;
             let separador = path_1.default.sep;
             let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id)) + separador + imagen;
-            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+            fs_2.default.access(ruta, fs_2.default.constants.F_OK, (err) => {
                 if (err) {
                     res.status(200).jsonp({ imagen: 0 });
                 }
                 else {
                     let path_file = path_1.default.resolve(ruta);
-                    let data = fs_1.default.readFileSync(path_file);
+                    let data = fs_2.default.readFileSync(path_file);
                     let codificado = data.toString('base64');
                     if (codificado === null) {
                         res.status(200).jsonp({ imagen: 0 });
@@ -1404,12 +1405,12 @@ class EmpleadoControlador {
                 data = {};
             }));
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+            fs_2.default.access(ruta, fs_2.default.constants.F_OK, (err) => {
                 if (err) {
                 }
                 else {
                     // ELIMINAR DEL SERVIDOR
-                    fs_1.default.unlinkSync(ruta);
+                    fs_2.default.unlinkSync(ruta);
                 }
             });
             listEmpleados.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
@@ -1705,380 +1706,136 @@ class EmpleadoControlador {
             const workbook = xlsx_1.default.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-            let data = {
-                fila: '',
-                cedula: '',
-                apellido: '',
-                nombre: '',
-                codigo: '',
-                estado_civil: '',
-                genero: '',
-                correo: '',
-                fec_nacimiento: '',
-                latitud: '',
-                longitud: '',
-                domicilio: '',
-                telefono: '',
-                nacionalidad: '',
-                usuario: '',
-                contrasena: '',
-                rol: '',
-                observacion: '',
-            };
-            var listEmpleadosManual = [];
-            var duplicados = [];
-            var duplicados1 = [];
-            var duplicados2 = [];
-            var duplicados3 = [];
-            var mensaje = 'correcto';
-            plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
-                var { item, cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, latitud, longitud, domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
-                //VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                if ((item != undefined && item != '') &&
-                    (cedula != undefined) && (apellido != undefined) &&
-                    (nombre != undefined) && (codigo != undefined) && (estado_civil != undefined) &&
-                    (genero != undefined) && (correo != undefined) &&
-                    (fec_nacimiento != undefined) &&
-                    (latitud != undefined) && (longitud != undefined) &&
-                    (domicilio != undefined) && (telefono != undefined) &&
-                    (nacionalidad != undefined) && (usuario != undefined) &&
-                    (contrasena != undefined) && (rol != undefined)) {
-                    data.fila = item;
-                    data.cedula = cedula;
-                    data.apellido = apellido;
-                    data.nombre = nombre;
-                    data.codigo = codigo;
-                    data.usuario = usuario;
-                    data.contrasena = contrasena;
-                    data.rol = rol;
-                    data.estado_civil = estado_civil;
-                    data.genero = genero;
-                    data.correo = correo;
-                    data.fec_nacimiento = fec_nacimiento;
-                    data.latitud = latitud;
-                    data.longitud = longitud;
-                    data.domicilio = domicilio;
-                    data.telefono = telefono;
-                    data.nacionalidad = nacionalidad;
-                    //VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
-                    const rege = /^[0-9]+$/;
-                    const valiContra = /\s/;
-                    if (rege.test(data.cedula)) {
-                        if (data.cedula.toString().length > 10 || data.cedula.toString().length < 10) {
-                            data.observacion = 'La cédula ingresada no es válida';
-                        }
-                        else {
-                            if (rege.test(data.codigo)) {
-                                console.log(!valiContra.test(data.contrasena));
-                                if (!valiContra.test(data.contrasena.toString())) {
-                                    data.observacion = 'La contraseña ingresada no es válida';
-                                }
-                                else {
-                                    console.log('entro ', data.contraseña.length);
-                                    if (data.contrasena.toString().length > 10) {
-                                        // Verificar si la variable tiene el formato de fecha correcto con moment
-                                        if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
-                                            //Valida si los datos de la columna telefono son numeros.
-                                            if (telefono != undefined) {
-                                                if (rege.test(data.telefono)) {
-                                                    if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                        data.observacion = 'El teléfono ingresada no es válido';
-                                                    }
-                                                    else {
-                                                        if (duplicados.find((p) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
-                                                            data.observacion = 'ok';
-                                                            duplicados.push(dato);
-                                                        }
-                                                    }
-                                                }
-                                                else {
-                                                    data.observacion = 'El teléfono ingresado no es válido';
-                                                }
-                                            }
-                                        }
-                                        else {
-                                            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
-                                        }
+            let listEmpleadosManual = [];
+            let duplicados = [];
+            let duplicados1 = [];
+            let duplicados2 = [];
+            let duplicados3 = [];
+            let mensaje = 'correcto';
+            plantilla.forEach((dato) => {
+                let { item, cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, latitud, longitud, domicilio, telefono, nacionalidad, usuario, contrasena, rol } = dato;
+                let observacion = 'ok';
+                if (!item || !cedula || !apellido || !nombre || !codigo || !estado_civil || !genero ||
+                    !correo || !fec_nacimiento || !latitud || !longitud || !domicilio || !telefono ||
+                    !nacionalidad || !usuario || !contrasena || !rol) {
+                    observacion = 'Datos incompletos';
+                }
+                const rege = /^[0-9]+$/;
+                const valiContra = /\s/;
+                if (rege.test(cedula) && cedula.toString().length === 10) {
+                    if (rege.test(codigo)) {
+                        if (!valiContra.test(contrasena) && contrasena.length <= 10) {
+                            if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
+                                if (telefono === undefined || (rege.test(telefono) && telefono.toString().length >= 7 && telefono.toString().length <= 10)) {
+                                    if (!duplicados.find((p) => p.cedula === cedula || p.usuario === usuario)) {
+                                        duplicados.push(dato);
                                     }
                                     else {
-                                        data.observacion = 'La contraseña debe ser maximo de 10 caracteres';
+                                        observacion = 'Registro duplicado';
                                     }
-                                }
-                            }
-                            else {
-                                data.observacion = 'Formato de código incorrecto';
-                            }
-                        }
-                    }
-                    else {
-                        data.observacion = 'La cédula ingresada no es válida';
-                    }
-                    listEmpleadosManual.push(data);
-                }
-                else {
-                    data.fila = item;
-                    data.cedula = cedula;
-                    data.apellido = apellido;
-                    data.nombre = nombre;
-                    data.codigo = codigo;
-                    data.usuario = usuario;
-                    data.contrasena = contrasena;
-                    data.rol = rol;
-                    data.estado_civil = estado_civil;
-                    data.genero = genero;
-                    data.correo = correo;
-                    data.fec_nacimiento = fec_nacimiento;
-                    data.latitud = latitud;
-                    data.longitud = longitud;
-                    data.domicilio = domicilio;
-                    data.telefono = telefono;
-                    data.nacionalidad = nacionalidad;
-                    data.observacion = 'no registrado';
-                    if (data.fila == '' || data.fila == undefined) {
-                        data.fila = 'error';
-                        mensaje = 'error';
-                    }
-                    if (apellido == undefined) {
-                        data.apellido = 'No registrado';
-                        data.observacion = 'Apellido ' + data.observacion;
-                    }
-                    if (nombre == undefined) {
-                        data.nombre = 'No registrado';
-                        data.observacion = 'Nombre ' + data.observacion;
-                    }
-                    if (codigo == undefined) {
-                        data.codigo = 'No registrado';
-                        data.observacion = 'Código ' + data.observacion;
-                    }
-                    if (estado_civil == undefined) {
-                        data.estado_civil = 'No registrado';
-                        data.observacion = 'Estado civil ' + data.observacion;
-                    }
-                    if (genero == undefined) {
-                        data.genero = 'No registrado';
-                        data.observacion = 'Género ' + data.observacion;
-                    }
-                    if (correo == undefined) {
-                        data.correo = 'No registrado';
-                        data.observacion = 'Correo ' + data.observacion;
-                    }
-                    if (fec_nacimiento == undefined) {
-                        data.fec_nacimiento = 'No registrado';
-                        data.observacion = 'Fecha de nacimiento ' + data.observacion;
-                    }
-                    if (latitud == undefined) {
-                        data.latitud = 'No registrado';
-                    }
-                    if (longitud == undefined) {
-                        data.longitud = 'No registrado';
-                    }
-                    if (domicilio == undefined) {
-                        data.domicilio = 'No registrado';
-                        data.observacion = 'Domicilio ' + data.observacion;
-                    }
-                    if (telefono == undefined) {
-                        data.telefono = 'No registrado';
-                        data.observacion = 'Teléfono ' + data.observacion;
-                    }
-                    if (nacionalidad == undefined) {
-                        data.nacionalidad = 'No registrado';
-                        data.observacion = 'Nacionalidad ' + data.observacion;
-                    }
-                    if (usuario == undefined) {
-                        data.usuario = 'No registrado';
-                        data.observacion = 'Usuario ' + data.observacion;
-                    }
-                    if (contrasena == undefined) {
-                        data.contrasena = contrasena;
-                        data.observacion = 'Contraseña ' + data.observacion;
-                    }
-                    if (rol == undefined) {
-                        data.rol = 'No registrado';
-                        data.observacion = 'Rol ' + data.observacion;
-                    }
-                    if (codigo != undefined) {
-                        const rege = /^[0-9]+$/;
-                        const valiContra = /\s/;
-                        if (!rege.test(data.codigo)) {
-                            data.observacion = 'Formato de código incorrecto';
-                        }
-                        else {
-                            if (!valiContra.test(data.contrasena.toString())) {
-                                console.log(data.contrasena, ' entro ', data.contrasena.toString().length);
-                                if (data.contrasena.toString().length > 10) {
-                                    data.observacion = 'La contraseña debe ser maximo de 10 caracteres';
                                 }
                                 else {
-                                    // Verificar si la variable tiene el formato de fecha correcto con moment
-                                    if (data.fec_nacimiento != 'No registrado') {
-                                        if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
-                                            //Valida si los datos de la columna telefono son numeros.
-                                            if (telefono != undefined) {
-                                                const regex = /^[0-9]+$/;
-                                                if (regex.test(data.telefono)) {
-                                                    if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                        data.observacion = 'El teléfono ingresado no es válido';
-                                                    }
-                                                }
-                                                else {
-                                                    data.observacion = 'El teléfono ingresado no es válido';
-                                                }
-                                            }
-                                        }
-                                        else {
-                                            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
-                                        }
-                                    }
+                                    observacion = 'El teléfono ingresado no es válido';
                                 }
                             }
                             else {
-                                data.observacion = 'La contraseña ingresada no es válida';
-                            }
-                        }
-                    }
-                    if (cedula == undefined) {
-                        data.cedula = 'No registrado';
-                        data.observacion = 'Cédula no registrada';
-                    }
-                    else {
-                        //VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
-                        const rege = /^[0-9]+$/;
-                        if (rege.test(data.cedula)) {
-                            if (data.cedula.toString().length != 10) {
-                                data.observacion = 'La cédula ingresada no es válida';
+                                observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                             }
                         }
                         else {
-                            data.observacion = 'La cédula ingresada no es válida';
+                            observacion = 'La contraseña debe ser máxima de 10 caracteres y no contener espacios';
                         }
                     }
-                    listEmpleadosManual.push(data);
-                }
-                data = {};
-            }));
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                if (err) {
+                    else {
+                        observacion = 'Formato de código incorrecto';
+                    }
                 }
                 else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs_1.default.unlinkSync(ruta);
+                    observacion = 'La cédula ingresada no es válida';
+                }
+                listEmpleadosManual.push({
+                    fila: item, cedula, apellido, nombre, codigo, estado_civil, genero,
+                    correo, fec_nacimiento, latitud, longitud, domicilio, telefono,
+                    nacionalidad, usuario, contrasena, rol, observacion
+                });
+            });
+            fs_2.default.access(ruta, fs_2.default.constants.F_OK, (err) => {
+                if (!err) {
+                    fs_2.default.unlinkSync(ruta);
                 }
             });
-            listEmpleadosManual.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
-                var VERIFICAR_CEDULA = yield database_1.default.query(`
-        SELECT * FROM eu_empleados WHERE cedula = $1
-        `, [valor.cedula]);
-                if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+            for (const valor of listEmpleadosManual) {
+                const VERIFICAR_CEDULA = yield database_1.default.query(`SELECT * FROM eu_empleados WHERE cedula = $1`, [valor.cedula]);
+                if (VERIFICAR_CEDULA.rows.length > 0) {
                     valor.observacion = 'Cédula ya existe en el sistema';
                 }
                 else {
-                    var VERIFICAR_CODIGO = yield database_1.default.query(`
-          SELECT * FROM eu_empleados WHERE codigo = $1
-          `, [valor.codigo]);
-                    if (VERIFICAR_CODIGO.rows[0] != undefined && VERIFICAR_CODIGO.rows[0] != '') {
-                        valor.observacion = 'Codigo ya existe en el sistema';
+                    const VERIFICAR_CODIGO = yield database_1.default.query(`SELECT * FROM eu_empleados WHERE codigo = $1`, [valor.codigo]);
+                    if (VERIFICAR_CODIGO.rows.length > 0) {
+                        valor.observacion = 'Código ya existe en el sistema';
                     }
                     else {
-                        var VERIFICAR_USUARIO = yield database_1.default.query(`
-            SELECT * FROM eu_usuarios WHERE usuario = $1
-            `, [valor.usuario]);
-                        if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
+                        const VERIFICAR_USUARIO = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE usuario = $1`, [valor.usuario]);
+                        if (VERIFICAR_USUARIO.rows.length > 0) {
                             valor.observacion = 'Usuario ya existe en el sistema';
                         }
                         else {
-                            if (valor.rol != 'No registrado') {
-                                var VERIFICAR_ROL = yield database_1.default.query(`
-                SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
-                `, [valor.rol.toUpperCase()]);
-                                if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != '') {
-                                    if (valor.nacionalidad != 'No registrado') {
-                                        var VERIFICAR_NACIONALIDAD = yield database_1.default.query(`
-                    SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
-                    `, [valor.nacionalidad.toUpperCase()]);
-                                        if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
-                                            // Discriminación de elementos iguales
-                                            if (duplicados1.find((p) => p.cedula === valor.cedula) == undefined) {
-                                                // Discriminación de elementos iguales
-                                                if (duplicados3.find((c) => c.codigo === valor.codigo) == undefined) {
-                                                    // Discriminación de elementos iguales
-                                                    if (duplicados2.find((a) => a.usuario === valor.usuario) == undefined) {
-                                                        //valor.observacion = 'ok'
-                                                        duplicados2.push(valor);
-                                                    }
-                                                    else {
-                                                        valor.observacion = '2';
-                                                    }
-                                                    duplicados3.push(valor);
-                                                }
-                                                else {
-                                                    valor.observacion = '3';
-                                                }
-                                                duplicados1.push(valor);
-                                            }
-                                            else {
-                                                valor.observacion = '1';
-                                            }
-                                        }
-                                        else {
-                                            valor.observacion = 'Nacionalidad no existe en el sistema';
-                                        }
-                                    }
-                                }
-                                else {
+                            if (valor.rol !== 'No registrado') {
+                                const VERIFICAR_ROL = yield database_1.default.query(`SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1`, [valor.rol.toUpperCase()]);
+                                if (VERIFICAR_ROL.rows.length === 0) {
                                     valor.observacion = 'Rol no existe en el sistema';
+                                }
+                                if (valor.nacionalidad !== 'No registrado') {
+                                    const VERIFICAR_NACIONALIDAD = yield database_1.default.query(`SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1`, [valor.nacionalidad.toUpperCase()]);
+                                    if (VERIFICAR_NACIONALIDAD.rows.length === 0) {
+                                        valor.observacion = 'Nacionalidad no existe en el sistema';
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }));
-            setTimeout(() => {
-                listEmpleadosManual.sort((a, b) => {
-                    // COMPARA LOS NÚMEROS DE LOS OBJETOS
-                    if (a.fila < b.fila) {
-                        return -1;
-                    }
-                    if (a.fila > b.fila) {
-                        return 1;
-                    }
-                    return 0; // SON IGUALES
-                });
-                var filaDuplicada = 0;
-                listEmpleadosManual.forEach((item) => {
-                    if (item.observacion == '1') {
-                        item.observacion = 'Registro duplicado (cédula)';
-                    }
-                    else if (item.observacion == '2') {
-                        item.observacion = 'Registro duplicado (usuario)';
-                    }
-                    else if (item.observacion == '3') {
-                        item.observacion = 'Registro duplicado (código)';
-                    }
-                    if (item.observacion != undefined) {
-                        let arrayObservacion = item.observacion.split(" ");
-                        if (arrayObservacion[0] == 'no') {
-                            item.observacion = 'ok';
-                        }
-                    }
-                    //VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
-                    if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                        //CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
-                        if (item.fila == filaDuplicada) {
-                            mensaje = 'error';
-                        }
+                if (valor.observacion === 'ok') {
+                    if (duplicados1.find((p) => p.cedula === valor.cedula) !== undefined) {
+                        valor.observacion = 'Registro duplicado (cédula)';
                     }
                     else {
-                        return mensaje = 'error';
+                        duplicados1.push(valor);
                     }
-                    filaDuplicada = item.fila;
-                });
-                if (mensaje == 'error') {
-                    listEmpleadosManual = undefined;
+                    if (duplicados2.find((p) => p.usuario === valor.usuario) !== undefined) {
+                        valor.observacion = 'Registro duplicado (usuario)';
+                    }
+                    else {
+                        duplicados2.push(valor);
+                    }
+                    if (duplicados3.find((p) => p.codigo === valor.codigo) !== undefined) {
+                        valor.observacion = 'Registro duplicado (código)';
+                    }
+                    else {
+                        duplicados3.push(valor);
+                    }
                 }
-                return res.jsonp({ message: mensaje, data: listEmpleadosManual });
-            }, 1500);
+            }
+            listEmpleadosManual.sort((a, b) => (a.fila < b.fila ? -1 : a.fila > b.fila ? 1 : 0));
+            let filaDuplicada = 0;
+            for (const item of listEmpleadosManual) {
+                if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                    if (item.fila === filaDuplicada) {
+                        mensaje = 'error';
+                    }
+                }
+                else {
+                    mensaje = 'error';
+                }
+                filaDuplicada = item.fila;
+                if (item.observacion.startsWith('no ')) {
+                    item.observacion = 'ok';
+                }
+            }
+            if (mensaje === 'error') {
+                return res.jsonp({ message: mensaje, data: undefined });
+            }
+            return res.jsonp({ message: mensaje, data: listEmpleadosManual });
         });
     }
     VerificarPlantilla_DatosManual(req, res) {
@@ -2135,12 +1892,12 @@ class EmpleadoControlador {
                 }
             }
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+            fs_2.default.access(filePath, fs_2.default.constants.F_OK, (err) => {
                 if (err) {
                 }
                 else {
                     // ELIMINAR DEL SERVIDOR
-                    fs_1.default.unlinkSync(filePath);
+                    fs_2.default.unlinkSync(filePath);
                 }
             });
         });
@@ -2292,6 +2049,101 @@ class EmpleadoControlador {
                     return res.status(500).jsonp({ message: error });
                 }
             }));
+        });
+    }
+    /** **************************************************************************************** **
+     ** **                      CREAR CARPETAS EMPLEADOS SELECCIONADOS                           **
+     ** **************************************************************************************** **/
+    CrearCarpetasEmpleado(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id, codigo } = req.body;
+            let verificar_permisos = 0;
+            let verificar_imagen = 0;
+            let verificar_vacunas = 0;
+            let verificar_contrato = 0;
+            try {
+                const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
+                try {
+                    yield fs_1.promises.access(carpetaPermisos, fs_2.default.constants.F_OK);
+                    verificar_permisos = 2; // La carpeta ya existe
+                }
+                catch (_a) {
+                    try {
+                        yield fs_1.promises.mkdir(carpetaPermisos, { recursive: true });
+                        verificar_permisos = 0; // Carpeta creada con éxito
+                    }
+                    catch (_b) {
+                        verificar_permisos = 1; // Error al crear la carpeta
+                    }
+                }
+                const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id);
+                try {
+                    yield fs_1.promises.access(carpetaImagenes, fs_2.default.constants.F_OK);
+                    verificar_imagen = 2; // La carpeta ya existe
+                }
+                catch (_c) {
+                    try {
+                        yield fs_1.promises.mkdir(carpetaImagenes, { recursive: true });
+                        verificar_imagen = 0; // Carpeta creada con éxito
+                    }
+                    catch (_d) {
+                        verificar_imagen = 1; // Error al crear la carpeta
+                    }
+                }
+                const carpetaVacunas = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(id);
+                try {
+                    yield fs_1.promises.access(carpetaVacunas, fs_2.default.constants.F_OK);
+                    verificar_vacunas = 2; // La carpeta ya existe
+                }
+                catch (_e) {
+                    try {
+                        yield fs_1.promises.mkdir(carpetaVacunas, { recursive: true });
+                        verificar_vacunas = 0; // Carpeta creada con éxito
+                    }
+                    catch (_f) {
+                        verificar_vacunas = 1; // Error al crear la carpeta
+                    }
+                }
+                const carpetaContratos = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(id);
+                try {
+                    yield fs_1.promises.access(carpetaContratos, fs_2.default.constants.F_OK);
+                    verificar_contrato = 2; // La carpeta ya existe
+                }
+                catch (_g) {
+                    try {
+                        yield fs_1.promises.mkdir(carpetaContratos, { recursive: true });
+                        verificar_contrato = 0; // Carpeta creada con éxito
+                    }
+                    catch (_h) {
+                        verificar_contrato = 1; // Error al crear la carpeta
+                    }
+                }
+                // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
+                if (verificar_permisos === 1 && verificar_imagen === 1 && verificar_vacunas === 1 && verificar_contrato === 1) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos, permisos, imagenes y vacunación del usuario.' });
+                }
+                else if (verificar_permisos === 1 && verificar_imagen === 0 && verificar_vacunas === 0 && verificar_contrato === 0) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos del usuario.' });
+                }
+                else if (verificar_permisos === 0 && verificar_imagen === 1 && verificar_vacunas === 0 && verificar_contrato === 0) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de imagenes del usuario.' });
+                }
+                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 0) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de vacunación del usuario.' });
+                }
+                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 1) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos del usuario.' });
+                }
+                else if (verificar_permisos === 2 && verificar_imagen === 2 && verificar_vacunas === 2 && verificar_contrato === 2) {
+                    res.jsonp({ message: 'Ya existen carpetas creadas de ' + codigo });
+                }
+                else {
+                    res.jsonp({ message: 'Carpetas creadas con exito.' });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ message: 'Error al procesar la solicitud.', error: error.message });
+            }
         });
     }
 }

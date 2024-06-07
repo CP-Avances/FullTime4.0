@@ -443,7 +443,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                     funcion: obj.nombre,
                     link: obj.link,
                     id_rol: this.id_rol,
-                    id_accion: accion.id
+                    id_accion: accion.id,
+                    user_name: this.user_name,
+                    ip: this.ip,
                   }
                   this.contador = this.contador + 1;
                   this.rest.crearPaginaRol(rolPermisosbody).subscribe(response => {
@@ -479,7 +481,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             funcion: obj.nombre,
             link: obj.link,
             id_rol: this.id_rol,
-            id_accion: null
+            id_accion: null,
+            user_name: this.user_name,
+            ip: this.ip,
           }
           // BUSCAR SI LAS PAGINAS YA FUERON ASIGNADAS AL ROL
           this.rest.BuscarIdPaginas(buscarPagina).subscribe(datos => {
@@ -563,7 +567,10 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                     funcion: obj.nombre,
                     link: obj.link,
                     id_rol: this.id_rol,
-                    id_accion: accion.id
+                    id_accion: accion.id,
+                    user_name: this.user_name,
+                    ip: this.ip,
+                    
                   }
                   this.contador = this.contador + 1;
                   this.rest.crearPaginaRol(rolPermisosbody).subscribe(response => {
@@ -600,7 +607,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             funcion: obj.nombre,
             link: obj.link,
             id_rol: this.id_rol,
-            id_accion: null
+            id_accion: null,
+            user_name: this.user_name,
+            ip: this.ip,
           }
           this.rest.BuscarIdPaginas(buscarPagina).subscribe(datos => {
             this.contador = this.contador + 1;
@@ -703,7 +712,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.paginasEliminar.forEach((datos: any) => {
       this.paginas = this.paginas.filter(item => item.id !== datos.id);
       var buscarPagina = {
-        id: datos.id
+        id: datos.id,
+        user_name: this.user_name,
+        ip: this.ip
       };
       this.contador = this.contador + 1;
       this.rest.EliminarPaginasRol(buscarPagina).subscribe(
