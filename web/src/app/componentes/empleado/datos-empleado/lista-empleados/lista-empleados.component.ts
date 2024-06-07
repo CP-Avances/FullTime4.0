@@ -113,6 +113,7 @@ export class ListaEmpleadosComponent implements OnInit {
     this.ip = localStorage.getItem('ip');
 
     if (this.rolEmpleado != 1){
+      this.idUsuariosAcceso.push(this.idEmpleado);
       this.ObtenerAsignacionesUsuario(this.idEmpleado);
     } else {
       this.GetEmpleados();
