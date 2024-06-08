@@ -732,6 +732,10 @@ class EmpleadoControlador {
     // CARGAR IMAGEN DE EMPLEADO
     CrearImagenEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            try {
+            }
+            catch (error) {
+            }
             // FECHA DEL SISTEMA
             const fecha = (0, moment_1.default)();
             const anio = fecha.format('YYYY');

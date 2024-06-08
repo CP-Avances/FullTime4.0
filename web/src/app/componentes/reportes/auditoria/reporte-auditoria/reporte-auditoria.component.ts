@@ -460,7 +460,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         n.push({
             style: 'tableMargin',
             table: {
-                widths: ['auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 140, 140],
+                widths: ['auto', '*', 'auto', 'auto', 100, 'auto', 'auto', 'auto', 140, 140],
                 headerRows: 1,
                 body: [
                     [
@@ -480,14 +480,14 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
                         return [
                             { style: 'itemsTableCentrado', text: totalAuditoria },
                             { style: 'itemsTable', text: audi.plataforma },
-                            { style: 'itemsTable', text: audi.user_name },
+                            { style: 'itemsTableCentrado', text: audi.user_name },
                             { style: 'itemsTableCentrado', text: audi.ip_address },
                             { style: 'itemsTableCentrado', text: audi.table_name },
                             { style: 'itemsTableCentrado', text: this.transformAction(audi.action) },
                             { style: 'itemsTable', text: this.getDateFromISO(audi.fecha_hora) },
                             { style: 'itemsTable', text: this.getTimeFromISO(audi.fecha_hora) },
-                            { style: 'itemsTable', text: audi.original_data, fontSize: 6, noWrap: false, overflow: 'hidden' },
-                            { style: 'itemsTable', text: audi.new_data, fontSize: 6, noWrap: false, overflow: 'hidden' },
+                            { style: 'itemsTable', text: audi.original_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [4, 0, 9, 0] },
+                            { style: 'itemsTable', text: audi.new_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [4, 0, 9, 0] },
                         ]
                     })
                 ]

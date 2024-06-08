@@ -827,6 +827,12 @@ class EmpleadoControlador {
 
   // CARGAR IMAGEN DE EMPLEADO
   public async CrearImagenEmpleado(req: Request, res: Response): Promise<void> {
+
+    try{
+
+    } catch(error){
+
+    }
     // FECHA DEL SISTEMA
     const fecha = moment();
     const anio = fecha.format('YYYY');
