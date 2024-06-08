@@ -3,6 +3,7 @@ import { Validators, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
+import { firstValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
@@ -46,8 +47,16 @@ export class PlanComidasComponent implements OnInit {
     bool_cargo: false,
   };
 
-  // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
   idEmpleadoLogueado: any;
+  rolEmpleado: number;
+  isEmpleado: boolean = false;
+  asignacionesAcceso: any;
+  idUsuariosAcceso: any = [];
+  idDepartamentosAcceso: any = [];
+  idSucursalesAcceso: any = [];
+  idCargosAcceso: any = [];
+
+  // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
@@ -126,6 +135,8 @@ export class PlanComidasComponent implements OnInit {
     private toastr: ToastrService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
+    this.isEmpleado = this.rolEmpleado != 1 ? true : false;
   }
 
   ngOnInit(): void {
@@ -152,9 +163,13 @@ export class PlanComidasComponent implements OnInit {
   }
 
   // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
-  PresentarInformacion() {
+  async PresentarInformacion() {
     let informacion = { id_empleado: this.idEmpleadoLogueado };
     let respuesta: any = [];
+    if (this.isEmpleado) {
+      this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
+      await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
+    }
     this.informacion.ObtenerInformacionUserRol(informacion).subscribe(res => {
       respuesta = res[0];
       this.AdministrarInformacion(respuesta, informacion);
@@ -311,11 +326,21 @@ export class PlanComidasComponent implements OnInit {
 
     this.OmitirDuplicados();
 
-    console.log('ver sucursales ', this.sucursales)
-    console.log('ver regimenes ', this.regimen)
-    console.log('ver departamentos ', this.departamentos)
-    console.log('ver cargos ', this.cargos)
-    console.log('ver empleados ', this.empleados)
+    // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
+    if (this.isEmpleado) {
+      this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
+      this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
+      this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
+      this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.includes(regimen.id_suc));
+
+      this.empleados.forEach((empleado: any) => {
+        this.idCargosAcceso = [...new Set([...this.idCargosAcceso, empleado.id_cargo_])];
+      });
+            
+      this.cargos = this.cargos.filter((cargo: any) => 
+        this.idSucursalesAcceso.includes(cargo.id_suc) && this.idCargosAcceso.includes(cargo.id)
+      );
+    }
   }
 
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
@@ -343,6 +368,31 @@ export class PlanComidasComponent implements OnInit {
       return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
     });
     this.cargos = verificados_car;
+  }
+
+  async ObtenerAsignacionesUsuario(idEmpleado: any) {
+    const data = {
+      id_empleado: Number(idEmpleado)
+    }
+
+    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(data));
+    this.asignacionesAcceso = res;
+
+    const promises = this.asignacionesAcceso.map((asignacion: any) => {
+      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
+      this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
+
+      const data = {
+        id_departamento: asignacion.id_departamento
+      }
+      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
+    });
+
+    const results = await Promise.all(promises);
+
+    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
+    this.idUsuariosAcceso.push(...ids);
+
   }
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE
