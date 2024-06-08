@@ -313,7 +313,12 @@ export class RegistroContratoComponent implements OnInit {
       });
       this.archivoForm.reset();
       this.nameFile = '';
-    });
+    }, error => {
+      this.toastr.info('Verifique que este usuario tenga creadas capetas', 'No se ha podido cargar el archivo.', {
+        timeOut: 6000,
+      });
+    }
+    );
   }
 
   // RETIRAR ARCHIVO SELECCIONADO

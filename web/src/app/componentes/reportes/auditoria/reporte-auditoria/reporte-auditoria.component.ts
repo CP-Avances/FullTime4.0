@@ -120,6 +120,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         { nombre: "e_codigo", modulo: "", disponibilidad: true },
         { nombre: "eu_empleados", modulo: "", disponibilidad: true },
         { nombre: "eu_usuarios", modulo: "", disponibilidad: true },
+        { nombre: "eu_usuario_departamento", modulo: "", disponibilidad: true },
         { nombre: "eu_empleado_contratos", modulo: "", disponibilidad: true },
         { nombre: "eu_empleado_cargos", modulo: "", disponibilidad: true },
         { nombre: "eu_empleado_titulos", modulo: "", disponibilidad: true },

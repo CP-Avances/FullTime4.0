@@ -6,11 +6,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const pg_pool_1 = __importDefault(require("pg-pool"));
 const pool = new pg_pool_1.default({
-    user: 'postgres',
-    host: 'localhost',
-    port: 5433,
-    database: 'fulltime4juan',
-    password: 'postgres'
+    user: 'fulltime',
+    host: '186.4.226.49',
+    port: 9192,
+    database: 'fulltime4_juan',
+    password: 'fulltime'
 });
 pool.query('SELECT NOW()', (err, res) => {
     if (err) {

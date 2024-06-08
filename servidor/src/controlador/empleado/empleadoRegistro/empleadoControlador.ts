@@ -1,6 +1,6 @@
 // SECCION LIBRERIAS
 import { ObtenerRutaUsuario, ObtenerRutaVacuna, ObtenerRutaPermisos, ObtenerRutaContrato } from '../../../libs/accesoCarpetas';
-   import { promises as pr } from 'fs';
+import { promises as pr } from 'fs';
 
 import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
@@ -842,23 +842,32 @@ class EmpleadoControlador {
 
     if (unEmpleado.rowCount > 0) {
       const promises = unEmpleado.rows.map(async (obj: any) => {
+
         try {
+
           const imagen = `${obj.codigo}_${anio}_${mes}_${dia}_${req.file?.originalname}`;
 
+          console.log("imagen ", imagen)
           if (obj.imagen && obj.imagen !== 'null') {
+            console.log("a ver si imprime obj.id ", obj.id);
+            console.log("a ver si imprime obj.imagen ", obj.imagen);
+
             const ruta = await ObtenerRutaUsuario(obj.id) + separador + obj.imagen;
             fs.access(ruta, fs.constants.F_OK, (err) => {
               if (!err) {
                 fs.unlinkSync(ruta);
               }
             });
+          }else{
+            console.log("prueba 3")
+
           }
 
           // INICIAR TRANSACCION
           await pool.query('BEGIN');
 
           // CONSULTAR DATOSORIGINALES
-          const empleado = await pool.query('SELECT * FROM empleados WHERE id = $1', [id]);
+          const empleado = await pool.query('SELECT * FROM eu_empleados WHERE id = $1', [id]);
           const [datosOriginales] = empleado.rows;
 
           if (!datosOriginales) {
@@ -2316,87 +2325,87 @@ class EmpleadoControlador {
 
 
 
-public async CrearCarpetasEmpleado(req: Request, res: Response) {
-  const { id, codigo } = req.body;
+  public async CrearCarpetasEmpleado(req: Request, res: Response) {
+    const { id, codigo } = req.body;
 
-  let verificar_permisos = 0;
-  let verificar_imagen = 0;
-  let verificar_vacunas = 0;
-  let verificar_contrato = 0;
+    let verificar_permisos = 0;
+    let verificar_imagen = 0;
+    let verificar_vacunas = 0;
+    let verificar_contrato = 0;
 
-  try {
-    const carpetaPermisos = await ObtenerRutaPermisos(codigo);
     try {
-      await pr.access(carpetaPermisos, fs.constants.F_OK);
-      verificar_permisos = 2; // La carpeta ya existe
-    } catch {
+      const carpetaPermisos = await ObtenerRutaPermisos(codigo);
       try {
-        await pr.mkdir(carpetaPermisos, { recursive: true });
-        verificar_permisos = 0; // Carpeta creada con éxito
+        await pr.access(carpetaPermisos, fs.constants.F_OK);
+        verificar_permisos = 2; // La carpeta ya existe
       } catch {
-        verificar_permisos = 1; // Error al crear la carpeta
+        try {
+          await pr.mkdir(carpetaPermisos, { recursive: true });
+          verificar_permisos = 0; // Carpeta creada con éxito
+        } catch {
+          verificar_permisos = 1; // Error al crear la carpeta
+        }
       }
-    }
 
-    const carpetaImagenes = await ObtenerRutaUsuario(id);
-    try {
-      await pr.access(carpetaImagenes, fs.constants.F_OK);
-      verificar_imagen = 2; // La carpeta ya existe
-    } catch {
+      const carpetaImagenes = await ObtenerRutaUsuario(id);
       try {
-        await pr.mkdir(carpetaImagenes, { recursive: true });
-        verificar_imagen = 0; // Carpeta creada con éxito
+        await pr.access(carpetaImagenes, fs.constants.F_OK);
+        verificar_imagen = 2; // La carpeta ya existe
       } catch {
-        verificar_imagen = 1; // Error al crear la carpeta
+        try {
+          await pr.mkdir(carpetaImagenes, { recursive: true });
+          verificar_imagen = 0; // Carpeta creada con éxito
+        } catch {
+          verificar_imagen = 1; // Error al crear la carpeta
+        }
       }
-    }
 
-    const carpetaVacunas = await ObtenerRutaVacuna(id);
-    try {
-      await pr.access(carpetaVacunas, fs.constants.F_OK);
-      verificar_vacunas = 2; // La carpeta ya existe
-    } catch {
+      const carpetaVacunas = await ObtenerRutaVacuna(id);
       try {
-        await pr.mkdir(carpetaVacunas, { recursive: true });
-        verificar_vacunas = 0; // Carpeta creada con éxito
+        await pr.access(carpetaVacunas, fs.constants.F_OK);
+        verificar_vacunas = 2; // La carpeta ya existe
       } catch {
-        verificar_vacunas = 1; // Error al crear la carpeta
+        try {
+          await pr.mkdir(carpetaVacunas, { recursive: true });
+          verificar_vacunas = 0; // Carpeta creada con éxito
+        } catch {
+          verificar_vacunas = 1; // Error al crear la carpeta
+        }
       }
-    }
 
-    const carpetaContratos = await ObtenerRutaContrato(id);
-    try {
-      await pr.access(carpetaContratos, fs.constants.F_OK);
-      verificar_contrato = 2; // La carpeta ya existe
-    } catch {
+      const carpetaContratos = await ObtenerRutaContrato(id);
       try {
-        await pr.mkdir(carpetaContratos, { recursive: true });
-        verificar_contrato = 0; // Carpeta creada con éxito
+        await pr.access(carpetaContratos, fs.constants.F_OK);
+        verificar_contrato = 2; // La carpeta ya existe
       } catch {
-        verificar_contrato = 1; // Error al crear la carpeta
+        try {
+          await pr.mkdir(carpetaContratos, { recursive: true });
+          verificar_contrato = 0; // Carpeta creada con éxito
+        } catch {
+          verificar_contrato = 1; // Error al crear la carpeta
+        }
       }
-    }
 
-    // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
-    if (verificar_permisos === 1 && verificar_imagen === 1 && verificar_vacunas === 1 && verificar_contrato === 1) {
-      res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos, permisos, imagenes y vacunación del usuario.' });
-    } else if (verificar_permisos === 1 && verificar_imagen === 0 && verificar_vacunas === 0 && verificar_contrato === 0) {
-      res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos del usuario.' });
-    } else if (verificar_permisos === 0 && verificar_imagen === 1 && verificar_vacunas === 0 && verificar_contrato === 0) {
-      res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de imagenes del usuario.' });
-    } else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 0) {
-      res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de vacunación del usuario.' });
-    } else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 1) {
-      res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos del usuario.' });
-    } else if (verificar_permisos === 2 && verificar_imagen === 2 && verificar_vacunas === 2 && verificar_contrato === 2) {
-      res.jsonp({ message: 'Ya existen carpetas creadas de '+codigo });
-    } else {
-      res.jsonp({ message: 'Carpetas creadas con exito.' });
+      // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
+      if (verificar_permisos === 1 && verificar_imagen === 1 && verificar_vacunas === 1 && verificar_contrato === 1) {
+        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos, permisos, imagenes y vacunación del usuario.' });
+      } else if (verificar_permisos === 1 && verificar_imagen === 0 && verificar_vacunas === 0 && verificar_contrato === 0) {
+        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos del usuario.' });
+      } else if (verificar_permisos === 0 && verificar_imagen === 1 && verificar_vacunas === 0 && verificar_contrato === 0) {
+        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de imagenes del usuario.' });
+      } else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 0) {
+        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de vacunación del usuario.' });
+      } else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 1) {
+        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos del usuario.' });
+      } else if (verificar_permisos === 2 && verificar_imagen === 2 && verificar_vacunas === 2 && verificar_contrato === 2) {
+        res.jsonp({ message: 'Ya existen carpetas creadas de ' + codigo });
+      } else {
+        res.jsonp({ message: 'Carpetas creadas con exito.' });
+      }
+    } catch (error) {
+      res.status(500).json({ message: 'Error al procesar la solicitud.', error: error.message });
     }
-  } catch (error) {
-    res.status(500).json({ message: 'Error al procesar la solicitud.', error: error.message });
   }
-}
 
 
 }

@@ -197,7 +197,13 @@ export class CrearVacunaComponent implements OnInit {
         this.toastr.success('', 'Registro guardado.', {
           timeOut: 6000,
         });
-      });
+      }, error => {
+        this.toastr.info('Verifique que este usuario tenga creadas capetas', 'No se ha podido cargar el archivo.', {
+          timeOut: 6000,
+        });
+      }
+
+      );
     });
   }
 
