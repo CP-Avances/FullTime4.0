@@ -679,6 +679,75 @@ class DepartamentoControlador {
             }
         });
     }
+    RevisarDatosNivel(req, res) {
+        var _a;
+        try {
+            const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
+            const workbook = xlsx_1.default.readFile(ruta);
+            let verificador = (0, accesoCarpetas_1.ObtenerIndicePlantilla)(workbook, 'NIVEL_DEPARTAMENTOS');
+            if (verificador === false) {
+                return res.jsonp({ message: 'no_existe', data: undefined });
+            }
+            else {
+                const sheet_name_list = workbook.SheetNames;
+                const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                console.log('plantilla_dispositivos: ', plantilla);
+                var listNivelesDep = [];
+                var duplicados = [];
+                var mensaje = 'correcto';
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(ruta);
+                    }
+                });
+                setTimeout(() => {
+                    listNivelesDep.sort((a, b) => {
+                        // Compara los números de los objetos
+                        if (a.fila < b.fila) {
+                            return -1;
+                        }
+                        if (a.fila > b.fila) {
+                            return 1;
+                        }
+                        return 0; // Son iguales
+                    });
+                    var filaDuplicada = 0;
+                    //VALIDACIONES DE LOS DATOS
+                    listNivelesDep.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                        if (item.observacion == '1') {
+                            item.observacion = 'Registro duplicado';
+                        }
+                        else {
+                        }
+                        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+                        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+                            if (item.fila == filaDuplicada) {
+                                mensaje = 'error';
+                            }
+                        }
+                        else {
+                            return mensaje = 'error';
+                        }
+                        filaDuplicada = item.fila;
+                    }));
+                    if (mensaje == 'error') {
+                        listNivelesDep = undefined;
+                    }
+                    return res.jsonp({ message: mensaje, data: listNivelesDep });
+                }, 1000);
+            }
+        }
+        catch (error) {
+            return res.status(500).jsonp({ message: error });
+        }
+    }
 }
 exports.DEPARTAMENTO_CONTROLADOR = new DepartamentoControlador();
 exports.default = exports.DEPARTAMENTO_CONTROLADOR;

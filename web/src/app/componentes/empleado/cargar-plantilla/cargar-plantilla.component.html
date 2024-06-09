@@ -18,7 +18,7 @@
                             <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                                 <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
                                     <form method="post" class="btn-2" enctype="multipart/form-data">
-                                        <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                        <input (change)="FileChange($event, 'niveles')" type="file" [formControl]="archivoForm" id="file"
                                             accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                         <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
                                             style="height: 65px; padding-top: 25px;"
@@ -35,7 +35,7 @@
                                 </div>
                             </div>
                             <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                                <div *ngIf="DatosContrato.length == 0" class="d-flex flex-wrap justify-content-around">
+                                <div *ngIf="DatosNivelesDep.length == 0" class="d-flex flex-wrap justify-content-around">
                                     <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                         style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
                                         href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
@@ -43,7 +43,7 @@
                                         Descargar plantilla usuarios
                                     </a>
                                 </div>
-                                <div *ngIf="DatosContrato.length > 0" class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                                <div *ngIf="DatosNivelesDep.length > 0" class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
                                     <button id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()"
                                          matSuffix matTooltipPosition="right"
                                          matTooltip="Guardar registro multiple.">
@@ -63,6 +63,28 @@
             </app-definicion-plantilla>
         </div>
 
+        <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS ------------------------------------------------->
+        <div *ngIf="DatosNivelesDep.length > 0 " class="container" style="padding-bottom: 10px; margin-bottom: 35px;">
+            <div class="mat-elevation-z8" style="background: white;">
+                <div id="titulo">REGISTRO MULTIPLE</div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                            <thead class="thead-light">
+                                <tr style="text-align: center; font-size: 13px;">
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    *ngFor="let nt of DatosNivelesDep | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                                    <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{nt.fila}}</td>
+                                    <td style="font-size: 12px;"></td>
+                                </tr>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
         
      </mat-tab>
 
@@ -83,7 +105,7 @@
                                 <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                                     <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
                                         <form method="post" class="btn-2" enctype="multipart/form-data">
-                                            <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                            <input (change)="FileChange($event, 'contratos')" type="file" [formControl]="archivoForm" id="file"
                                                 accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                             <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
                                                 style="height: 65px; padding-top: 25px;"

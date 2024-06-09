@@ -10,6 +10,7 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { environment } from 'src/environments/environment';
 import { MetodosComponent } from '../../administracionGeneral/metodoEliminar/metodos.component';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
+import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 
 @Component({
   selector: 'app-cargar-plantilla',
@@ -39,12 +40,14 @@ export class CargarPlantillaComponent {
   constructor(
     public restCa: EmplCargosService,
     public restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
+    public restDep: DepartamentosService, // SERVICIO DATOS DE DEPARTAMENTOS
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
     private router: Router, // VARIABLE DE MANEJO DE TUTAS URL
   ) {
     this.DatosContrato = [];
     this.DatosCargos = [];
+    this.DatosNivelesDep = [];
   }
 
   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
@@ -83,12 +86,71 @@ export class CargarPlantillaComponent {
   archivoSubido: Array<File>;
   mostrarbtnsubir: boolean = false;
 
+
+   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS NIVELES DE DEPARTAMENTO DEL ARCHIVO EXCEL
+     /** ************************************************************************************************************* **
+   ** **                       TRATAMIENTO DE PLANTILLA DE NIVELES DE DEPARTAMENTO                               ** **
+   ** ************************************************************************************************************* **/
+   DatosNivelesDep: any
+   listaNivelesCorrectas: any = [];
+   messajeExcel: string = '';
+   RevisarplantillaNiveles() {
+    this.listaNivelesCorrectas = [];
+    this.DatosNivelesDep = [];
+    let formData = new FormData();
+    for (var i = 0; i < this.archivoSubido.length; i++) {
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+    }
+
+    this.progreso = true;
+
+    this.restDep.RevisarFormatoNivelDep(formData).subscribe(res => {
+      console.log('plantilla niveles', res);
+      this.DatosNivelesDep = res.data;
+      this.messajeExcel = res.message;
+
+      if (this.messajeExcel == 'error') {
+        this.DatosNivelesDep = [];
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.DatosNivelesDep = [];
+        this.toastr.error('No se ha encontrado pestaña EMPLEADOS_CONTRATOS en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.DatosNivelesDep.forEach((item: any) => {
+          if (item.observacion.toLowerCase() == 'ok') {
+            this.listaNivelesCorrectas.push(item);
+          }
+        });
+      }
+
+    }, error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
+        timeOut: 4000,
+      });
+      this.progreso = false;
+    }, () => {
+      this.progreso = false;
+    });
+   }
+
+
+  
+
   /** ************************************************************************************************************* **
    ** **                       TRATAMIENTO DE PLANTILLA DE CONTRATOS DE EMPLEADOS                                ** **
    ** ************************************************************************************************************* **/
 
   // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE CONTRATOS EMPLEADOS
-  FileChange(element: any) {
+  FileChange(element: any, tipo: string) {
     this.archivoSubido = [];
     this.nameFile = '';
     this.archivoSubido = element.target.files;
@@ -101,7 +163,12 @@ export class CargarPlantillaComponent {
       if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
-        this.Revisarplantilla();
+        console.log('niveles: ',tipo);
+        if(tipo == 'niveles'){
+          this.RevisarplantillaNiveles();
+        }else{
+          this.Revisarplantilla();
+        }
       } else {
         this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
@@ -122,7 +189,6 @@ export class CargarPlantillaComponent {
 
   DatosContrato: any
   listaContratosCorrectas: any = [];
-  messajeExcel: string = '';
   Revisarplantilla() {
     this.listaContratosCorrectas = [];
     this.DatosContrato = [];
@@ -376,5 +442,11 @@ export class CargarPlantillaComponent {
       this.nameFile = '';
     }
   }
+
+
+
+
+
+
 
 }

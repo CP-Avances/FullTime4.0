@@ -112,4 +112,9 @@ export class DepartamentosService {
     return this.http.get(`${environment.url}/departamento/buscar/regimen-departamento/${id}`);
   }
 
+  RevisarFormatoNivelDep(formData){
+    console.log('formDataDepartamentos: ',formData);
+    return this.http.post<any>(environment.url + '/departamento/upload/revisionNivel', formData);
+  }
+
 }
