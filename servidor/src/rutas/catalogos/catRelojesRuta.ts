@@ -40,9 +40,9 @@ class RelojesRuta {
 
 
         //this.router.post('/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], RELOJES_CONTROLADOR.CargaPlantillaRelojes);
-        // METODO PARA LEER DATOS DE PLANTILLA
+        // METODO PARA LEER Y CARGAR DATOS DE PLANTILLA
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], RELOJES_CONTROLADOR.VerificarPlantilla);
-        //this.router.post('/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], RELOJES_CONTROLADOR.CargaPlantillaRelojes);
+        this.router.post('/plantillaExcel/', TokenValidation, RELOJES_CONTROLADOR.CargaPlantillaRelojes);
 
 
     }

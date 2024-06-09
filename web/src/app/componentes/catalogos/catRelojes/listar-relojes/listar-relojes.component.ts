@@ -279,6 +279,25 @@ export class ListarRelojesComponent implements OnInit {
       this.messajeExcel = res.message;
       console.log('probando plantilla1 dispositivos', this.DataDispositivos);
 
+      if (this.messajeExcel == 'error') {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña TIPO_DISCAPACIDAD en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.DataDispositivos.forEach((item: any) => {
+          if (item.observacion.toLowerCase() == 'ok') {
+            this.listaDispositivosCorrectos.push(item);
+          }
+        });
+      }
 
     }, error => {
       console.log('Serivicio rest -> metodo RevisarFormato - ', error);
@@ -289,6 +308,44 @@ export class ListarRelojesComponent implements OnInit {
     }, () => {
       this.progreso = false;
     });
+  }
+
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
+  colorCelda: string = ''
+  stiloCelda(observacion: string): string {
+    let arrayObservacion = observacion.split(" ");
+    if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya existe en el sistema') {
+      return 'rgb(239, 203, 106)';
+    } else if (observacion == 'Establecimiento no existe en la base' ||
+        observacion == 'Departamento no existe en la base') {
+      return 'rgb(255, 192, 203)';
+    } else if (observacion == 'Departamento no pertenece al establecimiento' ||
+        observacion == 'El puerto debe ser de 6 digitos'
+    ) {
+      return 'rgb(238, 34, 207)';
+    }else if (observacion == 'Dirección IP incorrecta' ||
+        observacion == 'Puerto incorrecto (solo números)' ||
+        observacion == 'Acción incorrecta ingrese (SI / NO)' ||
+        observacion == 'Número de acciones incorrecta ingrese (solo números)' ||
+        observacion == 'Formato de direccion mac incorrecta (numeración hexadecimal)'
+    ) {
+      return 'rgb(222, 162, 73)';
+    }else{
+      return 'rgb(242, 21, 21)';
+    }
+  }
+  colorTexto: string = '';
+  stiloTextoCelda(texto: string): string {
+    let arrayObservacion = texto;
+    if (arrayObservacion == 'No registrado') {
+      return 'rgb(255, 80, 80)';
+    } else {
+      return 'black'
+    }
   }
 
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
@@ -303,7 +360,30 @@ export class ListarRelojesComponent implements OnInit {
       });
   }
 
-  registrarDispositivos(){}
+  registrarDispositivos(){
+    if (this.listaDispositivosCorrectos.length > 0) {
+      const data = {
+        plantilla: this.listaDispositivosCorrectos,
+        user_name: this.user_name,
+        ip: this.ip,
+      }
+      this.rest.subirArchivoExcel(data).subscribe(response => {
+        this.toastr.success('Operación exitosa.', 'Plantilla de Dispositivos importada.', {
+          timeOut: 3000,
+        });
+        //window.location.reload();
+        this.LimpiarCampos();
+        this.archivoForm.reset();
+        this.nameFile = '';
+      });
+    } else {
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+      this.nameFile = '';
+    }
+  }
 
   plantilla() {
     let formData = new FormData();

@@ -55,6 +55,14 @@ export class CargarPlantillaComponent {
 
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
+    //NIVELES DEPARTAMENTO
+    this.archivoSubido = [];
+    this.nameFile = '';
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = false;
+    this.messajeExcel = '';
+
+
     //CONTRATOS
     this.DatosContrato = [];
     this.archivoSubido = [];
