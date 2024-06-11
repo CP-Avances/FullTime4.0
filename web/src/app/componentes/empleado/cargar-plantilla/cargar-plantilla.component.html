@@ -71,18 +71,39 @@
                     <table class="table table-hover table-sm">
                             <thead class="thead-light">
                                 <tr style="text-align: center; font-size: 13px;">
-                                    <th></th>
+                                    <th scope="col">Item</th>
+                                    <th scope="col">Observación</th>
+                                    <th scope="col">SUCURSAL</th>
+                                    <th scope="col">Departamento</th>
+                                    <th scope="col">Nivel</th>
+                                    <th scope="col">DEPARTAMENTO SUPERIOR</th>
+                                    <th scope="col">SUCURSAL DEPARTAMENTO SUPERIOR</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr
                                     *ngFor="let nt of DatosNivelesDep | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
                                     <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{nt.fila}}</td>
-                                    <td style="font-size: 12px;"></td>
+                                    <td style="font-size: 12px;">
+                                        <div style="width: 270px; margin: auto;">
+                                            <div id="t-editar" class="circulo"
+                                                [style.background-color]="stiloCelda(nt.observacion)"></div>
+                                            {{nt.observacion}}
+                                        </div>
+                                    </td>
+                                    <td style="font-size: 12px;">{{nt.sucursal}}</td>
+                                    <td style="font-size: 12px;">{{nt.departamento}}</td>
+                                    <td style="font-size: 12px;">{{nt.nivel}}</td>
+                                    <td style="font-size: 12px;">{{nt.depa_superior}}</td>
+                                    <td style="font-size: 12px;">{{nt.sucursal_depa_superior}}</td>
                                 </tr>
                             </tbody>
                     </table>
                 </div>
+                <mat-paginator  [length]="DatosNivelesDep.length!" [pageSize]="tamanio_paginaMul"
+                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                        showFirstLastButtons>
+                </mat-paginator>
             </div>
         </div>
         
