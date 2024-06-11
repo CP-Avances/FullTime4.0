@@ -197,31 +197,31 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     let respuesta: any = [];
     let codigos = '';
     //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
-      respuesta = data;
-      respuesta.forEach((obj: any) => {
-        if (codigos === '') {
-          codigos = '\'' + obj.id_sucursal + '\''
-        }
-        else {
-          codigos = codigos + ', \'' + obj.id_sucursal + '\''
-        }
-      })
-      //console.log('ver sucursales ', codigos);
+    // this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
+    //   respuesta = data;
+    //   respuesta.forEach((obj: any) => {
+    //     if (codigos === '') {
+    //       codigos = '\'' + obj.id_sucursal + '\''
+    //     }
+    //     else {
+    //       codigos = codigos + ', \'' + obj.id_sucursal + '\''
+    //     }
+    //   })
+    //   //console.log('ver sucursales ', codigos);
 
-      // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
-      if (usuario.id_rol === 1 && usuario.jefe === false) {
-        this.usua_sucursales = { id_sucursal: codigos };
-        this.BuscarInformacionAdministrador(this.usua_sucursales);
-      }
-      else if (usuario.id_rol === 1 && usuario.jefe === true) {
-        this.usua_sucursales = { id_sucursal: codigos, id_departamento: usuario.id_departamento };
-        this.BuscarInformacionJefe(this.usua_sucursales);
-      }
-      else if (usuario.id_rol === 3) {
-        this.BuscarInformacionSuperAdministrador();
-      }
-    });
+    //   // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
+    //   if (usuario.id_rol === 1 && usuario.jefe === false) {
+    //     this.usua_sucursales = { id_sucursal: codigos };
+    //     this.BuscarInformacionAdministrador(this.usua_sucursales);
+    //   }
+    //   else if (usuario.id_rol === 1 && usuario.jefe === true) {
+    //     this.usua_sucursales = { id_sucursal: codigos, id_departamento: usuario.id_departamento };
+    //     this.BuscarInformacionJefe(this.usua_sucursales);
+    //   }
+    //   else if (usuario.id_rol === 3) {
+    //     this.BuscarInformacionSuperAdministrador();
+    //   }
+    // });
   }
 
   // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL SUPERADMINISTRADOR

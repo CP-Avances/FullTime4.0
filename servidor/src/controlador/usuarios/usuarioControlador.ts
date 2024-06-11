@@ -88,7 +88,6 @@ class UsuarioControlador {
 
   public async ObtenerIdUsuariosDepartamento(req: Request, res: Response) {
     const { id_departamento } = req.body;
-    console.log('id_departamento ', id_departamento)
     const Ids = await pool.query(
       `
       SELECT id
@@ -156,7 +155,6 @@ class UsuarioControlador {
     }
     catch (error) {
       // REVERTIR TRANSACCION
-      console.log(error);
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
     }
@@ -1644,73 +1642,75 @@ class UsuarioControlador {
    ** ************************************************************************************************** */
 
   // BUSCAR DATOS DE USUARIOS - SUCURSAL
-  public async BuscarUsuarioSucursal(req: Request, res: Response) {
-    const { id_empleado } = req.body;
-    const USUARIOS = await pool.query(
-      `
-      SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1
-      `,
-      [id_empleado]
-    );
-    if (USUARIOS.rowCount > 0) {
-      return res.jsonp(USUARIOS.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-    }
-  }
+  // TODO: ELIMINAR ESTE METODO Y SU DESCENDENCIA
+  // public async BuscarUsuarioSucursal(req: Request, res: Response) {
+  //   const { id_empleado } = req.body;
+  //   const USUARIOS = await pool.query(
+  //     `
+  //     SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1
+  //     `,
+  //     [id_empleado]
+  //   );
+  //   if (USUARIOS.rowCount > 0) {
+  //     return res.jsonp(USUARIOS.rows)
+  //   }
+  //   else {
+  //     return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+  //   }
+  // }
 
   // CREAR REGISTRO DE USUARIOS - SUCURSAL
-  public async CrearUsuarioSucursal(req: Request, res: Response) {
-    try {
-      const { id_empleado, id_sucursal, principal, user_name, ip } = req.body;
+  // TODO: ELIMINAR ESTE METODO Y SU DESCENDENCIA
+  // public async CrearUsuarioSucursal(req: Request, res: Response) {
+  //   try {
+  //     const { id_empleado, id_sucursal, principal, user_name, ip } = req.body;
 
-      // INICIA TRANSACCION
-      await pool.query('BEGIN');
+  //     // INICIA TRANSACCION
+  //     await pool.query('BEGIN');
 
-      await pool.query(
-        `
-        INSERT INTO eu_usuario_sucursal (id_empleado, id_sucursal, principal) 
-        VALUES ($1, $2, $3)
-        `
-        , [id_empleado, id_sucursal, principal]);
+  //     await pool.query(
+  //       `
+  //       INSERT INTO eu_usuario_sucursal (id_empleado, id_sucursal, principal) 
+  //       VALUES ($1, $2, $3)
+  //       `
+  //       , [id_empleado, id_sucursal, principal]);
 
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'eu_usuario_sucursal',
-        usuario: user_name,
-        accion: 'I',
-        datosOriginales: '',
-        datosNuevos: `{"id_empleado": ${id_empleado}, "id_sucursal": ${id_sucursal}, "principal": ${principal}}`,
-        ip,
-        observacion: null
-      });
+  //     // AUDITORIA
+  //     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+  //       tabla: 'eu_usuario_sucursal',
+  //       usuario: user_name,
+  //       accion: 'I',
+  //       datosOriginales: '',
+  //       datosNuevos: `{"id_empleado": ${id_empleado}, "id_sucursal": ${id_sucursal}, "principal": ${principal}}`,
+  //       ip,
+  //       observacion: null
+  //     });
 
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-      res.jsonp({ message: 'Registro guardado.' });
-    }
-    catch (error) {
-      // REVERTIR TRANSACCION
-      await pool.query('ROLLBACK');
-      return res.jsonp({ message: 'error' });
-    }
-  }
+  //     // FINALIZAR TRANSACCION
+  //     await pool.query('COMMIT');
+  //     res.jsonp({ message: 'Registro guardado.' });
+  //   }
+  //   catch (error) {
+  //     // REVERTIR TRANSACCION
+  //     await pool.query('ROLLBACK');
+  //     return res.jsonp({ message: 'error' });
+  //   }
+  // }
 
   // CREAR REGISTRO DE USUARIOS - DEPARTAMENTO
   public async CrearUsuarioDepartamento(req: Request, res: Response) {
     try {
-      const { id_empleado, id_departamento, principal, personal, user_name, ip } = req.body
-
+      const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = req.body
+      
       // INICIA TRANSACCION
       await pool.query('BEGIN');
 
       await pool.query(
         `
-        INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal) 
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
+        VALUES ($1, $2, $3, $4, $5)
         `
-        , [id_empleado, id_departamento, principal, personal]);
+        , [id_empleado, id_departamento, principal, personal, administra]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -1718,7 +1718,7 @@ class UsuarioControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{"id_empleado": ${id_empleado}, "id_departamento": ${id_departamento}, "principal": ${principal}, "personal": ${personal}}`,
+        datosNuevos: `{"id_empleado": ${id_empleado}, "id_departamento": ${id_departamento}, "principal": ${principal}, "personal": ${personal}, "administra": ${administra}}`,
         ip,
         observacion: null
       });
@@ -1739,7 +1739,8 @@ class UsuarioControlador {
     const { id_empleado } = req.body;
     const USUARIOS = await pool.query(
       `
-      SELECT ud.id, e.nombre, e.apellido, d.nombre AS departamento, d.id AS id_departamento, s.id AS id_sucursal, s.nombre AS sucursal, ud.principal, ud.personal
+      SELECT ud.id, e.nombre, e.apellido, d.nombre AS departamento, d.id AS id_departamento, 
+      s.id AS id_sucursal, s.nombre AS sucursal, ud.principal, ud.personal, ud.administra
       FROM eu_usuario_departamento AS ud
       INNER JOIN eu_empleados AS e ON ud.id_empleado=e.id
       INNER JOIN ed_departamentos AS d ON ud.id_departamento=d.id
@@ -1755,12 +1756,14 @@ class UsuarioControlador {
     }
   }
 
-  // BUSCAR DATOS DE USUARIOS - SUCURSAL
-  public async BuscarUsuarioSucursalPrincipal(req: Request, res: Response) {
+  // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO
+  public async BuscarAsignacionUsuarioDepartamento(req: Request, res: Response) {
+    console.log('ver req.body ', req.body)
     const { id_empleado } = req.body;
     const USUARIOS = await pool.query(
       `
-      SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1 AND principal = true;
+      SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 
+      ORDER BY id ASC LIMIT 1
       `,
       [id_empleado]
     );
@@ -1768,31 +1771,31 @@ class UsuarioControlador {
       return res.jsonp(USUARIOS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+      return res.jsonp(null);
     }
   }
 
-  // METODO PARA ACTUALIZAR DATOS DE USUARIO - SUCURSAL
-  public async ActualizarUsuarioSucursalPrincipal(req: Request, res: Response): Promise<Response> {
+  // ACTUALIZAR DATOS DE USUARIOS - DEPARTAMENTO
+  public async ActualizarUsuarioDepartamento(req: Request, res: Response): Promise<Response> {
     try {
-      const { id_sucursal, id_empleado, user_name, ip } = req.body;
+      const { id, id_departamento, principal, personal, administra, user_name, ip } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       // CONSULTA DATOSORIGINALES
-      const consulta = await pool.query(`SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1 AND principal = true`, [id_empleado]);
+      const consulta = await pool.query(`SELECT * FROM eu_usuario_departamento WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'eu_usuario_sucursal',
+          tabla: 'eu_usuario_departamento',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
           datosNuevos: '',
           ip,
-          observacion: `Error al actualizar usuario con id: ${id_empleado}. Registro no encontrado.`
+          observacion: `Error al actualizar registro con id: ${id}. Registro no encontrado.`
         });
 
         // FINALIZAR TRANSACCION
@@ -1800,19 +1803,20 @@ class UsuarioControlador {
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
 
-      await pool.query(
+      const datosActuales = await pool.query(
         `
-        UPDATE eu_usuario_sucursal SET id_sucursal = $1 WHERE id_empleado = $2 AND principal = true;
+        UPDATE eu_usuario_departamento SET id_departamento = $2, principal = $3, personal = $4, administra = $5 
+        WHERE id = $1 RETURNING *
         `
-        , [id_sucursal, id_empleado]);
+        , [id, id_departamento, principal, personal, administra]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'eu_usuario_sucursal',
+        tabla: 'eu_usuario_departamento',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{"id_sucursal": ${id_sucursal}}`,
+        datosNuevos: JSON.stringify(datosActuales.rows[0]),
         ip,
         observacion: null
       });
@@ -1828,62 +1832,138 @@ class UsuarioControlador {
     }
   }
 
+  // BUSCAR DATOS DE USUARIOS - SUCURSAL
+  // TODO: ELIMINAR ESTE METODO Y SU DESCENDENCIA
+  // public async BuscarUsuarioSucursalPrincipal(req: Request, res: Response) {
+  //   const { id_empleado } = req.body;
+  //   const USUARIOS = await pool.query(
+  //     `
+  //     SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1 AND principal = true;
+  //     `,
+  //     [id_empleado]
+  //   );
+  //   if (USUARIOS.rowCount > 0) {
+  //     return res.jsonp(USUARIOS.rows)
+  //   }
+  //   else {
+  //     return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+  //   }
+  // }
+
+  // METODO PARA ACTUALIZAR DATOS DE USUARIO - SUCURSAL
+  // TODO: ELIMINAR ESTE METODO Y SU DESCENDENCIA
+  // public async ActualizarUsuarioSucursalPrincipal(req: Request, res: Response): Promise<Response> {
+  //   try {
+  //     const { id_sucursal, id_empleado, user_name, ip } = req.body;
+
+  //     // INICIAR TRANSACCION
+  //     await pool.query('BEGIN');
+
+  //     // CONSULTA DATOSORIGINALES
+  //     const consulta = await pool.query(`SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1 AND principal = true`, [id_empleado]);
+  //     const [datosOriginales] = consulta.rows;
+
+  //     if (!datosOriginales) {
+  //       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+  //         tabla: 'eu_usuario_sucursal',
+  //         usuario: user_name,
+  //         accion: 'U',
+  //         datosOriginales: '',
+  //         datosNuevos: '',
+  //         ip,
+  //         observacion: `Error al actualizar usuario con id: ${id_empleado}. Registro no encontrado.`
+  //       });
+
+  //       // FINALIZAR TRANSACCION
+  //       await pool.query('COMMIT');
+  //       return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+  //     }
+
+  //     await pool.query(
+  //       `
+  //       UPDATE eu_usuario_sucursal SET id_sucursal = $1 WHERE id_empleado = $2 AND principal = true;
+  //       `
+  //       , [id_sucursal, id_empleado]);
+
+  //     // AUDITORIA
+  //     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+  //       tabla: 'eu_usuario_sucursal',
+  //       usuario: user_name,
+  //       accion: 'U',
+  //       datosOriginales: JSON.stringify(datosOriginales),
+  //       datosNuevos: `{"id_sucursal": ${id_sucursal}}`,
+  //       ip,
+  //       observacion: null
+  //     });
+
+  //     // FINALIZAR TRANSACCION
+  //     await pool.query('COMMIT');
+  //     return res.jsonp({ message: 'Registro actualizado.' });
+  //   }
+  //   catch (error) {
+  //     // REVERTIR TRANSACCION
+  //     await pool.query('ROLLBACK');
+  //     return res.jsonp({ message: 'error' });
+  //   }
+  // }
+
 
   // METODO PARA ELIMINAR REGISTROS
-  public async EliminarUsuarioSucursal(req: Request, res: Response): Promise<Response> {
-    try {
-      const { user_name, ip } = req.body;
-      const id = req.params.id;
+  // TODO: ELIMINAR ESTE METODO Y SU DESCENDENCIA
+  // public async EliminarUsuarioSucursal(req: Request, res: Response): Promise<Response> {
+  //   try {
+  //     const { user_name, ip } = req.body;
+  //     const id = req.params.id;
 
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
+  //     // INICIAR TRANSACCION
+  //     await pool.query('BEGIN');
 
-      // CONSULTA DATOSORIGINALES
-      const consulta = await pool.query(`SELECT * FROM eu_usuario_sucursal WHERE id = $1`, [id]);
-      const [datosOriginales] = consulta.rows;
+  //     // CONSULTA DATOSORIGINALES
+  //     const consulta = await pool.query(`SELECT * FROM eu_usuario_sucursal WHERE id = $1`, [id]);
+  //     const [datosOriginales] = consulta.rows;
 
-      if (!datosOriginales) {
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'eu_usuario_sucursal',
-          usuario: user_name,
-          accion: 'D',
-          datosOriginales: '',
-          datosNuevos: '',
-          ip,
-          observacion: `Error al eliminar usuario_sucursal con id: ${id}. Registro no encontrado.`
-        });
+  //     if (!datosOriginales) {
+  //       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+  //         tabla: 'eu_usuario_sucursal',
+  //         usuario: user_name,
+  //         accion: 'D',
+  //         datosOriginales: '',
+  //         datosNuevos: '',
+  //         ip,
+  //         observacion: `Error al eliminar usuario_sucursal con id: ${id}. Registro no encontrado.`
+  //       });
 
-        // FINALIZAR TRANSACCION
-        await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-      }
+  //       // FINALIZAR TRANSACCION
+  //       await pool.query('COMMIT');
+  //       return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+  //     }
 
-      await pool.query(
-        `
-        DELETE FROM eu_usuario_sucursal WHERE id = $1
-        `
-        , [id]);
+  //     await pool.query(
+  //       `
+  //       DELETE FROM eu_usuario_sucursal WHERE id = $1
+  //       `
+  //       , [id]);
 
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'eu_usuario_sucursal',
-        usuario: user_name,
-        accion: 'D',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: '',
-        ip,
-        observacion: null
-      });
+  //     // AUDITORIA
+  //     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+  //       tabla: 'eu_usuario_sucursal',
+  //       usuario: user_name,
+  //       accion: 'D',
+  //       datosOriginales: JSON.stringify(datosOriginales),
+  //       datosNuevos: '',
+  //       ip,
+  //       observacion: null
+  //     });
 
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-      return res.jsonp({ message: 'Registro eliminado.' });
-    } catch (error) {
-      // REVERTIR TRANSACCION
-      await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'error' });
-    }
-  }
+  //     // FINALIZAR TRANSACCION
+  //     await pool.query('COMMIT');
+  //     return res.jsonp({ message: 'Registro eliminado.' });
+  //   } catch (error) {
+  //     // REVERTIR TRANSACCION
+  //     await pool.query('ROLLBACK');
+  //     return res.status(500).jsonp({ message: 'error' });
+  //   }
+  // }
 
   // METODO PARA ELIMINAR ASIGNACIONES DE USUARIO - DEPARTAMENTO
   public async EliminarUsuarioDepartamento(req: Request, res: Response): Promise<Response> {
