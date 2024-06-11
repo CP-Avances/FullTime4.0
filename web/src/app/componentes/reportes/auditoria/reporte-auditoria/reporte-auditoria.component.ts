@@ -10,6 +10,7 @@ import * as pdfMake from 'pdfmake/build/pdfmake.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+import pako from 'pako';
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
@@ -228,30 +229,161 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         };
 
 
+        /*
+                this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
+                    res => {
+                        this.data_pdf = res;
+                        //this.GenerarPDF(this.data_pdf);
+                        console.log(this.data_pdf)
+                        console.log(this.accionesSeleccionadas)
+        
+        
+                        switch (accion) {
+                            // case 'excel': this.ExportarExcelCargoRegimen(); break;
+                            case 'ver': this.VerDatos(); break;
+                            default: this.GenerarPDF(this.data_pdf, accion); break;
+                        }
+                    }
+                    , error => {
+                        if (error.status == '404') {
+                            this.toastr.error('No existen registros con las tablas y acciones seleccionadas', 'Ups!!! algo salio mal..', {
+                                timeOut: 6000,
+                            })
+                        }
+                    }
+        
+                )
+        */
 
+
+        /*
+                this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
+                    (res:any) => {
+                        // Descomprimir los datos antes de asignarlos
+                        zlib.gunzip(res, (err, uncompressedData) => {
+                            if (err) {
+                                // Manejar el error
+                                console.error('Error al descomprimir datos:', err);
+                                return;
+                            }
+                            // Asignar los datos descomprimidos a this.data_pdf
+                            this.data_pdf = JSON.parse(uncompressedData.toString());
+                            
+                            // Ahora puedes utilizar this.data_pdf como si no estuvieran comprimidos
+                            // Ejemplo: this.GenerarPDF(this.data_pdf);
+                        });
+                    },
+                    error => {
+                        if (error.status == '404') {
+                            this.toastr.error('No existen registros con las tablas y acciones seleccionadas', 'Ups!!! algo salió mal..', {
+                                timeOut: 6000,
+                            })
+                        }
+                    }
+                );
+        
+        */
+
+
+                /* no funciona descomprimir 
         this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
-            res => {
-                this.data_pdf = res;
-                //this.GenerarPDF(this.data_pdf);
-                console.log(this.data_pdf)
-                console.log(this.accionesSeleccionadas)
-
+            (res: any) => {
+                // Descomprimir los datos antes de asignarlos
+                const uncompressedData = pako.inflate(res, { to: 'string' });
+                // Convertir los datos JSON descomprimidos en un objeto
+                this.data_pdf = JSON.parse(uncompressedData);
+                // Asignar los datos descomprimidos a this.data_pdf
 
                 switch (accion) {
-                    // case 'excel': this.ExportarExcelCargoRegimen(); break;
-                    case 'ver': this.VerDatos(); break;
-                    default: this.GenerarPDF(this.data_pdf, accion); break;
+                    case 'ver':
+                        this.VerDatos();
+                        break;
+                    default:
+                        this.GenerarPDF(this.data_pdf, accion);
+                        break;
                 }
-            }
-            , error => {
+            },
+            error => {
                 if (error.status == '404') {
-                    this.toastr.error('No existen registros con las tablas y acciones seleccionadas', 'Ups!!! algo salio mal..', {
+                    this.toastr.error('No existen registros con las tablas y acciones seleccionadas', 'Ups!!! algo salió mal..', {
                         timeOut: 6000,
                     })
                 }
             }
+        );
 
-        )
+        */
+        this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
+            (res: any) => {
+                console.log("a ver si imprime: ", res);
+                const compressedData = res[0];
+
+                console.log("a ver si imprime 2: ", compressedData);
+
+                // Descomprimir los datos antes de asignarlos
+                console.log("a ver si imprime 2: ", compressedData);
+
+                const uncompressedData = pako.inflate(compressedData, { to: 'string' });
+
+        
+                // Convertir los datos JSON descomprimidos en un objeto
+                this.data_pdf = JSON.parse(uncompressedData);
+        
+                // Realizar la acción correspondiente según el valor de 'accion'
+                switch (accion) {
+                    case 'ver':
+                        this.VerDatos();
+                        break;
+                    default:
+                        this.GenerarPDF(this.data_pdf, accion);
+                        break;
+                }
+            },
+            error => {
+                if (error.status == '404') {
+                    this.toastr.error('No existen registros con las tablas y acciones seleccionadas', 'Ups!!! algo salió mal..', {
+                        timeOut: 6000,
+                    });
+                }
+            }
+        );
+
+
+
+        /* prueba de descomprimir parte
+                this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
+                    (res: any) => {
+                        console.log("a ver si imprime: ", res);
+                
+                        // Verificar si el cliente admite la transferencia de fragmentos
+                        const contentEncoding = res.headers.get('Content-Encoding');
+                        const isCompressed = contentEncoding && contentEncoding.includes('gzip');
+                
+                        // Descomprimir los datos antes de asignarlos
+                        const uncompressedData = isCompressed ? pako.inflate(res, { to: 'string' }) : res;
+                        
+                        // Convertir los datos JSON descomprimidos en un objeto
+                        this.data_pdf = JSON.parse(uncompressedData);
+                        
+                        // Realizar la acción correspondiente según el valor de 'accion'
+                        switch (accion) {
+                            case 'ver':
+                                this.VerDatos();
+                                break;
+                            default:
+                                this.GenerarPDF(this.data_pdf, accion);
+                                break;
+                        }
+                    },
+                    error => {
+                        if (error.status == '404') {
+                            this.toastr.error('No existen registros con las tablas y acciones seleccionadas', 'Ups!!! algo salió mal..', {
+                                timeOut: 6000,
+                            });
+                        }
+                    }
+                );*/
+
 
     }
 
