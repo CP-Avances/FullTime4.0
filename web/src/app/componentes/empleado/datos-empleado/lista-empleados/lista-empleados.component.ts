@@ -2,7 +2,7 @@
 import { Validators, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, forkJoin, map } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
@@ -74,7 +74,6 @@ export class ListaEmpleadosComponent implements OnInit {
   numero_paginaMul: number = 1;
 
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
-  rolEmpleado: number;
 
   // VARAIBLES DE SELECCION DE DATOS DE UNA TABLA
   selectionUno = new SelectionModel<EmpleadoElemento>(true, []);
@@ -108,16 +107,11 @@ export class ListaEmpleadosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
-    if (this.rolEmpleado != 1){
-      this.idUsuariosAcceso.push(this.idEmpleado);
-      this.ObtenerAsignacionesUsuario(this.idEmpleado);
-    } else {
-      this.GetEmpleados();
-    }
+    this.idUsuariosAcceso.push(this.idEmpleado);
+    this.ObtenerAsignacionesUsuario(this.idEmpleado);
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerNacionalidades();
@@ -386,22 +380,19 @@ export class ListaEmpleadosComponent implements OnInit {
 
   // METODO PARA LISTAR USUARIOS
   GetEmpleados() {
-    this.empleado = [];
-    this.rest.ListarEmpleadosActivos().subscribe(data => {
-      this.empleado = data;
+    const empleadosActivos$ = this.rest.ListarEmpleadosActivos().pipe(
+      map((data: any) => data.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id)))
+    );
 
-      // TODO: ANALIZAR QUE SUCEDE CON LOS ROLES ADMINISTRADOR Y SUPERADMINISTRADOR
-      if (this.rolEmpleado != 1) {
-        this.empleado = this.empleado.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
-      }
+    const empleadosDesactivados$ = this.rest.ListaEmpleadosDesactivados().pipe(
+      map((data: any) => data.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id)))
+    );
+
+    forkJoin([empleadosActivos$, empleadosDesactivados$]).subscribe(([empleados, desactivados]) => {
+      this.empleado = empleados;
       this.OrdenarDatos(this.empleado);
-    })
-    this.desactivados = [];
-    this.rest.ListaEmpleadosDesactivados().subscribe(res => {
-      this.desactivados = res;
-      if (this.rolEmpleado != 1) {
-        this.desactivados = this.desactivados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
-      }
+
+      this.desactivados = desactivados;
       this.OrdenarDatos(this.desactivados);
     });
   }
