@@ -1763,7 +1763,7 @@ class UsuarioControlador {
     const USUARIOS = await pool.query(
       `
       SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 
-      ORDER BY id ASC LIMIT 1
+      AND principal = true
       `,
       [id_empleado]
     );

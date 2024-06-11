@@ -20,6 +20,8 @@
                           <tr style="text-align: center;">
                             <th scope="col">Sucursal</th>
                             <th scope="col">Departamento</th>
+                            <th scope="col">Administra</th>
+                            <th scope="col">Personal</th>
                             <th scope="col">Acción</th>
                           </tr>
                       </thead>
@@ -27,11 +29,21 @@
                           <tr *ngFor="let a of asignaciones | paginate: tamanio_pagina:numero_pagina">
                             <td>{{a.sucursal}}</td>
                             <td>{{a.departamento}}</td>
+                            <td>{{a.administra?"Si":"No"}}</td>
+                            <td>{{a.personal?"Si":"No"}}</td>
                             <td class="justify-content-center">
-                              <i matSuffix matTooltipPosition="right"
+                              <i  *ngIf="!a.principal"
+                                  matSuffix matTooltipPosition="right"
                                   matTooltip="Eliminar asignación"
                                   class="fas fa-trash" id="t-eliminar"
                                   (click)="ConfirmarDeleteProceso(a.id)"
+                                  >
+                              </i>
+                              <i  *ngIf="a.principal && (a.personal || a.administra)"
+                                  matSuffix matTooltipPosition="right"
+                                  matTooltip="Deshabilitar asignación"
+                                  class="fas fa-ban" id="t-ver"
+                                  (click)="ConfirmarDeshabilitarProceso(a.id)"
                                   >
                               </i>
                           </td>

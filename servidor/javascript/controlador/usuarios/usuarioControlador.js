@@ -1519,7 +1519,7 @@ class UsuarioControlador {
             const { id_empleado } = req.body;
             const USUARIOS = yield database_1.default.query(`
       SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 
-      ORDER BY id ASC LIMIT 1
+      AND principal = true
       `, [id_empleado]);
             if (USUARIOS.rowCount > 0) {
                 return res.jsonp(USUARIOS.rows);
