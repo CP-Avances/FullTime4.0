@@ -142,14 +142,6 @@ export class UsuarioService {
     return this.http.post(`${environment.url}/usuarios/buscar-usuario-sucursal`, id_empleado);
   }
 
-  // REGISTRAR USUARIO
-  // RegistrarUsuarioSucursal(data: any) {
-  //   return this.http.post(`${environment.url}/usuarios/usuario-sucursal`, data)
-  //     .pipe(
-  //       catchError(data)
-  //     );
-  // }
-
   //REGISTRAR USUARIO - DEPARTAMENTO
   RegistrarUsuarioDepartamento(data: any) {
     return this.http.post(`${environment.url}/usuarios/usuario-departamento`, data)

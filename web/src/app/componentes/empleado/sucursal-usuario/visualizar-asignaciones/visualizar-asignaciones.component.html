@@ -26,7 +26,7 @@
                           </tr>
                       </thead>
                       <tbody>
-                          <tr *ngFor="let a of asignaciones | paginate: tamanio_pagina:numero_pagina">
+                          <tr *ngFor="let a of asignaciones | ordenarAsignaciones:'sucursal':'departamento' | paginate: tamanio_pagina:numero_pagina">
                             <td>{{a.sucursal}}</td>
                             <td>{{a.departamento}}</td>
                             <td>{{a.administra?"Si":"No"}}</td>

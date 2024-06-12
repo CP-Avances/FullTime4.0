@@ -408,7 +408,6 @@ class UsuarioControlador {
     let cargos_ = await Promise.all(lista_departamentos.map(async (reg: any) => {
       reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
         dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          //console.log('ver car ', car)
           car.cargos = await pool.query(
             `
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
@@ -502,7 +501,6 @@ class UsuarioControlador {
       "GROUP BY ig.id_suc, ig.name_suc " +
       "ORDER BY ig.name_suc ASC"
     ).then((result: any) => { return result.rows });
-    //console.log('sucursal ', sucursal_)
 
     if (sucursal_.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
 
@@ -558,7 +556,6 @@ class UsuarioControlador {
     let cargos_ = await Promise.all(lista_departamentos.map(async (reg: any) => {
       reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
         dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          //console.log('ver car ', car)
           car.cargos = await pool.query(
             `
               SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
@@ -705,7 +702,6 @@ class UsuarioControlador {
     let cargos_ = await Promise.all(lista_departamentos.map(async (reg: any) => {
       reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
         dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          //console.log('ver car ', car)
           car.cargos = await pool.query(
             `
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
@@ -932,7 +928,6 @@ class UsuarioControlador {
     let cargos_ = await Promise.all(lista_departamentos.map(async (reg: any) => {
       reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
         dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          //console.log('ver car ', car)
           car.cargos = await pool.query(
             `
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
@@ -1026,7 +1021,6 @@ class UsuarioControlador {
       "GROUP BY ig.id_suc, ig.name_suc " +
       "ORDER BY ig.name_suc ASC"
     ).then((result: any) => { return result.rows });
-    //console.log('sucursal ', sucursal_)
 
     if (sucursal_.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
 
@@ -1082,7 +1076,6 @@ class UsuarioControlador {
     let cargos_ = await Promise.all(lista_departamentos.map(async (reg: any) => {
       reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
         dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          //console.log('ver car ', car)
           car.cargos = await pool.query(
             `
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
@@ -1229,7 +1222,6 @@ class UsuarioControlador {
     let cargos_ = await Promise.all(lista_departamentos.map(async (reg: any) => {
       reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
         dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
-          //console.log('ver car ', car)
           car.cargos = await pool.query(
             `
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
@@ -1746,6 +1738,7 @@ class UsuarioControlador {
       INNER JOIN ed_departamentos AS d ON ud.id_departamento=d.id
       INNER JOIN e_sucursales AS s ON d.id_sucursal=s.id
       WHERE id_empleado = $1
+      ORDER BY ud.id ASC
       `,[id_empleado]
     );
     if (USUARIOS.rowCount > 0) {
@@ -1758,7 +1751,6 @@ class UsuarioControlador {
 
   // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO
   public async BuscarAsignacionUsuarioDepartamento(req: Request, res: Response) {
-    console.log('ver req.body ', req.body)
     const { id_empleado } = req.body;
     const USUARIOS = await pool.query(
       `
@@ -1969,7 +1961,6 @@ class UsuarioControlador {
   public async EliminarUsuarioDepartamento(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip, id } = req.body;
-      console.log( 'id',id, 'user_name',user_name, 'ip', ip);
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');

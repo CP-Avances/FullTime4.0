@@ -356,7 +356,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
               ig.name_regimen
@@ -439,7 +438,6 @@ class UsuarioControlador {
                 "WHERE ig.id_suc IN (" + id_sucursal + ")" +
                 "GROUP BY ig.id_suc, ig.name_suc " +
                 "ORDER BY ig.name_suc ASC").then((result) => { return result.rows; });
-            //console.log('sucursal ', sucursal_)
             if (sucursal_.length === 0)
                 return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
             // CONSULTA DE BUSQUEDA DE REGIMEN
@@ -484,7 +482,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
               SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
                   ig.name_regimen
@@ -609,7 +606,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
               ig.name_regimen
@@ -800,7 +796,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
               ig.name_regimen
@@ -883,7 +878,6 @@ class UsuarioControlador {
                 "WHERE ig.id_suc IN (" + id_sucursal + ")" +
                 "GROUP BY ig.id_suc, ig.name_suc " +
                 "ORDER BY ig.name_suc ASC").then((result) => { return result.rows; });
-            //console.log('sucursal ', sucursal_)
             if (sucursal_.length === 0)
                 return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
             // CONSULTA DE BUSQUEDA DE REGIMEN
@@ -928,7 +922,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
               ig.name_regimen
@@ -1053,7 +1046,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
               ig.name_regimen
@@ -1503,6 +1495,7 @@ class UsuarioControlador {
       INNER JOIN ed_departamentos AS d ON ud.id_departamento=d.id
       INNER JOIN e_sucursales AS s ON d.id_sucursal=s.id
       WHERE id_empleado = $1
+      ORDER BY ud.id ASC
       `, [id_empleado]);
             if (USUARIOS.rowCount > 0) {
                 return res.jsonp(USUARIOS.rows);
@@ -1515,7 +1508,6 @@ class UsuarioControlador {
     // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO
     BuscarAsignacionUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('ver req.body ', req.body);
             const { id_empleado } = req.body;
             const USUARIOS = yield database_1.default.query(`
       SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 
@@ -1698,7 +1690,6 @@ class UsuarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { user_name, ip, id } = req.body;
-                console.log('id', id, 'user_name', user_name, 'ip', ip);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTA DATOSORIGINALES

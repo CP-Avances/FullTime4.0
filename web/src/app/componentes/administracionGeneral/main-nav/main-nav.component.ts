@@ -282,7 +282,7 @@ export class MainNavComponent implements OnInit {
           { name: 'Cargar Plantillas', url: '/cargarPlantilla', color: true, ver: true },
           { name: 'Modalida Laboral', url: '/modalidaLaboral', color: true, ver: true },
           { name: 'Tipo Cargos', url: '/tipoCargos', color: true, ver: true },
-          { name: 'Administrar Información', url: '/administrarSucursales', color: true, ver: this.superadmin },
+          { name: 'Administrar Información', url: '/administrarInformacion', color: true, ver: this.superadmin },
         ]
       },
       {
@@ -559,7 +559,7 @@ export class MainNavComponent implements OnInit {
             color: true,
             children: [
               { name: 'Auditoría', url: '/reporte-auditoria', color: true, ver: true },
-              
+
             ]
           },
           {
