@@ -794,6 +794,194 @@ class DepartamentoControlador {
     }
   }
 
+  RevisarDatosNivel(req: Request, res: Response){
+    try{
+      const documento = req.file?.originalname;
+      let separador = path.sep;
+      let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+      const workbook = excel.readFile(ruta);
+
+      let verificador = ObtenerIndicePlantilla(workbook, 'NIVEL_DEPARTAMENTOS');
+      if (verificador === false) {
+        return res.jsonp({ message: 'no_existe', data: undefined });
+      }
+      else {
+        const sheet_name_list = workbook.SheetNames;
+        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+        console.log('plantilla: ',plantilla);
+
+        let data: any = {
+          fila:'',
+          sucursal:'',
+          departamento:'',
+          nivel:'',
+          depa_superior:'',
+          sucursal_depa_superior:'',
+          observacion: '',
+        }
+
+        //Exprecion regular para validar el formato de solo números.
+        const regex = /^[0-9]+$/;
+
+        var listNivelesDep: any = [];
+        var duplicados: any = [];
+        var mensaje: string = 'correcto';
+
+        // LECTURA DE LOS DATOS DE LA PLANTILLA
+        plantilla.forEach(async (dato: any, indice: any, array: any) => {
+          var { ITEM, SUCURSAL, DEPARTAMENTO, NIVEL, DEPARTAMENTO_SUPERIOR, SUCURSAL_DEPARTAMENTO_SUPERIOR } = dato;
+
+          if(ITEM != undefined && SUCURSAL != undefined &&
+            DEPARTAMENTO != undefined && NIVEL != undefined &&
+            DEPARTAMENTO_SUPERIOR != undefined && SUCURSAL_DEPARTAMENTO_SUPERIOR != undefined){
+
+            data.fila = ITEM;
+            data.sucursal = SUCURSAL; 
+            data.departamento = DEPARTAMENTO ;
+            data.nivel = NIVEL,
+            data.depa_superior = DEPARTAMENTO_SUPERIOR,
+            data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR,
+            data.observacion = 'no registrada';
+
+            listNivelesDep.push(data);
+
+          }else{
+            data.fila = ITEM;
+            data.sucursal = SUCURSAL; 
+            data.departamento = DEPARTAMENTO ;
+            data.nivel = NIVEL,
+            data.depa_superior = DEPARTAMENTO_SUPERIOR,
+            data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR,
+            data.observacion = 'no registrada';
+
+            if (data.fila == '' || data.fila == undefined) {
+              data.fila = 'error';
+              mensaje = 'error'
+            }
+  
+            if (SUCURSAL == undefined) {
+              data.sucursal = 'No registrado';
+              data.observacion = 'Sucursal ' + data.observacion;
+            }
+            if (DEPARTAMENTO == undefined) {
+              data.departamento = 'No registrado';
+              data.observacion = 'Departamento ' + data.observacion;
+            }
+            if (NIVEL == undefined) {
+              data.nivel = 'No registrado';
+              data.observacion = 'Nivel ' + data.observacion;
+            }
+            if (DEPARTAMENTO_SUPERIOR == undefined) {
+              data.depa_superior = 'No registrado';
+              data.observacion = 'Departamento superior ' + data.observacion;
+            }
+            if (SUCURSAL_DEPARTAMENTO_SUPERIOR == undefined) {
+              data.sucursal_depa_superior = 'No registrado';
+              data.observacion = 'Sucursal departamento superior ' + data.observacion;
+            }
+
+
+            listNivelesDep.push(data);
+          }
+
+
+          data = {};
+
+        });
+
+
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(ruta, fs.constants.F_OK, (err) => {
+          if (err) {
+          } else {
+              // ELIMINAR DEL SERVIDOR
+              fs.unlinkSync(ruta);
+          }
+        });
+
+        listNivelesDep.forEach(async (item: any) => {
+          if (item.observacion == 'no registrada') {
+            var validSucursal = await pool.query(
+              `SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`
+              ,[item.sucursal.toUpperCase()])
+            if (validSucursal.rows[0] != undefined && validSucursal.rows[0] != '') {
+              var validDeparta = await pool.query(
+                `SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1`
+                ,[item.departamento.toUpperCase()])
+                if(validDeparta.rows[0] != undefined && validDeparta.rows[0] != ''){
+                  if(validSucursal.rows[0].id == validDeparta.rows[0].id_sucursal){
+                    if (regex.test(item.nivel)) {
+                    }else{
+                      item.observacion = 'Nivel incorrecto (solo números)';
+                    }
+                  }else{
+                    item.observacion = 'Departamento no pertenece al establecimiento';
+                  }
+                }else{
+                  item.observacion = 'Departamento no existe en la base';
+                }
+            }else{
+              item.observacion = 'Sucursal no existe en la base';
+            }
+          }
+        });
+
+        setTimeout(() => {
+          listNivelesDep.sort((a: any, b: any) => {
+            // Compara los números de los objetos
+            if (a.fila < b.fila) {
+              return -1;
+            }
+            if (a.fila > b.fila) {
+              return 1;
+            }
+            return 0; // Son iguales
+          });
+  
+          var filaDuplicada: number = 0;
+
+          console.log('plantilla: ',listNivelesDep)
+
+          //VALIDACIONES DE LOS DATOS
+          listNivelesDep.forEach(async (item: any) => {
+              if (item.observacion == '1') {
+                  item.observacion = 'Registro duplicado'
+              }else{
+              }
+
+
+
+              // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+              if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                  // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+                  if (item.fila == filaDuplicada) {
+                      mensaje = 'error';
+                  }
+              } else {
+                  return mensaje = 'error';
+              }
+
+              filaDuplicada = item.fila;
+
+          });
+
+          if (mensaje == 'error') {
+              listNivelesDep = undefined;
+          }
+
+    
+          return res.jsonp({ message: mensaje, data: listNivelesDep });
+
+        }, 1000)
+
+
+
+      }
+    }catch(error){
+      return res.status(500).jsonp({ message: error });
+    }
+  }
+
 }
 
 export const DEPARTAMENTO_CONTROLADOR = new DepartamentoControlador();

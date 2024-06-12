@@ -121,15 +121,21 @@ export class CatTipoCargosComponent {
   }
 
   obtenerCargos() {
-
     this._TipoCargos.listaCargos().subscribe(res => {
       console.log('lista ', res);
       this.listaTipoCargos = res
     }, error => {
       console.log('Serivicio rest -> metodo RevisarFormato - ', error);
-      this.toastr.error('Error al cargar los datos', 'Listado de Tipo Cargos', {
-        timeOut: 4000,
-      });
+      if(error.status == 400 || error.status == 404){
+        this.toastr.info('Registro vacio', 'Cargos', {
+          timeOut: 3500,
+        });
+      }else{
+        this.toastr.error('Error al cargar los datos', 'Cargos', {
+          timeOut: 3500,
+        });
+      }
+      
     });
   }
 

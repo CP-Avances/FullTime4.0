@@ -113,9 +113,15 @@ export class CatVacunasComponent implements OnInit {
     this.rest.listaVacuna().subscribe(res => {
       this.vacunas = res
     }, error => {
-      this.toastr.error('Error al cargar los datos', 'Listado de Vacunas', {
-        timeOut: 4000,
-      });
+      if(error.status == 400 || error.status == 404){
+        this.toastr.info('Registro vacio', 'Vacunas', {
+          timeOut: 3500,
+        });
+      }else{
+        this.toastr.error('Error al cargar los datos', 'Vacunas', {
+          timeOut: 3500,
+        });
+      }
     });
   }
 

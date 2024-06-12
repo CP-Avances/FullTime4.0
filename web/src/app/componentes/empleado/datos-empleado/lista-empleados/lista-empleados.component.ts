@@ -459,15 +459,17 @@ export class ListaEmpleadosComponent implements OnInit {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
+    let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
-        var itemName = arrayItems[0].slice(0, 18);
-        if (itemName.toLowerCase() == 'empleadoautomatico') {
+        console.log('itemName: ',itemName)
+        if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
+          console.log('entra_automatico');
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;
           this.VerificarPlantillaAutomatico();
         } else {
-          this.toastr.error('Cargar la plantilla con nombre EmpleadoAutomatico.', 'Plantilla seleccionada incorrecta.', {
+          this.toastr.error('Cargar la plantilla con nombre plantillaconfiguraciongeneral.', 'Plantilla seleccionada incorrecta.', {
             timeOut: 6000,
           });
           this.archivoForm.reset();
@@ -477,14 +479,14 @@ export class ListaEmpleadosComponent implements OnInit {
         }
       }
       else {
-        itemName = arrayItems[0].slice(0, 14);
-        if (itemName.toLowerCase() == 'empleadomanual') {
+        console.log('itemName: ',itemName)
+        if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
           console.log('entra_manual');
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;
           this.VerificarPlantillaManual();
         } else {
-          this.toastr.error('Cargar la plantilla con nombre EmpleadoManual.', 'Plantilla seleccionada incorrecta.', {
+          this.toastr.error('Cargar la plantilla con nombre plantillaconfiguraciongeneral.', 'Plantilla seleccionada incorrecta.', {
             timeOut: 6000,
           });
           this.archivoForm.reset();

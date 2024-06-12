@@ -225,24 +225,24 @@ class ModalidaLaboralControlador {
                     var mensaje = 'correcto';
                     // LECTURA DE LOS DATOS DE LA PLANTILLA
                     plantilla_modalidad_laboral.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                        var { ITEM, MODALIDA_LABORAL } = dato;
+                        var { ITEM, MODALIDAD_LABORAL } = dato;
                         // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                         if ((ITEM != undefined && ITEM != '') &&
-                            (MODALIDA_LABORAL != undefined && MODALIDA_LABORAL != '')) {
+                            (MODALIDAD_LABORAL != undefined && MODALIDAD_LABORAL != '')) {
                             data.fila = ITEM;
-                            data.modalida_laboral = MODALIDA_LABORAL;
+                            data.modalida_laboral = MODALIDAD_LABORAL;
                             data.observacion = 'no registrada';
                             listModalidad.push(data);
                         }
                         else {
                             data.fila = ITEM;
-                            data.modalida_laboral = MODALIDA_LABORAL;
+                            data.modalida_laboral = MODALIDAD_LABORAL;
                             data.observacion = 'no registrada';
                             if (data.fila == '' || data.fila == undefined) {
                                 data.fila = 'error';
                                 mensaje = 'error';
                             }
-                            if (MODALIDA_LABORAL == undefined) {
+                            if (MODALIDAD_LABORAL == undefined) {
                                 data.modalida_laboral = 'No registrado';
                                 data.observacion = 'Modalidad Laboral ' + data.observacion;
                             }

@@ -119,9 +119,15 @@ export class CatDiscapacidadComponent implements OnInit {
     this.rest.ListarDiscapacidad().subscribe(res => {
       this.discapacidades = res
     }, error => {
-      this.toastr.error('Error al cargar los datos.', '', {
-        timeOut: 4000,
-      });
+      if(error.status == 400 || error.status == 404){
+        this.toastr.info('Registro vacio', 'Discapacidad', {
+          timeOut: 3500,
+        });
+      }else{
+        this.toastr.error('Error al cargar los datos', 'Discapacidad', {
+          timeOut: 3500,
+        });
+      }
     });
   }
 

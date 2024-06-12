@@ -686,6 +686,7 @@ export class MainNavComponent implements OnInit {
                  { name: 'Usuarios', url: '/listaNotifacionUsuario', color: true, ver: true },
                ]
              },
+             */
              {
                name: 'Auditoría',
                accion: true,
@@ -696,7 +697,7 @@ export class MainNavComponent implements OnInit {
                children: [
                  { name: 'Auditoria', url: '/auditoria', color: true, ver: true },
                ]
-             },*/
+             },
         ]
       },
     ];

@@ -16,14 +16,14 @@ td {
     text-align: center;
 }
 
+#letras {
+    text-align: center;
+    font-size: 14px;
+}
+
 .btn {
     background-color: rgb(80, 87, 97);
     color: white;
-    margin: 5px 10px 5px 10px;
-}
-
-.scrollme {
-    overflow-x: scroll;
 }
 
 [type="file"] {
@@ -33,16 +33,16 @@ td {
 }
 
 [type="file"]+label {
-    background: #f15d22;
+    background-color: rgb(83, 157, 76);
     border: none;
     border-radius: 5px;
     color: #fff;
     cursor: pointer;
     display: inline-block;
     font-family: "Poppins", sans-serif;
-    font-size: inherit;
+    font-size: 12px;
+    margin-top: 7px;
     font-weight: 600;
-    margin-bottom: 1rem;
     outline: none;
     padding: 1rem 50px;
     position: relative;
@@ -51,8 +51,12 @@ td {
     vertical-align: middle;
 }
 
+[type="file"]+label:hover {
+    background-color: rgb(27, 179, 0);
+}
+
 [type="file"]+label.btn-2 {
-    background-color: rgb(150, 243, 141);
+    background-color: rgb(78, 152, 72);
     overflow: hidden;
 }
 
@@ -65,31 +69,12 @@ td {
     right: 130%;
     line-height: 3.3;
     position: absolute;
-    top: 0px;
-    margin-left: 5px;
     -webkit-transition: all 0.3s;
     transition: all 0.3s;
 }
 
 [type="file"]+label.btn-2:hover {
-    background-color: rgb(21, 130, 1);
-}
-
-[type="file"]+label.btn-2:hover::before {
-    right: 80%
-}
-
-#descargar:hover {
-    background-color: rgb(0, 76, 255);
-    padding-bottom: 6px;
-    border-radius: 5px;
-    font-weight: bold;
-    font-family: "Poppins", sans-serif;
-    margin-left: 5px;
-    padding-top: 10px;
-    font-size: 14px;
-    height: 66px;
-    width: 220px;
+    background-color: rgb(12, 82, 0);
 }
 
 #descargar {
@@ -98,31 +83,22 @@ td {
     border-radius: 5px;
     font-family: "Poppins", sans-serif;
     font-weight: bold;
-    margin-left: 5px;
-    padding-top: 10px;
-    font-size: 14px;
+    margin: auto;
+    font-size: 12px;
     overflow: hidden;
     height: 65px;
     width: 220px;
 }
 
-mat-form-field.input-tables {
-    background: transparent;
-    font-size: 14px;
-    text-align: center;
-    outline: none;
-    fill: none;
-    height: 65px;
+#descargar:hover {
+    background-color: rgb(0, 76, 255);
+    font-weight: bold;
 }
 
-.ip { width: 120px; }
-
-#t-inputs {
-    background: transparent;
-    font-size: 14px;
-    text-align: center;
-    outline: none;
-    fill: none;
-    width: 120px;
-    height: 65px;
+.circulo{
+    margin-right: -50px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50px;
+    float: left;
 }

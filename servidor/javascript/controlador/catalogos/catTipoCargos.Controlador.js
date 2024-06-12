@@ -43,14 +43,14 @@ class TiposCargosControlador {
                 SELECT * FROM e_cat_tipo_cargo ORDER BY cargo ASC
                 `);
                 if (TIPO_CARGO.rowCount > 0) {
-                    return res.jsonp(TIPO_CARGO.rows);
+                    return res.status(200).jsonp(TIPO_CARGO.rows);
                 }
                 else {
-                    return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+                    return res.status(404).jsonp({ text: 'No se encuentran registros.', status: '404' });
                 }
             }
             catch (error) {
-                return res.status(500).jsonp({ message: error });
+                return res.status(500).jsonp({ message: error, status: '500' });
             }
         });
     }

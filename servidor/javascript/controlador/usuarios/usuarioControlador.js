@@ -142,6 +142,7 @@ class UsuarioControlador {
                 return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
+                console.log('error *** ', error);
                 // REVERTIR TRANSACCION
                 console.log(error);
                 yield database_1.default.query('ROLLBACK');

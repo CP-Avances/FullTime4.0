@@ -60,6 +60,6 @@ export class RelojesService {
   }
 
   VerificarArchivoExcel(formData) {
-    return this.http.post<any>(`${environment.url}/relojes/verificar_plantilla/plantillaExcel/`, formData);
+    return this.http.post<any>(`${environment.url}/relojes/upload/revision/`, formData);
   }
 }

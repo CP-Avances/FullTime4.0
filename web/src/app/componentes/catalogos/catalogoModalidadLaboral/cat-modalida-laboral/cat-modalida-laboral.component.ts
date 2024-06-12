@@ -127,9 +127,15 @@ export class CatModalidaLaboralComponent implements OnInit {
       this.listaModalida_Laboral = res
     }, error => {
       console.log('Serivicio rest -> metodo RevisarFormato - ', error);
-      this.toastr.error('Error al cargar los datos', 'Listado de Modalidad laboral', {
-        timeOut: 4000,
-      });
+      if(error.status == 400 || error.status == 404){
+        this.toastr.info('Registro vacio', 'Modalidad laboral', {
+          timeOut: 3500,
+        });
+      }else{
+        this.toastr.error('Error al cargar los datos', 'Modalidad laboral', {
+          timeOut: 3500,
+        });
+      }
     });
   }
 
