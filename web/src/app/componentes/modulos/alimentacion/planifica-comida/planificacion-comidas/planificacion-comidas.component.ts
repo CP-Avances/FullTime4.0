@@ -15,7 +15,6 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.serv
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 import { PlanComidasComponent } from '../plan-comidas/plan-comidas.component';
-import { use } from 'echarts';
 
 @Component({
   selector: 'app-planificacion-comidas',

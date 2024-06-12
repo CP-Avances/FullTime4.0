@@ -15,7 +15,6 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { use } from 'echarts';
 
 @Component({
   selector: 'app-editar-plan-comidas',

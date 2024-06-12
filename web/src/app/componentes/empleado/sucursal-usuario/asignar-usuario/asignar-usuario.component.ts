@@ -86,9 +86,8 @@ export class AsignarUsuarioComponent implements OnInit {
     this.ip = localStorage.getItem('ip');
 
     this.name_sucursal = this.data.nombre.toUpperCase();
-    this.BuscarAdministradoresJefes();
+    this.BuscarUsuariosSucursal();
     this.ObtenerSucursales();
-    console.log('ver datos ', this.data)
   }
 
   // METODO PARA VER PANTALLA PRINCIPAL SUCURSAL USUARIO
@@ -117,16 +116,16 @@ export class AsignarUsuarioComponent implements OnInit {
   usuarios: any = [];
   ver_principal: boolean = false;
   ver_asignados: boolean = false;
-  BuscarAdministradoresJefes() {
+  BuscarUsuariosSucursal() {
     let data = {
-      lista_sucursales:  this.data.id,
+      sucursal:  this.data.id,
       estado: 1
     }
-    //console.log('ver datos ', data)
+
     this.usuarios = [];
     this.asignados = [];
     this.principales = [];
-    this.general.ObtenerAdminJefes(data).subscribe(res => {
+    this.general.ObtenerUsuariosSucursal(data).subscribe(res => {
       this.usuarios = res;
       if (this.usuarios.length != 0) {
         this.usuarios.forEach((elemento: any) => {
@@ -141,7 +140,6 @@ export class AsignarUsuarioComponent implements OnInit {
 
       this.ver_principal = true;
 
-      console.log('ver sucursal ', this.usuarios)
     });
   }
 
@@ -166,11 +164,7 @@ export class AsignarUsuarioComponent implements OnInit {
   ObtenerSucursales() {
     this.sucursal.BuscarSucursal().subscribe(res => {
       this.sucursales = res;
-      // OMITIR SUCURSAL SELECCIONADA
-      //TODO: CONSULTAR SI SE DEBE O NO MOSTAR SUCURSAL SELECCIONADA
-      // LA LINEA A CONTINUACION OMITIRA LA SUCURSAL SELECCIONADA
-      //this.sucursales = this.sucursales.filter(elemento => elemento.id !== this.data.id);
-      // APLICACION DE BUSQUEDA CON FILTROS
+
       this.filteredOptions = this.sucursalForm.valueChanges
         .pipe(
           startWith(''),
@@ -187,11 +181,11 @@ export class AsignarUsuarioComponent implements OnInit {
     this.isChecked = false;
     this.isPersonal = false;
     this.deshabilitarTodos = false;
-    //console.log('ver datos ', this.sucursalForm.value)
+
     const [elemento] = this.sucursales.filter((o: any) => {
       return o.nombre === this.sucursalForm.value
-    })
-    console.log('ver elementos ', elemento)
+    });
+
     this.departamentos = [];
     const id_sucursal = elemento.id;
     this.departamentoService.BuscarDepartamentoSucursal(id_sucursal).subscribe(datos => {
@@ -210,7 +204,6 @@ export class AsignarUsuarioComponent implements OnInit {
     else {
       this.ver_personal = false;
     }
-
 
   }
 
@@ -310,16 +303,7 @@ export class AsignarUsuarioComponent implements OnInit {
   }
 
   // METODO PARA ASIGNAR ADMINISTRACION DE DATOS A OTROS USUARIOS - DEPARTAMENTOS
-  IngresarUsuarioDepartamento() {
-    let datos: any = {
-      id_empleado: '',
-      id_departamento: '',
-      principal: false,
-      personal: this.isPersonal,
-      user_name: this.user_name,
-      ip: this.ip,
-    };
-
+  async IngresarUsuarioDepartamento() {
     if (this.usuariosSeleccionados.selected.length === 0) {
       this.toastr.warning('No se han seleccionado usuarios.', 'VERIFICAR PROCESO.', {
         timeOut: 6000,
@@ -329,23 +313,45 @@ export class AsignarUsuarioComponent implements OnInit {
 
     const requests: Promise<any>[] = [];
 
-    this.usuariosSeleccionados.selected.forEach((objeto: any) => {
-      datos.id_empleado = objeto.id;
+    for (const objeto of this.usuariosSeleccionados.selected) {
+
+      let datos: Datos = {
+        id: '',
+        id_empleado: objeto.id,
+        id_departamento: '',
+        principal: false,
+        personal: false,
+        administra: false,
+        user_name: this.user_name,
+        ip: this.ip,
+      };
+
       if (this.isPersonal) {
         datos.id_departamento = objeto.id_departamento;
-        if (!this.VerificarAsignaciones(datos.id_empleado, datos.id_departamento)) {
-          requests.push(firstValueFrom(this.usuario.RegistrarUsuarioDepartamento(datos)));
+
+        const verificacion = await this.VerificarAsignaciones(datos, true);
+
+        if (verificacion === 2 ) {
+          requests.push(firstValueFrom(this.usuario.ActualizarUsuarioDepartamento(datos)));
         }
+
       }
 
-      this.departamentosSeleccionados.forEach((departamento: any) => {
-        datos.id_departamento = departamento.id;
-        if (!this.VerificarAsignaciones(datos.id_empleado, datos.id_departamento)) {
-          requests.push(firstValueFrom(this.usuario.RegistrarUsuarioDepartamento(datos)));
-        }
-      });
+      for (const departamento of this.departamentosSeleccionados) {
 
-    });
+        datos.id_departamento = departamento.id;
+        datos.administra = true;
+        datos.principal = false;
+        datos.personal = false;
+
+        const verificacion = await this.VerificarAsignaciones(datos, false);
+
+        if (verificacion === 1 || verificacion === 2) {
+          const accion = verificacion === 1 ? this.usuario.RegistrarUsuarioDepartamento.bind(this.usuario) : this.usuario.ActualizarUsuarioDepartamento.bind(this.usuario);
+          requests.push(firstValueFrom(accion(datos)));
+        }
+      };
+    };
 
     Promise.allSettled(requests).then(() => {
       this.toastr.success('Registros guardados exitosamente.', 'PROCESO EXITOSO.', {
@@ -353,13 +359,7 @@ export class AsignarUsuarioComponent implements OnInit {
       });
       // LIMPIAR DATOS Y REFRESCAR LAS CONSULTAS
       this.LimpiarDatos();
-      this.usuariosSeleccionados.clear();
-      this.departamentosSeleccionados = [];
-      this.adminSeleccionados = [];
-      this.ver_guardar = false;
-      this.ver_administradores = false;
-      this.ver_departamentos = false;
-      this.BuscarAdministradoresJefes();
+      this.BuscarUsuariosSucursal();
     }).catch(() => {
       this.toastr.error('Error al guardar registros.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
@@ -368,22 +368,56 @@ export class AsignarUsuarioComponent implements OnInit {
   }
 
   // METODO PARA OMITIR ASIGNACIONES EXISTENTES
-  VerificarAsignaciones(id_empleado: number, id_departamento: number): boolean {
-    const usuario = this.usuarios.find((u: any) => u.id === id_empleado);
+  /* @return
+    CASOS DE RETORNO
+    0: USUARIO NO EXISTE => NO SE EJECUTA NINGUNA ACCION
+    1: NO EXISTE LA ASIGNACION => SE PUEDE ASIGNAR (INSERTAR)
+    2: EXISTE LA ASIGNACION Y ES PRINCIPAL => SE ACTUALIZA LA ASIGNACION (PRINCIPAL)
+    3: EXISTE LA ASIGNACION Y NO ES PRINCIPAL => NO SE EJECUTA NINGUNA ACCION
+  */
+  async VerificarAsignaciones(datos: Datos, personal: boolean): Promise<number>  {
 
-    if (usuario && usuario.asignaciones) {
-      return usuario.asignaciones.some((asignacion: any) => asignacion.id_departamento == id_departamento);
+    const usuario = this.usuarios.find((u: any) => u.id === datos.id_empleado);
+
+    if (!usuario) return 0;
+
+    const asignacion = usuario.asignaciones?.find((a: any) => a.id_departamento === datos.id_departamento);
+
+
+    if (!asignacion) return 1;
+
+    if (asignacion.principal) {
+      datos.principal = true;
+      datos.id = asignacion.id;
+      datos.personal = asignacion.personal;
+
+      if (this.isPersonal) {
+        datos.personal = true;
+      }
+
+      if (personal) {
+        datos.administra = asignacion.administra;
+      }
+      return 2;
     }
 
-    return false;
+    return 3;
   }
 
   // METODO PARA LIMPIAR SELECCION DE USUARIOS
   LimpiarDatos() {
-    this.sucursalForm.setValue('');
-    this.administradores = [];
+    this.sucursalForm.patchValue('');
+    this.usuariosSeleccionados.clear();
+
     this.departamentos = [];
+    this.administradores = [];
+    this.adminSeleccionados = [];
+    this.departamentosSeleccionados = [];
+
+    this.ver_guardar = false;
     this.ver_seleccion = false;
+    this.ver_departamentos = false;
+    this.ver_administradores = false;
   }
 
   // METODO DE GUARDADO EN UNA LISTA LOS ELEMENTOS SELECCIONADOS
@@ -438,7 +472,6 @@ export class AsignarUsuarioComponent implements OnInit {
     this.plan_multiple = true;
     this.plan_multiple_ = true;
     this.activar_seleccion = false;
-    //console.log('ver datos seleccionados,,, ', this.selectionAsignados.selected.length)
   }
 
   // METODO PARA NO MOSTRAR ITEMS DE SELECCION
@@ -448,7 +481,6 @@ export class AsignarUsuarioComponent implements OnInit {
       this.plan_multiple = false;
       this.plan_multiple_ = false;
     }
-    //console.log('ver datos seleccionados ', this.selectionAsignados.selected.length)
   }
 
   VisualizarAsignaciones(usuario: any) {
@@ -479,6 +511,17 @@ export class AsignarUsuarioComponent implements OnInit {
   LimpiarAsignados() {
     this.selectionAsignados.clear();
     this.InhabilitarSeleccion();
-    this.BuscarAdministradoresJefes();
+    this.BuscarUsuariosSucursal();
   }
+}
+
+interface Datos {
+  id: string;
+  id_empleado: string;
+  id_departamento: string;
+  principal: boolean;
+  personal: boolean;
+  administra: boolean;
+  user_name: string | null;
+  ip: string | null;
 }

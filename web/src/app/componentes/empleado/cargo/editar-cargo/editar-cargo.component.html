@@ -51,6 +51,12 @@
                                         Jefe/Coordinador de departamento
                                     </label>
                                 </mat-checkbox>
+                                <mat-checkbox id="check2" matSuffix matTooltipPosition="right" [formControl]="personalF"
+                                    matTooltip="Indicar si el usuario tiene acceso a sus datos.">
+                                    <label id="textoradiobtn" style="font-size: 12px;">
+                                        Personal
+                                    </label>
+                                </mat-checkbox>
                             </div>
                         </div>
                     </div>
@@ -116,7 +122,7 @@
                                 <mat-label>Horas de trabajo</mat-label>
                                 <input matInput placeholder="Ej: 8:10 " [formControl]="horaTrabaja"
                                     (keypress)="IngresarNumeroCaracter($event)" required>
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Indicar el número de horas de trabajo. 
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Indicar el número de horas de trabajo.
                             En caso de horas y minutos ingresar en el siguiente formato 10 : 35">
                                     help_outline
                                 </mat-icon>
