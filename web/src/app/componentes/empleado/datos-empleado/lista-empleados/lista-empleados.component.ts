@@ -379,7 +379,7 @@ export class ListaEmpleadosComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
-  //  METODO PARA VALIDAR INGRESO DE NUMEROSO
+  //  METODO PARA VALIDAR INGRESO DE NUMEROS
   IngresarSoloNumeros(evt: any) {
     return this.validar.IngresarSoloNumeros(evt);
   }
