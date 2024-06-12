@@ -515,7 +515,12 @@ export class VerEmpleadoComponent implements OnInit {
       this.archivoForm.reset();
       this.nameFile = '';
       this.ResetDataMain();
-    });
+    }, error => {
+      this.toastr.info('Verifique que este usuario tenga creadas capetas', 'No se ha podido cargar el archivo.', {
+        timeOut: 6000,
+      });
+    }
+    );
   }
 
   ResetDataMain() {
@@ -3248,7 +3253,7 @@ export class VerEmpleadoComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;
