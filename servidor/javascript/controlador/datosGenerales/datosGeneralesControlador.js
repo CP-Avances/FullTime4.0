@@ -1361,6 +1361,7 @@ class DatosGeneralesControlador {
     }
     ;
     // METODO PARA BUSCAR USUARIOS ADMINISTRADORES Y JEFES DE UNA SUCURSAL
+    // TODO: VER DONDE SE UTILIZA  MODIFICAR Y ELIMINAR METODO
     BuscarAdminJefes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { lista_sucursales, estado } = req.body;
@@ -1376,6 +1377,26 @@ class DatosGeneralesControlador {
             AND da.estado = $1 AND us.id_sucursal IN (${lista_sucursales})
         ORDER BY 
             da.apellido ASC`, [estado]);
+            if (DATOS.rowCount > 0) {
+                return res.jsonp(DATOS.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'error' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR USUARIOS DE UNA SUCURSAL
+    BuscarUsuariosSucursal(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { sucursal, estado } = req.body;
+            const DATOS = yield database_1.default.query(`
+            SELECT  da.id, da.nombre, da.apellido, r.nombre AS rol, d.nombre AS departamento, d.id AS id_departamento
+            FROM datos_actuales_empleado AS da
+            JOIN ero_cat_roles AS r ON da.id_rol = r.id
+            JOIN ed_departamentos AS d ON da.id_departamento = d.id
+            WHERE da.id_sucursal = $1 AND da.estado = $2
+            ORDER BY da.apellido ASC
+            `, [sucursal, estado]);
             if (DATOS.rowCount > 0) {
                 return res.jsonp(DATOS.rows);
             }

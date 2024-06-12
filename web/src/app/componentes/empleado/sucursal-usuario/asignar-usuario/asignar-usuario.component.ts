@@ -86,7 +86,7 @@ export class AsignarUsuarioComponent implements OnInit {
     this.ip = localStorage.getItem('ip');
 
     this.name_sucursal = this.data.nombre.toUpperCase();
-    this.BuscarAdministradoresJefes();
+    this.BuscarUsuariosSucursal();
     this.ObtenerSucursales();
   }
 
@@ -116,16 +116,16 @@ export class AsignarUsuarioComponent implements OnInit {
   usuarios: any = [];
   ver_principal: boolean = false;
   ver_asignados: boolean = false;
-  BuscarAdministradoresJefes() {
+  BuscarUsuariosSucursal() {
     let data = {
-      lista_sucursales:  this.data.id,
+      sucursal:  this.data.id,
       estado: 1
     }
 
     this.usuarios = [];
     this.asignados = [];
     this.principales = [];
-    this.general.ObtenerAdminJefes(data).subscribe(res => {
+    this.general.ObtenerUsuariosSucursal(data).subscribe(res => {
       this.usuarios = res;
       if (this.usuarios.length != 0) {
         this.usuarios.forEach((elemento: any) => {
@@ -359,7 +359,7 @@ export class AsignarUsuarioComponent implements OnInit {
       });
       // LIMPIAR DATOS Y REFRESCAR LAS CONSULTAS
       this.LimpiarDatos();
-      this.BuscarAdministradoresJefes();
+      this.BuscarUsuariosSucursal();
     }).catch(() => {
       this.toastr.error('Error al guardar registros.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
@@ -511,7 +511,7 @@ export class AsignarUsuarioComponent implements OnInit {
   LimpiarAsignados() {
     this.selectionAsignados.clear();
     this.InhabilitarSeleccion();
-    this.BuscarAdministradoresJefes();
+    this.BuscarUsuariosSucursal();
   }
 }
 

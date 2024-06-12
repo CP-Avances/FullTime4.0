@@ -47,6 +47,8 @@ class CiudadRutas {
         this.router.post('/informacion-general-ubicacion-cargo/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosGeneralesCargoUbicacion);
         // METODO PARA BUSCAR ADMNISTRADORES Y JEFES
         this.router.post('/datos-actuales-sucursales', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.BuscarAdminJefes);
+        // METODO PARA BUSCAR USUARIOS DE UNA SUCURSAL
+        this.router.post('/datos-actuales-sucursal', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.BuscarUsuariosSucursal);
     }
 }
 const DATOS_GENERALES_RUTAS = new CiudadRutas();
