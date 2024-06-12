@@ -4,6 +4,8 @@ import { IReporteFaltas, ITableEmpleados } from 'src/app/model/reportes.model';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
+import { HttpResponse } from '@angular/common/http';
+
 
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
@@ -210,7 +212,30 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         this.ModelarTablasAuditoria(action);
     }
 
+    blobToArray(blob: Blob): Promise<any[]> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                try {
+                    const arrayBuffer = reader.result as ArrayBuffer;
+                    const dataArray = new Uint8Array(arrayBuffer);
+                    const jsonString = new TextDecoder('utf-8').decode(dataArray);
+                    //console.log('Contenido del Blob:', jsonString);
+                    // Convertir la cadena JSON en un array de objetos
+                    const data = jsonString.trim().split('\n').map(objStr => JSON.parse(objStr));
+                    console.log('Contenido del Blob a json:', data);
 
+                    resolve(data);
+                } catch (error) {
+                    reject(error);
+                }
+            };
+            reader.onerror = () => {
+                reject(reader.error);
+            };
+            reader.readAsArrayBuffer(blob);
+        });
+    }
     //BUSCAR REGISTROS AUDITORIA
 
     ModelarTablasAuditoria(accion: any) {
@@ -228,6 +253,34 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
             action: acciones,
         };
 
+        this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
+            (response: HttpResponse<Blob>) => {
+                if (response.body !== null) {
+                    //const data_pdf: Blob = response.body;
+                    this.blobToArray(response.body).then((data_pdf: any[]) => {
+                        console.log(data_pdf); // Aquí puedes manejar los datos recibidos, como guardarlos o procesarlos
+                        switch (accion) {
+                            // Agrega aquí tu lógica para manejar las diferentes acciones
+                            // case 'excel': this.ExportarExcelCargoRegimen(); break;
+                            case 'ver': this.VerDatos(); break;
+                            default: this.GenerarPDF(data_pdf, accion); break;
+                        }
+                    }).catch(error => {
+                        console.error('Error al convertir Blob a array de objetos:', error);
+                    });
+
+                } else {
+                    console.error('El cuerpo de la respuesta está vacío.');
+                }
+            },
+            error => {
+                if (error.status === 404) {
+                    console.error('No existen registros con las tablas y acciones seleccionadas');
+                } else {
+                    console.error('Error en la consulta:', error);
+                }
+            }
+        );
 
         /*
                 this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
@@ -239,7 +292,6 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         
         
                         switch (accion) {
-                            // case 'excel': this.ExportarExcelCargoRegimen(); break;
                             case 'ver': this.VerDatos(); break;
                             default: this.GenerarPDF(this.data_pdf, accion); break;
                         }
@@ -256,99 +308,41 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         */
 
 
-        /*
-                this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
-                    (res:any) => {
-                        // Descomprimir los datos antes de asignarlos
-                        zlib.gunzip(res, (err, uncompressedData) => {
-                            if (err) {
-                                // Manejar el error
-                                console.error('Error al descomprimir datos:', err);
-                                return;
-                            }
-                            // Asignar los datos descomprimidos a this.data_pdf
-                            this.data_pdf = JSON.parse(uncompressedData.toString());
-                            
-                            // Ahora puedes utilizar this.data_pdf como si no estuvieran comprimidos
-                            // Ejemplo: this.GenerarPDF(this.data_pdf);
-                        });
-                    },
-                    error => {
-                        if (error.status == '404') {
-                            this.toastr.error('No existen registros con las tablas y acciones seleccionadas', 'Ups!!! algo salió mal..', {
-                                timeOut: 6000,
-                            })
-                        }
-                    }
-                );
-        
-        */
+
+        /*pruebas para descomprimir
+this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
+    (res: any) => {
+        console.log("a ver si imprime: ", res);
+        const compressedData = res[0];
+
+        console.log("a ver si imprime 2: ", compressedData);
+        const uncompressedData = pako.inflate(compressedData, { to: 'string' });
+
+ 
+        // Convertir los datos JSON descomprimidos en un objeto
+        this.data_pdf = JSON.parse(uncompressedData);
+ 
+        // Realizar la acción correspondiente según el valor de 'accion'
+        switch (accion) {
+            case 'ver':
+                this.VerDatos();
+                break;
+            default:
+                this.GenerarPDF(this.data_pdf, accion);
+                break;
+        }
+    },
+    error => {
+        if (error.status == '404') {
+            this.toastr.error('No existen registros con las tablas y acciones seleccionadas', 'Ups!!! algo salió mal..', {
+                timeOut: 6000,
+            });
+        }
+    }
+);
 
 
-                /* no funciona descomprimir 
-        this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
-            (res: any) => {
-                // Descomprimir los datos antes de asignarlos
-                const uncompressedData = pako.inflate(res, { to: 'string' });
-                // Convertir los datos JSON descomprimidos en un objeto
-                this.data_pdf = JSON.parse(uncompressedData);
-                // Asignar los datos descomprimidos a this.data_pdf
-
-                switch (accion) {
-                    case 'ver':
-                        this.VerDatos();
-                        break;
-                    default:
-                        this.GenerarPDF(this.data_pdf, accion);
-                        break;
-                }
-            },
-            error => {
-                if (error.status == '404') {
-                    this.toastr.error('No existen registros con las tablas y acciones seleccionadas', 'Ups!!! algo salió mal..', {
-                        timeOut: 6000,
-                    })
-                }
-            }
-        );
-
-        */
-        this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
-            (res: any) => {
-                console.log("a ver si imprime: ", res);
-                const compressedData = res[0];
-
-                console.log("a ver si imprime 2: ", compressedData);
-
-                // Descomprimir los datos antes de asignarlos
-                console.log("a ver si imprime 2: ", compressedData);
-
-                const uncompressedData = pako.inflate(compressedData, { to: 'string' });
-
-        
-                // Convertir los datos JSON descomprimidos en un objeto
-                this.data_pdf = JSON.parse(uncompressedData);
-        
-                // Realizar la acción correspondiente según el valor de 'accion'
-                switch (accion) {
-                    case 'ver':
-                        this.VerDatos();
-                        break;
-                    default:
-                        this.GenerarPDF(this.data_pdf, accion);
-                        break;
-                }
-            },
-            error => {
-                if (error.status == '404') {
-                    this.toastr.error('No existen registros con las tablas y acciones seleccionadas', 'Ups!!! algo salió mal..', {
-                        timeOut: 6000,
-                    });
-                }
-            }
-        );
-
-
+*/
 
         /* prueba de descomprimir parte
                 this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
