@@ -182,19 +182,10 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   usua_sucursales: any = [];
   AdministrarSucursalesUsuario(opcion: number) {
     let empleado = { id_empleado: this.idEmpleadoLogueado };
-    let respuesta: any = [];
-    let codigos = '';
+
     //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
-      respuesta = data;
-      respuesta.forEach((obj: any) => {
-        if (codigos === '') {
-          codigos = '\'' + obj.id_sucursal + '\''
-        }
-        else {
-          codigos = codigos + ', \'' + obj.id_sucursal + '\''
-        }
-      })
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
+      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
       console.log('ver sucursales ', codigos);
       this.usua_sucursales = { id_sucursal: codigos };
       this.BuscarInformacion(opcion, this.usua_sucursales);
