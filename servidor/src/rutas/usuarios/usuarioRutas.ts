@@ -57,10 +57,8 @@ class UsuarioRutas {
 
 
 
-        // METODO PARA BUSCAR DATOS DE USUARIOS Y SUCURSALES
-        // this.router.post('/buscar-usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.BuscarUsuarioSucursal);
-        // // CREAR REGISTRO DE USUARIOS - SUCURSAL
-        // this.router.post('/usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.CrearUsuarioSucursal);
+        // METODO PARA BUSCAR LISTA DE ID_SUCURSAL DE ASIGNACIONES USUARIO - DEPARTAMENTO
+        this.router.post('/buscar-usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.BuscarUsuarioSucursal);
         // CREAR REGISTRO DE USUARIOS - DEPARTAMENTOS
         this.router.post('/usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.CrearUsuarioDepartamento);
         // METODO PARA BUSCAR DATOS DE USUARIO - DEPARTAMENTOS
@@ -71,12 +69,6 @@ class UsuarioRutas {
         this.router.post('/buscar-asignacion-usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.BuscarAsignacionUsuarioDepartamento);
         // METODO PARA ACTUALIZAR DATOS DE USUARIO - DEPARTAMENTO
         this.router.put('/actualizar-usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.ActualizarUsuarioDepartamento);
-        // METODO PARA BUSCAR DATOS DE USUARIO SUCURSAL PRINCIPAL (TRUE)
-        // this.router.post('/principal-usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.BuscarUsuarioSucursalPrincipal);
-        // METODO PARA ACTUALIZAR DATOS DE USUARIO - SUCURSAL
-        // this.router.put('/actualizar-usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.ActualizarUsuarioSucursalPrincipal);
-        // METODO PARA ELIMINAR REGISTRO USUARIO - SUCURSAL
-        // this.router.delete('/eliminar-usuario-sucursal/:id', TokenValidation, USUARIO_CONTROLADOR.EliminarUsuarioSucursal);
         // METODO PARA ELIMINAR REGISTRO USUARIO - DEPARTAMENTO
         this.router.delete('/eliminar-usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.EliminarUsuarioDepartamento);
 
