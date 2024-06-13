@@ -16,6 +16,38 @@ exports.AUDITORIA_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
 const stream_1 = require("stream");
 class AuditoriaControlador {
+    BuscarDatosAuditoriaporTablas(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { tabla, desde, hasta, action } = req.body;
+            // Convertir las cadenas de tablas y acciones en arrays
+            const tablasArray = tabla.split(',').map((t) => t.trim().replace(/'/g, ''));
+            const actionsArray = action.split(',').map((a) => a.trim().replace(/'/g, ''));
+            const tableNameClause = tabla;
+            const actionClause = `action IN (${actionsArray.map((_, i) => `$${tablasArray.length + i + 1}`).join(', ')})`;
+            const params = [tabla, ...actionsArray, desde, `${hasta} 23:59:59`];
+            const query = `
+        SELECT 
+               *
+           FROM 
+               audit.auditoria 
+           WHERE 
+            table_name = ${tableNameClause} 
+           AND 
+               ${actionClause} 
+           AND 
+               fecha_hora BETWEEN $${params.length - 1} AND $${params.length}
+           ORDER BY 
+               fecha_hora DESC;
+       `;
+            const DATOS = yield database_1.default.query(query, params);
+            if (DATOS.rowCount > 0) {
+                return res.jsonp(DATOS.rows);
+            }
+            else {
+                return res.status(404).jsonp({ message: 'No se encuentran registros', status: '404' });
+            }
+        });
+    }
     BuscarDatosAuditoriaoriginal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { tabla, desde, hasta, action } = req.body;

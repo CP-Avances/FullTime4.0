@@ -13,6 +13,7 @@ class AuditoriaRutas {
     }
     configuracion() {
         this.router.post('/auditar', verificarToken_1.TokenValidation, auditoriaControlador_1.default.BuscarDatosAuditoria);
+        this.router.post('/auditarportabla', verificarToken_1.TokenValidation, auditoriaControlador_1.default.BuscarDatosAuditoriaporTablas);
     }
 }
 const AUDITORIA_RUTAS = new AuditoriaRutas();

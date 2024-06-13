@@ -19,20 +19,16 @@ export class AuditoriaService {
   ConsultarAuditoriaOriginal(data: any) {
     return this.http.post(`${environment.url}/reportes-auditoria/auditar`, data, );
   }
-  
 
-  ConsultarAuditoria2(data: any) {
-    const headers = new HttpHeaders({
-      'Accept-Encoding': 'gzip, deflate',
-      'Content-Type': 'application/json'
-    });
 
-    return this.http.post(`${environment.url}/reportes-auditoria/auditar`, data, {
-      headers: headers,
-      responseType: 'arraybuffer' // Esto indica que esperamos una respuesta binaria
-    });
+  ConsultarAuditoriaPorTabla(data: any) {
+    return this.http.post(`${environment.url}/reportes-auditoria/auditarportabla`, data, );
   }
 
+  ConsultarAuditoriaAuntiguo(data: any) {
+    return this.http.post(`${environment.url}/reportes-auditoria/auditar`, data, );
+  }
+  
 
   ConsultarAuditoria(data: any): Observable<HttpResponse<Blob>> {
     return this.http.post(`${environment.url}/reportes-auditoria/auditar`, data, {

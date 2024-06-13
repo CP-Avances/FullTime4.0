@@ -9,6 +9,42 @@ class AuditoriaControlador {
 
 
 
+    public async BuscarDatosAuditoriaporTablas(req: Request, res: Response): Promise<Response> {
+
+        const { tabla, desde, hasta, action } = req.body
+        // Convertir las cadenas de tablas y acciones en arrays
+        const tablasArray = tabla.split(',').map((t: any) => t.trim().replace(/'/g, ''));
+        const actionsArray = action.split(',').map((a: any) => a.trim().replace(/'/g, ''));
+        const tableNameClause = tabla ;
+
+        const actionClause = `action IN (${actionsArray.map((_: any, i: any) => `$${tablasArray.length + i + 1}`).join(', ')})`;
+        const params = [tabla , ...actionsArray, desde, `${hasta} 23:59:59`];
+        const query = `
+        SELECT 
+               *
+           FROM 
+               audit.auditoria 
+           WHERE 
+            table_name = ${tableNameClause} 
+           AND 
+               ${actionClause} 
+           AND 
+               fecha_hora BETWEEN $${params.length - 1} AND $${params.length}
+           ORDER BY 
+               fecha_hora DESC;
+       `;
+
+        const DATOS = await pool.query(query, params);
+        if (DATOS.rowCount > 0) {
+            return res.jsonp(DATOS.rows);
+        } else {
+            return res.status(404).jsonp({ message: 'No se encuentran registros', status: '404' });
+        }
+    }
+
+
+
+
 
 
     public async BuscarDatosAuditoriaoriginal(req: Request, res: Response): Promise<Response> {
@@ -91,7 +127,7 @@ class AuditoriaControlador {
             res.status(500).json({ message: 'Error en el servidor', error });
         }
     }
-        
+
 
     // INSERTAR REGISTRO DE AUDITORIA
     public async InsertarAuditoria(data: Auditoria) {
