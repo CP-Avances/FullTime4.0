@@ -22,6 +22,7 @@ import { MainNavService } from 'src/app/componentes/administracionGeneral/main-n
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
+
 @Component({
   selector: 'app-plan-comidas',
   templateUrl: './plan-comidas.component.html',
@@ -48,15 +49,13 @@ export class PlanComidasComponent implements OnInit {
   };
 
   idEmpleadoLogueado: any;
-  rolEmpleado: number;
-  isEmpleado: boolean = false;
-  asignacionesAcceso: any;
-  idUsuariosAcceso: any = [];
-  idDepartamentosAcceso: any = [];
-  idSucursalesAcceso: any = [];
-  idCargosAcceso: any = [];
 
-  // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
+  asignacionesAcceso: any;
+  idCargosAcceso: any = [];
+  idUsuariosAcceso: any = [];
+  idSucursalesAcceso: any = [];
+  idDepartamentosAcceso: any = [];
+
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
@@ -135,8 +134,6 @@ export class PlanComidasComponent implements OnInit {
     private toastr: ToastrService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
-    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
-    this.isEmpleado = this.rolEmpleado != 1 ? true : false;
   }
 
   ngOnInit(): void {
@@ -166,10 +163,8 @@ export class PlanComidasComponent implements OnInit {
   async PresentarInformacion() {
     let informacion = { id_empleado: this.idEmpleadoLogueado };
     let respuesta: any = [];
-    if (this.isEmpleado) {
-      this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
-      await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
-    }
+    this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
+    await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
     this.informacion.ObtenerInformacionUserRol(informacion).subscribe(res => {
       respuesta = res[0];
       this.AdministrarInformacion(respuesta, informacion);
@@ -191,19 +186,10 @@ export class PlanComidasComponent implements OnInit {
     this.cargos = [];
 
     this.usua_sucursales = [];
-    let respuesta: any = [];
-    let codigos = '';
+
     //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
-      respuesta = data;
-      respuesta.forEach((obj: any) => {
-        if (codigos === '') {
-          codigos = '\'' + obj.id_sucursal + '\''
-        }
-        else {
-          codigos = codigos + ', \'' + obj.id_sucursal + '\''
-        }
-      })
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
+      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
       //console.log('ver sucursales ', codigos);
 
       // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
@@ -326,21 +312,18 @@ export class PlanComidasComponent implements OnInit {
 
     this.OmitirDuplicados();
 
-    // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
-    if (this.isEmpleado) {
-      this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
-      this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
-      this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
-      this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.includes(regimen.id_suc));
+    this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
+    this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
+    this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
+    this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.includes(regimen.id_suc));
 
-      this.empleados.forEach((empleado: any) => {
-        this.idCargosAcceso = [...new Set([...this.idCargosAcceso, empleado.id_cargo_])];
-      });
-            
-      this.cargos = this.cargos.filter((cargo: any) => 
-        this.idSucursalesAcceso.includes(cargo.id_suc) && this.idCargosAcceso.includes(cargo.id)
-      );
-    }
+    this.empleados.forEach((empleado: any) => {
+      this.idCargosAcceso = [...new Set([...this.idCargosAcceso, empleado.id_cargo_])];
+    });
+
+    this.cargos = this.cargos.filter((cargo: any) =>
+      this.idSucursalesAcceso.includes(cargo.id_suc) && this.idCargosAcceso.includes(cargo.id)
+    );
   }
 
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
@@ -370,6 +353,7 @@ export class PlanComidasComponent implements OnInit {
     this.cargos = verificados_car;
   }
 
+  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
   async ObtenerAsignacionesUsuario(idEmpleado: any) {
     const data = {
       id_empleado: Number(idEmpleado)
@@ -506,13 +490,13 @@ export class PlanComidasComponent implements OnInit {
    ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
    ** ************************************************************************************** **/
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
     const numSelected = this.selectionSuc.selected.length;
     return numSelected === this.sucursales.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
@@ -527,13 +511,13 @@ export class PlanComidasComponent implements OnInit {
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedReg() {
     const numSelected = this.selectionReg.selected.length;
     return numSelected === this.regimen.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleReg() {
     this.isAllSelectedReg() ?
       this.selectionReg.clear() :
@@ -548,13 +532,13 @@ export class PlanComidasComponent implements OnInit {
     return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedCarg() {
     const numSelected = this.selectionCarg.selected.length;
     return numSelected === this.cargos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleCarg() {
     this.isAllSelectedCarg() ?
       this.selectionCarg.clear() :
@@ -569,13 +553,13 @@ export class PlanComidasComponent implements OnInit {
     return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedDep() {
     const numSelected = this.selectionDep.selected.length;
     return numSelected === this.departamentos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
@@ -590,13 +574,13 @@ export class PlanComidasComponent implements OnInit {
     return `${this.selectionDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedEmp() {
     const numSelected = this.selectionEmp.selected.length;
     return numSelected === this.empleados.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
@@ -885,7 +869,7 @@ export class PlanComidasComponent implements OnInit {
     }
   }
 
-  // VALIDACIONES DE INGRESO DE LETRAS 
+  // VALIDACIONES DE INGRESO DE LETRAS
   IngresarSoloLetras(e: any) {
     return this.validar.IngresarSoloLetras(e);
   }
