@@ -27,10 +27,10 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
   idEmpleadoLogueado: any;
   asignacionesAcceso: any;
-  idUsuariosAcceso: any = [];
-  idDepartamentosAcceso: any = [];
-  idSucursalesAcceso: any = [];
   idCargosAcceso: any = [];
+  idUsuariosAcceso: any = [];
+  idSucursalesAcceso: any = [];
+  idDepartamentosAcceso: any = [];
 
   // CONTROL DE CRITERIOS DE BUSQUEDA
   codigo = new FormControl('');
