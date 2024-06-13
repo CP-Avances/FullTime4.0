@@ -198,7 +198,6 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     console.log('empleado ', empleado)
     this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
       const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
-      //console.log('ver sucursales ', codigos);
 
       // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
       if (usuario.id_rol === 1 && usuario.jefe === false) {
