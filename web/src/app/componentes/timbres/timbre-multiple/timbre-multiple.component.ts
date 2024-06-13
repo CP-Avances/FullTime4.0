@@ -37,6 +37,11 @@ import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.mode
 export class TimbreMultipleComponent implements OnInit {
 
   idEmpleadoLogueado: any;
+  asignacionesAcceso: any;
+  idCargosAcceso: any = [];
+  idUsuariosAcceso: any = [];
+  idSucursalesAcceso: any = [];
+  idDepartamentosAcceso: any = [];
 
   // CONTROL DE CRITERIOS DE BUSQUEDA
   codigo = new FormControl('');
