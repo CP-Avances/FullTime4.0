@@ -48,7 +48,6 @@ export class ListarRegimenComponent implements OnInit {
   empleado: any = [];
   regimen: any = [];
 
-  filtroRegimenLaboral = ""; // VARIABLE DE FILTRO DE BUSQUEDA
   idEmpleado: number; // VARIABLE QUE ALMACENA EL ID DEL EMPELADO QUE INICIA SESIÓN
 
   // ITEMS DE PAGINACION DE LA TABLA

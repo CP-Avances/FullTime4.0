@@ -434,7 +434,7 @@ export class CatVacunasComponent implements OnInit {
 
   ExportToExcel() {
     this.OrdenarDatos(this.vacunas);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.vacunas.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.vacunas.map((obj: any) => {
       return {
         CODIGO: obj.id,
         NOMBRE: obj.nombre,

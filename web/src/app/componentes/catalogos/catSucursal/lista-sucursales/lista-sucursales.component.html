@@ -20,7 +20,7 @@
                     </div>
                 </mat-card>
             </div>
-            <!------------------ Registro multiple de establecimientos ------------------------------------->
+            <!--  *********************************  REGISTRO MULTIPLE DE ESTABLECIMIENTOS  *****************************  -->
             <div class="col-12 col-md-6">
                 <div id="titulo">
                     <span>REGISTRO MULTIPLE</span>
@@ -30,17 +30,17 @@
                         <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                             <form method="post" class="btn-2" enctype="multipart/form-data">
                                 <input type="file" (change)="FileChange($event)" [formControl]="archivoForm" id="file"
-                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                 <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
-                                        style="height: 65px; padding-top: 25px;"
-                                        matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                        Subir plantilla
+                                    style="height: 65px; padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                    Subir plantilla
                                 </label>
                                 <label for="file" matSuffix matTooltipPosition="right"
-                                        *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
-                                        style="height: 65px; padding-top: 25px;"
-                                        matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                        Subir nueva plantilla
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                    style="height: 65px; padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                    Subir nueva plantilla
                                 </label>
                             </form>
                         </div>
@@ -50,7 +50,6 @@
                                 <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                     matTooltip="Dar click para ver o descargar el documento."
                                     href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
-
                                     <br>
                                     Descargar plantilla
                                 </a>
@@ -58,7 +57,7 @@
                             <div class="d-flex flex-wrap justify-content-center m-auto w-auto">
                                 <button *ngIf="Datasucursales && messajeExcel != 'error'" id="descargar"
                                     class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
-                                    matTooltipPosition="right" matTooltip="Guardar registro multiple.">
+                                    matTooltipPosition="right" matTooltip="Guardar registro múltiple.">
                                     Registrar
                                 </button>
                             </div>
@@ -110,14 +109,13 @@
                             <td></td>
                             <td>
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" [formControl]="buscarNombre"
-                                        [(ngModel)]="filtroNombreSuc">
+                                    <input matInput placeholder="Buscar" [formControl]="buscarNombre">
                                 </mat-form-field>
                             </td>
                             <td>
                                 <mat-form-field id="t-inputs">
                                     <input matInput placeholder="Buscar" (keypress)="IngresarSoloLetras($event)"
-                                        [formControl]="buscarCiudad" [(ngModel)]="filtroCiudadSuc">
+                                        [formControl]="buscarCiudad">
                                 </mat-form-field>
                             </td>
                             <td>
@@ -128,7 +126,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let s of sucursales | sucCiudad: filtroCiudadSuc | sucNombre: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let s of sucursales | sucCiudad: buscarCiudad.value | sucNombre: buscarNombre.value | paginate:tamanio_pagina:numero_pagina">
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionSucursales.toggle(s) : null"
@@ -217,15 +215,16 @@
                             *ngFor="let data of Datasucursales | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
                             <td style="width: 50px;" align="center">{{data.fila}}</td>
                             <td>
-                                <div style="width: 270px; margin: auto;">
+                                <div style="width: 250px; margin: auto;">
                                     <div id="t-editar" class="circulo"
-                                        [style.background-color]="stiloCelda(data.observacion)"></div>
+                                        [style.background-color]="stiloCelda(data.observacion)">
+                                    </div>
                                     {{ data.observacion}}
                                 </div>
                             </td>
                             <td [style.color]="stiloTextoCelda(data.nom_sucursal)">{{ data.nom_sucursal}}</td>
                             <td [style.color]="stiloTextoCelda(data.ciudad)">{{ data.ciudad}}</td>
-                            
+
                         </tr>
                     </tbody>
                 </table>

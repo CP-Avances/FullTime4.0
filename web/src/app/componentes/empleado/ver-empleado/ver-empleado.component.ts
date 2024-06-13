@@ -1371,7 +1371,7 @@ export class VerEmpleadoComponent implements OnInit {
         ip: this.ip,
         id_plan: '',
       }
-      this.id_planificacion_general.map(obj => {
+      this.id_planificacion_general.map((obj: any) => {
         datos.id_plan = obj.id;
         this.restPlanGeneral.EliminarRegistro(datos).subscribe(res => {
         })
@@ -1390,7 +1390,7 @@ export class VerEmpleadoComponent implements OnInit {
     };
     this.restPlanGeneral.BuscarFecha(plan_fecha).subscribe(res => {
       this.id_planificacion_general = res;
-      this.id_planificacion_general.map(obj => {
+      this.id_planificacion_general.map((obj: any) => {
         this.restPlanGeneral.EliminarRegistro(obj.id).subscribe(res => {
         })
       })
@@ -2897,7 +2897,7 @@ export class VerEmpleadoComponent implements OnInit {
               { text: 'NOMBRE', style: 'tableHeader' },
               { text: 'NIVEL', style: 'tableHeader' }
             ],
-            ...this.tituloEmpleado.map(obj => {
+            ...this.tituloEmpleado.map((obj: any) => {
               return [{ text: obj.nombre, style: 'tableCell' }, { text: obj.nivel, style: 'tableCell' }];
             })
           ]
@@ -2977,7 +2977,7 @@ export class VerEmpleadoComponent implements OnInit {
               { text: 'TIPO', style: 'tableHeader' },
               { text: 'PORCENTAJE', style: 'tableHeader' },
             ],
-            ...this.discapacidadUser.map(obj => {
+            ...this.discapacidadUser.map((obj: any) => {
               return [
                 { text: obj.carnet_conadis, style: 'tableCell' },
                 { text: obj.tipo, style: 'tableCell' },

@@ -112,8 +112,8 @@ const GraficaHorasExtras = function (id_empresa, fec_inicio, fec_final) {
             { id: 11, mes: 'Diciembre', valor: M_graficas.SumarValoresArray(modelarAnio.diciembre) }
         ];
         // console.log(data);
-        let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map(obj => { return obj.mes; });
-        let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map(obj => { return obj.valor; });
+        let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map((obj) => { return obj.mes; });
+        let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map((obj) => { return obj.valor; });
         return {
             datos: data,
             datos_grafica: {
@@ -217,8 +217,8 @@ const GraficaMarcaciones = function (id_empresa, fec_inicio, fec_final) {
             { id: 10, mes: 'Noviembre', valor: modelarAnio.noviembre.length },
             { id: 11, mes: 'Diciembre', valor: modelarAnio.diciembre.length }
         ];
-        let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map(obj => { return obj.mes; });
-        let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map(obj => { return obj.valor; });
+        let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map((obj) => { return obj.mes; });
+        let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map((obj) => { return obj.valor; });
         return {
             datos: data,
             datos_grafica: {
@@ -324,8 +324,8 @@ const MetricaHorasExtraEmpleado = function (codigo, id_empleado, fec_inicio, fec
             { id: 11, mes: 'Diciembre', valor: M_graficas.SumarValoresArray(modelarAnio.diciembre) }
         ];
         // console.log(data);
-        let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map(obj => { return obj.mes; });
-        let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map(obj => { return obj.valor; });
+        let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map((obj) => { return obj.mes; });
+        let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map((obj) => { return obj.valor; });
         return {
             tooltip: {
                 trigger: 'axis',
@@ -432,8 +432,8 @@ const MetricaVacacionesEmpleado = function (codigo, id_empleado, fec_inicio, fec
             { id: 11, mes: 'Diciembre', valor: M_graficas.SumarValoresArray(modelarAnio.diciembre) }
         ];
         // console.log(data);
-        let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map(obj => { return obj.mes; });
-        let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map(obj => { return obj.valor; });
+        let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map((obj) => { return obj.mes; });
+        let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map((obj) => { return obj.valor; });
         return {
             tooltip: {
                 trigger: 'axis',
@@ -538,8 +538,8 @@ const MetricaPermisosEmpleado = function (codigo, id_empleado, fec_inicio, fec_f
             { id: 11, mes: 'Diciembre', valor: M_graficas.SumarValoresArray(modelarAnio.diciembre) }
         ];
         // // console.log(data);
-        let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map(obj => { return obj.mes; });
-        let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map(obj => { return obj.valor; });
+        let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map((obj) => { return obj.mes; });
+        let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()); }).map((obj) => { return obj.valor; });
         return {
             tooltip: {
                 trigger: 'axis',

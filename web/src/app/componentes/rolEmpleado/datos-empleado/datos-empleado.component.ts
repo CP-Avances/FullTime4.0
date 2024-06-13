@@ -692,7 +692,7 @@ export class DatosEmpleadoComponent implements OnInit {
               { text: 'NOMBRE', style: 'tableHeader' },
               { text: 'NIVEL', style: 'tableHeader' }
             ],
-            ...this.tituloEmpleado.map(obj => {
+            ...this.tituloEmpleado.map((obj: any) => {
               return [{ text: obj.nombre, style: 'tableCell' }, { text: obj.nivel, style: 'tableCell' }];
             })
           ]
@@ -772,7 +772,7 @@ export class DatosEmpleadoComponent implements OnInit {
               { text: 'PORCENTAJE', style: 'tableHeader' },
               { text: 'TIPO', style: 'tableHeader' },
             ],
-            ...this.discapacidadUser.map(obj => {
+            ...this.discapacidadUser.map((obj: any) => {
               return [
                 { text: obj.carnet_conadis, style: 'tableCell' },
                 { text: obj.porcentaje + ' %', style: 'tableCell' },

@@ -65,13 +65,13 @@ export class ConfigAsistenciaComponent implements OnInit {
       sessionStorage.setItem('columnasValidasAsistencia', columnasValidas.toString())
 
       let ObjetoJSON = {
-        atraso: this.task.subtasks.filter(obj => { return (obj.name === 'ATRASO') }).map(obj => { return obj.completed })[0],
-        salida_antes: this.task.subtasks.filter(obj => { return (obj.name === 'SALIDA ANTICIPADA') }).map(obj => { return obj.completed })[0],
-        almuerzo: this.task.subtasks.filter(obj => { return (obj.name === 'ALIMENTACION') }).map(obj => { return obj.completed })[0],
-        h_trab: this.task.subtasks.filter(obj => { return (obj.name === 'HORAS TRABAJADAS') }).map(obj => { return obj.completed })[0],
-        h_supl: this.task.subtasks.filter(obj => { return (obj.name === 'HORAS SUPLEMENTARIAS') }).map(obj => { return obj.completed })[0],
-        h_ex_LV: this.task.subtasks.filter(obj => { return (obj.name === 'HORAS EXTRAS L-V') }).map(obj => { return obj.completed })[0],
-        h_ex_SD: this.task.subtasks.filter(obj => { return (obj.name === 'HORAS EXTRAS S-D') }).map(obj => { return obj.completed })[0]
+        atraso: this.task.subtasks.filter(obj => { return (obj.name === 'ATRASO') }).map((obj: any) => { return obj.completed })[0],
+        salida_antes: this.task.subtasks.filter(obj => { return (obj.name === 'SALIDA ANTICIPADA') }).map((obj: any) => { return obj.completed })[0],
+        almuerzo: this.task.subtasks.filter(obj => { return (obj.name === 'ALIMENTACION') }).map((obj: any) => { return obj.completed })[0],
+        h_trab: this.task.subtasks.filter(obj => { return (obj.name === 'HORAS TRABAJADAS') }).map((obj: any) => { return obj.completed })[0],
+        h_supl: this.task.subtasks.filter(obj => { return (obj.name === 'HORAS SUPLEMENTARIAS') }).map((obj: any) => { return obj.completed })[0],
+        h_ex_LV: this.task.subtasks.filter(obj => { return (obj.name === 'HORAS EXTRAS L-V') }).map((obj: any) => { return obj.completed })[0],
+        h_ex_SD: this.task.subtasks.filter(obj => { return (obj.name === 'HORAS EXTRAS S-D') }).map((obj: any) => { return obj.completed })[0]
       }
 
       let jsonTask = JSON.stringify(ObjetoJSON)

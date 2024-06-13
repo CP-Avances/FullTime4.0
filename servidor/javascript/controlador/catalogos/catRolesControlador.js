@@ -75,7 +75,7 @@ class RolesControlador {
             catch (error) {
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+                return res.jsonp({ message: 'error' });
             }
         });
     }

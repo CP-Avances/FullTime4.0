@@ -8,7 +8,7 @@ tr {
 
 table {
     width: 100%;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 
@@ -105,8 +105,8 @@ td {
 
 .circulo{
     margin-right: -50px;
-    width: 15px;
-    height: 15px;
+    width: 12px;
+    height: 12px;
     border-radius: 50px;
     float: left;
 }

@@ -688,7 +688,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
         { text: `USUARIOS - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0], },
-        ...this.EstructurarDatosPDF(this.data_pdf).map(obj => {
+        ...this.EstructurarDatosPDF(this.data_pdf).map((obj: any) => {
           return obj
         })
       ],

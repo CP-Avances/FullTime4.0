@@ -401,7 +401,7 @@ export class ListarNivelTitulosComponent implements OnInit {
                 { text: 'Código', style: 'tableHeader' },
                 { text: 'Nivel', style: 'tableHeader' },
               ],
-              ...this.nivelTitulos.map(obj => {
+              ...this.nivelTitulos.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableD' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -427,7 +427,7 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   ExportToExcel() {
     this.OrdenarDatos(this.nivelTitulos);
-    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.nivelTitulos.map(obj => {
+    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.nivelTitulos.map((obj: any) => {
       return {
         CODIGO: obj.id,
         NIVEL: obj.nombre,

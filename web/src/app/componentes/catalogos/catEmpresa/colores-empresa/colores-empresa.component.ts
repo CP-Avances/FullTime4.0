@@ -309,7 +309,7 @@ export class ColoresEmpresaComponent implements OnInit {
                 { text: 'REPRESENTANTE', style: 'tableHeader' },
                 { text: 'RESUMEN', style: 'tableHeaderS' }
               ],
-              ...this.empresas.map(obj => {
+              ...this.empresas.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },

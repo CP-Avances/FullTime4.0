@@ -451,7 +451,7 @@ export class CatTipoCargosComponent {
                 { text: 'Item', style: 'tableHeader' },
                 { text: 'Cargos', style: 'tableHeader' },
               ],
-              ...this.listaTipoCargos.map(obj => {
+              ...this.listaTipoCargos.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.cargo, style: 'itemsTableD' },
@@ -477,7 +477,7 @@ export class CatTipoCargosComponent {
 
   ExportToExcel() {
     this.OrdenarDatos(this.listaTipoCargos);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaTipoCargos.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaTipoCargos.map((obj: any) => {
       return {
         ITEM: obj.id,
         CARGO: obj.cargo,
@@ -552,7 +552,7 @@ export class CatTipoCargosComponent {
 
   ExportToCVS() {
     this.OrdenarDatos(this.listaTipoCargos);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaTipoCargos.map(obj => {
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaTipoCargos.map((obj: any) => {
       return {
         ITEM: obj.id,
         CARGOS: obj.cargos,

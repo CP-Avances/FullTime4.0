@@ -422,7 +422,7 @@ export class CatModalidaLaboralComponent implements OnInit {
                 { text: 'Item', style: 'tableHeader' },
                 { text: 'Modalidad laboral', style: 'tableHeader' },
               ],
-              ...this.listaModalida_Laboral.map(obj => {
+              ...this.listaModalida_Laboral.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTableD' },
@@ -448,7 +448,7 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   ExportToExcel() {
     this.OrdenarDatos(this.listaModalida_Laboral);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaModalida_Laboral.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaModalida_Laboral.map((obj: any) => {
       return {
         ITEM: obj.id,
         Modalidad_laboral: obj.descripcion,
@@ -523,7 +523,7 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   ExportToCVS() {
     this.OrdenarDatos(this.listaModalida_Laboral);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaModalida_Laboral.map(obj => {
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaModalida_Laboral.map((obj: any) => {
       return {
         ITEM: obj.id,
         MODALIDAD_LABORAL: obj.descripcion,

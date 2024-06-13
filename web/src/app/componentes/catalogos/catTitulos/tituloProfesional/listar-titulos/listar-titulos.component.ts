@@ -424,7 +424,7 @@ export class ListarTitulosComponent implements OnInit {
                 { text: 'Nombre', style: 'tableHeader' },
                 { text: 'Nivel', style: 'tableHeader' },
               ],
-              ...this.verTitulos.map(obj => {
+              ...this.verTitulos.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableD' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -451,7 +451,7 @@ export class ListarTitulosComponent implements OnInit {
 
   ExportToExcel() {
     this.OrdenarDatos(this.verTitulos);
-    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.verTitulos.map(obj => {
+    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.verTitulos.map((obj: any) => {
       return {
         CODIGO: obj.id,
         TITULO: obj.nombre,

@@ -39,10 +39,6 @@ import { ITableDepartamentos } from 'src/app/model/reportes.model';
 export class PrincipalDepartamentoComponent implements OnInit {
 
   // ALMACENAMIENTO DE DATOS CONSULTADOS Y FILTROS DE BUSQUEDA
-  filtroNombre = '';
-  filtroNombreSuc = '';
-  filtroEmpresaSuc = '';
-  filtroDeparPadre = '';
   departamentosEliminar: any = [];
   departamentos: any = [];
   depainfo: any = [];

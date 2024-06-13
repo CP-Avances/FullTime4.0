@@ -410,7 +410,7 @@ export class CatDiscapacidadComponent implements OnInit {
                 { text: 'Nombre', style: 'tableHeader' },
 
               ],
-              ...this.discapacidades.map(obj => {
+              ...this.discapacidades.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableD' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -437,7 +437,7 @@ export class CatDiscapacidadComponent implements OnInit {
 
   ExportToExcel() {
     this.OrdenarDatos(this.discapacidades);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidades.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidades.map((obj: any) => {
       return {
         CODIGO: obj.id,
         NOMBRE: obj.nombre,

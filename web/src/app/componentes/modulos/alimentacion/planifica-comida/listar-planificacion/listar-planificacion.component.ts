@@ -442,7 +442,7 @@ export class ListarPlanificacionComponent implements OnInit {
   // METODO PARA LEER TODOS LOS DATOS SELECCIONADOS Y EDITAR
   EditarRegistrosMultiple() {
     let EmpleadosSeleccionados: any;
-    EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
+    EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
       return {
         nombre: obj.nombre,
         cedula: obj.cedula,
@@ -477,7 +477,7 @@ export class ListarPlanificacionComponent implements OnInit {
   // METODO PARA LEER TODOS LOS DATOS SELECCIONADOS Y ELIMINAR
   EliminarRegistrosMultiple() {
     let EmpleadosSeleccionados: any;
-    EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
+    EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
       console.log('ver data obj... ', obj)
       return {
         alimentacion: obj
@@ -519,7 +519,7 @@ export class ListarPlanificacionComponent implements OnInit {
 
     var usuario = '';
 
-    datos.map(obj => {
+    datos.map((obj: any) => {
 
       console.log('ver eliminar 56666 ', plan)
       var plan = obj.alimentacion
@@ -563,7 +563,7 @@ export class ListarPlanificacionComponent implements OnInit {
     this.empleado_sinConsumo = [];
     this.contar = 0;
     this.contar_eliminados = 0;
-    datos.map(obj => {
+    datos.map((obj: any) => {
 
       // VERIFICAR SI HAY UN REGISTRO CON ESTADO CONSUMIDO DENTRO DE LA PLANIFICACION
       let datosConsumido = {
@@ -891,7 +891,7 @@ export class ListarPlanificacionComponent implements OnInit {
    ** ************************************************************************************************* **/
 
    exportToExcel() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificaciones.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificaciones.map((obj: any) => {
       return {
         Codigo: obj.id,
         Servicio: obj.nombre_servicio,
@@ -919,7 +919,7 @@ export class ListarPlanificacionComponent implements OnInit {
    ** ************************************************************************************************** **/
 
    exportToCVS() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificaciones.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificaciones.map((obj: any) => {
       return {
         Codigo: obj.id,
         Servicio: obj.nombre_servicio,

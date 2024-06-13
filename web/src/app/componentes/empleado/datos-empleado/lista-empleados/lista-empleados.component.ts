@@ -211,7 +211,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
     if (opcion === 1) {
 
-      EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
+      EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
         return {
           id: obj.id,
           codigo: obj.codigo,
@@ -219,7 +219,7 @@ export class ListaEmpleadosComponent implements OnInit {
         }
       })
     } else if (opcion === 2 || opcion === 3) {
-      EmpleadosSeleccionados = this.selectionDos.selected.map(obj => {
+      EmpleadosSeleccionados = this.selectionDos.selected.map((obj: any) => {
         return {
           id: obj.id,
           codigo: obj.codigo,
@@ -259,14 +259,14 @@ export class ListaEmpleadosComponent implements OnInit {
   Deshabilitar(opcion: number) {
     let EmpleadosSeleccionados: any;
     if (opcion === 1) {
-      EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
+      EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
         return {
           id: obj.id,
           empleado: obj.nombre + ' ' + obj.apellido
         }
       })
     } else if (opcion === 2 || opcion === 3) {
-      EmpleadosSeleccionados = this.selectionDos.selected.map(obj => {
+      EmpleadosSeleccionados = this.selectionDos.selected.map((obj: any) => {
         return {
           id: obj.id,
           empleado: obj.nombre + ' ' + obj.apellido
@@ -874,7 +874,7 @@ export class ListaEmpleadosComponent implements OnInit {
                 { text: 'Estado', style: 'tableHeader' },
                 { text: 'Nacionalidad', style: 'tableHeader' },
               ],
-              ...arreglo.map(obj => {
+              ...arreglo.map((obj: any) => {
                 var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
                 var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
@@ -924,7 +924,7 @@ export class ListaEmpleadosComponent implements OnInit {
     else {
       arreglo = this.desactivados
     }
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map(obj => {
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map((obj: any) => {
       let nacionalidad: any;
       this.nacionalidades.forEach(element => {
         if (obj.id_nacionalidad == element.id) {
@@ -1041,7 +1041,7 @@ export class ListaEmpleadosComponent implements OnInit {
       arreglo = this.desactivados
     }
     // const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map(obj => {
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map((obj: any) => {
       let nacionalidad: any;
       this.nacionalidades.forEach(element => {
         if (obj.id_nacionalidad == element.id) {
@@ -1119,7 +1119,7 @@ export class ListaEmpleadosComponent implements OnInit {
     this.contador = 0;
 
 
-    let EliminarActivos = this.selectionUno.selected.map(obj => {
+    let EliminarActivos = this.selectionUno.selected.map((obj: any) => {
       return {
         id: obj.id,
         empleado: obj.nombre + ' ' + obj.apellido
@@ -1184,7 +1184,7 @@ export class ListaEmpleadosComponent implements OnInit {
   ConfirmarDeleteMultipleInactivos() {
     this.ingresar = false;
     this.contador = 0;
-    let EliminarInactivos = this.selectionDos.selected.map(obj => {
+    let EliminarInactivos = this.selectionDos.selected.map((obj: any) => {
       return {
         id: obj.id,
         empleado: obj.nombre + ' ' + obj.apellido

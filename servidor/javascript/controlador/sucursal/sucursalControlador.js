@@ -244,7 +244,7 @@ class SucursalControlador {
                 var listSucursales = [];
                 var duplicados = [];
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                     var { ITEM, NOMBRE, CIUDAD } = dato;
                     data.fila = dato.ITEM;
                     data.nom_sucursal = dato.NOMBRE;
@@ -252,24 +252,24 @@ class SucursalControlador {
                     if ((data.fila != undefined && data.fila != '') &&
                         (data.nom_sucursal != undefined && data.nom_sucursal != '') &&
                         (data.ciudad != undefined && data.ciudad != '')) {
-                        //Validar primero que exista la ciudad en la tabla ciudades
+                        // VALIDAR PRIMERO QUE EXISTA LA CIUDAD EN LA TABLA CIUDADES
                         const existe_ciudad = yield database_1.default.query(`
-        SELECT id FROM e_ciudades WHERE UPPER(descripcion) = UPPER($1)
-        `, [CIUDAD]);
+            SELECT id FROM e_ciudades WHERE UPPER(descripcion) = UPPER($1)
+            `, [CIUDAD]);
                         var id_ciudad = existe_ciudad.rows[0];
                         if (id_ciudad != undefined && id_ciudad != '') {
-                            // VERIFICACIÓN SI LA SUCURSAL NO ESTE REGISTRADA EN EL SISTEMA
+                            // VERIFICACION SI LA SUCURSAL NO ESTE REGISTRADA EN EL SISTEMA
                             const VERIFICAR_SUCURSAL = yield database_1.default.query(`
-          SELECT * FROM e_sucursales 
-          WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2
-          `, [NOMBRE, id_ciudad.id]);
+              SELECT * FROM e_sucursales 
+              WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2
+              `, [NOMBRE, id_ciudad.id]);
                             if (VERIFICAR_SUCURSAL.rowCount === 0) {
                                 data.fila = ITEM;
                                 data.nom_sucursal = NOMBRE;
                                 data.ciudad = CIUDAD;
-                                // Discriminación de elementos iguales
-                                if (duplicados.find((p) => p.nombre.toLowerCase() === dato.NOMBRE.toLowerCase() &&
-                                    p.ciudad.toLowerCase() === dato.CIUDAD.toLowerCase()) == undefined) {
+                                // DISCRIMINACION DE ELEMENTOS IGUALES
+                                if (duplicados.find((p) => p.NOMBRE.toLowerCase() === dato.NOMBRE.toLowerCase() &&
+                                    p.CIUDAD.toLowerCase() === dato.CIUDAD.toLowerCase()) == undefined) {
                                     data.observacion = 'ok';
                                     duplicados.push(dato);
                                 }
@@ -311,7 +311,7 @@ class SucursalControlador {
                             data.observacion = 'Ciudad no registrada';
                         }
                         if ((data.nom_sucursal == '' || data.nom_sucursal == undefined) && (data.ciudad == '' || data.ciudad == undefined)) {
-                            data.observacion = 'Sucursal y ciudad no registrado';
+                            data.observacion = 'Sucursal y ciudad no registrada';
                         }
                         listSucursales.push(data);
                     }
@@ -328,23 +328,23 @@ class SucursalControlador {
                 });
                 setTimeout(() => {
                     listSucursales.sort((a, b) => {
-                        // Compara los números de los objetos
+                        // COMPARA LOS NUMEROS DE LOS OBJETOS
                         if (a.fila < b.fila) {
                             return -1;
                         }
                         if (a.fila > b.fila) {
                             return 1;
                         }
-                        return 0; // Son iguales
+                        return 0; // SON IGUALES
                     });
                     var filaDuplicada = 0;
                     listSucursales.forEach((item) => {
                         if (item.observacion == undefined || item.observacion == null || item.observacion == '') {
                             item.observacion = 'Registro duplicado';
                         }
-                        //Valida si los datos de la columna N son numeros.
+                        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                             if (item.fila == filaDuplicada) {
                                 mensaje = 'error';
                             }

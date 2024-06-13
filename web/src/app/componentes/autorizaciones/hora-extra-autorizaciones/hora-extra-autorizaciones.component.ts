@@ -329,7 +329,7 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
       }
     }
     else if (this.data.carga === 'multiple') {
-      this.listafiltrada.map(obj => {
+      this.listafiltrada.map((obj: any) => {
         if (obj.estado === 'Pre-Autorizado') {
           this.restH.BuscarDatosAutorizacion(obj.id).subscribe(data => {
             var documento = data[0].empleado_estado;

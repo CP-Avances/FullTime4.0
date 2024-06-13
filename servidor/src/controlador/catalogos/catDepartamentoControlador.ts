@@ -490,81 +490,103 @@ class DepartamentoControlador {
     try {
       const { id_departamento, departamento, user_name, ip } = req.body;
 
-      // INICIAR TRANSACCIÓN
+      // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       // OBTENER DATOS ANTES DE ACTUALIZAR
-      const response = await pool.query('SELECT * FROM ed_niveles_departamento WHERE id_departamento = $1', [id_departamento]);
-      const [datos] = response.rows;
+      const response1 = await pool.query('SELECT * FROM ed_niveles_departamento WHERE id_departamento = $1', [id_departamento]);
+      const [datos1] = response1.rows;
 
-      if (!datos) {
-        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'ed_niveles_departamento',
-          usuario: user_name,
-          accion: 'U',
-          datosOriginales: '',
-          datosNuevos: '',
-          ip: ip,
-          observacion: `Error al actualizar el nombre de nivel del departamento con ID: ${id_departamento}. Registro no encontrado.`,
-        });
+      const response2 = await pool.query('SELECT * FROM ed_niveles_departamento WHERE id_departamento_nivel = $1', [id_departamento]);
+      const [datos2] = response2.rows;
 
-        // FINALIZAR TRANSACCIÓN
-        await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'Registro no encontrado' });
+      if (datos1) {
+        if (!datos1) {
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ed_niveles_departamento',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: '',
+            datosNuevos: '',
+            ip: ip,
+            observacion: `Error al actualizar el nombre de nivel del departamento con ID: ${id_departamento}. Registro no encontrado.`,
+          });
+
+          // FINALIZAR TRANSACCIÓN
+          await pool.query('COMMIT');
+          return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
+        else {
+          await pool.query(
+            `
+            UPDATE ed_niveles_departamento SET departamento = $1
+            WHERE id_departamento = $2
+            `
+            , [departamento, id_departamento]);
+
+          // INSERTAR AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ed_niveles_departamento',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: JSON.stringify(datos1),
+            datosNuevos: `{departamento: ${departamento}}`,
+            ip: ip,
+            observacion: null
+          });
+        }
       }
 
-      await pool.query(
-        `
-        UPDATE ed_niveles_departamento SET departamento = $1
-        WHERE id_departamento = $2
-        `
-        , [departamento, id_departamento]);
+      if (datos2) {
+        if (!datos2) {
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ed_niveles_departamento',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: '',
+            datosNuevos: '',
+            ip: ip,
+            observacion: `Error al actualizar el nombre de nivel del departamento con ID: ${id_departamento}. Registro no encontrado.`,
+          });
 
-      // INSERTAR AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'ed_niveles_departamento',
-        usuario: user_name,
-        accion: 'U',
-        datosOriginales: JSON.stringify(datos),
-        datosNuevos: `{departamento: ${departamento}}`,
-        ip: ip,
-        observacion: null
-      });
+          // FINALIZAR TRANSACCIÓN
+          await pool.query('COMMIT');
+          return res.status(404).jsonp({ message: 'Registro no encontrado' });
+        }
+        else {
+          await pool.query(
+            `
+            UPDATE ed_niveles_departamento SET departamento_nombre_nivel = $1
+            WHERE id_departamento_nivel = $2
+            `
+            , [departamento, id_departamento]);
 
-      await pool.query(
-        `
-        UPDATE ed_niveles_departamento SET departamento_nombre_nivel = $1
-        WHERE id_departamento_nivel = $2
-        `
-        , [departamento, id_departamento]);
+          // INSERTAR AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ed_niveles_departamento',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: JSON.stringify(datos2),
+            datosNuevos: `{departamento_nombre_nivel: ${departamento}}`,
+            ip: ip,
+            observacion: null
+          });
+        }
+      }
 
-      // INSERTAR AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'ed_niveles_departamento',
-        usuario: user_name,
-        accion: 'U',
-        datosOriginales: JSON.stringify(datos),
-        datosNuevos: `{departamento_nombre_nivel: ${departamento}}`,
-        ip: ip,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCIÓN
+      // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro guardado.' });
 
     }
     catch (error) {
-      // REVERTIR TRANSACCIÓN
+      // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
     }
   }
 
 
-  /* 
-    * Metodo para revisar
-    */
   // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
   public async RevisarDatos(req: Request, res: Response): Promise<any> {
     const documento = req.file?.originalname;
@@ -591,7 +613,7 @@ class DepartamentoControlador {
       var mensaje: string = 'correcto';
 
       // LECTURA DE LOS DATOS DE LA PLANTILLA
-      plantilla.forEach(async (dato: any, indice: any, array: any) => {
+      plantilla.forEach(async (dato: any) => {
         var { ITEM, NOMBRE, SUCURSAL } = dato;
         //Verificar que el registo no tenga datos vacios
         if ((ITEM != undefined && ITEM != '') &&
@@ -619,13 +641,9 @@ class DepartamentoControlador {
             data.sucursal = 'No registrado';
             data.observacion = 'Sucursal ' + data.observacion;
           }
-
           listDepartamentos.push(data);
-
         }
-
         data = {};
-
       });
 
       // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
@@ -663,21 +681,21 @@ class DepartamentoControlador {
 
       setTimeout(() => {
         listDepartamentos.sort((a: any, b: any) => {
-          // Compara los números de los objetos
+          // COMPARA LOS NUMEROS DE LOS OBJETOS
           if (a.fila < b.fila) {
             return -1;
           }
           if (a.fila > b.fila) {
             return 1;
           }
-          return 0; // Son iguales
+          return 0; // SON IGUALES
         });
 
         var filaDuplicada: number = 0;
 
         listDepartamentos.forEach((item: any) => {
 
-          // Discriminación de elementos iguales
+          // DISCRIMINACION DE ELEMENTOS IGUALES
           item.nombre.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
           item.sucursal.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
           if (duplicados.find((p: any) => p.nombre.toLowerCase() === item.nombre.toLowerCase() && p.sucursal.toLowerCase() === item.sucursal.toLowerCase()) == undefined) {
@@ -686,30 +704,27 @@ class DepartamentoControlador {
             item.observacion = 'Registro duplicado'
           }
 
-          //Valida si los datos de la columna N son numeros.
+          // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
           if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
             if (item.fila == filaDuplicada) {
               mensaje = 'error';
             }
           } else {
             return mensaje = 'error';
           }
-
           filaDuplicada = item.fila;
-
         });
 
         if (mensaje == 'error') {
           listDepartamentos = undefined;
         }
-
         return res.jsonp({ message: mensaje, data: listDepartamentos });
-
       }, 1000)
     }
   }
 
+  // METODO PARA REGISTRAR DATOS DE DEPARTAMENTOS
   public async CargarPlantilla(req: Request, res: Response) {
     try {
       const plantilla = req.body;
@@ -719,20 +734,20 @@ class DepartamentoControlador {
 
       plantilla.forEach(async (data: any) => {
         console.log('data: ', data);
-        // Datos que se guardaran de la plantilla ingresada
-        const { item, nombre, sucursal } = data;
+        // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
+        const { nombre, sucursal } = data;
         const ID_SUCURSAL: any = await pool.query(
           `
           SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
           `
           , [sucursal.toUpperCase()]);
 
-        var nivel = 0;
         var id_sucursal = ID_SUCURSAL.rows[0].id;
 
-        // Registro de los datos de contratos
+        // REGISTRO DE LOS DATOS DE CONTRATOS
         const response: QueryResult = await pool.query(
-          `INSERT INTO ed_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING *
+          `
+          INSERT INTO ed_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING *
           `
           , [nombre.toUpperCase(), id_sucursal]);
 
@@ -745,9 +760,7 @@ class DepartamentoControlador {
             return respuesta = res.status(404).jsonp({ message: 'error' })
           }
         }
-
         contador = contador + 1;
-
       });
 
     } catch (error) {
@@ -794,8 +807,8 @@ class DepartamentoControlador {
     }
   }
 
-  RevisarDatosNivel(req: Request, res: Response){
-    try{
+  RevisarDatosNivel(req: Request, res: Response) {
+    try {
       const documento = req.file?.originalname;
       let separador = path.sep;
       let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
@@ -808,19 +821,19 @@ class DepartamentoControlador {
       else {
         const sheet_name_list = workbook.SheetNames;
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
-        console.log('plantilla: ',plantilla);
+        console.log('plantilla: ', plantilla);
 
         let data: any = {
-          fila:'',
-          sucursal:'',
-          departamento:'',
-          nivel:'',
-          depa_superior:'',
-          sucursal_depa_superior:'',
+          fila: '',
+          sucursal: '',
+          departamento: '',
+          nivel: '',
+          depa_superior: '',
+          sucursal_depa_superior: '',
           observacion: '',
         }
 
-        //Exprecion regular para validar el formato de solo números.
+        // EXPRESION REGULAR PARA VALIDAR EL FORMATO DE SOLO NUMEROS.
         const regex = /^[0-9]+$/;
 
         var listNivelesDep: any = [];
@@ -831,34 +844,34 @@ class DepartamentoControlador {
         plantilla.forEach(async (dato: any, indice: any, array: any) => {
           var { ITEM, SUCURSAL, DEPARTAMENTO, NIVEL, DEPARTAMENTO_SUPERIOR, SUCURSAL_DEPARTAMENTO_SUPERIOR } = dato;
 
-          if(ITEM != undefined && SUCURSAL != undefined &&
+          if (ITEM != undefined && SUCURSAL != undefined &&
             DEPARTAMENTO != undefined && NIVEL != undefined &&
-            DEPARTAMENTO_SUPERIOR != undefined && SUCURSAL_DEPARTAMENTO_SUPERIOR != undefined){
+            DEPARTAMENTO_SUPERIOR != undefined && SUCURSAL_DEPARTAMENTO_SUPERIOR != undefined) {
 
             data.fila = ITEM;
-            data.sucursal = SUCURSAL; 
-            data.departamento = DEPARTAMENTO ;
+            data.sucursal = SUCURSAL;
+            data.departamento = DEPARTAMENTO;
             data.nivel = NIVEL,
-            data.depa_superior = DEPARTAMENTO_SUPERIOR,
-            data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR,
-            data.observacion = 'no registrada';
+              data.depa_superior = DEPARTAMENTO_SUPERIOR,
+              data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR,
+              data.observacion = 'no registrada';
 
             listNivelesDep.push(data);
 
-          }else{
+          } else {
             data.fila = ITEM;
-            data.sucursal = SUCURSAL; 
-            data.departamento = DEPARTAMENTO ;
+            data.sucursal = SUCURSAL;
+            data.departamento = DEPARTAMENTO;
             data.nivel = NIVEL,
-            data.depa_superior = DEPARTAMENTO_SUPERIOR,
-            data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR,
-            data.observacion = 'no registrada';
+              data.depa_superior = DEPARTAMENTO_SUPERIOR,
+              data.sucursal_depa_superior = SUCURSAL_DEPARTAMENTO_SUPERIOR,
+              data.observacion = 'no registrada';
 
             if (data.fila == '' || data.fila == undefined) {
               data.fila = 'error';
               mensaje = 'error'
             }
-  
+
             if (SUCURSAL == undefined) {
               data.sucursal = 'No registrado';
               data.observacion = 'Sucursal ' + data.observacion;
@@ -879,23 +892,17 @@ class DepartamentoControlador {
               data.sucursal_depa_superior = 'No registrado';
               data.observacion = 'Sucursal departamento superior ' + data.observacion;
             }
-
-
             listNivelesDep.push(data);
           }
-
-
           data = {};
-
         });
-
 
         // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
         fs.access(ruta, fs.constants.F_OK, (err) => {
           if (err) {
           } else {
-              // ELIMINAR DEL SERVIDOR
-              fs.unlinkSync(ruta);
+            // ELIMINAR DEL SERVIDOR
+            fs.unlinkSync(ruta);
           }
         });
 
@@ -903,24 +910,24 @@ class DepartamentoControlador {
           if (item.observacion == 'no registrada') {
             var validSucursal = await pool.query(
               `SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`
-              ,[item.sucursal.toUpperCase()])
+              , [item.sucursal.toUpperCase()])
             if (validSucursal.rows[0] != undefined && validSucursal.rows[0] != '') {
               var validDeparta = await pool.query(
                 `SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1`
-                ,[item.departamento.toUpperCase()])
-                if(validDeparta.rows[0] != undefined && validDeparta.rows[0] != ''){
-                  if(validSucursal.rows[0].id == validDeparta.rows[0].id_sucursal){
-                    if (regex.test(item.nivel)) {
-                    }else{
-                      item.observacion = 'Nivel incorrecto (solo números)';
-                    }
-                  }else{
-                    item.observacion = 'Departamento no pertenece al establecimiento';
+                , [item.departamento.toUpperCase()])
+              if (validDeparta.rows[0] != undefined && validDeparta.rows[0] != '') {
+                if (validSucursal.rows[0].id == validDeparta.rows[0].id_sucursal) {
+                  if (regex.test(item.nivel)) {
+                  } else {
+                    item.observacion = 'Nivel incorrecto (solo números)';
                   }
-                }else{
-                  item.observacion = 'Departamento no existe en la base';
+                } else {
+                  item.observacion = 'Departamento no pertenece al establecimiento';
                 }
-            }else{
+              } else {
+                item.observacion = 'Departamento no existe en la base';
+              }
+            } else {
               item.observacion = 'Sucursal no existe en la base';
             }
           }
@@ -928,48 +935,48 @@ class DepartamentoControlador {
 
         setTimeout(() => {
           listNivelesDep.sort((a: any, b: any) => {
-            // Compara los números de los objetos
+            // COMPARA LOS NUMEROS DE LOS OBJETOS
             if (a.fila < b.fila) {
               return -1;
             }
             if (a.fila > b.fila) {
               return 1;
             }
-            return 0; // Son iguales
+            return 0; // SON IGUALES
           });
-  
+
           var filaDuplicada: number = 0;
 
-          console.log('plantilla: ',listNivelesDep)
+          console.log('plantilla: ', listNivelesDep)
 
-          //VALIDACIONES DE LOS DATOS
+          // VALIDACIONES DE LOS DATOS
           listNivelesDep.forEach(async (item: any) => {
-              if (item.observacion == '1') {
-                  item.observacion = 'Registro duplicado'
-              }else{
+            if (item.observacion == '1') {
+              item.observacion = 'Registro duplicado'
+            } else {
+            }
+
+
+
+            // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+            if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+              // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+              if (item.fila == filaDuplicada) {
+                mensaje = 'error';
               }
+            } else {
+              return mensaje = 'error';
+            }
 
-
-
-              // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
-              if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                  // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
-                  if (item.fila == filaDuplicada) {
-                      mensaje = 'error';
-                  }
-              } else {
-                  return mensaje = 'error';
-              }
-
-              filaDuplicada = item.fila;
+            filaDuplicada = item.fila;
 
           });
 
           if (mensaje == 'error') {
-              listNivelesDep = undefined;
+            listNivelesDep = undefined;
           }
 
-    
+
           return res.jsonp({ message: mensaje, data: listNivelesDep });
 
         }, 1000)
@@ -977,7 +984,7 @@ class DepartamentoControlador {
 
 
       }
-    }catch(error){
+    } catch (error) {
       return res.status(500).jsonp({ message: error });
     }
   }

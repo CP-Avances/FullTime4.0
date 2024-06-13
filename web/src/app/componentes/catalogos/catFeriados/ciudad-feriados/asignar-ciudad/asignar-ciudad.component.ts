@@ -251,7 +251,7 @@ export class AsignarCiudadComponent implements OnInit {
     if (this.ciudadesSeleccionadas.length != 0) {
       this.habilitarprogress = true;
       // RECORRER LA LISTA DE CIUDADES SELECCIONADAS
-      this.ciudadesSeleccionadas.map(obj => {
+      this.ciudadesSeleccionadas.map((obj: any) => {
         var buscarCiudad = {
           id_feriado: this.id_feriado,
           id_ciudad: obj.id,

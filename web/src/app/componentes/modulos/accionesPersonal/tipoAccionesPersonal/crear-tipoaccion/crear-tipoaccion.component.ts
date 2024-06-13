@@ -82,7 +82,7 @@ export class CrearTipoaccionComponent implements OnInit {
   contador: number = 0;
   GuardarInformacion(datosAccion: any) {
     this.contador = 0;
-    this.tipos_acciones.map(obj => {
+    this.tipos_acciones.map((obj: any) => {
       if (obj.id_tipo === datosAccion.id_tipo) {
         this.contador = this.contador + 1;
       }
@@ -189,7 +189,7 @@ export class CrearTipoaccionComponent implements OnInit {
   contar: number = 0;
   VerificarDuplicidad(form: any, tipo: any, datos: any) {
     this.contar = 0;
-    this.tipos.map(obj => {
+    this.tipos.map((obj: any) => {
       if (obj.descripcion.toUpperCase() === form.otroTipoForm.toUpperCase()) {
         this.contar = this.contar + 1;
       }
