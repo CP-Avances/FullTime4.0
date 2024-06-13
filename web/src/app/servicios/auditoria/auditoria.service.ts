@@ -21,7 +21,7 @@ export class AuditoriaService {
   }
   
 
-  ConsultarAuditoria1(data: any) {
+  ConsultarAuditoria2(data: any) {
     const headers = new HttpHeaders({
       'Accept-Encoding': 'gzip, deflate',
       'Content-Type': 'application/json'
