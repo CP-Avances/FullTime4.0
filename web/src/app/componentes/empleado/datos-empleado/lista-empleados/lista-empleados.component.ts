@@ -104,7 +104,6 @@ export class ListaEmpleadosComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
-    this.idUsuariosAcceso.push(this.idEmpleado);
     this.ObtenerAsignacionesUsuario(this.idEmpleado);
 
     this.ObtenerEmpleados(this.idEmpleado);
