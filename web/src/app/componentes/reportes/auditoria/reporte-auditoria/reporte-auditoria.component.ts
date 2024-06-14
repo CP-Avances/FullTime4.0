@@ -50,7 +50,6 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
     verDetalle: boolean = false;
 
 
-    data_pdf: any = [];
 
     accionesSeleccionadas = [];
 
@@ -91,10 +90,10 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
     // Inicialización directa de la lista de objetos Tablas
     tablas: Tablas[] = [
-        { nombre: "e_empresa ", modulo: "", disponibilidad: true },
+        { nombre: "e_empresa", modulo: "", disponibilidad: true },
         { nombre: "e_provincias", modulo: "", disponibilidad: true },
         { nombre: "e_ciudades", modulo: "", disponibilidad: true },
-        { nombre: "e_sucursales ", modulo: "", disponibilidad: true },
+        { nombre: "e_sucursales", modulo: "", disponibilidad: true },
         //e_cat_tipo_cargo
         { nombre: "e_cat_tipo_cargo", modulo: "", disponibilidad: true },
         { nombre: "e_cat_modalidad_trabajo", modulo: "", disponibilidad: true },
@@ -176,7 +175,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
 
 
-        tabla.map((x: any)  => {
+        tabla.map((x: any) => {
 
             if (x.disponibilidad == true) {
                 this.tablasD.push({
@@ -203,6 +202,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         this.ObtenerLogo();
         this.ObtenerColores();
 
+
     }
 
 
@@ -210,6 +210,10 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
     ValidarReporte(action: any) {
         if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '' || this.accionesSeleccionadas.length == 0) return this.toastr.error('Primero valide fechas de búsqueda y acciones.');
         this.ModelarTablasAuditoriaPorTablas(action);
+
+        // this.data_pdf =  this.ModelarTablasAuditoriaPorTablas(action);
+        //this.obtenerDatosPdf();
+
     }
 
     blobToArray(blob: Blob): Promise<any[]> {
@@ -255,8 +259,8 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         this.data_pdf = [];
         var tablas = '';
         var acciones = '';
-        tablas = this.tablasSolicitadas.map((x: any)  => x.nombre).join(',');
-        acciones = this.accionesSeleccionadas.map((x: any)  => x).join(',');
+        tablas = this.tablasSolicitadas.map((x: any) => x.nombre).join(',');
+        acciones = this.accionesSeleccionadas.map((x: any) => x).join(',');
 
         const buscarTabla = {
             tabla: tablas,
@@ -301,52 +305,65 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
 
 
-    ModelarTablasAuditoriaPorTablas(accion: any) {
+    datosbusqueda: any = [];
+    data_pdf: any = [];
 
+
+
+    async ModelarTablasAuditoriaPorTablas(accion: any) {
         this.data_pdf = [];
-        var tablas = '';
+        this.datosbusqueda = [];
         var acciones = '';
-        //tablas = this.tablasSolicitadas.map(x => x.nombre).join(',');
         acciones = this.accionesSeleccionadas.map(x => x).join(',');
-        this.tablasSolicitadas.map(x => {
+
+        const consultas: Promise<any>[] = [];
+
+        for (let i = 0; i < this.tablasSolicitadas.length; i++) {
+            const tabla = this.tablasSolicitadas[i];
             const buscarTabla = {
-                tabla: x.nombre,
+                tabla: tabla.nombre,
                 desde: this.rangoFechas.fec_inico,
                 hasta: this.rangoFechas.fec_final,
                 action: acciones,
             };
-            this.restAuditoria.ConsultarAuditoriaPorTabla(buscarTabla).subscribe(
-                res => {
-                    this.data_pdf.push(res);
-                }
-                , error => {
-                    if (error.status == '404') {
-                        this.toastr.error('No existen registros con la tabla y acciones seleccionadas', 'Ups!!! algo salio mal..', {
-                            timeOut: 6000,
-                        })
-                    }
-                }
 
-            );
-        })
+            const consulta = this.restAuditoria.ConsultarAuditoriaPorTabla(buscarTabla).toPromise();
+            consultas.push(consulta);
+        }
 
-        console.log("busqueda: ",this.data_pdf)
+        try {
+            // Esperar a que todas las consultas se completen
+            const resultados = await Promise.allSettled(consultas);
 
+            // Filtrar y extraer sólo los resultados exitosos
+            this.datosbusqueda = resultados
+                .filter(result => result.status === 'fulfilled')
+                .map(result => (result as PromiseFulfilledResult<any>).value);
 
+            console.log("a ver si carga datos pdf", this.datosbusqueda);
 
-        switch (accion) {
-            case 'ver': this.VerDatos(); break;
-            default: this.GenerarPDF(this.data_pdf, accion); break;
+            this.data_pdf = this.datosbusqueda.flat();
+
+            console.log("datos oficiales", this.data_pdf);
+
+            switch (accion) {
+                case 'ver':
+                    this.VerDatos();
+                    break;
+                default:
+                    this.GenerarPDF(this.data_pdf, accion);
+                    break;
+            }
+        } catch (error) {
+            console.error("Error al consultar auditorías por tabla:", error);
         }
     }
-
-
-
 
     ngOnDestroy(): void {
         //this.ModelarTablasAuditoria();
     }
     ngOnInit(): void {
+        //this.obtenerDatosPdf();
 
         this.ContruirTablaDefinitiva(this.tablas);
     }
@@ -400,7 +417,8 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         }
         this.tablasSolicitadas = this.selectionAuditoria.selected;
 
-        //console.log(this.selectionPaginas.selected)
+
+        // console.log(this.selectionAuditoria.selected)
         return `${this.selectionAuditoria.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
 
     }

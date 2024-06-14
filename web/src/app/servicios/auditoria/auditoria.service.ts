@@ -25,6 +25,13 @@ export class AuditoriaService {
     return this.http.post(`${environment.url}/reportes-auditoria/auditarportabla`, data, );
   }
 
+  ConsultarAuditoriaPorTablaEmpaquetados(data: any) {
+    return this.http.post(`${environment.url}/reportes-auditoria/auditarportablaempaquetados`, data,{
+        observe: 'response',
+        responseType: 'blob' // Indicar que esperamos una respuesta de tipo Blob (para la transmisión)
+      });
+  }
+
   ConsultarAuditoriaAuntiguo(data: any) {
     return this.http.post(`${environment.url}/reportes-auditoria/auditar`, data, );
   }
