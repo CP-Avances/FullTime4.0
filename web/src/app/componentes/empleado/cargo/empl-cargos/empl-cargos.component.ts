@@ -11,6 +11,7 @@ import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-empl-cargos',
@@ -24,6 +25,10 @@ export class EmplCargosComponent implements OnInit {
   idEmpleado: string;
   ver_jefe: boolean = false;
   ver_personal: boolean = false;
+
+  asignacionesAcceso: any;
+  idSucursalesAcceso: any = [];
+  idDepartamentosAcceso: any = [];
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS
   departamento: any = [];
@@ -101,11 +106,12 @@ export class EmplCargosComponent implements OnInit {
   }
 
   // METODO DE BUSQUEDA DE ESTABLECIMIENTOS
-  FiltrarSucursales() {
+  async FiltrarSucursales() {
     let idEmpre = parseInt(localStorage.getItem('empresa') as string);
     this.sucursales = [];
+    await this.ObtenerAsignacionesUsuario(this.idEmpleado);
     this.restSucursales.BuscarSucursalEmpresa(idEmpre).subscribe(datos => {
-      this.sucursales = datos;
+      this.sucursales = this.FiltrarSucursalesAsignadas(datos);
     }, error => {
       this.toastr.info('No se han encontrado registros de Sucursales.', '', {
         timeOut: 6000,
@@ -113,17 +119,63 @@ export class EmplCargosComponent implements OnInit {
     })
   }
 
+  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
+  async ObtenerAsignacionesUsuario(idEmpleado: any) {
+    const dataEmpleado = {
+      id_empleado: Number(idEmpleado)
+    }
+
+    let noPersonal: boolean = false;
+
+    const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(dataEmpleado));
+    this.asignacionesAcceso = res;
+
+    const promises = this.asignacionesAcceso.map((asignacion: any) => {
+      if (asignacion.principal) {
+        if (!asignacion.administra && !asignacion.personal) {
+          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+        } else if (asignacion.administra && !asignacion.personal) {
+          noPersonal = true;
+        } else if (asignacion.personal && !asignacion.administra) {
+
+          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+        }
+      }
+
+      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
+      this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
+
+      const data = {
+        id_departamento: asignacion.id_departamento
+      }
+      return firstValueFrom(this.usuario.ObtenerIdUsuariosDepartamento(data));
+    });
+
+    await Promise.all(promises);
+
+  }
+
+  // METODO PARA FILTRAR SUCURSALES ASIGNADAS
+  FiltrarSucursalesAsignadas(data: any) {
+    return data.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
+  }
+
   // METODO PARA LISTAR DEPARTAMENTOS
   ObtenerDepartamentos(form: any) {
     this.departamento = [];
     let idSucursal = form.idSucursalForm;
     this.restCatDepartamento.BuscarDepartamentoSucursal(idSucursal).subscribe(datos => {
-      this.departamento = datos;
+      this.departamento = this.FiltrarDepartamentosAsignados(datos);
     }, error => {
       this.toastr.info('Sucursal no cuenta con departamentos registrados.', '', {
         timeOut: 6000,
       })
     });
+  }
+
+  // METODO PARA FILTRAR DEPARTAMENTOS ASIGNADOS
+  FiltrarDepartamentosAsignados(data: any) {
+    return data.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
   }
 
   // METODO PARA ACTIVAR INGRESO DE CARGO
