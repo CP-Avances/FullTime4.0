@@ -146,7 +146,7 @@ export class ComunicadosComponent implements OnInit {
     private toastr: ToastrService,
     private restR: ReportesService,
     private restP: ParametrosService,
-    public restUsuario: UsuarioService,
+    private restUsuario: UsuarioService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }

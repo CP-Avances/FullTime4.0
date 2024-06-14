@@ -129,7 +129,7 @@ export class PlanComidasComponent implements OnInit {
     public ventana: MatDialog,
     public validar: ValidacionesService,
     public informacion: DatosGeneralesService,
-    public restUsuario: UsuarioService,
+    private restUsuario: UsuarioService,
     private funciones: MainNavService,
     private toastr: ToastrService,
   ) {

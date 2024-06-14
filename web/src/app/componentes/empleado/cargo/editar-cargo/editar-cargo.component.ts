@@ -72,7 +72,7 @@ export class EditarCargoComponent implements OnInit {
     private verEmpleado: VerEmpleadoComponent,
     private validar: ValidacionesService,
     private toastr: ToastrService,
-    public usuario: UsuarioService,
+    private usuario: UsuarioService,
     public tipocargo: CatTipoCargosService,
   ) { }
 

@@ -137,7 +137,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     public validar: ValidacionesService,
     private toastr: ToastrService,
     public informacion: DatosGeneralesService,
-    public restUsuario: UsuarioService,
+    private restUsuario: UsuarioService,
     private funciones: MainNavService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);

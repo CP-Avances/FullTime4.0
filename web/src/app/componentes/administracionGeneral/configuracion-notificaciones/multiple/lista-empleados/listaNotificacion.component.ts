@@ -122,9 +122,9 @@ export class ListaNotificacionComponent implements OnInit {
 
     constructor(
         public informacion: DatosGeneralesService,
-        public restUsuario: UsuarioService,
         public restR: ReportesService,
         private ventana: MatDialog,
+        private restUsuario: UsuarioService,
         private validar: ValidacionesService,
         private toastr: ToastrService,
     ) {

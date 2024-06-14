@@ -69,7 +69,7 @@ export class EmplCargosComponent implements OnInit {
     private cargos: EmplCargosService,
     private toastr: ToastrService,
     public router: Router,
-    public usuario: UsuarioService,
+    private usuario: UsuarioService,
     public ventana: MatDialogRef<EmplCargosComponent>,
     public validar: ValidacionesService,
     public tipocargo: CatTipoCargosService,
