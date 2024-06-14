@@ -305,12 +305,24 @@ export class ListaEmpleadosComponent implements OnInit {
       id_empleado: Number(idEmpleado)
     }
 
+    let noPersonal: boolean = false;
+
     const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(data));
     this.empleadoD.asignaciones = res;
-    //console.log('lista empleados ', this.empleadoD.asignaciones)
     // VERIFICAMOS SI EXISTEN DATOS DE USUARIOS
     if (this.empleadoD.asignaciones) {
       const promises = this.empleadoD.asignaciones.map((asignacion: any) => {
+
+        if (asignacion.principal) {
+          if (!asignacion.administra && !asignacion.personal) {
+            return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+          } else if (asignacion.administra && !asignacion.personal) {
+            noPersonal = true;
+          } else if (asignacion.personal && !asignacion.administra) {
+            this.idUsuariosAcceso.push(this.idEmpleado);
+            return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+          }
+        }
         const data = {
           id_departamento: asignacion.id_departamento
         }
@@ -321,6 +333,10 @@ export class ListaEmpleadosComponent implements OnInit {
 
       const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
       this.idUsuariosAcceso.push(...ids);
+
+      if (noPersonal) {
+        this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleado);
+      }
 
       this.GetEmpleados();
     }
