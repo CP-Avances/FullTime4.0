@@ -17,6 +17,7 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 import { ConfiguracionNotificacionComponent } from '../configuracion/configuracionNotificacion.component';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-listaNotificacion',
@@ -48,6 +49,12 @@ export class ListaNotificacionComponent implements OnInit {
 
     // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
     idEmpleadoLogueado: any;
+    asignacionesAcceso: any;
+    idCargosAcceso: any = [];
+    idUsuariosAcceso: any = [];
+    idSucursalesAcceso: any = [];
+    idDepartamentosAcceso: any = [];
+
     departamentos: any = [];
     sucursales: any = [];
     empleados: any = [];
@@ -136,9 +143,10 @@ export class ListaNotificacionComponent implements OnInit {
     }
 
     // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
-    PresentarInformacion() {
+    async PresentarInformacion() {
         let informacion = { id_empleado: this.idEmpleadoLogueado };
         let respuesta: any = [];
+        await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
         this.informacion.ObtenerInformacionUserRol(informacion).subscribe(res => {
             respuesta = res[0];
             this.AdministrarInformacion(respuesta, informacion);
@@ -288,11 +296,19 @@ export class ListaNotificacionComponent implements OnInit {
 
         this.OmitirDuplicados();
 
-        console.log('ver sucursales ', this.sucursales)
-        console.log('ver regimenes ', this.regimen)
-        console.log('ver departamentos ', this.departamentos)
-        console.log('ver cargos ', this.cargos)
-        console.log('ver empleados ', this.empleados)
+        // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
+        this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
+        this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
+        this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
+        this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.includes(regimen.id_suc));
+
+        this.empleados.forEach((empleado: any) => {
+          this.idCargosAcceso = [...new Set([...this.idCargosAcceso, empleado.id_cargo_])];
+        });
+
+        this.cargos = this.cargos.filter((cargo: any) =>
+          this.idSucursalesAcceso.includes(cargo.id_suc) && this.idCargosAcceso.includes(cargo.id)
+        );
     }
 
     // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
@@ -321,6 +337,50 @@ export class ListaNotificacionComponent implements OnInit {
         });
         this.cargos = verificados_car;
     }
+
+  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
+  async ObtenerAsignacionesUsuario(idEmpleado: any) {
+    const dataEmpleado = {
+      id_empleado: Number(idEmpleado)
+    }
+
+    let noPersonal: boolean = false;
+
+    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
+    this.asignacionesAcceso = res;
+
+    const promises = this.asignacionesAcceso.map((asignacion: any) => {
+      if (asignacion.principal) {
+        if (!asignacion.administra && !asignacion.personal) {
+          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+        } else if (asignacion.administra && !asignacion.personal) {
+          noPersonal = true;
+        } else if (asignacion.personal && !asignacion.administra) {
+          this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
+          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+        }
+      }
+
+      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
+      this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
+
+      const data = {
+        id_departamento: asignacion.id_departamento
+      }
+      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
+    });
+
+    const results = await Promise.all(promises);
+
+    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
+    this.idUsuariosAcceso.push(...ids);
+
+    if (noPersonal) {
+      this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleadoLogueado);
+    }
+
+  }
+
 
     // METODO PARA ACTIVAR SELECCION MULTIPLE
     multiple: boolean = false;
