@@ -26,6 +26,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ITableDispositivos } from 'src/app/model/reportes.model';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-listar-relojes',
@@ -45,6 +47,10 @@ export class ListarRelojesComponent implements OnInit {
 
   empleado: any = [];
   idEmpleado: number;
+
+  asignacionesAcceso: any;
+  idDepartamentosAcceso: any = [];
+
   listar_relojes: boolean = true;
   dispositivosEliminar: any = [];
 
@@ -91,6 +97,7 @@ export class ListarRelojesComponent implements OnInit {
     public restE: EmpleadoService,
     private rest: RelojesService,
     private toastr: ToastrService,
+    private restUsuario: UsuarioService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -106,11 +113,40 @@ export class ListarRelojesComponent implements OnInit {
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
-  ObtenerEmpleados(idemploy: any) {
+  async ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
+    await this.ObtenerAsignacionesUsuario(this.idEmpleado);
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
       this.empleado = data;
     })
+  }
+
+  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
+  async ObtenerAsignacionesUsuario(idEmpleado: any) {
+    const dataEmpleado = {
+      id_empleado: Number(idEmpleado)
+    }
+
+    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
+    this.asignacionesAcceso = res;
+
+    const promises = this.asignacionesAcceso.map((asignacion: any) => {
+      if (asignacion.principal) {
+        if (!asignacion.administra ) {
+          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+        }
+      }
+
+      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
+
+      const data = {
+        id_departamento: asignacion.id_departamento
+      }
+      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
+    });
+
+    await Promise.all(promises);
+
   }
 
   // METODO PARA OBTENER EL LOGO DE LA EMPRESA
@@ -143,8 +179,14 @@ export class ListarRelojesComponent implements OnInit {
   ObtenerReloj() {
     this.relojes = [];
     this.rest.ConsultarRelojes().subscribe(datos => {
-      this.relojes = datos;
+      this.relojes = this.FiltrarRelojesAsignados(datos);
+      console.log('probando relojes', this.relojes);
     })
+  }
+
+  // METODO PARA FILTRAR RELOJES POR ASIGNACION USUARIO - DEPARTAMENTO
+  FiltrarRelojesAsignados(data: any) {
+    return data.filter((reloj: any) => this.idDepartamentosAcceso.includes(reloj.id_departamento));
   }
 
   // METODO PARA INGRESAR IP

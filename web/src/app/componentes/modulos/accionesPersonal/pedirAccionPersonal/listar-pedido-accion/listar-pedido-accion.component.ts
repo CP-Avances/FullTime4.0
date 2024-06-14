@@ -190,7 +190,6 @@ export class ListarPedidoAccionComponent implements OnInit {
         this.formato_fecha,
         this.formato_hora
       );
-      console.log("lista pedidos", this.listaPedidos);
     });
   }
 
@@ -235,9 +234,7 @@ export class ListarPedidoAccionComponent implements OnInit {
 
   // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
   FiltrarEmpleadosAsignados(data: any) {
-    if (this.idUsuariosAcceso.length > 0) {
       return data.filter((pedido: any) => this.idUsuariosAcceso.includes(pedido.id_empleado));
-    }
   }
 
 
