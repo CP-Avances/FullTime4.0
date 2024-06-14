@@ -244,7 +244,7 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
     // VALIDAR EXISTENCIA DE DETALLES
     if (this.datosDetalle.length != 0) {
 
-      this.datosDetalle.map(obj => {
+      this.datosDetalle.map((obj: any) => {
         // VALIDAR ORDEN DE LOS DETALLES
         contador = contador + 1;
         if (datos.orden === 1 && obj.orden != 1 && (datos.hora + ':00') > obj.hora && this.datosHorario[0].nocturno === false) {
@@ -337,7 +337,7 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
     // VALIDAR EXISTENCIA DE DETALLES
     if (this.datosDetalle.length != 0) {
 
-      this.datosDetalle.map(obj => {
+      this.datosDetalle.map((obj: any) => {
         // VALIDAR INGRESO DE HORAS DE DETALLES
         contador = contador + 1;
         if (datos.orden === 1 && obj.orden != 1 && (datos.hora + ':00') > obj.hora && this.datosHorario[0].nocturno === false) {

@@ -317,7 +317,7 @@ export class ListarTipoComidasComponent implements OnInit {
                 { text: 'Hora Finaliza', style: 'tableHeader' },
                 { text: 'Observaciones', style: 'tableHeader' },
               ],
-              ...this.tipoComidas.map(obj => {
+              ...this.tipoComidas.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableD' },
                   { text: obj.tipo, style: 'itemsTableD' },
@@ -347,7 +347,7 @@ export class ListarTipoComidasComponent implements OnInit {
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   ExportToExcel() {
-    const wsc: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipoComidas.map(obj => {
+    const wsc: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipoComidas.map((obj: any) => {
       return {
         CODIGO: obj.id,
         SERVICIO: obj.tipo,

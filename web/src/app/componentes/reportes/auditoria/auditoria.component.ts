@@ -265,7 +265,7 @@ export class AuditoriaComponent implements OnInit {
 
   GenerarExcel(datos: any) {
     let accion = '';
-    const wsl: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos.map(obj => {
+    const wsl: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos.map((obj: any) => {
       if (obj.action === 'I') {
         accion = 'Insertar';
       }

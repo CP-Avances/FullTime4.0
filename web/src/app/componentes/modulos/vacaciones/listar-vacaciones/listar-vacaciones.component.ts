@@ -400,7 +400,7 @@ export class ListarVacacionesComponent implements OnInit {
 
   AutorizarVacacionesMultiple() {
     let EmpleadosSeleccionados: any;
-    EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
+    EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
       return {
         id: obj.id,
         empleado: obj.nombre + ' ' + obj.apellido,
@@ -628,7 +628,7 @@ export class ListarVacacionesComponent implements OnInit {
    ** ************************************************************************************************* **/
 
   exportToExcel(opcion: string) {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Vacaciones solicitadas" ? this.listaVacacionDeparta : this.listaVacacionesFiltradaAutorizada).map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Vacaciones solicitadas" ? this.listaVacacionDeparta : this.listaVacacionesFiltradaAutorizada).map((obj: any) => {
       return {
         Nombre: obj.nombre + ' ' + obj.apellido,
         Estado: obj.estado,
@@ -654,7 +654,7 @@ export class ListarVacacionesComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   exportToCVS(opcion: string) {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Vacaciones solicitadas" ? this.listaVacacionDeparta : this.listaVacacionesFiltradaAutorizada).map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Vacaciones solicitadas" ? this.listaVacacionDeparta : this.listaVacacionesFiltradaAutorizada).map((obj: any) => {
       return {
         Nombre: obj.nombre + ' ' + obj.apellido,
         Estado: obj.estado,

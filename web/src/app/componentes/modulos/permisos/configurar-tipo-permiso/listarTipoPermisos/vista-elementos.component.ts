@@ -287,7 +287,7 @@ export class VistaElementosComponent implements OnInit {
                 { text: 'Fecha de restricción', style: 'tableHeader' },
 
               ],
-              ...this.tipoPermiso.map(obj => {
+              ...this.tipoPermiso.map((obj: any) => {
                 var descuento = this.DescuentoSelect[obj.tipo_descuento - 1];
                 var acceso = this.AccesoEmpleadoSelect[obj.solicita_empleado - 1];
                 var fecha = this.obtenerFecha(obj.fecha_fin);

@@ -683,7 +683,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
    ** ************************************************************************************************* **/
 
    exportToExcel(opcion: string) {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map((obj: any) => {
       return {
         Permiso: obj.id,
         Departamento: obj.depa_nombre,
@@ -712,7 +712,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
    ** ************************************************************************************************** **/
 
    exportToCVS(opcion: string) {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map((obj: any) => {
       return {
         Permiso: obj.id,
         Departamento: obj.depa_nombre,

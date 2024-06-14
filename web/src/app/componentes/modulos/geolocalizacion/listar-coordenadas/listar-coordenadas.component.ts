@@ -276,7 +276,7 @@ export class ListarCoordenadasComponent implements OnInit {
                 { text: 'Latitud', style: 'tableHeader' },
                 { text: 'Longitud', style: 'tableHeader' },
               ],
-              ...this.coordenadas.map(obj => {
+              ...this.coordenadas.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTable' },

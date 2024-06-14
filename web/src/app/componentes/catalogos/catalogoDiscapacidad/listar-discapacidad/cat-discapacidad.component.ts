@@ -48,7 +48,6 @@ export class CatDiscapacidadComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
-  filtradoDiscapacidad = ''; // VARIABLE DE BUSQUEDA DE DATOS
   archivoForm = new FormControl('', Validators.required);
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
@@ -119,9 +118,15 @@ export class CatDiscapacidadComponent implements OnInit {
     this.rest.ListarDiscapacidad().subscribe(res => {
       this.discapacidades = res
     }, error => {
-      this.toastr.error('Error al cargar los datos.', '', {
-        timeOut: 4000,
-      });
+      if(error.status == 400 || error.status == 404){
+        this.toastr.info('Registro vacio', 'Discapacidad', {
+          timeOut: 3500,
+        });
+      }else{
+        this.toastr.error('Error al cargar los datos', 'Discapacidad', {
+          timeOut: 3500,
+        });
+      }
     });
   }
 
@@ -135,7 +140,6 @@ export class CatDiscapacidadComponent implements OnInit {
     });
     this.ngOnInit();
     this.messajeExcel = '';
-    this.filtradoDiscapacidad = '';
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
   }
@@ -191,7 +195,7 @@ export class CatDiscapacidadComponent implements OnInit {
   nameFile: string;
   archivoSubido: Array<File>;
   mostrarbtnsubir: boolean = false;
-  // METODO PARA SELECCIONAR PLANTILLA DE DATOS -----------------------------------------------------------------
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS
   FileChange(element: any) {
     this.archivoSubido = [];
     this.nameFile = '';
@@ -236,12 +240,11 @@ export class CatDiscapacidadComponent implements OnInit {
 
     this.progreso = true;
 
-    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.Datos_discapacidad = res.data;
       this.messajeExcel = res.message;
-      console.log('probando plantilla discapacidad', this.Datos_discapacidad);
-
+      //console.log('probando plantilla discapacidad', this.Datos_discapacidad);
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -262,7 +265,7 @@ export class CatDiscapacidadComponent implements OnInit {
         });
       }
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      //console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
@@ -320,7 +323,6 @@ export class CatDiscapacidadComponent implements OnInit {
         this.toastr.success('Operación exitosa.', 'Plantilla de Discapacidad importada.', {
           timeOut: 3000,
         });
-        //window.location.reload();
         this.LimpiarCampos();
         this.archivoForm.reset();
         this.nameFile = '';
@@ -404,7 +406,7 @@ export class CatDiscapacidadComponent implements OnInit {
                 { text: 'Nombre', style: 'tableHeader' },
 
               ],
-              ...this.discapacidades.map(obj => {
+              ...this.discapacidades.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableD' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -431,7 +433,7 @@ export class CatDiscapacidadComponent implements OnInit {
 
   ExportToExcel() {
     this.OrdenarDatos(this.discapacidades);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidades.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidades.map((obj: any) => {
       return {
         CODIGO: obj.id,
         NOMBRE: obj.nombre,

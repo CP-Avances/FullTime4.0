@@ -32,7 +32,7 @@ export class ConfirmarCrearCarpetaComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
-    this.empleados = this.Empleados.lista.map(obj => {
+    this.empleados = this.Empleados.lista.map((obj: any) => {
       return obj;
     });
     this.Opcion();

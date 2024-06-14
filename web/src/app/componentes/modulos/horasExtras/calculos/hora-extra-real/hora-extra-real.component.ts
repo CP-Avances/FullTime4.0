@@ -463,7 +463,7 @@ export class HoraExtraRealComponent implements OnInit {
                 { text: 'Estado', style: 'tableHeader' },
                 { text: 'Nacionalidad', style: 'tableHeader' },
               ],
-              ...this.empleado.map(obj => {
+              ...this.empleado.map((obj: any) => {
                 var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
                 var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
@@ -708,7 +708,7 @@ export class HoraExtraRealComponent implements OnInit {
                 { text: 'Estado', style: 'tableHeader' },
                 { text: 'Nacionalidad', style: 'tableHeader' },
               ],
-              ...this.empleadoTimbre.map(obj => {
+              ...this.empleadoTimbre.map((obj: any) => {
                 var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
                 var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];

@@ -201,7 +201,7 @@ export class DetalleCatHorarioComponent implements OnInit {
     // VERIFICAR SI EXISTEN REGISTROS DE DETALLES
     if (this.datosDetalle.length != 0) {
 
-      this.datosDetalle.map(obj => {
+      this.datosDetalle.map((obj: any) => {
 
         // VALIDAR ORDEN DE DETALLES
         contador = contador + 1;
@@ -336,7 +336,7 @@ export class DetalleCatHorarioComponent implements OnInit {
     if (this.datosDetalle.length != 0) {
 
       // VALIDAR ORDEN DE DETALLES
-      this.datosDetalle.map(obj => {
+      this.datosDetalle.map((obj: any) => {
         contador = contador + 1;
         if (obj.orden === datos.orden && obj.orden === 1) {
           orden1 = orden1 + 1;

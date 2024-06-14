@@ -15,7 +15,6 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.serv
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 import { PlanComidasComponent } from '../plan-comidas/plan-comidas.component';
-import { use } from 'echarts';
 
 @Component({
   selector: 'app-planificacion-comidas',
@@ -315,7 +314,7 @@ export class PlanificacionComidasComponent implements OnInit {
         let h_fin = this.validar.FormatearHora(plan.hora_fin, this.formato_hora);
 
         // REGISTRAR PLANIFICACION DEL USUARIO
-        this.fechasHorario.map(obj => {
+        this.fechasHorario.map((obj: any) => {
           planEmpleado.fecha = obj;
 
           // METODO PARA PLANIFICAR ALIMENTACION DEL USUARIO
@@ -359,7 +358,7 @@ export class PlanificacionComidasComponent implements OnInit {
       fecha_fin: form.fechaFinForm
     }
     // PROCESAR TODOS LOS DATOS
-    this.data.map(obj => {
+    this.data.map((obj: any) => {
       datosDuplicados.id = obj.id;
       // METODO PARA VERIFICAR DATOS DUPLICADOS
       this.restPlan.BuscarDuplicadosFechas(datosDuplicados).subscribe(res => {
@@ -393,7 +392,7 @@ export class PlanificacionComidasComponent implements OnInit {
       fechaInicio: form.fechaInicioForm,
       fechaFinal: form.fechaFinForm
     }
-    sin_planificacion.map(obj => {
+    sin_planificacion.map((obj: any) => {
       // METODO PARA BUSCAR EXISTENCIA DE HORARIO
       this.restH.BuscarHorarioFechas(obj.codigo, datosHorario).subscribe(res => {
         contar_horario = contar_horario + 1;
@@ -440,7 +439,7 @@ export class PlanificacionComidasComponent implements OnInit {
       else {
         // MENSAJE SI ALGUNOS USUARIOS CUENTAN CON PLANIFICACION
         var nombres_empleados = '';
-        array_datos.map(obj => {
+        array_datos.map((obj: any) => {
           nombres_empleados = nombres_empleados + ' - ' + obj.nombre
         })
         this.toastr.info('',
@@ -466,7 +465,7 @@ export class PlanificacionComidasComponent implements OnInit {
       else {
         // SI ALGUNOS USUARIOS O CUENTA CON PLANIFICACION HORARIA
         var nombres_empleados = '';
-        array_datos.map(obj => {
+        array_datos.map((obj: any) => {
           nombres_empleados = nombres_empleados + ' - ' + obj.nombre
         })
         this.toastr.info('',
@@ -525,7 +524,7 @@ export class PlanificacionComidasComponent implements OnInit {
             ip: this.ip,
           }
           // LEER DATOS DE CADA USUARIOS
-          empleados_planificados.map(obj => {
+          empleados_planificados.map((obj: any) => {
             planEmpleado.codigo = obj.codigo;
             planEmpleado.id_empleado = obj.id;
 

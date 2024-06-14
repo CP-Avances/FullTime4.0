@@ -176,7 +176,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
 
 
-        tabla.map(x => {
+        tabla.map((x: any)  => {
 
             if (x.disponibilidad == true) {
                 this.tablasD.push({
@@ -255,8 +255,8 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         this.data_pdf = [];
         var tablas = '';
         var acciones = '';
-        tablas = this.tablasSolicitadas.map(x => x.nombre).join(',');
-        acciones = this.accionesSeleccionadas.map(x => x).join(',');
+        tablas = this.tablasSolicitadas.map((x: any)  => x.nombre).join(',');
+        acciones = this.accionesSeleccionadas.map((x: any)  => x).join(',');
 
         const buscarTabla = {
             tabla: tablas,

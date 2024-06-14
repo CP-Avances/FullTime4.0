@@ -40,11 +40,6 @@ export class UsuarioService {
       catchError(data));
   }
 
-  // METODO PARA REGISTRAR ACCESOS AL SISTEMA
-  CrearAccesosSistema(data: any) {
-    return this.http.post(`${environment.url}/usuarios/acceso`, data);
-  }
-
   // METODO PARA CAMBIAR PASSWORD
   ActualizarPassword(data: any) {
     return this.http.put(`${environment.url}/usuarios`, data);
@@ -134,20 +129,12 @@ export class UsuarioService {
 
 
   /** *********************************************************************************************** **
-   ** **                       SERVICIOS DE TABLA USUARIO - SUCURSAL                               ** **
+   ** **                     SERVICIOS DE USUARIO - SUCURSAL - DEPARTAMENTO                        ** **
    ** *********************************************************************************************** */
 
   // METODO DE BUSQUEDA DE DATOS DE USUARIO
   BuscarUsuarioSucursal(id_empleado: any) {
     return this.http.post(`${environment.url}/usuarios/buscar-usuario-sucursal`, id_empleado);
-  }
-
-  // REGISTRAR USUARIO
-  RegistrarUsuarioSucursal(data: any) {
-    return this.http.post(`${environment.url}/usuarios/usuario-sucursal`, data)
-      .pipe(
-        catchError(data)
-      );
   }
 
   //REGISTRAR USUARIO - DEPARTAMENTO
@@ -163,25 +150,36 @@ export class UsuarioService {
     return this.http.post(`${environment.url}/usuarios/buscar-usuario-departamento`, id_empleado);
   }
 
-  // METODO DE BUSQUEDA DE DATOS DE USUARIO - SUCURSAL
-  BuscarUsuarioSucursalPrincipal(id_empleado: any) {
-    return this.http.post(`${environment.url}/usuarios/principal-usuario-sucursal`, id_empleado);
+  // METODO PARA BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO
+  BuscarAsignacionUsuarioDepartamento(data: any) {
+    return this.http.post(`${environment.url}/usuarios/buscar-asignacion-usuario-departamento`, data);
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO DE USUARIO - SUCURSAL
-  ActualizarUsuarioSucursalPrincipal(data: any) {
-    return this.http.put(`${environment.url}/usuarios/actualizar-usuario-sucursal`, data).pipe(
+  // METODO PARA ACTUALIZAR REGISTRO DE USUARIO - DEPARTAMENTOS
+  ActualizarUsuarioDepartamento(data: any) {
+    return this.http.put(`${environment.url}/usuarios/actualizar-usuario-departamento`, data).pipe(
       catchError(data));
   }
 
+  // METODO DE BUSQUEDA DE DATOS DE USUARIO - SUCURSAL
+  // BuscarUsuarioSucursalPrincipal(id_empleado: any) {
+  //   return this.http.post(`${environment.url}/usuarios/principal-usuario-sucursal`, id_empleado);
+  // }
+
+  // METODO PARA ACTUALIZAR REGISTRO DE USUARIO - SUCURSAL
+  // ActualizarUsuarioSucursalPrincipal(data: any) {
+  //   return this.http.put(`${environment.url}/usuarios/actualizar-usuario-sucursal`, data).pipe(
+  //     catchError(data));
+  // }
+
   // METODO PARA ELIMINAR REGISTROS DE USUARIO - SUCURSAL
-  EliminarUsuarioSucursal(id_usucursal: any, datos: any) {
-    const url = `${environment.url}/usuarios/eliminar-usuario-sucursal/${id_usucursal}`;
-    const httpOptions = {
-      body: datos
-    };
-    return this.http.request('delete', url, httpOptions);
-  }
+  // EliminarUsuarioSucursal(id_usucursal: any, datos: any) {
+  //   const url = `${environment.url}/usuarios/eliminar-usuario-sucursal/${id_usucursal}`;
+  //   const httpOptions = {
+  //     body: datos
+  //   };
+  //   return this.http.request('delete', url, httpOptions);
+  // }
 
   // METODO PARA ELIMINAR REGISTROS DE USUARIO - DEPARTAMENTO
   EliminarUsuarioDepartamento(datos: any) {

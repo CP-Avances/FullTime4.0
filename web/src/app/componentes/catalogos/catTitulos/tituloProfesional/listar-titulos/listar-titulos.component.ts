@@ -46,10 +46,6 @@ export class ListarTitulosComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number; // VARIABLE QUE ALMACENA ID DE EMPLEADO QUE INICIO SESION
 
-  // VARIABLES USADAS PARA FILTROS DE BUSQUEDA
-  filtradoNombre = '';
-  filtradoNivel = '';
-
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
   nivelF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
@@ -424,7 +420,7 @@ export class ListarTitulosComponent implements OnInit {
                 { text: 'Nombre', style: 'tableHeader' },
                 { text: 'Nivel', style: 'tableHeader' },
               ],
-              ...this.verTitulos.map(obj => {
+              ...this.verTitulos.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableD' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -451,7 +447,7 @@ export class ListarTitulosComponent implements OnInit {
 
   ExportToExcel() {
     this.OrdenarDatos(this.verTitulos);
-    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.verTitulos.map(obj => {
+    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.verTitulos.map((obj: any) => {
       return {
         CODIGO: obj.id,
         TITULO: obj.nombre,

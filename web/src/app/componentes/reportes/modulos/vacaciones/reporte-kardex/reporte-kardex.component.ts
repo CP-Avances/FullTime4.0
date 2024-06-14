@@ -409,7 +409,7 @@ export class ReporteKardexComponent implements OnInit {
               text: 'Min'
             }
           ],
-          ...d.map(obj => {
+          ...d.map((obj: any) => {
             return [
               { style: 'itemsTableCentrado', text: obj.periodo },
               { style: 'itemsTable', text: obj.detalle },

@@ -79,7 +79,7 @@ export class PlanHoraExtraAutorizaComponent implements OnInit {
 
   insertarAutorizacion(form: any) {
     if (this.data.carga === 'multiple') {
-      this.data.datosHora.map(obj => {
+      this.data.datosHora.map((obj: any) => {
         if (obj.estado === 'Pre-autorizado') {
           this.restPlanH.BuscarDatosAutorizacion(obj.id).subscribe(data => {
             var documento = data[0].empleado_estado;

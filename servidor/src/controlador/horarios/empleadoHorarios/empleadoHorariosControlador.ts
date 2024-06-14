@@ -368,7 +368,7 @@ class EmpleadoHorariosControlador {
                 var newDate = start.setDate(start.getDate() + 1);
                 start = new Date(newDate);
             }
-            fechasHorario.map(obj => {
+            fechasHorario.map((obj: any) => {
                 arrayDetalles.map(async (element: any) => {
                     try {
                         var accion = 0;

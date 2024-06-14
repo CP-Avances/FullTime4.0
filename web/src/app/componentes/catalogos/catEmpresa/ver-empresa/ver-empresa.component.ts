@@ -107,6 +107,9 @@ export class VerEmpresaComponent implements OnInit {
       this.datosEmpresa = datos;
       this.p_color = this.datosEmpresa[0].color_principal;
       this.s_color = this.datosEmpresa[0].color_secundario;
+      console.log('ver datos de colores ', this.p_color, ' - ', this.s_color)
+      this.principal.patchValue(this.p_color);
+      this.secundario.patchValue(this.s_color);
       if (this.datosEmpresa[0].establecimiento === null || this.datosEmpresa[0].establecimiento === '' || this.datosEmpresa[0].establecimiento === undefined) {
         this.nombre_establecimiento = 'establecimientos';
       }
@@ -231,10 +234,9 @@ export class VerEmpresaComponent implements OnInit {
 
   // METODO DE REGISTRO DE COLORES
   CambiarColores() {
-
     let datos = {
-      color_p: this.p_color,
-      color_s: this.s_color,
+      color_p: this.principal.value,
+      color_s: this.secundario.value,
       id: this.datosEmpresa[0].id,
       user_name: this.user_name,
       ip: this.ip
@@ -355,7 +357,7 @@ export class VerEmpresaComponent implements OnInit {
                 { text: 'REPRESENTANTE', style: 'tableHeader' },
                 { text: 'RESUMEN', style: 'tableHeaderS' }
               ],
-              ...this.datosEmpresa.map(obj => {
+              ...this.datosEmpresa.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },

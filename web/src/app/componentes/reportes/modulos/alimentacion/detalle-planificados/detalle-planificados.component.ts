@@ -546,7 +546,7 @@ export class DetallePlanificadosComponent implements OnInit {
             { text: 'COSTO', style: 'centrado' },
             { text: 'COSTO TOTAL', style: 'centrado' },
           ],
-          ...arreglo.map(obj => {
+          ...arreglo.map((obj: any) => {
             return [
               { text: '', style: 'itemsTableD' },
               { text: obj.apellido + ' ' + obj.nombre, style: 'itemsTableD' },
@@ -632,7 +632,7 @@ export class DetallePlanificadosComponent implements OnInit {
      ******************************************************************************************************/
   exportToExcelAlimentacion(form: any) {
     var j = 0;
-    const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificados.map(obj => {
+    const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificados.map((obj: any) => {
       return {
         N_REGISTROS: j = j + 1,
         TICKET: '',
@@ -657,7 +657,7 @@ export class DetallePlanificadosComponent implements OnInit {
     }
 
     var i = 0;
-    const wss: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.solicitados.map(obj => {
+    const wss: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.solicitados.map((obj: any) => {
       return {
         N_REGISTROS: i = i + 1,
         TICKET: '',
@@ -682,7 +682,7 @@ export class DetallePlanificadosComponent implements OnInit {
     }
 
     var k = 0;
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.extras.map(obj => {
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.extras.map((obj: any) => {
       return {
         N_REGISTROS: k = k + 1,
         TICKET: '',

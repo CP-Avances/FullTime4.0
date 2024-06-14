@@ -63,13 +63,13 @@ export class ConfigEmpleadosComponent implements OnInit {
       sessionStorage.setItem('columnasValidas', columnasValidas.toString())
 
       let ObjetoJSON = {
-        // cedula: this.task.subtasks.filter(obj => {return (obj.name === 'Cedula')}).map(obj => {return obj.completed})[0],
-        // nombre: this.task.subtasks.filter(obj => {return (obj.name === 'Nombre')}).map(obj => {return obj.completed})[0],
-        codigo: this.task.subtasks.filter(obj => { return (obj.name === 'Codigo') }).map(obj => { return obj.completed })[0],
-        depart: this.task.subtasks.filter(obj => { return (obj.name === 'Departamento') }).map(obj => { return obj.completed })[0],
-        cargo: this.task.subtasks.filter(obj => { return (obj.name === 'Cargo') }).map(obj => { return obj.completed })[0],
-        grupo: this.task.subtasks.filter(obj => { return (obj.name === 'Grupo') }).map(obj => { return obj.completed })[0],
-        detall: this.task.subtasks.filter(obj => { return (obj.name === 'Detalle Grupo') }).map(obj => { return obj.completed })[0]
+        // cedula: this.task.subtasks.filter(obj => {return (obj.name === 'Cedula')}).map((obj: any) => {return obj.completed})[0],
+        // nombre: this.task.subtasks.filter(obj => {return (obj.name === 'Nombre')}).map((obj: any) => {return obj.completed})[0],
+        codigo: this.task.subtasks.filter(obj => { return (obj.name === 'Codigo') }).map((obj: any) => { return obj.completed })[0],
+        depart: this.task.subtasks.filter(obj => { return (obj.name === 'Departamento') }).map((obj: any) => { return obj.completed })[0],
+        cargo: this.task.subtasks.filter(obj => { return (obj.name === 'Cargo') }).map((obj: any) => { return obj.completed })[0],
+        grupo: this.task.subtasks.filter(obj => { return (obj.name === 'Grupo') }).map((obj: any) => { return obj.completed })[0],
+        detall: this.task.subtasks.filter(obj => { return (obj.name === 'Detalle Grupo') }).map((obj: any) => { return obj.completed })[0]
       }
 
       let jsonTask = JSON.stringify(ObjetoJSON)

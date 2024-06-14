@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
+import { config } from 'rxjs';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
@@ -36,12 +37,22 @@ export class VisualizarAsignacionesComponent {
     this.id = this.data.id;
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  // METODO PARA CONFIRMAR SI SE ELIMINA UN REGISTRO
   ConfirmarDeleteProceso(id: number) {
-    this.dialogo.open(MetodosComponent, { width: '450px' }).afterClosed()
+    this.dialogo.open(MetodosComponent,  { width: '450px', data: 'eliminar' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.EliminarAsignacion(id);
+        }
+      });
+  }
+
+  // METODO PARA CONFIRMAR SI SE DESHABILITA UN REGISTRO
+  ConfirmarDeshabilitarProceso(id: number) {
+    this.dialogo.open(MetodosComponent, { width: '450px', data: 'deshabilitar' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.DeshabilitarAsignacion(id);
         }
       });
   }
@@ -56,6 +67,30 @@ export class VisualizarAsignacionesComponent {
     this.usuario.EliminarUsuarioDepartamento(datos).subscribe(data => {
       this.asignaciones = this.asignaciones.filter((asignacion: any) => asignacion.id !== id);
     });
+  }
+
+  // METODO PARA DESHABILITAR ASIGNACIONES
+  DeshabilitarAsignacion(id: number) {
+    const asignacion = this.asignaciones.find((asignacion: any) => asignacion.id === id);
+    const datos = {
+      id: id,
+      id_departamento: asignacion.id_departamento,
+      principal: asignacion.principal,
+      personal: false,
+      administra: false,
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+    this.usuario.ActualizarUsuarioDepartamento(datos).subscribe(data => {
+      this.asignaciones = this.asignaciones.map((asignacion: any) => {
+        if (asignacion.id === id) {
+          asignacion.personal = false;
+          asignacion.administra = false;
+        }
+        return asignacion;
+      });
+    });
+
   }
 
   // METODO PARA MANEJAR LA PAGINACION

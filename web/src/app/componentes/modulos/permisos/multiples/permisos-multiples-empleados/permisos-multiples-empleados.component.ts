@@ -26,13 +26,11 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
   idEmpleadoLogueado: any;
-  rolEmpleado: number;
-  isEmpleado: boolean = false;
   asignacionesAcceso: any;
-  idUsuariosAcceso: any = [];
-  idDepartamentosAcceso: any = [];
-  idSucursalesAcceso: any = [];
   idCargosAcceso: any = [];
+  idUsuariosAcceso: any = [];
+  idSucursalesAcceso: any = [];
+  idDepartamentosAcceso: any = [];
 
   // CONTROL DE CRITERIOS DE BUSQUEDA
   codigo = new FormControl('');
@@ -135,8 +133,6 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     private funciones: MainNavService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
-    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
-    this.isEmpleado = this.rolEmpleado != 1 ? true : false;
   }
 
   ngOnInit(): void {
@@ -166,10 +162,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
   async PresentarInformacion() {
     let informacion = { id_empleado: this.idEmpleadoLogueado };
     let respuesta: any = [];
-    if (this.isEmpleado) {
-      this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
-      await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
-    }
+    await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
     this.informacion.ObtenerInformacionUserRol(informacion).subscribe(res => {
       respuesta = res[0];
       this.AdministrarInformacion(respuesta, informacion);
@@ -191,19 +184,10 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     this.cargos = [];
 
     this.usua_sucursales = [];
-    let respuesta: any = [];
-    let codigos = '';
-    //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
-      respuesta = data;
-      respuesta.forEach((obj: any) => {
-        if (codigos === '') {
-          codigos = '\'' + obj.id_sucursal + '\''
-        }
-        else {
-          codigos = codigos + ', \'' + obj.id_sucursal + '\''
-        }
-      })
+
+    console.log('empleado ', empleado)
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
+      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
       //console.log('ver sucursales ', codigos);
 
       // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
@@ -328,20 +312,19 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     this.OmitirDuplicados();
 
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
-    if (this.isEmpleado) {
-      this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
-      this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
-      this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
-      this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.includes(regimen.id_suc));
 
-      this.empleados.forEach((empleado: any) => {
-        this.idCargosAcceso = [...new Set([...this.idCargosAcceso, empleado.id_cargo_])];
-      });
-            
-      this.cargos = this.cargos.filter((cargo: any) => 
-        this.idSucursalesAcceso.includes(cargo.id_suc) && this.idCargosAcceso.includes(cargo.id)
-      );
-    }
+    this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
+    this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
+    this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
+    this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.includes(regimen.id_suc));
+
+    this.empleados.forEach((empleado: any) => {
+      this.idCargosAcceso = [...new Set([...this.idCargosAcceso, empleado.id_cargo_])];
+    });
+
+    this.cargos = this.cargos.filter((cargo: any) =>
+      this.idSucursalesAcceso.includes(cargo.id_suc) && this.idCargosAcceso.includes(cargo.id)
+    );
   }
 
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
@@ -373,14 +356,27 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
   // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
   async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const data = {
+    const dataEmpleado = {
       id_empleado: Number(idEmpleado)
     }
 
-    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(data));
+    let noPersonal: boolean = false;
+
+    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
     this.asignacionesAcceso = res;
 
     const promises = this.asignacionesAcceso.map((asignacion: any) => {
+      if (asignacion.principal) {
+        if (!asignacion.administra && !asignacion.personal) {
+          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+        } else if (asignacion.administra && !asignacion.personal) {
+          noPersonal = true;
+        } else if (asignacion.personal && !asignacion.administra) {
+          this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
+          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+        }
+      }
+
       this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
       this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
 
@@ -394,6 +390,10 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
     const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
     this.idUsuariosAcceso.push(...ids);
+
+    if (noPersonal) {
+      this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleadoLogueado);
+    }
 
   }
 
@@ -507,13 +507,13 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
    ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
    ** ************************************************************************************** **/
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
     const numSelected = this.selectionSuc.selected.length;
     return numSelected === this.sucursales.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
@@ -528,13 +528,13 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedReg() {
     const numSelected = this.selectionReg.selected.length;
     return numSelected === this.regimen.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleReg() {
     this.isAllSelectedReg() ?
       this.selectionReg.clear() :
@@ -549,13 +549,13 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedCarg() {
     const numSelected = this.selectionCarg.selected.length;
     return numSelected === this.cargos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleCarg() {
     this.isAllSelectedCarg() ?
       this.selectionCarg.clear() :
@@ -570,13 +570,13 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedDep() {
     const numSelected = this.selectionDep.selected.length;
     return numSelected === this.departamentos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
@@ -591,13 +591,13 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     return `${this.selectionDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedEmp() {
     const numSelected = this.selectionEmp.selected.length;
     return numSelected === this.empleados.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
@@ -763,7 +763,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
 
   /** ************************************************************************************** **
-   ** **                       METODOS DE REGISTRO DE PERMISOS                            ** ** 
+   ** **                       METODOS DE REGISTRO DE PERMISOS                            ** **
    ** ************************************************************************************** **/
 
   // METODO PARA ABRIR FORMULARIO DE PERMISO

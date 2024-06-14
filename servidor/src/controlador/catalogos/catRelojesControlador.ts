@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
+import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
-import excel from 'xlsx';
-import pool from '../../database';
 import fs from 'fs';
+import path from 'path';
+import pool from '../../database';
+import excel from 'xlsx';
 
 class RelojesControlador {
 
@@ -256,95 +258,7 @@ class RelojesControlador {
         }
     }
 
-    public async CargaPlantillaRelojes(req: Request, res: Response): Promise<void> {
-        let list: any = req.files;
-        let cadena = list.uploads[0].path;
-        let filename = cadena.split("\\")[1];
-        var filePath = `./plantillas/${filename}`
-
-        const workbook = excel.readFile(filePath);
-        const sheet_name_list = workbook.SheetNames;
-        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-
-        plantilla.forEach(async (data: any) => {
-            try {
-                // DATOS DE LA PLANTILLA INGRESADA
-                const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante,
-                    mac, tiene_funciones, sucursal, departamento, codigo_reloj, numero_accion, user_name, user_ip } = data;
-
-                // INICIAR TRANSACCION
-                await pool.query('BEGIN');
-    
-                // BUSCAR ID DE LA SUCURSAL INGRESADA
-                const id_sucursal = await pool.query('SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
-                
-                const id_departamento = await pool.query('SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND ' +
-                    'id_sucursal = $2', [departamento.toUpperCase(), id_sucursal.rows[0]['id']]);
-
-                if (id_sucursal.rowCount === 0 || id_departamento.rowCount === 0) {
-                    // AUDITORIA
-                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                        tabla: 'ed_relojes',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: user_ip,
-                        observacion: `Error al guardar el reloj con nombre: ${nombre} e ip: ${ip}.`
-                    });
-
-                    // FINALIZAR TRANSACCION
-                    await pool.query('COMMIT');
-                    return;
-                }
-    
-                // VERIFICAR QUE SE HAYA INGRESADO NÚMERO DE ACCIONES SI EL DISPOSITIVO LAS TIENE
-                if (tiene_funciones === true) {
-                    var accion = numero_accion;
-                }
-                else {
-                    accion = 0;
-                }
-    
-                await pool.query(
-                    `
-                    INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
-                        id_fabricacion, fabricante, mac, tiene_funciones, id_sucursal, id_departamento, id, numero_accion) 
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-                    `
-                    , [nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac,
-                        tiene_funciones, id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], codigo_reloj, accion]);
-                
-                // AUDITORIA
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'ed_relojes',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tien_funciones": "${tiene_funciones}", "id_sucursal": "${id_sucursal.rows[0]['id']}", "id_departamento": "${id_departamento.rows[0]['id']}", "id": "${codigo_reloj}", "numero_accion": "${accion}"}`,
-                    ip: user_ip,
-                    observacion: null
-                });
-
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-                res.jsonp({ message: 'correcto' });
-            } catch (error) {
-                // REVERTIR TRANSACCION
-                await pool.query('ROLLBACK');
-                return;
-            }
-        });
-        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-        fs.access(filePath, fs.constants.F_OK, (err) => {
-            if (err) {
-            } else {
-                // ELIMINAR DEL SERVIDOR
-                fs.unlinkSync(filePath);
-            }
-        });
-
-    }
+   
 
     public async VerificarDatos(req: Request, res: Response): Promise<void> {
         let list: any = req.files;
@@ -463,66 +377,425 @@ class RelojesControlador {
     }
 
     public async VerificarPlantilla(req: Request, res: Response) {
-        let list: any = req.files;
-        let cadena = list.uploads[0].path;
-        let filename = cadena.split("\\")[1];
-        var filePath = `./plantillas/${filename}`
-        const workbook = excel.readFile(filePath);
-        const sheet_name_list = workbook.SheetNames;
-        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-        var contarNombreData = 0;
-        var contarCodigoData = 0;
-        var contarIP_Data = 0;
-        var contador_arreglo = 1;
-        var arreglos_datos: any = [];
-        //Leer la plantilla para llenar un array con los datos cedula y usuario para verificar que no sean duplicados
-        plantilla.forEach(async (data: any) => {
-            // Datos que se leen de la plantilla ingresada
-            const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante,
-                mac, tiene_funciones, sucursal, departamento, codigo_reloj, numero_accion } = data;
-            let datos_array = {
-                nombre: nombre,
-                ip: ip,
-                codigo: codigo_reloj
-            }
-            arreglos_datos.push(datos_array);
-        });
+        try{  
+            const documento = req.file?.originalname;
+            let separador = path.sep;
+            let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+            const workbook = excel.readFile(ruta);
+            let verificador = ObtenerIndicePlantilla(workbook, 'BIOMETRICOS');
+            if (verificador === false) {
+              return res.jsonp({ message: 'no_existe', data: undefined });
+            }else {
+                const sheet_name_list = workbook.SheetNames;
+                const plantilla_dispositivos = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                console.log('plantilla_dispositivos: ',plantilla_dispositivos);
+                
+                let data: any = {
+                    fila: '',
+                    establecimiento: '',
+                    departamento: '',
+                    nombre_dispo: '',
+                    codigo: '',
+                    direccion_ip: '',
+                    puerto: '',
+                    acciones: '',
+                    numero_acciones: '',
+                    marca: '',
+                    modelo: '',
+                    id_fabricante: '',
+                    fabricante: '',
+                    numero_serie: '',
+                    direccion_mac: '',
+                    contrasena: '',
+                    observacion: ''
+                }
+                
+                
+                var listDispositivos: any = [];
+                var duplicados: any = [];
+                var mensaje: string = 'correcto';
 
-        // Vamos a verificar dentro de arreglo_datos que no se encuentren datos duplicados
-        for (var i = 0; i <= arreglos_datos.length - 1; i++) {
-            for (var j = 0; j <= arreglos_datos.length - 1; j++) {
-                if (arreglos_datos[i].nombre.toUpperCase() === arreglos_datos[j].nombre.toUpperCase()) {
-                    contarNombreData = contarNombreData + 1;
-                }
-                if (arreglos_datos[i].ip === arreglos_datos[j].ip) {
-                    contarIP_Data = contarIP_Data + 1;
-                }
-                if (arreglos_datos[i].codigo === arreglos_datos[j].codigo) {
-                    contarCodigoData = contarCodigoData + 1;
-                }
+                //Exprecion regular para validar el formato de una IPv4.
+                const ipv4Regex = /^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/;
+                //Exprecion regular para validar el formato de una direccion mac
+                const direccMac = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$|^[0-9A-Fa-f]{12}$/;
+                //Exprecion regular para validar el formato de solo números.
+                const regex = /^[0-9]+$/;
+
+                // LECTURA DE LOS DATOS DE LA PLANTILLA
+                plantilla_dispositivos.forEach(async (dato: any, indice: any, array: any) => {
+                    var { ITEM, ESTABLECIMIENTO, DEPARTAMENTO, NOMBRE_DISPOSITIVO,
+                        CODIGO, DIRECCION_IP, PUERTO, ACCIONES, NUMERO_ACCIONES, MARCA,
+                        MODELO, ID_FABRICANTE, FABRICANTE, NUMERO_SERIE, DIRECCION_MAC, CONTRASENA
+                     } = dato;
+
+                     // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                     if((ITEM != undefined && ITEM != '') && (ESTABLECIMIENTO != undefined && ESTABLECIMIENTO != '') &&
+                        (DEPARTAMENTO != undefined && DEPARTAMENTO != '') && (NOMBRE_DISPOSITIVO != undefined && NOMBRE_DISPOSITIVO != '') &&
+                        (CODIGO != undefined && CODIGO != '') && (DIRECCION_IP != undefined && DIRECCION_IP != '') &&
+                        (PUERTO != undefined && PUERTO != '') && (ACCIONES != undefined && ACCIONES != '') &&
+                        (NUMERO_ACCIONES != undefined && NUMERO_ACCIONES != '') && (MARCA != undefined && MARCA != '') &&
+                        (MODELO != undefined && MODELO != '') && (ID_FABRICANTE != undefined && ID_FABRICANTE != '') &&
+                        (FABRICANTE != undefined && FABRICANTE != '') && (NUMERO_SERIE != undefined && NUMERO_SERIE != '') &&
+                        (DIRECCION_MAC != undefined && DIRECCION_MAC != '') && (CONTRASENA != undefined && CONTRASENA != '')
+                     ){
+                        data.fila = ITEM;
+                        data.establecimiento = ESTABLECIMIENTO; 
+                        data.departamento = DEPARTAMENTO;
+                        data.nombre_dispo =  NOMBRE_DISPOSITIVO;
+                        data.codigo = CODIGO;
+                        data.direccion_ip = DIRECCION_IP;
+                        data.puerto = PUERTO;
+                        data.acciones = ACCIONES;
+                        data.numero_acciones = NUMERO_ACCIONES;
+                        data.marca = MARCA;
+                        data.modelo = MODELO;                    
+                        data.id_fabricante = ID_FABRICANTE;
+                        data.fabricante = FABRICANTE;
+                        data.numero_serie = NUMERO_SERIE;
+                        data.direccion_mac = DIRECCION_MAC;
+                        data.contrasena = CONTRASENA;
+                        data.observacion = 'no registrado';
+
+                        listDispositivos.push(data);
+
+                    }else{
+                        data.fila = ITEM;
+                        data.establecimiento = ESTABLECIMIENTO; 
+                        data.departamento = DEPARTAMENTO;
+                        data.nombre_dispo =  NOMBRE_DISPOSITIVO;
+                        data.codigo = CODIGO;
+                        data.direccion_ip = DIRECCION_IP;
+                        data.puerto = PUERTO;
+                        data.acciones = ACCIONES;
+                        data.numero_acciones = NUMERO_ACCIONES;
+                        data.marca = MARCA;
+                        data.modelo = MODELO;                    
+                        data.id_fabricante = ID_FABRICANTE;
+                        data.fabricante = FABRICANTE;
+                        data.numero_serie = NUMERO_SERIE;
+                        data.direccion_mac = DIRECCION_MAC;
+                        data.contrasena = CONTRASENA;
+                        data.observacion = 'no registrado';
+
+                        if (data.fila == '' || data.fila == undefined) {
+                            data.fila = 'error';
+                            mensaje = 'error'
+                        }
+                        if (ESTABLECIMIENTO == undefined) {
+                            data.establecimiento = 'No registrado';
+                            data.observacion = 'Establecimiento ' + data.observacion;
+                        }
+                        if (DEPARTAMENTO == undefined) {
+                            data.departamento = 'No registrado';
+                            data.observacion = 'Departamento ' + data.observacion;
+                        }
+                        if (NOMBRE_DISPOSITIVO == undefined) {
+                            data.nombre_dispo = 'No registrado';
+                            data.observacion = 'Nombre dispositivo ' + data.observacion;
+                        }
+                        if (CODIGO == undefined) {
+                            data.codigo = 'No registrado';
+                            data.observacion = 'Codigo ' + data.observacion;
+                        }
+                        if (DIRECCION_IP == undefined) {
+                            data.direccion_ip = 'No registrado';
+                            data.observacion = 'Dirección IP ' + data.observacion;
+                        }
+                        if (PUERTO == undefined) {
+                            data.puerto = 'No registrado';
+                            data.observacion = 'Puerto ' + data.observacion;
+                        }
+                        if (ACCIONES == undefined) {
+                            data.acciones = 'No registrado';
+                            data.observacion = 'Acciones ' + data.observacion;
+                        }
+                        if (NUMERO_ACCIONES == undefined) {
+                            data.numero_acciones = ' - ';
+                        }
+                        if (MARCA == undefined) {
+                            data.marca = ' - ';
+                        }
+                        if (MODELO == undefined) {
+                            data.modelo = ' - ';
+                        }
+                        if (ID_FABRICANTE == undefined) {
+                            data.id_fabricante = ' - ';
+                        }
+                        if (FABRICANTE == undefined) {
+                            data.fabricante = ' - ';
+                        }
+                        if (NUMERO_SERIE == undefined) {
+                            data.numero_serie = ' - ';
+                        }
+                        if (DIRECCION_MAC == undefined) {
+                            data.direccion_mac = ' - ';
+                        }
+                        if (CONTRASENA == undefined) {
+                            data.contrasena = ' - ';
+                        }
+
+
+                        listDispositivos.push(data);
+
+                    }
+            
+                    data = {};
+
+                });
+
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs.access(ruta, fs.constants.F_OK, (err) => {
+                    if (err) {
+                    } else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs.unlinkSync(ruta);
+                    }
+                });
+
+                listDispositivos.forEach(async (item: any) => {
+                    if (item.observacion == 'no registrado') {
+                        var validEstablecimiento = await pool.query(
+                            `SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`
+                            ,[item.establecimiento.toUpperCase()])
+                        if (validEstablecimiento.rows[0] != undefined && validEstablecimiento.rows[0] != '') {
+                            var validDeparta = await pool.query(
+                                `SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1`
+                                ,[item.departamento.toUpperCase()])
+                                if(validDeparta.rows[0] != undefined && validDeparta.rows[0] != ''){
+                                    if(validEstablecimiento.rows[0].id == validDeparta.rows[0].id_sucursal){
+                                        var validCodigo = await pool.query(
+                                            `SELECT * FROM ed_relojes WHERE codigo = $1`
+                                            ,[item.codigo])
+                                        if(validCodigo.rows[0] == undefined || validCodigo.rows[0] == ''){
+                                            if(ipv4Regex.test(item.direccion_ip.toString())){
+                                                var validDireccIP = await pool.query(
+                                                    `SELECT * FROM ed_relojes WHERE ip = $1`
+                                                    ,[item.direccion_ip])
+                                                if(validDireccIP.rows[0] == undefined || validDireccIP.rows[0] == '')
+                                                    if (regex.test(item.puerto)) {
+                                                        if (item.puerto.length > 6) {
+                                                            item.observacion = 'El puerto debe ser de 6 digitos';
+                                                        } else{
+                                                            if(item.acciones.toString().toLowerCase() == 'si' || item.acciones.toString().toLowerCase() == 'no'){
+                                                                if(item.numero_acciones != ' - '){
+                                                                    if(regex.test(item.numero_acciones)){
+                                                                        
+                                                                        // Discriminación de elementos iguales
+                                                                        if (duplicados.find((p: any) => parseInt(p.codigo) === parseInt(item.codigo) || 
+                                                                            p.direccion_ip === item.direccion_ip) == undefined) {
+                                                                            item.observacion = 'ok';
+                                                                            duplicados.push(item);
+                                                                        } else {
+                                                                            item.observacion = '1';
+                                                                        }   
+
+                                                                    }else{
+                                                                        item.observacion = 'Número de acciones incorrecta ingrese (solo números)';
+                                                                    }
+                                                                }else{
+                                                                    // Discriminación de elementos iguales
+                                                                    if (duplicados.find((p: any) => parseInt(p.codigo) === parseInt(item.codigo) || 
+                                                                        p.direccion_ip === item.direccion_ip) == undefined) {
+                                                                        item.observacion = 'ok';
+                                                                        duplicados.push(item);
+                                                                    } else {
+                                                                        item.observacion = '1';
+                                                                    }
+                                                                }
+                                                            }else{
+                                                                item.observacion = 'Acción incorrecta ingrese (SI / NO)';
+                                                            }
+                                                        }
+                                                    }else{
+                                                        item.observacion = 'Puerto incorrecto (solo números)';
+                                                    }
+                                                else{
+                                                    item.observacion = 'Ya existe en el sistema';
+                                                }
+                                            }else{
+                                                item.observacion = 'Dirección IP incorrecta';
+                                            }
+                                        }else{
+                                            item.observacion = 'Ya existe en el sistema';
+                                        }
+                                    }else{
+                                        item.observacion = 'Departamento no pertenece al establecimiento';
+                                    }
+                                }else{
+                                    item.observacion = 'Departamento no existe en la base';
+                                }
+                        } else {
+                            item.observacion = 'Establecimiento no existe en la base';
+                        }
+                    }
+
+                    
+                });
+
+                setTimeout(() => {
+                    listDispositivos.sort((a: any, b: any) => {
+                      // COMPARA LOS NUMEROS DE LOS OBJETOS
+                      if (a.fila < b.fila) {
+                        return -1;
+                      }
+                      if (a.fila > b.fila) {
+                        return 1;
+                      }
+                      return 0; // SON IGUALES
+                    });
+            
+                    var filaDuplicada: number = 0;
+
+                    //VALIDACIONES DE LOS DATOS
+                    listDispositivos.forEach(async (item: any) => {
+                        if (item.observacion == '1') {
+                            item.observacion = 'Registro duplicado'
+                        }else{
+                            if(item.direccion_mac != ' - '){
+                                console.log('mac: ',item.direccion_mac.toString());
+                                console.log('mac: ',direccMac.test(item.direccion_mac));
+                                if(direccMac.test(item.direccion_mac.toString())){
+                                    
+                                }else{
+                                    item.observacion = 'Formato de direccion mac incorrecta (numeración hexadecimal)'
+                                }
+                            }
+                            
+                        }
+
+
+
+                        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+                        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+                            if (item.fila == filaDuplicada) {
+                                mensaje = 'error';
+                            }
+                        } else {
+                            return mensaje = 'error';
+                        }
+
+                        filaDuplicada = item.fila;
+
+                    });
+
+                    if (mensaje == 'error') {
+                        listDispositivos = undefined;
+                    }
+
+              
+                    return res.jsonp({ message: mensaje, data: listDispositivos });
+
+                }, 1000)
+
             }
-            contador_arreglo = contador_arreglo + 1;
+
+
+        } catch (error) {
+            return res.status(500).jsonp({ message: error });
         }
 
-        // Cuando todos los datos han sido leidos verificamos si todos los datos son correctos
-        console.log('nombre_data', contarNombreData, plantilla.length, contador_arreglo);
-        console.log('ip', contarIP_Data, plantilla.length, contador_arreglo);
-        if ((contador_arreglo - 1) === plantilla.length) {
-            if (contarNombreData === plantilla.length && contarIP_Data === plantilla.length &&
-                contarCodigoData === plantilla.length) {
-                return res.jsonp({ message: 'correcto' });
-            } else {
-                return res.jsonp({ message: 'error' });
-            }
+    }
+
+    public async CargaPlantillaRelojes(req: Request, res: Response) : Promise<any>{
+        try {
+            const { plantilla, user_name, ip } = req.body;
+
+            console.log('plantilla: ', plantilla.length);
+
+            var contador = 1;
+            var respuesta: any
+
+            plantilla.forEach(async (data: any) => {
+
+                    // DATOS DE LA PLANTILLA INGRESADA
+                    const { establecimiento, departamento, nombre_dispo, codigo, direccion_ip, puerto, acciones, 
+                        numero_acciones, marca, modelo, id_fabricante, fabricante, numero_serie, direccion_mac, contrasena } = data;
+
+                    // INICIAR TRANSACCION
+                    await pool.query('BEGIN');
+
+                    // BUSCAR ID DE LA SUCURSAL INGRESADA
+                    const id_sucursal = await pool.query('SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1', [establecimiento.toUpperCase()]);
+                
+                    const id_departamento = await pool.query('SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND ' +
+                        'id_sucursal = $2', [departamento.toUpperCase(), id_sucursal.rows[0]['id']]);
+
+                    
+                    if (id_sucursal.rowCount === 0 || id_departamento.rowCount === 0) {
+                        // AUDITORIA
+                        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                            tabla: 'ed_relojes',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip: ip,
+                            observacion: `Error al guardar el reloj con nombre: ${nombre_dispo} e ip: ${ip}.`
+                        });
+                    }
+                    
+
+                    // VERIFICAR QUE SE HAYA INGRESADO NÚMERO DE ACCIONES SI EL DISPOSITIVO LAS TIENE
+                    var num_accion;
+                    var acciones_boolean;
+                    if (acciones.toLowerCase() === 'si') {
+                        num_accion = numero_acciones;
+                        acciones_boolean = true;
+                    }else {
+                        num_accion = 0;
+                        acciones_boolean = false;
+                    }
+
+                    // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
+                    const response: QueryResult = await pool.query(
+                        `
+                        INSERT INTO ed_relojes (id_sucursal, id_departamento, nombre, ip, puerto, contrasenia, marca, modelo, serie, 
+                            id_fabricacion, fabricante, mac, tiene_funciones, numero_accion, codigo) 
+                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                        `
+                        ,[id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], nombre_dispo, direccion_ip, puerto, contrasena, marca, 
+                            modelo, numero_serie, id_fabricante, fabricante, direccion_mac, acciones_boolean, num_accion, codigo]);
+
+                    const [reloj_ingre] = response.rows;
+                    
+                    console.log('response.rows: ',response.rows);
+                    
+                    // AUDITORIA
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'ed_relojes',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{"nombre": "${nombre_dispo}", "ip": "${direccion_ip}", "puerto": "${puerto}", "contrasenia": "${contrasena}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${numero_serie}", "id_fabricacion": "${id_fabricante}", "fabricante": "${fabricante}", "mac": "${direccion_mac}", "tien_funciones": "${acciones_boolean}", "id_sucursal": "${id_sucursal.rows[0]['id']}", "id_departamento": "${id_departamento.rows[0]['id']}", "id": "${codigo}", "numero_accion": "${num_accion}"}`,
+                        ip: ip,
+                        observacion: null
+                    });
+                    
+
+                    // FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
+                    console.log('contador: ',contador,' plantilla: ',plantilla.length)
+                    if (contador === plantilla.length) {
+                        console.log('reloj: ',reloj_ingre);
+                        if (reloj_ingre) {
+                            return respuesta = res.status(200).jsonp({ message: 'ok' })
+                        } else {
+                            return respuesta = res.status(404).jsonp({ message: 'error' })
+                        }
+                    }
+    
+                    contador = contador + 1;
+                
+            });
+        
+        }catch(error){
+            // ROLLBACK SI HAY ERROR
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: error });
         }
-        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-        fs.access(filePath, fs.constants.F_OK, (err) => {
-            if (err) {
-            } else {
-                // ELIMINAR DEL SERVIDOR
-                fs.unlinkSync(filePath);
-            }
-        });
+
     }
 }
 

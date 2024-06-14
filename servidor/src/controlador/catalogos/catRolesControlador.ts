@@ -69,10 +69,11 @@ class RolesControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro eliminado.' });
+      
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+      return res.jsonp({ message: 'error' });
     }
   }
 

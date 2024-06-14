@@ -177,20 +177,9 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     this.cargos = [];
 
     this.usua_sucursales = [];
-    let respuesta: any = [];
-    let codigos = '';
     //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
-      respuesta = data;
-      respuesta.forEach((obj: any) => {
-        if (codigos === '') {
-          codigos = '\'' + obj.id_sucursal + '\''
-        }
-        else {
-          codigos = codigos + ', \'' + obj.id_sucursal + '\''
-        }
-      })
-      //console.log('ver sucursales ', codigos);
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
+      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
 
       // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
       if (usuario.id_rol === 1 && usuario.jefe === false) {
@@ -324,8 +313,8 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       this.empleados.forEach((empleado: any) => {
         this.idCargosAcceso = [...new Set([...this.idCargosAcceso, empleado.id_cargo_])];
       });
-            
-      this.cargos = this.cargos.filter((cargo: any) => 
+
+      this.cargos = this.cargos.filter((cargo: any) =>
         this.idSucursalesAcceso.includes(cargo.id_suc) && this.idCargosAcceso.includes(cargo.id)
       );
     }

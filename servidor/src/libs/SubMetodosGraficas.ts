@@ -111,8 +111,8 @@ async function ListaHorasExtrasGrafica(fec_desde: Date, fec_hasta: Date) {
     let arrayUno = await HorasExtrasSolicitadasGrafica(fec_desde, fec_hasta)
     let arrayDos = await PlanificacionHorasExtrasSolicitadasGrafica(fec_desde, fec_hasta)
     let arrayUnido = arrayUno.concat(arrayDos)
-    let set = new Set(arrayUnido.map(obj => { return JSON.stringify(obj) }))
-    arrayUnido = Array.from(set).map(obj => { return JSON.parse(obj) });
+    let set = new Set(arrayUnido.map((obj: any) => { return JSON.stringify(obj) }))
+    arrayUnido = Array.from(set).map((obj: any) => { return JSON.parse(obj) });
 
     for (let j = 0; j < arrayUnido.length; j++) {
         let numMin;
@@ -253,8 +253,8 @@ async function EmpleadoHorasExtrasGrafica(codigo: string | number, fec_desde: Da
     let arrayDos = await EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(codigo, fec_desde, fec_hasta)
     // let arrayUnido  = [...new Set(arrayUno.concat(arrayDos))];  
     let arrayUnido = arrayUno.concat(arrayDos)
-    let set = new Set(arrayUnido.map(obj => { return JSON.stringify(obj) }))
-    arrayUnido = Array.from(set).map(obj => { return JSON.parse(obj) });
+    let set = new Set(arrayUnido.map((obj: any) => { return JSON.stringify(obj) }))
+    arrayUnido = Array.from(set).map((obj: any) => { return JSON.parse(obj) });
 
     for (let j = 0; j < arrayUnido.length; j++) {
         let numMin;
@@ -423,7 +423,7 @@ export const ModelarFechas = function (desde: string, hasta: string, horario: an
 
     let objeto = DiasConEstado(horario, fechasRango);
     // console.log('Objeto JSON: ', objeto);
-    return objeto.filter(obj => { return (obj.estado === false) }).map(obj => { return { fecha: obj.fecha } })
+    return objeto.filter(obj => { return (obj.estado === false) }).map((obj: any) => { return { fecha: obj.fecha } })
 }
 
 /**

@@ -279,7 +279,7 @@ export class PrincipalProcesoComponent implements OnInit {
                 { text: 'Nivel', style: 'tableHeader' },
                 { text: 'Proceso Superior', style: 'tableHeader' },
               ],
-              ...this.procesos.map(obj => {
+              ...this.procesos.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },

@@ -37,13 +37,13 @@
                     <td></td>
                     <td>
                         <mat-form-field class="input-tables funcion" style="float: left;">
-                            <input matInput placeholder="Buscar" [(ngModel)]="filtrofuncion" [formControl]="funcion"
+                            <input matInput placeholder="Buscar" [formControl]="funcion"
                                 type="text" (keypress)="IngresarSoloLetras($event)">
                         </mat-form-field>
                     </td>
                     <td></td>
                 </tr>
-                <tr *ngFor="let p of paginas | roles: filtrofuncion | paginate:tamanio_pagina:numero_pagina "
+                <tr *ngFor="let p of paginas | roles: funcion.value | paginate:tamanio_pagina:numero_pagina "
                     style="text-align: left;">
                     <td>
                         <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
@@ -79,7 +79,7 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-sm">
-                            <!-- Tabla de menu -->
+                            <!--  ************  TABLA DE MENU  ****************  -->
                             <div class="d-flex flex-wrap justify-content-start">
                                 <div class="modal-body" style="margin-left: 60px; padding-top: 15px;">
                                     <div class="container-fluid">
@@ -101,7 +101,7 @@
                                                 <label style="margin-left: 30px; font-size: 11px;"
                                                     class="form-check-label" for="inlineCheckbox1">
                                                     {{n.nombre}}
-                                                    <!--Acciones de las paginas-->
+                                                    <!--  ***************  ACCIONES DE LAS PAGINAS  **************  -->
                                                 </label>
                                                 <div class="d-flex flex-wrap justify-content-start">
                                                     <div class="modal-body"
@@ -146,15 +146,16 @@
         </mat-card-content>
         <mat-card-actions>
             <div class="container" style="text-align: center;">
-                <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaRol()"
-                    value="Guardar">Guardar</button>
+                <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaRol()" value="Guardar">
+                    Guardar
+                </button>
             </div>
         </mat-card-actions>
     </mat-card>
 </div>
-<div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="id_rol != 1">
+<div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="id_rol != 1 && ver_modulo === true">
     <div id="titulo">
-        <span>MODULOS DEL SISTEMA</span>
+        <span>MÓDULOS DEL SISTEMA</span>
     </div>
     <mat-card class="example-card mat-elevation-z8">
         <!-- FORMULARIO COMPLETO -->
@@ -168,7 +169,7 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-sm">
-                            <!-- Tabla de menu Modulos -->
+                            <!-- TABLA DE MENU MODULOS -->
                             <div class="d-flex flex-wrap justify-content-start">
                                 <div class="modal-body" style="margin-left: 60px; padding-top: 15px;">
                                     <div class="container-fluid" *ngFor="let modulo of nombreModulos; index as j">
@@ -191,7 +192,7 @@
                                                 <label style="margin-left: 30px; font-size: 11px;"
                                                     class="form-check-label" for="inlineCheckbox1">
                                                     {{n.nombre}}
-                                                    <!--Acciones de las paginas-->
+                                                    <!--  **************  ACCIONES DE LAS PAGINAS  ***************  -->
                                                 </label>
                                                 <div class="d-flex flex-wrap justify-content-start">
                                                     <div class="modal-body"
@@ -235,8 +236,9 @@
         </mat-card-content>
         <mat-card-actions>
             <div class="container" style="text-align: center;">
-                <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaModulosRol()"
-                    value="Guardar">Guardar</button>
+                <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaModulosRol()" value="Guardar">
+                    Guardar
+                </button>
             </div>
         </mat-card-actions>
     </mat-card>

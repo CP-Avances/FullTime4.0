@@ -438,7 +438,7 @@ export class ListarFeriadosComponent implements OnInit {
 
    // RECORRER LA LISTA DE CIUDADES SELECCIONADAS
 
-   this.ciudadesSeleccionadas.map(obj => {
+   this.ciudadesSeleccionadas.map((obj: any) => {
      var buscarCiudad = {
        id_feriado: id,
        id_ciudad: obj.id
@@ -608,7 +608,7 @@ export class ListarFeriadosComponent implements OnInit {
 
   ExportToExcel() {
     this.OrdenarDatos(this.feriados);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.feriados.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.feriados.map((obj: any) => {
       return {
         CODIGO: obj.id,
         FERIADO: obj.descripcion,
@@ -686,7 +686,7 @@ export class ListarFeriadosComponent implements OnInit {
 
   ExportToCVS() {
     this.OrdenarDatos(this.feriados);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.feriados.map(obj => {
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.feriados.map((obj: any) => {
       return {
         CODIGO: obj.id,
         FERIADO: obj.descripcion,

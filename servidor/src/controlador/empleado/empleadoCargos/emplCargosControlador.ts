@@ -393,7 +393,7 @@ class EmpleadoCargosControlador {
   
   
       // LECTURA DE LOS DATOS DE LA PLANTILLA
-      plantilla.forEach(async (dato: any, indice: any, array: any) => {
+      plantilla.forEach(async (dato: any) => {
         var { ITEM, CEDULA, DEPARTAMENTO, FECHA_DESDE, FECHA_HASTA, SUCURSAL, SUELDO,
           CARGO, HORA_TRABAJA, JEFE } = dato;
   
@@ -637,14 +637,14 @@ class EmpleadoCargosControlador {
       setTimeout(() => {
   
         listCargos.sort((a: any, b: any) => {
-          // Compara los números de los objetos
+          // COMPARA LOS NUMEROS DE LOS OBJETOS
           if (a.fila < b.fila) {
             return -1;
           }
           if (a.fila > b.fila) {
             return 1;
           }
-          return 0; // Son iguales
+          return 0; // SON IGUALES
         });
   
         var filaDuplicada: number = 0;
@@ -661,9 +661,9 @@ class EmpleadoCargosControlador {
             }
           }
   
-          //Valida si los datos de la columna N son numeros.
+          // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
           if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
             if (item.fila == filaDuplicada) {
               mensaje = 'error';
             }

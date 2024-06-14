@@ -37,6 +37,11 @@ import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.mode
 export class TimbreMultipleComponent implements OnInit {
 
   idEmpleadoLogueado: any;
+  asignacionesAcceso: any;
+  idCargosAcceso: any = [];
+  idUsuariosAcceso: any = [];
+  idSucursalesAcceso: any = [];
+  idDepartamentosAcceso: any = [];
 
   // CONTROL DE CRITERIOS DE BUSQUEDA
   codigo = new FormControl('');
@@ -183,19 +188,10 @@ export class TimbreMultipleComponent implements OnInit {
     this.cargos = [];
 
     this.usua_sucursales = [];
-    let respuesta: any = [];
-    let codigos = '';
+
     //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
-      respuesta = data;
-      respuesta.forEach((obj: any) => {
-        if (codigos === '') {
-          codigos = '\'' + obj.id_sucursal + '\''
-        }
-        else {
-          codigos = codigos + ', \'' + obj.id_sucursal + '\''
-        }
-      })
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
+      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
       //console.log('ver sucursales ', codigos);
 
       // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO

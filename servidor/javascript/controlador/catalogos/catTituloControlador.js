@@ -202,8 +202,8 @@ class TituloControlador {
                 var duplicados = [];
                 var mensaje = 'correcto';
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                    var { ITEM, NOMBRE, NIVEL } = dato;
+                plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
+                    var { NOMBRE, NIVEL } = dato;
                     data.fila = dato.ITEM;
                     data.titulo = dato.NOMBRE;
                     data.nivel = dato.NIVEL;
@@ -211,10 +211,12 @@ class TituloControlador {
                         (data.titulo != undefined && data.titulo != '') &&
                         (data.nivel != undefined && data.nivel != '')) {
                         // VALIDAR PRIMERO QUE EXISTA NIVELES EN LA TABLA NIVELES
-                        const existe_nivel = yield database_1.default.query('SELECT id FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [NIVEL]);
+                        const existe_nivel = yield database_1.default.query(`
+            SELECT id FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
+            `, [NIVEL]);
                         var id_nivel = existe_nivel.rows[0];
                         if (id_nivel != undefined && id_nivel != '') {
-                            // VERIFICACIÓN SI LA SUCURSAL NO ESTE REGISTRADA EN EL SISTEMA
+                            // VERIFICACION SI EL TITULO NO ESTE REGISTRADO EN EL SISTEMA
                             const VERIFICAR_Titulos = yield database_1.default.query(`
               SELECT * FROM et_titulos
               WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2
@@ -223,7 +225,8 @@ class TituloControlador {
                                 data.fila = dato.ITEM;
                                 data.titulo = dato.NOMBRE;
                                 data.nivel = dato.NIVEL;
-                                if (duplicados.find((p) => p.nombre.toLowerCase() === dato.NOMBRE.toLowerCase() && p.nivel.toLowerCase() === dato.NIVEL.toLowerCase()) == undefined) {
+                                if (duplicados.find((p) => p.NOMBRE.toLowerCase() === dato.NOMBRE.toLowerCase() &&
+                                    p.NIVEL.toLowerCase() === dato.NIVEL.toLowerCase()) == undefined) {
                                     data.observacion = 'ok';
                                     duplicados.push(dato);
                                 }
@@ -283,7 +286,7 @@ class TituloControlador {
                 });
                 setTimeout(() => {
                     listTitulosProfesionales.sort((a, b) => {
-                        // COMPARA LOS NÚMEROS DE LOS OBJETOS
+                        // COMPARA LOS NUMEROS DE LOS OBJETOS
                         if (a.fila < b.fila) {
                             return -1;
                         }

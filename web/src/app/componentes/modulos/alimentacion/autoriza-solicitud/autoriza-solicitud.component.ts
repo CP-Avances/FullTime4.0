@@ -179,7 +179,7 @@ export class AutorizaSolicitudComponent implements OnInit {
     var nombre_estado = '';
     var contador = 0;
     var contador_plan = 0;
-    this.data.datosMultiple.map(obj => {
+    this.data.datosMultiple.map((obj: any) => {
       let datosEstado = {
         aprobada: estado,
         verificar: 'Si',

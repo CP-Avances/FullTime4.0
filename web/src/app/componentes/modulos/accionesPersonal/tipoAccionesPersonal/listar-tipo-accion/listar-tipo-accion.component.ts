@@ -272,7 +272,7 @@ export class ListarTipoAccionComponent implements OnInit {
                 { text: 'Base Legal', style: 'tableHeader' },
                 { text: 'Tipo', style: 'tableHeader' },
               ],
-              ...this.tipo_acciones.map(obj => {
+              ...this.tipo_acciones.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.nombre, style: 'itemsTable' },

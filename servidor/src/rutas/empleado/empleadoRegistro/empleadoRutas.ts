@@ -174,7 +174,7 @@ class EmpleadoRutas {
         /** **************************************************************************************** **
          ** **                CREACION DE CARPETAS DE LOS EMPLEADOS SELECCIONADOS                 ** ** 
          ** **************************************************************************************** **/
-        this.router.post('/crear_carpetas/', TokenValidation, EMPLEADO_CONTROLADOR.CrearCarpetasEmpleado);
+        //this.router.post('/crear_carpetas/', TokenValidation, EMPLEADO_CONTROLADOR.CrearCarpetasEmpleado);
 
     }
 

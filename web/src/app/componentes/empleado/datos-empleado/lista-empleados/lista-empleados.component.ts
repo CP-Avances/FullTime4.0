@@ -1,35 +1,35 @@
 // IMPORTACION DE LIBRERIAS
+import { firstValueFrom, forkJoin, map } from 'rxjs';
 import { Validators, FormControl } from '@angular/forms';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-import { firstValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
+import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
+import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
 
 // IMPORTAR COMPONENTES
 import { ConfirmarDesactivadosComponent } from '../confirmar-desactivados/confirmar-desactivados.component';
 import { ConfirmarCrearCarpetaComponent } from '../confirmar-crearCarpeta/confirmar-crearCarpeta.component';
-
+import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 // IMPORTAR SERVICIOS
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { EmpleadoElemento } from '../../../../model/empleado.model'
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { ThemePalette } from '@angular/material/core';
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+
+import { EmpleadoElemento } from '../../../../model/empleado.model'
 
 @Component({
   selector: 'app-lista-empleados',
@@ -54,12 +54,6 @@ export class ListaEmpleadosComponent implements OnInit {
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
 
-  // VARIABLES USADAS EN BUSQUEDA DE FILTRO DE DATOS
-  filtroCodigo: number;
-  filtroApellido: '';
-  filtroCedula: '';
-  filtroNombre: '';
-
   // ITEMS DE PAGINACION DE LA TABLA
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
@@ -74,7 +68,6 @@ export class ListaEmpleadosComponent implements OnInit {
   numero_paginaMul: number = 1;
 
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
-  rolEmpleado: number;
 
   // VARAIBLES DE SELECCION DE DATOS DE UNA TABLA
   selectionUno = new SelectionModel<EmpleadoElemento>(true, []);
@@ -108,16 +101,11 @@ export class ListaEmpleadosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
-    if (this.rolEmpleado != 1){
-      this.idUsuariosAcceso.push(this.idEmpleado);
-      this.ObtenerAsignacionesUsuario(this.idEmpleado);
-    } else {
-      this.GetEmpleados();
-    }
+    this.idUsuariosAcceso.push(this.idEmpleado);
+    this.ObtenerAsignacionesUsuario(this.idEmpleado);
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerNacionalidades();
@@ -217,7 +205,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
     if (opcion === 1) {
 
-      EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
+      EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
         return {
           id: obj.id,
           codigo: obj.codigo,
@@ -225,7 +213,7 @@ export class ListaEmpleadosComponent implements OnInit {
         }
       })
     } else if (opcion === 2 || opcion === 3) {
-      EmpleadosSeleccionados = this.selectionDos.selected.map(obj => {
+      EmpleadosSeleccionados = this.selectionDos.selected.map((obj: any) => {
         return {
           id: obj.id,
           codigo: obj.codigo,
@@ -265,14 +253,14 @@ export class ListaEmpleadosComponent implements OnInit {
   Deshabilitar(opcion: number) {
     let EmpleadosSeleccionados: any;
     if (opcion === 1) {
-      EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
+      EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
         return {
           id: obj.id,
           empleado: obj.nombre + ' ' + obj.apellido
         }
       })
     } else if (opcion === 2 || opcion === 3) {
-      EmpleadosSeleccionados = this.selectionDos.selected.map(obj => {
+      EmpleadosSeleccionados = this.selectionDos.selected.map((obj: any) => {
         return {
           id: obj.id,
           empleado: obj.nombre + ' ' + obj.apellido
@@ -319,21 +307,23 @@ export class ListaEmpleadosComponent implements OnInit {
 
     const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(data));
     this.empleadoD.asignaciones = res;
+    //console.log('lista empleados ', this.empleadoD.asignaciones)
+    // VERIFICAMOS SI EXISTEN DATOS DE USUARIOS
+    if (this.empleadoD.asignaciones) {
+      const promises = this.empleadoD.asignaciones.map((asignacion: any) => {
+        const data = {
+          id_departamento: asignacion.id_departamento
+        }
+        return firstValueFrom(this.usuario.ObtenerIdUsuariosDepartamento(data));
+      });
 
-    const promises = this.empleadoD.asignaciones.map((asignacion: any) => {
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.usuario.ObtenerIdUsuariosDepartamento(data));
-    });
+      const results = await Promise.all(promises);
 
-    const results = await Promise.all(promises);
+      const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
+      this.idUsuariosAcceso.push(...ids);
 
-    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    this.idUsuariosAcceso.push(...ids);
-
-    this.GetEmpleados();
-
+      this.GetEmpleados();
+    }
   }
 
   // METODO PARA OBTENER LOGO DE EMPRESA
@@ -379,29 +369,26 @@ export class ListaEmpleadosComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
-  //  METODO PARA VALIDAR INGRESO DE NUMEROSO
+  //  METODO PARA VALIDAR INGRESO DE NUMEROS
   IngresarSoloNumeros(evt: any) {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
   // METODO PARA LISTAR USUARIOS
   GetEmpleados() {
-    this.empleado = [];
-    this.rest.ListarEmpleadosActivos().subscribe(data => {
-      this.empleado = data;
+    const empleadosActivos$ = this.rest.ListarEmpleadosActivos().pipe(
+      map((data: any) => data.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id)))
+    );
 
-      // TODO: ANALIZAR QUE SUCEDE CON LOS ROLES ADMINISTRADOR Y SUPERADMINISTRADOR
-      if (this.rolEmpleado != 1) {
-        this.empleado = this.empleado.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
-      }
+    const empleadosDesactivados$ = this.rest.ListaEmpleadosDesactivados().pipe(
+      map((data: any) => data.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id)))
+    );
+
+    forkJoin([empleadosActivos$, empleadosDesactivados$]).subscribe(([empleados, desactivados]) => {
+      this.empleado = empleados;
       this.OrdenarDatos(this.empleado);
-    })
-    this.desactivados = [];
-    this.rest.ListaEmpleadosDesactivados().subscribe(res => {
-      this.desactivados = res;
-      if (this.rolEmpleado != 1) {
-        this.desactivados = this.desactivados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
-      }
+
+      this.desactivados = desactivados;
       this.OrdenarDatos(this.desactivados);
     });
   }
@@ -459,15 +446,17 @@ export class ListaEmpleadosComponent implements OnInit {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
+    let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
-        var itemName = arrayItems[0].slice(0, 18);
-        if (itemName.toLowerCase() == 'empleadoautomatico') {
+        console.log('itemName: ', itemName)
+        if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
+          console.log('entra_automatico');
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;
           this.VerificarPlantillaAutomatico();
         } else {
-          this.toastr.error('Cargar la plantilla con nombre EmpleadoAutomatico.', 'Plantilla seleccionada incorrecta.', {
+          this.toastr.error('Cargar la plantilla con nombre plantillaconfiguraciongeneral.', 'Plantilla seleccionada incorrecta.', {
             timeOut: 6000,
           });
           this.archivoForm.reset();
@@ -477,14 +466,14 @@ export class ListaEmpleadosComponent implements OnInit {
         }
       }
       else {
-        itemName = arrayItems[0].slice(0, 14);
-        if (itemName.toLowerCase() == 'empleadomanual') {
+        console.log('itemName: ', itemName)
+        if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
           console.log('entra_manual');
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;
           this.VerificarPlantillaManual();
         } else {
-          this.toastr.error('Cargar la plantilla con nombre EmpleadoManual.', 'Plantilla seleccionada incorrecta.', {
+          this.toastr.error('Cargar la plantilla con nombre plantillaconfiguraciongeneral.', 'Plantilla seleccionada incorrecta.', {
             timeOut: 6000,
           });
           this.archivoForm.reset();
@@ -881,7 +870,7 @@ export class ListaEmpleadosComponent implements OnInit {
                 { text: 'Estado', style: 'tableHeader' },
                 { text: 'Nacionalidad', style: 'tableHeader' },
               ],
-              ...arreglo.map(obj => {
+              ...arreglo.map((obj: any) => {
                 var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
                 var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
@@ -931,7 +920,7 @@ export class ListaEmpleadosComponent implements OnInit {
     else {
       arreglo = this.desactivados
     }
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map(obj => {
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map((obj: any) => {
       let nacionalidad: any;
       this.nacionalidades.forEach(element => {
         if (obj.id_nacionalidad == element.id) {
@@ -1048,7 +1037,7 @@ export class ListaEmpleadosComponent implements OnInit {
       arreglo = this.desactivados
     }
     // const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map(obj => {
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map((obj: any) => {
       let nacionalidad: any;
       this.nacionalidades.forEach(element => {
         if (obj.id_nacionalidad == element.id) {
@@ -1126,7 +1115,7 @@ export class ListaEmpleadosComponent implements OnInit {
     this.contador = 0;
 
 
-    let EliminarActivos = this.selectionUno.selected.map(obj => {
+    let EliminarActivos = this.selectionUno.selected.map((obj: any) => {
       return {
         id: obj.id,
         empleado: obj.nombre + ' ' + obj.apellido
@@ -1191,7 +1180,7 @@ export class ListaEmpleadosComponent implements OnInit {
   ConfirmarDeleteMultipleInactivos() {
     this.ingresar = false;
     this.contador = 0;
-    let EliminarInactivos = this.selectionDos.selected.map(obj => {
+    let EliminarInactivos = this.selectionDos.selected.map((obj: any) => {
       return {
         id: obj.id,
         empleado: obj.nombre + ' ' + obj.apellido

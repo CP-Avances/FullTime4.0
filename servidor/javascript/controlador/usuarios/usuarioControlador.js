@@ -86,7 +86,6 @@ class UsuarioControlador {
     ObtenerIdUsuariosDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_departamento } = req.body;
-            console.log('id_departamento ', id_departamento);
             const Ids = yield database_1.default.query(`
       SELECT id
       FROM datos_actuales_empleado
@@ -142,8 +141,8 @@ class UsuarioControlador {
                 return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
+                console.log('error *** ', error);
                 // REVERTIR TRANSACCION
-                console.log(error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }
@@ -358,7 +357,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
               ig.name_regimen
@@ -441,7 +439,6 @@ class UsuarioControlador {
                 "WHERE ig.id_suc IN (" + id_sucursal + ")" +
                 "GROUP BY ig.id_suc, ig.name_suc " +
                 "ORDER BY ig.name_suc ASC").then((result) => { return result.rows; });
-            //console.log('sucursal ', sucursal_)
             if (sucursal_.length === 0)
                 return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
             // CONSULTA DE BUSQUEDA DE REGIMEN
@@ -486,7 +483,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
               SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
                   ig.name_regimen
@@ -611,7 +607,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
               ig.name_regimen
@@ -802,7 +797,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
               ig.name_regimen
@@ -885,7 +879,6 @@ class UsuarioControlador {
                 "WHERE ig.id_suc IN (" + id_sucursal + ")" +
                 "GROUP BY ig.id_suc, ig.name_suc " +
                 "ORDER BY ig.name_suc ASC").then((result) => { return result.rows; });
-            //console.log('sucursal ', sucursal_)
             if (sucursal_.length === 0)
                 return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
             // CONSULTA DE BUSQUEDA DE REGIMEN
@@ -930,7 +923,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
               ig.name_regimen
@@ -1055,7 +1047,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
               ig.name_regimen
@@ -1409,14 +1400,17 @@ class UsuarioControlador {
         });
     }
     /** ************************************************************************************************** **
-     ** **                           METODOS TABLA USUARIO - SUCURSAL                                   ** **
+     ** **                           METODOS TABLA USUARIO - DEPARTAMENTO                               ** **
      ** ************************************************************************************************** */
-    // BUSCAR DATOS DE USUARIOS - SUCURSAL
+    // BUSCAR LISTA DE ID_SUCURSAL DE ASIGNACION USUARIO - DEPARTAMENTO
     BuscarUsuarioSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
             const USUARIOS = yield database_1.default.query(`
-      SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1
+      SELECT DISTINCT d.id_sucursal
+      FROM eu_usuario_departamento AS ud
+      JOIN ed_departamentos AS d ON ud.id_departamento = d.id 
+      WHERE id_empleado = $1
       `, [id_empleado]);
             if (USUARIOS.rowCount > 0) {
                 return res.jsonp(USUARIOS.rows);
@@ -1426,56 +1420,24 @@ class UsuarioControlador {
             }
         });
     }
-    // CREAR REGISTRO DE USUARIOS - SUCURSAL
-    CrearUsuarioSucursal(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id_empleado, id_sucursal, principal, user_name, ip } = req.body;
-                // INICIA TRANSACCION
-                yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
-        INSERT INTO eu_usuario_sucursal (id_empleado, id_sucursal, principal) 
-        VALUES ($1, $2, $3)
-        `, [id_empleado, id_sucursal, principal]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_usuario_sucursal',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{"id_empleado": ${id_empleado}, "id_sucursal": ${id_sucursal}, "principal": ${principal}}`,
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                res.jsonp({ message: 'Registro guardado.' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.jsonp({ message: 'error' });
-            }
-        });
-    }
     // CREAR REGISTRO DE USUARIOS - DEPARTAMENTO
     CrearUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, id_departamento, principal, personal, user_name, ip } = req.body;
+                const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = req.body;
                 // INICIA TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
-        INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal) 
-        VALUES ($1, $2, $3, $4)
-        `, [id_empleado, id_departamento, principal, personal]);
+        INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
+        VALUES ($1, $2, $3, $4, $5)
+        `, [id_empleado, id_departamento, principal, personal, administra]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_usuario_departamento',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{"id_empleado": ${id_empleado}, "id_departamento": ${id_departamento}, "principal": ${principal}, "personal": ${personal}}`,
+                    datosNuevos: `{"id_empleado": ${id_empleado}, "id_departamento": ${id_departamento}, "principal": ${principal}, "personal": ${personal}, "administra": ${administra}}`,
                     ip,
                     observacion: null
                 });
@@ -1495,12 +1457,14 @@ class UsuarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
             const USUARIOS = yield database_1.default.query(`
-      SELECT ud.id, e.nombre, e.apellido, d.nombre AS departamento, d.id AS id_departamento, s.id AS id_sucursal, s.nombre AS sucursal, ud.principal, ud.personal
+      SELECT ud.id, e.nombre, e.apellido, d.nombre AS departamento, d.id AS id_departamento, 
+      s.id AS id_sucursal, s.nombre AS sucursal, ud.principal, ud.personal, ud.administra
       FROM eu_usuario_departamento AS ud
       INNER JOIN eu_empleados AS e ON ud.id_empleado=e.id
       INNER JOIN ed_departamentos AS d ON ud.id_departamento=d.id
       INNER JOIN e_sucursales AS s ON d.id_sucursal=s.id
       WHERE id_empleado = $1
+      ORDER BY ud.id ASC
       `, [id_empleado]);
             if (USUARIOS.rowCount > 0) {
                 return res.jsonp(USUARIOS.rows);
@@ -1510,55 +1474,57 @@ class UsuarioControlador {
             }
         });
     }
-    // BUSCAR DATOS DE USUARIOS - SUCURSAL
-    BuscarUsuarioSucursalPrincipal(req, res) {
+    // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO
+    BuscarAsignacionUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
             const USUARIOS = yield database_1.default.query(`
-      SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1 AND principal = true;
+      SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 
+      AND principal = true
       `, [id_empleado]);
             if (USUARIOS.rowCount > 0) {
                 return res.jsonp(USUARIOS.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+                return res.jsonp(null);
             }
         });
     }
-    // METODO PARA ACTUALIZAR DATOS DE USUARIO - SUCURSAL
-    ActualizarUsuarioSucursalPrincipal(req, res) {
+    // ACTUALIZAR DATOS DE USUARIOS - DEPARTAMENTO
+    ActualizarUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_sucursal, id_empleado, user_name, ip } = req.body;
+                const { id, id_departamento, principal, personal, administra, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTA DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1 AND principal = true`, [id_empleado]);
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuario_departamento WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'eu_usuario_sucursal',
+                        tabla: 'eu_usuario_departamento',
                         usuario: user_name,
                         accion: 'U',
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al actualizar usuario con id: ${id_empleado}. Registro no encontrado.`
+                        observacion: `Error al actualizar registro con id: ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
-                yield database_1.default.query(`
-        UPDATE eu_usuario_sucursal SET id_sucursal = $1 WHERE id_empleado = $2 AND principal = true;
-        `, [id_sucursal, id_empleado]);
+                const datosActuales = yield database_1.default.query(`
+        UPDATE eu_usuario_departamento SET id_departamento = $2, principal = $3, personal = $4, administra = $5 
+        WHERE id = $1 RETURNING *
+        `, [id, id_departamento, principal, personal, administra]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_usuario_sucursal',
+                    tabla: 'eu_usuario_departamento',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"id_sucursal": ${id_sucursal}}`,
+                    datosNuevos: JSON.stringify(datosActuales.rows[0]),
                     ip,
                     observacion: null
                 });
@@ -1573,61 +1539,11 @@ class UsuarioControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTROS
-    EliminarUsuarioSucursal(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { user_name, ip } = req.body;
-                const id = req.params.id;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTA DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuario_sucursal WHERE id = $1`, [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'eu_usuario_sucursal',
-                        usuario: user_name,
-                        accion: 'D',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al eliminar usuario_sucursal con id: ${id}. Registro no encontrado.`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                }
-                yield database_1.default.query(`
-        DELETE FROM eu_usuario_sucursal WHERE id = $1
-        `, [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_usuario_sucursal',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro eliminado.' });
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
     // METODO PARA ELIMINAR ASIGNACIONES DE USUARIO - DEPARTAMENTO
     EliminarUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { user_name, ip, id } = req.body;
-                console.log('id', id, 'user_name', user_name, 'ip', ip);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTA DATOSORIGINALES

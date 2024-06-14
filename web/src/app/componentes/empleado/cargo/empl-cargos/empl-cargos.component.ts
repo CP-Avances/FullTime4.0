@@ -23,6 +23,7 @@ export class EmplCargosComponent implements OnInit {
   habilitarCargo: boolean = false;
   idEmpleado: string;
   ver_jefe: boolean = false;
+  ver_personal: boolean = false;
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS
   departamento: any = [];
@@ -45,6 +46,7 @@ export class EmplCargosComponent implements OnInit {
   cargoF = new FormControl('', [Validators.minLength(3)]);
   tipoF = new FormControl('');
   jefeF = new FormControl(false);
+  personalF = new FormControl(false);
 
   // AGREGAR CAMPOS DE FORMULARIO
   public formulario = new FormGroup({
@@ -57,6 +59,7 @@ export class EmplCargosComponent implements OnInit {
     cargoForm: this.cargoF,
     tipoForm: this.tipoF,
     jefeForm: this.jefeF,
+    personalForm: this.personalF,
   });
 
   constructor(
@@ -81,6 +84,7 @@ export class EmplCargosComponent implements OnInit {
 
     if (this.datoEmpleado.idRol != 2) {
       this.ver_jefe = true;
+      this.ver_personal = true;
     }
     this.FiltrarSucursales();
     this.BuscarTiposCargos();
@@ -233,7 +237,7 @@ export class EmplCargosComponent implements OnInit {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
-      this.BuscarUsuarioSucursal(form);
+      this.BuscarUsuarioDepartamento(form);
       this.CerrarVentana();
     });
   }
@@ -317,47 +321,54 @@ export class EmplCargosComponent implements OnInit {
 
 
   /** *************************************************************************************************** **
-   **                              METODOS TABLA USUARIO - SUCURSAL                                    ** **
+   **                              METODOS TABLA USUARIO - DEPARTAMENTO                                ** **
    ** *************************************************************************************************** **/
 
-  // METODO PARA REGISTRAR TIPO CARGO
-  IngresarUsuarioSucursal(form: any) {
+  // METODO PARA BUSCAR USUARIO - DEPARTAMENTO
+  BuscarUsuarioDepartamento(form: any) {
     let datos = {
       id_empleado: this.idEmpleado,
-      id_sucursal: form.idSucursalForm,
-      principal: true,
-      user_name: this.user_name,
-      ip: this.ip,
     }
-    this.usuario.RegistrarUsuarioSucursal(datos).subscribe(res => {
+
+    this.usuario.BuscarAsignacionUsuarioDepartamento(datos).subscribe(res => {
+
+      if (res != null) {
+        const id = res[0].id;
+        this.ActualizarUsuarioDepartamento(form, id);
+      }
+      else {
+        this.IngresarUsuarioDepartamento(form);
+      }
     });
   }
 
-  // METODO PARA BUSCAR USUARIO - SUCURSAL
-  BuscarUsuarioSucursal(form: any) {
-    if (this.datoEmpleado.idRol != 2) {
-      let datos = {
-        id_empleado: this.idEmpleado,
-      }
-      this.usuario.BuscarUsuarioSucursalPrincipal(datos).subscribe(res => {
-        if (res[0].id_sucursal != form.idSucursalForm) {
-          this.ActualizarUsuarioSucursal(form);
-        }
-      }, vacio => {
-        this.IngresarUsuarioSucursal(form);
-      });
-    }
-  }
-
-  // METODO PARA ACTUALIZAR USUARIO - SUCURSAL
-  ActualizarUsuarioSucursal(form: any) {
+  // METODO PARA REGISTRAR USUARIO - DEPARTAMENTO
+  IngresarUsuarioDepartamento(form: any) {
     let datos = {
-      id_sucursal: form.idSucursalForm,
       id_empleado: this.idEmpleado,
+      id_departamento: form.idDeparForm,
+      principal: true,
+      personal: form.personalForm,
+      administra: form.jefeForm,
       user_name: this.user_name,
       ip: this.ip,
     }
-    this.usuario.ActualizarUsuarioSucursalPrincipal(datos).subscribe(res => {
+    this.usuario.RegistrarUsuarioDepartamento(datos).subscribe(res => {
+    });
+  }
+
+  // METODO PARA ACTUALIZAR USUARIO - DEPARTAMENTO
+  ActualizarUsuarioDepartamento(form: any, id: number) {
+    let datos = {
+      id: id,
+      id_departamento: form.idDeparForm,
+      principal: true,
+      personal: form.personalForm,
+      administra: form.jefeForm,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+    this.usuario.ActualizarUsuarioDepartamento(datos).subscribe(res => {
     });
   }
 

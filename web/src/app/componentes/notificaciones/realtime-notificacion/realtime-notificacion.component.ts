@@ -108,7 +108,7 @@ export class RealtimeNotificacionComponent implements OnInit {
 
   // METODO PARA ELIMINAR NOTIFICACIONES
   EliminarNotificaciones(opcion: number) {
-    let EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
+    let EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
       return {
         id: obj.id,
         empleado: obj.nombre + ' ' + obj.apellido

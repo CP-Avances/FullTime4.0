@@ -43,11 +43,11 @@
                             </label>
                         </form>
                     </div>
-                    <div class="col-12 col-md-auto m-auto w-auto"  style="padding-top: 5px; padding-bottom: 5px;">
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                         <div *ngIf="!Datos_discapacidad" class="d-flex flex-wrap justify-content-around">
                             <a id="descargar" class="btn m-auto" matSuffix matTooltipPosition="right"
                                 matTooltip="Dar click para ver o descargar el documento."
-                                href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">>
+                                href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
                                 <br>
                                 Descargar plantilla usuarios
                             </a>
@@ -107,7 +107,7 @@
                         <td>
                             <mat-form-field id="t-inputs">
                                 <input matInput placeholder="Buscar" [formControl]="nombreF"
-                                    [(ngModel)]="filtradoDiscapacidad" (keypress)="IngresarSoloLetras($event)">
+                                    (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
@@ -118,7 +118,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let discapacidad of discapacidades| filtrosNombres: filtradoDiscapacidad |  paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let discapacidad of discapacidades| filtrosNombres: nombreF.value |  paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionDiscapacidad.toggle(discapacidad) : null"
@@ -188,14 +188,16 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center; font-size: 13px;">
-                        <th scope="col">Observación</th>
                         <th scope="col">Item</th>
+                        <th scope="col">Observación</th>
                         <th scope="col">Discapacidad</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
                         *ngFor="let dis of Datos_discapacidad | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                            {{dis.fila}}</td>
                         <td style="font-size: 12px;">
                             <div style="width: 270px; margin: auto;">
                                 <div id="t-editar" class="circulo"
@@ -203,8 +205,6 @@
                                 {{dis.observacion}}
                             </div>
                         </td>
-                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
-                            {{dis.fila}}</td>
                         <td [style.color]="stiloTextoCelda(dis.discapacidad)" style="font-size: 12px;">
                             {{dis.discapacidad}}</td>
                     </tr>

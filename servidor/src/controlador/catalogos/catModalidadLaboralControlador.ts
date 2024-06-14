@@ -237,25 +237,23 @@ class ModalidaLaboralControlador {
                     modalida_laboral: '',
                     observacion: ''
                 };
-
                 var listModalidad: any = [];
                 var duplicados: any = [];
                 var mensaje: string = 'correcto';
 
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
                 plantilla_modalidad_laboral.forEach(async (dato: any, indice: any, array: any) => {
-                    var { ITEM, MODALIDA_LABORAL } = dato;
+                    var { ITEM, MODALIDAD_LABORAL } = dato;
                     // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                     if ((ITEM != undefined && ITEM != '') &&
-                        (MODALIDA_LABORAL != undefined && MODALIDA_LABORAL != '')) {
+                        (MODALIDAD_LABORAL != undefined && MODALIDAD_LABORAL != '')) {
                         data.fila = ITEM;
-                        data.modalida_laboral = MODALIDA_LABORAL;
+                        data.modalida_laboral = MODALIDAD_LABORAL;
                         data.observacion = 'no registrada';
-
                         listModalidad.push(data);
                     } else {
                         data.fila = ITEM;
-                        data.modalida_laboral = MODALIDA_LABORAL;
+                        data.modalida_laboral = MODALIDAD_LABORAL;
                         data.observacion = 'no registrada';
 
                         if (data.fila == '' || data.fila == undefined) {
@@ -263,11 +261,10 @@ class ModalidaLaboralControlador {
                             mensaje = 'error'
                         }
 
-                        if (MODALIDA_LABORAL == undefined) {
+                        if (MODALIDAD_LABORAL == undefined) {
                             data.modalida_laboral = 'No registrado';
                             data.observacion = 'Modalidad Laboral ' + data.observacion;
                         }
-
                         listModalidad.push(data);
                     }
                     data = {};
@@ -286,8 +283,8 @@ class ModalidaLaboralControlador {
                     if (item.observacion == 'no registrada') {
                         var VERIFICAR_MODALIDAD = await pool.query(
                             `
-                        SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
-                        `
+                            SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                            `
                             , [item.modalida_laboral.toUpperCase()])
                         if (VERIFICAR_MODALIDAD.rows[0] == undefined || VERIFICAR_MODALIDAD.rows[0] == '') {
                             item.observacion = 'ok'
@@ -295,7 +292,7 @@ class ModalidaLaboralControlador {
                             item.observacion = 'Ya existe en el sistema'
                         }
 
-                        // Discriminación de elementos iguales
+                        // DISCRIMINACIÓN DE ELEMENTOS IGUALES
                         if (duplicados.find((p: any) => p.modalida_laboral.toLowerCase() === item.modalida_laboral.toLowerCase()) == undefined) {
                             duplicados.push(item);
                         } else {
@@ -343,14 +340,12 @@ class ModalidaLaboralControlador {
                     return res.jsonp({ message: mensaje, data: listModalidad });
                 }, 1000)
             }
-
-
         } catch (error) {
             return res.status(500).jsonp({ message: error });
         }
     }
 
-    // REGISTRAR PLANTILLA MODALIDAD_CARGO 
+    // REGISTRAR PLANTILLA MODALIDAD_LABORAL
     public async CargarPlantilla(req: Request, res: Response) {
         try {
             const { plantilla, user_name, ip } = req.body;
@@ -360,7 +355,7 @@ class ModalidaLaboralControlador {
 
             plantilla.forEach(async (data: any) => {
                 // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
-                const { item, modalida_laboral, observacion } = data;
+                const { modalida_laboral } = data;
                 const modalidad = modalida_laboral.charAt(0).toUpperCase() + modalida_laboral.slice(1).toLowerCase();
 
                 // INICIO DE TRANSACCION
@@ -396,11 +391,8 @@ class ModalidaLaboralControlador {
                         return respuesta = res.status(404).jsonp({ message: 'error' })
                     }
                 }
-
                 contador = contador + 1;
-
             });
-
 
         } catch (error) {
             // ROLLBACK SI HAY ERROR

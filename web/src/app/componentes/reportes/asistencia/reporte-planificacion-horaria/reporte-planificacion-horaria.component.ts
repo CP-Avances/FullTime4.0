@@ -208,19 +208,10 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   usua_sucursales: any = [];
   AdministrarSucursalesUsuario(opcion: number) {
     let empleado = { id_empleado: this.idEmpleadoLogueado };
-    let respuesta: any = [];
-    let codigos = '';
+
     //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
-      respuesta = data;
-      respuesta.forEach((obj: any) => {
-        if (codigos === '') {
-          codigos = '\'' + obj.id_sucursal + '\''
-        }
-        else {
-          codigos = codigos + ', \'' + obj.id_sucursal + '\''
-        }
-      })
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
+      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
       console.log('ver sucursales ', codigos);
       this.usua_sucursales = { id_sucursal: codigos };
       this.BuscarInformacion(opcion, this.usua_sucursales);
@@ -758,7 +749,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
         { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
         { text: `PLANIFICACIÓN HORARIA - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         { text: 'PERIODO DEL: ' + this.mes_inicio + " AL " + this.mes_fin, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
-        ...this.EstructurarDatosPDF().map(obj => {
+        ...this.EstructurarDatosPDF().map((obj: any) => {
           return obj
         })
       ],

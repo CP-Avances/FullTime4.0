@@ -32,7 +32,7 @@ export class ConfirmarDesactivadosComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
-    this.ids = this.Empleados.lista.map(obj => {
+    this.ids = this.Empleados.lista.map((obj: any) => {
       return obj.id
     });
     this.Opcion();

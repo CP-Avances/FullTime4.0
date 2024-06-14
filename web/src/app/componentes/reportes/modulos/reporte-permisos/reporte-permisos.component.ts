@@ -221,7 +221,7 @@ export class ReportePermisosComponent implements OnInit {
   VerDatosAutorizacion(codigo: string | number, archivo: string, form) {
     this.verificar = 1;
     // RECORREMOS EL ARRAY DE DATOS PARA CAMBIAR EL ESTADO
-    this.totalPermisos.map(obj => {
+    this.totalPermisos.map((obj: any) => {
       // OBTENEMOS EL ID DEL EMPLEADO QUE REALIZO EL CAMBIO DE ESTADO A LA AUTORIZACIÓN
       // BUSCAMOS LOS RESPECTIVOS DATOS DEL ID DEL EMPLEADO ENCONTRADO
       if (obj.estado != 'Pendiente') {
@@ -414,7 +414,7 @@ export class ReportePermisosComponent implements OnInit {
       // TÍTULO DEL ARCHIVO Y SUMATORIA DE CÁLCULOS
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        ...this.datosEmpleado.map(obj => {
+        ...this.datosEmpleado.map((obj: any) => {
           if (obj.codigo === codigo) {
             return [
               { text: obj.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, -30, 0, 5] },
@@ -612,7 +612,7 @@ export class ReportePermisosComponent implements OnInit {
             { text: 'DÍAS', style: 'tableHeader' },
           ],
 
-          ...this.totalPermisos.map(obj => {
+          ...this.totalPermisos.map((obj: any) => {
             var horas_decimal, dias_decimal, horaT, trabaja;
             // FORMATO DE HORAS:MINUTOS:SEGUNDOS
             if (String(obj.hora_trabaja).length != 1) {
@@ -714,7 +714,7 @@ export class ReportePermisosComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        ...this.datosEmpleado.map(obj => {
+        ...this.datosEmpleado.map((obj: any) => {
           if (obj.codigo === codigo) {
             return [
               { text: obj.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, 50, 0, 5] },
@@ -895,7 +895,7 @@ export class ReportePermisosComponent implements OnInit {
     }
     wse["!cols"] = wscolsE;
 
-    const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.totalPermisos.map(obj => {
+    const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.totalPermisos.map((obj: any) => {
       var estado = '', horas_decimal, dias_decimal, horaT, trabaja, empleadoAutoriza = '';
           if (obj.estado === 'Autorizado') {
             empleadoAutoriza = obj.autorizado_por;

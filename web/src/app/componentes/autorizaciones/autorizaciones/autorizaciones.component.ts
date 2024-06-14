@@ -473,7 +473,7 @@ export class AutorizacionesComponent implements OnInit {
         }
 
         if (this.data.carga === 'multiple') {
-          this.NuevaListaAprobada.map(obj => {
+          this.NuevaListaAprobada.map((obj: any) => {
             if (obj.estado === 'Pre-autorizado') {
               this.restP.BuscarDatosAutorizacion(obj.id).subscribe(data => {
                 var documento = data[0].empleado_estado;

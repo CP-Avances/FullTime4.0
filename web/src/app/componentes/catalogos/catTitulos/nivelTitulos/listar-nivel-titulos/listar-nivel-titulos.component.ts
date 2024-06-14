@@ -45,7 +45,6 @@ export class ListarNivelTitulosComponent implements OnInit {
   empleado: any = [];
 
   idEmpleado: number; // VARIABLE QUE ALMACENA ID DE EMPLEADO QUE INICIO SESIÓN
-  filtradoNombre = ''; // VARIABLE DE BUSQUEDA DE DATOS
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
@@ -77,7 +76,6 @@ export class ListarNivelTitulosComponent implements OnInit {
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
-
 
   constructor(
     public nivel: NivelTitulosService, // SERVICIO DATOS NIVELES DE TÍTULOS
@@ -401,7 +399,7 @@ export class ListarNivelTitulosComponent implements OnInit {
                 { text: 'Código', style: 'tableHeader' },
                 { text: 'Nivel', style: 'tableHeader' },
               ],
-              ...this.nivelTitulos.map(obj => {
+              ...this.nivelTitulos.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableD' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -427,7 +425,7 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   ExportToExcel() {
     this.OrdenarDatos(this.nivelTitulos);
-    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.nivelTitulos.map(obj => {
+    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.nivelTitulos.map((obj: any) => {
       return {
         CODIGO: obj.id,
         NIVEL: obj.nombre,

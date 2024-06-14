@@ -234,7 +234,7 @@ export class AdministradorTodasComponent implements OnInit {
                 { text: 'Fecha Final', style: 'tableHeader' },
                 { text: 'Estado', style: 'tableHeader' }
               ],
-              ...datos.map(obj => {
+              ...datos.map((obj: any) => {
                 return [
                   { text: obj.create_at.split('T')[0], style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -351,7 +351,7 @@ export class AdministradorTodasComponent implements OnInit {
                 { text: 'Horas Autorizadas', style: 'tableHeader' },
                 { text: 'Estado', style: 'tableHeader' }
               ],
-              ...datos.map(obj => {
+              ...datos.map((obj: any) => {
                 return [
                   { text: obj.create_at.split('T')[0], style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -469,7 +469,7 @@ export class AdministradorTodasComponent implements OnInit {
                 { text: 'Fecha Ingreso', style: 'tableHeader' },
                 { text: 'Estado', style: 'tableHeader' }
               ],
-              ...datos.map(obj => {
+              ...datos.map((obj: any) => {
                 return [
                   { text: obj.create_at.split('T')[0], style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -582,7 +582,7 @@ export class AdministradorTodasComponent implements OnInit {
                 { text: 'Cédula', style: 'tableHeader' },
                 { text: 'Descripción', style: 'tableHeader' },
               ],
-              ...datos.map(obj => {
+              ...datos.map((obj: any) => {
                 return [
                   { text: obj.create_at.split('T')[0], style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },

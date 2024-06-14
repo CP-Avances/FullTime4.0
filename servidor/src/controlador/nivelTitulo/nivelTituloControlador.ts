@@ -199,7 +199,7 @@ class NivelTituloControlador {
     }
   }
 
-  
+
 
   // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
   public async RevisarDatos(req: Request, res: Response): Promise<any> {
@@ -225,33 +225,31 @@ class NivelTituloControlador {
       var mensaje: string = 'correcto';
 
       // LECTURA DE LOS DATOS DE LA PLANTILLA
-      plantilla.forEach(async (dato: any, indice: any, array: any) => {
+      plantilla.forEach(async (dato: any) => {
         var { ITEM, NOMBRE } = dato;
         data.fila = dato.ITEM
         data.nombre = dato.NOMBRE;
 
         if ((data.fila != undefined && data.fila != '') &&
           (data.nombre != undefined && data.nombre != '' && data.nombre != null)) {
-          //Validar primero que exista la ciudad en la tabla ciudades
+          // VALIDAR PRIMERO QUE EXISTA EL NIVEL DE TITULO
           const existe_nivelProfecional = await pool.query(
             `
             SELECT nombre FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
             `
             , [data.nombre]);
           if (existe_nivelProfecional.rowCount == 0) {
-            data.fila = ITEM
+            data.fila = ITEM;
             data.nombre = NOMBRE;
-            if (duplicados.find((p: any) => p.nombre.toLowerCase() === data.nombre.toLowerCase()) == undefined) {
+            if (duplicados.find((p: any) => p.NOMBRE.toLowerCase() === data.nombre.toLowerCase()) == undefined) {
               data.observacion = 'ok';
               duplicados.push(dato);
             }
-
             listNivelesProfesionales.push(data);
           } else {
             data.fila = ITEM
             data.nombre = NOMBRE;
             data.observacion = 'Ya existe en el sistema';
-
             listNivelesProfesionales.push(data);
           }
         } else {
@@ -263,12 +261,9 @@ class NivelTituloControlador {
             data.fila = 'error';
             mensaje = 'error'
           }
-
           listNivelesProfesionales.push(data);
         }
-
         data = {};
-
       });
 
       // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
@@ -281,16 +276,15 @@ class NivelTituloControlador {
       });
 
       setTimeout(() => {
-
         listNivelesProfesionales.sort((a: any, b: any) => {
-          // Compara los números de los objetos
+          // COMPARA LOS NUMEROS DE LOS OBJETOS
           if (a.fila < b.fila) {
             return -1;
           }
           if (a.fila > b.fila) {
             return 1;
           }
-          return 0; // Son iguales
+          return 0; // SON IGUALES
         });
 
         var filaDuplicada: number = 0;
@@ -300,29 +294,24 @@ class NivelTituloControlador {
             item.observacion = 'Registro duplicado'
           }
 
-          //Valida si los datos de la columna N son numeros.
+          // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
           if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
             if (item.fila == filaDuplicada) {
               mensaje = 'error';
             }
           } else {
             return mensaje = 'error';
           }
-
           filaDuplicada = item.fila;
-
         });
 
         if (mensaje == 'error') {
           listNivelesProfesionales = undefined;
         }
-
         return res.jsonp({ message: mensaje, data: listNivelesProfesionales });
-
       }, 1500)
     }
-
   }
 
 }

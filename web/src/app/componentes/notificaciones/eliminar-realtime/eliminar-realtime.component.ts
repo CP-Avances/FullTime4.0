@@ -45,7 +45,7 @@ export class EliminarRealtimeComponent implements OnInit {
   }
 
   MostrarInformacion() {
-    this.ids = this.Notificaciones.lista.map(obj => {
+    this.ids = this.Notificaciones.lista.map((obj: any) => {
       return obj.id
     });
     this.Opcion();

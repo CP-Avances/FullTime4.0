@@ -33,10 +33,7 @@ import { ITableProvincias } from 'src/app/model/reportes.model';
 
 export class PrincipalProvinciaComponent implements OnInit {
 
-
   // ALMACENAMIENTO DE DATOS
-  filtroPais = '';
-  filtroProvincia = '';
   idEmpleado: number;
   provincias: any = [];
   empleado: any = [];

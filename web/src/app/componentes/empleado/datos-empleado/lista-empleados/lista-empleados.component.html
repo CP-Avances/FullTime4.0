@@ -1,6 +1,6 @@
 <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;">
     <div class="row">
-        <div class="col-md">
+        <div class="col-12 col-md-6">
             <div id="titulo">
                 <span>USUARIOS</span>
             </div>
@@ -30,34 +30,31 @@
                 </div>
             </mat-card>
         </div>
-        <div class="col-md">
+        <div class="col-12 col-md-6">
             <div id="titulo">
                 <span>REGISTRO MÚLTIPLE DE USUARIOS</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
-                <div class="row">
-                    <div class="col-md" style="padding-top: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around"
-                            style="text-align: center; justify-content: center;">
-                            <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
-                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
-                                    style="height: 65px; padding-top: 25px;"
-                                    matTooltip="Dar click para selecionar plantilla y cargar registros.">
-                                    Subir plantilla
-                                </label>
-                                <label for="file" matSuffix matTooltipPosition="right"
-                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
-                                    style="height: 64px; padding-top: 25px;"
-                                    matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                    Subir nueva plantilla
-                                </label>
-                            </form>
-                        </div>
+                <div class="row m-auto">
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <form method="post" class="btn-2" enctype="multipart/form-data">
+                            <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                            <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                style="height: 65px; padding-top: 25px;"
+                                matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                Subir plantilla
+                            </label>
+                            <label for="file" matSuffix matTooltipPosition="right"
+                                *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                style="height: 65px; padding-top: 25px;"
+                                matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                Subir nueva plantilla
+                            </label>
+                        </form>
                     </div>
-                    <div class="col-md" *ngIf="!DataEmpleados">
-                        <div class="d-flex flex-wrap justify-content-around">
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div *ngIf="!DataEmpleados" class="d-flex flex-wrap justify-content-around">
                             <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                 style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
                                 href="{{link}}">
@@ -65,9 +62,7 @@
                                 Descargar plantilla usuarios
                             </a>
                         </div>
-                    </div>
-                    <div class="col-md" *ngIf="DataEmpleados" style="padding-top: 5px; padding-bottom: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around"
+                        <div *ngIf="DataEmpleados" class="d-flex flex-wrap justify-content-around"
                             style="text-align: center; justify-content: center;">
                             <button id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
                                 matTooltipPosition="right" matTooltip="Guardar registro multiple.">
@@ -75,7 +70,6 @@
                             </button>
                         </div>
                     </div>
-
                 </div>
             </mat-card>
         </div>
@@ -231,25 +225,25 @@
                         <td></td>
                         <td>
                             <mat-form-field class="input-tables codigo">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo" [formControl]="codigo"
+                                <input matInput placeholder="Buscar" [formControl]="codigo"
                                     (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field class="input-tables cedula">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombre" [formControl]="nombre"
-                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field class="input-tables cedula">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroApellido"
-                                    [formControl]="apellido" type="text" (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" [formControl]="apellido" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field class="input-tables cedula">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula" maxlength="10"
+                                <input matInput placeholder="Buscar" maxlength="10"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
@@ -264,7 +258,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let e of empleado | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombre | emplApellido: filtroApellido | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let e of empleado | emplCodigo: codigo.value | emplCedula: cedula.value | emplNombre: nombre.value | emplApellido: apellido.value | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionUno.toggle(e) : null" [checked]="selectionUno.isSelected(e)"

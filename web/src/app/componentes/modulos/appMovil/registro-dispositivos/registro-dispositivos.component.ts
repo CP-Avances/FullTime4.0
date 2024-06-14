@@ -364,7 +364,7 @@ export class RegistroDispositivosComponent implements OnInit {
                 { text: 'Id dispositivo', style: 'tableHeader' },
                 { text: 'Modelo dispositivo', style: 'tableHeader' },
               ],
-              ...this.dispositivosRegistrados.map(obj => {
+              ...this.dispositivosRegistrados.map((obj: any) => {
                 return [
                   { text: count++, style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
