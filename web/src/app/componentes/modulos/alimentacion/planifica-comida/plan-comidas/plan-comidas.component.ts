@@ -163,7 +163,7 @@ export class PlanComidasComponent implements OnInit {
   async PresentarInformacion() {
     let informacion = { id_empleado: this.idEmpleadoLogueado };
     let respuesta: any = [];
-    this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
+
     await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
     this.informacion.ObtenerInformacionUserRol(informacion).subscribe(res => {
       respuesta = res[0];
@@ -355,14 +355,27 @@ export class PlanComidasComponent implements OnInit {
 
   // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
   async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const data = {
+    const dataEmpleado = {
       id_empleado: Number(idEmpleado)
     }
 
-    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(data));
+    let noPersonal: boolean = false;
+
+    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
     this.asignacionesAcceso = res;
 
     const promises = this.asignacionesAcceso.map((asignacion: any) => {
+      if (asignacion.principal) {
+        if (!asignacion.administra && !asignacion.personal) {
+          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+        } else if (asignacion.administra && !asignacion.personal) {
+          noPersonal = true;
+        } else if (asignacion.personal && !asignacion.administra) {
+          this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
+          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+        }
+      }
+
       this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
       this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
 
@@ -377,7 +390,12 @@ export class PlanComidasComponent implements OnInit {
     const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
     this.idUsuariosAcceso.push(...ids);
 
+    if (noPersonal) {
+      this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleadoLogueado);
+    }
+
   }
+
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE
   plan_multiple: boolean = false;
