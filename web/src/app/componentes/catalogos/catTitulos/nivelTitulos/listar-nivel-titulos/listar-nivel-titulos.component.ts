@@ -45,7 +45,6 @@ export class ListarNivelTitulosComponent implements OnInit {
   empleado: any = [];
 
   idEmpleado: number; // VARIABLE QUE ALMACENA ID DE EMPLEADO QUE INICIO SESIÓN
-  filtradoNombre = ''; // VARIABLE DE BUSQUEDA DE DATOS
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
@@ -77,7 +76,6 @@ export class ListarNivelTitulosComponent implements OnInit {
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
-
 
   constructor(
     public nivel: NivelTitulosService, // SERVICIO DATOS NIVELES DE TÍTULOS

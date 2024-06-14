@@ -577,14 +577,14 @@ class RelojesControlador {
                     }));
                     setTimeout(() => {
                         listDispositivos.sort((a, b) => {
-                            // Compara los números de los objetos
+                            // COMPARA LOS NUMEROS DE LOS OBJETOS
                             if (a.fila < b.fila) {
                                 return -1;
                             }
                             if (a.fila > b.fila) {
                                 return 1;
                             }
-                            return 0; // Son iguales
+                            return 0; // SON IGUALES
                         });
                         var filaDuplicada = 0;
                         //VALIDACIONES DE LOS DATOS

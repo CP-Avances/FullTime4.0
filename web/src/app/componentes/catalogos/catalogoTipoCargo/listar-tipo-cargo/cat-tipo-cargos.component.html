@@ -27,21 +27,21 @@
             <mat-card class="example-card mat-elevation-z9">
                 <div class="row m-auto">
                     <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                            <form method="post" class="btn-2" enctype="multipart/form-data">
-                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
-                                    style="height: 65px; padding-top: 25px;"
-                                    matTooltip="Dar click para selecionar plantilla y cargar registros.">
-                                    Subir plantilla
-                                </label>
-                                <label for="file" matSuffix matTooltipPosition="right"
-                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
-                                    style="height: 65px; padding-top: 25px;"
-                                    matTooltip="Presionar para seleccionar Plantilla con nombre Modalidad.">
-                                    Subir nueva plantilla
-                                </label>
-                            </form>
+                        <form method="post" class="btn-2" enctype="multipart/form-data">
+                            <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                            <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                style="height: 65px; padding-top: 25px;"
+                                matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                Subir plantilla
+                            </label>
+                            <label for="file" matSuffix matTooltipPosition="right"
+                                *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                style="height: 65px; padding-top: 25px;"
+                                matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                Subir nueva plantilla
+                            </label>
+                        </form>
                     </div>
                     <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                         <div *ngIf="!Datos_tipo_cargos" class="d-flex flex-wrap justify-content-around">
@@ -55,7 +55,7 @@
                         <div class="d-flex flex-wrap justify-content-center m-auto w-auto">
                             <button *ngIf="Datos_tipo_cargos && messajeExcel != 'error'" id="descargar"
                                 class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
-                                matTooltipPosition="right" matTooltip="Guardar registro multiple.">
+                                matTooltipPosition="right" matTooltip="Guardar registro míltiple.">
                                 Registrar
                             </button>
                         </div>
@@ -106,8 +106,7 @@
                         <td></td>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [formControl]="buscarCargo"
-                                    [(ngModel)]="filtroCargo">
+                                <input matInput placeholder="Buscar" [formControl]="buscarCargo">
                             </mat-form-field>
                         </td>
                         <td>
@@ -117,7 +116,8 @@
                             </mat-icon>
                         </td>
                     </tr>
-                    <tr *ngFor="let cargo of listaTipoCargos | emplCargo: filtroCargo |  paginate:tamanio_pagina:numero_pagina">
+                    <tr
+                        *ngFor="let cargo of listaTipoCargos | emplCargo: buscarCargo.value |  paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionTipoCargo.toggle(cargo) : null"

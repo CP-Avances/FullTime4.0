@@ -530,7 +530,7 @@ class DepartamentoControlador {
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
                 plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                     var { ITEM, NOMBRE, SUCURSAL } = dato;
-                    //Verificar que el registo no tenga datos vacios
+                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                     if ((ITEM != undefined && ITEM != '') &&
                         (NOMBRE != undefined) && (SUCURSAL != undefined)) {
                         data.fila = ITEM;
@@ -637,7 +637,7 @@ class DepartamentoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const plantilla = req.body;
-                console.log('datos departamento: ', plantilla);
+                //console.log('datos departamento: ', plantilla);
                 var contador = 1;
                 var respuesta;
                 plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
@@ -733,7 +733,7 @@ class DepartamentoControlador {
                 var duplicados = [];
                 var mensaje = 'correcto';
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                     var { ITEM, SUCURSAL, DEPARTAMENTO, NIVEL, DEPARTAMENTO_SUPERIOR, SUCURSAL_DEPARTAMENTO_SUPERIOR } = dato;
                     if (ITEM != undefined && SUCURSAL != undefined &&
                         DEPARTAMENTO != undefined && NIVEL != undefined &&

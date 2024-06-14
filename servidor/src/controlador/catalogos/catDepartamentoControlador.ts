@@ -615,7 +615,7 @@ class DepartamentoControlador {
       // LECTURA DE LOS DATOS DE LA PLANTILLA
       plantilla.forEach(async (dato: any) => {
         var { ITEM, NOMBRE, SUCURSAL } = dato;
-        //Verificar que el registo no tenga datos vacios
+        // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
         if ((ITEM != undefined && ITEM != '') &&
           (NOMBRE != undefined) && (SUCURSAL != undefined)) {
           data.fila = ITEM;
@@ -625,7 +625,8 @@ class DepartamentoControlador {
           listDepartamentos.push(data);
         } else {
           data.fila = ITEM;
-          data.nombre = NOMBRE; data.sucursal = SUCURSAL;
+          data.nombre = NOMBRE; 
+          data.sucursal = SUCURSAL;
           data.observacion = 'no registrado';
 
           if (data.fila == '' || data.fila == undefined) {
@@ -728,7 +729,7 @@ class DepartamentoControlador {
   public async CargarPlantilla(req: Request, res: Response) {
     try {
       const plantilla = req.body;
-      console.log('datos departamento: ', plantilla);
+      //console.log('datos departamento: ', plantilla);
       var contador = 1;
       var respuesta: any
 
@@ -841,7 +842,7 @@ class DepartamentoControlador {
         var mensaje: string = 'correcto';
 
         // LECTURA DE LOS DATOS DE LA PLANTILLA
-        plantilla.forEach(async (dato: any, indice: any, array: any) => {
+        plantilla.forEach(async (dato: any) => {
           var { ITEM, SUCURSAL, DEPARTAMENTO, NIVEL, DEPARTAMENTO_SUPERIOR, SUCURSAL_DEPARTAMENTO_SUPERIOR } = dato;
 
           if (ITEM != undefined && SUCURSAL != undefined &&

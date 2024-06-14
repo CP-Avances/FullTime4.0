@@ -294,7 +294,7 @@ class FeriadosControlador {
                 var fecha_igual = [];
                 var mensaje = 'correcto';
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                     var { ITEM, FECHA, DESCRIPCION, FECHA_RECUPERACION } = dato;
                     if ((ITEM != undefined && ITEM != '') &&
                         (FECHA != undefined) && (FECHA != '') &&
@@ -448,9 +448,9 @@ class FeriadosControlador {
                             }
                         }
                     }
-                    //Valida si los datos de la columna N son numeros.
+                    // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                     if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                        //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                        // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                         if (item.fila == filaDuplicada) {
                             mensaje = 'error';
                         }
@@ -485,9 +485,9 @@ class FeriadosControlador {
                             value.observacion = 'La provincia ingresada no existe en la base';
                         }
                     }
-                    //Valida si los datos de la columna N son numeros.
+                    // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                     if (typeof value.fila === 'number' && !isNaN(value.fila)) {
-                        //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                        // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                         if (value.fila == filaDuplicada_fc) {
                             mensaje = 'error';
                         }
@@ -501,24 +501,24 @@ class FeriadosControlador {
                     //console.log('lista feriados: ',listFeriados);
                     fecha_igual = listFeriados;
                     listFeriados.sort((a, b) => {
-                        // Compara los números de los objetos
+                        // COMPARA LOS NUMEROS DE LOS OBJETOS
                         if (a.fila < b.fila) {
                             return -1;
                         }
                         if (a.fila > b.fila) {
                             return 1;
                         }
-                        return 0; // Son iguales
+                        return 0; // SON IGUALES
                     });
                     listFeriados_ciudades.sort((a, b) => {
-                        // Compara los números de los objetos
+                        // COMPARA LOS NUMEROS DE LOS OBJETOS
                         if (a.fila < b.fila) {
                             return -1;
                         }
                         if (a.fila > b.fila) {
                             return 1;
                         }
-                        return 0; // Son iguales
+                        return 0; // SON IGUALES
                     });
                     listFeriados.forEach((item) => {
                         console.log('item.observacion: ', item);

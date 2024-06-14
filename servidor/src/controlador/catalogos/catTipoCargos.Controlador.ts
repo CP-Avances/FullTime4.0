@@ -1,7 +1,7 @@
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import fs from 'fs';
 import path from 'path';
 import pool from '../../database';
@@ -40,7 +40,7 @@ class TiposCargosControlador {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.', status: '404' });
             }
         } catch (error) {
-            return res.status(500).jsonp({ message: error , status: '500'});
+            return res.status(500).jsonp({ message: error, status: '500' });
         }
     }
 
@@ -133,7 +133,7 @@ class TiposCargosControlador {
 
 
             if (tipoCargoExiste.rows[0] != undefined && tipoCargoExiste.rows[0].cargo != '' && tipoCargoExiste.rows[0].cargo != null) {
-                return res.status(200).jsonp({ message: 'Ya existe el cargo', status: '300' })
+                return res.status(200).jsonp({ message: 'Tipo cargo ya existe en el sistema.', status: '300' })
             } else {
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
@@ -261,7 +261,7 @@ class TiposCargosControlador {
                 var mensaje: string = 'correcto';
 
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla_cargo.forEach(async (dato: any, indice: any, array: any) => {
+                plantilla_cargo.forEach(async (dato: any) => {
                     var { ITEM, CARGO } = dato;
                     // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                     if ((ITEM != undefined && ITEM != '') &&
@@ -289,7 +289,6 @@ class TiposCargosControlador {
                         listCargos.push(data);
                     }
                     data = {};
-
                 });
 
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
@@ -305,8 +304,8 @@ class TiposCargosControlador {
                     if (item.observacion == 'no registrado') {
                         var VERIFICAR_CARGOS = await pool.query(
                             `
-                        SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
-                        `
+                            SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+                            `
                             , [item.tipo_cargo.toUpperCase()])
                         if (VERIFICAR_CARGOS.rows[0] == undefined || VERIFICAR_CARGOS.rows[0] == '') {
                             item.observacion = 'ok'
@@ -361,11 +360,8 @@ class TiposCargosControlador {
                     if (mensaje == 'error') {
                         listCargos = undefined;
                     }
-
                     return res.jsonp({ message: mensaje, data: listCargos });
-
                 }, 1000)
-
             }
 
         } catch (error) {
@@ -382,7 +378,7 @@ class TiposCargosControlador {
 
             plantilla.forEach(async (data: any) => {
                 // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
-                const { item, tipo_cargo, observacion } = data;
+                const { tipo_cargo } = data;
                 const cargo = tipo_cargo.charAt(0).toUpperCase() + tipo_cargo.slice(1).toLowerCase();
 
                 // INICIAR TRANSACCION

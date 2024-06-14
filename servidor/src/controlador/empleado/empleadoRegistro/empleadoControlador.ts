@@ -1357,7 +1357,7 @@ class EmpleadoControlador {
         var duplicados2: any = [];
         var mensaje: string = 'correcto';
 
-        plantilla.forEach(async (dato: any, indice: any, array: any) => {
+        plantilla.forEach(async (dato: any) => {
       // Datos que se leen de la plantilla ingresada
       var { ITEM, CEDULA, APELLIDO, NOMBRE, USUARIO, CONTRASENA, ROL, ESTADO_CIVIL, GENERO, CORREO, FECHA_NACIMIENTO, LATITUD, LONGITUD,
         DOMICILIO, TELEFONO, NACIONALIDAD} = dato;
@@ -1640,14 +1640,14 @@ class EmpleadoControlador {
         setTimeout(() => {
 
         listEmpleados.sort((a: any, b: any) => {
-        // Compara los números de los objetos
+        // COMPARA LOS NUMEROS DE LOS OBJETOS
         if (a.fila < b.fila) {
           return -1;
         }
         if (a.fila > b.fila) {
           return 1;
         }
-        return 0; // Son iguales
+        return 0; // SON IGUALES
         });
 
         var filaDuplicada: number = 0;
@@ -1668,9 +1668,9 @@ class EmpleadoControlador {
           item.observacion = 'Datos no registrado'
         }
 
-        //Valida si los datos de la columna N son numeros.
+        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-          //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+          // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
           if (item.fila == filaDuplicada) {
             mensaje = 'error';
           }
@@ -2029,7 +2029,7 @@ class EmpleadoControlador {
         var duplicados3: any = [];
         var mensaje: string = 'correcto';
 
-        plantilla.forEach(async (dato: any, indice: any, array: any) => {
+        plantilla.forEach(async (dato: any) => {
         // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
         var { ITEM, CODIGO, CEDULA, APELLIDO, NOMBRE, USUARIO, CONTRASENA, ROL, ESTADO_CIVIL, GENERO, CORREO, FECHA_NACIMIENTO, LATITUD, LONGITUD,
           DOMICILIO, TELEFONO, NACIONALIDAD, estado_user, app_habilita } = dato;

@@ -1,11 +1,11 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { ThemePalette } from '@angular/material/core';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
@@ -34,7 +34,6 @@ import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/
 
 export class CatVacunasComponent implements OnInit {
 
-  filtradoVacunas = ''; // VARIABLE DE BUSQUEDA DE DATOS
   vacunasEliminar: any = [];
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
@@ -113,12 +112,12 @@ export class CatVacunasComponent implements OnInit {
     this.rest.listaVacuna().subscribe(res => {
       this.vacunas = res
     }, error => {
-      if(error.status == 400 || error.status == 404){
-        this.toastr.info('Registro vacio', 'Vacunas', {
-          timeOut: 3500,
+      if (error.status == 400 || error.status == 404) {
+        this.toastr.info('No se ha encontrado registros.', '', {
+          timeOut: 1500,
         });
-      }else{
-        this.toastr.error('Error al cargar los datos', 'Vacunas', {
+      } else {
+        this.toastr.error('Error al cargar los datos.', 'Ups!!! algo slaio mal.', {
           timeOut: 3500,
         });
       }
@@ -134,7 +133,6 @@ export class CatVacunasComponent implements OnInit {
       nombreForm: '',
     });
     this.ObtenerVacuna();
-    this.filtradoVacunas = '';
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
   }
@@ -191,7 +189,7 @@ export class CatVacunasComponent implements OnInit {
   nameFile: string;
   archivoSubido: Array<File>;
   mostrarbtnsubir: boolean = false;
-  // METODO PARA SELECCIONAR PLANTILLA DE DATOS -----------------------------------------------------------------
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS
   FileChange(element: any) {
     this.archivoSubido = [];
     this.nameFile = '';
@@ -633,7 +631,7 @@ export class CatVacunasComponent implements OnInit {
             this.selectionVacuna.clear();
             this.ngOnInit();
           } else {
-            this.toastr.warning('No ha seleccionado vacunas.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado TIPO VACUNAS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
           }

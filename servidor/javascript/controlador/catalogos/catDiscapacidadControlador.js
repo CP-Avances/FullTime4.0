@@ -224,7 +224,7 @@ class DiscapacidadControlador {
                     var duplicados = [];
                     var mensaje = 'correcto';
                     // LECTURA DE LOS DATOS DE LA PLANTILLA
-                    plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                    plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                         var { ITEM, DISCAPACIDAD } = dato;
                         // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                         if ((ITEM != undefined && ITEM != '') &&
@@ -364,7 +364,7 @@ class DiscapacidadControlador {
             catch (error) {
                 // ROLLBACK
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error con el servidor metodo CargarPlantilla', status: '500' });
+                return res.status(500).jsonp({ message: 'Error con el servidor método CargarPlantilla.', status: '500' });
             }
         });
     }

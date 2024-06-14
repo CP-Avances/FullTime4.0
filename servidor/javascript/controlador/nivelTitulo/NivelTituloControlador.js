@@ -209,20 +209,20 @@ class NivelTituloControlador {
                 var duplicados = [];
                 var mensaje = 'correcto';
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                     var { ITEM, NOMBRE } = dato;
                     data.fila = dato.ITEM;
                     data.nombre = dato.NOMBRE;
                     if ((data.fila != undefined && data.fila != '') &&
                         (data.nombre != undefined && data.nombre != '' && data.nombre != null)) {
-                        //Validar primero que exista la ciudad en la tabla ciudades
+                        // VALIDAR PRIMERO QUE EXISTA EL NIVEL DE TITULO
                         const existe_nivelProfecional = yield database_1.default.query(`
             SELECT nombre FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
             `, [data.nombre]);
                         if (existe_nivelProfecional.rowCount == 0) {
                             data.fila = ITEM;
                             data.nombre = NOMBRE;
-                            if (duplicados.find((p) => p.nombre.toLowerCase() === data.nombre.toLowerCase()) == undefined) {
+                            if (duplicados.find((p) => p.NOMBRE.toLowerCase() === data.nombre.toLowerCase()) == undefined) {
                                 data.observacion = 'ok';
                                 duplicados.push(dato);
                             }
@@ -258,23 +258,23 @@ class NivelTituloControlador {
                 });
                 setTimeout(() => {
                     listNivelesProfesionales.sort((a, b) => {
-                        // Compara los números de los objetos
+                        // COMPARA LOS NUMEROS DE LOS OBJETOS
                         if (a.fila < b.fila) {
                             return -1;
                         }
                         if (a.fila > b.fila) {
                             return 1;
                         }
-                        return 0; // Son iguales
+                        return 0; // SON IGUALES
                     });
                     var filaDuplicada = 0;
                     listNivelesProfesionales.forEach((item) => {
                         if (item.observacion == undefined || item.observacion == null || item.observacion == '') {
                             item.observacion = 'Registro duplicado';
                         }
-                        //Valida si los datos de la columna N son numeros.
+                        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                             if (item.fila == filaDuplicada) {
                                 mensaje = 'error';
                             }

@@ -1,11 +1,10 @@
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 
-import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
-
-import pool from '../../database';
 import excel from 'xlsx';
+import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
 

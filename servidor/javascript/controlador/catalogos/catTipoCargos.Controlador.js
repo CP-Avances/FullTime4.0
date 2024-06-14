@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TIPOSCARGOSCONTROLADOR = void 0;
-const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
@@ -127,7 +127,7 @@ class TiposCargosControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
                 if (tipoCargoExiste.rows[0] != undefined && tipoCargoExiste.rows[0].cargo != '' && tipoCargoExiste.rows[0].cargo != null) {
-                    return res.status(200).jsonp({ message: 'Ya existe el cargo', status: '300' });
+                    return res.status(200).jsonp({ message: 'Tipo cargo ya existe en el sistema.', status: '300' });
                 }
                 else {
                     // INICIAR TRANSACCION
@@ -240,7 +240,7 @@ class TiposCargosControlador {
                     var duplicados = [];
                     var mensaje = 'correcto';
                     // LECTURA DE LOS DATOS DE LA PLANTILLA
-                    plantilla_cargo.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                    plantilla_cargo.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                         var { ITEM, CARGO } = dato;
                         // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                         if ((ITEM != undefined && ITEM != '') &&
@@ -278,8 +278,8 @@ class TiposCargosControlador {
                     listCargos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                         if (item.observacion == 'no registrado') {
                             var VERIFICAR_CARGOS = yield database_1.default.query(`
-                        SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
-                        `, [item.tipo_cargo.toUpperCase()]);
+                            SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+                            `, [item.tipo_cargo.toUpperCase()]);
                             if (VERIFICAR_CARGOS.rows[0] == undefined || VERIFICAR_CARGOS.rows[0] == '') {
                                 item.observacion = 'ok';
                             }
@@ -344,7 +344,7 @@ class TiposCargosControlador {
                 var respuesta;
                 plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                     // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
-                    const { item, tipo_cargo, observacion } = data;
+                    const { tipo_cargo } = data;
                     const cargo = tipo_cargo.charAt(0).toUpperCase() + tipo_cargo.slice(1).toLowerCase();
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');

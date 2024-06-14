@@ -1,35 +1,35 @@
 // IMPORTACION DE LIBRERIAS
+import { firstValueFrom, forkJoin, map } from 'rxjs';
 import { Validators, FormControl } from '@angular/forms';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-import { firstValueFrom, forkJoin, map } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
+import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
+import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
 
 // IMPORTAR COMPONENTES
 import { ConfirmarDesactivadosComponent } from '../confirmar-desactivados/confirmar-desactivados.component';
 import { ConfirmarCrearCarpetaComponent } from '../confirmar-crearCarpeta/confirmar-crearCarpeta.component';
-
+import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 // IMPORTAR SERVICIOS
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { EmpleadoElemento } from '../../../../model/empleado.model'
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { ThemePalette } from '@angular/material/core';
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+
+import { EmpleadoElemento } from '../../../../model/empleado.model'
 
 @Component({
   selector: 'app-lista-empleados',
@@ -53,12 +53,6 @@ export class ListaEmpleadosComponent implements OnInit {
   codigo = new FormControl('');
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
-
-  // VARIABLES USADAS EN BUSQUEDA DE FILTRO DE DATOS
-  filtroCodigo: number;
-  filtroApellido: '';
-  filtroCedula: '';
-  filtroNombre: '';
 
   // ITEMS DE PAGINACION DE LA TABLA
   pageSizeOptions = [5, 10, 20, 50];
@@ -313,21 +307,23 @@ export class ListaEmpleadosComponent implements OnInit {
 
     const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(data));
     this.empleadoD.asignaciones = res;
+    //console.log('lista empleados ', this.empleadoD.asignaciones)
+    // VERIFICAMOS SI EXISTEN DATOS DE USUARIOS
+    if (this.empleadoD.asignaciones) {
+      const promises = this.empleadoD.asignaciones.map((asignacion: any) => {
+        const data = {
+          id_departamento: asignacion.id_departamento
+        }
+        return firstValueFrom(this.usuario.ObtenerIdUsuariosDepartamento(data));
+      });
 
-    const promises = this.empleadoD.asignaciones.map((asignacion: any) => {
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.usuario.ObtenerIdUsuariosDepartamento(data));
-    });
+      const results = await Promise.all(promises);
 
-    const results = await Promise.all(promises);
+      const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
+      this.idUsuariosAcceso.push(...ids);
 
-    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    this.idUsuariosAcceso.push(...ids);
-
-    this.GetEmpleados();
-
+      this.GetEmpleados();
+    }
   }
 
   // METODO PARA OBTENER LOGO DE EMPRESA
@@ -453,7 +449,7 @@ export class ListaEmpleadosComponent implements OnInit {
     let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
-        console.log('itemName: ',itemName)
+        console.log('itemName: ', itemName)
         if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
           console.log('entra_automatico');
           this.numero_paginaMul = 1;
@@ -470,7 +466,7 @@ export class ListaEmpleadosComponent implements OnInit {
         }
       }
       else {
-        console.log('itemName: ',itemName)
+        console.log('itemName: ', itemName)
         if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
           console.log('entra_manual');
           this.numero_paginaMul = 1;

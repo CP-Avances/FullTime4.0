@@ -635,14 +635,14 @@ class RelojesControlador {
 
                 setTimeout(() => {
                     listDispositivos.sort((a: any, b: any) => {
-                      // Compara los números de los objetos
+                      // COMPARA LOS NUMEROS DE LOS OBJETOS
                       if (a.fila < b.fila) {
                         return -1;
                       }
                       if (a.fila > b.fila) {
                         return 1;
                       }
-                      return 0; // Son iguales
+                      return 0; // SON IGUALES
                     });
             
                     var filaDuplicada: number = 0;

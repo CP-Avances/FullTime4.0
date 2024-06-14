@@ -170,7 +170,6 @@ export class LoginComponent implements OnInit {
             timeOut: 6000,
           })
         }
-        this.IngresoSistema(form.usuarioF, 'Fallido', datos.text);
       }
 
       else if (datos.message === 'error_') {
@@ -235,7 +234,6 @@ export class LoginComponent implements OnInit {
         if (datos.rol === 2) { // EMPLEADO
           this.router.navigate(['/estadisticas']);
         }
-        this.IngresoSistema(form.usuarioF, 'Exitoso', datos.ip_adress);
 
       }
     }, err => {
@@ -243,20 +241,5 @@ export class LoginComponent implements OnInit {
     })
   }
 
-  // METODO PARA AUDITAR INICIOS DE SESION
-  IngresoSistema(user: any, acceso: string, dir_ip: any) {
-    var f = moment();
-    var fecha = f.format('YYYY-MM-DD');
-    var time = f.format('HH:mm:ss');
-    let dataAcceso = {
-      ip_address: dir_ip,
-      user_name: user,
-      modulo: 'login',
-      acceso: acceso,
-      fecha: fecha,
-      hora: time,
-    }
-    this.restU.CrearAccesosSistema(dataAcceso).subscribe(datos => { })
-  }
 
 }

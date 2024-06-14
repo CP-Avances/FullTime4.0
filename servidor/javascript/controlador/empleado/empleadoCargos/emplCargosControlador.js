@@ -353,7 +353,7 @@ class EmpleadoCargosControlador {
                 var duplicados = [];
                 var mensaje = 'correcto';
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                     var { ITEM, CEDULA, DEPARTAMENTO, FECHA_DESDE, FECHA_HASTA, SUCURSAL, SUELDO, CARGO, HORA_TRABAJA, JEFE } = dato;
                     console.log('dato: ', dato);
                     //Verificar que el registo no tenga datos vacios
@@ -583,14 +583,14 @@ class EmpleadoCargosControlador {
                 }));
                 setTimeout(() => {
                     listCargos.sort((a, b) => {
-                        // Compara los números de los objetos
+                        // COMPARA LOS NUMEROS DE LOS OBJETOS
                         if (a.fila < b.fila) {
                             return -1;
                         }
                         if (a.fila > b.fila) {
                             return 1;
                         }
-                        return 0; // Son iguales
+                        return 0; // SON IGUALES
                     });
                     var filaDuplicada = 0;
                     listCargos.forEach((item) => {
@@ -603,9 +603,9 @@ class EmpleadoCargosControlador {
                                 item.observacion = 'ok';
                             }
                         }
-                        //Valida si los datos de la columna N son numeros.
+                        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                             if (item.fila == filaDuplicada) {
                                 mensaje = 'error';
                             }

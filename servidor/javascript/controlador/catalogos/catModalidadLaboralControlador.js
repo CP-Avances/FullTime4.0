@@ -262,15 +262,15 @@ class ModalidaLaboralControlador {
                     listModalidad.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                         if (item.observacion == 'no registrada') {
                             var VERIFICAR_MODALIDAD = yield database_1.default.query(`
-                        SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
-                        `, [item.modalida_laboral.toUpperCase()]);
+                            SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                            `, [item.modalida_laboral.toUpperCase()]);
                             if (VERIFICAR_MODALIDAD.rows[0] == undefined || VERIFICAR_MODALIDAD.rows[0] == '') {
                                 item.observacion = 'ok';
                             }
                             else {
                                 item.observacion = 'Ya existe en el sistema';
                             }
-                            // Discriminación de elementos iguales
+                            // DISCRIMINACIÓN DE ELEMENTOS IGUALES
                             if (duplicados.find((p) => p.modalida_laboral.toLowerCase() === item.modalida_laboral.toLowerCase()) == undefined) {
                                 duplicados.push(item);
                             }
@@ -319,7 +319,7 @@ class ModalidaLaboralControlador {
             }
         });
     }
-    // REGISTRAR PLANTILLA MODALIDAD_CARGO 
+    // REGISTRAR PLANTILLA MODALIDAD_LABORAL
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -328,7 +328,7 @@ class ModalidaLaboralControlador {
                 var respuesta;
                 plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                     // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
-                    const { item, modalida_laboral, observacion } = data;
+                    const { modalida_laboral } = data;
                     const modalidad = modalida_laboral.charAt(0).toUpperCase() + modalida_laboral.slice(1).toLowerCase();
                     // INICIO DE TRANSACCION
                     yield database_1.default.query('BEGIN');

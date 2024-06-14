@@ -1203,7 +1203,7 @@ class EmpleadoControlador {
                     var duplicados1 = [];
                     var duplicados2 = [];
                     var mensaje = 'correcto';
-                    plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                    plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                         // Datos que se leen de la plantilla ingresada
                         var { ITEM, CEDULA, APELLIDO, NOMBRE, USUARIO, CONTRASENA, ROL, ESTADO_CIVIL, GENERO, CORREO, FECHA_NACIMIENTO, LATITUD, LONGITUD, DOMICILIO, TELEFONO, NACIONALIDAD } = dato;
                         //Verificar que el registo no tenga datos vacios
@@ -1483,14 +1483,14 @@ class EmpleadoControlador {
                     }));
                     setTimeout(() => {
                         listEmpleados.sort((a, b) => {
-                            // Compara los números de los objetos
+                            // COMPARA LOS NUMEROS DE LOS OBJETOS
                             if (a.fila < b.fila) {
                                 return -1;
                             }
                             if (a.fila > b.fila) {
                                 return 1;
                             }
-                            return 0; // Son iguales
+                            return 0; // SON IGUALES
                         });
                         var filaDuplicada = 0;
                         listEmpleados.forEach((item) => {
@@ -1509,9 +1509,9 @@ class EmpleadoControlador {
                             else {
                                 item.observacion = 'Datos no registrado';
                             }
-                            //Valida si los datos de la columna N son numeros.
+                            // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                             if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                                //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                                // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                                 if (item.fila == filaDuplicada) {
                                     mensaje = 'error';
                                 }
@@ -1814,7 +1814,7 @@ class EmpleadoControlador {
                     var duplicados2 = [];
                     var duplicados3 = [];
                     var mensaje = 'correcto';
-                    plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                    plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                         // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
                         var { ITEM, CODIGO, CEDULA, APELLIDO, NOMBRE, USUARIO, CONTRASENA, ROL, ESTADO_CIVIL, GENERO, CORREO, FECHA_NACIMIENTO, LATITUD, LONGITUD, DOMICILIO, TELEFONO, NACIONALIDAD, estado_user, app_habilita } = dato;
                         //VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS

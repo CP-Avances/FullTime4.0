@@ -40,11 +40,6 @@ export class UsuarioService {
       catchError(data));
   }
 
-  // METODO PARA REGISTRAR ACCESOS AL SISTEMA
-  CrearAccesosSistema(data: any) {
-    return this.http.post(`${environment.url}/usuarios/acceso`, data);
-  }
-
   // METODO PARA CAMBIAR PASSWORD
   ActualizarPassword(data: any) {
     return this.http.put(`${environment.url}/usuarios`, data);
