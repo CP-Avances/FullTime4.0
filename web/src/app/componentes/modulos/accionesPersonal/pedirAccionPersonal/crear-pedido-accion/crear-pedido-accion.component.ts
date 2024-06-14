@@ -372,7 +372,6 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
   async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    console.log("idEmpleado", idEmpleado);
     const dataEmpleado = {
       id_empleado: Number(idEmpleado)
     }
