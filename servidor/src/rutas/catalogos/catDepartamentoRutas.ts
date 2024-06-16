@@ -67,6 +67,8 @@ class DepartamentoRutas {
         this.router.post('/cargar_plantilla/', TokenValidation, DEPARTAMENTO_CONTROLADOR.CargarPlantilla);
 
         this.router.post('/upload/revisionNivel', [TokenValidation, upload.single('uploads')], DEPARTAMENTO_CONTROLADOR.RevisarDatosNivel);
+        this.router.post('/cargar_plantillaNivel/', TokenValidation, DEPARTAMENTO_CONTROLADOR.CargarPlantillaNivelesDep);
+
     }
 }
 

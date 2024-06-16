@@ -117,4 +117,8 @@ export class DepartamentosService {
     return this.http.post<any>(environment.url + '/departamento/upload/revisionNivel', formData);
   }
 
+  subirDepaNivel(formData){
+    return this.http.post<any>(`${environment.url}/departamento/cargar_plantillaNivel/`, formData);
+  }
+
 }

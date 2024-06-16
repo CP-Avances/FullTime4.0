@@ -59,13 +59,8 @@ export class CargarPlantillaComponent {
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
     //NIVELES DEPARTAMENTO
-    this.archivoSubido = [];
-    this.nameFile = '';
-    this.archivoForm.reset();
-    this.mostrarbtnsubir = false;
-    this.messajeExcel = '';
-
-
+    this.DatosNivelesDep = [];
+   
     //CONTRATOS
     this.DatosContrato = [];
     this.archivoSubido = [];
@@ -142,6 +137,26 @@ export class CargarPlantillaComponent {
     });
    }
 
+   RegistrarDepaNiveles(){
+    if (this.listaNivelesCorrectas.length > 0) {
+      this.restDep.subirDepaNivel(this.listaNivelesCorrectas).subscribe(response => {
+        console.log('respuesta: ', response);
+        this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
+          timeOut: 3000,
+        });
+        window.location.reload();
+        this.archivoForm.reset();
+        this.nameFile = '';
+      });
+    }else{
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+      this.nameFile = '';
+    }
+
+   }
 
   
 
@@ -241,10 +256,16 @@ export class CargarPlantillaComponent {
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     console.log('listaContratosCorrectas: ', this.listaContratosCorrectas.length);
+    console.log('listaContratosCorrectas: ', this.listaNivelesCorrectas.length);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.registroContratos();
+          if (this.listaContratosCorrectas.length > 0){
+            this.registroContratos();
+          }else if(this.listaNivelesCorrectas.length > 0){
+            this.RegistrarDepaNiveles();
+          }
+          
         }
       });
   }
@@ -269,10 +290,35 @@ export class CargarPlantillaComponent {
     }
   }
 
-
-
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
+  stiloCeldaNivel(observacion: string): string {
+    let arrayObservacion = observacion.split(" ");
+    if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya existe en el sistema') {
+      return 'rgb(239, 203, 106)';
+    } else if (observacion == 'Sucursal no existe en la base' || 
+      observacion == 'Departamento no existe en la base' ||
+      observacion == 'Departamento superior no existe en la base' ||
+      observacion == 'Sucursal superior no existe en la base' 
+    ) {
+      return 'rgb(255, 192, 203)';
+    } else if (observacion == 'Departamento no pertenece al establecimiento' || 
+      observacion == 'Departamento no pertenece a la sucursal' ||
+      observacion == 'El nivel no puede ser mayor a 5'
+    ) {
+      return 'rgb(238, 34, 207)';
+    }else if (observacion == 'Nivel incorrecto (solo números)') {
+      return 'rgb(222, 162, 73)';
+    }else {
+      return 'rgb(242, 21, 21)';
+    }
+  }
+
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
     if (observacion == 'Fecha duplicada') {
