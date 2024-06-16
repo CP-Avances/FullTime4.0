@@ -1,14 +1,12 @@
 import { Request, Response } from 'express';
 import pool from '../../database';
-import zlib from 'zlib';
 
-import pako from 'pako';
 import { Readable } from 'stream';
 
 class AuditoriaControlador {
 
 
-    public async BuscarDatosAuditoriaporTablasEmpaquetados(req: Request, res: Response): Promise<Response | void> {
+    public async BuscarDatosAuditoriaporTablasEmpaquetados(req: Request, res: Response):  Promise<void> {
         const { tabla, desde, hasta, action } = req.body;
 
         // Convertir las cadenas de acciones en arrays
@@ -43,39 +41,30 @@ class AuditoriaControlador {
 
 
         try {
-            const DATOS = await pool.query(query, params);
+            const result = await pool.query(query, params);
 
-
-
-            if (DATOS.rowCount > 0 && DATOS.rowCount < 500000) {
-                console.log("contador tab", DATOS.rowCount);
-                return res.jsonp(DATOS.rows);
-
-            } else if (DATOS.rowCount > 499999) {
-
+            if (result.rowCount > 0) {
                 const dataStream = new Readable({
                     objectMode: true,
                     read() { }
                 });
-                DATOS.rows.forEach(row => {
+
+                result.rows.forEach(row => {
                     dataStream.push(JSON.stringify(row));
                 });
+
                 dataStream.push(null); // Fin del stream
 
                 res.set('Content-Type', 'application/json');
                 dataStream.pipe(res);
-
-            } else if (DATOS.rowCount = 0) {
+            } else {
                 res.status(404).json({ message: 'No se encuentran registros', status: '404' });
-
             }
-
         } catch (error) {
             res.status(500).json({ message: 'Error en el servidor', error });
         }
 
     }
-
 
     public async BuscarDatosAuditoriaporTablas(req: Request, res: Response): Promise<Response> {
         try {
@@ -124,9 +113,6 @@ class AuditoriaControlador {
             return res.status(500).jsonp({ message: 'Error interno del servidor', error: error.message });
         }
     }
-
-
-
 
     public async BuscarDatosAuditoriaoriginal(req: Request, res: Response): Promise<Response> {
         const { tabla, desde, hasta, action } = req.body

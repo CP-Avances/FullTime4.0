@@ -44,24 +44,20 @@ class AuditoriaControlador {
             console.log('Query:', query);
             console.log('Params:', params);
             try {
-                const DATOS = yield database_1.default.query(query, params);
-                if (DATOS.rowCount > 0 && DATOS.rowCount < 500000) {
-                    console.log("contador tab", DATOS.rowCount);
-                    return res.jsonp(DATOS.rows);
-                }
-                else if (DATOS.rowCount > 499999) {
+                const result = yield database_1.default.query(query, params);
+                if (result.rowCount > 0) {
                     const dataStream = new stream_1.Readable({
                         objectMode: true,
                         read() { }
                     });
-                    DATOS.rows.forEach(row => {
+                    result.rows.forEach(row => {
                         dataStream.push(JSON.stringify(row));
                     });
                     dataStream.push(null); // Fin del stream
                     res.set('Content-Type', 'application/json');
                     dataStream.pipe(res);
                 }
-                else if (DATOS.rowCount = 0) {
+                else {
                     res.status(404).json({ message: 'No se encuentran registros', status: '404' });
                 }
             }

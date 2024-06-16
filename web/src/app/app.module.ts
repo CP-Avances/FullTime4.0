@@ -146,7 +146,6 @@ import { EmplCargosService } from './servicios/empleado/empleadoCargo/empl-cargo
 import { CiudadService } from './servicios/ciudad/ciudad.service';
 import { TokenInterceptorService } from './servicios/login/token-interceptor.service';
 import { SpinnerService } from './servicios/intercepto/spinner.service';
-
 import { GraficasService } from './servicios/graficas/graficas.service';
 import { ProgressService } from './componentes/administracionGeneral/progress/progress.service';
 
@@ -641,7 +640,6 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
       useClass: SpinnerInterceptor,
       multi: true
     },
-
     {
       provide: LOCALE_ID, useValue: 'es-EC'
     },

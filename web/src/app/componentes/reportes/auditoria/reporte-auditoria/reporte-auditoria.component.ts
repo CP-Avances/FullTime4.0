@@ -6,6 +6,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { HttpResponse } from '@angular/common/http';
 
+import { forkJoin } from 'rxjs';
 
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
@@ -209,11 +210,56 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
     // VALIDACIONES DE OPCIONES DE REPORTE
     ValidarReporte(action: any) {
         if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '' || this.accionesSeleccionadas.length == 0) return this.toastr.error('Primero valide fechas de búsqueda y acciones.');
-        this.ModelarTablasAuditoriaPorTablas(action);
+        this.ModelarTablasAuditoriaPorTablasEmpaquetados(action);
+    }
 
-        // this.data_pdf =  this.ModelarTablasAuditoriaPorTablas(action);
-        //this.obtenerDatosPdf();
+    blobToArraynoString(blob: Blob): Promise<any[]> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
 
+            reader.onload = () => {
+                try {
+                    const result = reader.result;
+                    if (result instanceof ArrayBuffer) {
+                        const dataArray = new Uint8Array(result);
+
+                        const decoder = new TextDecoder('utf-8');
+                        let jsonString = '';
+                        const objects: any[] = []; // Define the type of objects array
+                        let lastIndex = 0;
+
+                        for (let i = 0; i < dataArray.length; i++) {
+                            if (dataArray[i] === 125) { // Character code for "}"
+                                let segment = decoder.decode(dataArray.slice(lastIndex, i + 1));
+                                lastIndex = i + 1;
+                                jsonString += segment;
+
+                                try {
+                                    const jsonObject = JSON.parse(jsonString);
+                                    objects.push(jsonObject);
+                                    jsonString = '';
+                                } catch (e) {
+                                    // If JSON.parse fails, the segment isn't complete yet
+                                    continue;
+                                }
+                            }
+                        }
+
+                        resolve(objects);
+                    } else {
+                        reject(new Error("Expected an ArrayBuffer but got a different type"));
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            };
+
+            reader.onerror = () => {
+                reject(reader.error);
+            };
+
+            reader.readAsArrayBuffer(blob);
+        });
     }
 
     blobToArray(blob: Blob): Promise<any[]> {
@@ -223,6 +269,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
                 try {
                     const arrayBuffer = reader.result as ArrayBuffer;
                     const dataArray = new Uint8Array(arrayBuffer);
+                    console.log("para ver como es este array", dataArray)
                     let jsonString = new TextDecoder('utf-8').decode(dataArray);
 
                     // console.log('Contenido original del Blob:', jsonString); // Imprimir el contenido original del Blob
@@ -248,10 +295,6 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         });
     }
 
-
-
-
-
     //BUSCAR REGISTROS AUDITORIA
 
     ModelarTablasAuditoria(accion: any) {
@@ -275,7 +318,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
                 if (response.body !== null) {
                     //const data_pdf: Blob = response.body;
                     //console.log("para ver", response.body);
-                    this.blobToArray(response.body).then((data_pdf: any[]) => {
+                    this.blobToArraynoString(response.body).then((data_pdf: any[]) => {
                         //console.log(data_pdf); // Aquí puedes manejar los datos recibidos, como guardarlos o procesarlos
                         this.data_pdf = data_pdf;
 
@@ -302,8 +345,6 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
             }
         );
     }
-
-
 
     datosbusqueda: any = [];
     data_pdf: any = [];
@@ -358,6 +399,84 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
             console.error("Error al consultar auditorías por tabla:", error);
         }
     }
+
+    datosPdF: any = []
+    async ModelarTablasAuditoriaPorTablasEmpaquetados(accion: any) {
+
+        //try {
+        this.data_pdf = [];
+        var acciones = this.accionesSeleccionadas.map(x => x).join(',');
+
+        // Array para almacenar todas las promesas de consulta
+        const consultasPromesas: Promise<any>[] = [];
+
+        for (let i = 0; i < this.tablasSolicitadas.length; i++) {
+            const tabla = this.tablasSolicitadas[i];
+            const buscarTabla = {
+                tabla: tabla.nombre,
+                desde: this.rangoFechas.fec_inico,
+                hasta: this.rangoFechas.fec_final,
+                action: acciones,
+            };
+
+            // Crear una promesa para cada consulta
+            const consultaPromise = new Promise((resolve, reject) => {
+                this.restAuditoria.ConsultarAuditoriaPorTablaEmpaquetados(buscarTabla).subscribe(
+                    (response: any) => {
+                        if (response !== null && response.body instanceof Blob) {
+                            this.blobToArraynoString(response.body).then((data_pdf: any[]) => {
+                                resolve(data_pdf); // Resolver la promesa con los datos convertidos
+                            }).catch(error => {
+                                reject(`Error al convertir Blob a array de objetos: ${error}`);
+                            });
+                        } else {
+                            reject('Respuesta vacía o no es un Blob.');
+                        }
+                    },
+                    error => {
+                        if (error.status === 404) {
+                            reject('No existen registros con las tablas y acciones seleccionadas');
+                        } else {
+                            reject(`Error en la consulta: ${error}`);
+                        }
+                    }
+                );
+            });
+
+
+            consultasPromesas.push(consultaPromise); // Agregar la promesa al array
+        }
+
+        // Esperar a que todas las promesas se resuelvan
+        const resultados = await Promise.allSettled(consultasPromesas);
+
+        this.datosbusqueda = resultados
+            .filter(result => result.status === 'fulfilled')
+            .map(result => (result as PromiseFulfilledResult<any>).value);
+
+
+        // resultados ahora contiene todos los arrays de datos obtenidos
+        this.data_pdf = this.datosbusqueda.flat(); // Aplanar el array de arrays
+
+        console.log("quiero ver los datos", this.data_pdf);
+        this.datosPdF = this.data_pdf;
+        // Realizar la acción correspondiente
+        switch (accion) {
+            case 'ver':
+                this.VerDatos();
+                break;
+            default:
+                this.GenerarPDF(this.datosPdF, accion);
+                break;
+        }
+        // } catch (error) {
+        // console.error('Error en las consultas:', error);
+        // Aquí puedes manejar el error de manera adecuada para tu aplicación
+        //}
+    }
+
+
+
 
     ngOnDestroy(): void {
         //this.ModelarTablasAuditoria();
