@@ -28,6 +28,9 @@ export class CargarPlantillaComponent {
   tamanio_paginaMul: number = 5;
   numero_paginaMul: number = 1;
 
+  tamanio_paginaDepaNivel: number = 5;
+  numero_paginaDepaNivel: number = 1;
+
   tamanio_paginaMulCargo: number = 5;
   numero_paginaMulCargo: number = 1;
 
@@ -51,9 +54,18 @@ export class CargarPlantillaComponent {
   }
 
   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
-  ManejarPaginaMulti(e: PageEvent) {
-    this.tamanio_paginaMul = e.pageSize;
-    this.numero_paginaMul = e.pageIndex + 1
+  ManejarPaginaMulti(e: PageEvent, tipo: string) {
+    if(tipo == 'depaNivel'){
+      this.tamanio_paginaDepaNivel = e.pageSize;
+      this.numero_paginaDepaNivel = e.pageIndex + 1
+    }else if(tipo == 'contrato'){
+      this.tamanio_paginaMul = e.pageSize;
+      this.numero_paginaMul = e.pageIndex + 1
+    }else if(tipo == 'cargo'){
+      this.tamanio_paginaMulCargo = e.pageSize;
+      this.numero_paginaMulCargo = e.pageIndex + 1
+    }
+    
   }
 
   // METODO PARA LIMPIAR FORMULARIO

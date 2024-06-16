@@ -100,8 +100,8 @@
                             </tbody>
                     </table>
                 </div>
-                <mat-paginator  [length]="DatosNivelesDep.length!" [pageSize]="tamanio_paginaMul"
-                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                <mat-paginator  [length]="DatosNivelesDep.length!" [pageSize]="tamanio_paginaMulCargo"
+                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'depaNivel')"
                         showFirstLastButtons>
                 </mat-paginator>
             </div>
@@ -216,7 +216,7 @@
                         </table>
                     </div>
                     <mat-paginator  [length]="DatosContrato.length!" [pageSize]="tamanio_paginaMul"
-                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'contrato')"
                         showFirstLastButtons>
                     </mat-paginator>
                 </div>
@@ -329,7 +329,7 @@
                         </table>
                     </div>
                     <mat-paginator [length]="DatosCargos.length!" [pageSize]="tamanio_paginaMulCargo"
-                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'cargo')"
                         showFirstLastButtons>
                     </mat-paginator>
                 </div>
