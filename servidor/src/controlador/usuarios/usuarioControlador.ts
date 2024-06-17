@@ -60,7 +60,7 @@ class UsuarioControlador {
       SELECT * FROM eu_usuarios WHERE id_empleado = $1
       `
       , [id_empleado]);
-    if (UN_USUARIO.rowCount > 0) {
+    if (UN_USUARIO.rowCount != 0) {
       return res.jsonp(UN_USUARIO.rows);
     }
     else {
@@ -78,7 +78,7 @@ class UsuarioControlador {
       WHERE id_contrato = $1
       `
       , [id_empleado]);
-    if (EMPLEADO.rowCount > 0) {
+    if (EMPLEADO.rowCount != 0) {
       return res.jsonp(EMPLEADO.rows)
     }
     else {
@@ -95,7 +95,7 @@ class UsuarioControlador {
       WHERE id_departamento = $1
       `
       , [id_departamento]);
-    if (Ids.rowCount > 0) {
+    if (Ids.rowCount != 0) {
       return res.jsonp(Ids.rows)
     }
     else {
@@ -1646,7 +1646,7 @@ class UsuarioControlador {
       `,
       [id_empleado]
     );
-    if (USUARIOS.rowCount > 0) {
+    if (USUARIOS.rowCount != 0) {
       return res.jsonp(USUARIOS.rows)
     }
     else {
@@ -1707,7 +1707,7 @@ class UsuarioControlador {
       ORDER BY ud.id ASC
       `,[id_empleado]
     );
-    if (USUARIOS.rowCount > 0) {
+    if (USUARIOS.rowCount != 0) {
       return res.jsonp(USUARIOS.rows)
     }
     else {
@@ -1725,7 +1725,7 @@ class UsuarioControlador {
       `,
       [id_empleado]
     );
-    if (USUARIOS.rowCount > 0) {
+    if (USUARIOS.rowCount != 0) {
       return res.jsonp(USUARIOS.rows)
     }
     else {

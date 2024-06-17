@@ -26,7 +26,7 @@ class ReportesControlador {
                 ON te.id_empleado = ts.id_empleado AND te.fecha_inicio::date = ts.fecha_fin::date AND 
                 te.id_empleado = $1 AND te.fecha_inicio::date BETWEEN $2 AND $3
             `, [id_empleado, fechaInicio, fechaFinal]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -42,7 +42,7 @@ class ReportesControlador {
             SELECT * FROM mhe_solicitud_hora_extra 
             WHERE id_empleado_solicita = $1 AND fecha_inicio::date BETWEEN $2 AND $3
             `, [id_usua_solicita, fechaInicio, fechaFinal]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -59,7 +59,7 @@ class ReportesControlador {
                 AND te.fecha_inicio::date = ts.fecha_fin::date 
                 AND te.fecha_inicio::date BETWEEN $1 AND $2
             `, [fechaInicio, fechaFinal]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -73,7 +73,7 @@ class ReportesControlador {
             const DATOS = yield database_1.default.query(`
             SELECT * FROM mhe_solicitud_hora_extra WHERE fecha_inicio::date BETWEEN $1 AND $2
             `, [fechaInicio, fechaFinal]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -95,7 +95,7 @@ class ReportesControlador {
                 AND p.codigo = $1 
             ORDER BY p.numero_permiso ASC
             `, [codigo]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 DATOS.rows.map((obj) => {
                     if (obj.id_autoriza_estado != null && obj.id_autoriza_estado != '' && obj.estado != 1) {
                         var autorizaciones = obj.id_autoriza_estado.split(',');

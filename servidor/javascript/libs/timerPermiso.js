@@ -34,7 +34,7 @@ const conteoPermisos = function () {
                     AND con.id = p.id_empleado_contrato AND con.id_empleado = e.id 
                 ORDER BY p.fecha_final DESC
                 `, [fecha]);
-            if (permiso.rowCount > 0) {
+            if (permiso.rowCount != 0) {
                 console.log(permiso.rows);
                 permiso.rows.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
                     let timbre = yield database_1.default.query(`

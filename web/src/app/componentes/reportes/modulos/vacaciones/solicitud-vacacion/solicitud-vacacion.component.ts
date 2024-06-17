@@ -212,7 +212,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
   ModelarEmpleados(accion) {
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_vacunas_multiples') as any)
     respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach(element => {
+      obj.departamentos.forEach((element: any) => {
         element.empleado = element.empleado.filter((o: any) => {
           var bool = this.selectionEmp.selected.find(obj1 => {
             return obj1.id === o.id

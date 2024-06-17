@@ -162,6 +162,9 @@ export class VerEmpleadoComponent implements OnInit {
     var cadena = this.router.url.split('#')[0];
     this.idEmpleado = cadena.split("/")[2];
     this.scriptService.load('pdfMake', 'vfsFonts');
+
+    console.log('cadena: ', cadena);
+    console.log('logo ', this.logoE)
   }
 
   ngOnInit(): void {
@@ -347,14 +350,15 @@ export class VerEmpleadoComponent implements OnInit {
         this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
         this.restEmpleado.obtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
           console.log('ver imagen data ', data)
-          if (data.imagen != 0) {
-            this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
-          }
-          else {
+          if (data.imagen === 0) {
             this.ImagenLocalUsuario("assets/imagenes/user.png").then(
               (result) => (this.imagenEmpleado = result)
             );
           }
+          else {
+            this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
+          }
+          console.log('imagen codificado ', this.imagenEmpleado)
         });
         //console.log('ver urlImagen ', this.urlImagen)
         this.mostrarImagen = true;
@@ -514,7 +518,7 @@ export class VerEmpleadoComponent implements OnInit {
       this.nameFile = '';
       this.ResetDataMain();
     }, error => {
-      this.toastr.info('Verifique que este usuario tenga creadas capetas', 'No se ha podido cargar el archivo.', {
+      this.toastr.info('No se ha encontrado el directorio.', 'No se ha podido cargar el archivo.', {
         timeOut: 6000,
       });
     }
@@ -2800,7 +2804,7 @@ export class VerEmpleadoComponent implements OnInit {
     let genero = this.GeneroSelect[this.empleadoUno[0].genero - 1];
     let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
     let nacionalidad: any;
-    this.nacionalidades.forEach(element => {
+    this.nacionalidades.forEach((element: any) => {
       if (this.empleadoUno[0].id_nacionalidad == element.id) {
         nacionalidad = element.nombre;
       }
@@ -3008,7 +3012,7 @@ export class VerEmpleadoComponent implements OnInit {
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
@@ -3159,7 +3163,7 @@ export class VerEmpleadoComponent implements OnInit {
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }

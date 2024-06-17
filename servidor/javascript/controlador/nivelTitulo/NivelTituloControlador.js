@@ -26,7 +26,7 @@ class NivelTituloControlador {
             const titulo = yield database_1.default.query(`
       SELECT * FROM et_cat_nivel_titulo ORDER BY nombre ASC
       `);
-            if (titulo.rowCount > 0) {
+            if (titulo.rowCount != 0) {
                 return res.jsonp(titulo.rows);
             }
             else {
@@ -177,7 +177,7 @@ class NivelTituloControlador {
             const unNivelTitulo = yield database_1.default.query(`
       SELECT * FROM et_cat_nivel_titulo WHERE UPPER(nombre) = $1
       `, [nombre]);
-            if (unNivelTitulo.rowCount > 0) {
+            if (unNivelTitulo.rowCount != 0) {
                 return res.jsonp(unNivelTitulo.rows);
             }
             else {

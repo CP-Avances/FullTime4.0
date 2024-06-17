@@ -27,7 +27,7 @@ class ModalidaLaboralControlador {
                 const MODALIDAL_LABORAL = yield database_1.default.query(`
                 SELECT * FROM e_cat_modalidad_trabajo ORDER BY descripcion ASC
                 `);
-                if (MODALIDAL_LABORAL.rowCount > 0) {
+                if (MODALIDAL_LABORAL.rowCount != 0) {
                     return res.jsonp(MODALIDAL_LABORAL.rows);
                 }
                 else {

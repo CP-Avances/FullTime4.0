@@ -153,7 +153,7 @@ class ContratoEmpleadoControlador {
             WHERE ec.id_empleado = $1 ORDER BY ec.id ASC
             `
             , [id_empleado]);
-        if (CONTRATO_EMPLEADO_REGIMEN.rowCount > 0) {
+        if (CONTRATO_EMPLEADO_REGIMEN.rowCount != 0) {
             return res.jsonp(CONTRATO_EMPLEADO_REGIMEN.rows)
         }
         else {
@@ -321,7 +321,7 @@ class ContratoEmpleadoControlador {
             WHERE ec.id_empleado = e.id AND e.id = $1
             `
             , [id_empleado]);
-        if (CONTRATO.rowCount > 0) {
+        if (CONTRATO.rowCount != 0) {
             if (CONTRATO.rows[0]['max'] != null) {
                 return res.jsonp(CONTRATO.rows)
             }
@@ -346,7 +346,7 @@ class ContratoEmpleadoControlador {
             WHERE ec.id = $1 AND ec.id_regimen = cr.id AND mt.id = ec.id_modalidad_laboral
             `
             , [id]);
-        if (CONTRATO.rowCount > 0) {
+        if (CONTRATO.rowCount != 0) {
             return res.jsonp(CONTRATO.rows)
         }
         else {
@@ -364,7 +364,7 @@ class ContratoEmpleadoControlador {
             WHERE ca.id = $1 AND ec.id = ca.id_contrato
             `
             , [id_empleado]);
-        if (FECHA.rowCount > 0) {
+        if (FECHA.rowCount != 0) {
             return res.jsonp(FECHA.rows)
         }
         else {
@@ -384,7 +384,7 @@ class ContratoEmpleadoControlador {
             SELECT * FROM e_cat_modalidad_trabajo
             `
         );
-        if (CONTRATOS.rowCount > 0) {
+        if (CONTRATOS.rowCount != 0) {
             return res.jsonp(CONTRATOS.rows)
         }
         else {
@@ -443,7 +443,7 @@ class ContratoEmpleadoControlador {
             `
             , [nombre]
         );
-        if (CONTRATOS.rowCount > 0) {
+        if (CONTRATOS.rowCount != 0) {
             return res.jsonp(CONTRATOS.rows)
         }
         else {
@@ -459,7 +459,7 @@ class ContratoEmpleadoControlador {
             WHERE contrato.id = $1
             `
             , [id_contrato]);
-        if (FECHA.rowCount > 0) {
+        if (FECHA.rowCount != 0) {
             return res.jsonp(FECHA.rows)
         }
         else {

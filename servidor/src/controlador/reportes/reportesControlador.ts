@@ -16,7 +16,7 @@ class ReportesControlador {
                 te.id_empleado = $1 AND te.fecha_inicio::date BETWEEN $2 AND $3
             `
             , [id_empleado, fechaInicio, fechaFinal]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -33,7 +33,7 @@ class ReportesControlador {
             WHERE id_empleado_solicita = $1 AND fecha_inicio::date BETWEEN $2 AND $3
             `
             , [id_usua_solicita, fechaInicio, fechaFinal]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -51,7 +51,7 @@ class ReportesControlador {
                 AND te.fecha_inicio::date BETWEEN $1 AND $2
             `
             , [fechaInicio, fechaFinal]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -66,7 +66,7 @@ class ReportesControlador {
             SELECT * FROM mhe_solicitud_hora_extra WHERE fecha_inicio::date BETWEEN $1 AND $2
             `
             , [fechaInicio, fechaFinal]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -92,7 +92,7 @@ class ReportesControlador {
             `
             , [codigo]);
 
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             DATOS.rows.map((obj: any) => {
                 if (obj.id_autoriza_estado != null && obj.id_autoriza_estado != '' && obj.estado != 1) {
                     var autorizaciones = obj.id_autoriza_estado.split(',');

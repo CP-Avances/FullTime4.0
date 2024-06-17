@@ -30,7 +30,7 @@ export const cumpleanios = function () {
                 `
                 , [fecha]);
 
-            if (felizCumple.rowCount > 0) {
+            if (felizCumple.rowCount != 0) {
 
                 var correos = BuscarCorreos(felizCumple);
 

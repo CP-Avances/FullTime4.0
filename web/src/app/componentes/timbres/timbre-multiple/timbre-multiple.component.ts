@@ -1,5 +1,5 @@
 // IMPORTAR LIBRERIAS
-import { Validators, FormControl } from '@angular/forms';
+import { Validators, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
@@ -29,10 +29,16 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
 import { firstValueFrom } from 'rxjs';
 
+
+
+
+
 @Component({
   selector: 'app-timbre-multiple',
+
   templateUrl: './timbre-multiple.component.html',
-  styleUrls: ['./timbre-multiple.component.css']
+  styleUrls: ['./timbre-multiple.component.css'],
+
 })
 
 export class TimbreMultipleComponent implements OnInit {

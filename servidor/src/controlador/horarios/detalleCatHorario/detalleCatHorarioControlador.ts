@@ -214,7 +214,7 @@ class DetalleCatalogoHorarioControlador {
             SELECT * FROM eh_detalle_horarios
             `
         );
-        if (HORARIO.rowCount > 0) {
+        if (HORARIO.rowCount != 0) {
             return res.jsonp(HORARIO.rows)
         }
         else {

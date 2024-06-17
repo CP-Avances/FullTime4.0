@@ -102,7 +102,7 @@ class LoginControlador {
           ORDER BY c.fecha_inicio DESC LIMIT 1
           `, [USUARIO.rows[0].id_empleado]);
                     // VALIDACION DE ACCESO CON LICENCIA 
-                    if (INFORMACION.rowCount > 0) {
+                    if (INFORMACION.rowCount != 0) {
                         console.log('ingresa a validacion de licencia');
                         try {
                             const { id_contrato, id_cargo, id_departamento, acciones_timbres, id_sucursal, id_empresa, public_key: licencia } = INFORMACION.rows[0];
@@ -110,7 +110,7 @@ class LoginControlador {
               SELECT estado FROM ed_autoriza_departamento
               WHERE id_empleado_cargo = $1 AND id_departamento = $2
               `, [id_cargo, id_departamento]);
-                            if (AUTORIZA.rowCount > 0) {
+                            if (AUTORIZA.rowCount != 0) {
                                 const { estado: autoriza_est } = AUTORIZA.rows[0];
                                 const token = jsonwebtoken_1.default.sign({
                                     _licencia: licencia, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,

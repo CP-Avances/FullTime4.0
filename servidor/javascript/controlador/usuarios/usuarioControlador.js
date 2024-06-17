@@ -58,7 +58,7 @@ class UsuarioControlador {
             const UN_USUARIO = yield database_1.default.query(`
       SELECT * FROM eu_usuarios WHERE id_empleado = $1
       `, [id_empleado]);
-            if (UN_USUARIO.rowCount > 0) {
+            if (UN_USUARIO.rowCount != 0) {
                 return res.jsonp(UN_USUARIO.rows);
             }
             else {
@@ -75,7 +75,7 @@ class UsuarioControlador {
       INNER JOIN ed_departamentos ON e.id_departamento = ed_departamentos.id 
       WHERE id_contrato = $1
       `, [id_empleado]);
-            if (EMPLEADO.rowCount > 0) {
+            if (EMPLEADO.rowCount != 0) {
                 return res.jsonp(EMPLEADO.rows);
             }
             else {
@@ -91,7 +91,7 @@ class UsuarioControlador {
       FROM datos_actuales_empleado
       WHERE id_departamento = $1
       `, [id_departamento]);
-            if (Ids.rowCount > 0) {
+            if (Ids.rowCount != 0) {
                 return res.jsonp(Ids.rows);
             }
             else {
@@ -1412,7 +1412,7 @@ class UsuarioControlador {
       JOIN ed_departamentos AS d ON ud.id_departamento = d.id 
       WHERE id_empleado = $1
       `, [id_empleado]);
-            if (USUARIOS.rowCount > 0) {
+            if (USUARIOS.rowCount != 0) {
                 return res.jsonp(USUARIOS.rows);
             }
             else {
@@ -1466,7 +1466,7 @@ class UsuarioControlador {
       WHERE id_empleado = $1
       ORDER BY ud.id ASC
       `, [id_empleado]);
-            if (USUARIOS.rowCount > 0) {
+            if (USUARIOS.rowCount != 0) {
                 return res.jsonp(USUARIOS.rows);
             }
             else {
@@ -1482,7 +1482,7 @@ class UsuarioControlador {
       SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 
       AND principal = true
       `, [id_empleado]);
-            if (USUARIOS.rowCount > 0) {
+            if (USUARIOS.rowCount != 0) {
                 return res.jsonp(USUARIOS.rows);
             }
             else {

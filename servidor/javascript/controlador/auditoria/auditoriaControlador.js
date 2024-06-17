@@ -42,7 +42,7 @@ class AuditoriaControlador {
                fecha_hora DESC;
        `;
             const DATOS = yield database_1.default.query(query, params);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -73,7 +73,7 @@ class AuditoriaControlador {
                 fecha_hora DESC;
         `;
             const DATOS = yield database_1.default.query(query, params);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 // Comprimir los datos antes de enviarlos
                 const compressedData = pako_1.default.gzip(JSON.stringify(DATOS.rows));
                 res.setHeader('Content-Encoding', 'gzip');
@@ -108,7 +108,7 @@ class AuditoriaControlador {
         `;
             try {
                 const result = yield database_1.default.query(query, params);
-                if (result.rowCount > 0) {
+                if (result.rowCount != 0) {
                     const dataStream = new stream_1.Readable({
                         objectMode: true,
                         read() { }
