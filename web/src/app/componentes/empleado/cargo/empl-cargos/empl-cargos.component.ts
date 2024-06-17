@@ -26,6 +26,7 @@ export class EmplCargosComponent implements OnInit {
   ver_jefe: boolean = false;
   ver_personal: boolean = false;
 
+  idEmpleadoAcceso: any;
   asignacionesAcceso: any;
   idSucursalesAcceso: any = [];
   idDepartamentosAcceso: any = [];
@@ -84,6 +85,7 @@ export class EmplCargosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.idEmpleadoAcceso = localStorage.getItem('empleado');
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
@@ -109,7 +111,7 @@ export class EmplCargosComponent implements OnInit {
   async FiltrarSucursales() {
     let idEmpre = parseInt(localStorage.getItem('empresa') as string);
     this.sucursales = [];
-    await this.ObtenerAsignacionesUsuario(this.idEmpleado);
+    await this.ObtenerAsignacionesUsuario(this.idEmpleadoAcceso);
     this.restSucursales.BuscarSucursalEmpresa(idEmpre).subscribe(datos => {
       this.sucursales = this.FiltrarSucursalesAsignadas(datos);
     }, error => {
@@ -125,19 +127,12 @@ export class EmplCargosComponent implements OnInit {
       id_empleado: Number(idEmpleado)
     }
 
-    let noPersonal: boolean = false;
-
     const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(dataEmpleado));
     this.asignacionesAcceso = res;
 
     const promises = this.asignacionesAcceso.map((asignacion: any) => {
       if (asignacion.principal) {
-        if (!asignacion.administra && !asignacion.personal) {
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        } else if (asignacion.administra && !asignacion.personal) {
-          noPersonal = true;
-        } else if (asignacion.personal && !asignacion.administra) {
-
+        if (!asignacion.administra ) {
           return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
         }
       }

@@ -162,8 +162,6 @@ export class VerEmpleadoComponent implements OnInit {
     var cadena = this.router.url.split('#')[0];
     this.idEmpleado = cadena.split("/")[2];
     this.scriptService.load('pdfMake', 'vfsFonts');
-
-    console.log('cadena: ', cadena);
   }
 
   ngOnInit(): void {
