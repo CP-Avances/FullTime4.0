@@ -27,7 +27,7 @@ class DiscapacidadControlador {
                 const DISCAPACIDAD = yield database_1.default.query(`
                 SELECT * FROM e_cat_discapacidad ORDER BY nombre ASC
                 `);
-                if (DISCAPACIDAD.rowCount > 0) {
+                if (DISCAPACIDAD.rowCount != 0) {
                     return res.jsonp(DISCAPACIDAD.rows);
                 }
                 else {

@@ -92,7 +92,7 @@ class PlanGeneralControlador {
             WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND codigo = $4
             `
             , [fec_inicio, fec_final, id_horario, codigo]);
-        if (FECHAS.rowCount > 0) {
+        if (FECHAS.rowCount != 0) {
             return res.jsonp(FECHAS.rows)
         }
         else {
@@ -208,7 +208,7 @@ class PlanGeneralControlador {
                 `
                 , [codigo]);
 
-            if (HORARIO.rowCount > 0) {
+            if (HORARIO.rowCount != 0) {
                 return res.jsonp(HORARIO.rows)
             }
             else {
@@ -273,7 +273,7 @@ class PlanGeneralControlador {
                 "ORDER BY 3,4,1"
                 , [fecha_inicio, fecha_final]);
 
-            if (HORARIO.rowCount > 0) {
+            if (HORARIO.rowCount != 0) {
                 return res.jsonp({ message: 'OK', data: HORARIO.rows })
             }
             else {
@@ -303,7 +303,7 @@ class PlanGeneralControlador {
                 "ORDER BY dh.id_horario, dh.hora ASC"
                 , [fecha_inicio, fecha_final]);
 
-            if (HORARIO.rowCount > 0) {
+            if (HORARIO.rowCount != 0) {
                 return res.jsonp({ message: 'OK', data: HORARIO.rows })
             }
             else {
@@ -329,7 +329,7 @@ class PlanGeneralControlador {
                 "GROUP BY codigo_horario, p_g.id_horario"
                 , [fecha_inicio, fecha_final]);
 
-            if (HORARIO.rowCount > 0) {
+            if (HORARIO.rowCount != 0) {
                 return res.jsonp({ message: 'OK', data: HORARIO.rows })
             }
             else {
@@ -481,7 +481,7 @@ class PlanGeneralControlador {
             });
 
 
-            if (PLAN.rowCount > 0) {
+            if (PLAN.rowCount != 0) {
 
                 const TIMBRE = await pool.query(
                     `
@@ -526,7 +526,7 @@ class PlanGeneralControlador {
             WHERE fecha_horario = $1 AND id_horario = $2 AND codigo = $3
             `
             , [fec_inicio, id_horario, codigo]);
-        if (FECHAS.rowCount > 0) {
+        if (FECHAS.rowCount != 0) {
             return res.jsonp(FECHAS.rows)
         }
         else {

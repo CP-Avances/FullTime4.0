@@ -18,7 +18,7 @@ class AutorizaDepartamentoControlador {
                 AND da.id_empleado = $1
             `
             , [id_empleado]);
-        if (AUTORIZA.rowCount > 0) {
+        if (AUTORIZA.rowCount != 0) {
             return res.jsonp(AUTORIZA.rows)
         }
         else {
@@ -44,7 +44,7 @@ class AutorizaDepartamentoControlador {
                 AND n.id_departamento_nivel = cd.id
             `
             , [id_empleado]);
-        if (AUTORIZA.rowCount > 0) {
+        if (AUTORIZA.rowCount != 0) {
             return res.jsonp(AUTORIZA.rows)
         }
         else {
@@ -217,7 +217,7 @@ class AutorizaDepartamentoControlador {
             WHERE d.id_departamento = $1
             `
             , [id_depa]);
-        if (EMPLEADOS.rowCount > 0) {
+        if (EMPLEADOS.rowCount != 0) {
             return res.jsonp(EMPLEADOS.rows)
         }
         else {
@@ -232,7 +232,7 @@ class AutorizaDepartamentoControlador {
             SELECT * FROM VistaAutorizanCargo WHERE id_depar = $1
             `
             , [id_depar]);
-        if (EMPLEADOS.rowCount > 0) {
+        if (EMPLEADOS.rowCount != 0) {
             return res.jsonp(EMPLEADOS.rows)
         }
         else {
@@ -262,7 +262,7 @@ class AutorizaDepartamentoControlador {
             `
             , [id_depar, estado]);
 
-        if (EMPLEADOS.rowCount > 0) {
+        if (EMPLEADOS.rowCount != 0) {
             return res.jsonp(EMPLEADOS.rows)
         }
         else {

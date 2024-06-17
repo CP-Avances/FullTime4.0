@@ -126,7 +126,7 @@
                                 <mat-form-field>
                                     <mat-label>Domicilio</mat-label>
                                     <input matInput placeholder="Sector, Avenida, Calle" type="text"
-                                        formControlName="domicilioForm" required>
+                                        formControlName="domicilioForm">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingrese la dirección de domicilio en donde reside, Av, interseción, número de casa.">
                                         my_location
@@ -137,7 +137,7 @@
                                     <input matInput placeholder="0984297443" type="text" maxlength="10"
                                         formControlName="telefonoForm"
                                         oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                        (keypress)="IngresarSoloNumeros($event)" required>
+                                        (keypress)="IngresarSoloNumeros($event)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar número telefónico convencional o celular.">phone
                                     </mat-icon>
@@ -252,11 +252,11 @@
                         </mat-form-field>
                     </div>
                     <div style="text-align: center; padding-top: 15px;">
-                        <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
+                        <button mat-raised-button matStepperPrevious class="float-left" id="btn-raised-">Atrás</button>
 
                         <button button mat-raised-button id="btn-raised" (click)="stepper.reset()">Cancelar</button>
 
-                        <button button mat-raised-button id="btn-raised" class="float-right"
+                        <button button mat-raised-button class="float-right" id="btn-raised_"
                             (click)="InsertarEmpleado(primeroFormGroup.value, segundoFormGroup.value, terceroFormGroup.value);"
                             type="submit" [disabled]="!terceroFormGroup.valid">
                             Guardar

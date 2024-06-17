@@ -30,7 +30,7 @@ class VacunasControlador {
             WHERE ev.id_vacuna = tv.id AND ev.id_empleado = $1
             ORDER BY ev.id DESC
             `, [id_empleado]);
-            if (VACUNA.rowCount > 0) {
+            if (VACUNA.rowCount != 0) {
                 return res.jsonp(VACUNA.rows);
             }
             else {
@@ -44,7 +44,7 @@ class VacunasControlador {
             const VACUNA = yield database_1.default.query(`
             SELECT * FROM e_cat_vacuna
             `);
-            if (VACUNA.rowCount > 0) {
+            if (VACUNA.rowCount != 0) {
                 return res.jsonp(VACUNA.rows);
             }
             else {
@@ -59,7 +59,7 @@ class VacunasControlador {
             const VACUNA = yield database_1.default.query(`
             SELECT * FROM eu_empleado_vacunas WHERE fecha = $1 AND id_vacuna = $2 AND id_empleado = $3
             `, [fecha, id_vacuna, id_empleado]);
-            if (VACUNA.rowCount > 0) {
+            if (VACUNA.rowCount != 0) {
                 return res.jsonp(VACUNA.rows);
             }
             else {
@@ -432,7 +432,7 @@ class VacunasControlador {
             WHERE ev.id_vacuna = tv.id
             ORDER BY ev.id DESC
             `);
-            if (VACUNA.rowCount > 0) {
+            if (VACUNA.rowCount != 0) {
                 return res.jsonp(VACUNA.rows);
             }
             else {

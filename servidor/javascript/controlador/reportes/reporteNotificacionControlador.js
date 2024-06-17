@@ -27,7 +27,7 @@ class NotificacionesControlador {
                 AND p.id = rn.id_permiso AND p.id_tipo_permiso = ctp.id 
             ORDER BY rn.id DESC
             `, [envia]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -47,7 +47,7 @@ class NotificacionesControlador {
                 p.id = rn.id_permiso AND p.id_tipo_permiso = ctp.id 
             ORDER BY rn.id DESC
             `, [recibe]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -67,7 +67,7 @@ class NotificacionesControlador {
                 h.id = rn.id_hora_extra 
             ORDER BY rn.id DESC
             `, [envia]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -87,7 +87,7 @@ class NotificacionesControlador {
                 h.id = rn.id_hora_extra 
             ORDER BY rn.id DESC
             `, [recibe]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -107,7 +107,7 @@ class NotificacionesControlador {
                 v.id = rn.id_vacaciones 
             ORDER BY rn.id DESC
             `, [envia]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -127,7 +127,7 @@ class NotificacionesControlador {
                 v.id = rn.id_vacaciones 
             ORDER BY rn.id DESC
             `, [recibe]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -146,7 +146,7 @@ class NotificacionesControlador {
                 AND rn.descripcion like \'Alimentación Planificada%\' 
             ORDER BY rn.id DESC
             `, [envia]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -165,7 +165,7 @@ class NotificacionesControlador {
                 AND rn.descripcion like \'Planificación de Alimentación Eliminada.\' 
             ORDER BY rn.id DESC
             `, [envia]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -184,7 +184,7 @@ class NotificacionesControlador {
             WHERE id_permiso IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
             ORDER BY e.nombre ASC
             `, [envia]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -202,7 +202,7 @@ class NotificacionesControlador {
             WHERE id_permiso IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 
             ORDER BY e.nombre ASC
             `, [recibe]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -220,7 +220,7 @@ class NotificacionesControlador {
             WHERE rn.id_hora_extra IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
             ORDER BY e.nombre ASC
             `, [envia]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -238,7 +238,7 @@ class NotificacionesControlador {
             WHERE rn.id_hora_extra IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 
             ORDER BY e.nombre ASC
             `, [recibe]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -256,7 +256,7 @@ class NotificacionesControlador {
             WHERE rn.id_vacaciones IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1
             ORDER BY e.nombre ASC
             `, [envia]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -274,7 +274,7 @@ class NotificacionesControlador {
             WHERE rn.id_vacaciones IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 
             ORDER BY e.nombre ASC
             `, [recibe]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -293,7 +293,7 @@ class NotificacionesControlador {
                 AND rn.descripcion like \'Alimentación Planificada%\' 
             ORDER BY e.nombre ASC
             `, [envia]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -312,7 +312,7 @@ class NotificacionesControlador {
                 AND rn.descripcion like \'Solicitó Alimentación%\' 
             ORDER BY e.nombre ASC
             `, [recibe]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -333,7 +333,7 @@ class NotificacionesControlador {
                 AND rn.id_empleado_recibe = $2 AND p.id = rn.id_permiso AND p.id_tipo_permiso = ctp.id 
             ORDER BY rn.id DESC
             `, [envia, id_empleado]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -353,7 +353,7 @@ class NotificacionesControlador {
                 AND rn.id_empleado_envia = $2 AND p.id = rn.id_permiso AND p.id_tipo_permiso = ctp.id 
             ORDER BY rn.id DESC
             `, [recibe, id_empleado]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -373,7 +373,7 @@ class NotificacionesControlador {
                 AND rn.id_empleado_recibe = $2 AND h.id = rn.id_hora_extra 
             ORDER BY rn.id DESC
             `, [envia, id_empleado]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -393,7 +393,7 @@ class NotificacionesControlador {
                 rn.id_empleado_recibe = $2 AND v.id = rn.id_vacaciones 
             ORDER BY rn.id DESC
             `, [envia, id_empleado]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -414,7 +414,7 @@ class NotificacionesControlador {
                 v.id = rn.id_vacaciones 
             ORDER BY rn.id DESC
             `, [recibe, id_empleado]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -434,7 +434,7 @@ class NotificacionesControlador {
                 AND rn.id_empleado_recibe = $2 
             ORDER BY rn.id DESC
             `, [envia, id_empleado]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -456,7 +456,7 @@ class NotificacionesControlador {
                 p.id = rn.id_permiso AND p.id_tipo_permiso = ctp.id 
             ORDER BY rn.id DESC
             `, [envia, id_empleado, fec_inicio, fec_final]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -477,7 +477,7 @@ class NotificacionesControlador {
                 AND p.id_tipo_permiso = ctp.id 
             ORDER BY rn.id DESC
             `, [recibe, id_empleado, fec_inicio, fec_final]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -498,7 +498,7 @@ class NotificacionesControlador {
                 AND h.id = rn.id_hora_extra 
             ORDER BY rn.id DESC
             `, [envia, id_empleado, fec_inicio, fec_final]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -519,7 +519,7 @@ class NotificacionesControlador {
                 AND v.id = rn.id_vacaciones 
             ORDER BY rn.id DESC
             `, [envia, id_empleado, fec_inicio, fec_final]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -540,7 +540,7 @@ class NotificacionesControlador {
                 AND v.id = rn.id_vacaciones 
             ORDER BY rn.id DESC
             `, [recibe, id_empleado, fec_inicio, fec_final]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -560,7 +560,7 @@ class NotificacionesControlador {
                 AND rn.id_empleado_recibe = $2 AND rn.fecha_hora BETWEEN $3 AND $4 
             ORDER BY rn.id DESC
             `, [envia, id_empleado, fec_inicio, fec_final]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -581,7 +581,7 @@ class NotificacionesControlador {
                 AND p.id = rn.id_permiso AND p.id_tipo_permiso = ctp.id AND rn.fecha_hora BETWEEN $2 AND $3 
             ORDER BY rn.id DESC
             `, [envia]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -601,7 +601,7 @@ class NotificacionesControlador {
                 AND p.id = rn.id_permiso AND p.id_tipo_permiso = ctp.id 
             ORDER BY rn.id DESC
             `, [recibe]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -620,7 +620,7 @@ class NotificacionesControlador {
             WHERE rn.id_hora_extra IS NOT null AND e.id = rn.id_empleado_recibe AND rn.id_empleado_envia = $1 
                 AND h.id = rn.id_hora_extra ORDER BY rn.id DESC
                 `, [envia]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -640,7 +640,7 @@ class NotificacionesControlador {
                 AND h.id = rn.id_hora_extra 
             ORDER BY rn.id DESC
             `, [recibe]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -660,7 +660,7 @@ class NotificacionesControlador {
                 v.id = rn.id_vacaciones 
             ORDER BY rn.id DESC
             `, [envia]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -679,7 +679,7 @@ class NotificacionesControlador {
             WHERE rn.id_vacaciones IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 AND 
                 v.id = rn.id_vacaciones ORDER BY rn.id DESC
             `, [recibe]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -698,7 +698,7 @@ class NotificacionesControlador {
                 AND rn.descripcion like \'Alimentación Planificada%\' 
             ORDER BY rn.id DESC
             `, [envia]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -717,7 +717,7 @@ class NotificacionesControlador {
                 AND rn.descripcion like \'Planificación de Alimentación Eliminada.\' 
             ORDER BY rn.id DESC
             `, [envia]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {

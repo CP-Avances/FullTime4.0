@@ -23,7 +23,7 @@ class ParametrosControlador {
             SELECT tp.id, tp.descripcion
             FROM ep_parametro AS tp
             `);
-            if (PARAMETRO.rowCount > 0) {
+            if (PARAMETRO.rowCount != 0) {
                 return res.jsonp(PARAMETRO.rows);
             }
             else {
@@ -86,7 +86,7 @@ class ParametrosControlador {
             const PARAMETRO = yield database_1.default.query(`
             SELECT * FROM ep_parametro WHERE id = $1
             `, [id]);
-            if (PARAMETRO.rowCount > 0) {
+            if (PARAMETRO.rowCount != 0) {
                 return res.jsonp(PARAMETRO.rows);
             }
             else {
@@ -103,7 +103,7 @@ class ParametrosControlador {
             FROM ep_parametro AS tp, ep_detalle_parametro AS dtp
             WHERE tp.id = dtp.id_parametro AND tp.id = $1
             `, [id]);
-            if (PARAMETRO.rowCount > 0) {
+            if (PARAMETRO.rowCount != 0) {
                 return res.jsonp(PARAMETRO.rows);
             }
             else {

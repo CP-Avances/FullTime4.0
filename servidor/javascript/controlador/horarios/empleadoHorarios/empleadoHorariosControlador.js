@@ -30,7 +30,7 @@ class EmpleadoHorariosControlador {
             WHERE pg.codigo = $3 AND pg.id_horario = ch.id AND
                 (fecha_horario BETWEEN $1 AND $2)
             `, [fechaInicio, fechaFinal, codigo]);
-            if (HORARIO.rowCount > 0) {
+            if (HORARIO.rowCount != 0) {
                 return res.jsonp(HORARIO.rows);
             }
             else {
@@ -189,7 +189,7 @@ class EmpleadoHorariosControlador {
             WHERE codigo = $3 AND id_horario = $4 AND
                 (fecha_horario BETWEEN $1 AND $2) LIMIT 4
             `, [fechaInicio, fechaFinal, codigo, id_horario]);
-            if (HORARIO.rowCount > 0) {
+            if (HORARIO.rowCount != 0) {
                 return res.jsonp(HORARIO.rows);
             }
             else {

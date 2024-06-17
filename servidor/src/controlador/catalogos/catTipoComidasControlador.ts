@@ -15,7 +15,7 @@ class TipoComidasControlador {
             ORDER BY tc.nombre ASC, ctc.id ASC
             `
         );
-        if (TIPO_COMIDAS.rowCount > 0) {
+        if (TIPO_COMIDAS.rowCount != 0) {
             return res.jsonp(TIPO_COMIDAS.rows)
         }
         else {
@@ -34,7 +34,7 @@ class TipoComidasControlador {
             ORDER BY tc.nombre ASC, ctc.id ASC
             `
         );
-        if (TIPO_COMIDAS.rowCount > 0) {
+        if (TIPO_COMIDAS.rowCount != 0) {
             return res.jsonp(TIPO_COMIDAS.rows)
         }
         else {
@@ -52,7 +52,7 @@ class TipoComidasControlador {
             WHERE ctc.id_comida = tc.id AND ctc.id = $1
             `
             , [id]);
-        if (TIPO_COMIDAS.rowCount > 0) {
+        if (TIPO_COMIDAS.rowCount != 0) {
             return res.jsonp(TIPO_COMIDAS.rows)
         }
         else {
@@ -72,7 +72,7 @@ class TipoComidasControlador {
             ORDER BY tc.nombre ASC
             `
             , [id]);
-        if (TIPO_COMIDAS.rowCount > 0) {
+        if (TIPO_COMIDAS.rowCount != 0) {
             return res.jsonp(TIPO_COMIDAS.rows)
         }
         else {
@@ -288,7 +288,7 @@ class TipoComidasControlador {
             WHERE tc.id = menu.id_comida AND dm.id_horario_comida = menu.id AND menu.id = $1
             `
             , [id]);
-        if (TIPO_COMIDAS.rowCount > 0) {
+        if (TIPO_COMIDAS.rowCount != 0) {
             return res.jsonp(TIPO_COMIDAS.rows)
         }
         else {

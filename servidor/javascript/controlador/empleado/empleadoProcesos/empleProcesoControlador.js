@@ -103,7 +103,7 @@ class EmpleadoProcesoControlador {
       FROM map_empleado_procesos AS ep, map_cat_procesos AS cp 
       WHERE ep.id_empleado = $1 AND ep.id_proceso = cp.id
       `, [id_empleado]);
-            if (HORARIO_CARGO.rowCount > 0) {
+            if (HORARIO_CARGO.rowCount != 0) {
                 return res.jsonp(HORARIO_CARGO.rows);
             }
             res.status(404).jsonp({ text: 'Registro no encontrado.' });

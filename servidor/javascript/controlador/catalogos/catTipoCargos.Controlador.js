@@ -27,7 +27,7 @@ class TiposCargosControlador {
             const CARGOS = yield database_1.default.query(`
             SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
             `, [nombre]);
-            if (CARGOS.rowCount > 0) {
+            if (CARGOS.rowCount != 0) {
                 return res.jsonp(CARGOS.rows);
             }
             else {
@@ -42,7 +42,7 @@ class TiposCargosControlador {
                 const TIPO_CARGO = yield database_1.default.query(`
                 SELECT * FROM e_cat_tipo_cargo ORDER BY cargo ASC
                 `);
-                if (TIPO_CARGO.rowCount > 0) {
+                if (TIPO_CARGO.rowCount != 0) {
                     return res.status(200).jsonp(TIPO_CARGO.rows);
                 }
                 else {

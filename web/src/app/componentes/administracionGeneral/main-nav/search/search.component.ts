@@ -66,7 +66,7 @@ export class SearchComponent implements OnInit {
   };
 
   abrirInfoEmpleado(nombre: string) {
-    this.buscar_empl.forEach(element => {
+    this.buscar_empl.forEach((element: any) => {
       if (element.empleado === nombre) {
         this.router.navigate(['/verEmpleado/', element.id],
           { relativeTo: this.route, skipLocationChange: false });

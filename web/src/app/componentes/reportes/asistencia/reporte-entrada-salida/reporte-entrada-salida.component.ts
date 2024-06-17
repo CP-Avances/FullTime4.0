@@ -688,7 +688,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
             //console.log('ver fecha map ', obj + ' ' + dayFecha + ' ' + day);
 
             // BUSQUEDA de los datos
-            this.totalEntradasSalidas.forEach(element => {
+            this.totalEntradasSalidas.forEach((element: any) => {
               fecha_timbre = moment(element.fecha_hora_timbre).format('DD/MM/YYYY');
               // TIMBRE EXISTENTE - ESTADO Y HORA DEL TIMBRE
 
@@ -1000,7 +1000,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
       day = obj.split(' ')[0].charAt(0).toUpperCase() + obj.split(' ')[0].slice(1);
 
       // BUSQUEDA de los datos
-      this.totalEntradasSalidas.forEach(element => {
+      this.totalEntradasSalidas.forEach((element: any) => {
         fecha_timbre = moment(element.fecha_hora_timbre).format('DD/MM/YYYY');
         // TIMBRE EXISTENTE - ESTADO Y HORA DEL TIMBRE
         if (dayFecha === fecha_timbre && element.accion === 'E') {

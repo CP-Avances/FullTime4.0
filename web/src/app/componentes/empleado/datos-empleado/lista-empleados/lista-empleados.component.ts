@@ -875,7 +875,7 @@ export class ListaEmpleadosComponent implements OnInit {
                 var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
                 let nacionalidad;
-                this.nacionalidades.forEach(element => {
+                this.nacionalidades.forEach((element: any) => {
                   if (obj.id_nacionalidad == element.id) {
                     nacionalidad = element.nombre;
                   }
@@ -922,7 +922,7 @@ export class ListaEmpleadosComponent implements OnInit {
     }
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map((obj: any) => {
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
@@ -973,7 +973,7 @@ export class ListaEmpleadosComponent implements OnInit {
       var genero = this.GeneroSelect[obj.genero - 1];
       var estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
@@ -1039,7 +1039,7 @@ export class ListaEmpleadosComponent implements OnInit {
     // const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo);
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map((obj: any) => {
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }

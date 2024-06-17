@@ -230,7 +230,8 @@ export class AutorizacionesComponent implements OnInit {
   ChangeDepa(e: any, select: MatSelect) {
     if (e != null && e != undefined) {
       select.value = null;
-      select.defaultTabIndex = 0;
+      //select.defaultTabIndex = 0;
+      select.tabIndex = 0;
       const [departamento] = this.ArrayAutorizacionTipos.filter((o: any) => {
         return o.id_departamento === e
       })

@@ -183,7 +183,7 @@ export const beforeFiveDays = function () {
                 `
                 , [diaIncrementado]);
             console.log(avisoVacacion.rows);
-            if (avisoVacacion.rowCount > 0) {
+            if (avisoVacacion.rowCount != 0) {
                 // Enviar mail a todos los que nacieron en la fecha seleccionada
                 avisoVacacion.rows.forEach((obj: any) => {
                     Credenciales(0);
@@ -235,7 +235,7 @@ export const beforeTwoDays = function () {
                 `
                 , [diaIncrementado]);
             console.log(avisoVacacion.rows);
-            if (avisoVacacion.rowCount > 0) {
+            if (avisoVacacion.rowCount != 0) {
                 // Enviar mail a todos los que nacieron en la fecha seleccionada
                 avisoVacacion.rows.forEach((obj: any) => {
 

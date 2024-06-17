@@ -33,7 +33,7 @@ class PlanComidasControlador {
         ctc.id = dm.id_horario_comida AND sc.id_detalle_comida = dm.id AND sc.fecha_comida >= current_date 
       ORDER BY sc.fecha_comida DESC
       `);
-            if (PLAN_COMIDAS.rowCount > 0) {
+            if (PLAN_COMIDAS.rowCount != 0) {
                 return res.jsonp(PLAN_COMIDAS.rows);
             }
             res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -53,7 +53,7 @@ class PlanComidasControlador {
         AND ctc.id = dm.id_horario_comida AND sc.id_detalle_comida = dm.id AND sc.fecha_comida >= current_date 
       ORDER BY sc.fecha_comida DESC
       `);
-            if (PLAN_COMIDAS.rowCount > 0) {
+            if (PLAN_COMIDAS.rowCount != 0) {
                 return res.jsonp(PLAN_COMIDAS.rows);
             }
             res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -73,7 +73,7 @@ class PlanComidasControlador {
         AND sc.fecha_comida < current_date 
       ORDER BY sc.fecha_comida DESC
       `);
-            if (PLAN_COMIDAS.rowCount > 0) {
+            if (PLAN_COMIDAS.rowCount != 0) {
                 return res.jsonp(PLAN_COMIDAS.rows);
             }
             res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -87,7 +87,7 @@ class PlanComidasControlador {
       WHERE NOT id = $1 AND id_empleado = $2 AND fecha_comida = $3 
         AND ($4 BETWEEN hora_inicio AND hora_fin OR $5 BETWEEN hora_inicio AND hora_fin)
       `, [id, id_empleado, fecha, hora_inicio, hora_fin]);
-            if (PLAN_COMIDAS.rowCount > 0) {
+            if (PLAN_COMIDAS.rowCount != 0) {
                 return res.jsonp(PLAN_COMIDAS.rows);
             }
             else {
@@ -106,7 +106,7 @@ class PlanComidasControlador {
       WHERE sc.id_empleado = $1 AND ctc.id_comida = tc.id AND ctc.id = dm.id_horario_comida AND sc.id_detalle_comida = dm.id 
       ORDER BY sc.fecha_comida DESC
       `, [id_empleado]);
-            if (PLAN_COMIDAS.rowCount > 0) {
+            if (PLAN_COMIDAS.rowCount != 0) {
                 return res.jsonp(PLAN_COMIDAS.rows);
             }
             res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -123,7 +123,7 @@ class PlanComidasControlador {
       WHERE ctc.id_comida = tc.id AND ctc.id = dm.id_horario_comida AND pc.id_detalle_comida = dm.id 
       ORDER BY pc.fecha_inicio DESC
       `);
-            if (PLAN_COMIDAS.rowCount > 0) {
+            if (PLAN_COMIDAS.rowCount != 0) {
                 return res.jsonp(PLAN_COMIDAS.rows);
             }
             else {
@@ -177,7 +177,7 @@ class PlanComidasControlador {
       SELECT * FROM ma_empleado_plan_comida_general 
       WHERE id_detalle_plan = $1 AND consumido = true AND id_empleado = $2
       `, [id_plan_comida, id_empleado]);
-            if (PLAN_COMIDAS.rowCount > 0) {
+            if (PLAN_COMIDAS.rowCount != 0) {
                 return res.jsonp(PLAN_COMIDAS.rows);
             }
             res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -191,7 +191,7 @@ class PlanComidasControlador {
       SELECT * FROM ma_empleado_plan_comida_general 
       WHERE id_empleado = $1 AND fecha BETWEEN $2 AND $3
       `, [id, fecha_inicio, fecha_fin]);
-            if (PLAN_COMIDAS.rowCount > 0) {
+            if (PLAN_COMIDAS.rowCount != 0) {
                 return res.jsonp(PLAN_COMIDAS.rows);
             }
             else {
@@ -207,7 +207,7 @@ class PlanComidasControlador {
       SELECT * FROM ma_empleado_plan_comida_general WHERE NOT id_detalle_plan = $4 
         AND id_empleado = $1 AND fecha BETWEEN $2 AND $3
       `, [id, fecha_inicio, fecha_fin, id_plan_comida]);
-            if (PLAN_COMIDAS.rowCount > 0) {
+            if (PLAN_COMIDAS.rowCount != 0) {
                 return res.jsonp(PLAN_COMIDAS.rows);
             }
             else {
@@ -223,7 +223,7 @@ class PlanComidasControlador {
       SELECT * FROM ma_empleado_plan_comida_general 
       WHERE NOT id_solicitud_comida = $4 AND id_empleado = $1 AND fecha BETWEEN $2 AND $3
       `, [id, fecha_inicio, fecha_fin, id_sol_comida]);
-            if (PLAN_COMIDAS.rowCount > 0) {
+            if (PLAN_COMIDAS.rowCount != 0) {
                 return res.jsonp(PLAN_COMIDAS.rows);
             }
             else {
@@ -237,7 +237,7 @@ class PlanComidasControlador {
             const PLAN_COMIDAS = yield database_1.default.query(`
       SELECT * FROM ma_cat_comidas
       `);
-            if (PLAN_COMIDAS.rowCount > 0) {
+            if (PLAN_COMIDAS.rowCount != 0) {
                 return res.jsonp(PLAN_COMIDAS.rows);
             }
             else {
@@ -701,7 +701,7 @@ class PlanComidasControlador {
         AND pc.id = pce.id_detalle_plan AND e.id = pce.id_empleado 
       ORDER BY pc.fecha_inicio DESC
       `, [id]);
-            if (PLAN_COMIDAS.rowCount > 0) {
+            if (PLAN_COMIDAS.rowCount != 0) {
                 return res.jsonp(PLAN_COMIDAS.rows);
             }
             res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -756,7 +756,7 @@ class PlanComidasControlador {
         AND pc.id = pce.id_detalle_plan AND e.id = pce.id_empleado
 	    ORDER BY pc.fecha_inicio DESC
       `, [id_empleado]);
-            if (PLAN_COMIDAS.rowCount > 0) {
+            if (PLAN_COMIDAS.rowCount != 0) {
                 return res.jsonp(PLAN_COMIDAS.rows);
             }
             res.status(404).jsonp({ text: 'Registro no encontrado.' });

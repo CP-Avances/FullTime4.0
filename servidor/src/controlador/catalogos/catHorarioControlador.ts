@@ -64,7 +64,7 @@ class HorarioControlador {
         `
         , [codigo.toUpperCase()]);
 
-      if (HORARIOS.rowCount > 0) return res.status(200).jsonp({ message: 'No se encuentran registros.' });
+      if (HORARIOS.rowCount != 0) return res.status(200).jsonp({ message: 'No se encuentran registros.' });
 
       return res.status(404).jsonp({ message: 'No existe horario. Continua.' })
 
@@ -328,7 +328,7 @@ class HorarioControlador {
       `
       SELECT * FROM eh_cat_horarios ORDER BY codigo ASC
       `);
-    if (HORARIOS.rowCount > 0) {
+    if (HORARIOS.rowCount != 0) {
       return res.jsonp(HORARIOS.rows)
     }
     else {
@@ -346,7 +346,7 @@ class HorarioControlador {
         `,
         [parseInt(id), codigo.toUpperCase()]);
 
-      if (HORARIOS.rowCount > 0) return res.status(200).jsonp({
+      if (HORARIOS.rowCount != 0) return res.status(200).jsonp({
         message: 'El nombre de horario ya existe, ingresar un nuevo nombre.'
       });
 
@@ -425,7 +425,7 @@ class HorarioControlador {
       SELECT * FROM eh_cat_horarios WHERE id = $1
       `
       , [id]);
-    if (UN_HORARIO.rowCount > 0) {
+    if (UN_HORARIO.rowCount != 0) {
       return res.jsonp(UN_HORARIO.rows)
     }
     else {
@@ -683,7 +683,7 @@ class HorarioControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
 
-            if (response2.rowCount > 0) {
+            if (response2.rowCount != 0) {
               detallesCargados = true;
             } else {
               detallesCargados = false;
@@ -936,7 +936,7 @@ async function VerificarDuplicadoBase(codigo: string): Promise<boolean> {
     SELECT * FROM eh_cat_horarios WHERE LOWER(codigo) = $1
     `
     , [codigo.toLowerCase()]);
-  return result.rowCount > 0;
+  return result.rowCount != 0;
 }
 
 // FUNCION PARA COMPROBAR QUE CODIGO_HORARIO EXISTA EN PLANTILLAHORARIOS

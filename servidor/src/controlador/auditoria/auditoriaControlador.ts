@@ -36,7 +36,7 @@ class AuditoriaControlador {
        `;
 
         const DATOS = await pool.query(query, params);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows);
         } else {
             return res.status(404).jsonp({ message: 'No se encuentran registros', status: '404' });
@@ -73,7 +73,7 @@ class AuditoriaControlador {
 
         const DATOS = await pool.query(query, params);
 
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             // Comprimir los datos antes de enviarlos
             const compressedData = pako.gzip(JSON.stringify(DATOS.rows));
 
@@ -110,7 +110,7 @@ class AuditoriaControlador {
         try {
             const result = await pool.query(query, params);
 
-            if (result.rowCount > 0) {
+            if (result.rowCount != 0) {
                 const dataStream = new Readable({
                     objectMode: true,
                     read() { }

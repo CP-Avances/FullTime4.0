@@ -28,7 +28,7 @@ class HorasExtrasPedidasControlador {
       ORDER BY id DESC
       `
     );
-    if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+    if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {
@@ -51,7 +51,7 @@ class HorasExtrasPedidasControlador {
       ORDER BY id DESC
       `
     );
-    if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+    if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {
@@ -73,7 +73,7 @@ class HorasExtrasPedidasControlador {
       ORDER BY id DESC
       `
     );
-    if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+    if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {
@@ -88,7 +88,7 @@ class HorasExtrasPedidasControlador {
       SELECT * FROM VistaSolicitudHoraExtra WHERE id_emple_hora = $1
       `
       , [id]);
-    if (SOLICITUD.rowCount > 0) {
+    if (SOLICITUD.rowCount != 0) {
       return res.json(SOLICITUD.rows)
     }
     else {
@@ -105,7 +105,7 @@ class HorasExtrasPedidasControlador {
       WHERE hp.id = a.id_hora_extra AND hp.id = $1
       `
       , [id]);
-    if (SOLICITUD.rowCount > 0) {
+    if (SOLICITUD.rowCount != 0) {
       return res.json(SOLICITUD.rows)
     }
     else {
@@ -124,7 +124,7 @@ class HorasExtrasPedidasControlador {
       ORDER BY e.nombre ASC, ph.fecha_inicio ASC
       `
     );
-    if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+    if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {
@@ -143,7 +143,7 @@ class HorasExtrasPedidasControlador {
       ORDER BY e.nombre ASC, ph.fecha_inicio ASC
       `
     );
-    if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+    if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {
@@ -163,7 +163,7 @@ class HorasExtrasPedidasControlador {
       ORDER BY e.nombre ASC, ph.fecha_inicio ASC
       `
       , [id_empleado]);
-    if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+    if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {
@@ -183,7 +183,7 @@ class HorasExtrasPedidasControlador {
       ORDER BY e.nombre ASC, ph.fecha_inicio ASC
       `
       , [id_empleado]);
-    if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+    if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
       HORAS_EXTRAS_PEDIDAS.rows.map((obj: any) => {
         if (obj.id_autoriza_estado != null && obj.id_autoriza_estado != '' && obj.estado != 1) {
           var autorizaciones = obj.id_autoriza_estado.split(',');
@@ -513,7 +513,7 @@ class HorasExtrasPedidasControlador {
       SELECT * FROM mhe_solicitud_hora_extra WHERE id_empleado_solicita = $1 ORDER BY id DESC
       `
       , [id_user]);
-    if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+    if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {
@@ -736,7 +736,7 @@ class HorasExtrasPedidasControlador {
       WHERE h.id = $1 AND e.id = h.id_empleado_solicita
       `
       , [id]);
-    if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+    if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
     else {

@@ -22,7 +22,7 @@ class TipoPermisosControlador {
             const rolPermisos = yield database_1.default.query(`
       SELECT * FROM mp_cat_tipo_permisos ORDER BY descripcion ASC
       `);
-            if (rolPermisos.rowCount > 0) {
+            if (rolPermisos.rowCount != 0) {
                 return res.jsonp(rolPermisos.rows);
             }
             else {
@@ -87,7 +87,7 @@ class TipoPermisosControlador {
             const unTipoPermiso = yield database_1.default.query(`
       SELECT * FROM mp_cat_tipo_permisos WHERE id = $1
       `, [id]);
-            if (unTipoPermiso.rowCount > 0) {
+            if (unTipoPermiso.rowCount != 0) {
                 return res.jsonp(unTipoPermiso.rows);
             }
             res.status(404).jsonp({ text: 'Registro no encontrado.' });

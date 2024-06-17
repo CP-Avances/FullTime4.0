@@ -212,7 +212,7 @@ class TimbresControlador {
                 `
                 , [codigo, fecha, cedula]).then((result: any) => {
                     timbresRows = result.rowCount;
-                    if (result.rowCount > 0) {
+                    if (result.rowCount != 0) {
                         return res.status(200).jsonp({ message: 'timbres encontrados', timbres: result.rows });
                     }
                 }
@@ -460,7 +460,7 @@ class TimbresControlador {
             , [id_empleado])
             .then(async (result: any) => {
 
-                if (result.rowCount > 0) {
+                if (result.rowCount != 0) {
                     return await Promise.all(result.rows.map(async (obj: any): Promise<any> => {
 
                         let nombre = await pool.query(
@@ -503,7 +503,7 @@ class TimbresControlador {
             WHERE r.id = $1 AND e.id = r.id_empleado_envia
             `
             , [id]);
-        if (AVISOS.rowCount > 0) {
+        if (AVISOS.rowCount != 0) {
             return res.jsonp(AVISOS.rows[0])
         }
         else {
@@ -665,7 +665,7 @@ class TimbresControlador {
             `
             , [codigo, fecha, funcion]);
 
-        if (TIMBRE.rowCount > 0) {
+        if (TIMBRE.rowCount != 0) {
             return res.jsonp({ message: 'OK', respuesta: TIMBRE.rows })
         }
         else {
