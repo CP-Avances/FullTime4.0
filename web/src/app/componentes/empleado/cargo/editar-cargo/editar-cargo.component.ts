@@ -138,8 +138,6 @@ export class EditarCargoComponent implements OnInit {
 
     await Promise.all(promises);
 
-    console.log('idDepartamentosAcceso', this.idDepartamentosAcceso);
-
   }
 
   // METODO PARA FILTRAR SUCURSALES ASIGNADAS
