@@ -20,9 +20,11 @@ import { LogosComponent } from 'src/app/componentes/catalogos/catEmpresa/logos/l
 
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableSucursales } from 'src/app/model/reportes.model';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-ver-empresa',
@@ -41,6 +43,10 @@ export class VerEmpresaComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
+
+  asignacionesAcceso: any;
+  idSucursalesAcceso: any = [];
+  idDepartamentosAcceso: any = [];
 
   //IMAGEN
   logo: string;
@@ -79,6 +85,7 @@ export class VerEmpresaComponent implements OnInit {
     public restS: SucursalService,
     public restE: EmpleadoService,
     private toastr: ToastrService,
+    private usuario: UsuarioService,
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('empresa') as string,)
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -88,6 +95,7 @@ export class VerEmpresaComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
+    this.ObtenerAsignacionesUsuario(this.idEmpleado);
     this.ObtenerEmpleados(this.idEmpleado);
     this.CargarDatosEmpresa();
     this.ObtenerSucursal();
@@ -156,8 +164,34 @@ export class VerEmpresaComponent implements OnInit {
   ObtenerSucursal() {
     this.datosSucursales = [];
     this.restS.BuscarSucursal().subscribe(data => {
-      this.datosSucursales = data;
+      this.datosSucursales = this.FiltrarSucursalesAsignadas(data);
     });
+  }
+
+  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
+  async ObtenerAsignacionesUsuario(idEmpleado: any) {
+    const dataEmpleado = {
+      id_empleado: Number(idEmpleado)
+    }
+
+    const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(dataEmpleado));
+    this.asignacionesAcceso = res;
+
+    this.asignacionesAcceso.map((asignacion: any) => {
+      if (asignacion.principal && !asignacion.administra) {
+        return;
+      }
+
+      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
+      this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
+
+    });
+
+  }
+
+  // METODO PARA FILTRAR SUCURSALES ASIGNADAS
+  FiltrarSucursalesAsignadas(data: any) {
+    return data.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
   }
 
   // VENTANA PARA EDITAR DATOS DE EMPRESA

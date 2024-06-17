@@ -120,23 +120,15 @@ export class EditarCargoComponent implements OnInit {
     const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(dataEmpleado));
     this.asignacionesAcceso = res;
 
-    const promises = this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal) {
-        if (!asignacion.administra ) {
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        }
+    this.asignacionesAcceso.map((asignacion: any) => {
+      if (asignacion.principal && !asignacion.administra) {
+        return;
       }
 
       this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
       this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
 
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.usuario.ObtenerIdUsuariosDepartamento(data));
     });
-
-    await Promise.all(promises);
 
   }
 
