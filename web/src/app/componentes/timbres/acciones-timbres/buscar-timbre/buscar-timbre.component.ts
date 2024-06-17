@@ -163,6 +163,7 @@ export class BuscarTimbreComponent implements OnInit {
   // METODO PARA BUSCAR TIMBRES
   BuscarTimbresFecha(form: any) {
     this.timbres = [];
+    this.existenTimbres = false;
 
     if (form.codigoForm === "" && form.cedulaForm === "") {
       return this.toastr.error('Ingrese código o cédula del usuario.', 'Llenar los campos.', {
@@ -183,7 +184,7 @@ export class BuscarTimbreComponent implements OnInit {
         this.timbres = await this.FiltrarEmpleadosAsignados(timbres.timbres);
         if (this.timbres.length === 0 && this.existenTimbres) {
           this.mostrarTabla = false;
-          return this.toastr.error('No tiene acceso a los timbres de este usuario.', 'Notificación', {
+          return this.toastr.error('No tiene acceso a los datos de este usuario.', 'Notificación', {
             timeOut: 6000,
           })
         }

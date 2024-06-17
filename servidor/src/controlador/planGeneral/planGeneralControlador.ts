@@ -405,13 +405,14 @@ class PlanGeneralControlador {
 
         if (verificador === 0) {
             const ASISTENCIA = await pool.query(
-                "SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios, " +
-                "p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre, " +
-                "empleado.cedula, empleado.nombre, empleado.apellido " +
-                "FROM eu_asistencia_general p_g " +
-                "INNER JOIN eu_empleados empleado on empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigos + ")" +
-                "WHERE p_g.fecha_horario BETWEEN $1 AND $2 " +
-                "ORDER BY p_g.fecha_hora_horario ASC",
+                `
+                SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios,
+                p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre,
+                empleado.cedula, empleado.nombre, empleado.apellido, empleado.id AS id_empleado
+                FROM eu_asistencia_general p_g
+                INNER JOIN eu_empleados empleado on empleado.codigo = p_g.codigo AND p_g.codigo IN (${codigos})
+                WHERE p_g.fecha_horario BETWEEN $1 AND $2
+                ORDER BY p_g.fecha_hora_horario ASC`,
                 [inicio, fin]);
 
             if (ASISTENCIA.rowCount === 0) {
