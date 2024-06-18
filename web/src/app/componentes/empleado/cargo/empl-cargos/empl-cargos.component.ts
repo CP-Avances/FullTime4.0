@@ -10,6 +10,7 @@ import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
 import { firstValueFrom } from 'rxjs';
 
@@ -26,8 +27,7 @@ export class EmplCargosComponent implements OnInit {
   ver_jefe: boolean = false;
   ver_personal: boolean = false;
 
-  idEmpleadoAcceso: any;
-  asignacionesAcceso: any;
+
   idSucursalesAcceso: any = [];
   idDepartamentosAcceso: any = [];
 
@@ -40,6 +40,7 @@ export class EmplCargosComponent implements OnInit {
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
+  rol: string;
 
   // VARIABLES DE FORMULARIO
   idEmpleContrato = new FormControl('', [Validators.required]);
@@ -70,12 +71,13 @@ export class EmplCargosComponent implements OnInit {
 
   constructor(
     private restCatDepartamento: DepartamentosService,
+    private asignaciones: AsignacionesService,
     private restSucursales: SucursalService,
     private restEmpleado: EmpleadoService,
     private cargos: EmplCargosService,
+    private usuario: UsuarioService,
     private toastr: ToastrService,
     public router: Router,
-    private usuario: UsuarioService,
     public ventana: MatDialogRef<EmplCargosComponent>,
     public validar: ValidacionesService,
     public tipocargo: CatTipoCargosService,
@@ -85,9 +87,12 @@ export class EmplCargosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.idEmpleadoAcceso = localStorage.getItem('empleado');
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.rol = localStorage.getItem('rol') as string;
+
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
 
     if (this.datoEmpleado.idRol != 2) {
       this.ver_jefe = true;
@@ -111,33 +116,13 @@ export class EmplCargosComponent implements OnInit {
   async FiltrarSucursales() {
     let idEmpre = parseInt(localStorage.getItem('empresa') as string);
     this.sucursales = [];
-    await this.ObtenerAsignacionesUsuario(this.idEmpleadoAcceso);
     this.restSucursales.BuscarSucursalEmpresa(idEmpre).subscribe(datos => {
-      this.sucursales = this.FiltrarSucursalesAsignadas(datos);
+      this.sucursales = this.rol === '1' ? datos : this.FiltrarSucursalesAsignadas(datos);
     }, error => {
       this.toastr.info('No se han encontrado registros de Sucursales.', '', {
         timeOut: 6000,
       })
     })
-  }
-
-  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const dataEmpleado = {
-      id_empleado: Number(idEmpleado)
-    }
-
-    const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(dataEmpleado));
-    this.asignacionesAcceso = res;
-
-    this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal && !asignacion.administra) {
-          return;
-      }
-      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
-      this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
-    });
-
   }
 
   // METODO PARA FILTRAR SUCURSALES ASIGNADAS
@@ -150,7 +135,7 @@ export class EmplCargosComponent implements OnInit {
     this.departamento = [];
     let idSucursal = form.idSucursalForm;
     this.restCatDepartamento.BuscarDepartamentoSucursal(idSucursal).subscribe(datos => {
-      this.departamento = this.FiltrarDepartamentosAsignados(datos);
+      this.departamento = this.rol === '1' ? datos : this.FiltrarDepartamentosAsignados(datos);
     }, error => {
       this.toastr.info('Sucursal no cuenta con departamentos registrados.', '', {
         timeOut: 6000,
