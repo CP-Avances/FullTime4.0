@@ -10,6 +10,7 @@ import pool from '../../database';
 import path from 'path';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
+import FUNCIONES_LLAVES from '../llaves/rsa-keys.service';
 
 interface IPayload {
   _id: number,
@@ -35,13 +36,14 @@ class LoginControlador {
     try {
 
       const { nombre_usuario, pass } = req.body;
+      let pass_encriptado = FUNCIONES_LLAVES.encriptarLogin(pass);
 
       // BUSQUEDA DE USUARIO
       const USUARIO = await pool.query(
         `
         SELECT id, usuario, id_rol, id_empleado FROM accesoUsuarios($1, $2)
         `
-        , [nombre_usuario, pass]);
+        , [nombre_usuario, pass_encriptado]);
 
       // SI EXISTE USUARIOS
       if (USUARIO.rowCount != 0) {
@@ -71,13 +73,6 @@ class LoginControlador {
         // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO
         if (!web_access) return res.status(404).jsonp({ message: "sin_permiso_acceso" })
 
-        // BUSQUEDA DE MODULOS DEL SISTEMA
-        const [modulos] = await pool.query(
-          `
-          SELECT * FROM e_funciones LIMIT 1
-          `
-        ).then((result: any) => { return result.rows; })
-
         // BUSQUEDA DE CLAVE DE LICENCIA
         const EMPRESA = await pool.query(
           `
@@ -86,24 +81,28 @@ class LoginControlador {
         );
 
         const { public_key, id_empresa } = EMPRESA.rows[0];
-
+        
         // BUSQUEDA DE LICENCIA DE USO DE APLICACION
-        const data = fs.readFileSync('licencia.conf.json', 'utf8')
-        const FileLicencias = JSON.parse(data);
+        const licenciaData = await fetch(`${(process.env.DIRECCIONAMIENTO as string)}/licencia`, 
+        {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({public_key: public_key})
+        });
 
-        const ok_licencias = FileLicencias.filter((o: Licencias) => {
-          return o.public_key === public_key
-        }).map((o: Licencias) => {
-          o.fec_activacion = new Date(o.fec_activacion),
-            o.fec_desactivacion = new Date(o.fec_desactivacion)
-          return o
-        })
+        
+        if(!licenciaData.ok){
+          return res.status(404).jsonp({ message: 'licencia_no_existe' });
+        }
+        
+        const dataLic = await licenciaData.json();
 
-        if (ok_licencias.length === 0) return res.status(404)
-          .jsonp({ message: 'licencia_no_existe' });
+        const fec_activacion = new Date(dataLic[0].fecha_activacion);
+        const fec_desactivacion = new Date(dataLic[0].fecha_desactivacion);
 
         const hoy = new Date();
-        const { fec_activacion, fec_desactivacion } = ok_licencias[0];
         if (hoy > fec_desactivacion) return res.status(404).jsonp({ message: 'licencia_expirada' });
         if (hoy < fec_activacion) return res.status(404).jsonp({ message: 'licencia_expirada' });
         caducidad_licencia = fec_desactivacion
@@ -148,28 +147,28 @@ class LoginControlador {
                 _licencia: licencia, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
                 _dep: id_departamento, _web_access: web_access, _acc_tim: acciones_timbres, _suc: id_sucursal,
                 _empresa: id_empresa, estado: autoriza_est, cargo: id_cargo, ip_adress: ip_cliente,
-                modulos: modulos, id_contrato: id_contrato
+                /*modulos: modulos,*/ id_contrato: id_contrato
               },
                 process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
               return res.status(200).jsonp({
                 caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
                 departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
                 empresa: id_empresa, cargo: id_cargo, estado: autoriza_est, ip_adress: ip_cliente,
-                modulos: modulos, id_contrato: id_contrato
+                /*modulos: modulos,*/ id_contrato: id_contrato
               });
 
             } else {
               const token = jwt.sign({
                 _licencia: licencia, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
                 _dep: id_departamento, _web_access: web_access, _acc_tim: acciones_timbres, _suc: id_sucursal,
-                _empresa: id_empresa, estado: false, cargo: id_cargo, ip_adress: ip_cliente, modulos: modulos,
+                _empresa: id_empresa, estado: false, cargo: id_cargo, ip_adress: ip_cliente, //modulos: modulos,
                 id_contrato: id_contrato
               },
                 process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
               return res.status(200).jsonp({
                 caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
                 departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
-                empresa: id_empresa, cargo: id_cargo, estado: false, ip_adress: ip_cliente, modulos: modulos,
+                empresa: id_empresa, cargo: id_cargo, estado: false, ip_adress: ip_cliente, //modulos: modulos,
                 id_contrato: id_contrato
               });
             }
@@ -180,15 +179,15 @@ class LoginControlador {
         }
         else {
           // VALIDAR SI EL USUARIO QUE ACCEDE ES ADMINISTRADOR
-          if (id_rol === 1 || id_rol == 3) {
+          if (id_rol === 1) {
             const token = jwt.sign({
               _licencia: public_key, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
-              _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente, modulos: modulos
+              _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente//, modulos: modulos
             },
               process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
             return res.status(200).jsonp({
               caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
-              empresa: id_empresa, ip_adress: ip_cliente, modulos: modulos
+              empresa: id_empresa, ip_adress: ip_cliente//, modulos: modulos
             });
           }
           else {
@@ -308,6 +307,10 @@ class LoginControlador {
   public async CambiarContrasenia(req: Request, res: Response) {
     var token = req.body.token;
     var contrasena = req.body.contrasena;
+
+    var contrasena_encriptada = FUNCIONES_LLAVES.encriptarLogin(contrasena);
+    console.log(contrasena,'_',contrasena_encriptada);
+
     try {
       const payload = jwt.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail') as IPayload;
       const id_empleado = payload._id;
@@ -315,7 +318,7 @@ class LoginControlador {
         `
         UPDATE eu_usuarios SET contrasena = $2 WHERE id_empleado = $1
         `
-        , [id_empleado, contrasena]);
+        , [id_empleado, contrasena_encriptada]);
       return res.jsonp({
         expiro: 'no',
         message: "Contraseña actualizada. Intente ingresar con la nueva contraseña."
@@ -351,7 +354,6 @@ class LoginControlador {
 }
 
 const LOGIN_CONTROLADOR = new LoginControlador();
-
 export default LOGIN_CONTROLADOR;
 
 

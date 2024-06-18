@@ -25,15 +25,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FUNCIONES_LLAVES = void 0;
 const CryptoJS = __importStar(require("crypto-js"));
-const frase_contrasenia_1 = require("./frase-contrasenia"); //Importacion frase para encriptar
-const frase_contrasenia_2 = require("./frase-contrasenia"); //Importacion semilla iv para encriptar vector de inicializacion
-const frase_contrasenia_3 = require("./frase-contrasenia"); //Importacion semilla salt frase para encriptar de derivacion limitada
+const frase_contrasenia_1 = require("./frase-contrasenia"); //Importacion frase para encriptar, semilla iv para encriptar vector de inicializacion, semilla salt frase para encriptar de derivacion limitada
 class RsaKeysService {
     constructor() {
         //Codificacion de Base64 a UTF8
         this.key = CryptoJS.enc.Utf8.parse(frase_contrasenia_1.frasecontrasenia);
-        this.iv = CryptoJS.enc.Utf8.parse(frase_contrasenia_2.ivcontrasenia);
-        this.salt = CryptoJS.enc.Utf8.parse(frase_contrasenia_3.saltcontrasenia);
+        this.iv = CryptoJS.enc.Utf8.parse(frase_contrasenia_1.ivcontrasenia);
+        this.salt = CryptoJS.enc.Utf8.parse(frase_contrasenia_1.saltcontrasenia);
         //Generacion de key de derivacion encriptada para passwords
         this.keyLogin = CryptoJS.enc.Utf8.parse(CryptoJS.PBKDF2(this.key, this.salt, { keySize: 8, iterations: 1000 }).toString());
     }
@@ -48,6 +46,9 @@ class RsaKeysService {
     encriptarLogin(password) {
         //Encriptacion con key encriptada para passwords
         return CryptoJS.AES.encrypt(password, this.keyLogin, { iv: this.iv }).toString();
+    }
+    desencriptarLogin(passwordEncrypted) {
+        return CryptoJS.AES.decrypt(passwordEncrypted, this.keyLogin, { iv: this.iv }).toString(CryptoJS.enc.Utf8);
     }
 }
 exports.FUNCIONES_LLAVES = new RsaKeysService();

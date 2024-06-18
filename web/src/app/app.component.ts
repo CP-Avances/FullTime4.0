@@ -18,8 +18,7 @@ export class AppComponent {
     public location: Location,
     public loginServices: LoginService
   ) 
-  { 
-  }
+  { }
 
   removerForget() {
     var tituloPestania = this.location.prepareExternalUrl(this.location.path());

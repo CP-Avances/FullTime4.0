@@ -18,7 +18,7 @@ class FuncionesControlador {
     ObtenerFunciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                //consulta de empresa en base a codigo encriptado
+                //CONSULTA DE EMPRESA EN BASE A CODIGO ENCRIPTADO
                 let { direccion } = req.body;
                 let empresasRows = 0;
                 let empresas = yield database_1.default.query("SELECT emp.empresa_id as id, emp.hora_extra, emp.accion_personal, emp.alimentacion, emp.permisos, emp.geolocalizacion, emp.vacaciones, emp.app_movil, emp.timbre_web FROM empresa AS emp WHERE emp.empresa_direccion = $1", [direccion]).then((result) => {

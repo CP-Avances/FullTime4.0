@@ -17,16 +17,18 @@ const settingsMail_1 = require("../../libs/settingsMail");
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const rsa_keys_service_1 = __importDefault(require("../llaves/rsa-keys.service"));
 class UsuarioControlador {
     // CREAR REGISTRO DE USUARIOS
     CrearUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { usuario, contrasena, estado, id_rol, id_empleado } = req.body;
+                let contrasena_encriptado = rsa_keys_service_1.default.encriptarLogin(contrasena);
                 yield database_1.default.query(`
         INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado) 
           VALUES ($1, $2, $3, $4, $5)
-        `, [usuario, contrasena, estado, id_rol, id_empleado]);
+        `, [usuario, contrasena_encriptado, estado, id_rol, id_empleado]);
                 res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
@@ -85,9 +87,10 @@ class UsuarioControlador {
     CambiarPasswordUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { contrasena, id_empleado } = req.body;
+            let contrasena_encriptada = rsa_keys_service_1.default.encriptarLogin(contrasena);
             yield database_1.default.query(`
       UPDATE eu_usuarios SET contrasena = $1 WHERE id_empleado = $2
-      `, [contrasena, id_empleado]);
+      `, [contrasena_encriptada, id_empleado]);
             res.jsonp({ message: 'Registro actualizado.' });
         });
     }
@@ -1193,6 +1196,18 @@ class UsuarioControlador {
       DELETE FROM eu_usuario_sucursal WHERE id = $1
       `, [id]);
             res.jsonp({ message: 'Registro eliminado.' });
+        });
+    }
+    //METODO PARA OBTENER TEXTO ENCRIPTADO
+    ObtenerDatoEncriptado(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { contrasena } = req.body;
+                res.jsonp({ message: rsa_keys_service_1.default.encriptarLogin(contrasena) });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
         });
     }
 }

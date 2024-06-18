@@ -7,7 +7,6 @@ import { Router } from '@angular/router';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { RsaKeysService } from 'src/app/servicios/llaves/rsa-keys.service';//Importacion encriptacion
 
 @Component({
   selector: 'app-recuperar-frase',
@@ -39,8 +38,7 @@ export class RecuperarFraseComponent implements OnInit {
     private restLogin: LoginService,
     private restEmpresa: EmpresaService,
     public router: Router,
-    public location: Location,
-    private rsaKeysService: RsaKeysService,
+    public location: Location
   ) {
     var urlToken = this.location.prepareExternalUrl(this.location.path());
     this.token = urlToken.slice(1).split("/")[1];
@@ -53,7 +51,7 @@ export class RecuperarFraseComponent implements OnInit {
   IngresarFrase(form: any) {
     //JSON con codigo empresarial encriptado
     let empresas = {
-      "codigo_empresa": this.rsaKeysService.encriptarLogin(form.nEmpresa.toString())
+      "codigo_empresa": form.nEmpresa.toString()
     };
     //Validacion de codigo empresarial.
     this.restLogin.getEmpresa(empresas).subscribe(

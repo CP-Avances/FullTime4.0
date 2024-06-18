@@ -9,7 +9,10 @@ const empresasRutas_1 = __importDefault(require("./rutas/empresas/empresasRutas"
 const parametrizacionRutas_1 = __importDefault(require("./rutas/parametrizacion/parametrizacionRutas"));
 const empleadoRutas_1 = __importDefault(require("./rutas/empleado/empleadoRutas"));
 const funcionesRutas_1 = __importDefault(require("./rutas/funciones/funcionesRutas"));
+const licenciaRutas_1 = __importDefault(require("./rutas/licencia/licenciaRutas"));
 const http_1 = require("http");
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 var io;
 class Servidor {
     constructor() {
@@ -39,9 +42,10 @@ class Servidor {
         });
     }
     rutas() {
-        this.app.use('/fulltime', empresasRutas_1.default); //ruta para empresa
-        this.app.use('/parametrizacion', parametrizacionRutas_1.default); //ruta datos inciales
-        this.app.use('/empleado', empleadoRutas_1.default); //ruta datos inciales
+        this.app.use('/fulltime', empresasRutas_1.default); //RUTA PARA EMPRESA
+        this.app.use('/parametrizacion', parametrizacionRutas_1.default); //RUTA DATOS INICIALES
+        this.app.use('/empleado', empleadoRutas_1.default); //RUTA DATOS INICIALES
+        this.app.use('/licencia', licenciaRutas_1.default); //RUTA PARA OBTENER LICENCIA
         this.app.use('/', funcionesRutas_1.default);
     }
     start() {

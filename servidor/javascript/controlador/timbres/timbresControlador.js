@@ -348,7 +348,7 @@ class TimbresControlador {
             const { id_empleado } = req.params;
             const TIMBRES_NOTIFICACION = yield database_1.default.query(`
             SELECT id, to_char(fecha_hora, 'yyyy-MM-dd HH24:mi:ss') AS fecha_hora, id_empleado_envia, visto, 
-                descripcion, id_timbre, tipo, id_empleado_recibe
+                descripcion, id_timbre, tipo, id_empleado_recibe 
             FROM ecm_realtime_timbres WHERE id_empleado_recibe = $1 
             ORDER BY (visto is FALSE) DESC, id DESC LIMIT 20
             `, [id_empleado])

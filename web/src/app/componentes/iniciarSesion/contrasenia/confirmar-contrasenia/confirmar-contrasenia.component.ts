@@ -4,7 +4,6 @@ import { ToastrService } from 'ngx-toastr';
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { RsaKeysService } from 'src/app/servicios/llaves/rsa-keys.service';//Importacion encriptacion
 
 @Component({
   selector: 'app-confirmar-contrasenia',
@@ -33,8 +32,7 @@ export class ConfirmarContraseniaComponent implements OnInit {
     private restLogin: LoginService,
     private toastr: ToastrService,
     public router: Router,
-    public location: Location,
-    private rsaKeysService: RsaKeysService,
+    public location: Location
   ) {
     var urlToken = this.location.prepareExternalUrl(this.location.path());
     this.token = urlToken.slice(1).split("/")[1];
@@ -54,8 +52,8 @@ export class ConfirmarContraseniaComponent implements OnInit {
 
   // NETODO PARA CAMBIAR CONTRASEÑA
   EnviarContraseniaConfirmacion(form: any) {
-    // CIFRADO DE CONTRASEÑA
-    let clave = this.rsaKeysService.encriptarLogin(form.cPass.toString());
+    // CIFRADO DE CONTRASEÑA?
+    let clave = form.cPass.toString();
 
     let data = {
       token: this.token,
@@ -64,7 +62,7 @@ export class ConfirmarContraseniaComponent implements OnInit {
 
     //JSON CON CODIGO EMPRESARIAL ENCRIPTADO
     let empresas = {
-      "codigo_empresa": this.rsaKeysService.encriptarLogin(form.empresaPass.toString())
+      "codigo_empresa": form.empresaPass.toString()
     };
 
     //VALIDACION DE CODIGO EMPRESARIAL

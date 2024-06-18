@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { RsaKeysService } from 'src/app/servicios/llaves/rsa-keys.service';//Importacion de encriptacion
 
 @Component({
   selector: 'app-olvidar-contrasenia',
@@ -31,8 +30,7 @@ export class OlvidarContraseniaComponent implements OnInit {
     public rest: LoginService,
     public restE: EmpresaService,
     private router: Router,
-    private toastr: ToastrService,
-    private rsaKeysService: RsaKeysService) { }
+    private toastr: ToastrService) { }
 
   ngOnInit(): void {
     this.VerRuta();
@@ -59,7 +57,7 @@ export class OlvidarContraseniaComponent implements OnInit {
   EnviarCorreoConfirmacion(form: any) {
     //CODIGO EMPRESARIAL ENCRIPTADO, PARA VALIDAR CON SERVICIO
     let empresas = {
-      "codigo_empresa": this.rsaKeysService.encriptarLogin(form.empresaF.toString())
+      "codigo_empresa": form.empresaF.toString()
     };
 
     //VALIDACION DE CODIGO EMPRESARIAL

@@ -8,7 +8,6 @@ import { Router } from '@angular/router';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
-import { RsaKeysService } from 'src/app/servicios/llaves/rsa-keys.service';//Importacion encriptacion
 
 @Component({
   selector: 'app-olvidar-frase',
@@ -38,8 +37,7 @@ export class OlvidarFraseComponent implements OnInit {
     private toastr: ToastrService,
     public restE: EmpresaService,
     public rest: UsuarioService,
-    private router: Router,
-    private rsaKeysService: RsaKeysService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -66,7 +64,7 @@ export class OlvidarFraseComponent implements OnInit {
   EnviarCorreoConfirmacion(form: any) {
     //JSON CON CODIGO EMPRESARIAL ENCRIPTADO
     let empresas = {
-      "codigo_empresa": this.rsaKeysService.encriptarLogin(form.empresaF.toString())
+      "codigo_empresa": form.empresaF.toString()
     };
     //VALIDACION DE CODIGO EMPRESARIAL
     this.restLogin.getEmpresa(empresas).subscribe(

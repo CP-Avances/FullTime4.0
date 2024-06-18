@@ -174,7 +174,10 @@ export class ListaNotificacionComponent implements OnInit {
                 }
             })
             //console.log('ver sucursales ', codigos);
+            this.usua_sucursales = { id_sucursal: codigos };
+            this.BuscarInformacionAdministrador(this.usua_sucursales);
 
+            /*
             // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
             if (usuario.id_rol === 1 && usuario.jefe === false) {
                 this.usua_sucursales = { id_sucursal: codigos };
@@ -187,6 +190,7 @@ export class ListaNotificacionComponent implements OnInit {
             else if (usuario.id_rol === 3) {
                 this.BuscarInformacionSuperAdministrador();
             }
+            */
         });
     }
 

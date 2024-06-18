@@ -243,7 +243,7 @@ class AccionPersonalControlador {
     // TABLA ACCION_PERSONAL_EMPLEADO
     CrearPedidoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti } = req.body;
+            const { id_empleado, fecha_creacion, fecha_rige_desde, fecha_rige_hasta, identificacion_accion_personal, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti } = req.body;
             yield database_1.default.query(`
             INSERT INTO map_solicitud_accion_personal (id_empleado, fecha_creacion, fecha_rige_desde, 
                 fecha_rige_hasta, identificacion_accion_personal, numero_partida_empresa, id_contexto_legal, 
@@ -254,7 +254,7 @@ class AccionPersonalControlador {
                 primera_fecha_reemplazo, posesion_notificacion, descripcion_posesion_notificacion) 
             VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, 
                 $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)
-            `, [id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
+            `, [id_empleado, fecha_creacion, fecha_rige_desde, fecha_rige_hasta, identificacion_accion_personal, num_partida,
                 decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal,
                 tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad,
                 id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp,

@@ -6,6 +6,7 @@ import { Request, Response } from 'express';
 import path from 'path';
 import pool from '../../database';
 import jwt from 'jsonwebtoken';
+import FUNCIONES_LLAVES from '../llaves/rsa-keys.service';
 
 interface IPayload {
   _id: number,
@@ -17,12 +18,13 @@ class UsuarioControlador {
   public async CrearUsuario(req: Request, res: Response) {
     try {
       const { usuario, contrasena, estado, id_rol, id_empleado } = req.body;
+      let contrasena_encriptado = FUNCIONES_LLAVES.encriptarLogin(contrasena);
       await pool.query(
         `
         INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado) 
           VALUES ($1, $2, $3, $4, $5)
         `
-        , [usuario, contrasena, estado, id_rol, id_empleado]);
+        , [usuario, contrasena_encriptado, estado, id_rol, id_empleado]);
 
       res.jsonp({ message: 'Registro guardado.' });
     }
@@ -85,11 +87,12 @@ class UsuarioControlador {
   // METODO PARA ACTUALIZAR CONTRASEÑA
   public async CambiarPasswordUsuario(req: Request, res: Response): Promise<any> {
     const { contrasena, id_empleado } = req.body;
+    let contrasena_encriptada = FUNCIONES_LLAVES.encriptarLogin(contrasena);
     await pool.query(
       `
       UPDATE eu_usuarios SET contrasena = $1 WHERE id_empleado = $2
       `
-      , [contrasena, id_empleado]);
+      , [contrasena_encriptada, id_empleado]);
     res.jsonp({ message: 'Registro actualizado.' });
   }
 
@@ -1401,6 +1404,16 @@ class UsuarioControlador {
     res.jsonp({ message: 'Registro eliminado.' });
   }
 
+  //METODO PARA OBTENER TEXTO ENCRIPTADO
+  public async ObtenerDatoEncriptado(req: Request, res: Response) {
+    try {
+      const { contrasena } = req.body;
+      res.jsonp({ message: FUNCIONES_LLAVES.encriptarLogin(contrasena) });
+    }
+    catch (error) {
+      return res.jsonp({ message: 'error' });
+    }
+  }
 
 }
 

@@ -5,7 +5,7 @@ class FuncionesControlador {
 
     public async ObtenerFunciones(req: Request, res: Response){
         try{
-            //consulta de empresa en base a codigo encriptado
+            //CONSULTA DE EMPRESA EN BASE A CODIGO ENCRIPTADO
             let { direccion } = req.body;
             let empresasRows: any = 0;
             let empresas = await pool.query(

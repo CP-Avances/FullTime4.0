@@ -59,6 +59,8 @@ class UsuarioRutas {
         this.router.delete('/eliminar-usuario-sucursal/:id', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.EliminarUsuarioSucursal);
         this.router.get('/', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.list);
         this.router.get('/busqueda/:usuario', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getIdByUsuario);
+        //METODO PARA DEVOLVER STRING ENCRIPTADO
+        this.router.post('/datos-usuario', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ObtenerDatoEncriptado);
     }
 }
 const USUARIO_RUTA = new UsuarioRutas();

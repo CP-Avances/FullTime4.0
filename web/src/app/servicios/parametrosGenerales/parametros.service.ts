@@ -13,7 +13,7 @@ export class ParametrosService {
     private http: HttpClient
   ) { 
     //carga de url por defecto para evitar errores en consola, se actualiza al ya existir empresaURL
-    this.url = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string: environment.url as string;
+    this.url = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
   }
 
   // BUSCAR LISTA DE PARAMETROS

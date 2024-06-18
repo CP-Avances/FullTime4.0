@@ -194,6 +194,11 @@ export class ComunicadosComponent implements OnInit {
       })
       //console.log('ver sucursales ', codigos);
 
+      console.log('ver sucursales ', codigos);
+      this.usua_sucursales = { id_sucursal: codigos };
+      this.BuscarInformacionAdministrador(this.usua_sucursales);
+      //this.BuscarInformacionSuperAdministrador();
+/*
       // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
       if (usuario.id_rol === 1 && usuario.jefe === false) {
         this.usua_sucursales = { id_sucursal: codigos };
@@ -205,7 +210,7 @@ export class ComunicadosComponent implements OnInit {
       }
       else if (usuario.id_rol === 3) {
         this.BuscarInformacionSuperAdministrador();
-      }
+      }*/
     });
   }
 
@@ -623,6 +628,7 @@ export class ComunicadosComponent implements OnInit {
       this.selectionEmp.selected.find(obj1 => {
         if (obj1.id === obj.id) {
           if (obj.comunicado_mail === true || obj.comunicado_noti === true) {
+            console.log('comunicado: ', obj);
             respuesta.push(obj)
           }
         }
@@ -673,6 +679,7 @@ export class ComunicadosComponent implements OnInit {
           this.cont = this.cont + 1;
 
           if (obj.comunicado_noti === true) {
+            console.log('NotificarPlanificacion: ', this.idEmpleadoLogueado,'_',obj.id);
             this.NotificarPlanificacion(this.idEmpleadoLogueado, obj.id, form);
           }
           if (this.cont === data.length) {

@@ -12,8 +12,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
-//LLAVES
-import { RsaKeysService } from './servicios/llaves/rsa-keys.service';
 
 // COMPONENTES ADMINISTRADOR
 import { VistaRolesComponent } from './componentes/catalogos/catRoles/vista-roles/vista-roles.component';
@@ -683,8 +681,7 @@ const config: SocketIoConfig = { url: String(url), options: {} };
     VistaElementosComponent,
     ListaSucursalesComponent,
     VerEmpresaComponent,
-    HorariosEmpleadoComponent,
-    RsaKeysService,
+    HorariosEmpleadoComponent
   ],
 
   bootstrap: [AppComponent]

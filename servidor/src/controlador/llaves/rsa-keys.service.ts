@@ -1,7 +1,5 @@
 import * as CryptoJS from 'crypto-js';
-import { frasecontrasenia } from './frase-contrasenia';//Importacion frase para encriptar
-import { ivcontrasenia } from './frase-contrasenia';//Importacion semilla iv para encriptar vector de inicializacion
-import { saltcontrasenia } from './frase-contrasenia'//Importacion semilla salt frase para encriptar de derivacion limitada
+import { frasecontrasenia, ivcontrasenia, saltcontrasenia } from './frase-contrasenia';//Importacion frase para encriptar, semilla iv para encriptar vector de inicializacion, semilla salt frase para encriptar de derivacion limitada
 
 class RsaKeysService {
 
@@ -30,11 +28,11 @@ class RsaKeysService {
         return CryptoJS.AES.encrypt(password, this.keyLogin, { iv: this.iv}).toString();
     }
 
-    /*
+    
     private desencriptarLogin(passwordEncrypted: string): string {
         return CryptoJS.AES.decrypt(passwordEncrypted, this.keyLogin, { iv: this.iv}).toString(CryptoJS.enc.Utf8);
     }
-    */
+    
 
 }
 

@@ -322,7 +322,7 @@ export class VerEmpresaComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
+        { image: this.logo, width: 50, margin: [10, -25, 0, 5] },
         { text: 'FORMATO REPORTES', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
         this.PresentarDataPDFEmpresas(),
       ],

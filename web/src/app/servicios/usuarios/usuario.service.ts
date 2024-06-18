@@ -196,5 +196,12 @@ export class UsuarioService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios/busqueda/${usuario}`);
   }
 
+  //OBTENER TEXTO ENCRIPTADO
+  getTextoEncriptado(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/datos-usuario`, data)
+      .pipe(
+        catchError(data)
+      );
+  }
 
 }

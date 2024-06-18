@@ -7,7 +7,6 @@ moment.locale('es');
 
 import { LoginService } from '../../../servicios/login/login.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { RsaKeysService } from 'src/app/servicios/llaves/rsa-keys.service';//Importacion de llaves
 
 @Component({
   selector: 'app-login',
@@ -29,7 +28,7 @@ export class LoginComponent implements OnInit {
   // VALIDACIONES DE CAMPOS DE FORMULARIO
   userMail = new FormControl('', Validators.required);
   pass = new FormControl('', Validators.required);
-  //Empresa
+  //EMPRESA
   empresaSel = new FormControl('', Validators.required);
   //Valor para encriptar codigo empresarial de la vista
   datoEncriptado: string;
@@ -46,8 +45,7 @@ export class LoginComponent implements OnInit {
     public restU: UsuarioService,
     private router: Router,
     private route: ActivatedRoute,
-    private toastr: ToastrService,
-    private rsaKeysService: RsaKeysService) {
+    private toastr: ToastrService) {
     this.formulario.setValue({
       usuarioF: '',
       passwordF: '',
@@ -120,14 +118,14 @@ export class LoginComponent implements OnInit {
     if (form.empresaF.trim().length === 0) return;
 
     //Inicio Encriptacion codigo empresarial
-    console.log('Encriptando IP: ', form.empresaF, ' ', form.empresaF.length);
-    this.datoEncriptado = this.rsaKeysService.encriptarLogin(form.empresaF.toString());
-    console.log('Encrypted Data:', this.datoEncriptado, ' ', this.datoEncriptado.length);
+    console.log('empresaF: ', form.empresaF, ' ', form.empresaF.length);
+    //this.datoEncriptado = this.rsaKeysService.encriptarLogin(form.empresaF.toString());
+    //console.log('Encrypted Data:', this.datoEncriptado, ' ', this.datoEncriptado.length);
     //Fin Encriptacion codigo empresarial
 
     //Codigo empresarial encriptado a JSON para uso con servicio
     let empresas = {
-      "codigo_empresa": this.datoEncriptado
+      "codigo_empresa": form.empresaF.toString()
     };
 
     //Validacion de empresa para direccionamiento
@@ -155,9 +153,9 @@ export class LoginComponent implements OnInit {
         },
         complete: () => 
         {
-          //Tras la validacion correcta de empresa, continuamos con el proceso normal de login
+          //TRAS VALIDACION CORRECTA DE EMPRESA, CONTINUA EL PROCESO NORMAL DE LOGIN
           console.log('CONTINUAR LOGIN');          
-          ////login
+          //LOGIN
           var local: boolean;
           this.intentos = this.intentos + 1;
 
@@ -184,7 +182,7 @@ export class LoginComponent implements OnInit {
               timeOut: 3000,
             });
           }
-          ////fin login
+          //FIN LOGIN
         }
       }
     );
@@ -192,8 +190,8 @@ export class LoginComponent implements OnInit {
 
   // METODO PARA INICIAR SESION
   IniciarSesion(form: any) {
-    // CIFRADO DE CONTRASEÑA
-    let clave = this.rsaKeysService.encriptarLogin(form.passwordF.toString());
+    // CIFRADO DE CONTRASEÑA?
+    let clave = form.passwordF.toString();
     
     let dataUsuario = {
       nombre_usuario: form.usuarioF,
@@ -224,7 +222,7 @@ export class LoginComponent implements OnInit {
         }
         this.IngresoSistema(form.usuarioF, 'Fallido', datos.text);
       }
-
+      
       else if (datos.message === 'error_') {
         this.toastr.error('Usuario no cumple con todos los requerimientos necesarios para acceder al sistema.', 'Oops!', {
           timeOut: 6000,
@@ -274,11 +272,21 @@ export class LoginComponent implements OnInit {
         });
         console.log('datos.rol ', datos.rol);
         if (!!localStorage.getItem("redireccionar")) {
+          console.log('redireccionar ');
           let redi = localStorage.getItem("redireccionar");
           this.router.navigate([redi], { relativeTo: this.route, skipLocationChange: false });
           localStorage.removeItem("redireccionar");
         } else {
-          this.router.navigate(['/home'])
+          this.router.navigate(['/home']);
+          /*
+          //inicio recarga pagina al inicio, recarga valores iniciales por defecto
+          const paginaRecargada = sessionStorage.getItem('paginaRecargada');
+          if (!paginaRecargada) {
+            sessionStorage.setItem('paginaRecargada', 'true');
+            location.reload();
+          }
+          //fin recarga pagina al inicio, recarga valores iniciales por defecto
+          */
         };
         //REDIRECCIONAMIENTO A /home Y RECARGA TRAS LOGIN
         /*
@@ -310,7 +318,13 @@ export class LoginComponent implements OnInit {
         */
       }
     }, err => {
-      this.toastr.error(err.error.message)
+      if (err.error.message === 'sin_permiso_acceso') {
+        this.toastr.error('Usuario no tiene permisos de acceso al sistema.', 'Oops!', {
+          timeOut: 6000,
+        })
+      } else{
+        this.toastr.error(err.error.message);
+      }
     })
   }
 
@@ -327,7 +341,8 @@ export class LoginComponent implements OnInit {
       fecha: fecha,
       hora: time,
     }
-    this.restU.CrearAccesosSistema(dataAcceso).subscribe(datos => { })
+    //TODO YA NO FORMA PARTE DEL SISTEMA
+    //this.restU.CrearAccesosSistema(dataAcceso).subscribe(datos => { })
   }
 
 }

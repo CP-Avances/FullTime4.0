@@ -50,26 +50,26 @@ class PermisosRutas {
     configuracion(): void {
 
         // METODO PARA BUSCAR NUMERO DE PERMISO
-        this.router.get('/numPermiso/:id_empleado', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.ObtenerNumPermiso);
+        this.router.get('/numPermiso/:id_empleado', TokenValidation, PERMISOS_CONTROLADOR.ObtenerNumPermiso);
         // METODO PARA BUSCAR PERMISOS SOLICITADOS 
-        this.router.post('/permisos-solicitados-totales', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.BuscarPermisosTotales);
+        this.router.post('/permisos-solicitados-totales', TokenValidation, PERMISOS_CONTROLADOR.BuscarPermisosTotales);
         // METODO PARA BUSCAR PERMISOS SOLICITADOS POR DIAS
-        this.router.post('/permisos-solicitados', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.BuscarPermisosDias);
+        this.router.post('/permisos-solicitados', TokenValidation, PERMISOS_CONTROLADOR.BuscarPermisosDias);
         // METODO PARA BUSCAR PERMISOS SOLICITADOS POR HORAS
-        this.router.post('/permisos-solicitados-horas', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.BuscarPermisosHoras);
+        this.router.post('/permisos-solicitados-horas', TokenValidation, PERMISOS_CONTROLADOR.BuscarPermisosHoras);
         // METODO PARA BUSCAR PERMISOS SOLICITADOS ACTUALIZAR
-        this.router.post('/permisos-solicitados-totales-editar', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.BuscarPermisosTotalesEditar);
+        this.router.post('/permisos-solicitados-totales-editar', TokenValidation, PERMISOS_CONTROLADOR.BuscarPermisosTotalesEditar);
         // METODO PARA BUSCAR PERMISOS SOLICITADOS POR DIAS ACTUALIZAR
-        this.router.post('/permisos-solicitados-editar', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.BuscarPermisosDiasEditar);
+        this.router.post('/permisos-solicitados-editar', TokenValidation, PERMISOS_CONTROLADOR.BuscarPermisosDiasEditar);
         // METODO PARA BUSCAR PERMISOS SOLICITADOS POR HORAS ACTUALIZAR
-        this.router.post('/permisos-solicitados-horas-editar', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.BuscarPermisosHorasEditar);
+        this.router.post('/permisos-solicitados-horas-editar', TokenValidation, PERMISOS_CONTROLADOR.BuscarPermisosHorasEditar);
         // CREAR PERMISO
-        this.router.post('/', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.CrearPermisos);
+        this.router.post('/', TokenValidation, PERMISOS_CONTROLADOR.CrearPermisos);
         // ACTUALIZAR PERMISO
-        this.router.put('/:id/permiso-solicitado', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EditarPermiso);
+        this.router.put('/:id/permiso-solicitado', TokenValidation, PERMISOS_CONTROLADOR.EditarPermiso);
 
         // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO
-        this.router.put('/:id/archivo/:archivo/validar/:codigo', [TokenValidation, ModuloPermisosValidation, upload.single('uploads')], PERMISOS_CONTROLADOR.GuardarDocumentoPermiso);
+        this.router.put('/:id/archivo/:archivo/validar/:codigo', [TokenValidation, upload.single('uploads')], PERMISOS_CONTROLADOR.GuardarDocumentoPermiso);
 
         // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO APLICACION MOVIL
         this.router.put('/:id/archivo/:archivo/validar/:codigo', upload.single('uploads'), PERMISOS_CONTROLADOR.GuardarDocumentoPermiso);
@@ -80,25 +80,25 @@ class PermisosRutas {
 
 
         // ELIMINAR DOCUMENTO
-        this.router.put('/eliminar-documento', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EliminarDocumentoPermiso);
+        this.router.put('/eliminar-documento', TokenValidation, PERMISOS_CONTROLADOR.EliminarDocumentoPermiso);
 
 
         // BUSQUEDA DE PERMISOS POR ID DE EMPLEADO
-        this.router.get('/permiso-usuario/:id_empleado', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.ObtenerPermisoEmpleado);
+        this.router.get('/permiso-usuario/:id_empleado', TokenValidation, PERMISOS_CONTROLADOR.ObtenerPermisoEmpleado);
         // BUSCAR INFORMACION DE UN PERMISO
-        this.router.get('/informe-un-permiso/:id_permiso', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.InformarUnPermiso);
+        this.router.get('/informe-un-permiso/:id_permiso', TokenValidation, PERMISOS_CONTROLADOR.InformarUnPermiso);
 
         // ELIMINAR PERMISO
-        this.router.delete('/eliminar/:id_permiso/:doc/verificar/:codigo', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EliminarPermiso);
+        this.router.delete('/eliminar/:id_permiso/:doc/verificar/:codigo', TokenValidation, PERMISOS_CONTROLADOR.EliminarPermiso);
 
         // BUSQUEDA DE RESPALDOS DE PERMISOS
         this.router.get('/documentos/:docs/visualizar/:codigo', PERMISOS_CONTROLADOR.ObtenerDocumentoPermiso);
         // ENVIAR CORREO MEDIANTE APLICACION WEB
-        this.router.post('/mail-noti/', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EnviarCorreoWeb);
+        this.router.post('/mail-noti/', TokenValidation, PERMISOS_CONTROLADOR.EnviarCorreoWeb);
         // ENVIAR CORREO EDICION MEDIANTE APLICACION WEB
-        this.router.post('/mail-noti-editar/', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EnviarCorreoWebEditar);
+        this.router.post('/mail-noti-editar/', TokenValidation, PERMISOS_CONTROLADOR.EnviarCorreoWebEditar);
         // ENVIAR CORREO MEDIANTE APLICACION WEB SOLICITUDES MULTIPLES
-        this.router.post('/mail-noti/solicitud-multiple', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EnviarCorreoWebMultiple);
+        this.router.post('/mail-noti/solicitud-multiple', TokenValidation, PERMISOS_CONTROLADOR.EnviarCorreoWebMultiple);
 
 
 
@@ -106,16 +106,16 @@ class PermisosRutas {
 
 
 
-        this.router.get('/', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.ListarPermisos);
-        this.router.get('/lista/', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.ListarEstadosPermisos);
-        this.router.get('/lista-autorizados/', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.ListarPermisosAutorizados);
-        this.router.get('/:id', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.ObtenerUnPermiso);
-        this.router.get('/permiso/editar/:id', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.ObtenerPermisoEditar);
-        this.router.get('/permisoContrato/:id_empl_contrato', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.ObtenerPermisoContrato);
-        this.router.get('/datosSolicitud/:id_emple_permiso', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.ObtenerDatosSolicitud);
-        this.router.get('/datosAutorizacion/:id_permiso', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.ObtenerDatosAutorizacion);
+        this.router.get('/', TokenValidation, PERMISOS_CONTROLADOR.ListarPermisos);
+        this.router.get('/lista/', TokenValidation, PERMISOS_CONTROLADOR.ListarEstadosPermisos);
+        this.router.get('/lista-autorizados/', TokenValidation, PERMISOS_CONTROLADOR.ListarPermisosAutorizados);
+        this.router.get('/:id', TokenValidation, PERMISOS_CONTROLADOR.ObtenerUnPermiso);
+        this.router.get('/permiso/editar/:id', TokenValidation, PERMISOS_CONTROLADOR.ObtenerPermisoEditar);
+        this.router.get('/permisoContrato/:id_empl_contrato', TokenValidation, PERMISOS_CONTROLADOR.ObtenerPermisoContrato);
+        this.router.get('/datosSolicitud/:id_emple_permiso', TokenValidation, PERMISOS_CONTROLADOR.ObtenerDatosSolicitud);
+        this.router.get('/datosAutorizacion/:id_permiso', TokenValidation, PERMISOS_CONTROLADOR.ObtenerDatosAutorizacion);
 
-        this.router.post('/fechas_permiso/:codigo', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.ObtenerFechasPermiso);
+        this.router.post('/fechas_permiso/:codigo', TokenValidation, PERMISOS_CONTROLADOR.ObtenerFechasPermiso);
 
 
 
@@ -130,9 +130,9 @@ class PermisosRutas {
 
 
         // ACTUALIZAR ESTADO DEL PERMISO
-        this.router.put('/:id/estado', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.ActualizarEstado);
+        this.router.put('/:id/estado', TokenValidation, PERMISOS_CONTROLADOR.ActualizarEstado);
         // BUSCAR INFORMACION DE UN PERMISO
-        this.router.get('/un-permiso/:id_permiso', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.ListarUnPermisoInfo);
+        this.router.get('/un-permiso/:id_permiso', TokenValidation, PERMISOS_CONTROLADOR.ListarUnPermisoInfo);
 
         // ELIMINAR DOCUMENTO DE PERMISO DESDE APLICACION MOVIL
         this.router.delete('/eliminar-movil/:documento/validar:codigo', PERMISOS_CONTROLADOR.EliminarPermisoMovil);

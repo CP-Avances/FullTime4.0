@@ -263,9 +263,9 @@ class ModalidaLaboralControlador {
 
                 if (contador === plantilla.length) {
                     if (modalidad_la) {
-                        return respuesta = res.status(200).jsonp({ message: 'ok' })
+                        return respuesta = res.status(200).jsonp({ message: 'ok' });
                     } else {
-                        return respuesta = res.status(404).jsonp({ message: 'error' })
+                        return respuesta = res.status(404).jsonp({ message: 'error' });
                     }
                 }
 

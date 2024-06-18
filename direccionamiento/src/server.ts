@@ -5,8 +5,11 @@ import EMPRESAS_RUTAS from './rutas/empresas/empresasRutas';
 import PARAMETRIZACION_RUTAS from './rutas/parametrizacion/parametrizacionRutas';
 import EMPLEADO_RUTAS from './rutas/empleado/empleadoRutas';
 import FUNCIONES_RUTAS from './rutas/funciones/funcionesRutas';
+import LICENCIA_RUTAS from './rutas/licencia/licenciaRutas';
 
 import { createServer, Server } from 'http';
+import dotenv from 'dotenv';
+dotenv.config();
 
 var io: any;
 
@@ -49,9 +52,10 @@ class Servidor{
     }
 
     rutas(): void {
-        this.app.use('/fulltime', EMPRESAS_RUTAS);//ruta para empresa
-        this.app.use('/parametrizacion', PARAMETRIZACION_RUTAS);//ruta datos inciales
-        this.app.use('/empleado', EMPLEADO_RUTAS);//ruta datos inciales
+        this.app.use('/fulltime', EMPRESAS_RUTAS);//RUTA PARA EMPRESA
+        this.app.use('/parametrizacion', PARAMETRIZACION_RUTAS);//RUTA DATOS INICIALES
+        this.app.use('/empleado', EMPLEADO_RUTAS);//RUTA DATOS INICIALES
+        this.app.use('/licencia', LICENCIA_RUTAS);//RUTA PARA OBTENER LICENCIA
         this.app.use('/', FUNCIONES_RUTAS);
     }
 

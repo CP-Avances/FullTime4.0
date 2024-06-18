@@ -4,7 +4,6 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { RsaKeysService } from 'src/app/servicios/llaves/rsa-keys.service';//Servicio para encriptar
 
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
@@ -36,8 +35,7 @@ export class CambiarContrasenaComponent implements OnInit {
     private toastr: ToastrService,
     public router: Router,
     public ventana: MatDialogRef<CambiarContrasenaComponent>,
-    public location: Location,
-    private rsaKeysService: RsaKeysService
+    public location: Location
   ) {
     this.usuario = localStorage.getItem('empleado') as string;
   }
@@ -46,34 +44,56 @@ export class CambiarContrasenaComponent implements OnInit {
   }
 
   CompararContrasenia(form: any) {
-    // CIFRADO DE CONTRASEÑA
-    let pass = this.rsaKeysService.encriptarLogin(form.aPass.toString());
+    //TODO CAMBIO PARA NO ENCRIPTAR EN FRONTEND
+    // CIFRADO DE CONTRASEÑA?
+    let pass = form.aPass.toString();
+    let passEncriptado = null;
+    let datos = {
+      "contrasena": pass
+    };
 
-    this.datosUser = [];
-    this.restUser.BuscarDatosUser(parseInt(this.usuario)).subscribe(data => {
-      this.datosUser = data;
-      if (pass === this.datosUser[0].contrasena) {
-        if (form.nPass != form.cPass) {
-          this.toastr.error('Incorrecto.', 'Las contraseñas no coinciden.', {
-            timeOut: 6000,
+    this.restUser.getTextoEncriptado(datos).subscribe(
+      {
+        next: (v) => {
+          passEncriptado = v.message;
+        },
+        error: (e) => {
+          this.toastr.error('Error al obtener datos', 'Error.', {
+            timeOut: 3000,
           });
-        }
-        else {
-          this.EnviarContraseniaConfirmacion(form);
+        },
+        complete: () => {
+          //INICIO CONTINUACION
+          this.datosUser = [];
+          this.restUser.BuscarDatosUser(parseInt(this.usuario)).subscribe(data => {
+            this.datosUser = data;
+            //FIXME pass => passEncriptado
+            if (passEncriptado === this.datosUser[0].contrasena) {
+              if (form.nPass != form.cPass) {
+                this.toastr.error('Incorrecto.', 'Las contraseñas no coinciden.', {
+                  timeOut: 6000,
+                });
+              }
+              else {
+                this.EnviarContraseniaConfirmacion(form);
+              }
+            }
+            else {
+              this.toastr.error('Incorrecto.', 'La contraseña actual no es la correcta.', {
+                timeOut: 6000,
+              });
+            }
+          });
+          //FIN CONTINUACION
         }
       }
-      else {
-        this.toastr.error('Incorrecto.', 'La contraseña actual no es la correcta.', {
-          timeOut: 6000,
-        });
-      }
-    });
+    );
   }
 
   // METODO PARA ACTUALIZAR CONTRASEÑA
   EnviarContraseniaConfirmacion(form: any) {
-    // CIFRADO DE CONTRASEÑA
-    let clave = this.rsaKeysService.encriptarLogin(form.cPass.toString());
+    // CIFRADO DE CONTRASEÑA?
+    let clave = form.cPass.toString();
 
     let datos = {
       id_empleado: parseInt(this.usuario),

@@ -77,6 +77,8 @@ class UsuarioRutas {
 
         this.router.get('/', TokenValidation, USUARIO_CONTROLADOR.list);
         this.router.get('/busqueda/:usuario', TokenValidation, USUARIO_CONTROLADOR.getIdByUsuario);
+        //METODO PARA DEVOLVER STRING ENCRIPTADO
+        this.router.post('/datos-usuario', TokenValidation, USUARIO_CONTROLADOR.ObtenerDatoEncriptado);
 
     }
 }

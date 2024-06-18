@@ -249,7 +249,7 @@ class Servidor {
                     tipo: data.tipo,
                     usuario: data.usuario
                 };
-                //--console.log('server aviso .......', data_llega);
+                //console.log('server aviso .......', data_llega);
                 socket.broadcast.emit('recibir_aviso', data_llega);
                 socket.emit('recibir_aviso', data_llega);
             });

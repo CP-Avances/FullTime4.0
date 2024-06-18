@@ -257,7 +257,7 @@ class AccionPersonalControlador {
     // TABLA ACCION_PERSONAL_EMPLEADO
 
     public async CrearPedidoAccionPersonal(req: Request, res: Response): Promise<void> {
-        const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
+        const { id_empleado, fecha_creacion, fecha_rige_desde, fecha_rige_hasta, identificacion_accion_personal, num_partida,
             decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal,
             tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
             salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso,
@@ -275,7 +275,7 @@ class AccionPersonalControlador {
             VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, 
                 $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)
             `
-            , [id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
+            , [id_empleado, fecha_creacion, fecha_rige_desde, fecha_rige_hasta, identificacion_accion_personal, num_partida,
                 decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal,
                 tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad,
                 id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp,

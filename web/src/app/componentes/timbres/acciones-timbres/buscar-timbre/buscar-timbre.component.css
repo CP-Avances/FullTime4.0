@@ -16,10 +16,6 @@ table {
 mat-form-field {
     margin: 0px 10px 0px 10px;
     width: 200px;
-
-    input {
-        font-size: large;
-    }
 }
 
 mat-label {
