@@ -13,6 +13,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 
+import { CommonModule } from '@angular/common';
+
 // COMPONENTES ADMINISTRADOR
 import { VistaRolesComponent } from './componentes/catalogos/catRoles/vista-roles/vista-roles.component';
 import { LoginComponent } from './componentes/iniciarSesion/login/login.component';
@@ -145,7 +147,8 @@ import { EmpleadoHorariosService } from './servicios/horarios/empleadoHorarios/e
 import { EmplCargosService } from './servicios/empleado/empleadoCargo/empl-cargos.service';
 import { CiudadService } from './servicios/ciudad/ciudad.service';
 import { TokenInterceptorService } from './servicios/login/token-interceptor.service';
-import { SpinnerService } from './servicios/intercepto/spinner.service';
+
+
 import { GraficasService } from './servicios/graficas/graficas.service';
 import { ProgressService } from './componentes/administracionGeneral/progress/progress.service';
 
@@ -608,25 +611,26 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
   ],
 
   imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    ReactiveFormsModule,
+   BrowserModule,
+   AppRoutingModule,
+   HttpClientModule,
+   ReactiveFormsModule,
     ToastrModule.forRoot(),
-    SocketIoModule.forRoot(config),
-    FontAwesomeModule,
-    FormsModule,
-    MatCardModule,
-    ScrollingModule,
-    FiltrosModule,
-    MaterialModule,
-    MatButtonModule,
-    MatPaginatorModule,
-    MatTableModule,
-    MatDatepickerModule,
+   SocketIoModule.forRoot(config),
+   FontAwesomeModule,
+   FormsModule,
+   MatCardModule,
+   ScrollingModule,
+   FiltrosModule,
+   MaterialModule,
+   MatButtonModule,
+   MatPaginatorModule,
+   MatTableModule,
+   MatDatepickerModule,
     MatNativeDateModule,
     ReportesModule,
-    SpinnerModule
+    SpinnerModule,
+    CommonModule
   ],
   providers: [
     AuthGuard,
@@ -644,7 +648,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
       provide: LOCALE_ID, useValue: 'es-EC'
     },
     { provide: MatPaginatorIntl, useClass: MatPaginatorIntl },
-    LoginService,
+    //LoginService,
     RolesService,
     TituloService,
     EmpleadoService,
@@ -683,6 +687,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     VerEmpresaComponent,
     HorariosEmpleadoComponent,
   ],
+  exports: [CommonModule, TimbreMultipleComponent],
 
   bootstrap: [AppComponent]
 

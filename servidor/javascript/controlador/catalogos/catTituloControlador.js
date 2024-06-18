@@ -39,7 +39,7 @@ class TituloControlador {
             const TITULO = yield database_1.default.query(`
       SELECT * FROM et_titulos WHERE UPPER(nombre) = $1 AND id_nivel = $2
       `, [nombre, nivel]);
-            if (TITULO.rowCount > 0) {
+            if (TITULO.rowCount != 0) {
                 return res.jsonp(TITULO.rows);
             }
             else {

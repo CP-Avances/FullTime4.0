@@ -30,7 +30,7 @@ class TituloControlador {
       `
       , [nombre, nivel]);
 
-    if (TITULO.rowCount > 0) {
+    if (TITULO.rowCount != 0) {
       return res.jsonp(TITULO.rows)
     }
     else {

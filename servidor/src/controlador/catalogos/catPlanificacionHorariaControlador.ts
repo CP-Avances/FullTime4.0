@@ -245,7 +245,7 @@ class PlanificacionHorariaControlador {
                             SELECT * FROM eu_asistencia_general WHERE codigo = $1 AND fecha_horario = $2 AND id_horario = $3
                         `, [data.codigo_usuario, horario.dia, horarioDefaultLibre.entrada.id_horario]);
 
-                            if (horarioRegistrado.rowCount > 0) {
+                            if (horarioRegistrado.rowCount != 0) {
                                 continue;
                             }
 
@@ -305,7 +305,7 @@ class PlanificacionHorariaControlador {
                             SELECT * FROM eu_asistencia_general WHERE codigo = $1 AND fecha_horario = $2 AND id_horario = $3
                         `, [data.codigo_usuario, horario.dia, horarioDefaultFeriado.entrada.id_horario]);
 
-                            if (horarioRegistrado.rowCount > 0) {
+                            if (horarioRegistrado.rowCount != 0) {
                                 continue;
                             }
 
@@ -485,7 +485,7 @@ async function VerificarHorario(codigo: any): Promise<[boolean, any]> {
             [codigo.toLowerCase()]);
 
         // SI EXISTE HORARIO VERIFICAR SI HORARIO.HORA_TRABAJO ESTE EN FORMATO HH:MM:SS
-        const existe = horario.rowCount > 0;
+        const existe = horario.rowCount != 0;
 
         if (existe) {
             const formatoHora = /^\d{2}:[0-5][0-9]:[0-5][0-9]$/;
@@ -656,7 +656,7 @@ async function ListarPlanificacionHoraria(codigo: string, fecha_inicio: string, 
             ORDER BY p_g.codigo, fecha, p_g.id_horario
         `, [fecha_inicio, fecha_final, codigo]);
 
-        if (horario.rowCount > 0) {
+        if (horario.rowCount != 0) {
             return horario.rows;
         }
         else {
@@ -682,7 +682,7 @@ async function ConsultarFeriados(fecha_inicio: string, fecha_final: string, id_u
             `
             , [fecha_inicio, fecha_final, id_usuario]);
 
-        if (FERIADO.rowCount > 0) {
+        if (FERIADO.rowCount != 0) {
             return FERIADO.rows;
         }
         else {
@@ -706,7 +706,7 @@ async function ConsultarHorarioDefault(codigo: string): Promise<any> {
         `, [codigo]
         );
 
-        if (horario.rowCount > 0) {
+        if (horario.rowCount != 0) {
             //SEPARAR LOS TIPOS DE ACCIONES DE LOS HORARIOS
             let horarioEstructurado: any;
             const entrada = horario.rows.find((o: any) => o.tipo_accion === 'E');

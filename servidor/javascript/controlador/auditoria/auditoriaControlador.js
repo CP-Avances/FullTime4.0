@@ -45,7 +45,7 @@ class AuditoriaControlador {
             console.log('Params:', params);
             try {
                 const result = yield database_1.default.query(query, params);
-                if (result.rowCount > 0) {
+                if (result.rowCount != 0) {
                     const dataStream = new stream_1.Readable({
                         objectMode: true,
                         read() { }
@@ -95,7 +95,7 @@ class AuditoriaControlador {
                 console.log('Query:', query);
                 console.log('Params:', params);
                 const DATOS = yield database_1.default.query(query, params);
-                if (DATOS.rowCount > 0) {
+                if (DATOS.rowCount != 0) {
                     console.log("contador tab", DATOS.rowCount);
                     return res.jsonp(DATOS.rows);
                 }
@@ -134,7 +134,7 @@ class AuditoriaControlador {
                fecha_hora DESC;
        `;
             const DATOS = yield database_1.default.query(query, params);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -142,7 +142,6 @@ class AuditoriaControlador {
             }
         });
     }
-    // para muchos registros
     BuscarDatosAuditoria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { tabla, desde, hasta, action } = req.body;
@@ -167,7 +166,7 @@ class AuditoriaControlador {
         `;
             try {
                 const result = yield database_1.default.query(query, params);
-                if (result.rowCount > 0) {
+                if (result.rowCount != 0) {
                     const dataStream = new stream_1.Readable({
                         objectMode: true,
                         read() { }

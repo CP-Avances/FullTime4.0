@@ -25,9 +25,11 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 
 // IMPORTAR SERVICIOS
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 import { EmpleadoElemento } from '../../../../model/empleado.model'
 
@@ -95,7 +97,9 @@ export class ListaEmpleadosComponent implements OnInit {
     public rest: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     private toastr: ToastrService, // VARIABLE DE MANEJO DE MENSAJES DE NOTIFICACIONES
     private validar: ValidacionesService,
-    private usuario: UsuarioService
+    private usuario: UsuarioService,
+    private asignaciones: AsignacionesService,
+    private datosGenerales: DatosGeneralesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -103,10 +107,10 @@ export class ListaEmpleadosComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.asignaciones.ObtenerEstado();
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
 
-    this.idUsuariosAcceso.push(this.idEmpleado);
-    this.ObtenerAsignacionesUsuario(this.idEmpleado);
-
+    this.GetEmpleados();
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerNacionalidades();
     this.DescargarPlantilla();
@@ -305,12 +309,24 @@ export class ListaEmpleadosComponent implements OnInit {
       id_empleado: Number(idEmpleado)
     }
 
+    let noPersonal: boolean = false;
+
     const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(data));
     this.empleadoD.asignaciones = res;
-    //console.log('lista empleados ', this.empleadoD.asignaciones)
     // VERIFICAMOS SI EXISTEN DATOS DE USUARIOS
     if (this.empleadoD.asignaciones) {
       const promises = this.empleadoD.asignaciones.map((asignacion: any) => {
+
+        if (asignacion.principal) {
+          if (!asignacion.administra && !asignacion.personal) {
+            return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+          } else if (asignacion.administra && !asignacion.personal) {
+            noPersonal = true;
+          } else if (asignacion.personal && !asignacion.administra) {
+            this.idUsuariosAcceso.push(this.idEmpleado);
+            return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+          }
+        }
         const data = {
           id_departamento: asignacion.id_departamento
         }
@@ -321,6 +337,10 @@ export class ListaEmpleadosComponent implements OnInit {
 
       const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
       this.idUsuariosAcceso.push(...ids);
+
+      if (noPersonal) {
+        this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleado);
+      }
 
       this.GetEmpleados();
     }
@@ -375,13 +395,22 @@ export class ListaEmpleadosComponent implements OnInit {
   }
 
   // METODO PARA LISTAR USUARIOS
-  GetEmpleados() {
+  async GetEmpleados() {
+    const res: any = await firstValueFrom(this.datosGenerales.ListarIdInformacionActual());
+    const idsEmpleadosActuales = res.map((empleado: any) => empleado.id);
+    console.log('idsEmpleadosActuales', idsEmpleadosActuales);
+
+
     const empleadosActivos$ = this.rest.ListarEmpleadosActivos().pipe(
-      map((data: any) => data.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id)))
+      map((data: any) => data.filter((empleado: any) =>
+        this.idUsuariosAcceso.includes(empleado.id) || !idsEmpleadosActuales.includes(empleado.id)
+      ))
     );
 
     const empleadosDesactivados$ = this.rest.ListaEmpleadosDesactivados().pipe(
-      map((data: any) => data.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id)))
+      map((data: any) => data.filter((empleado: any) =>
+        this.idUsuariosAcceso.includes(empleado.id) || !idsEmpleadosActuales.includes(empleado.id)
+      ))
     );
 
     forkJoin([empleadosActivos$, empleadosDesactivados$]).subscribe(([empleados, desactivados]) => {
@@ -875,7 +904,7 @@ export class ListaEmpleadosComponent implements OnInit {
                 var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
                 let nacionalidad;
-                this.nacionalidades.forEach(element => {
+                this.nacionalidades.forEach((element: any) => {
                   if (obj.id_nacionalidad == element.id) {
                     nacionalidad = element.nombre;
                   }
@@ -922,7 +951,7 @@ export class ListaEmpleadosComponent implements OnInit {
     }
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map((obj: any) => {
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
@@ -973,7 +1002,7 @@ export class ListaEmpleadosComponent implements OnInit {
       var genero = this.GeneroSelect[obj.genero - 1];
       var estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
@@ -1039,7 +1068,7 @@ export class ListaEmpleadosComponent implements OnInit {
     // const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo);
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(arreglo.map((obj: any) => {
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }

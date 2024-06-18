@@ -1,8 +1,6 @@
 import { FormControl, FormGroup } from '@angular/forms';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { ThemePalette } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
@@ -21,6 +19,7 @@ import { LogosComponent } from 'src/app/componentes/catalogos/catEmpresa/logos/l
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableSucursales } from 'src/app/model/reportes.model';
 
@@ -41,6 +40,9 @@ export class VerEmpresaComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
+
+  idSucursalesAcceso: any = [];
+  idDepartamentosAcceso: any = [];
 
   //IMAGEN
   logo: string;
@@ -79,6 +81,7 @@ export class VerEmpresaComponent implements OnInit {
     public restS: SucursalService,
     public restE: EmpleadoService,
     private toastr: ToastrService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('empresa') as string,)
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -87,8 +90,10 @@ export class VerEmpresaComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.asignaciones.ObtenerEstado();
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
 
-    this.ObtenerEmpleados(this.idEmpleado);
     this.CargarDatosEmpresa();
     this.ObtenerSucursal();
   }
@@ -156,8 +161,13 @@ export class VerEmpresaComponent implements OnInit {
   ObtenerSucursal() {
     this.datosSucursales = [];
     this.restS.BuscarSucursal().subscribe(data => {
-      this.datosSucursales = data;
+      this.datosSucursales = this.FiltrarSucursalesAsignadas(data);
     });
+  }
+
+  // METODO PARA FILTRAR SUCURSALES ASIGNADAS
+  FiltrarSucursalesAsignadas(data: any) {
+    return data.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
   }
 
   // VENTANA PARA EDITAR DATOS DE EMPRESA

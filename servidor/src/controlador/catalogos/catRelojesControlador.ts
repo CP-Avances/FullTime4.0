@@ -22,7 +22,7 @@ class RelojesControlador {
                 cr.id_sucursal = s.id AND s.id_empresa = e.id AND s.id_ciudad = c.id;
             `
         );
-        if (RELOJES.rowCount > 0) {
+        if (RELOJES.rowCount != 0) {
             return res.jsonp(RELOJES.rows)
         }
         else {
@@ -153,7 +153,7 @@ class RelojesControlador {
             SELECT * FROM ed_relojes WHERE id = $1
             `
             , [id]);
-        if (RELOJES.rowCount > 0) {
+        if (RELOJES.rowCount != 0) {
             return res.jsonp(RELOJES.rows)
         }
         else {
@@ -250,7 +250,7 @@ class RelojesControlador {
                 AND s.id_empresa = e.id AND s.id_ciudad = c.id AND cr.id = $1
             `
             , [id]);
-        if (RELOJES.rowCount > 0) {
+        if (RELOJES.rowCount != 0) {
             return res.jsonp(RELOJES.rows)
         }
         else {
@@ -323,7 +323,7 @@ class RelojesControlador {
                 SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
                 `
                 , [sucursal.toUpperCase()]);
-            if (VERIFICAR_SUCURSAL.rowCount > 0) {
+            if (VERIFICAR_SUCURSAL.rowCount != 0) {
                 contarSucursal = contarSucursal + 1;
                 // Verificar que el departamento exista dentro del sistema
                 const VERIFICAR_DEPARTAMENTO = await pool.query(
@@ -331,7 +331,7 @@ class RelojesControlador {
                     SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND id_sucursal = $2
                     `
                     , [departamento.toUpperCase(), VERIFICAR_SUCURSAL.rows[0]['id']]);
-                if (VERIFICAR_DEPARTAMENTO.rowCount > 0) {
+                if (VERIFICAR_DEPARTAMENTO.rowCount != 0) {
                     contarDepartamento = contarDepartamento + 1;
                 }
             }

@@ -396,7 +396,7 @@ class DatosGeneralesControlador {
             WHERE da.id_cargo = ce.id AND da.id_rol = r.id AND NOT da.id_rol = 2 AND da.id = $1
             ORDER BY da.apellido ASC
             `, [id_empleado]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -791,7 +791,7 @@ class DatosGeneralesControlador {
             const DATOS = yield database_1.default.query(`
             SELECT * FROM datos_actuales_empleado WHERE id = $1
             `, [empleado_id]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -1249,7 +1249,23 @@ class DatosGeneralesControlador {
                 e_datos.id_contrato = co.id AND co.id_regimen = r.id 
             ORDER BY e_datos.nombre ASC
             `);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
+                return res.jsonp(DATOS.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'error' });
+            }
+        });
+    }
+    // METODO PARA LISTAR ID ACTUALES DE USUARIOS
+    ListarIdDatosActualesEmpleado(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const DATOS = yield database_1.default.query(`
+            SELECT dae.id
+            FROM datos_actuales_empleado AS dae
+            ORDER BY dae.id ASC
+            `);
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -1268,7 +1284,7 @@ class DatosGeneralesControlador {
             WHERE da.id_cargo = ec.id AND ec.id_tipo_cargo = tc.id AND cd.id = da.id_departamento AND 
             da.id = $1
             `, [empleado_id]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -1377,7 +1393,7 @@ class DatosGeneralesControlador {
             AND da.estado = $1 AND us.id_sucursal IN (${lista_sucursales})
         ORDER BY 
             da.apellido ASC`, [estado]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -1397,7 +1413,7 @@ class DatosGeneralesControlador {
             WHERE da.id_sucursal = $1 AND da.estado = $2
             ORDER BY da.apellido ASC
             `, [sucursal, estado]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {

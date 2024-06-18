@@ -8,6 +8,7 @@ moment.locale('es');
 
 import { LoginService } from '../../../servicios/login/login.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 @Component({
   selector: 'app-login',
@@ -39,7 +40,9 @@ export class LoginComponent implements OnInit {
     public restU: UsuarioService,
     private router: Router,
     private route: ActivatedRoute,
-    private toastr: ToastrService) {
+    private toastr: ToastrService,
+    private asignacionesService: AsignacionesService,
+  ) {
     this.formulario.setValue({
       usuarioF: '',
       passwordF: ''
@@ -216,6 +219,8 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('ultimoContrato', datos.id_contrato);
         localStorage.setItem('bool_timbres', datos.acciones_timbres);
         localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
+
+        this.asignacionesService.ObtenerAsignacionesUsuario(datos.empleado);
 
         this.toastr.success('Ingreso Existoso! ' + datos.usuario + ' ' + datos.ip_adress, 'Usuario y contraseña válidos', {
           timeOut: 6000,

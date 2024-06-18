@@ -597,7 +597,7 @@ export class DatosEmpleadoComponent implements OnInit {
     let genero = this.GeneroSelect[this.empleadoUno[0].genero - 1];
     let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
     let nacionalidad: any;
-    this.nacionalidades.forEach(element => {
+    this.nacionalidades.forEach((element: any) => {
       if (this.empleadoUno[0].id_nacionalidad == element.id) {
         nacionalidad = element.nombre;
       }
@@ -801,7 +801,7 @@ export class DatosEmpleadoComponent implements OnInit {
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
@@ -933,7 +933,7 @@ export class DatosEmpleadoComponent implements OnInit {
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }

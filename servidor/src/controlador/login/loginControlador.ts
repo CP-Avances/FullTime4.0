@@ -129,7 +129,7 @@ class LoginControlador {
           , [USUARIO.rows[0].id_empleado]);
 
         // VALIDACION DE ACCESO CON LICENCIA 
-        if (INFORMACION.rowCount > 0) {
+        if (INFORMACION.rowCount != 0) {
           console.log('ingresa a validacion de licencia')
 
           try {
@@ -143,7 +143,7 @@ class LoginControlador {
               `
               , [id_cargo, id_departamento])
 
-            if (AUTORIZA.rowCount > 0) {
+            if (AUTORIZA.rowCount != 0) {
 
               const { estado: autoriza_est } = AUTORIZA.rows[0]
               const token = jwt.sign({

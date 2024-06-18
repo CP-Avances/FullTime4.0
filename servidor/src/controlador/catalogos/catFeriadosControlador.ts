@@ -18,7 +18,7 @@ class FeriadosControlador {
             SELECT * FROM ef_cat_feriados ORDER BY descripcion ASC
             `
         );
-        if (FERIADOS.rowCount > 0) {
+        if (FERIADOS.rowCount != 0) {
             return res.jsonp(FERIADOS.rows)
         }
         else {
@@ -148,7 +148,7 @@ class FeriadosControlador {
             SELECT * FROM ef_cat_feriados WHERE NOT id = $1
             `
             , [id]);
-        if (FERIADOS.rowCount > 0) {
+        if (FERIADOS.rowCount != 0) {
             return res.jsonp(FERIADOS.rows)
         }
         else {
@@ -221,7 +221,7 @@ class FeriadosControlador {
             SELECT * FROM ef_cat_feriados WHERE id = $1
             `
             , [id]);
-        if (FERIADO.rowCount > 0) {
+        if (FERIADO.rowCount != 0) {
             return res.jsonp(FERIADO.rows)
         }
         res.status(404).jsonp({ text: 'Registros no encontrados.' });
@@ -241,7 +241,7 @@ class FeriadosControlador {
                 `
                 , [fecha_inicio, fecha_final, id_empleado]);
 
-            if (FERIADO.rowCount > 0) {
+            if (FERIADO.rowCount != 0) {
                 return res.jsonp(FERIADO.rows)
             }
             else {
@@ -268,7 +268,7 @@ class FeriadosControlador {
                 `
                 , [fecha_inicio, fecha_final, id_empleado]);
 
-            if (FERIADO.rowCount > 0) {
+            if (FERIADO.rowCount != 0) {
                 return res.jsonp(FERIADO.rows)
             }
             else {

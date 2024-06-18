@@ -87,7 +87,7 @@ class NotificacionTiempoRealControlador {
                 const CONFIG_NOTI = yield database_1.default.query(`
         SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1
         `, [id_empleado]);
-                if (CONFIG_NOTI.rowCount > 0) {
+                if (CONFIG_NOTI.rowCount != 0) {
                     return res.jsonp(CONFIG_NOTI.rows);
                 }
                 else {
@@ -337,7 +337,7 @@ class NotificacionTiempoRealControlador {
         WHERE r.id_empleado_recibe = $1 AND e.id = r.id_empleado_envia 
         ORDER BY (visto is FALSE) DESC, id DESC LIMIT 20
         `, [id]);
-                if (REAL_TIME_NOTIFICACION.rowCount > 0) {
+                if (REAL_TIME_NOTIFICACION.rowCount != 0) {
                     return res.jsonp(REAL_TIME_NOTIFICACION.rows);
                 }
                 else {
@@ -360,7 +360,7 @@ class NotificacionTiempoRealControlador {
       FROM ecm_realtime_notificacion AS r, eu_empleados AS e 
       WHERE r.id = $1 AND e.id = r.id_empleado_envia
       `, [id]);
-            if (REAL_TIME_NOTIFICACION_VACACIONES.rowCount > 0) {
+            if (REAL_TIME_NOTIFICACION_VACACIONES.rowCount != 0) {
                 return res.jsonp(REAL_TIME_NOTIFICACION_VACACIONES.rows[0]);
             }
             else {

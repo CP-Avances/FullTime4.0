@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ImagenBase64LogosEmpresas = void 0;
+exports.ImagenBase64LogosEmpleado = exports.ImagenBase64LogosEmpresas = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const ImagenBase64LogosEmpresas = function (path_file) {
@@ -23,6 +23,7 @@ const ImagenBase64LogosEmpresas = function (path_file) {
             path_file = path_1.default.resolve('logos') + separador + path_file;
             console.log('ver si ingresa ', path_file);
             let data = fs_1.default.readFileSync(path_file);
+            console.log('data 8899 ', data);
             return data.toString('base64');
         }
         catch (error) {
@@ -31,3 +32,18 @@ const ImagenBase64LogosEmpresas = function (path_file) {
     });
 };
 exports.ImagenBase64LogosEmpresas = ImagenBase64LogosEmpresas;
+const ImagenBase64LogosEmpleado = function (ruta) {
+    console.log("Path logo: ", ruta);
+    let separador = path_1.default.sep;
+    try {
+        let path_file = path_1.default.resolve(ruta);
+        console.log('ver si ingresa ', ruta);
+        let data = fs_1.default.readFileSync(path_file);
+        console.log('data 9999 ', data);
+        return data.toString('base64');
+    }
+    catch (error) {
+        return 0;
+    }
+};
+exports.ImagenBase64LogosEmpleado = ImagenBase64LogosEmpleado;

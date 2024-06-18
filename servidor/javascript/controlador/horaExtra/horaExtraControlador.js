@@ -34,7 +34,7 @@ class HorasExtrasPedidasControlador {
         contrato.id = cargo.id_contrato AND cargo.id = h.id_empleado_cargo AND h.observacion = false 
       ORDER BY id DESC
       `);
-            if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+            if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
                 return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows);
             }
             else {
@@ -56,7 +56,7 @@ class HorasExtrasPedidasControlador {
         AND cargo.id = h.id_empleado_cargo AND h.observacion = true AND da.id_contrato = e.id AND depa.id = da.id_departamento
       ORDER BY id DESC
       `);
-            if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+            if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
                 return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows);
             }
             else {
@@ -77,7 +77,7 @@ class HorasExtrasPedidasControlador {
         AND cargo.id = h.id_empleado_cargo AND da.id_contrato = e.id AND depa.id = da.id_departamento 
       ORDER BY id DESC
       `);
-            if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+            if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
                 return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows);
             }
             else {
@@ -91,7 +91,7 @@ class HorasExtrasPedidasControlador {
             const SOLICITUD = yield database_1.default.query(`
       SELECT * FROM VistaSolicitudHoraExtra WHERE id_emple_hora = $1
       `, [id]);
-            if (SOLICITUD.rowCount > 0) {
+            if (SOLICITUD.rowCount != 0) {
                 return res.json(SOLICITUD.rows);
             }
             else {
@@ -107,7 +107,7 @@ class HorasExtrasPedidasControlador {
       FROM ecm_autorizaciones AS a, mhe_solicitud_hora_extra AS hp 
       WHERE hp.id = a.id_hora_extra AND hp.id = $1
       `, [id]);
-            if (SOLICITUD.rowCount > 0) {
+            if (SOLICITUD.rowCount != 0) {
                 return res.json(SOLICITUD.rows);
             }
             else {
@@ -125,7 +125,7 @@ class HorasExtrasPedidasControlador {
       WHERE e.id = ph.id_empleado_solicita 
       ORDER BY e.nombre ASC, ph.fecha_inicio ASC
       `);
-            if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+            if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
                 return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows);
             }
             else {
@@ -143,7 +143,7 @@ class HorasExtrasPedidasControlador {
       WHERE e.id = ph.id_empleado_solicita AND a.id_hora_extra = ph.id AND a.estado = 3 
       ORDER BY e.nombre ASC, ph.fecha_inicio ASC
       `);
-            if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+            if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
                 return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows);
             }
             else {
@@ -162,7 +162,7 @@ class HorasExtrasPedidasControlador {
       WHERE e.id = ph.id_empleado_solicita AND e.id = $1 
       ORDER BY e.nombre ASC, ph.fecha_inicio ASC
       `, [id_empleado]);
-            if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+            if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
                 return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows);
             }
             else {
@@ -181,7 +181,7 @@ class HorasExtrasPedidasControlador {
       WHERE e.id = ph.id_empleado_solicita AND a.id_hora_extra = ph.id AND a.estado = 3 AND e.id = $1
       ORDER BY e.nombre ASC, ph.fecha_inicio ASC
       `, [id_empleado]);
-            if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+            if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
                 HORAS_EXTRAS_PEDIDAS.rows.map((obj) => {
                     if (obj.id_autoriza_estado != null && obj.id_autoriza_estado != '' && obj.estado != 1) {
                         var autorizaciones = obj.id_autoriza_estado.split(',');
@@ -456,7 +456,7 @@ class HorasExtrasPedidasControlador {
             const HORAS_EXTRAS_PEDIDAS = yield database_1.default.query(`
       SELECT * FROM mhe_solicitud_hora_extra WHERE id_empleado_solicita = $1 ORDER BY id DESC
       `, [id_user]);
-            if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+            if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
                 return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows);
             }
             else {
@@ -646,7 +646,7 @@ class HorasExtrasPedidasControlador {
       FROM mhe_solicitud_hora_extra AS h, eu_empleados AS e 
       WHERE h.id = $1 AND e.id = h.id_empleado_solicita
       `, [id]);
-            if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
+            if (HORAS_EXTRAS_PEDIDAS.rowCount != 0) {
                 return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows);
             }
             else {

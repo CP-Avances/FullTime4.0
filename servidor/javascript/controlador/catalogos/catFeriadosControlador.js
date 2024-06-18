@@ -26,7 +26,7 @@ class FeriadosControlador {
             const FERIADOS = yield database_1.default.query(`
             SELECT * FROM ef_cat_feriados ORDER BY descripcion ASC
             `);
-            if (FERIADOS.rowCount > 0) {
+            if (FERIADOS.rowCount != 0) {
                 return res.jsonp(FERIADOS.rows);
             }
             else {
@@ -137,7 +137,7 @@ class FeriadosControlador {
             const FERIADOS = yield database_1.default.query(`
             SELECT * FROM ef_cat_feriados WHERE NOT id = $1
             `, [id]);
-            if (FERIADOS.rowCount > 0) {
+            if (FERIADOS.rowCount != 0) {
                 return res.jsonp(FERIADOS.rows);
             }
             else {
@@ -201,7 +201,7 @@ class FeriadosControlador {
             const FERIADO = yield database_1.default.query(`
             SELECT * FROM ef_cat_feriados WHERE id = $1
             `, [id]);
-            if (FERIADO.rowCount > 0) {
+            if (FERIADO.rowCount != 0) {
                 return res.jsonp(FERIADO.rows);
             }
             res.status(404).jsonp({ text: 'Registros no encontrados.' });
@@ -219,7 +219,7 @@ class FeriadosControlador {
                 WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
                     AND s.id_ciudad = cf.id_ciudad AND de.id_sucursal = s.id AND de.id = $3
                 `, [fecha_inicio, fecha_final, id_empleado]);
-                if (FERIADO.rowCount > 0) {
+                if (FERIADO.rowCount != 0) {
                     return res.jsonp(FERIADO.rows);
                 }
                 else {
@@ -244,7 +244,7 @@ class FeriadosControlador {
                     AND s.id_ciudad = cf.id_ciudad AND de.id_sucursal = s.id AND de.id = $3
                     AND f.fecha_recuperacion IS NOT null
                 `, [fecha_inicio, fecha_final, id_empleado]);
-                if (FERIADO.rowCount > 0) {
+                if (FERIADO.rowCount != 0) {
                     return res.jsonp(FERIADO.rows);
                 }
                 else {

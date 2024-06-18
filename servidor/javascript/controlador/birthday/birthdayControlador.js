@@ -27,7 +27,7 @@ class BirthdayControlador {
             const DAY = yield database_1.default.query(`
             SELECT * FROM e_message_birthday WHERE id_empresa = $1
             `, [id_empresa]);
-            if (DAY.rowCount > 0) {
+            if (DAY.rowCount != 0) {
                 return res.jsonp(DAY.rows);
             }
             else {
@@ -87,7 +87,7 @@ class BirthdayControlador {
                 const unEmpleado = yield database_1.default.query(`
                 SELECT * FROM e_message_birthday WHERE id = $1
                 `, [id]);
-                if (unEmpleado.rowCount > 0) {
+                if (unEmpleado.rowCount != 0) {
                     unEmpleado.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
                         if (obj.img != null) {
                             let ruta = (0, accesoCarpetas_1.ObtenerRutaBirthday)() + separador + obj.img;

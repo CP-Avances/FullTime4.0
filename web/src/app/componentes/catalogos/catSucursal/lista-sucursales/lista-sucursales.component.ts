@@ -20,16 +20,17 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
-import { ThemePalette } from '@angular/material/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+
 import { environment } from 'src/environments/environment';
-import { use } from 'echarts';
+
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableSucursales } from 'src/app/model/reportes.model';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-lista-sucursales',
@@ -66,6 +67,10 @@ export class ListaSucursalesComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
+  asignacionesAcceso: any;
+  idSucursalesAcceso: any = [];
+  idDepartamentosAcceso: any = [];
+
   expansion: boolean = false;
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
@@ -91,6 +96,7 @@ export class ListaSucursalesComponent implements OnInit {
     public ventana: MatDialog,
     public validar: ValidacionesService,
     public restE: EmpleadoService,
+    private usuario: UsuarioService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -99,6 +105,7 @@ export class ListaSucursalesComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
+    this.ObtenerAsignacionesUsuario(this.idEmpleado);
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerSucursal();
     this.ObtenerColores();
@@ -154,8 +161,34 @@ export class ListaSucursalesComponent implements OnInit {
 
     this.sucursales = [];
     this.rest.BuscarSucursal().subscribe(data => {
-      this.sucursales = data;
+      this.sucursales = this.FiltrarSucursalesAsignadas(data);
     });
+  }
+
+  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
+  async ObtenerAsignacionesUsuario(idEmpleado: any) {
+    const dataEmpleado = {
+      id_empleado: Number(idEmpleado)
+    }
+
+    const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(dataEmpleado));
+    this.asignacionesAcceso = res;
+
+    this.asignacionesAcceso.map((asignacion: any) => {
+      if (asignacion.principal && !asignacion.administra) {
+        return;
+      }
+
+      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
+      this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
+
+    });
+
+  }
+
+  // METODO PARA FILTRAR SUCURSALES ASIGNADAS
+  FiltrarSucursalesAsignadas(data: any) {
+    return data.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
   }
 
   // METODO PARA REGISTRAR SUCURSAL

@@ -5,7 +5,7 @@ import { FormControl, Validators, FormGroup } from "@angular/forms";
 import { Component, OnInit } from "@angular/core";
 import { startWith, map } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
-import { Observable } from "rxjs";
+import { Observable, firstValueFrom } from "rxjs";
 import { Router } from "@angular/router";
 import * as moment from "moment";
 
@@ -17,6 +17,7 @@ import { EmpresaService } from "src/app/servicios/catalogos/catEmpresa/empresa.s
 import { ProcesoService } from "src/app/servicios/catalogos/catProcesos/proceso.service";
 import { MainNavService } from "src/app/componentes/administracionGeneral/main-nav/main-nav.service";
 import { CiudadService } from "src/app/servicios/ciudad/ciudad.service";
+import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
 
 @Component({
   selector: "app-crear-pedido-accion",
@@ -144,6 +145,9 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   // INICIACION DE VARIABLES
   idEmpleadoLogueado: any;
+  asignacionesAcceso: any;
+  idUsuariosAcceso: any = [];
+
   empleados: any = [];
   ciudades: any = [];
   departamento: any;
@@ -157,6 +161,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     public restAccion: AccionPersonalService,
     public restProcesos: ProcesoService,
     public restEmpresa: EmpresaService,
+    private restUsuario: UsuarioService,
     private toastr: ToastrService,
     public restE: EmpleadoService,
     public restC: CiudadService,
@@ -353,16 +358,62 @@ export class CrearPedidoAccionComponent implements OnInit {
   }
 
   // METODO PARA OBTENER LISTA DE EMPLEADOS
-  ObtenerEmpleados() {
+  async ObtenerEmpleados() {
     this.empleados = [];
+    await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
     this.restE.BuscarListaEmpleados().subscribe((data) => {
-      this.empleados = data;
+      this.empleados = this.FiltrarEmpleadosAsignados(data);
       this.seleccionarEmpleados = "";
       this.seleccionEmpleadoH = "";
       this.seleccionEmpleadoG = "";
       this.seleccionarEmpResponsable = "";
-      console.log("empleados", this.empleados);
     });
+  }
+
+  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
+  async ObtenerAsignacionesUsuario(idEmpleado: any) {
+    const dataEmpleado = {
+      id_empleado: Number(idEmpleado)
+    }
+
+    let noPersonal: boolean = false;
+
+    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
+    this.asignacionesAcceso = res;
+
+    const promises = this.asignacionesAcceso.map((asignacion: any) => {
+      if (asignacion.principal) {
+        if (!asignacion.administra && !asignacion.personal) {
+          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+        } else if (asignacion.administra && !asignacion.personal) {
+          noPersonal = true;
+        } else if (asignacion.personal && !asignacion.administra) {
+          this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
+          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+        }
+      }
+
+      const data = {
+        id_departamento: asignacion.id_departamento
+      }
+      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
+    });
+
+    const results = await Promise.all(promises);
+
+    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
+    this.idUsuariosAcceso.push(...ids);
+
+    if (noPersonal) {
+      this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleadoLogueado);
+    }
+  }
+
+  // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
+  FiltrarEmpleadosAsignados(data: any) {
+    if (this.idUsuariosAcceso.length > 0) {
+      return data.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
+    }
   }
 
   // METODO PARA OBTENER LISTA DE CIUDADES

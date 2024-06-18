@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PLAN_GENERAL_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
-const moment_1 = __importDefault(require("moment"));
+const settingsMail_1 = require("../../libs/settingsMail");
 class PlanGeneralControlador {
     // METODO PARA REGISTRAR PLAN GENERAL   --**VERIFICADO
     CrearPlanificacion(req, res) {
@@ -43,31 +43,12 @@ class PlanGeneralControlador {
                         plan_general[i].salida_otro_dia, plan_general[i].min_antes, plan_general[i].min_despues, plan_general[i].estado_origen,
                         plan_general[i].min_alimentacion], (error, results) => __awaiter(this, void 0, void 0, function* () {
                         iterar = iterar + 1;
-                        function FormatearFecha(fecha, formato, dia) {
-                            let valor;
-                            if (dia === 'ddd') {
-                                valor = (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
-                                    (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
-                                    ' ' + (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(formato);
-                            }
-                            else if (dia === 'no') {
-                                valor = (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(formato);
-                            }
-                            else {
-                                valor = (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
-                                    (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
-                                    ', ' + (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(formato);
-                            }
-                            return valor;
-                        }
-                        function FormatearHora(hora, formato) {
-                            let valor = (0, moment_1.default)(hora, 'HH:mm:ss').format(formato);
-                            return valor;
-                        }
-                        var fecha_hora_horario1 = FormatearHora(plan_general[i].fec_hora_horario.toLocaleString().split(' ')[1], 'HH:mm:ss');
-                        var fecha_hora_horario = FormatearFecha(plan_general[i].fec_hora_horario.toLocaleString(), 'DD/MM/YYYY', 'ddd');
-                        var fecha_horario1 = FormatearHora(plan_general[i].fec_horario.toLocaleString().split(' ')[1], 'HH:mm:ss');
-                        var fecha_horario = FormatearFecha(plan_general[i].fec_horario.toLocaleString(), 'DD/MM/YYYY', 'ddd');
+                        //const fechaHora = await FormatearHora(plan_general[i].fec_hora_horario.toLocaleString().split(' ')[1])
+                        //         const fechaTimbre = await FormatearFecha(plan_general[i].fec_hora_horario.toLocaleString(), 'ddd')
+                        var fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(plan_general[i].fec_hora_horario.split(' ')[1]);
+                        var fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha)(plan_general[i].fec_hora_horario, 'ddd');
+                        var fecha_horario1 = yield (0, settingsMail_1.FormatearHora)(plan_general[i].fec_hora_horario.split(' ')[1]);
+                        var fecha_horario = yield (0, settingsMail_1.FormatearFecha)(plan_general[i].fec_hora_horario, 'ddd');
                         // AUDITORIA
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -134,7 +115,7 @@ class PlanGeneralControlador {
             SELECT id FROM eu_asistencia_general 
             WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND codigo = $4
             `, [fec_inicio, fec_final, id_horario, codigo]);
-            if (FECHAS.rowCount > 0) {
+            if (FECHAS.rowCount != 0) {
                 return res.jsonp(FECHAS.rows);
             }
             else {
@@ -234,7 +215,7 @@ class PlanGeneralControlador {
                     AND (pg.tipo_accion = 'E' OR pg.tipo_accion = 'S') 
                 ORDER BY pg.fecha_horario ASC
                 `, [codigo]);
-                if (HORARIO.rowCount > 0) {
+                if (HORARIO.rowCount != 0) {
                     return res.jsonp(HORARIO.rows);
                 }
                 else {
@@ -297,7 +278,7 @@ class PlanGeneralControlador {
                     ") AS datos " +
                     "GROUP BY codigo_e, nombre_e, anio, mes " +
                     "ORDER BY 3,4,1", [fecha_inicio, fecha_final]);
-                if (HORARIO.rowCount > 0) {
+                if (HORARIO.rowCount != 0) {
                     return res.jsonp({ message: 'OK', data: HORARIO.rows });
                 }
                 else {
@@ -323,7 +304,7 @@ class PlanGeneralControlador {
                     "WHERE fecha_horario BETWEEN $1 AND $2 " +
                     "GROUP BY codigo_dia, tipo_dia, horario.nombre, dh.id_horario, dh.hora, dh.tipo_accion, dh.id " +
                     "ORDER BY dh.id_horario, dh.hora ASC", [fecha_inicio, fecha_final]);
-                if (HORARIO.rowCount > 0) {
+                if (HORARIO.rowCount != 0) {
                     return res.jsonp({ message: 'OK', data: HORARIO.rows });
                 }
                 else {
@@ -346,7 +327,7 @@ class PlanGeneralControlador {
                     "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
                     "WHERE fecha_horario BETWEEN $1 AND $2 " +
                     "GROUP BY codigo_horario, p_g.id_horario", [fecha_inicio, fecha_final]);
-                if (HORARIO.rowCount > 0) {
+                if (HORARIO.rowCount != 0) {
                     return res.jsonp({ message: 'OK', data: HORARIO.rows });
                 }
                 else {
@@ -405,13 +386,14 @@ class PlanGeneralControlador {
                 codigos = '\'' + codigo + '\'';
             }
             if (verificador === 0) {
-                const ASISTENCIA = yield database_1.default.query("SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios, " +
-                    "p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre, " +
-                    "empleado.cedula, empleado.nombre, empleado.apellido " +
-                    "FROM eu_asistencia_general p_g " +
-                    "INNER JOIN eu_empleados empleado on empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigos + ")" +
-                    "WHERE p_g.fecha_horario BETWEEN $1 AND $2 " +
-                    "ORDER BY p_g.fecha_hora_horario ASC", [inicio, fin]);
+                const ASISTENCIA = yield database_1.default.query(`
+                SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios,
+                p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre,
+                empleado.cedula, empleado.nombre, empleado.apellido, empleado.id AS id_empleado
+                FROM eu_asistencia_general p_g
+                INNER JOIN eu_empleados empleado on empleado.codigo = p_g.codigo AND p_g.codigo IN (${codigos})
+                WHERE p_g.fecha_horario BETWEEN $1 AND $2
+                ORDER BY p_g.fecha_hora_horario ASC`, [inicio, fin]);
                 if (ASISTENCIA.rowCount === 0) {
                     return res.status(404).jsonp({ message: 'vacio' });
                 }
@@ -466,7 +448,7 @@ class PlanGeneralControlador {
                     ip,
                     observacion: null
                 });
-                if (PLAN.rowCount > 0) {
+                if (PLAN.rowCount != 0) {
                     const TIMBRE = yield database_1.default.query(`
                     UPDATE eu_timbres SET accion = $1 WHERE id = $2
                     `, [accion, id_timbre]);
@@ -504,7 +486,7 @@ class PlanGeneralControlador {
             SELECT id FROM eu_asistencia_general 
             WHERE fecha_horario = $1 AND id_horario = $2 AND codigo = $3
             `, [fec_inicio, id_horario, codigo]);
-            if (FECHAS.rowCount > 0) {
+            if (FECHAS.rowCount != 0) {
                 return res.jsonp(FECHAS.rows);
             }
             else {

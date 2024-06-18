@@ -29,7 +29,7 @@ class PlanHoraExtraControlador {
       WHERE t.observacion = false AND (e.codigo = t.id_empleado OR e.codigo = t.id_empl) AND (t.estado = 1 OR t.estado = 2)
       `
     );
-    if (PLAN.rowCount > 0) {
+    if (PLAN.rowCount != 0) {
       res.jsonp(PLAN.rows);
     }
     else {
@@ -52,7 +52,7 @@ class PlanHoraExtraControlador {
       WHERE t.observacion = true AND (e.codigo = t.id_empleado OR e.codigo = t.id_empl) AND (t.estado = 1 OR t.estado = 2)
       `
     );
-    if (PLAN.rowCount > 0) {
+    if (PLAN.rowCount != 0) {
       res.jsonp(PLAN.rows);
     }
     else {
@@ -75,7 +75,7 @@ class PlanHoraExtraControlador {
       WHERE (e.codigo = t.id_empleado OR e.codigo = t.id_empl) AND (t.estado = 3 OR t.estado = 4)
       `
     );
-    if (PLAN.rowCount > 0) {
+    if (PLAN.rowCount != 0) {
       res.jsonp(PLAN.rows);
     }
     else {
@@ -94,7 +94,7 @@ class PlanHoraExtraControlador {
       WHERE pe.id = a.id_plan_hora_extra AND pe.id_detalle_plan = p.id AND p.id = $1
       `
       , [id]);
-    if (SOLICITUD.rowCount > 0) {
+    if (SOLICITUD.rowCount != 0) {
       return res.json(SOLICITUD.rows)
     }
     else {
@@ -327,7 +327,7 @@ class PlanHoraExtraControlador {
       SELECT * FROM mhe_detalle_plan_hora_extra ORDER BY fecha_desde DESC
       `
     );
-    if (PLAN.rowCount > 0) {
+    if (PLAN.rowCount != 0) {
       res.jsonp(PLAN.rows);
     }
     else {
@@ -347,7 +347,7 @@ class PlanHoraExtraControlador {
       WHERE pe.id_detalle_plan = $1 AND pe.id_detalle_plan = p.id AND e.id = pe.id_empleado_realiza
       `
       , [id]);
-    if (PLAN.rowCount > 0) {
+    if (PLAN.rowCount != 0) {
       res.jsonp(PLAN.rows);
     }
     else {
@@ -482,7 +482,7 @@ class PlanHoraExtraControlador {
       WHERE pe.id_empleado_realiza = $1 AND pe.id_detalle_plan = p.id AND da.id = pe.id_empleado_realiza
       `
       , [id]);
-    if (PLAN.rowCount > 0) {
+    if (PLAN.rowCount != 0) {
       res.jsonp(PLAN.rows);
     }
     else {

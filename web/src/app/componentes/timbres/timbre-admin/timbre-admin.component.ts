@@ -10,6 +10,8 @@ import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-ge
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-timbre-admin',
@@ -21,6 +23,10 @@ export class TimbreAdminComponent implements OnInit {
 
   // VARIABLE DE ALMACENAMIENTO DE DATOS DE EMPLEADO
   datosEmpleado: any = [];
+
+  idEmpleadoLogueado: any;
+  asignacionesAcceso: any;
+  idUsuariosAcceso: any = [];
 
   // DATOS DEL FORMULARIO DE BUSQUEDA
   departamentoF = new FormControl('', Validators.minLength(2));
@@ -60,8 +66,10 @@ export class TimbreAdminComponent implements OnInit {
     private toastr: ToastrService, // VARIABLE MANEJO DE NOTIFICACIONES
     public restD: DatosGeneralesService, // SERVICIO DATOS GENERALES
     public parametro: ParametrosService,
-
-  ) { }
+    private restUsuario: UsuarioService,
+  ) {
+    this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
+  }
 
   ngOnInit(): void {
     this.VerDatosEmpleado();
@@ -70,7 +78,7 @@ export class TimbreAdminComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -100,12 +108,58 @@ export class TimbreAdminComponent implements OnInit {
   }
 
   // LISTA DE DATOS DE EMPLEADOS
-  VerDatosEmpleado() {
+  async VerDatosEmpleado() {
     this.datosEmpleado = [];
+    await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
     this.restD.ListarInformacionActual().subscribe(data => {
-      this.datosEmpleado = data;
+      this.datosEmpleado = this.FiltrarEmpleadosAsignados(data);
     });
   }
+
+  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
+  async ObtenerAsignacionesUsuario(idEmpleado: any) {
+    const dataEmpleado = {
+      id_empleado: Number(idEmpleado)
+    }
+
+    let noPersonal: boolean = false;
+
+    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
+    this.asignacionesAcceso = res;
+
+    const promises = this.asignacionesAcceso.map((asignacion: any) => {
+      if (asignacion.principal) {
+        if (!asignacion.administra && !asignacion.personal) {
+          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+        } else if (asignacion.administra && !asignacion.personal) {
+          noPersonal = true;
+        } else if (asignacion.personal && !asignacion.administra) {
+          this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
+          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+        }
+      }
+
+      const data = {
+        id_departamento: asignacion.id_departamento
+      }
+      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
+    });
+
+    const results = await Promise.all(promises);
+
+    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
+    this.idUsuariosAcceso.push(...ids);
+
+    if (noPersonal) {
+      this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleadoLogueado);
+    }
+
+  }
+
+  // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
+  FiltrarEmpleadosAsignados(data: any) {
+    return data.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
+}
 
   // EVENTO PARA MANEJAR LA PAGINACION DE TABLA DE TIMBRES
   ManejarPagina(e: PageEvent) {

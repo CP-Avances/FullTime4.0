@@ -10,7 +10,9 @@ import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-empl-cargos',
@@ -25,6 +27,10 @@ export class EmplCargosComponent implements OnInit {
   ver_jefe: boolean = false;
   ver_personal: boolean = false;
 
+
+  idSucursalesAcceso: any = [];
+  idDepartamentosAcceso: any = [];
+
   // VARIABLES DE ALMACENAMIENTO DE DATOS
   departamento: any = [];
   sucursales: any = [];
@@ -34,6 +40,7 @@ export class EmplCargosComponent implements OnInit {
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
   ip: string | null;
+  rol: string;
 
   // VARIABLES DE FORMULARIO
   idEmpleContrato = new FormControl('', [Validators.required]);
@@ -64,12 +71,13 @@ export class EmplCargosComponent implements OnInit {
 
   constructor(
     private restCatDepartamento: DepartamentosService,
+    private asignaciones: AsignacionesService,
     private restSucursales: SucursalService,
     private restEmpleado: EmpleadoService,
     private cargos: EmplCargosService,
+    private usuario: UsuarioService,
     private toastr: ToastrService,
     public router: Router,
-    public usuario: UsuarioService,
     public ventana: MatDialogRef<EmplCargosComponent>,
     public validar: ValidacionesService,
     public tipocargo: CatTipoCargosService,
@@ -81,6 +89,10 @@ export class EmplCargosComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.rol = localStorage.getItem('rol') as string;
+
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
 
     if (this.datoEmpleado.idRol != 2) {
       this.ver_jefe = true;
@@ -101,11 +113,11 @@ export class EmplCargosComponent implements OnInit {
   }
 
   // METODO DE BUSQUEDA DE ESTABLECIMIENTOS
-  FiltrarSucursales() {
+  async FiltrarSucursales() {
     let idEmpre = parseInt(localStorage.getItem('empresa') as string);
     this.sucursales = [];
     this.restSucursales.BuscarSucursalEmpresa(idEmpre).subscribe(datos => {
-      this.sucursales = datos;
+      this.sucursales = this.rol === '1' ? datos : this.FiltrarSucursalesAsignadas(datos);
     }, error => {
       this.toastr.info('No se han encontrado registros de Sucursales.', '', {
         timeOut: 6000,
@@ -113,17 +125,27 @@ export class EmplCargosComponent implements OnInit {
     })
   }
 
+  // METODO PARA FILTRAR SUCURSALES ASIGNADAS
+  FiltrarSucursalesAsignadas(data: any) {
+    return data.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
+  }
+
   // METODO PARA LISTAR DEPARTAMENTOS
   ObtenerDepartamentos(form: any) {
     this.departamento = [];
     let idSucursal = form.idSucursalForm;
     this.restCatDepartamento.BuscarDepartamentoSucursal(idSucursal).subscribe(datos => {
-      this.departamento = datos;
+      this.departamento = this.rol === '1' ? datos : this.FiltrarDepartamentosAsignados(datos);
     }, error => {
       this.toastr.info('Sucursal no cuenta con departamentos registrados.', '', {
         timeOut: 6000,
       })
     });
+  }
+
+  // METODO PARA FILTRAR DEPARTAMENTOS ASIGNADOS
+  FiltrarDepartamentosAsignados(data: any) {
+    return data.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
   }
 
   // METODO PARA ACTIVAR INGRESO DE CARGO

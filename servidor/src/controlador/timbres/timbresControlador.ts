@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
-import moment from 'moment';
+import { FormatearFecha, FormatearHora } from '../../libs/settingsMail';
 
 
 class TimbresControlador {
@@ -20,7 +20,7 @@ class TimbresControlador {
                     // CONSULTAR DATOSORIGINALES
                     const consulta = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [obj]);
                     const [datosOriginales] = consulta.rows;
-                    
+
 
                     if (!datosOriginales) {
                         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -204,7 +204,7 @@ class TimbresControlador {
 
             let timbres = await pool.query(
                 `
-                SELECT (da.nombre || ' ' || da.apellido) AS empleado, CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
+                SELECT (da.nombre || ' ' || da.apellido) AS empleado, da.id AS id_empleado, CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
                     t.tecla_funcion, t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
                     CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id 
                 FROM eu_timbres AS t, datos_actuales_empleado AS da
@@ -215,7 +215,7 @@ class TimbresControlador {
                 `
                 , [codigo, fecha, cedula]).then((result: any) => {
                     timbresRows = result.rowCount;
-                    if (result.rowCount > 0) {
+                    if (result.rowCount != 0) {
                         return res.status(200).jsonp({ message: 'timbres encontrados', timbres: result.rows });
                     }
                 }
@@ -293,59 +293,35 @@ class TimbresControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            const [timbre] = await pool.query(
+            pool.query(
                 `
                 INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, 
                     codigo, fecha_hora_timbre_servidor, id_reloj, ubicacion, dispositivo_timbre)
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id
-                `
-                , [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
-                    f.toLocaleString(), id_reloj, ubicacion, ip_cliente])
-                .then(async (result: any) => {
-                    // AUDITORIA
-                    function FormatearFecha(fecha: string, formato: string, dia: string): string {
-                        let valor: string;
-                        if (dia === 'ddd') {
-                            valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
-                                moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
-                                ' ' + moment(fecha, 'YYYY/MM/DD').format(formato);
-                        } else if (dia === 'no') {
-                            valor = moment(fecha, 'YYYY/MM/DD').format(formato);
-                        } else {
-                            valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
-                                moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
-                                ', ' + moment(fecha, 'YYYY/MM/DD').format(formato);
-                        }
-                        return valor;
-                    }
+                `,
+                [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
+                    f.toLocaleString(), id_reloj, ubicacion, ip_cliente],
 
-                    function FormatearHora(hora: string, formato: string) {
-                        let valor = moment(hora, 'HH:mm:ss').format(formato);
-                        return valor;
-                    }
-                    const fechaHora = FormatearHora(fec_hora_timbre.split('T')[1], 'HH:mm:ss')
-                    const fechaTimbre = FormatearFecha(fec_hora_timbre.toLocaleString(), 'DD/MM/YYYY', 'ddd')
+                async (error, results) => {
+                    const fechaHora = await FormatearHora(fec_hora_timbre.split('T')[1]);
+                    const fechaTimbre = await FormatearFecha(fec_hora_timbre.toLocaleString(), 'ddd');
+
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                         tabla: 'eu_timbres',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' '+fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${f.toLocaleString()}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: ${ip_cliente}}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${f.toLocaleString()}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: ${ip_cliente}}`,
                         ip,
                         observacion: null
                     });
 
-                    //FINALIZAR TRANSACCION
+
                     await pool.query('COMMIT');
-                    return result.rows
-                }).catch((err: any) => {
-                    return err
-                });
-
-            if (timbre) {
-                return res.status(200).jsonp({ message: 'Registro guardado.' });
-            }
-
+                    res.status(200).jsonp({ message: 'Registro guardado.' });
+                   
+                }
+            )
             return res.status(500).jsonp({ message: 'Ups!!! algo ha salido mal.' });
 
         } catch (error) {
@@ -356,6 +332,7 @@ class TimbresControlador {
     }
 
     // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR
+
     public async CrearTimbreWebAdmin(req: Request, res: Response): Promise<any> {
         try {
 
@@ -402,46 +379,30 @@ class TimbresControlador {
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 `
                 , [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
-                    id_reloj, ip_cliente, servidor])
-                .then(async (result: any) => {
+                    id_reloj, ip_cliente, servidor]
 
-                    function FormatearFecha(fecha: string, formato: string, dia: string): string {
-                        let valor: string;
-                        if (dia === 'ddd') {
-                            valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
-                                moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
-                                ' ' + moment(fecha, 'YYYY/MM/DD').format(formato);
-                        } else if (dia === 'no') {
-                            valor = moment(fecha, 'YYYY/MM/DD').format(formato);
-                        } else {
-                            valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
-                                moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
-                                ', ' + moment(fecha, 'YYYY/MM/DD').format(formato);
-                        }
-                        return valor;
-                    }
+                , async (error, results) => {
+                    const fechaHora = await FormatearHora(fec_hora_timbre.split('T')[1])
+                    const fechaTimbre = await FormatearFecha(fec_hora_timbre.toLocaleString(), 'ddd')
 
-                    function FormatearHora(hora: string, formato: string) {
-                        let valor = moment(hora, 'HH:mm:ss').format(formato);
-                        return valor;
-                    }
-                    const fechaHora = FormatearHora(fec_hora_timbre.split('T')[1], 'HH:mm:ss')
-                    const fechaTimbre = FormatearFecha(fec_hora_timbre.toLocaleString(), 'DD/MM/YYYY', 'ddd')
-                    // AUDITORIA
+
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                         tabla: 'eu_timbres',
                         usuario: 'admin',
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' '+fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: ${ip_cliente}, fecha_hora_timbre_servidor: ${servidor}}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: ${ip_cliente}, fecha_hora_timbre_servidor: ${servidor}}`,
                         ip: ip_cliente,
                         observacion: null
                     });
 
-                    // FINALIZAR TRANSACCION
                     await pool.query('COMMIT');
                     res.status(200).jsonp({ message: 'Registro guardado.' });
-                });
+
+                }
+
+            )
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -508,7 +469,7 @@ class TimbresControlador {
             , [id_empleado])
             .then(async (result: any) => {
 
-                if (result.rowCount > 0) {
+                if (result.rowCount != 0) {
                     return await Promise.all(result.rows.map(async (obj: any): Promise<any> => {
 
                         let nombre = await pool.query(
@@ -551,7 +512,7 @@ class TimbresControlador {
             WHERE r.id = $1 AND e.id = r.id_empleado_envia
             `
             , [id]);
-        if (AVISOS.rowCount > 0) {
+        if (AVISOS.rowCount != 0) {
             return res.jsonp(AVISOS.rows[0])
         }
         else {
@@ -713,7 +674,7 @@ class TimbresControlador {
             `
             , [codigo, fecha, funcion]);
 
-        if (TIMBRE.rowCount > 0) {
+        if (TIMBRE.rowCount != 0) {
             return res.jsonp({ message: 'OK', respuesta: TIMBRE.rows })
         }
         else {

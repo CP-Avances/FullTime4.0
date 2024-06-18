@@ -17,7 +17,7 @@ class DiscapacidadControlador {
                 SELECT * FROM e_cat_discapacidad ORDER BY nombre ASC
                 `
             );
-            if (DISCAPACIDAD.rowCount > 0) {
+            if (DISCAPACIDAD.rowCount != 0) {
                 return res.jsonp(DISCAPACIDAD.rows)
             } else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.' });

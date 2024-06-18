@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
-import moment from 'moment';
+import { FormatearFecha, FormatearHora } from '../../libs/settingsMail';
 
 class PlanGeneralControlador {
 
@@ -40,30 +40,15 @@ class PlanGeneralControlador {
                     , async (error, results) => {
 
                         iterar = iterar + 1;
-                        function FormatearFecha(fecha: string, formato: string, dia: string): string {
-                            let valor: string;
-                            if (dia === 'ddd') {
-                                valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
-                                    moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
-                                    ' ' + moment(fecha, 'YYYY/MM/DD').format(formato);
-                            } else if (dia === 'no') {
-                                valor = moment(fecha, 'YYYY/MM/DD').format(formato);
-                            } else {
-                                valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
-                                    moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
-                                    ', ' + moment(fecha, 'YYYY/MM/DD').format(formato);
-                            }
-                            return valor;
-                        }
+                        
 
-                        function FormatearHora(hora: string, formato: string) {
-                            let valor = moment(hora, 'HH:mm:ss').format(formato);
-                            return valor;
-                        }
-                        var fecha_hora_horario1 = FormatearHora(plan_general[i].fec_hora_horario.toLocaleString().split(' ')[1], 'HH:mm:ss')
-                        var fecha_hora_horario = FormatearFecha(plan_general[i].fec_hora_horario.toLocaleString(), 'DD/MM/YYYY', 'ddd')
-                        var fecha_horario1 = FormatearHora(plan_general[i].fec_horario.toLocaleString().split(' ')[1], 'HH:mm:ss')
-                        var fecha_horario = FormatearFecha(plan_general[i].fec_horario.toLocaleString(), 'DD/MM/YYYY', 'ddd')
+                        //const fechaHora = await FormatearHora(plan_general[i].fec_hora_horario.toLocaleString().split(' ')[1])
+               //         const fechaTimbre = await FormatearFecha(plan_general[i].fec_hora_horario.toLocaleString(), 'ddd')
+                
+                        var fecha_hora_horario1 =await FormatearHora(plan_general[i].fec_hora_horario.split(' ')[1])
+                        var fecha_hora_horario = await FormatearFecha(plan_general[i].fec_hora_horario, 'ddd')
+                        var fecha_horario1 = await FormatearHora(plan_general[i].fec_hora_horario.split(' ')[1])
+                        var fecha_horario = await FormatearFecha(plan_general[i].fec_hora_horario, 'ddd')
                         // AUDITORIA
                         // AUDITORIA
                         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -131,7 +116,7 @@ class PlanGeneralControlador {
             WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND codigo = $4
             `
             , [fec_inicio, fec_final, id_horario, codigo]);
-        if (FECHAS.rowCount > 0) {
+        if (FECHAS.rowCount != 0) {
             return res.jsonp(FECHAS.rows)
         }
         else {
@@ -247,7 +232,7 @@ class PlanGeneralControlador {
                 `
                 , [codigo]);
 
-            if (HORARIO.rowCount > 0) {
+            if (HORARIO.rowCount != 0) {
                 return res.jsonp(HORARIO.rows)
             }
             else {
@@ -312,7 +297,7 @@ class PlanGeneralControlador {
                 "ORDER BY 3,4,1"
                 , [fecha_inicio, fecha_final]);
 
-            if (HORARIO.rowCount > 0) {
+            if (HORARIO.rowCount != 0) {
                 return res.jsonp({ message: 'OK', data: HORARIO.rows })
             }
             else {
@@ -342,7 +327,7 @@ class PlanGeneralControlador {
                 "ORDER BY dh.id_horario, dh.hora ASC"
                 , [fecha_inicio, fecha_final]);
 
-            if (HORARIO.rowCount > 0) {
+            if (HORARIO.rowCount != 0) {
                 return res.jsonp({ message: 'OK', data: HORARIO.rows })
             }
             else {
@@ -368,7 +353,7 @@ class PlanGeneralControlador {
                 "GROUP BY codigo_horario, p_g.id_horario"
                 , [fecha_inicio, fecha_final]);
 
-            if (HORARIO.rowCount > 0) {
+            if (HORARIO.rowCount != 0) {
                 return res.jsonp({ message: 'OK', data: HORARIO.rows })
             }
             else {
@@ -444,13 +429,14 @@ class PlanGeneralControlador {
 
         if (verificador === 0) {
             const ASISTENCIA = await pool.query(
-                "SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios, " +
-                "p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre, " +
-                "empleado.cedula, empleado.nombre, empleado.apellido " +
-                "FROM eu_asistencia_general p_g " +
-                "INNER JOIN eu_empleados empleado on empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigos + ")" +
-                "WHERE p_g.fecha_horario BETWEEN $1 AND $2 " +
-                "ORDER BY p_g.fecha_hora_horario ASC",
+                `
+                SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios,
+                p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre,
+                empleado.cedula, empleado.nombre, empleado.apellido, empleado.id AS id_empleado
+                FROM eu_asistencia_general p_g
+                INNER JOIN eu_empleados empleado on empleado.codigo = p_g.codigo AND p_g.codigo IN (${codigos})
+                WHERE p_g.fecha_horario BETWEEN $1 AND $2
+                ORDER BY p_g.fecha_hora_horario ASC`,
                 [inicio, fin]);
 
             if (ASISTENCIA.rowCount === 0) {
@@ -520,7 +506,7 @@ class PlanGeneralControlador {
             });
 
 
-            if (PLAN.rowCount > 0) {
+            if (PLAN.rowCount != 0) {
 
                 const TIMBRE = await pool.query(
                     `
@@ -565,7 +551,7 @@ class PlanGeneralControlador {
             WHERE fecha_horario = $1 AND id_horario = $2 AND codigo = $3
             `
             , [fec_inicio, id_horario, codigo]);
-        if (FECHAS.rowCount > 0) {
+        if (FECHAS.rowCount != 0) {
             return res.jsonp(FECHAS.rows)
         }
         else {
