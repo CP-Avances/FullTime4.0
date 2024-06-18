@@ -30,6 +30,7 @@ export class AsignacionesService {
     const promises = this.asignacionesAcceso.map((asignacion: any) => {
       if (asignacion.principal) {
         if (!asignacion.administra && !asignacion.personal) {
+          noPersonal = true;
           return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
         } else if (asignacion.administra && !asignacion.personal) {
           noPersonal = true;
@@ -51,11 +52,16 @@ export class AsignacionesService {
     const results = await Promise.all(promises);
 
     const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    this.idUsuariosAcceso.push(...ids);
+    this.idUsuariosAcceso = [...new Set([...this.idUsuariosAcceso, ...ids])];
 
     if (noPersonal) {
+      console.log("noPersonal", noPersonal);
       this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id != idEmpleado);
     }
+
+    console.log("this.idDepartamentosAcceso", this.idDepartamentosAcceso);
+    console.log("sucursales",this.idSucursalesAcceso);
+    console.log("usuarios",this.idUsuariosAcceso);
 
     this.GuardarEstado();
 

@@ -10,6 +10,7 @@ import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-ge
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
@@ -76,6 +77,7 @@ export class AsignarUsuarioComponent implements OnInit {
     public general: DatosGeneralesService,
     public toastr: ToastrService,
     private usuario: UsuarioService,
+    private asignacionesService: AsignacionesService,
 
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -353,13 +355,14 @@ export class AsignarUsuarioComponent implements OnInit {
       };
     };
 
-    Promise.allSettled(requests).then(() => {
+    Promise.allSettled(requests).then(async () => {
       this.toastr.success('Registros guardados exitosamente.', 'PROCESO EXITOSO.', {
         timeOut: 6000,
       });
       // LIMPIAR DATOS Y REFRESCAR LAS CONSULTAS
       this.LimpiarDatos();
       this.BuscarUsuariosSucursal();
+      await this.asignacionesService.ObtenerAsignacionesUsuario(this.idEmpleado);
     }).catch(() => {
       this.toastr.error('Error al guardar registros.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
@@ -495,12 +498,13 @@ export class AsignarUsuarioComponent implements OnInit {
       data: datos,
       width: '700px',
       height: 'auto',
-    }).afterClosed().subscribe((datos: any) => {
+    }).afterClosed().subscribe(async (datos: any) => {
       if (datos) {
         const usuarioIndex = this.usuarios.findIndex((u: any) => u.id === datos.id);
         if (usuarioIndex !== -1) {
           this.usuarios[usuarioIndex].asignaciones = datos.asignaciones;
         }
+          await this.asignacionesService.ObtenerAsignacionesUsuario(this.idEmpleado);
       }
     }
     );
