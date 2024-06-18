@@ -206,7 +206,7 @@ class TimbresControlador {
                 }
                 let timbresRows = 0;
                 let timbres = yield database_1.default.query(`
-                SELECT (da.nombre || ' ' || da.apellido) AS empleado, CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
+                SELECT (da.nombre || ' ' || da.apellido) AS empleado, da.id AS id_empleado, CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
                     t.tecla_funcion, t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
                     CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id 
                 FROM eu_timbres AS t, datos_actuales_empleado AS da

@@ -28,6 +28,7 @@ export class VerSucursalComponent implements OnInit {
 
   @Input() idSucursal: number;
   @Input() pagina_: string = '';
+  @Input() idDepartamentosAcceso: any = [];
 
   datosSucursal: any = [];
   datosDepartamentos: any = [];
@@ -78,9 +79,14 @@ export class VerSucursalComponent implements OnInit {
   ListaDepartamentos() {
     this.datosDepartamentos = []
     this.restD.BuscarInformacionDepartamento(this.idSucursal).subscribe(datos => {
-      this.datosDepartamentos = datos;
+      this.datosDepartamentos = this.FiltrarDepartamentosAsignados(datos);
       this.OrdenarDatos(this.datosDepartamentos);
     })
+  }
+
+  // METODO PARA FILTRAR DEPARTAMENTOS ASIGNADOS
+  FiltrarDepartamentosAsignados(data: any) {
+    return data.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
   }
 
   // ORDENAR LOS DATOS SEGÚN EL ID

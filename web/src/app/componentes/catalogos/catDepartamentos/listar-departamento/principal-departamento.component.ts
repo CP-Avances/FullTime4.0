@@ -21,6 +21,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 import { RegistroDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/registro-departamento/registro-departamento.component';
 import { EditarDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/editar-departamento/editar-departamento.component';
@@ -29,6 +30,7 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableDepartamentos } from 'src/app/model/reportes.model';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-principal-departamento',
@@ -44,6 +46,9 @@ export class PrincipalDepartamentoComponent implements OnInit {
   depainfo: any = [];
   empleado: any = [];
   idEmpleado: number;
+
+  asignacionesAcceso: any;
+  idDepartamentosAcceso: any = [];
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   departamentoPadreF = new FormControl('');
@@ -91,6 +96,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     public restE: EmpleadoService,
     public ventana: MatDialog,
     public restEmpre: EmpresaService,
+    private usuario: UsuarioService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.scriptService.load('pdfMake', 'vfsFonts');
@@ -100,6 +106,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
+    this.ObtenerAsignacionesUsuario(this.idEmpleado);
     this.ListaDepartamentos();
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
@@ -140,15 +147,39 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1
   }
 
+  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
+  async ObtenerAsignacionesUsuario(idEmpleado: any) {
+    const dataEmpleado = {
+      id_empleado: Number(idEmpleado)
+    }
+
+    const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(dataEmpleado));
+    this.asignacionesAcceso = res;
+
+    this.asignacionesAcceso.map((asignacion: any) => {
+      if (asignacion.principal && !asignacion.administra) {
+        return;
+      }
+
+      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
+
+    });
+  }
+
   niveles: number = 0;
   depaSuperior: string = '';
   // METODO PARA BUSCAR DEPARTAMENTOS
   ListaDepartamentos() {
     this.departamentos = []
     this.rest.ConsultarDepartamentos().subscribe(datos => {
-      this.departamentos = datos;
+      this.departamentos = this.FiltrarDepartamentosAsignados(datos);
       this.OrdenarDatos(this.departamentos);
     })
+  }
+
+  // METODO PARA FILTRAR DEPARTAMENTOS ASIGNADOS
+  FiltrarDepartamentosAsignados(data: any) {
+    return data.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
   }
 
   // METODO PARA ABRIR VENTANA DE REGISTRO DE DEPARTAMENTO

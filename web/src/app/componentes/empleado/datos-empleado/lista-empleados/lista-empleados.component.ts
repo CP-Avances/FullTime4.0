@@ -28,6 +28,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 import { EmpleadoElemento } from '../../../../model/empleado.model'
 
@@ -95,7 +96,8 @@ export class ListaEmpleadosComponent implements OnInit {
     public rest: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     private toastr: ToastrService, // VARIABLE DE MANEJO DE MENSAJES DE NOTIFICACIONES
     private validar: ValidacionesService,
-    private usuario: UsuarioService
+    private usuario: UsuarioService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -103,10 +105,10 @@ export class ListaEmpleadosComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+    console.log('idUsuariosAcceso: ', this.idUsuariosAcceso);
 
-    this.idUsuariosAcceso.push(this.idEmpleado);
-    this.ObtenerAsignacionesUsuario(this.idEmpleado);
-
+    this.GetEmpleados();
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerNacionalidades();
     this.DescargarPlantilla();
@@ -305,12 +307,24 @@ export class ListaEmpleadosComponent implements OnInit {
       id_empleado: Number(idEmpleado)
     }
 
+    let noPersonal: boolean = false;
+
     const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(data));
     this.empleadoD.asignaciones = res;
-    //console.log('lista empleados ', this.empleadoD.asignaciones)
     // VERIFICAMOS SI EXISTEN DATOS DE USUARIOS
     if (this.empleadoD.asignaciones) {
       const promises = this.empleadoD.asignaciones.map((asignacion: any) => {
+
+        if (asignacion.principal) {
+          if (!asignacion.administra && !asignacion.personal) {
+            return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+          } else if (asignacion.administra && !asignacion.personal) {
+            noPersonal = true;
+          } else if (asignacion.personal && !asignacion.administra) {
+            this.idUsuariosAcceso.push(this.idEmpleado);
+            return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+          }
+        }
         const data = {
           id_departamento: asignacion.id_departamento
         }
@@ -321,6 +335,10 @@ export class ListaEmpleadosComponent implements OnInit {
 
       const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
       this.idUsuariosAcceso.push(...ids);
+
+      if (noPersonal) {
+        this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleado);
+      }
 
       this.GetEmpleados();
     }

@@ -77,7 +77,7 @@ export class PlanificacionComidasComponent implements OnInit {
     public aviso: RealTimeService,
     public validar: ValidacionesService,
     public restPlan: PlanComidasService,
-    public restUsuario: UsuarioService,
+    private restUsuario: UsuarioService,
     public compenentel: PlanComidasComponent,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);

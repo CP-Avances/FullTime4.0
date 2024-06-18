@@ -75,7 +75,7 @@ export class AsignarUsuarioComponent implements OnInit {
     public ventana: MatDialog,
     public general: DatosGeneralesService,
     public toastr: ToastrService,
-    public usuario: UsuarioService,
+    private usuario: UsuarioService,
 
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);

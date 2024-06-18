@@ -125,12 +125,12 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
   constructor(
     public informacion: DatosGeneralesService,
-    public restUsuario: UsuarioService,
     public restPerV: PeriodoVacacionesService,
     public restR: ReportesService,
     private toastr: ToastrService,
     private validar: ValidacionesService,
     private funciones: MainNavService,
+    private restUsuario: UsuarioService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
