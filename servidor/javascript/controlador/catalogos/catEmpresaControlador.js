@@ -59,8 +59,8 @@ class EmpresaControlador {
     }
     // METODO PARA EDITAR LOGO DE EMPRESA
     ActualizarLogoEmpresa(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             // FECHA DEL SISTEMA
             var fecha = (0, moment_1.default)();
             var anio = fecha.format('YYYY');
@@ -341,8 +341,8 @@ class EmpresaControlador {
     }
     // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO
     ActualizarCabeceraCorreo(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             // FECHA DEL SISTEMA
             var fecha = (0, moment_1.default)();
             var anio = fecha.format('YYYY');
@@ -428,8 +428,8 @@ class EmpresaControlador {
     }
     // METODO PARA ACTUALIZAR PIE DE FIRMA DE CORREO
     ActualizarPieCorreo(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             // FECHA DEL SISTEMA
             var fecha = (0, moment_1.default)();
             var anio = fecha.format('YYYY');

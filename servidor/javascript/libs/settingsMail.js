@@ -25,8 +25,8 @@ exports.pie_firma = process.env.PIEF || '';
 exports.cabecera_firma = process.env.CABECERA || '';
 exports.servidor = process.env.SERVIDOR || '';
 exports.puerto = process.env.PUERTO || '';
-const Credenciales = function (id_empresa, correo = process.env.EMAIL, password = process.env.PASSWORD, empresa = process.env.NOMBRE, img = process.env.LOGO, img_pie = process.env.PIEF, img_cabecera = process.env.CABECERA, port = process.env.PUERTO, host = process.env.SERVIDOR) {
-    return __awaiter(this, void 0, void 0, function* () {
+const Credenciales = function (id_empresa_1) {
+    return __awaiter(this, arguments, void 0, function* (id_empresa, correo = process.env.EMAIL, password = process.env.PASSWORD, empresa = process.env.NOMBRE, img = process.env.LOGO, img_pie = process.env.PIEF, img_cabecera = process.env.CABECERA, port = process.env.PUERTO, host = process.env.SERVIDOR) {
         let credenciales = [];
         credenciales = yield DatosCorreo(id_empresa);
         return credenciales.message;
