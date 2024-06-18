@@ -18,12 +18,10 @@ import { LogosComponent } from 'src/app/componentes/catalogos/catEmpresa/logos/l
 
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableSucursales } from 'src/app/model/reportes.model';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-ver-empresa',
@@ -83,7 +81,6 @@ export class VerEmpresaComponent implements OnInit {
     public restS: SucursalService,
     public restE: EmpleadoService,
     private toastr: ToastrService,
-    private usuario: UsuarioService,
     private asignaciones: AsignacionesService,
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('empresa') as string,)
@@ -93,10 +90,10 @@ export class VerEmpresaComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.asignaciones.ObtenerEstado();
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
 
-    this.ObtenerEmpleados(this.idEmpleado);
     this.CargarDatosEmpresa();
     this.ObtenerSucursal();
   }

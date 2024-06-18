@@ -21,7 +21,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 import { RegistroDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/registro-departamento/registro-departamento.component';
 import { EditarDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/editar-departamento/editar-departamento.component';
@@ -30,7 +30,6 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableDepartamentos } from 'src/app/model/reportes.model';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-principal-departamento',
@@ -47,7 +46,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
-  asignacionesAcceso: any;
   idDepartamentosAcceso: any = [];
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
@@ -89,6 +87,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   ip: string | null;
 
   constructor(
+    private asignacionesService: AsignacionesService,
     private scriptService: ScriptService,
     private toastr: ToastrService,
     private router: Router,
@@ -96,7 +95,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
     public restE: EmpleadoService,
     public ventana: MatDialog,
     public restEmpre: EmpresaService,
-    private usuario: UsuarioService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.scriptService.load('pdfMake', 'vfsFonts');
@@ -106,7 +104,9 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
-    this.ObtenerAsignacionesUsuario(this.idEmpleado);
+    this.idDepartamentosAcceso = this.asignacionesService.idDepartamentosAcceso;
+    console.log('idDepartamentosAcceso: ', this.idDepartamentosAcceso);
+
     this.ListaDepartamentos();
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
@@ -147,24 +147,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1
   }
 
-  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const dataEmpleado = {
-      id_empleado: Number(idEmpleado)
-    }
-
-    const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(dataEmpleado));
-    this.asignacionesAcceso = res;
-
-    this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal && !asignacion.administra) {
-        return;
-      }
-
-      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
-
-    });
-  }
 
   niveles: number = 0;
   depaSuperior: string = '';
