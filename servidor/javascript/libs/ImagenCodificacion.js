@@ -33,19 +33,17 @@ const ImagenBase64LogosEmpresas = function (path_file) {
 };
 exports.ImagenBase64LogosEmpresas = ImagenBase64LogosEmpresas;
 const ImagenBase64LogosEmpleado = function (ruta) {
-    return __awaiter(this, void 0, void 0, function* () {
-        console.log("Path logo: ", ruta);
-        let separador = path_1.default.sep;
-        try {
-            let path_file = path_1.default.resolve(ruta);
-            console.log('ver si ingresa ', ruta);
-            let data = fs_1.default.readFileSync(path_file);
-            console.log('data 9999 ', data);
-            return data.toString('base64');
-        }
-        catch (error) {
-            return 0;
-        }
-    });
+    console.log("Path logo: ", ruta);
+    let separador = path_1.default.sep;
+    try {
+        let path_file = path_1.default.resolve(ruta);
+        console.log('ver si ingresa ', ruta);
+        let data = fs_1.default.readFileSync(path_file);
+        console.log('data 9999 ', data);
+        return data.toString('base64');
+    }
+    catch (error) {
+        return 0;
+    }
 };
 exports.ImagenBase64LogosEmpleado = ImagenBase64LogosEmpleado;

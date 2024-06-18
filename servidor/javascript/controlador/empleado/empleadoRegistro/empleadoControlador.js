@@ -1172,7 +1172,7 @@ class EmpleadoControlador {
                 }
             });
             if (verificador === 0) {
-                const codificado = yield (0, ImagenCodificacion_1.ImagenBase64LogosEmpleado)(ruta);
+                const codificado = (0, ImagenCodificacion_1.ImagenBase64LogosEmpleado)(ruta);
                 console.log('codificado ', codificado);
                 if (codificado === 0) {
                     res.status(200).jsonp({ imagen: 0 });

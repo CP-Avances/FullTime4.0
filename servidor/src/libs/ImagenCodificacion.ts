@@ -16,7 +16,7 @@ export const ImagenBase64LogosEmpresas: any = async function (path_file: string)
     }
 }
 
-export const ImagenBase64LogosEmpleado: any = async function (ruta: any) {
+export const ImagenBase64LogosEmpleado: any =  function (ruta: any) {
     console.log("Path logo: ", ruta);
     let separador = path.sep;
 
