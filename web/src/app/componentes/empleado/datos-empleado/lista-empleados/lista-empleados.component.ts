@@ -25,6 +25,7 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 
 // IMPORTAR SERVICIOS
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
@@ -98,6 +99,7 @@ export class ListaEmpleadosComponent implements OnInit {
     private validar: ValidacionesService,
     private usuario: UsuarioService,
     private asignaciones: AsignacionesService,
+    private datosGenerales: DatosGeneralesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -393,13 +395,22 @@ export class ListaEmpleadosComponent implements OnInit {
   }
 
   // METODO PARA LISTAR USUARIOS
-  GetEmpleados() {
+  async GetEmpleados() {
+    const res: any = await firstValueFrom(this.datosGenerales.ListarIdInformacionActual());
+    const idsEmpleadosActuales = res.map((empleado: any) => empleado.id);
+    console.log('idsEmpleadosActuales', idsEmpleadosActuales);
+
+
     const empleadosActivos$ = this.rest.ListarEmpleadosActivos().pipe(
-      map((data: any) => data.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id)))
+      map((data: any) => data.filter((empleado: any) =>
+        this.idUsuariosAcceso.includes(empleado.id) || !idsEmpleadosActuales.includes(empleado.id)
+      ))
     );
 
     const empleadosDesactivados$ = this.rest.ListaEmpleadosDesactivados().pipe(
-      map((data: any) => data.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id)))
+      map((data: any) => data.filter((empleado: any) =>
+        this.idUsuariosAcceso.includes(empleado.id) || !idsEmpleadosActuales.includes(empleado.id)
+      ))
     );
 
     forkJoin([empleadosActivos$, empleadosDesactivados$]).subscribe(([empleados, desactivados]) => {

@@ -1257,6 +1257,22 @@ class DatosGeneralesControlador {
             }
         });
     }
+    // METODO PARA LISTAR ID ACTUALES DE USUARIOS
+    ListarIdDatosActualesEmpleado(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const DATOS = yield database_1.default.query(`
+            SELECT dae.id
+            FROM datos_actuales_empleado AS dae
+            ORDER BY dae.id ASC
+            `);
+            if (DATOS.rowCount != 0) {
+                return res.jsonp(DATOS.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'error' });
+            }
+        });
+    }
     ListarDatosEmpleadoAutoriza(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { empleado_id } = req.params;

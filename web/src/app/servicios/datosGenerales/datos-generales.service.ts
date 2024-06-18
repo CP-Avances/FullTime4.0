@@ -84,6 +84,11 @@ export class DatosGeneralesService {
     return this.http.get(`${environment.url}/generalidades/info_actual`);
   }
 
+  // METODO PARA LISTAR ID ACTUALES DE USUARIOS
+  ListarIdInformacionActual() {
+    return this.http.get(`${environment.url}/generalidades/info_actual_id`);
+  }
+
   // METODO PARA BUSCAR INFORMACION DEL USUARIO QUE APRUEBA SOLICITUDES
   InformarEmpleadoAutoriza(id_empleado: number) {
     return this.http.get(`${environment.url}/generalidades/empleadoAutoriza/${id_empleado}`);
