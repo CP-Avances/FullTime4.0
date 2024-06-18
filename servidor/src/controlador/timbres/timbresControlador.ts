@@ -1,13 +1,15 @@
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
+import moment from 'moment';
+
 
 class TimbresControlador {
 
     // ELIMINAR NOTIFICACIONES TABLA DE AVISOS --**VERIFICADO
     public async EliminarMultiplesAvisos(req: Request, res: Response): Promise<any> {
         try {
-            const {arregloAvisos, user_name, ip} = req.body;
+            const { arregloAvisos, user_name, ip } = req.body;
             let contador: number = 0;
             if (arregloAvisos.length > 0) {
                 contador = 0;
@@ -18,6 +20,7 @@ class TimbresControlador {
                     // CONSULTAR DATOSORIGINALES
                     const consulta = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [obj]);
                     const [datosOriginales] = consulta.rows;
+                    
 
                     if (!datosOriginales) {
                         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -198,7 +201,7 @@ class TimbresControlador {
             }
 
             let timbresRows: any = 0;
-         
+
             let timbres = await pool.query(
                 `
                 SELECT (da.nombre || ' ' || da.apellido) AS empleado, CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
@@ -300,16 +303,38 @@ class TimbresControlador {
                     f.toLocaleString(), id_reloj, ubicacion, ip_cliente])
                 .then(async (result: any) => {
                     // AUDITORIA
+                    function FormatearFecha(fecha: string, formato: string, dia: string): string {
+                        let valor: string;
+                        if (dia === 'ddd') {
+                            valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+                                moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
+                                ' ' + moment(fecha, 'YYYY/MM/DD').format(formato);
+                        } else if (dia === 'no') {
+                            valor = moment(fecha, 'YYYY/MM/DD').format(formato);
+                        } else {
+                            valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+                                moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
+                                ', ' + moment(fecha, 'YYYY/MM/DD').format(formato);
+                        }
+                        return valor;
+                    }
+
+                    function FormatearHora(hora: string, formato: string) {
+                        let valor = moment(hora, 'HH:mm:ss').format(formato);
+                        return valor;
+                    }
+                    const fechaHora = FormatearHora(fec_hora_timbre.split('T')[1], 'HH:mm:ss')
+                    const fechaTimbre = FormatearFecha(fec_hora_timbre.toLocaleString(), 'DD/MM/YYYY', 'ddd')
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                         tabla: 'eu_timbres',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fec_hora_timbre}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${f.toLocaleString()}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: ${ip_cliente}}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' '+fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${f.toLocaleString()}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: ${ip_cliente}}`,
                         ip,
                         observacion: null
                     });
-                    
+
                     //FINALIZAR TRANSACCION
                     await pool.query('COMMIT');
                     return result.rows
@@ -379,13 +404,36 @@ class TimbresControlador {
                 , [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
                     id_reloj, ip_cliente, servidor])
                 .then(async (result: any) => {
+
+                    function FormatearFecha(fecha: string, formato: string, dia: string): string {
+                        let valor: string;
+                        if (dia === 'ddd') {
+                            valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+                                moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
+                                ' ' + moment(fecha, 'YYYY/MM/DD').format(formato);
+                        } else if (dia === 'no') {
+                            valor = moment(fecha, 'YYYY/MM/DD').format(formato);
+                        } else {
+                            valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+                                moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
+                                ', ' + moment(fecha, 'YYYY/MM/DD').format(formato);
+                        }
+                        return valor;
+                    }
+
+                    function FormatearHora(hora: string, formato: string) {
+                        let valor = moment(hora, 'HH:mm:ss').format(formato);
+                        return valor;
+                    }
+                    const fechaHora = FormatearHora(fec_hora_timbre.split('T')[1], 'HH:mm:ss')
+                    const fechaTimbre = FormatearFecha(fec_hora_timbre.toLocaleString(), 'DD/MM/YYYY', 'ddd')
                     // AUDITORIA
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                         tabla: 'eu_timbres',
                         usuario: 'admin',
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fec_hora_timbre}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: ${ip_cliente}, fecha_hora_timbre_servidor: ${servidor}}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' '+fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: ${ip_cliente}, fecha_hora_timbre_servidor: ${servidor}}`,
                         ip: ip_cliente,
                         observacion: null
                     });
@@ -562,10 +610,10 @@ class TimbresControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const consulta = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1',[id]);
+            const consulta = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [id]);
             const [datosOriginales] = consulta.rows;
 
-            if (!datosOriginales){
+            if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'ecm_realtime_timbres',
                     usuario: user_name,
@@ -580,7 +628,7 @@ class TimbresControlador {
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Registro no encontrado.' });
             }
-        
+
             await pool.query(
                 `
                 UPDATE ecm_realtime_timbres SET visto = $1 WHERE id = $2
@@ -604,7 +652,7 @@ class TimbresControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'Error al actualizar la vista.' }); 
+            return res.status(500).jsonp({ message: 'Error al actualizar la vista.' });
         }
     }
 

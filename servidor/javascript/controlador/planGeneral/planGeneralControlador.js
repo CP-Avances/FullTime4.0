@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PLAN_GENERAL_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
+const moment_1 = __importDefault(require("moment"));
 class PlanGeneralControlador {
     // METODO PARA REGISTRAR PLAN GENERAL   --**VERIFICADO
     CrearPlanificacion(req, res) {
@@ -42,13 +43,53 @@ class PlanGeneralControlador {
                         plan_general[i].salida_otro_dia, plan_general[i].min_antes, plan_general[i].min_despues, plan_general[i].estado_origen,
                         plan_general[i].min_alimentacion], (error, results) => __awaiter(this, void 0, void 0, function* () {
                         iterar = iterar + 1;
+                        function FormatearFecha(fecha, formato, dia) {
+                            let valor;
+                            if (dia === 'ddd') {
+                                valor = (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+                                    (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
+                                    ' ' + (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(formato);
+                            }
+                            else if (dia === 'no') {
+                                valor = (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(formato);
+                            }
+                            else {
+                                valor = (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+                                    (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
+                                    ', ' + (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(formato);
+                            }
+                            return valor;
+                        }
+                        function FormatearHora(hora, formato) {
+                            let valor = (0, moment_1.default)(hora, 'HH:mm:ss').format(formato);
+                            return valor;
+                        }
+                        var fecha_hora_horario1 = FormatearHora(plan_general[i].fec_hora_horario.toLocaleString().split(' ')[1], 'HH:mm:ss');
+                        var fecha_hora_horario = FormatearFecha(plan_general[i].fec_hora_horario.toLocaleString(), 'DD/MM/YYYY', 'ddd');
+                        var fecha_horario1 = FormatearHora(plan_general[i].fec_horario.toLocaleString().split(' ')[1], 'HH:mm:ss');
+                        var fecha_horario = FormatearFecha(plan_general[i].fec_horario.toLocaleString(), 'DD/MM/YYYY', 'ddd');
+                        // AUDITORIA
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
                             tabla: 'eu_asistencia_general',
                             usuario: user_name,
                             accion: 'I',
                             datosOriginales: '',
-                            datosNuevos: JSON.stringify(results.rows),
+                            datosNuevos: `{fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, 
+                            tolerancia: ${plan_general[i].tolerancia},  estado_timbre: ${plan_general[i].estado_timbre}, 
+                            id_detalle_horario: ${plan_general[i].id_det_horario}, 
+                            fecha_horario: ${fecha_horario + ' ' + fecha_horario1}, 
+                            id_empleado_cargo: ${plan_general[i].id_empl_cargo}, 
+                            tipo_accion: ${plan_general[i].tipo_entr_salida}, 
+                            codigo: ${plan_general[i].codigo}, 
+                            id_horario: ${plan_general[i].id_horario}, 
+                            tipo_dia: ${plan_general[i].tipo_dia}, 
+                            salida_otro_dia: ${plan_general[i].salida_otro_dia}, 
+                            minutos_antes: ${plan_general[i].min_antes}, 
+                            minutos_despues: ${plan_general[i].min_despues}, 
+                            estado_origen: ${plan_general[i].estado_origen}, 
+                            minutos_alimentacion: ${plan_general[i].min_alimentacion}
+                            }`,
                             ip,
                             observacion: null
                         });

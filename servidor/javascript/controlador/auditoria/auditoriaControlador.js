@@ -29,9 +29,9 @@ class AuditoriaControlador {
             const params = [tabla, ...actionsArray, fechaDesde, fechaHasta];
             const query = `
                 SELECT 
-                    *
+                    a.plataforma, a.table_name, a.user_name,CAST(a.fecha_hora AS VARCHAR) , a.action, a.original_data, a.new_data, a.ip_address, a.observacion               
                 FROM 
-                    audit.auditoria 
+                    audit.auditoria AS a
                 WHERE 
                     table_name = $1
                 AND 

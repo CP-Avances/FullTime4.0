@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.timbresControlador = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
+const moment_1 = __importDefault(require("moment"));
 class TimbresControlador {
     // ELIMINAR NOTIFICACIONES TABLA DE AVISOS --**VERIFICADO
     EliminarMultiplesAvisos(req, res) {
@@ -289,12 +290,35 @@ class TimbresControlador {
                     f.toLocaleString(), id_reloj, ubicacion, ip_cliente])
                     .then((result) => __awaiter(this, void 0, void 0, function* () {
                     // AUDITORIA
+                    function FormatearFecha(fecha, formato, dia) {
+                        let valor;
+                        if (dia === 'ddd') {
+                            valor = (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+                                (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
+                                ' ' + (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(formato);
+                        }
+                        else if (dia === 'no') {
+                            valor = (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(formato);
+                        }
+                        else {
+                            valor = (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+                                (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
+                                ', ' + (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(formato);
+                        }
+                        return valor;
+                    }
+                    function FormatearHora(hora, formato) {
+                        let valor = (0, moment_1.default)(hora, 'HH:mm:ss').format(formato);
+                        return valor;
+                    }
+                    const fechaHora = FormatearHora(fec_hora_timbre.split('T')[1], 'HH:mm:ss');
+                    const fechaTimbre = FormatearFecha(fec_hora_timbre.toLocaleString(), 'DD/MM/YYYY', 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_timbres',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fec_hora_timbre}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${f.toLocaleString()}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: ${ip_cliente}}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${f.toLocaleString()}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: ${ip_cliente}}`,
                         ip,
                         observacion: null
                     });
@@ -352,13 +376,36 @@ class TimbresControlador {
                 `, [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
                     id_reloj, ip_cliente, servidor])
                     .then((result) => __awaiter(this, void 0, void 0, function* () {
+                    function FormatearFecha(fecha, formato, dia) {
+                        let valor;
+                        if (dia === 'ddd') {
+                            valor = (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+                                (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
+                                ' ' + (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(formato);
+                        }
+                        else if (dia === 'no') {
+                            valor = (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(formato);
+                        }
+                        else {
+                            valor = (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+                                (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
+                                ', ' + (0, moment_1.default)(fecha, 'YYYY/MM/DD').format(formato);
+                        }
+                        return valor;
+                    }
+                    function FormatearHora(hora, formato) {
+                        let valor = (0, moment_1.default)(hora, 'HH:mm:ss').format(formato);
+                        return valor;
+                    }
+                    const fechaHora = FormatearHora(fec_hora_timbre.split('T')[1], 'HH:mm:ss');
+                    const fechaTimbre = FormatearFecha(fec_hora_timbre.toLocaleString(), 'DD/MM/YYYY', 'ddd');
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_timbres',
                         usuario: 'admin',
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fec_hora_timbre}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: ${ip_cliente}, fecha_hora_timbre_servidor: ${servidor}}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: ${ip_cliente}, fecha_hora_timbre_servidor: ${servidor}}`,
                         ip: ip_cliente,
                         observacion: null
                     });

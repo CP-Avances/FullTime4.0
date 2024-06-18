@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
+import moment from 'moment';
 
 class PlanGeneralControlador {
 
@@ -15,7 +16,7 @@ class PlanGeneralControlador {
         iterar = 0;
         cont = 0;
 
-        const {user_name, ip, plan_general } = req.body;
+        const { user_name, ip, plan_general } = req.body;
 
         for (var i = 0; i < plan_general.length; i++) {
 
@@ -37,23 +38,61 @@ class PlanGeneralControlador {
                     plan_general[i].salida_otro_dia, plan_general[i].min_antes, plan_general[i].min_despues, plan_general[i].estado_origen,
                     plan_general[i].min_alimentacion]
                     , async (error, results) => {
-    
-                        iterar = iterar + 1;
 
+                        iterar = iterar + 1;
+                        function FormatearFecha(fecha: string, formato: string, dia: string): string {
+                            let valor: string;
+                            if (dia === 'ddd') {
+                                valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+                                    moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
+                                    ' ' + moment(fecha, 'YYYY/MM/DD').format(formato);
+                            } else if (dia === 'no') {
+                                valor = moment(fecha, 'YYYY/MM/DD').format(formato);
+                            } else {
+                                valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+                                    moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
+                                    ', ' + moment(fecha, 'YYYY/MM/DD').format(formato);
+                            }
+                            return valor;
+                        }
+
+                        function FormatearHora(hora: string, formato: string) {
+                            let valor = moment(hora, 'HH:mm:ss').format(formato);
+                            return valor;
+                        }
+                        var fecha_hora_horario1 = FormatearHora(plan_general[i].fec_hora_horario.toLocaleString().split(' ')[1], 'HH:mm:ss')
+                        var fecha_hora_horario = FormatearFecha(plan_general[i].fec_hora_horario.toLocaleString(), 'DD/MM/YYYY', 'ddd')
+                        var fecha_horario1 = FormatearHora(plan_general[i].fec_horario.toLocaleString().split(' ')[1], 'HH:mm:ss')
+                        var fecha_horario = FormatearFecha(plan_general[i].fec_horario.toLocaleString(), 'DD/MM/YYYY', 'ddd')
+                        // AUDITORIA
                         // AUDITORIA
                         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                             tabla: 'eu_asistencia_general',
                             usuario: user_name,
                             accion: 'I',
                             datosOriginales: '',
-                            datosNuevos: JSON.stringify(results.rows),
+                            datosNuevos: `{fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, 
+                            tolerancia: ${plan_general[i].tolerancia},  estado_timbre: ${plan_general[i].estado_timbre}, 
+                            id_detalle_horario: ${plan_general[i].id_det_horario}, 
+                            fecha_horario: ${fecha_horario + ' ' + fecha_horario1}, 
+                            id_empleado_cargo: ${plan_general[i].id_empl_cargo}, 
+                            tipo_accion: ${plan_general[i].tipo_entr_salida}, 
+                            codigo: ${plan_general[i].codigo}, 
+                            id_horario: ${plan_general[i].id_horario}, 
+                            tipo_dia: ${plan_general[i].tipo_dia}, 
+                            salida_otro_dia: ${plan_general[i].salida_otro_dia}, 
+                            minutos_antes: ${plan_general[i].min_antes}, 
+                            minutos_despues: ${plan_general[i].min_despues}, 
+                            estado_origen: ${plan_general[i].estado_origen}, 
+                            minutos_alimentacion: ${plan_general[i].min_alimentacion}
+                            }`,
                             ip,
                             observacion: null
                         });
 
                         // FINALIZAR TRANSACCION
                         await pool.query('COMMIT');
-    
+
                         try {
                             console.log('if ', error)
                             if (error) {
@@ -70,7 +109,7 @@ class PlanGeneralControlador {
                                     return res.status(200).jsonp({ message: 'error' });
                                 }
                             }
-    
+
                         } catch (error) {
                             throw error;
                         }
@@ -112,7 +151,7 @@ class PlanGeneralControlador {
         iterar = 0;
         cont = 0;
 
-        const {user_name, ip, id_plan } = req.body;
+        const { user_name, ip, id_plan } = req.body;
 
         for (var i = 0; i < id_plan.length; i++) {
 
@@ -146,7 +185,7 @@ class PlanGeneralControlador {
                     `,
                     [id_plan[i].id]
                     , async (error) => {
-    
+
                         iterar = iterar + 1;
 
                         // AUDITORIA
@@ -162,7 +201,7 @@ class PlanGeneralControlador {
 
                         // FINALIZAR TRANSACCION
                         await pool.query('COMMIT');
-    
+
                         try {
                             if (error) {
                                 errores = errores + 1;
@@ -178,7 +217,7 @@ class PlanGeneralControlador {
                                     return res.status(200).jsonp({ message: 'error' });
                                 }
                             }
-    
+
                         } catch (error) {
                             throw error;
                         }
@@ -342,7 +381,7 @@ class PlanGeneralControlador {
     }
 
     // METODO PARA LISTAR PLANIFICACIONES DE DIAS LIBRES Y FERIADOS   --**VERIFICADO
-  
+
 
     // METODO PARA BUSCAR ASISTENCIAS
     public async BuscarAsistencia(req: Request, res: Response) {
@@ -488,7 +527,7 @@ class PlanGeneralControlador {
                     UPDATE eu_timbres SET accion = $1 WHERE id = $2
                     `
                     , [accion, id_timbre]);
-                
+
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'timbres',

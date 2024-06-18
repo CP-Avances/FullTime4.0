@@ -5,10 +5,8 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { HttpResponse } from '@angular/common/http';
-
-import { forkJoin } from 'rxjs';
-
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import { MatTableDataSource } from '@angular/material/table';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
@@ -38,8 +36,6 @@ interface TablasD {
     modulo: string;
 }
 
-
-
 @Component({
     selector: 'app-reporte-auditoria',
     templateUrl: './reporte-auditoria.component.html',
@@ -48,10 +44,27 @@ interface TablasD {
 
 export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
+    formato_fecha: string = 'DD/MM/YYYY';
+    formato_hora: string = 'HH:mm:ss';
+  
+    // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+    BuscarParametro() {
+      // id_tipo_parametro Formato fecha = 25
+      this.parametro.ListarDetalleParametros(25).subscribe(
+        res => {
+          this.formato_fecha = res[0].descripcion;
+        });
+    }
+  
+    BuscarHora() {
+      // id_tipo_parametro Formato hora = 26
+      this.parametro.ListarDetalleParametros(26).subscribe(
+        res => {
+          this.formato_hora = res[0].descripcion;
+        });
+    }
+
     verDetalle: boolean = false;
-
-
-
     accionesSeleccionadas = [];
 
 
@@ -196,6 +209,8 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         private toastr: ToastrService,
         private restAuditoria: AuditoriaService,
         private restEmpre: EmpresaService,
+        public validar: ValidacionesService, // SERVICIO CONTROL DE VALIDACONES
+        public parametro: ParametrosService,
 
 
     ) {
@@ -351,6 +366,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
 
 
+    dataSource: any;
     async ModelarTablasAuditoriaPorTablas(accion: any) {
         this.data_pdf = [];
         this.datosbusqueda = [];
@@ -460,13 +476,16 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
         console.log("quiero ver los datos", this.data_pdf);
         this.datosPdF = this.data_pdf;
+        //this.dataSource = new MatTableDataSource(this.datosPdF );
+
+
         // Realizar la acción correspondiente
         switch (accion) {
             case 'ver':
                 this.VerDatos();
                 break;
             default:
-                this.GenerarPDF(this.datosPdF, accion);
+                this.GenerarPDF( this.datosPdF, accion);
                 break;
         }
         // } catch (error) {
@@ -485,6 +504,8 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         //this.obtenerDatosPdf();
 
         this.ContruirTablaDefinitiva(this.tablas);
+        this.BuscarParametro();
+        this.BuscarHora();
     }
     // METODO PARA MOSTRAR FILAS DETERMINADAS DE DATOS EN LA TABLA
     ManejarPagina(e: PageEvent) {
@@ -706,8 +727,8 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
                             { style: 'itemsTableCentrado', text: audi.ip_address },
                             { style: 'itemsTableCentrado', text: audi.table_name },
                             { style: 'itemsTableCentrado', text: this.transformAction(audi.action) },
-                            { style: 'itemsTable', text: this.getDateFromISO(audi.fecha_hora) },
-                            { style: 'itemsTable', text: this.getTimeFromISO(audi.fecha_hora) },
+                            { style: 'itemsTable', text: this.validar.FormatearFecha(audi.fecha_hora, this.formato_fecha, this.validar.dia_abreviado) },
+                            { style: 'itemsTable', text: this.validar.FormatearHora(audi.fecha_hora.split(' ')[1], this.formato_hora) },
                             { style: 'itemsTable', text: audi.original_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [4, 0, 9, 0] },
                             { style: 'itemsTable', text: audi.new_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [4, 0, 9, 0] },
                         ]
