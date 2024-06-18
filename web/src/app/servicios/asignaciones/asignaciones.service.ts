@@ -17,6 +17,7 @@ export class AsignacionesService {
   }
 
   async ObtenerAsignacionesUsuario(idEmpleado: any) {
+    console.log("idEmpleado", idEmpleado);
 
     const dataEmpleado = {
       id_empleado: Number(idEmpleado)
@@ -52,6 +53,7 @@ export class AsignacionesService {
     const results = await Promise.all(promises);
 
     const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
+    console.log("ids", ids);
     this.idUsuariosAcceso = [...new Set([...this.idUsuariosAcceso, ...ids])];
 
     if (noPersonal) {
