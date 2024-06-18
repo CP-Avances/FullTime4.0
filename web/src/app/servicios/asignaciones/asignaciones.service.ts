@@ -12,7 +12,9 @@ export class AsignacionesService {
   idUsuariosAcceso: any[] = [];
   asignacionesAcceso: any[] = [];
 
-  constructor(private restUsuario: UsuarioService) {}
+  constructor(private restUsuario: UsuarioService) {
+    this.ObtenerEstado();
+  }
 
   async ObtenerAsignacionesUsuario(idEmpleado: any) {
 
@@ -55,9 +57,19 @@ export class AsignacionesService {
       this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id != idEmpleado);
     }
 
-    console.log("idUsuariosAcceso", this.idUsuariosAcceso);
-    console.log("idDepartamentosAcceso", this.idDepartamentosAcceso);
-    console.log("idSucursalesAcceso", this.idSucursalesAcceso);
+    this.GuardarEstado();
 
+  }
+
+  GuardarEstado() {
+    localStorage.setItem('idDepartamentosAcceso', JSON.stringify(this.idDepartamentosAcceso));
+    localStorage.setItem('idSucursalesAcceso', JSON.stringify(this.idSucursalesAcceso));
+    localStorage.setItem('idUsuariosAcceso', JSON.stringify(this.idUsuariosAcceso));
+  }
+
+  ObtenerEstado() {
+    this.idDepartamentosAcceso = JSON.parse(localStorage.getItem('idDepartamentosAcceso') || '[]');
+    this.idSucursalesAcceso = JSON.parse(localStorage.getItem('idSucursalesAcceso') || '[]');
+    this.idUsuariosAcceso = JSON.parse(localStorage.getItem('idUsuariosAcceso') || '[]');
   }
 }
