@@ -135,7 +135,7 @@ export class EmplCargosComponent implements OnInit {
     this.departamento = [];
     let idSucursal = form.idSucursalForm;
     this.restCatDepartamento.BuscarDepartamentoSucursal(idSucursal).subscribe(datos => {
-      this.departamento = this.FiltrarDepartamentosAsignados(datos);
+      this.departamento = this.rol === '1' ? datos : this.FiltrarDepartamentosAsignados(datos);
     }, error => {
       this.toastr.info('Sucursal no cuenta con departamentos registrados.', '', {
         timeOut: 6000,
