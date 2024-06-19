@@ -1,13 +1,15 @@
-import { Validators, FormGroup, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+
+import { Validators, FormGroup, FormControl } from '@angular/forms';
+import { PageEvent } from '@angular/material/paginator';
+
 import { ToastrService } from 'ngx-toastr';
+import moment from 'moment';
+
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import moment from 'moment';
-import { PageEvent } from '@angular/material/paginator';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
-import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
-import { firstValueFrom } from 'rxjs';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 @Component({
   selector: 'app-buscar-asistencia',
@@ -31,7 +33,6 @@ export class BuscarAsistenciaComponent implements OnInit {
   pageSizeOptions = [5, 10, 20, 50];
 
   idEmpleadoLogueado: any;
-  asignacionesAcceso: any;
   idUsuariosAcceso: any = [];
 
   existenAsistencias: boolean = false;
@@ -50,12 +51,13 @@ export class BuscarAsistenciaComponent implements OnInit {
     public validar: ValidacionesService,
     public asistir: PlanGeneralService,
     public parametro: ParametrosService,
-    private restUsuario: UsuarioService,
+    private asignaciones: AsignacionesService,
   ) { }
 
   ngOnInit(): void {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
-    this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
     this.BuscarFecha();
     this.BuscarHora();
   }
@@ -89,45 +91,6 @@ export class BuscarAsistenciaComponent implements OnInit {
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1
-  }
-
-  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const dataEmpleado = {
-      id_empleado: Number(idEmpleado)
-    }
-
-    let noPersonal: boolean = false;
-
-    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
-    this.asignacionesAcceso = res;
-
-    const promises = this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal) {
-        if (!asignacion.administra && !asignacion.personal) {
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        } else if (asignacion.administra && !asignacion.personal) {
-          noPersonal = true;
-        } else if (asignacion.personal && !asignacion.administra) {
-          this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        }
-      }
-
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
-    });
-
-    const results = await Promise.all(promises);
-
-    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    this.idUsuariosAcceso.push(...ids);
-
-    if (noPersonal) {
-      this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleadoLogueado);
-    }
   }
 
   // METODO PARA

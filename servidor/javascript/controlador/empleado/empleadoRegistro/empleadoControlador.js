@@ -1587,6 +1587,7 @@ class EmpleadoControlador {
     }
     CargarPlantilla_Automatico(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const { plantilla, user_name, ip } = req.body;
             const VALOR = yield database_1.default.query(`
       SELECT * FROM e_codigo
@@ -1597,8 +1598,10 @@ class EmpleadoControlador {
                 codigo = codigo_dato = parseInt(codigo_dato);
             }
             var contador = 1;
-            plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                var _a;
+            let ocurrioError = false;
+            let mensajeError = '';
+            let codigoError = 0;
+            for (const data of plantilla) {
                 try {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
@@ -1676,7 +1679,7 @@ class EmpleadoControlador {
           SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
           `, [rol.toUpperCase()]);
                     if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
-                        // INCREMENTAR EL VALOR DEL CÓDIGO
+                        // INCREMENTAR EL VALOR DEL CODIGO
                         codigo = codigo + 1;
                     }
                     else {
@@ -1709,7 +1712,7 @@ class EmpleadoControlador {
                     });
                     // OBTENER EL ID DEL EMPLEADO INGRESADO
                     const id_empleado = empleado.id;
-                    console.log('id ', id_empleado);
+                    //console.log('id ', id_empleado)
                     // REGISTRO DE LOS DATOS DE USUARIO
                     yield database_1.default.query(`
           INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita)
@@ -1778,7 +1781,12 @@ class EmpleadoControlador {
                             console.error('Error al crear las carpetas.');
                         }
                     }
-                    console.log('contador ', contador, ' plantilla ', plantilla.length);
+                    else {
+                        ocurrioError = true;
+                        mensajeError = 'error';
+                        codigoError = 404;
+                        break;
+                    }
                     if (contador === plantilla.length) {
                         // ACTUALIZACION DEL CODIGO
                         if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
@@ -1805,13 +1813,18 @@ class EmpleadoControlador {
                 catch (error) {
                     // REVERTIR TRANSACCION
                     yield database_1.default.query('ROLLBACK');
-                    console.log('error ---- ', error);
-                    //return res.status(500).jsonp({ message: error });
+                    ocurrioError = true;
+                    mensajeError = error;
+                    codigoError = 500;
+                    break;
                 }
-            }));
-            setTimeout(() => {
-                return res.jsonp({ message: 'correcto' });
-            }, 1500);
+            }
+            if (ocurrioError) {
+                res.status(500).jsonp({ message: mensajeError });
+            }
+            else {
+                res.jsonp({ message: 'correcto' });
+            }
         });
     }
     // METODOS PARA VERIFICAR PLANTILLA CON CODIGO INGRESADO DE FORMA MANUAL 
@@ -2219,7 +2232,10 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip } = req.body;
             var contador = 1;
-            plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
+            let ocurrioError = false;
+            let mensajeError = '';
+            let codigoError = 0;
+            for (const data of plantilla) {
                 try {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
@@ -2303,10 +2319,10 @@ class EmpleadoControlador {
                     console.log('longitud: ', _longitud, ' latitud: ', _latitud)*/
                     // REGISTRO DE NUEVO EMPLEADO
                     const response = yield database_1.default.query(`
-        INSERT INTO eu_empleados ( cedula, apellido, nombre, estado_civil, genero, correo,
-          fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
-        `, [cedula, apellidoE, nombreE,
+          INSERT INTO eu_empleados ( cedula, apellido, nombre, estado_civil, genero, correo,
+            fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
+          `, [cedula, apellidoE, nombreE,
                         id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
                         domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
                     const [empleado] = response.rows;
@@ -2321,7 +2337,9 @@ class EmpleadoControlador {
                         observacion: null
                     });
                     // OBTENER EL ID DEL EMPLEADO INGRESADO
-                    const oneEmpley = yield database_1.default.query('SELECT id FROM eu_empleados WHERE cedula = $1', [cedula]);
+                    const oneEmpley = yield database_1.default.query(`
+          SELECT id FROM eu_empleados WHERE cedula = $1
+          `, [cedula]);
                     const id_empleado = oneEmpley.rows[0].id;
                     // REGISTRO DE LOS DATOS DE USUARIO
                     yield database_1.default.query(`
@@ -2391,6 +2409,12 @@ class EmpleadoControlador {
                             console.error('Error al crear las carpetas.');
                         }
                     }
+                    else {
+                        ocurrioError = true;
+                        mensajeError = 'error';
+                        codigoError = 404;
+                        break;
+                    }
                     if (contador === plantilla.length) {
                         // ACTUALIZACIÓN DEL CÓDIGO
                         yield database_1.default.query(`
@@ -2415,9 +2439,18 @@ class EmpleadoControlador {
                 catch (error) {
                     // REVERTIR TRANSACCION
                     yield database_1.default.query('ROLLBACK');
-                    return res.status(500).jsonp({ message: error });
+                    ocurrioError = true;
+                    mensajeError = error;
+                    codigoError = 500;
+                    break;
                 }
-            }));
+            }
+            if (ocurrioError) {
+                res.status(500).jsonp({ message: mensajeError });
+            }
+            else {
+                res.jsonp({ message: 'correcto' });
+            }
         });
     }
     /** **************************************************************************************** **

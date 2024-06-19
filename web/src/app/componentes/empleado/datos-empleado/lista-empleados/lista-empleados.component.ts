@@ -107,7 +107,6 @@ export class ListaEmpleadosComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-    this.asignaciones.ObtenerEstado();
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
 
     this.GetEmpleados();

@@ -386,7 +386,6 @@ export class AsignarUsuarioComponent implements OnInit {
 
     const asignacion = usuario.asignaciones?.find((a: any) => a.id_departamento === datos.id_departamento);
 
-
     if (!asignacion) return 1;
 
     if (asignacion.principal) {
@@ -504,10 +503,9 @@ export class AsignarUsuarioComponent implements OnInit {
         if (usuarioIndex !== -1) {
           this.usuarios[usuarioIndex].asignaciones = datos.asignaciones;
         }
-          await this.asignacionesService.ObtenerAsignacionesUsuario(this.idEmpleado);
       }
-    }
-    );
+      await this.asignacionesService.ObtenerAsignacionesUsuario(this.idEmpleado);
+    });
   }
 
 

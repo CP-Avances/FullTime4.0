@@ -1782,9 +1782,13 @@ class EmpleadoControlador {
     if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
       codigo = codigo_dato = parseInt(codigo_dato);
     }
-    var contador = 1;
 
-    plantilla.forEach(async (data: any) => {
+    var contador = 1;
+    let ocurrioError = false;
+    let mensajeError = '';
+    let codigoError = 0;
+
+    for (const data of plantilla) {
       try {
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
@@ -1880,7 +1884,7 @@ class EmpleadoControlador {
           , [rol.toUpperCase()]);
 
         if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
-          // INCREMENTAR EL VALOR DEL CÓDIGO
+          // INCREMENTAR EL VALOR DEL CODIGO
           codigo = codigo + 1;
         } else {
           codigo = cedula;
@@ -1919,7 +1923,7 @@ class EmpleadoControlador {
 
         // OBTENER EL ID DEL EMPLEADO INGRESADO
         const id_empleado = empleado.id;
-        console.log('id ', id_empleado)
+        //console.log('id ', id_empleado)
         // REGISTRO DE LOS DATOS DE USUARIO
         await pool.query(
           `
@@ -1996,7 +2000,13 @@ class EmpleadoControlador {
             console.error('Error al crear las carpetas.');
           }
         }
-        console.log('contador ', contador, ' plantilla ', plantilla.length)
+        else {
+          ocurrioError = true;
+          mensajeError = 'error';
+          codigoError = 404;
+          break;
+        }
+
         if (contador === plantilla.length) {
           // ACTUALIZACION DEL CODIGO
           if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
@@ -2026,13 +2036,18 @@ class EmpleadoControlador {
       } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
-        console.log('error ---- ', error)
-        //return res.status(500).jsonp({ message: error });
+        ocurrioError = true;
+        mensajeError = error;
+        codigoError = 500;
+        break;
       }
-    });
-    setTimeout(() => {
-      return res.jsonp({ message: 'correcto' });
-    }, 1500)
+    }
+
+    if (ocurrioError) {
+      res.status(500).jsonp({ message: mensajeError });
+    } else {
+      res.jsonp({ message: 'correcto' });
+    }
   }
 
   // METODOS PARA VERIFICAR PLANTILLA CON CODIGO INGRESADO DE FORMA MANUAL 
@@ -2438,11 +2453,15 @@ class EmpleadoControlador {
     }
   }
 
-  public async CargarPlantilla_Manual(req: Request, res: Response): Promise<void> {
+  public async CargarPlantilla_Manual(req: Request, res: Response): Promise<any> {
     const { plantilla, user_name, ip } = req.body
-    var contador = 1;
 
-    plantilla.forEach(async (data: any) => {
+    var contador = 1;
+    let ocurrioError = false;
+    let mensajeError = '';
+    let codigoError = 0;
+
+    for (const data of plantilla) {
       try {
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
@@ -2544,10 +2563,10 @@ class EmpleadoControlador {
         // REGISTRO DE NUEVO EMPLEADO
         const response: QueryResult = await pool.query(
           `
-        INSERT INTO eu_empleados ( cedula, apellido, nombre, estado_civil, genero, correo,
-          fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
-        `
+          INSERT INTO eu_empleados ( cedula, apellido, nombre, estado_civil, genero, correo,
+            fecha_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
+          `
           , [cedula, apellidoE, nombreE,
             id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
             domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
@@ -2566,7 +2585,11 @@ class EmpleadoControlador {
         });
 
         // OBTENER EL ID DEL EMPLEADO INGRESADO
-        const oneEmpley = await pool.query('SELECT id FROM eu_empleados WHERE cedula = $1', [cedula]);
+        const oneEmpley = await pool.query(
+          `
+          SELECT id FROM eu_empleados WHERE cedula = $1
+          `
+          , [cedula]);
         const id_empleado = oneEmpley.rows[0].id;
 
         // REGISTRO DE LOS DATOS DE USUARIO
@@ -2646,6 +2669,12 @@ class EmpleadoControlador {
           }
 
         }
+        else {
+          ocurrioError = true;
+          mensajeError = 'error';
+          codigoError = 404;
+          break;
+        }
 
         if (contador === plantilla.length) {
           // ACTUALIZACIÓN DEL CÓDIGO
@@ -2675,9 +2704,17 @@ class EmpleadoControlador {
       } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
-        return res.status(500).jsonp({ message: error });
+        ocurrioError = true;
+        mensajeError = error;
+        codigoError = 500;
+        break;
       }
-    });
+    }
+    if (ocurrioError) {
+      res.status(500).jsonp({ message: mensajeError });
+    } else {
+      res.jsonp({ message: 'correcto' });
+    }
   }
 
   /** **************************************************************************************** **

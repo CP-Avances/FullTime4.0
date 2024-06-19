@@ -14,16 +14,16 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 moment.locale("es");
 
 // LLAMADO DE SERVICIOS
-import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
 import { EmpleadoProcesosService } from "src/app/servicios/empleado/empleadoProcesos/empleado-procesos.service";
-import { AccionPersonalService } from "src/app/servicios/accionPersonal/accion-personal.service";
-import { ValidacionesService } from "src/app/servicios/validaciones/validaciones.service";
-import { EmplCargosService } from "src/app/servicios/empleado/empleadoCargo/empl-cargos.service";
-import { ParametrosService } from "src/app/servicios/parametrosGenerales/parametros.service";
-import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
-import { EmpresaService } from "src/app/servicios/catalogos/catEmpresa/empresa.service";
+import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
 import { MainNavService } from "src/app/componentes/administracionGeneral/main-nav/main-nav.service";
-import { firstValueFrom } from "rxjs";
+import { AccionPersonalService } from "src/app/servicios/accionPersonal/accion-personal.service";
+import { EmplCargosService } from "src/app/servicios/empleado/empleadoCargo/empl-cargos.service";
+import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
+import { ParametrosService } from "src/app/servicios/parametrosGenerales/parametros.service";
+import { ValidacionesService } from "src/app/servicios/validaciones/validaciones.service";
+import { AsignacionesService } from "src/app/servicios/asignaciones/asignaciones.service";
+import { EmpresaService } from "src/app/servicios/catalogos/catEmpresa/empresa.service";
 import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
 
 @Component({
@@ -57,7 +57,6 @@ export class ListarPedidoAccionComponent implements OnInit {
   decreto: string[];
   tipoAccion: string[];
 
-  asignacionesAcceso: any;
   idUsuariosAcceso: any = [];
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
@@ -90,6 +89,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     private validar: ValidacionesService,
     private funciones: MainNavService,
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem("empleado") as string);
   }
@@ -104,6 +104,8 @@ export class ListarPedidoAccionComponent implements OnInit {
       };
       return this.validar.RedireccionarHomeAdmin(mensaje);
     } else {
+      this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
       this.ObtenerLogo();
       this.ObtenerEmpresa();
       this.VerDatosAcciones();
@@ -180,9 +182,8 @@ export class ListarPedidoAccionComponent implements OnInit {
 
   //DATOS ACCIONES
   listaPedidos: any = [];
-  async VerDatosAcciones() {
+  VerDatosAcciones() {
     this.listaPedidos = [];
-    await this.ObtenerAsignacionesUsuario(this.idEmpleado);
     this.restAccion.BuscarDatosPedido().subscribe((data) => {
       this.listaPedidos = this.FiltrarEmpleadosAsignados(data);
       this.FormatearDatos(
@@ -191,45 +192,6 @@ export class ListarPedidoAccionComponent implements OnInit {
         this.formato_hora
       );
     });
-  }
-
-  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const dataEmpleado = {
-      id_empleado: Number(idEmpleado)
-    }
-
-    let noPersonal: boolean = false;
-
-    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
-    this.asignacionesAcceso = res;
-
-    const promises = this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal) {
-        if (!asignacion.administra && !asignacion.personal) {
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        } else if (asignacion.administra && !asignacion.personal) {
-          noPersonal = true;
-        } else if (asignacion.personal && !asignacion.administra) {
-          this.idUsuariosAcceso.push(this.idEmpleado);
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        }
-      }
-
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
-    });
-
-    const results = await Promise.all(promises);
-
-    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    this.idUsuariosAcceso.push(...ids);
-
-    if (noPersonal) {
-      this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleado);
-    }
   }
 
   // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
