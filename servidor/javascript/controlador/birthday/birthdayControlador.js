@@ -72,8 +72,8 @@ class BirthdayControlador {
     }
     // METODO PARA CARGAR MENSAJE DE CUMPLEANIOS    --**VERIFICADO
     CrearImagenEmpleado(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
             try {
                 // FECHA DEL SISTEMA
                 var fecha = (0, moment_1.default)();

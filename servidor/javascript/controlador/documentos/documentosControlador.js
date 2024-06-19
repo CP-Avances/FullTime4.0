@@ -168,8 +168,8 @@ class DocumentosControlador {
     }
     // METODO PARA REGISTRAR UN DOCUMENTO    --**VERIFICADO
     CrearDocumento(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
             try {
                 // TODO ANALIZAR COMOOBTENER USER_NAME E IP DESDE EL FRONT
                 const { user_name, ip } = req.body;

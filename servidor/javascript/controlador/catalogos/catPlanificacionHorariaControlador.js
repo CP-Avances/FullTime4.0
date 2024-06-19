@@ -22,8 +22,8 @@ const moment_1 = __importDefault(require("moment"));
 class PlanificacionHorariaControlador {
     //METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA
     VerificarDatosPlanificacionHoraria(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;

@@ -261,8 +261,8 @@ class FeriadosControlador {
     */
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
     RevisarDatos(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
