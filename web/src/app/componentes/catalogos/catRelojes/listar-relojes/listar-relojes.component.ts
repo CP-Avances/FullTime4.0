@@ -19,15 +19,16 @@ import { RelojesComponent } from 'src/app/componentes/catalogos/catRelojes/reloj
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableDispositivos } from 'src/app/model/reportes.model';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { firstValueFrom } from 'rxjs';
+
 
 @Component({
   selector: 'app-listar-relojes',
@@ -48,7 +49,6 @@ export class ListarRelojesComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
-  asignacionesAcceso: any;
   idDepartamentosAcceso: any = [];
 
   listar_relojes: boolean = true;
@@ -98,6 +98,7 @@ export class ListarRelojesComponent implements OnInit {
     private rest: RelojesService,
     private toastr: ToastrService,
     private restUsuario: UsuarioService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -105,6 +106,7 @@ export class ListarRelojesComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
@@ -113,40 +115,11 @@ export class ListarRelojesComponent implements OnInit {
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
-  async ObtenerEmpleados(idemploy: any) {
+  ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
-    await this.ObtenerAsignacionesUsuario(this.idEmpleado);
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
       this.empleado = data;
     })
-  }
-
-  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const dataEmpleado = {
-      id_empleado: Number(idEmpleado)
-    }
-
-    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
-    this.asignacionesAcceso = res;
-
-    const promises = this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal) {
-        if (!asignacion.administra ) {
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        }
-      }
-
-      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
-
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
-    });
-
-    await Promise.all(promises);
-
   }
 
   // METODO PARA OBTENER EL LOGO DE LA EMPRESA
