@@ -17,7 +17,11 @@ export class AsignacionesService {
   }
 
   async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    console.log("idEmpleado", idEmpleado);
+
+    this.asignacionesAcceso = [];
+    this.idDepartamentosAcceso = [];
+    this.idSucursalesAcceso = [];
+    this.idUsuariosAcceso = [];
 
     const dataEmpleado = {
       id_empleado: Number(idEmpleado)
@@ -53,17 +57,11 @@ export class AsignacionesService {
     const results = await Promise.all(promises);
 
     const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    console.log("ids", ids);
     this.idUsuariosAcceso = [...new Set([...this.idUsuariosAcceso, ...ids])];
 
     if (noPersonal) {
-      console.log("noPersonal", noPersonal);
       this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id != idEmpleado);
     }
-
-    console.log("this.idDepartamentosAcceso", this.idDepartamentosAcceso);
-    console.log("sucursales",this.idSucursalesAcceso);
-    console.log("usuarios",this.idUsuariosAcceso);
 
     this.GuardarEstado();
 
@@ -78,6 +76,6 @@ export class AsignacionesService {
   ObtenerEstado() {
     this.idDepartamentosAcceso = JSON.parse(localStorage.getItem('idDepartamentosAcceso') || '[]');
     this.idSucursalesAcceso = JSON.parse(localStorage.getItem('idSucursalesAcceso') || '[]');
-    this.idUsuariosAcceso = JSON.parse(localStorage.getItem('idUsuariosAcceso') || '[]');
+    this.idUsuariosAcceso = JSON.parse(localStorage.getItem('idUsuariosAcceso') || '[]');;
   }
 }
