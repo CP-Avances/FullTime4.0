@@ -50,6 +50,9 @@ export class ListaEmpleadosComponent implements OnInit {
   empleado: any = [];
   idUsuariosAcceso: any = [];  // VARIABLE DE ALMACENAMIENTO DE IDs DE USUARIOS A LOS QUE TIENE ACCESO EL USURIO QUE INICIO SESION
 
+  mostarTabla: boolean = false;
+
+
   // CAMPOS DEL FORMULARIO
   apellido = new FormControl('', [Validators.minLength(2)]);
   codigo = new FormControl('');
@@ -403,6 +406,7 @@ export class ListaEmpleadosComponent implements OnInit {
       this.OrdenarDatos(this.empleado);
       this.desactivados = desactivados;
       this.OrdenarDatos(this.desactivados);
+      this.mostarTabla = true;
     });
   }
 
