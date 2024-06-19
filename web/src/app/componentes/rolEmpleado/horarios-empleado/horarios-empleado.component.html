@@ -185,7 +185,7 @@
 <div class="container" style="padding-bottom: 25px;" *ngIf="ver_tabla_horarios">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
-            <i class="fa fa-pencil-square-o float-right" aria-hidden="true" id="activar_editar"
+            <i class="fa fa-pencil-square-o float-right" aria-hidden="false" id="activar_editar"
                 *ngIf="ver_activar_editar" (click)="ActivarEditarHorario()">
             </i>
             <span class="w-100 bd-highlight">
@@ -244,7 +244,7 @@
                                 [ngStyle]="{'background':CambiarColores(h.color)}">{{h.mes}}</td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 1 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 1, h.dia1, h.index)">
                                 </i>
@@ -256,7 +256,7 @@
                             </td>
                             <td id="td_horarios" style="white-space: pre;"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 2 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 2, h.dia2, h.index)">
                                 </i>
@@ -268,7 +268,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 3 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 3, h.dia3, h.index)">
                                 </i>
@@ -280,7 +280,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 4 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 4, h.dia4, h.index)">
                                 </i>
@@ -292,7 +292,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 5 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 5, h.dia5, h.index)">
                                 </i>
@@ -304,7 +304,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 6 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 6, h.dia6, h.index)">
                                 </i>
@@ -316,7 +316,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 7 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 7, h.dia7, h.index)">
                                 </i>
@@ -328,7 +328,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 8 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 8, h.dia8, h.index)">
                                 </i>
@@ -340,7 +340,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 9 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 9, h.dia9, h.index)">
                                 </i>
@@ -352,7 +352,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 10 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 10, h.dia10, h.index)">
                                 </i>
@@ -364,7 +364,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 11 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 11, h.dia11, h.index)">
                                 </i>
@@ -376,7 +376,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 12 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 12, h.dia12, h.index)">
                                 </i>
@@ -388,7 +388,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 13 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 13, h.dia13, h.index)">
                                 </i>
@@ -400,7 +400,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 14 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 14, h.dia14, h.index)">
                                 </i>
@@ -412,7 +412,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 15 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 15, h.dia15, h.index)">
                                 </i>
@@ -421,7 +421,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 16 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 16, h.dia16, h.index)">
                                 </i>
@@ -433,7 +433,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 17 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 17, h.dia17, h.index)">
                                 </i>
@@ -445,7 +445,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 18 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 18, h.dia18, h.index)">
                                 </i>
@@ -457,7 +457,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 19 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 19, h.dia19, h.index)">
                                 </i>
@@ -469,7 +469,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 20 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 20, h.dia20, h.index)">
                                 </i>
@@ -481,7 +481,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 21 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 21, h.dia21, h.index)">
                                 </i>
@@ -493,7 +493,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 22 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 22, h.dia22, h.index)">
                                 </i>
@@ -505,7 +505,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 23 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 23, h.dia23, h.index)">
                                 </i>
@@ -517,7 +517,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 24 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 24, h.dia24, h.index)">
                                 </i>
@@ -529,7 +529,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 25 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 25, h.dia25, h.index)">
                                 </i>
@@ -541,7 +541,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 26 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 26, h.dia26, h.index)">
                                 </i>
@@ -553,7 +553,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 27 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 27, h.dia27, h.index)">
                                 </i>
@@ -565,7 +565,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 28 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 28, h.dia28, h.index)">
                                 </i>
@@ -577,7 +577,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 29 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 29, h.dia29, h.index)">
                                 </i>
@@ -589,7 +589,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 30 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 30, h.dia30, h.index)">
                                 </i>
@@ -601,7 +601,7 @@
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 31 ? '#9CF7B9' : '' }">
-                                <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 31, h.dia31, h.index)">
                                 </i>

@@ -1252,7 +1252,7 @@ class EmpleadoControlador {
         });
     }
     /** **************************************************************************************** **
-     ** **                      CARGAR INFORMACIÓN MEDIANTE PLANTILLA                            **
+     ** **                      CARGAR INFORMACION MEDIANTE PLANTILLA                            **
      ** **************************************************************************************** **/
     VerificarPlantilla_Automatica(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
