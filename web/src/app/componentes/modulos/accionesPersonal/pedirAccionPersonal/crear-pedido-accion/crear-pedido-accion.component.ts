@@ -18,6 +18,7 @@ import { ProcesoService } from "src/app/servicios/catalogos/catProcesos/proceso.
 import { MainNavService } from "src/app/componentes/administracionGeneral/main-nav/main-nav.service";
 import { CiudadService } from "src/app/servicios/ciudad/ciudad.service";
 import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
+import { AsignacionesService } from "src/app/servicios/asignaciones/asignaciones.service";
 
 @Component({
   selector: "app-crear-pedido-accion",
@@ -145,7 +146,6 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   // INICIACION DE VARIABLES
   idEmpleadoLogueado: any;
-  asignacionesAcceso: any;
   idUsuariosAcceso: any = [];
 
   empleados: any = [];
@@ -167,7 +167,8 @@ export class CrearPedidoAccionComponent implements OnInit {
     public restC: CiudadService,
     public router: Router,
     private funciones: MainNavService,
-    private validar: ValidacionesService
+    private validar: ValidacionesService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem("empleado") as string);
     this.departamento = parseInt(localStorage.getItem("departamento") as string);
@@ -186,6 +187,9 @@ export class CrearPedidoAccionComponent implements OnInit {
       };
       return this.validar.RedireccionarHomeAdmin(mensaje);
     } else {
+
+      this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
       // INICIALIZACION DE FECHA Y MOSTRAR EN FORMULARIO
       var f = moment();
       this.FechaActual = f.format("YYYY-MM-DD");
@@ -358,9 +362,8 @@ export class CrearPedidoAccionComponent implements OnInit {
   }
 
   // METODO PARA OBTENER LISTA DE EMPLEADOS
-  async ObtenerEmpleados() {
+  ObtenerEmpleados() {
     this.empleados = [];
-    await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
     this.restE.BuscarListaEmpleados().subscribe((data) => {
       this.empleados = this.FiltrarEmpleadosAsignados(data);
       this.seleccionarEmpleados = "";
@@ -368,45 +371,6 @@ export class CrearPedidoAccionComponent implements OnInit {
       this.seleccionEmpleadoG = "";
       this.seleccionarEmpResponsable = "";
     });
-  }
-
-  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const dataEmpleado = {
-      id_empleado: Number(idEmpleado)
-    }
-
-    let noPersonal: boolean = false;
-
-    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
-    this.asignacionesAcceso = res;
-
-    const promises = this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal) {
-        if (!asignacion.administra && !asignacion.personal) {
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        } else if (asignacion.administra && !asignacion.personal) {
-          noPersonal = true;
-        } else if (asignacion.personal && !asignacion.administra) {
-          this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        }
-      }
-
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
-    });
-
-    const results = await Promise.all(promises);
-
-    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    this.idUsuariosAcceso.push(...ids);
-
-    if (noPersonal) {
-      this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleadoLogueado);
-    }
   }
 
   // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
