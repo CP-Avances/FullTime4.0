@@ -85,7 +85,7 @@ class FeriadosControlador {
         });
     }
     // METODO PARA CREAR REGISTRO DE FERIADO
-    CrearFeriados(req, res) {
+    CrearFeriados1(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fecha, descripcion, fec_recuperacion, user_name, ip } = req.body;
@@ -99,35 +99,45 @@ class FeriadosControlador {
                     return res.jsonp({ message: 'existe', status: '300' });
                 }
                 else {
-                    const response = yield database_1.default.query(`
+                    yield database_1.default.query(`
                     INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
                     VALUES ($1, $2, $3) RETURNING *
-                    `, [fecha, descripcion, fec_recuperacion]);
-                    const [feriado] = response.rows;
-                    var fecha_formato_hora = yield (0, settingsMail_1.FormatearHora)(fecha.toLocaleString().split('T')[1]);
-                    var fecha_formato = yield (0, settingsMail_1.FormatearFecha)(fecha.toLocaleString(), 'ddd');
-                    var fec_recuperacion_formato_hora = yield (0, settingsMail_1.FormatearHora)(fec_recuperacion.toLocaleString().split('T')[1]);
-                    var fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha)(fec_recuperacion.toLocaleString(), 'ddd');
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'ef_cat_feriados',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        //datosNuevos: JSON.stringify(feriado),
-                        datosNuevos: `{fecha: ${fecha_formato + ' ' + fecha_formato_hora}, 
+                    `, [fecha, descripcion, fec_recuperacion], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                        // const [feriado] = response.rows;
+                        var fecha_formato_hora = yield (0, settingsMail_1.FormatearHora)(fecha.toLocaleString().split('T')[1]);
+                        var fecha_formato = yield (0, settingsMail_1.FormatearFecha)(fecha.toLocaleString(), 'ddd');
+                        var fec_recuperacion_formato_hora = '';
+                        var fec_recuperacion_formato = '';
+                        if (fec_recuperacion) {
+                            var fec_recuperacion_formato_hora = yield (0, settingsMail_1.FormatearHora)(fec_recuperacion.split('T')[1]);
+                            var fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha)(fec_recuperacion, 'ddd');
+                        }
+                        // var fec_recuperacion_formato_hora = await FormatearHora(fec_recuperacion.split('T')[1])
+                        var fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha)(fec_recuperacion, 'ddd');
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'ef_cat_feriados',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            //datosNuevos: JSON.stringify(feriado),
+                            datosNuevos: `{fecha: ${fecha_formato + ' ' + fecha_formato_hora}, 
                             descripcion: ${descripcion}, fecha_recuperacion: ${fec_recuperacion_formato + ' ' + fec_recuperacion_formato_hora}} `,
-                        ip,
-                        observacion: null
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    if (feriado) {
-                        return res.status(200).jsonp(feriado);
-                    }
-                    else {
-                        return res.status(404).jsonp({ message: 'error' });
-                    }
+                            ip,
+                            observacion: null
+                        });
+                        yield database_1.default.query('COMMIT');
+                        res.status(200).jsonp({ message: 'Registro guardado.' });
+                    }));
+                    return res.status(500).jsonp({ message: 'Ups!!! algo ha salido mal.' });
+                    /*
+                                    if (feriado) {
+                                        return res.status(200).jsonp(feriado);
+                                    }
+                                    else {
+                                        return res.status(404).jsonp({ message: 'error' });
+                                    }
+                                        */
                 }
             }
             catch (error) {
@@ -150,6 +160,53 @@ class FeriadosControlador {
             }
             else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+        });
+    }
+    // METODO PARA CREAR REGISTRO DE FERIADO
+    CrearFeriados(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { fecha, descripcion, fec_recuperacion, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const busqueda = yield database_1.default.query(`
+                SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1
+                `, [descripcion.toUpperCase()]);
+                const [nombres] = busqueda.rows;
+                if (nombres) {
+                    return res.jsonp({ message: 'existe', status: '300' });
+                }
+                else {
+                    const response = yield database_1.default.query(`
+                    INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
+                    VALUES ($1, $2, $3) RETURNING *
+                    `, [fecha, descripcion, fec_recuperacion]);
+                    const [feriado] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ef_cat_feriados',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(feriado),
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    if (feriado) {
+                        return res.status(200).jsonp(feriado);
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'error' });
+                    }
+                }
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }

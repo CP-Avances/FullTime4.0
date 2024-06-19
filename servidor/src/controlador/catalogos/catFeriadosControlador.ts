@@ -85,7 +85,8 @@ class FeriadosControlador {
     }
 
     // METODO PARA CREAR REGISTRO DE FERIADO
-    public async CrearFeriados(req: Request, res: Response): Promise<Response> {
+    
+    public async CrearFeriados1(req: Request, res: Response): Promise<Response> {
         try {
             const { fecha, descripcion, fec_recuperacion, user_name, ip } = req.body;
 
@@ -96,7 +97,7 @@ class FeriadosControlador {
                 `
                 SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1
                 `
-                , [descripcion.toUpperCase()]);
+                , [descripcion.toUpperCase()],);
 
             const [nombres] = busqueda.rows;
 
@@ -104,45 +105,56 @@ class FeriadosControlador {
                 return res.jsonp({ message: 'existe', status: '300' });
             }
             else {
-                
-                const response: QueryResult = await pool.query(
+
+                await pool.query(
                     `
                     INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
                     VALUES ($1, $2, $3) RETURNING *
                     `
-                    , [fecha, descripcion, fec_recuperacion]);
+                    , [fecha, descripcion, fec_recuperacion],
 
-                const [feriado] = response.rows;
+                    async (error, results) => {
+                        // const [feriado] = response.rows;
 
-                var fecha_formato_hora =await FormatearHora(fecha.toLocaleString().split('T')[1])
-                var fecha_formato= await FormatearFecha(fecha.toLocaleString(), 'ddd')
-                
-                var fec_recuperacion_formato_hora =await FormatearHora(fec_recuperacion.toLocaleString().split('T')[1])
-                var fec_recuperacion_formato= await FormatearFecha(fec_recuperacion.toLocaleString(), 'ddd')
-                
+                        var fecha_formato_hora = await FormatearHora(fecha.toLocaleString().split('T')[1])
+                        var fecha_formato = await FormatearFecha(fecha.toLocaleString(), 'ddd')
 
-                // AUDITORIA
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'ef_cat_feriados',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    //datosNuevos: JSON.stringify(feriado),
-                    datosNuevos: `{fecha: ${fecha_formato+ ' '+fecha_formato_hora}, 
-                            descripcion: ${descripcion}, fecha_recuperacion: ${fec_recuperacion_formato + ' '+ fec_recuperacion_formato_hora}} `,
-                    ip,
-                    observacion: null
-                });
 
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
+                        var fec_recuperacion_formato_hora ='';
+                        var fec_recuperacion_formato = '';
+                        if(fec_recuperacion){
+                            var fec_recuperacion_formato_hora = await FormatearHora(fec_recuperacion.split('T')[1])
+                            var fec_recuperacion_formato = await FormatearFecha(fec_recuperacion, 'ddd')
+                        }
 
-                if (feriado) {
-                    return res.status(200).jsonp(feriado);
-                }
-                else {
-                    return res.status(404).jsonp({ message: 'error' });
-                }
+                       // var fec_recuperacion_formato_hora = await FormatearHora(fec_recuperacion.split('T')[1])
+                        var fec_recuperacion_formato = await FormatearFecha(fec_recuperacion, 'ddd')
+                        // AUDITORIA
+                        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                            tabla: 'ef_cat_feriados',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            //datosNuevos: JSON.stringify(feriado),
+                            datosNuevos: `{fecha: ${fecha_formato + ' ' + fecha_formato_hora}, 
+                            descripcion: ${descripcion}, fecha_recuperacion: ${fec_recuperacion_formato + ' ' + fec_recuperacion_formato_hora}} `,
+                            ip,
+                            observacion: null
+                        });
+                        await pool.query('COMMIT');
+                        res.status(200).jsonp({ message: 'Registro guardado.' });
+                    }
+                );
+                return res.status(500).jsonp({ message: 'Ups!!! algo ha salido mal.' });
+
+                /*
+                                if (feriado) {
+                                    return res.status(200).jsonp(feriado);
+                                }
+                                else {
+                                    return res.status(404).jsonp({ message: 'error' });
+                                }
+                                    */
             }
         }
         catch (error) {
@@ -167,6 +179,65 @@ class FeriadosControlador {
         }
         else {
             return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+        }
+    }
+
+
+     // METODO PARA CREAR REGISTRO DE FERIADO
+     public async CrearFeriados(req: Request, res: Response): Promise<Response> {
+        try {
+            const { fecha, descripcion, fec_recuperacion, user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            const busqueda: QueryResult = await pool.query(
+                `
+                SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1
+                `
+                , [descripcion.toUpperCase()]);
+
+            const [nombres] = busqueda.rows;
+
+            if (nombres) {
+                return res.jsonp({ message: 'existe', status: '300' });
+            }
+            else {
+                const response: QueryResult = await pool.query(
+                    `
+                    INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
+                    VALUES ($1, $2, $3) RETURNING *
+                    `
+                    , [fecha, descripcion, fec_recuperacion]);
+
+                const [feriado] = response.rows;
+
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'ef_cat_feriados',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(feriado),
+                    ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
+                if (feriado) {
+                    return res.status(200).jsonp(feriado);
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+            }
+        }
+        catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
         }
     }
 
