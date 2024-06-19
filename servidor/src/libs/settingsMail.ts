@@ -137,6 +137,22 @@ export const FormatearFecha = async function (fecha: string, dia: string) {
   return valor;
 }
 
+export const FormatearFecha2 = async function (fecha: string, dia: string) {
+  let formato = await BuscarFecha();
+
+  let diaFormateado = moment(fecha).format(dia);
+    // Limpia el día formateado de puntos no deseados
+    diaFormateado = diaFormateado.replace('.', '');
+    // Asegúrate de que la primera letra esté en mayúscula
+    diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+
+    let fechaFormateada = moment(fecha).format(formato.fecha);
+
+    let valor = `${diaFormateado}, ${fechaFormateada}`;
+
+  return valor;
+}
+
 export const FormatearHora = async function (hora: string) {
   let formato = await BuscarHora();
   let valor = moment(hora, 'HH:mm:ss').format(formato.hora);

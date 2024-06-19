@@ -8,6 +8,8 @@ import excel from 'xlsx';
 import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
+import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
+
 
 class FeriadosControlador {
 
@@ -102,6 +104,7 @@ class FeriadosControlador {
                 return res.jsonp({ message: 'existe', status: '300' });
             }
             else {
+                
                 const response: QueryResult = await pool.query(
                     `
                     INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
@@ -111,13 +114,22 @@ class FeriadosControlador {
 
                 const [feriado] = response.rows;
 
+                var fecha_formato_hora =await FormatearHora(fecha.toLocaleString().split('T')[1])
+                var fecha_formato= await FormatearFecha(fecha.toLocaleString(), 'ddd')
+                
+                var fec_recuperacion_formato_hora =await FormatearHora(fec_recuperacion.toLocaleString().split('T')[1])
+                var fec_recuperacion_formato= await FormatearFecha(fec_recuperacion.toLocaleString(), 'ddd')
+                
+
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'ef_cat_feriados',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(feriado),
+                    //datosNuevos: JSON.stringify(feriado),
+                    datosNuevos: `{fecha: ${fecha_formato+ ' '+fecha_formato_hora}, 
+                            descripcion: ${descripcion}, fecha_recuperacion: ${fec_recuperacion_formato + ' '+ fec_recuperacion_formato_hora}} `,
                     ip,
                     observacion: null
                 });
@@ -135,6 +147,8 @@ class FeriadosControlador {
         }
         catch (error) {
             // REVERTIR TRANSACCION
+
+            console.log(error);
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error' });
         }

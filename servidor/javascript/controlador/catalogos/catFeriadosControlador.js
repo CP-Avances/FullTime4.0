@@ -19,6 +19,7 @@ const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const settingsMail_1 = require("../../libs/settingsMail");
 class FeriadosControlador {
     // CONSULTA DE LISTA DE FERIADOS ORDENADOS POR SU DESCRIPCION
     ListarFeriados(req, res) {
@@ -103,13 +104,19 @@ class FeriadosControlador {
                     VALUES ($1, $2, $3) RETURNING *
                     `, [fecha, descripcion, fec_recuperacion]);
                     const [feriado] = response.rows;
+                    var fecha_formato_hora = yield (0, settingsMail_1.FormatearHora)(fecha.toLocaleString().split('T')[1]);
+                    var fecha_formato = yield (0, settingsMail_1.FormatearFecha)(fecha.toLocaleString(), 'ddd');
+                    var fec_recuperacion_formato_hora = yield (0, settingsMail_1.FormatearHora)(fec_recuperacion.toLocaleString().split('T')[1]);
+                    var fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha)(fec_recuperacion.toLocaleString(), 'ddd');
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'ef_cat_feriados',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: JSON.stringify(feriado),
+                        //datosNuevos: JSON.stringify(feriado),
+                        datosNuevos: `{fecha: ${fecha_formato + ' ' + fecha_formato_hora}, 
+                            descripcion: ${descripcion}, fecha_recuperacion: ${fec_recuperacion_formato + ' ' + fec_recuperacion_formato_hora}} `,
                         ip,
                         observacion: null
                     });
@@ -125,6 +132,7 @@ class FeriadosControlador {
             }
             catch (error) {
                 // REVERTIR TRANSACCION
+                console.log(error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }
@@ -261,8 +269,8 @@ class FeriadosControlador {
     */
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
     RevisarDatos(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;

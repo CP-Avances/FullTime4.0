@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BuscarHora = exports.BuscarFecha = exports.FormatearHora = exports.FormatearFecha = exports.dia_completo = exports.dia_abreviado = exports.fechaHora = exports.enviarCorreos = exports.enviarMail = exports.Credenciales = exports.puerto = exports.servidor = exports.cabecera_firma = exports.pie_firma = exports.logo_ = exports.nombre = exports.email = void 0;
+exports.BuscarHora = exports.BuscarFecha = exports.FormatearHora = exports.FormatearFecha2 = exports.FormatearFecha = exports.dia_completo = exports.dia_abreviado = exports.fechaHora = exports.enviarCorreos = exports.enviarMail = exports.Credenciales = exports.puerto = exports.servidor = exports.cabecera_firma = exports.pie_firma = exports.logo_ = exports.nombre = exports.email = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const database_1 = __importDefault(require("../database"));
 const moment_1 = __importDefault(require("moment"));
@@ -25,8 +25,8 @@ exports.pie_firma = process.env.PIEF || '';
 exports.cabecera_firma = process.env.CABECERA || '';
 exports.servidor = process.env.SERVIDOR || '';
 exports.puerto = process.env.PUERTO || '';
-const Credenciales = function (id_empresa, correo = process.env.EMAIL, password = process.env.PASSWORD, empresa = process.env.NOMBRE, img = process.env.LOGO, img_pie = process.env.PIEF, img_cabecera = process.env.CABECERA, port = process.env.PUERTO, host = process.env.SERVIDOR) {
-    return __awaiter(this, void 0, void 0, function* () {
+const Credenciales = function (id_empresa_1) {
+    return __awaiter(this, arguments, void 0, function* (id_empresa, correo = process.env.EMAIL, password = process.env.PASSWORD, empresa = process.env.NOMBRE, img = process.env.LOGO, img_pie = process.env.PIEF, img_cabecera = process.env.CABECERA, port = process.env.PUERTO, host = process.env.SERVIDOR) {
         let credenciales = [];
         credenciales = yield DatosCorreo(id_empresa);
         return credenciales.message;
@@ -137,6 +137,20 @@ const FormatearFecha = function (fecha, dia) {
     });
 };
 exports.FormatearFecha = FormatearFecha;
+const FormatearFecha2 = function (fecha, dia) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let formato = yield (0, exports.BuscarFecha)();
+        let diaFormateado = (0, moment_1.default)(fecha).format(dia);
+        // Limpia el día formateado de puntos no deseados
+        diaFormateado = diaFormateado.replace('.', '');
+        // Asegúrate de que la primera letra esté en mayúscula
+        diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+        let fechaFormateada = (0, moment_1.default)(fecha).format(formato.fecha);
+        let valor = `${diaFormateado}, ${fechaFormateada}`;
+        return valor;
+    });
+};
+exports.FormatearFecha2 = FormatearFecha2;
 const FormatearHora = function (hora) {
     return __awaiter(this, void 0, void 0, function* () {
         let formato = yield (0, exports.BuscarHora)();

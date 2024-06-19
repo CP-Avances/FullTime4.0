@@ -24,14 +24,14 @@ import { ConfirmarCrearCarpetaComponent } from '../confirmar-crearCarpeta/confir
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 // IMPORTAR SERVICIOS
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
-import { EmpleadoElemento } from '../../../../model/empleado.model'
+import { EmpleadoElemento } from '../../../../model/empleado.model';
 
 @Component({
   selector: 'app-lista-empleados',
@@ -204,11 +204,10 @@ export class ListaEmpleadosComponent implements OnInit {
     return `${this.selectionDos.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
+  // METODO PARA CREAR LA CARPETA DEL USUARIO
   CrearCarpeta(opcion: number) {
     let EmpleadosSeleccionados: any;
-
     if (opcion === 1) {
-
       EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
         return {
           id: obj.id,
@@ -248,9 +247,6 @@ export class ListaEmpleadosComponent implements OnInit {
         timeOut: 6000,
       })
     }
-
-
-
   }
 
   // METODO PARA DESHABILITAR USUARIOS
@@ -281,12 +277,12 @@ export class ListaEmpleadosComponent implements OnInit {
         .afterClosed().subscribe(item => {
           if (item === true) {
             this.GetEmpleados();
-            this.btnCheckHabilitar = false;
-            this.btnCheckDeshabilitado = false;
-            this.selectionUno.clear();
-            this.selectionDos.clear();
-            EmpleadosSeleccionados = [];
           };
+          this.btnCheckHabilitar = false;
+          this.btnCheckDeshabilitado = false;
+          this.selectionUno.clear();
+          this.selectionDos.clear();
+          EmpleadosSeleccionados = [];
         });
     }
     else {
@@ -304,27 +300,25 @@ export class ListaEmpleadosComponent implements OnInit {
     })
   }
 
+  // METODO PARA CONSULTAR ADMINISTRACION DE DATOS
   async ObtenerAsignacionesUsuario(idEmpleado: any) {
     const data = {
       id_empleado: Number(idEmpleado)
     }
-
     let noPersonal: boolean = false;
-
     const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(data));
     this.empleadoD.asignaciones = res;
     // VERIFICAMOS SI EXISTEN DATOS DE USUARIOS
     if (this.empleadoD.asignaciones) {
       const promises = this.empleadoD.asignaciones.map((asignacion: any) => {
-
         if (asignacion.principal) {
           if (!asignacion.administra && !asignacion.personal) {
-            return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+            return Promise.resolve(null); // DEVUELVE UNA PROMESA RESUELTA PARA MANTENER LA CONSISTENCIA DE LOS TIPOS DE DATOS
           } else if (asignacion.administra && !asignacion.personal) {
             noPersonal = true;
           } else if (asignacion.personal && !asignacion.administra) {
             this.idUsuariosAcceso.push(this.idEmpleado);
-            return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
+            return Promise.resolve(null); // DEVUELVE UNA PROMESA RESUELTA PARA MANTENER LA CONSISTENCIA DE LOS TIPOS DE DATOS
           }
         }
         const data = {
@@ -332,16 +326,12 @@ export class ListaEmpleadosComponent implements OnInit {
         }
         return firstValueFrom(this.usuario.ObtenerIdUsuariosDepartamento(data));
       });
-
       const results = await Promise.all(promises);
-
       const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
       this.idUsuariosAcceso.push(...ids);
-
       if (noPersonal) {
         this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleado);
       }
-
       this.GetEmpleados();
     }
   }
@@ -398,31 +388,26 @@ export class ListaEmpleadosComponent implements OnInit {
   async GetEmpleados() {
     const res: any = await firstValueFrom(this.datosGenerales.ListarIdInformacionActual());
     const idsEmpleadosActuales = res.map((empleado: any) => empleado.id);
-    console.log('idsEmpleadosActuales', idsEmpleadosActuales);
-
-
+    //console.log('idsEmpleadosActuales', idsEmpleadosActuales);
     const empleadosActivos$ = this.rest.ListarEmpleadosActivos().pipe(
       map((data: any) => data.filter((empleado: any) =>
         this.idUsuariosAcceso.includes(empleado.id) || !idsEmpleadosActuales.includes(empleado.id)
       ))
     );
-
     const empleadosDesactivados$ = this.rest.ListaEmpleadosDesactivados().pipe(
       map((data: any) => data.filter((empleado: any) =>
         this.idUsuariosAcceso.includes(empleado.id) || !idsEmpleadosActuales.includes(empleado.id)
       ))
     );
-
     forkJoin([empleadosActivos$, empleadosDesactivados$]).subscribe(([empleados, desactivados]) => {
       this.empleado = empleados;
       this.OrdenarDatos(this.empleado);
-
       this.desactivados = desactivados;
       this.OrdenarDatos(this.desactivados);
     });
   }
 
-  // ORDENAR LOS DATOS SEGUN EL  CODIGO
+  // ORDENAR LOS DATOS SEGUN EL CODIGO
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
       if (parseInt(a.codigo) < parseInt(b.codigo)) {
@@ -458,8 +443,6 @@ export class ListaEmpleadosComponent implements OnInit {
     });
   }
 
-
-
   /** ************************************************************************* **
    ** **               METODOS Y VARIABLES PARA SUBIR PLANTILLA              ** **
    ** ************************************************************************* **/
@@ -478,9 +461,9 @@ export class ListaEmpleadosComponent implements OnInit {
     let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
-        console.log('itemName: ', itemName)
+        //console.log('itemName: ', itemName)
         if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
-          console.log('entra_automatico');
+          //console.log('entra_automatico');
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;
           this.VerificarPlantillaAutomatico();
@@ -495,9 +478,9 @@ export class ListaEmpleadosComponent implements OnInit {
         }
       }
       else {
-        console.log('itemName: ', itemName)
+        //console.log('itemName: ', itemName)
         if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
-          console.log('entra_manual');
+          //console.log('entra_manual');
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;
           this.VerificarPlantillaManual();
@@ -518,11 +501,11 @@ export class ListaEmpleadosComponent implements OnInit {
       this.archivoForm.reset();
       this.nameFile = '';
     }
-
     this.archivoForm.reset();
     this.mostrarbtnsubir = true;
   }
 
+  // METODO PARA VERIFICAR PLANTILLA MODO CODIGO AUTOMATICO
   DataEmpleados: any;
   listUsuariosCorrectas: any = [];
   messajeExcel: string = '';
@@ -532,11 +515,9 @@ export class ListaEmpleadosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-
     this.progreso = true;
-
     this.rest.verificarArchivoExcel_Automatico(formData).subscribe(res => {
-      console.log('plantilla 1', res);
+      //console.log('plantilla 1', res);
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
 
@@ -553,7 +534,7 @@ export class ListaEmpleadosComponent implements OnInit {
         });
       }
     }, error => {
-      console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ', error);
+      //console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ', error);
       this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
@@ -562,16 +543,9 @@ export class ListaEmpleadosComponent implements OnInit {
       this.progreso = false;
     });
 
-    /*
-    if (this.datosCodigo[0].automatico === true) {
-      this.ArchivoAutomatico(formData);
-    }
-    else {
-      this.ArchivoManual(formData);
-    }
-    */
   }
 
+  // METODO PARA VERIFICAR LA PLANTILLA CON CODIGO MODO MANUAL
   datosManuales: boolean = false;
   VerificarPlantillaManual() {
     this.listUsuariosCorrectas = [];
@@ -580,11 +554,9 @@ export class ListaEmpleadosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-
     this.progreso = true;
-
     this.rest.verificarArchivoExcel_Manual(formData).subscribe(res => {
-      console.log('plantilla manual', res);
+      //console.log('plantilla manual', res);
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
       if (this.messajeExcel == 'error') {
@@ -600,9 +572,8 @@ export class ListaEmpleadosComponent implements OnInit {
         });
         this.datosManuales = true;
       }
-
     }, error => {
-      console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ', error);
+      //console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
@@ -617,25 +588,24 @@ export class ListaEmpleadosComponent implements OnInit {
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
-    console.log('this.listUsuariosCorrectas: ', this.listUsuariosCorrectas.length);
+    //console.log('this.listUsuariosCorrectas: ', this.listUsuariosCorrectas.length);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.registrarUsuariosMultiple();
+          this.RegistrarUsuariosMultiple();
         }
       });
   }
 
-  registrarUsuariosMultiple() {
+  // METODO PARA REGISTRAR LOS DATOS EL SISTEMA
+  RegistrarUsuariosMultiple() {
     if (this.listUsuariosCorrectas.length > 0) {
       const datos = {
         plantilla: this.listUsuariosCorrectas,
         user_name: this.user_name,
         ip: this.ip
       };
-
       if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
-
         this.rest.subirArchivoExcel_Automatico(datos).subscribe(datos_archivo => {
           this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
             timeOut: 3000,
@@ -664,136 +634,65 @@ export class ListaEmpleadosComponent implements OnInit {
     }
   }
 
-
-
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
   colorCelda: string = ''
-  stiloCelda(observacion: string): string {
+  EstiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
     if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Ya esta registrado en base') {
+    }
+    else if (observacion == 'Ya esta registrado en base') {
       return 'rgb(239, 203, 106)';
-    } else if ((arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Cédula ya' ||
+    }
+    else if ((arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Cédula ya' ||
       (arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Usuario ya' ||
       (arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Codigo ya') {
       return 'rgb(239, 203, 106)';
-    } else if (arrayObservacion[0] == 'Cédula' || arrayObservacion[0] == 'Usuario') {
+    }
+    else if (arrayObservacion[0] == 'Cédula' || arrayObservacion[0] == 'Usuario') {
       return 'rgb(251, 73, 18)';
-    } else if ((arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Registro duplicado') {
+    }
+    else if ((arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
-    } else if ((observacion == 'Código ingresado no válido') ||
+    }
+    else if ((observacion == 'Código ingresado no válido') ||
       (observacion == 'Teléfono ingresado no es válido') ||
       (observacion == 'Cédula ingresada no es válida')
     ) {
       return 'rgb(222, 162, 73)';
-    } else if ((observacion == 'Rol no existe en el sistema') ||
+    }
+    else if ((observacion == 'Rol no existe en el sistema') ||
       (observacion == 'Nacionalidad no existe en el sistema')) {
       return 'rgb(255, 192, 203)';
-    } else if (arrayObservacion[0] == 'Formato') {
+    }
+    else if (arrayObservacion[0] == 'Formato') {
       return 'rgb(222, 162, 73)';
-    } else {
+    }
+    else {
       return 'rgb(251, 73, 18)';
     }
 
   }
 
+  // METODO DE ESTILO DE COLORES EN CELDAS
   colorTexto: string = '';
-  stiloTextoCelda(texto: string): string {
+  EstiloTextoCelda(texto: string): string {
     if (texto == 'No registrado') {
       return 'rgb(255, 80, 80)';
-    } else {
-      return 'black'
+    }
+    else {
+      return 'black';
     }
   }
 
-  ArchivoAutomatico(datosArchivo) {
-    this.rest.verificarArchivoExcel_Automatico(datosArchivo).subscribe(res => {
-      console.log('plantilla 1', res);
-      if (res.message === "error") {
-        this.toastr.error('Para el buen funcionamiento del sistema verifique los datos de su plantilla, ' +
-          'recuerde que la cédula, código y nombre de usuario son datos únicos por ende no deben constar ' +
-          'en otros registros. Asegurese de que el rol ingresado exista en el sistema.',
-          'Registro Fallido. Verificar Plantilla', {
-          timeOut: 6000,
-        });
-        this.archivoForm.reset();
-        this.nameFile = '';
-      } else {
-        this.rest.verificarArchivoExcel_DatosAutomatico(datosArchivo).subscribe(response => {
-          console.log('plantilla 2', response);
-          if (response.message === "error") {
-            this.toastr.error('Para el buen funcionamiento del sistema verifique los datos de su plantilla, ' +
-              'recuerde que la cédula, código y nombre de usuario son datos únicos por ende no deben constar ' +
-              'en otros registros. Asegurese de que el rol ingresado exista en el sistema.',
-              'Registro Fallido. Verificar Plantilla', {
-              timeOut: 6000,
-            });
-            this.archivoForm.reset();
-            this.nameFile = '';
-          } else {
-            this.rest.subirArchivoExcel_Automatico(datosArchivo).subscribe(datos_archivo => {
-              console.log('plantilla 3', datos_archivo);
-              this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
-                timeOut: 6000,
-              });
-              window.location.reload();
-            });
-          }
-        });
-      }
-    });
-  }
-
-  ArchivoManual(datosArchivo) {
-    this.rest.verificarArchivoExcel_Manual(datosArchivo).subscribe(res => {
-      console.log('plantilla 1', res);
-      if (res.message === "error") {
-        this.toastr.error('Para el buen funcionamiento del sistema verifique los datos de su plantilla, ' +
-          'recuerde que la cédula, código y nombre de usuario son datos únicos por ende no deben constar ' +
-          'en otros registros. Asegurese de que el rol ingresado exista en el sistema.',
-          'Registro Fallido. Verificar Plantilla.', {
-          timeOut: 6000,
-        });
-        this.archivoForm.reset();
-        this.nameFile = '';
-      } else {
-        this.rest.verificarArchivoExcel_DatosManual(datosArchivo).subscribe(response => {
-          console.log('plantilla 2', response);
-          if (response.message === "error") {
-            this.toastr.error('Para el buen funcionamiento del sistema verifique los datos de su plantilla, ' +
-              'recuerde que la cédula, código y nombre de usuario son datos únicos por ende no deben constar ' +
-              'en otros registros. Asegurese de que el rol ingresado exista en el sistema.',
-              'Registro Fallido. Verificar Plantilla.', {
-              timeOut: 6000,
-            });
-            this.archivoForm.reset();
-            this.nameFile = '';
-          } else {
-            this.rest.subirArchivoExcel_Manual(datosArchivo).subscribe(datos_archivo => {
-              console.log('plantilla 3', datos_archivo);
-              this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
-                timeOut: 6000,
-              });
-              window.location.reload();
-            });
-          }
-        });
-      }
-    });
-  }
-
+  // METODO PARA VERIFICAR LA CONFIGURACION DEL CODIGO DEL EMPLEADO
   link: string = '';
   datosCodigo: any = [];
   DescargarPlantilla() {
     this.datosCodigo = [];
     this.rest.ObtenerCodigo().subscribe(datos => {
       this.datosCodigo = datos;
-      if (datos[0].automatico === true || datos[0].cedula === true) {
-        this.link = `${environment.url}/plantillaD/documento/EmpleadoAutomatico.xlsx`
-      } else {
-        this.link = `${environment.url}/plantillaD/documento/EmpleadoManual.xlsx`
-      }
+      this.link = `${environment.url}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx`;
     }, error => {
       this.toastr.info('Para el correcto funcionamiento del sistema debe realizar la configuración del código de empleado.', '', {
         timeOut: 6000,
@@ -801,15 +700,6 @@ export class ListaEmpleadosComponent implements OnInit {
       this.router.navigate(['/codigo/']);
     });
   }
-
-
-
-
-
-
-
-
-
 
 
   /** ************************************************************************************************* **
@@ -857,7 +747,7 @@ export class ListaEmpleadosComponent implements OnInit {
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
         { text: 'Lista de Empleados', bold: true, fontSize: 20, alignment: 'center', margin: [0, -20, 0, 10] },
-        this.presentarDataPDFEmpleados(numero),
+        this.PresentarDataPDFEmpleados(numero),
       ],
       styles: {
         tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color },
@@ -870,7 +760,7 @@ export class ListaEmpleadosComponent implements OnInit {
   EstadoCivilSelect: any = ['Soltero/a', 'Unión de Hecho', 'Casado/a', 'Divorciado/a', 'Viudo/a'];
   GeneroSelect: any = ['Masculino', 'Femenino'];
   EstadoSelect: any = ['Activo', 'Inactivo'];
-  presentarDataPDFEmpleados(numero: any) {
+  PresentarDataPDFEmpleados(numero: any) {
     if (numero === 1) {
       var arreglo = this.empleado
     }
@@ -903,7 +793,7 @@ export class ListaEmpleadosComponent implements OnInit {
                 var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
                 var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
-                let nacionalidad;
+                let nacionalidad: any;
                 this.nacionalidades.forEach((element: any) => {
                   if (obj.id_nacionalidad == element.id) {
                     nacionalidad = element.nombre;
@@ -1045,8 +935,6 @@ export class ListaEmpleadosComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-
-
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Empleados.xml';
@@ -1093,15 +981,6 @@ export class ListaEmpleadosComponent implements OnInit {
     FileSaver.saveAs(data, "EmpleadosCSV" + '.csv');
   }
 
-  // Metodos para la eliminacion de empleados activos e inactivos
-
-  // METODOS PARA LA SELECCION MULTIPLE
-
-
-
-
-
-
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_empleado: number) {
     this.rest.EliminarEmpleados(id_empleado).subscribe(res => {
@@ -1115,14 +994,12 @@ export class ListaEmpleadosComponent implements OnInit {
         });
         this.GetEmpleados();
       }
-
     });
   }
 
 
   contador: number = 0;
   ingresar: boolean = false;
-
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
@@ -1133,37 +1010,27 @@ export class ListaEmpleadosComponent implements OnInit {
           this.router.navigate(['/empleados']);
         }
       });
-
     this.GetEmpleados();
-
   }
 
+  // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultipleActivos() {
-
     this.ingresar = false;
     this.contador = 0;
-
-
     let EliminarActivos = this.selectionUno.selected.map((obj: any) => {
       return {
         id: obj.id,
         empleado: obj.nombre + ' ' + obj.apellido
       }
     })
-
-
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           if (EliminarActivos.length != 0) {
-
             //ELIMINAR EMPLEADO
-
             EliminarActivos.forEach((datos: any) => {
-
               this.empleado = this.empleado.filter(item => item.id !== datos.id);
               this.contador = this.contador + 1;
-
               this.rest.EliminarEmpleados(datos.id).subscribe(res => {
                 if (res.message === 'error') {
                   this.toastr.error('Existen datos relacionados con ' + datos.empleado + '.', 'No fue posible eliminar.', {
@@ -1197,15 +1064,9 @@ export class ListaEmpleadosComponent implements OnInit {
         }
       }
       );
-    //this.GetEmpleados();
-
   }
 
-
-
-
-
-
+  // METODO PARA CONFIRMAR ELIMINACION DE USUARIO INACTIVOS
   ConfirmarDeleteMultipleInactivos() {
     this.ingresar = false;
     this.contador = 0;
@@ -1256,8 +1117,5 @@ export class ListaEmpleadosComponent implements OnInit {
       }
       );
   }
-
-
-
 
 }

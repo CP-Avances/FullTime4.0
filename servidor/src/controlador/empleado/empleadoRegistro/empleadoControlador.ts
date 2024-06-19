@@ -1420,7 +1420,7 @@ class EmpleadoControlador {
 
 
   /** **************************************************************************************** **
-   ** **                      CARGAR INFORMACIÓN MEDIANTE PLANTILLA                            ** 
+   ** **                      CARGAR INFORMACION MEDIANTE PLANTILLA                            ** 
    ** **************************************************************************************** **/
 
   public async VerificarPlantilla_Automatica(req: Request, res: Response) {

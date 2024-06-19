@@ -46,9 +46,9 @@ class PlanGeneralControlador {
                         //const fechaHora = await FormatearHora(plan_general[i].fec_hora_horario.toLocaleString().split(' ')[1])
                         //         const fechaTimbre = await FormatearFecha(plan_general[i].fec_hora_horario.toLocaleString(), 'ddd')
                         var fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(plan_general[i].fec_hora_horario.split(' ')[1]);
-                        var fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha)(plan_general[i].fec_hora_horario, 'ddd');
-                        var fecha_horario1 = yield (0, settingsMail_1.FormatearHora)(plan_general[i].fec_hora_horario.split(' ')[1]);
-                        var fecha_horario = yield (0, settingsMail_1.FormatearFecha)(plan_general[i].fec_hora_horario, 'ddd');
+                        var fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(plan_general[i].fec_hora_horario, 'ddd');
+                        var fecha_horario1 = yield (0, settingsMail_1.FormatearHora)(plan_general[i].fec_horario.split(' ')[1]);
+                        var fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(plan_general[i].fec_horario, 'ddd');
                         // AUDITORIA
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -59,7 +59,7 @@ class PlanGeneralControlador {
                             datosNuevos: `{fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, 
                             tolerancia: ${plan_general[i].tolerancia},  estado_timbre: ${plan_general[i].estado_timbre}, 
                             id_detalle_horario: ${plan_general[i].id_det_horario}, 
-                            fecha_horario: ${fecha_horario + ' ' + fecha_horario1}, 
+                            fecha_horario: ${fecha_horario}, 
                             id_empleado_cargo: ${plan_general[i].id_empl_cargo}, 
                             tipo_accion: ${plan_general[i].tipo_entr_salida}, 
                             codigo: ${plan_general[i].codigo}, 
