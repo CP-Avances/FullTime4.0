@@ -1834,8 +1834,11 @@ class EmpleadoControlador {
     }
     var contador = 1;
 
-    plantilla.forEach(async (data: any) => {
+    let ocurrioError = false;
+    let mensajeError = '';
+    let codigoError = 0;
 
+    for (const data of plantilla) {
       try {
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
@@ -2049,7 +2052,10 @@ class EmpleadoControlador {
 
         }
         else {
-          return res.status(404).jsonp({ message: 'error' })
+          ocurrioError = true;
+          mensajeError = 'error';
+          codigoError = 404;
+          break;
         }
 
         if (contador === plantilla.length) {
@@ -2082,14 +2088,18 @@ class EmpleadoControlador {
       } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
-        return res.status(500).jsonp({ message: error });
+        ocurrioError = true;
+        mensajeError = error;
+        codigoError = 500;
+        break;
       }
-    });
+    }
 
-    setTimeout(() => {
-      return res.jsonp({ message: 'correcto' });
-    }, 1500)
-
+    if (ocurrioError) {
+      res.status(500).jsonp({ message: mensajeError });
+    } else {
+      res.jsonp({ message: 'correcto' });
+    }
   }
 
   /** METODOS PARA VERIFICAR PLANTILLA CON CÓDIGO INGRESADO DE FORMA MANUAL */

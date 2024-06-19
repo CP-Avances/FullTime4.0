@@ -1637,6 +1637,7 @@ class EmpleadoControlador {
         });
     }
     CargarPlantilla_Automatico(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip } = req.body;
             const VALOR = yield database_1.default.query('SELECT * FROM codigo');
@@ -1646,8 +1647,10 @@ class EmpleadoControlador {
                 codigo = codigo_dato = parseInt(codigo_dato);
             }
             var contador = 1;
-            plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                var _a;
+            let ocurrioError = false;
+            let mensajeError = '';
+            let codigoError = 0;
+            for (const data of plantilla) {
                 try {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
@@ -1826,7 +1829,10 @@ class EmpleadoControlador {
                         }
                     }
                     else {
-                        return res.status(404).jsonp({ message: 'error' });
+                        ocurrioError = true;
+                        mensajeError = 'error';
+                        codigoError = 404;
+                        break;
                     }
                     if (contador === plantilla.length) {
                         // ACTUALIZACIÓN DEL CÓDIGO
@@ -1854,12 +1860,18 @@ class EmpleadoControlador {
                 catch (error) {
                     // REVERTIR TRANSACCION
                     yield database_1.default.query('ROLLBACK');
-                    return res.status(500).jsonp({ message: error });
+                    ocurrioError = true;
+                    mensajeError = error;
+                    codigoError = 500;
+                    break;
                 }
-            }));
-            setTimeout(() => {
-                return res.jsonp({ message: 'correcto' });
-            }, 1500);
+            }
+            if (ocurrioError) {
+                res.status(500).jsonp({ message: mensajeError });
+            }
+            else {
+                res.jsonp({ message: 'correcto' });
+            }
         });
     }
     /** METODOS PARA VERIFICAR PLANTILLA CON CÓDIGO INGRESADO DE FORMA MANUAL */
