@@ -5,15 +5,15 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import moment from 'moment';
 
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 import { EditarTimbreComponent } from '../editar-timbre/editar-timbre.component';
 import { VerTimbreComponent } from '../ver-timbre/ver-timbre.component';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-buscar-timbre',
@@ -46,7 +46,6 @@ export class BuscarTimbreComponent implements OnInit {
   timbres: any = [];
   idEmpleadoLogueado: any;
 
-  asignacionesAcceso: any;
   idUsuariosAcceso: any = [];
 
   constructor(
@@ -57,15 +56,17 @@ export class BuscarTimbreComponent implements OnInit {
     public parametro: ParametrosService,
     public restEmpleado: EmpleadoService,
     private restUsuario: UsuarioService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
     this.BuscarParametro();
     this.BuscarHora();
     this.ObtenerEmpleadoLogueado(this.idEmpleadoLogueado);
-    this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
   }
 
   /** **************************************************************************************** **
@@ -99,45 +100,6 @@ export class BuscarTimbreComponent implements OnInit {
     this.restEmpleado.BuscarUnEmpleado(idemploy).subscribe(data => {
       this.datosEmpleadoLogueado = data[0];
     })
-  }
-
-  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const dataEmpleado = {
-      id_empleado: Number(idEmpleado)
-    }
-
-    let noPersonal: boolean = false;
-
-    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
-    this.asignacionesAcceso = res;
-
-    const promises = this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal) {
-        if (!asignacion.administra && !asignacion.personal) {
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        } else if (asignacion.administra && !asignacion.personal) {
-          noPersonal = true;
-        } else if (asignacion.personal && !asignacion.administra) {
-          this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        }
-      }
-
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
-    });
-
-    const results = await Promise.all(promises);
-
-    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    this.idUsuariosAcceso.push(...ids);
-
-    if (noPersonal) {
-      this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleadoLogueado);
-    }
   }
 
   async FiltrarEmpleadosAsignados(data: any) {
