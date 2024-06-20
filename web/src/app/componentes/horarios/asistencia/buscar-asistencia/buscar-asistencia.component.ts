@@ -33,7 +33,7 @@ export class BuscarAsistenciaComponent implements OnInit {
   pageSizeOptions = [5, 10, 20, 50];
 
   idEmpleadoLogueado: any;
-  idUsuariosAcceso: any = [];
+  idUsuariosAcceso: Set<any> = new Set();
 
   existenAsistencias: boolean = false;
 
@@ -170,7 +170,7 @@ export class BuscarAsistenciaComponent implements OnInit {
   }
 
   async FiltrarEmpleadosAsignados(data: any) {
-    return data.filter((asistencia: any) => this.idUsuariosAcceso.includes(asistencia.id_empleado));
+    return data.filter((asistencia: any) => this.idUsuariosAcceso.has(asistencia.id_empleado));
   }
 
   // METODO PARA VER PANTALLA DETALLE DE TIMBRE

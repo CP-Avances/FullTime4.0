@@ -7,11 +7,11 @@ import { PageEvent } from '@angular/material/paginator';
 
 // IMPORTACION DE SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { firstValueFrom } from 'rxjs';
+import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 @Component({
   selector: 'app-timbre-admin',
@@ -25,8 +25,7 @@ export class TimbreAdminComponent implements OnInit {
   datosEmpleado: any = [];
 
   idEmpleadoLogueado: any;
-  asignacionesAcceso: any;
-  idUsuariosAcceso: any = [];
+  idUsuariosAcceso: Set<any> = new Set();
 
   // DATOS DEL FORMULARIO DE BUSQUEDA
   departamentoF = new FormControl('', Validators.minLength(2));
@@ -67,11 +66,14 @@ export class TimbreAdminComponent implements OnInit {
     public restD: DatosGeneralesService, // SERVICIO DATOS GENERALES
     public parametro: ParametrosService,
     private restUsuario: UsuarioService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
     this.VerDatosEmpleado();
     this.BuscarParametro();
     this.BuscarHora();
@@ -108,57 +110,16 @@ export class TimbreAdminComponent implements OnInit {
   }
 
   // LISTA DE DATOS DE EMPLEADOS
-  async VerDatosEmpleado() {
+  VerDatosEmpleado() {
     this.datosEmpleado = [];
-    await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
     this.restD.ListarInformacionActual().subscribe(data => {
       this.datosEmpleado = this.FiltrarEmpleadosAsignados(data);
     });
   }
 
-  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const dataEmpleado = {
-      id_empleado: Number(idEmpleado)
-    }
-
-    let noPersonal: boolean = false;
-
-    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
-    this.asignacionesAcceso = res;
-
-    const promises = this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal) {
-        if (!asignacion.administra && !asignacion.personal) {
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        } else if (asignacion.administra && !asignacion.personal) {
-          noPersonal = true;
-        } else if (asignacion.personal && !asignacion.administra) {
-          this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        }
-      }
-
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
-    });
-
-    const results = await Promise.all(promises);
-
-    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    this.idUsuariosAcceso.push(...ids);
-
-    if (noPersonal) {
-      this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleadoLogueado);
-    }
-
-  }
-
   // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
   FiltrarEmpleadosAsignados(data: any) {
-    return data.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
+    return data.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
 }
 
   // EVENTO PARA MANEJAR LA PAGINACION DE TABLA DE TIMBRES

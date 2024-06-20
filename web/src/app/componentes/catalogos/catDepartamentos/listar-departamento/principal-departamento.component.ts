@@ -46,7 +46,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
-  idDepartamentosAcceso: any = [];
+  idDepartamentosAcceso: Set<any> = new Set();
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   departamentoPadreF = new FormControl('');
@@ -105,7 +105,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.ip = localStorage.getItem('ip');
 
     this.idDepartamentosAcceso = this.asignacionesService.idDepartamentosAcceso;
-    console.log('idDepartamentosAcceso: ', this.idDepartamentosAcceso);
 
     this.ListaDepartamentos();
     this.ObtenerEmpleados(this.idEmpleado);
@@ -161,7 +160,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   // METODO PARA FILTRAR DEPARTAMENTOS ASIGNADOS
   FiltrarDepartamentosAsignados(data: any) {
-    return data.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
+    return data.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
   }
 
   // METODO PARA ABRIR VENTANA DE REGISTRO DE DEPARTAMENTO

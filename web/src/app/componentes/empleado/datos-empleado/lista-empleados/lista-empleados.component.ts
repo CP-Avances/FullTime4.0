@@ -48,7 +48,10 @@ export class ListaEmpleadosComponent implements OnInit {
   nacionalidades: any = [];
   empleadoD: any = [];
   empleado: any = [];
-  idUsuariosAcceso: any = [];  // VARIABLE DE ALMACENAMIENTO DE IDs DE USUARIOS A LOS QUE TIENE ACCESO EL USURIO QUE INICIO SESION
+  idUsuariosAcceso:   Set<any> = new Set();// VARIABLE DE ALMACENAMIENTO DE IDs DE USUARIOS A LOS QUE TIENE ACCESO EL USURIO QUE INICIO SESION
+
+  mostarTabla: boolean = false;
+
 
   // CAMPOS DEL FORMULARIO
   apellido = new FormControl('', [Validators.minLength(2)]);
@@ -299,42 +302,6 @@ export class ListaEmpleadosComponent implements OnInit {
     })
   }
 
-  // METODO PARA CONSULTAR ADMINISTRACION DE DATOS
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const data = {
-      id_empleado: Number(idEmpleado)
-    }
-    let noPersonal: boolean = false;
-    const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(data));
-    this.empleadoD.asignaciones = res;
-    // VERIFICAMOS SI EXISTEN DATOS DE USUARIOS
-    if (this.empleadoD.asignaciones) {
-      const promises = this.empleadoD.asignaciones.map((asignacion: any) => {
-        if (asignacion.principal) {
-          if (!asignacion.administra && !asignacion.personal) {
-            return Promise.resolve(null); // DEVUELVE UNA PROMESA RESUELTA PARA MANTENER LA CONSISTENCIA DE LOS TIPOS DE DATOS
-          } else if (asignacion.administra && !asignacion.personal) {
-            noPersonal = true;
-          } else if (asignacion.personal && !asignacion.administra) {
-            this.idUsuariosAcceso.push(this.idEmpleado);
-            return Promise.resolve(null); // DEVUELVE UNA PROMESA RESUELTA PARA MANTENER LA CONSISTENCIA DE LOS TIPOS DE DATOS
-          }
-        }
-        const data = {
-          id_departamento: asignacion.id_departamento
-        }
-        return firstValueFrom(this.usuario.ObtenerIdUsuariosDepartamento(data));
-      });
-      const results = await Promise.all(promises);
-      const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-      this.idUsuariosAcceso.push(...ids);
-      if (noPersonal) {
-        this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleado);
-      }
-      this.GetEmpleados();
-    }
-  }
-
   // METODO PARA OBTENER LOGO DE EMPRESA
   logo: any = String;
   ObtenerLogo() {
@@ -386,16 +353,16 @@ export class ListaEmpleadosComponent implements OnInit {
   // METODO PARA LISTAR USUARIOS
   async GetEmpleados() {
     const res: any = await firstValueFrom(this.datosGenerales.ListarIdInformacionActual());
-    const idsEmpleadosActuales = res.map((empleado: any) => empleado.id);
+    const idsEmpleadosActuales = new Set(res.map((empleado: any) => empleado.id));
     //console.log('idsEmpleadosActuales', idsEmpleadosActuales);
     const empleadosActivos$ = this.rest.ListarEmpleadosActivos().pipe(
       map((data: any) => data.filter((empleado: any) =>
-        this.idUsuariosAcceso.includes(empleado.id) || !idsEmpleadosActuales.includes(empleado.id)
+        this.idUsuariosAcceso.has(empleado.id) || !idsEmpleadosActuales.has(empleado.id)
       ))
     );
     const empleadosDesactivados$ = this.rest.ListaEmpleadosDesactivados().pipe(
       map((data: any) => data.filter((empleado: any) =>
-        this.idUsuariosAcceso.includes(empleado.id) || !idsEmpleadosActuales.includes(empleado.id)
+        this.idUsuariosAcceso.has(empleado.id) || !idsEmpleadosActuales.has(empleado.id)
       ))
     );
     forkJoin([empleadosActivos$, empleadosDesactivados$]).subscribe(([empleados, desactivados]) => {
@@ -403,6 +370,7 @@ export class ListaEmpleadosComponent implements OnInit {
       this.OrdenarDatos(this.empleado);
       this.desactivados = desactivados;
       this.OrdenarDatos(this.desactivados);
+      this.mostarTabla = true;
     });
   }
 

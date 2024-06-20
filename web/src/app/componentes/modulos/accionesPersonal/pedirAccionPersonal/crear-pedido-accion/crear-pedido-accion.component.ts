@@ -146,7 +146,7 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   // INICIACION DE VARIABLES
   idEmpleadoLogueado: any;
-  idUsuariosAcceso: any = [];
+  idUsuariosAcceso: Set<any> = new Set();
 
   empleados: any = [];
   ciudades: any = [];
@@ -375,9 +375,7 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
   FiltrarEmpleadosAsignados(data: any) {
-    if (this.idUsuariosAcceso.length > 0) {
-      return data.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
-    }
+    return data.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
   }
 
   // METODO PARA OBTENER LISTA DE CIUDADES

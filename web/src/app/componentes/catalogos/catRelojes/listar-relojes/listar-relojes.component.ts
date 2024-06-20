@@ -49,7 +49,7 @@ export class ListarRelojesComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
-  idDepartamentosAcceso: any = [];
+  idDepartamentosAcceso: Set<any> = new Set();
 
   listar_relojes: boolean = true;
   dispositivosEliminar: any = [];
@@ -159,7 +159,7 @@ export class ListarRelojesComponent implements OnInit {
 
   // METODO PARA FILTRAR RELOJES POR ASIGNACION USUARIO - DEPARTAMENTO
   FiltrarRelojesAsignados(data: any) {
-    return data.filter((reloj: any) => this.idDepartamentosAcceso.includes(reloj.id_departamento));
+    return data.filter((reloj: any) => this.idDepartamentosAcceso.has(reloj.id_departamento));
   }
 
   // METODO PARA INGRESAR IP

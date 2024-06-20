@@ -57,7 +57,7 @@ export class ListarPedidoAccionComponent implements OnInit {
   decreto: string[];
   tipoAccion: string[];
 
-  idUsuariosAcceso: any = [];
+  idUsuariosAcceso: Set<any> = new Set();
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string {
@@ -196,7 +196,7 @@ export class ListarPedidoAccionComponent implements OnInit {
 
   // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
   FiltrarEmpleadosAsignados(data: any) {
-      return data.filter((pedido: any) => this.idUsuariosAcceso.includes(pedido.id_empleado));
+      return data.filter((pedido: any) => this.idUsuariosAcceso.has(pedido.id_empleado));
   }
 
 
