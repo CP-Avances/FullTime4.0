@@ -659,14 +659,17 @@ export class ListaEmpleadosComponent implements OnInit {
       return 'rgb(156, 214, 255)';
     }
     else if ((observacion == 'Código ingresado no válido') ||
-      (observacion == 'Teléfono ingresado no es válido') ||
-      (observacion == 'Cédula ingresada no es válida')
+      (observacion == 'El teléfono ingresado no es válido') ||
+      (observacion == 'La cédula ingresada no es válida')
     ) {
       return 'rgb(222, 162, 73)';
     }
     else if ((observacion == 'Rol no existe en el sistema') ||
       (observacion == 'Nacionalidad no existe en el sistema')) {
       return 'rgb(255, 192, 203)';
+    }
+    else if ((observacion == 'La contraseña debe tener máximo 10 caracteres')) {
+      return 'rgb(238, 34, 207)';
     }
     else if (arrayObservacion[0] == 'Formato') {
       return 'rgb(222, 162, 73)';

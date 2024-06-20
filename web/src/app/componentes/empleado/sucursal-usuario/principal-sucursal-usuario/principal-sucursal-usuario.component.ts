@@ -59,7 +59,7 @@ export class PrincipalSucursalUsuarioComponent implements OnInit {
   ObtenerSucursal() {
     this.rest.BuscarSucursal().subscribe(data => {
       this.sucursales = data;
-      console.log('ver sucursal ', this.sucursales)
+      //console.log('ver sucursal ', this.sucursales)
     });
   }
 

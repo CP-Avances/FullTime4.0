@@ -78,8 +78,8 @@ class HorarioControlador {
     }
     // GUARDAR DOCUMENTO DE HORARIO
     GuardarDocumentoHorario(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 let id = req.params.id;
                 let { archivo, codigo } = req.params;
@@ -465,8 +465,8 @@ class HorarioControlador {
     }
     // METODO PARA CARGAR HORARIOS Y DETALLES DE UNA PLANTILLA EN LA BASE DE DATOS
     CargarHorarioPlantilla(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 const { horarios, detalles, user_name, } = req.body;
                 let horariosCargados = true;
@@ -639,8 +639,8 @@ class HorarioControlador {
     }
     // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE HORARIOS Y DETALLES
     VerificarDatos(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
