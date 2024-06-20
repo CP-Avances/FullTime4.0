@@ -16,8 +16,8 @@ exports.EMPLEADO_CONTROLADOR = void 0;
 // SECCION LIBRERIAS
 const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
-const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
+const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
 const ts_md5_1 = require("ts-md5");
 const fs_1 = require("fs");
 const database_1 = __importDefault(require("../../../database"));
@@ -1723,7 +1723,6 @@ class EmpleadoControlador {
                         id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
                         domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
                     const [empleado] = response.rows;
-                    //console.log('empleados insertados ', empleado.id)
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleados',
@@ -2365,9 +2364,6 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id, codigo } = req.body;
             let verificar_permisos = 0;
-            let verificar_imagen = 0;
-            let verificar_vacunas = 0;
-            let verificar_contrato = 0;
             try {
                 const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
                 try {
@@ -2377,75 +2373,21 @@ class EmpleadoControlador {
                 catch (_a) {
                     try {
                         yield fs_1.promises.mkdir(carpetaPermisos, { recursive: true });
-                        verificar_permisos = 0; // CARPETA CREADA CON ÉXITO
+                        verificar_permisos = 0; // CARPETA CREADA CON EXITO
                     }
                     catch (_b) {
                         verificar_permisos = 1; // ERROR AL CREAR LA CARPETA
                     }
                 }
-                const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id);
-                try {
-                    yield fs_1.promises.access(carpetaImagenes, fs_2.default.constants.F_OK);
-                    verificar_imagen = 2; // LA CARPETA YA EXISTE
-                }
-                catch (_c) {
-                    try {
-                        yield fs_1.promises.mkdir(carpetaImagenes, { recursive: true });
-                        verificar_imagen = 0; // CARPETA CREADA CON ÉXITO
-                    }
-                    catch (_d) {
-                        verificar_imagen = 1; // ERROR AL CREAR LA CARPETA
-                    }
-                }
-                const carpetaVacunas = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(id);
-                try {
-                    yield fs_1.promises.access(carpetaVacunas, fs_2.default.constants.F_OK);
-                    verificar_vacunas = 2; // LA CARPETA YA EXISTE
-                }
-                catch (_e) {
-                    try {
-                        yield fs_1.promises.mkdir(carpetaVacunas, { recursive: true });
-                        verificar_vacunas = 0; // CARPETA CREADA CON ÉXITO
-                    }
-                    catch (_f) {
-                        verificar_vacunas = 1; // ERROR AL CREAR LA CARPETA
-                    }
-                }
-                const carpetaContratos = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(id);
-                try {
-                    yield fs_1.promises.access(carpetaContratos, fs_2.default.constants.F_OK);
-                    verificar_contrato = 2; // LA CARPETA YA EXISTE
-                }
-                catch (_g) {
-                    try {
-                        yield fs_1.promises.mkdir(carpetaContratos, { recursive: true });
-                        verificar_contrato = 0; // CARPETA CREADA CON ÉXITO
-                    }
-                    catch (_h) {
-                        verificar_contrato = 1; // ERROR AL CREAR LA CARPETA
-                    }
-                }
                 // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
-                if (verificar_permisos === 1 && verificar_imagen === 1 && verificar_vacunas === 1 && verificar_contrato === 1) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos, permisos, imagenes y vacunación del usuario.' });
+                if (verificar_permisos === 1) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos.' });
                 }
-                else if (verificar_permisos === 1 && verificar_imagen === 0 && verificar_vacunas === 0 && verificar_contrato === 0) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos del usuario.' });
-                }
-                else if (verificar_permisos === 0 && verificar_imagen === 1 && verificar_vacunas === 0 && verificar_contrato === 0) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de imagenes del usuario.' });
-                }
-                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 0) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de vacunación del usuario.' });
-                }
-                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 1) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos del usuario.' });
-                }
-                else if (verificar_permisos === 2 && verificar_imagen === 2 && verificar_vacunas === 2 && verificar_contrato === 2) {
+                else if (verificar_permisos === 2) {
                     res.jsonp({ message: 'Ya existen carpetas creadas de ' + codigo });
                 }
                 else {
-                    res.jsonp({ message: 'Carpetas creadas con exito.' });
+                    res.jsonp({ message: 'Carpetas creadas con éxito.' });
                 }
             }
             catch (error) {

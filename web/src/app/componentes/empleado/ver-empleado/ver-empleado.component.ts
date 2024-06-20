@@ -358,7 +358,7 @@ export class VerEmpleadoComponent implements OnInit {
           else {
             this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
           }
-          console.log('imagen codificado ', this.imagenEmpleado)
+          //console.log('imagen codificado ', this.imagenEmpleado)
         });
         //console.log('ver urlImagen ', this.urlImagen)
         this.mostrarImagen = true;
@@ -401,7 +401,7 @@ export class VerEmpleadoComponent implements OnInit {
   MAP: any;
   MapGeolocalizar(latitud: number, longitud: number, empleado: string) {
     let zoom = 19;
-    if (latitud === null && longitud === null) {
+    if (latitud === null || longitud === null) {
       latitud = -0.1918213;
       longitud = -78.4875258;
       zoom = 7
