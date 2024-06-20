@@ -51,7 +51,7 @@ class HorarioControlador {
                 const HORARIOS = yield database_1.default.query(`
         SELECT * FROM eh_cat_horarios WHERE UPPER(codigo) = $1
         `, [codigo.toUpperCase()]);
-                if (HORARIOS.rowCount > 0)
+                if (HORARIOS.rowCount != 0)
                     return res.status(200).jsonp({ message: 'No se encuentran registros.' });
                 return res.status(404).jsonp({ message: 'No existe horario. Continua.' });
             }
@@ -62,8 +62,8 @@ class HorarioControlador {
     }
     // GUARDAR DOCUMENTO DE HORARIO
     GuardarDocumentoHorario(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             let id = req.params.id;
             let { archivo, codigo } = req.params;
             // FECHA DEL SISTEMA
@@ -164,7 +164,7 @@ class HorarioControlador {
             const HORARIOS = yield database_1.default.query(`
       SELECT * FROM eh_cat_horarios ORDER BY codigo ASC
       `);
-            if (HORARIOS.rowCount > 0) {
+            if (HORARIOS.rowCount != 0) {
                 return res.jsonp(HORARIOS.rows);
             }
             else {
@@ -180,7 +180,7 @@ class HorarioControlador {
                 const HORARIOS = yield database_1.default.query(`
         SELECT * FROM eh_cat_horarios WHERE NOT id = $1 AND UPPER(codigo) = $2
         `, [parseInt(id), codigo.toUpperCase()]);
-                if (HORARIOS.rowCount > 0)
+                if (HORARIOS.rowCount != 0)
                     return res.status(200).jsonp({
                         message: 'El nombre de horario ya existe, ingresar un nuevo nombre.'
                     });
@@ -213,7 +213,7 @@ class HorarioControlador {
             const UN_HORARIO = yield database_1.default.query(`
       SELECT * FROM eh_cat_horarios WHERE id = $1
       `, [id]);
-            if (UN_HORARIO.rowCount > 0) {
+            if (UN_HORARIO.rowCount != 0) {
                 return res.jsonp(UN_HORARIO.rows);
             }
             else {
@@ -257,8 +257,8 @@ class HorarioControlador {
     }
     // METODO PARA CARGAR HORARIOS Y DETALLES DE UNA PLANTILLA EN LA BASE DE DATOS
     CargarHorarioPlantilla(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 const { horarios, detalles } = req.body;
                 let horariosCargados = true;
@@ -368,7 +368,7 @@ class HorarioControlador {
               minutos_antes, minutos_despues) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             `, [ORDEN, HORA, TOLERANCIA, ID_HORARIO, TIPO_ACCION, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES,
                             MIN_DESPUES]);
-                        if (response2.rowCount > 0) {
+                        if (response2.rowCount != 0) {
                             detallesCargados = true;
                         }
                         else {
@@ -390,8 +390,8 @@ class HorarioControlador {
     }
     // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE HORARIOS Y DETALLES
     VerificarDatos(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
@@ -570,7 +570,7 @@ function VerificarDuplicadoBase(codigo) {
         const result = yield database_1.default.query(`
     SELECT * FROM eh_cat_horarios WHERE LOWER(codigo) = $1
     `, [codigo.toLowerCase()]);
-        return result.rowCount > 0;
+        return result.rowCount != 0;
     });
 }
 // FUNCION PARA COMPROBAR QUE CODIGO_HORARIO EXISTA EN PLANTILLAHORARIOS

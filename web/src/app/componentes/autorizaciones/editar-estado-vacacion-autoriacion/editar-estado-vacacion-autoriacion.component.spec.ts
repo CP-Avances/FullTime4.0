@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EditarEstadoVacacionAutoriacionComponent } from './editar-estado-vacacion-autoriacion.component';
 
@@ -6,14 +6,12 @@ describe('EditarEstadoVacacionAutoriacionComponent', () => {
   let component: EditarEstadoVacacionAutoriacionComponent;
   let fixture: ComponentFixture<EditarEstadoVacacionAutoriacionComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ EditarEstadoVacacionAutoriacionComponent ]
     })
     .compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(EditarEstadoVacacionAutoriacionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

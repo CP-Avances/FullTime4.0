@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TimbreMultipleComponent } from './timbre-multiple.component';
 
@@ -6,14 +6,12 @@ describe('TimbreMultipleComponent', () => {
   let component: TimbreMultipleComponent;
   let fixture: ComponentFixture<TimbreMultipleComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ TimbreMultipleComponent ]
     })
     .compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(TimbreMultipleComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

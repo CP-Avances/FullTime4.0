@@ -25,7 +25,7 @@ class NivelTituloControlador {
             const titulo = yield database_1.default.query(`
       SELECT * FROM et_cat_nivel_titulo ORDER BY nombre ASC
       `);
-            if (titulo.rowCount > 0) {
+            if (titulo.rowCount != 0) {
                 return res.jsonp(titulo.rows);
             }
             else {
@@ -82,7 +82,7 @@ class NivelTituloControlador {
             const unNivelTitulo = yield database_1.default.query(`
       SELECT * FROM et_cat_nivel_titulo WHERE UPPER(nombre) = $1
       `, [nombre]);
-            if (unNivelTitulo.rowCount > 0) {
+            if (unNivelTitulo.rowCount != 0) {
                 return res.jsonp(unNivelTitulo.rows);
             }
             else {
@@ -96,7 +96,7 @@ class NivelTituloControlador {
             const unNivelTitulo = yield database_1.default.query(`
       SELECT * FROM et_cat_nivel_titulo WHERE id = $1
       `, [id]);
-            if (unNivelTitulo.rowCount > 0) {
+            if (unNivelTitulo.rowCount != 0) {
                 return res.jsonp(unNivelTitulo.rows);
             }
             else {
@@ -106,8 +106,8 @@ class NivelTituloControlador {
     }
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
     RevisarDatos(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;

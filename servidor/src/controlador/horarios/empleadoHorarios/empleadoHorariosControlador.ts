@@ -18,7 +18,7 @@ class EmpleadoHorariosControlador {
                 (fecha_horario BETWEEN $1 AND $2)
             `
             , [fechaInicio, fechaFinal, codigo]);
-        if (HORARIO.rowCount > 0) {
+        if (HORARIO.rowCount != 0) {
             return res.jsonp(HORARIO.rows)
         }
         else {
@@ -208,7 +208,7 @@ class EmpleadoHorariosControlador {
                 (fecha_horario BETWEEN $1 AND $2) LIMIT 4
             `
             , [fechaInicio, fechaFinal, codigo, id_horario]);
-        if (HORARIO.rowCount > 0) {
+        if (HORARIO.rowCount != 0) {
             return res.jsonp(HORARIO.rows)
         }
         else {

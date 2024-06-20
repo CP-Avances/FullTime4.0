@@ -20,7 +20,7 @@ class HorasExtrasControlador {
             const HORAS_EXTRAS = yield database_1.default.query(`
       SELECT * FROM mhe_configurar_hora_extra
       `);
-            if (HORAS_EXTRAS.rowCount > 0) {
+            if (HORAS_EXTRAS.rowCount != 0) {
                 return res.jsonp(HORAS_EXTRAS.rows);
             }
             else {
@@ -34,7 +34,7 @@ class HorasExtrasControlador {
             const HORAS_EXTRAS = yield database_1.default.query(`
       SELECT * FROM mhe_configurar_hora_extra WHERE id = $1
       `, [id]);
-            if (HORAS_EXTRAS.rowCount > 0) {
+            if (HORAS_EXTRAS.rowCount != 0) {
                 return res.jsonp(HORAS_EXTRAS.rows);
             }
             else {

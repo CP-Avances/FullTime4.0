@@ -21,7 +21,7 @@ class AccionPersonalControlador {
             const ACCION = yield database_1.default.query(`
             SELECT * FROM map_tipo_accion_personal
             `);
-            if (ACCION.rowCount > 0) {
+            if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
             }
             else {
@@ -65,7 +65,7 @@ class AccionPersonalControlador {
             const ACCION = yield database_1.default.query(`
             SELECT MAX(id) AS id FROM map_tipo_accion_personal
             `);
-            if (ACCION.rowCount > 0) {
+            if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
             }
             else {
@@ -79,7 +79,7 @@ class AccionPersonalControlador {
             const ACCION = yield database_1.default.query(`
             SELECT * FROM map_cargo_propuesto
             `);
-            if (ACCION.rowCount > 0) {
+            if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
             }
             else {
@@ -101,7 +101,7 @@ class AccionPersonalControlador {
             const ACCION = yield database_1.default.query(`
             SELECT MAX(id) AS id FROM map_cargo_propuesto
             `);
-            if (ACCION.rowCount > 0) {
+            if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
             }
             else {
@@ -115,7 +115,7 @@ class AccionPersonalControlador {
             const ACCION = yield database_1.default.query(`
             SELECT * FROM map_cargo_propuesto WHERE id = $1
             `, [id]);
-            if (ACCION.rowCount > 0) {
+            if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
             }
             else {
@@ -129,7 +129,7 @@ class AccionPersonalControlador {
             const ACCION = yield database_1.default.query(`
             SELECT * FROM map_contexto_legal
             `);
-            if (ACCION.rowCount > 0) {
+            if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
             }
             else {
@@ -151,7 +151,7 @@ class AccionPersonalControlador {
             const ACCION = yield database_1.default.query(`
             SELECT MAX(id) AS id FROM map_contexto_legal
             `);
-            if (ACCION.rowCount > 0) {
+            if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
             }
             else {
@@ -165,7 +165,7 @@ class AccionPersonalControlador {
             const ACCION = yield database_1.default.query(`
             SELECT * FROM map_contexto_legal WHERE id = $1
             `, [id]);
-            if (ACCION.rowCount > 0) {
+            if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
             }
             else {
@@ -182,7 +182,7 @@ class AccionPersonalControlador {
             FROM map_detalle_tipo_accion_personal AS dtap, map_tipo_accion_personal AS tap 
             WHERE tap.id = dtap.id_tipo_accion_personal
             `);
-            if (ACCION.rowCount > 0) {
+            if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
             }
             else {
@@ -196,7 +196,7 @@ class AccionPersonalControlador {
             const ACCION = yield database_1.default.query(`
             SELECT * FROM map_detalle_tipo_accion_personal WHERE NOT id_tipo = $1
             `, [id]);
-            if (ACCION.rowCount > 0) {
+            if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
             }
             else {
@@ -213,7 +213,7 @@ class AccionPersonalControlador {
             FROM map_detalle_tipo_accion_personal AS dtap, map_tipo_accion_personal AS tap 
             WHERE dtap.id = $1 AND tap.id = dtap.id_tipo_accion_personal
             `, [id]);
-            if (ACCION.rowCount > 0) {
+            if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
             }
             else {
@@ -307,7 +307,7 @@ class AccionPersonalControlador {
             FROM datos_actuales_empleado AS d, eu_empleado_cargos AS ec, e_cat_tipo_cargo AS tc, ed_departamentos AS cd 
             WHERE d.id_cargo = ec.id AND ec.id_tipo_cargo = tc.id AND ec.id_departamento = cd.id AND d.id = $1
             `, [id]);
-            if (EMPLEADO.rowCount > 0) {
+            if (EMPLEADO.rowCount != 0) {
                 return res.jsonp(EMPLEADO.rows);
             }
             else {
@@ -321,7 +321,7 @@ class AccionPersonalControlador {
             const CIUDAD = yield database_1.default.query(`
             SELECT * FROM e_ciudades where id = $1
             `, [id]);
-            if (CIUDAD.rowCount > 0) {
+            if (CIUDAD.rowCount != 0) {
                 return res.json(CIUDAD.rows);
             }
             else {
@@ -345,7 +345,7 @@ class AccionPersonalControlador {
             FROM map_solicitud_accion_personal AS ap, map_detalle_tipo_accion_personal AS tap, map_tipo_accion_personal AS ta 
             WHERE ap.id_detalle_tipo_accion_personal = tap.id AND ap.id = $1 AND ta.id = tap.id_tipo_accion_personal
             `, [id]);
-            if (ACCION.rowCount > 0) {
+            if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
             }
             else {
@@ -368,7 +368,7 @@ class AccionPersonalControlador {
             FROM map_solicitud_accion_personal AS ap, map_detalle_tipo_accion_personal AS tap, eu_empleados AS e 
             WHERE ap.id_detalle_tipo_accion_personal = tap.id AND e.id = ap.id_empleado
             `);
-            if (ACCION.rowCount > 0) {
+            if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
             }
             else {
@@ -389,7 +389,7 @@ class AccionPersonalControlador {
             ) 
             SELECT UPPER(nombre) AS nombre, numero FROM procesos ORDER BY numero DESC
             `, [id]);
-            if (ACCION.rowCount > 0) {
+            if (ACCION.rowCount != 0) {
                 return res.jsonp(ACCION.rows);
             }
             else {

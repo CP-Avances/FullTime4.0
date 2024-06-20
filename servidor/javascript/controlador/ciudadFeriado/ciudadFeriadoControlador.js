@@ -24,7 +24,7 @@ class CiudadFeriadoControlador {
             FROM e_ciudades c, e_provincias p 
             WHERE c.id_provincia = p.id AND p.nombre = $1
             `, [nombre]);
-            if (CIUDAD_FERIADO.rowCount > 0) {
+            if (CIUDAD_FERIADO.rowCount != 0) {
                 return res.jsonp(CIUDAD_FERIADO.rows);
             }
             else {
@@ -42,7 +42,7 @@ class CiudadFeriadoControlador {
             FROM ef_cat_feriados fe, ef_ciudad_feriado cfe, e_ciudades c
             WHERE fe.id = cfe.id_feriado AND c.id = cfe.id_ciudad AND fe.id = $1
             `, [idferiado]);
-            if (CIUDAD_FERIADO.rowCount > 0) {
+            if (CIUDAD_FERIADO.rowCount != 0) {
                 return res.jsonp(CIUDAD_FERIADO.rows);
             }
             else {
@@ -67,7 +67,7 @@ class CiudadFeriadoControlador {
             const CIUDAD_FERIADO = yield database_1.default.query(`
             SELECT * FROM ef_ciudad_feriado WHERE id_feriado = $1 AND id_ciudad = $2
             `, [id_feriado, id_ciudad]);
-            if (CIUDAD_FERIADO.rowCount > 0) {
+            if (CIUDAD_FERIADO.rowCount != 0) {
                 return res.jsonp(CIUDAD_FERIADO.rows);
             }
             else {
@@ -112,7 +112,7 @@ class CiudadFeriadoControlador {
             const CIUDAD_FERIADO = yield database_1.default.query(`
             SELECT * FROM ef_ciudad_feriado WHERE id_ciudad = $1
             `, [id_ciudad]);
-            if (CIUDAD_FERIADO.rowCount > 0) {
+            if (CIUDAD_FERIADO.rowCount != 0) {
                 return res.jsonp(CIUDAD_FERIADO.rows);
             }
             else {

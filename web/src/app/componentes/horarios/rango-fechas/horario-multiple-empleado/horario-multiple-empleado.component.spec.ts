@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HorarioMultipleEmpleadoComponent } from './horario-multiple-empleado.component';
 
@@ -6,14 +6,12 @@ describe('HorarioMultipleEmpleadoComponent', () => {
   let component: HorarioMultipleEmpleadoComponent;
   let fixture: ComponentFixture<HorarioMultipleEmpleadoComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ HorarioMultipleEmpleadoComponent ]
     })
     .compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(HorarioMultipleEmpleadoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

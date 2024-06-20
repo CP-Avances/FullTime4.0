@@ -29,7 +29,7 @@ class TituloControlador {
       `
       , [nombre, nivel]);
 
-    if (TITULO.rowCount > 0) {
+    if (TITULO.rowCount != 0) {
       return res.jsonp(TITULO.rows)
     }
     else {
@@ -85,7 +85,7 @@ class TituloControlador {
       SELECT * FROM et_titulos WHERE id = $1
       `
       , [id]);
-    if (unTitulo.rowCount > 0) {
+    if (unTitulo.rowCount != 0) {
       return res.jsonp(unTitulo.rows)
     }
     res.status(404).jsonp({ text: 'Registro no encontrado.' });

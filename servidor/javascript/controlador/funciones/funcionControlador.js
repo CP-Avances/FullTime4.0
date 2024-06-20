@@ -21,7 +21,7 @@ class FuncionesControlador {
             const FUNCIONES = yield database_1.default.query(`
             SELECT * FROM e_funciones
             `);
-            if (FUNCIONES.rowCount > 0) {
+            if (FUNCIONES.rowCount != 0) {
                 return res.jsonp(FUNCIONES.rows);
             }
             else {

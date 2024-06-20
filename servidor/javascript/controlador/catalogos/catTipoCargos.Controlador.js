@@ -26,7 +26,7 @@ class TiposCargosControlador {
             const CARGOS = yield database_1.default.query(`
             SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
             `, [nombre]);
-            if (CARGOS.rowCount > 0) {
+            if (CARGOS.rowCount != 0) {
                 return res.jsonp(CARGOS.rows);
             }
             else {
@@ -41,7 +41,7 @@ class TiposCargosControlador {
                 const TIPO_CARGO = yield database_1.default.query(`
                 SELECT * FROM e_cat_tipo_cargo ORDER BY cargo ASC
                 `);
-                if (TIPO_CARGO.rowCount > 0) {
+                if (TIPO_CARGO.rowCount != 0) {
                     return res.jsonp(TIPO_CARGO.rows);
                 }
                 else {
@@ -132,8 +132,8 @@ class TiposCargosControlador {
     }
     // LECTURA DE LOS DATOS DE LA PLATILLA TIPO CARGO
     VerfificarPlantillaTipoCargos(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
                 let separador = path_1.default.sep;

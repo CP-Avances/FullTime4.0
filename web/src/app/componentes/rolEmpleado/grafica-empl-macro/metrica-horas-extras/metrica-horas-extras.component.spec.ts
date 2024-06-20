@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MetricaHorasExtrasComponent } from './metrica-horas-extras.component';
 
@@ -6,14 +6,12 @@ describe('MetricaHorasExtrasComponent', () => {
   let component: MetricaHorasExtrasComponent;
   let fixture: ComponentFixture<MetricaHorasExtrasComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ MetricaHorasExtrasComponent ]
     })
     .compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(MetricaHorasExtrasComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

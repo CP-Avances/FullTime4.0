@@ -14,7 +14,7 @@ class DiscapacidadControlador {
       WHERE cd.id_empleado = e.id AND cd.id_discapacidad = td.id AND cd.id_empleado = $1
       `
       , [id_empleado]);
-    if (unaDiscapacidad.rowCount > 0) {
+    if (unaDiscapacidad.rowCount != 0) {
       return res.jsonp(unaDiscapacidad.rows)
     }
     else {
@@ -88,7 +88,7 @@ class DiscapacidadControlador {
       SELECT * FROM e_cat_discapacidad
       `
     );
-    if (TIPO_DISCAPACIDAD.rowCount > 0) {
+    if (TIPO_DISCAPACIDAD.rowCount != 0) {
       return res.jsonp(TIPO_DISCAPACIDAD.rows)
     }
     else {
@@ -104,7 +104,7 @@ class DiscapacidadControlador {
       SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1
       `
       , [nombre])
-    if (TIPO_DISCAPACIDAD.rowCount > 0) {
+    if (TIPO_DISCAPACIDAD.rowCount != 0) {
       return res.jsonp(TIPO_DISCAPACIDAD.rows)
     }
     else {
@@ -128,7 +128,7 @@ class DiscapacidadControlador {
       SELECT * FROM eu_empleado_discapacidad
       `
     );
-    if (DISCAPACIDAD.rowCount > 0) {
+    if (DISCAPACIDAD.rowCount != 0) {
       return res.jsonp(DISCAPACIDAD.rows)
     }
     else {
@@ -154,7 +154,7 @@ class DiscapacidadControlador {
       SELECT * FROM e_cat_discapacidad WHERE id = $1
       `
       , [id]);
-    if (TIPO_DISCAPACIDAD.rowCount > 0) {
+    if (TIPO_DISCAPACIDAD.rowCount != 0) {
       return res.jsonp(TIPO_DISCAPACIDAD.rows)
     }
     else {

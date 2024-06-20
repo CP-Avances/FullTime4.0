@@ -26,7 +26,7 @@ class ModalidaLaboralControlador {
                 const MODALIDAL_LABORAL = yield database_1.default.query(`
                 SELECT * FROM e_cat_modalidad_trabajo ORDER BY descripcion ASC
                 `);
-                if (MODALIDAL_LABORAL.rowCount > 0) {
+                if (MODALIDAL_LABORAL.rowCount != 0) {
                     return res.jsonp(MODALIDAL_LABORAL.rows);
                 }
                 else {
@@ -116,8 +116,8 @@ class ModalidaLaboralControlador {
     }
     // LECTURA DE LOS DATOS DE LA PLATILLA MODALIDAD_CARGO 
     VerfificarPlantillaModalidadLaboral(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
                 let separador = path_1.default.sep;

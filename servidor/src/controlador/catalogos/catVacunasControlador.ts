@@ -12,7 +12,7 @@ class VacunaControlador {
                 SELECT * FROM e_cat_vacuna ORDER BY nombre ASC
                 `
             );
-            if (VACUNA.rowCount > 0) {
+            if (VACUNA.rowCount != 0) {
                 return res.jsonp(VACUNA.rows)
             } else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.' });

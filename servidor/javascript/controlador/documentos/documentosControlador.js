@@ -132,8 +132,8 @@ class DocumentosControlador {
     }
     // METODO PARA REGISTRAR UN DOCUMENTO    --**VERIFICADO
     CrearDocumento(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             // FECHA DEL SISTEMA
             var fecha = (0, moment_1.default)();
             var anio = fecha.format('YYYY');

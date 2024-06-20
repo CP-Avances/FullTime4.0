@@ -17,7 +17,7 @@ class SucursalControlador {
       `
       , [nombre]);
 
-    if (SUCURSAL.rowCount > 0) {
+    if (SUCURSAL.rowCount != 0) {
       return res.jsonp(SUCURSAL.rows)
     }
     else {
@@ -66,7 +66,7 @@ class SucursalControlador {
       SELECT * FROM e_sucursales WHERE id_empresa = $1
       `
       , [id_empresa]);
-    if (SUCURSAL.rowCount > 0) {
+    if (SUCURSAL.rowCount != 0) {
       return res.jsonp(SUCURSAL.rows)
     }
     else {
@@ -84,7 +84,7 @@ class SucursalControlador {
       ORDER BY s.id
       `
     );
-    if (SUCURSAL.rowCount > 0) {
+    if (SUCURSAL.rowCount != 0) {
       return res.jsonp(SUCURSAL.rows)
     }
     else {
@@ -119,7 +119,7 @@ class SucursalControlador {
       WHERE s.id_ciudad = c.id AND s.id_empresa = ce.id AND s.id = $1
       `
       , [id]);
-    if (SUCURSAL.rowCount > 0) {
+    if (SUCURSAL.rowCount != 0) {
       return res.jsonp(SUCURSAL.rows)
     }
     else {

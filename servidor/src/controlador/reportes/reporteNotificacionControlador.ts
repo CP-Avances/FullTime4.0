@@ -16,7 +16,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -37,7 +37,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [recibe]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -58,7 +58,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -80,7 +80,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [recibe]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -101,7 +101,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -122,7 +122,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [recibe]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -142,7 +142,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -162,7 +162,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -182,7 +182,7 @@ class NotificacionesControlador {
             ORDER BY e.nombre ASC
             `
             , [envia]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -201,7 +201,7 @@ class NotificacionesControlador {
             ORDER BY e.nombre ASC
             `
             , [recibe]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -220,7 +220,7 @@ class NotificacionesControlador {
             ORDER BY e.nombre ASC
             `
             , [envia]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -239,7 +239,7 @@ class NotificacionesControlador {
             ORDER BY e.nombre ASC
             `
             , [recibe]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -258,7 +258,7 @@ class NotificacionesControlador {
             ORDER BY e.nombre ASC
             `
             , [envia]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -277,7 +277,7 @@ class NotificacionesControlador {
             ORDER BY e.nombre ASC
             `,
             [recibe]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -297,7 +297,7 @@ class NotificacionesControlador {
             ORDER BY e.nombre ASC
             `
             , [envia]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -317,7 +317,7 @@ class NotificacionesControlador {
             ORDER BY e.nombre ASC
             `
             , [recibe]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -339,7 +339,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia, id_empleado]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -360,7 +360,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [recibe, id_empleado]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -381,7 +381,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia, id_empleado]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -403,7 +403,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [recibe, id_empleado]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -424,7 +424,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia, id_empleado]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -446,7 +446,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [recibe, id_empleado]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -467,7 +467,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia, id_empleado]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -490,7 +490,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia, id_empleado, fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -512,7 +512,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [recibe, id_empleado, fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -534,7 +534,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia, id_empleado, fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -556,7 +556,7 @@ class NotificacionesControlador {
                 AND h.id = rn.id_hora_extra ORDER BY rn.id DESC
             `
             , [recibe, id_empleado, fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -578,7 +578,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia, id_empleado, fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -600,7 +600,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [recibe, id_empleado, fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -621,7 +621,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia, id_empleado, fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -645,7 +645,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -666,7 +666,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [recibe]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -686,7 +686,7 @@ class NotificacionesControlador {
                 AND h.id = rn.id_hora_extra ORDER BY rn.id DESC
                 `
             , [envia]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -709,7 +709,7 @@ class NotificacionesControlador {
             `
             ,
             [recibe]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -730,7 +730,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -750,7 +750,7 @@ class NotificacionesControlador {
                 v.id = rn.id_vacaciones ORDER BY rn.id DESC
             `
             , [recibe]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -770,7 +770,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -790,7 +790,7 @@ class NotificacionesControlador {
             ORDER BY rn.id DESC
             `
             , [envia]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {

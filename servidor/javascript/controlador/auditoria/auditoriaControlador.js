@@ -25,7 +25,7 @@ class AuditoriaControlador {
             WHERE table_name = $1 AND fecha_hora::date BETWEEN $2 AND $3 
             ORDER BY fecha_hora::date DESC
             `, [tabla, desde, hasta]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {

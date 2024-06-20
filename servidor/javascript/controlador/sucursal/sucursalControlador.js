@@ -26,7 +26,7 @@ class SucursalControlador {
             const SUCURSAL = yield database_1.default.query(`
       SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
       `, [nombre]);
-            if (SUCURSAL.rowCount > 0) {
+            if (SUCURSAL.rowCount != 0) {
                 return res.jsonp(SUCURSAL.rows);
             }
             else {
@@ -67,7 +67,7 @@ class SucursalControlador {
             const SUCURSAL = yield database_1.default.query(`
       SELECT * FROM e_sucursales WHERE id_empresa = $1
       `, [id_empresa]);
-            if (SUCURSAL.rowCount > 0) {
+            if (SUCURSAL.rowCount != 0) {
                 return res.jsonp(SUCURSAL.rows);
             }
             else {
@@ -84,7 +84,7 @@ class SucursalControlador {
       WHERE s.id_ciudad = c.id AND s.id_empresa = ce.id
       ORDER BY s.id
       `);
-            if (SUCURSAL.rowCount > 0) {
+            if (SUCURSAL.rowCount != 0) {
                 return res.jsonp(SUCURSAL.rows);
             }
             else {
@@ -116,7 +116,7 @@ class SucursalControlador {
       FROM e_sucursales s, e_ciudades c, e_empresa ce
       WHERE s.id_ciudad = c.id AND s.id_empresa = ce.id AND s.id = $1
       `, [id]);
-            if (SUCURSAL.rowCount > 0) {
+            if (SUCURSAL.rowCount != 0) {
                 return res.jsonp(SUCURSAL.rows);
             }
             else {
@@ -126,8 +126,8 @@ class SucursalControlador {
     }
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
     RevisarDatos(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;

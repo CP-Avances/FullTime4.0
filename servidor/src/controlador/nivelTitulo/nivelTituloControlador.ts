@@ -15,7 +15,7 @@ class NivelTituloControlador {
       SELECT * FROM et_cat_nivel_titulo ORDER BY nombre ASC
       `
     );
-    if (titulo.rowCount > 0) {
+    if (titulo.rowCount != 0) {
       return res.jsonp(titulo.rows)
     }
     else {
@@ -85,7 +85,7 @@ class NivelTituloControlador {
       `
       , [nombre]);
 
-    if (unNivelTitulo.rowCount > 0) {
+    if (unNivelTitulo.rowCount != 0) {
       return res.jsonp(unNivelTitulo.rows)
     }
     else {
@@ -108,7 +108,7 @@ class NivelTituloControlador {
       SELECT * FROM et_cat_nivel_titulo WHERE id = $1
       `
       , [id]);
-    if (unNivelTitulo.rowCount > 0) {
+    if (unNivelTitulo.rowCount != 0) {
       return res.jsonp(unNivelTitulo.rows)
     }
     else {

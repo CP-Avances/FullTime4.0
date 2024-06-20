@@ -38,7 +38,7 @@ const cumpleanios = function () {
                 WHERE CAST(da.fec_nacimiento AS VARCHAR) LIKE '%' || $1 AND da.id_sucursal = s.id
                     AND da.estado = 1
                 `, [fecha]);
-            if (felizCumple.rowCount > 0) {
+            if (felizCumple.rowCount != 0) {
                 var correos = (0, exports.BuscarCorreos)(felizCumple);
                 var usuarios = (0, exports.PresentarUsuarios)(felizCumple);
                 console.log('ver infor correos', correos);

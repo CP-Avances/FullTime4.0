@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RegistroPlanHorarioComponent } from './registro-plan-horario.component';
 
@@ -6,14 +6,12 @@ describe('RegistroPlanHorarioComponent', () => {
   let component: RegistroPlanHorarioComponent;
   let fixture: ComponentFixture<RegistroPlanHorarioComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ RegistroPlanHorarioComponent ]
     })
     .compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(RegistroPlanHorarioComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

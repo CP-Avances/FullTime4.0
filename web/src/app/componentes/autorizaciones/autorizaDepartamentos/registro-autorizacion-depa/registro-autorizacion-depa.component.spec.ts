@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RegistroAutorizacionDepaComponent } from './registro-autorizacion-depa.component';
 
@@ -6,14 +6,12 @@ describe('RegistroAutorizacionDepaComponent', () => {
   let component: RegistroAutorizacionDepaComponent;
   let fixture: ComponentFixture<RegistroAutorizacionDepaComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ RegistroAutorizacionDepaComponent ]
     })
     .compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(RegistroAutorizacionDepaComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

@@ -25,7 +25,7 @@ class EmpleadoCargosControlador {
       ORDER BY ec.id
       `
       , [id]);
-    if (unEmplCargp.rowCount > 0) {
+    if (unEmplCargp.rowCount != 0) {
       return res.jsonp(unEmplCargp.rows)
     }
     else {
@@ -76,7 +76,7 @@ class EmpleadoCargosControlador {
       WHERE ec.id_contrato = $1 AND ec.id_sucursal = s.id AND ec.id_departamento = d.id
       `
       , [id_empl_contrato]);
-    if (unEmplCargp.rowCount > 0) {
+    if (unEmplCargp.rowCount != 0) {
       return res.jsonp(unEmplCargp.rows)
     }
     else {
@@ -95,7 +95,7 @@ class EmpleadoCargosControlador {
       WHERE ec.id = dc.cargo_id AND dc.empl_id = $1 AND $2 < ec.fecha_final
       `
       , [id_empleado, fecha_verificar]);
-    if (CARGOS.rowCount > 0) {
+    if (CARGOS.rowCount != 0) {
       return res.jsonp(CARGOS.rows)
     }
     else {
@@ -113,7 +113,7 @@ class EmpleadoCargosControlador {
         WHERE ec.id = dc.cargo_id AND dc.empl_id = $1 AND $2 < ec.fecha_final AND NOT ec.id = $3
         `
       , [id_empleado, fecha_verificar, id_cargo]);
-    if (CARGOS.rowCount > 0) {
+    if (CARGOS.rowCount != 0) {
       return res.jsonp(CARGOS.rows)
     }
     else {
@@ -148,7 +148,7 @@ class EmpleadoCargosControlador {
       SELECT * FROM eu_empleado_cargos
       `
     );
-    if (Cargos.rowCount > 0) {
+    if (Cargos.rowCount != 0) {
       return res.jsonp(Cargos.rows);
     }
     else {
@@ -167,7 +167,7 @@ class EmpleadoCargosControlador {
       ORDER BY nombre ASC
       `
     );
-    if (empleadoCargos.rowCount > 0) {
+    if (empleadoCargos.rowCount != 0) {
       return res.jsonp(empleadoCargos.rows);
     }
     else {
@@ -186,7 +186,7 @@ class EmpleadoCargosControlador {
       WHERE ce.id_empleado = e.id AND ec.id_contrato = ce.id AND e.id = $1
       `
       , [id_empleado]);
-    if (CARGO.rowCount > 0) {
+    if (CARGO.rowCount != 0) {
       return res.jsonp(CARGO.rows)
     }
     else {
@@ -204,7 +204,7 @@ class EmpleadoCargosControlador {
       `
       ,
       [id_empleado]);
-    if (CARGO.rowCount > 0 && CARGO.rows[0]['max'] != null) {
+    if (CARGO.rowCount != 0 && CARGO.rows[0]['max'] != null) {
       return res.jsonp(CARGO.rows)
     }
     else {
@@ -226,7 +226,7 @@ class EmpleadoCargosControlador {
       SELECT * FROM e_cat_tipo_cargo WHERE id = $1
       `
       , [id]);
-    if (Cargos.rowCount > 0) {
+    if (Cargos.rowCount != 0) {
       return res.jsonp(Cargos.rows);
     }
     else {
@@ -244,7 +244,7 @@ class EmpleadoCargosControlador {
       GROUP BY tc.cargo, tc.id
       `
       , [id]);
-    if (Cargos.rowCount > 0) {
+    if (Cargos.rowCount != 0) {
       return res.jsonp(Cargos.rows);
     }
     else {
@@ -262,7 +262,7 @@ class EmpleadoCargosControlador {
       GROUP BY tc.cargo, tc.id
       `
       , [id]);
-    if (Cargos.rowCount > 0) {
+    if (Cargos.rowCount != 0) {
       return res.jsonp(Cargos.rows);
     }
     else {
@@ -280,7 +280,7 @@ class EmpleadoCargosControlador {
       GROUP BY tc.id, tc.cargo
       `
       , [id]);
-    if (Cargos.rowCount > 0) {
+    if (Cargos.rowCount != 0) {
       return res.jsonp(Cargos.rows);
     }
     else {
@@ -306,7 +306,7 @@ class EmpleadoCargosControlador {
       SELECT * FROM e_cat_tipo_cargo
       `
     );
-    if (Cargos.rowCount > 0) {
+    if (Cargos.rowCount != 0) {
       return res.jsonp(Cargos.rows);
     }
     else {

@@ -98,7 +98,7 @@ class LoginControlador {
           ORDER BY c.fecha_inicio DESC LIMIT 1
           `, [USUARIO.rows[0].id_empleado]);
                     // VALIDACION DE ACCESO CON LICENCIA 
-                    if (INFORMACION.rowCount > 0) {
+                    if (INFORMACION.rowCount != 0) {
                         console.log('ingresa a validacion de licencia');
                         try {
                             const { id_contrato, id_cargo, id_departamento, acciones_timbres, id_sucursal, id_empresa, public_key: licencia } = INFORMACION.rows[0];
@@ -106,7 +106,7 @@ class LoginControlador {
               SELECT estado FROM ed_autoriza_departamento
               WHERE id_empleado_cargo = $1 AND id_departamento = $2
               `, [id_cargo, id_departamento]);
-                            if (AUTORIZA.rowCount > 0) {
+                            if (AUTORIZA.rowCount != 0) {
                                 const { estado: autoriza_est } = AUTORIZA.rows[0];
                                 const token = jsonwebtoken_1.default.sign({
                                     _licencia: licencia, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
@@ -125,13 +125,13 @@ class LoginControlador {
                                 const token = jsonwebtoken_1.default.sign({
                                     _licencia: licencia, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
                                     _dep: id_departamento, _web_access: web_access, _acc_tim: acciones_timbres, _suc: id_sucursal,
-                                    _empresa: id_empresa, estado: false, cargo: id_cargo, ip_adress: ip_cliente,
+                                    _empresa: id_empresa, estado: false, cargo: id_cargo, ip_adress: ip_cliente, //modulos: modulos,
                                     id_contrato: id_contrato
                                 }, process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
                                 return res.status(200).jsonp({
                                     caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
                                     departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
-                                    empresa: id_empresa, cargo: id_cargo, estado: false, ip_adress: ip_cliente,
+                                    empresa: id_empresa, cargo: id_cargo, estado: false, ip_adress: ip_cliente, //modulos: modulos,
                                     id_contrato: id_contrato
                                 });
                             }

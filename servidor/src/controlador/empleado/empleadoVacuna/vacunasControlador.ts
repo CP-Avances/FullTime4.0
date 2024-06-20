@@ -19,7 +19,7 @@ class VacunasControlador {
             ORDER BY ev.id DESC
             `
             , [id_empleado]);
-        if (VACUNA.rowCount > 0) {
+        if (VACUNA.rowCount != 0) {
             return res.jsonp(VACUNA.rows)
         }
         else {
@@ -34,7 +34,7 @@ class VacunasControlador {
             SELECT * FROM e_cat_vacuna
             `
         );
-        if (VACUNA.rowCount > 0) {
+        if (VACUNA.rowCount != 0) {
             return res.jsonp(VACUNA.rows)
         }
         else {
@@ -51,7 +51,7 @@ class VacunasControlador {
             `
             , [fecha, id_vacuna, id_empleado]
         );
-        if (VACUNA.rowCount > 0) {
+        if (VACUNA.rowCount != 0) {
             return res.jsonp(VACUNA.rows)
         }
         else {
@@ -278,7 +278,7 @@ class VacunasControlador {
             ORDER BY ev.id DESC
             `
         );
-        if (VACUNA.rowCount > 0) {
+        if (VACUNA.rowCount != 0) {
             return res.jsonp(VACUNA.rows)
         }
         else {

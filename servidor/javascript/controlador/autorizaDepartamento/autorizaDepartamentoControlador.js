@@ -28,7 +28,7 @@ class AutorizaDepartamentoControlador {
             WHERE da.id_departamento = cd.id AND cd.id_sucursal = s.id AND ce.id = s.id_empresa
                 AND da.id_empleado = $1
             `, [id_empleado]);
-            if (AUTORIZA.rowCount > 0) {
+            if (AUTORIZA.rowCount != 0) {
                 return res.jsonp(AUTORIZA.rows);
             }
             else {
@@ -53,7 +53,7 @@ class AutorizaDepartamentoControlador {
                 AND e.id_cargo = da.id_empleado_cargo
                 AND n.id_departamento_nivel = cd.id
             `, [id_empleado]);
-            if (AUTORIZA.rowCount > 0) {
+            if (AUTORIZA.rowCount != 0) {
                 return res.jsonp(AUTORIZA.rows);
             }
             else {
@@ -100,7 +100,7 @@ class AutorizaDepartamentoControlador {
             const AUTORIZA = yield database_1.default.query(`
             SELECT * FROM ed_autoriza_departamento
             `);
-            if (AUTORIZA.rowCount > 0) {
+            if (AUTORIZA.rowCount != 0) {
                 return res.jsonp(AUTORIZA.rows);
             }
             else {
@@ -119,7 +119,7 @@ class AutorizaDepartamentoControlador {
                 AND d.id_empleado_cargo = v.id_cargo 
             WHERE d.id_departamento = $1
             `, [id_depa]);
-            if (EMPLEADOS.rowCount > 0) {
+            if (EMPLEADOS.rowCount != 0) {
                 return res.jsonp(EMPLEADOS.rows);
             }
             else {
@@ -133,7 +133,7 @@ class AutorizaDepartamentoControlador {
             const EMPLEADOS = yield database_1.default.query(`
             SELECT * FROM VistaAutorizanCargo WHERE id_depar = $1
             `, [id_depar]);
-            if (EMPLEADOS.rowCount > 0) {
+            if (EMPLEADOS.rowCount != 0) {
                 return res.jsonp(EMPLEADOS.rows);
             }
             else {
@@ -161,7 +161,7 @@ class AutorizaDepartamentoControlador {
                 AND dae.estado = $2
             ORDER BY nivel ASC
             `, [id_depar, estado]);
-            if (EMPLEADOS.rowCount > 0) {
+            if (EMPLEADOS.rowCount != 0) {
                 return res.jsonp(EMPLEADOS.rows);
             }
             else {

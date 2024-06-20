@@ -16,7 +16,7 @@ class ModalidaLaboralControlador {
                 SELECT * FROM e_cat_modalidad_trabajo ORDER BY descripcion ASC
                 `
             );
-            if (MODALIDAL_LABORAL.rowCount > 0) {
+            if (MODALIDAL_LABORAL.rowCount != 0) {
                 return res.jsonp(MODALIDAL_LABORAL.rows)
             } else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.' });

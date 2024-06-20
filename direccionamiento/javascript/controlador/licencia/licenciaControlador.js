@@ -20,7 +20,6 @@ class LicenciaControlador {
             try {
                 //CONSULTA DE LICENCIA EN BASE A PUBLIC_KEY DE EMPRESA
                 let { public_key } = req.body;
-                console.log(public_key);
                 let licenciasRows = 0;
                 let licencias = yield database_1.default.query(`
                 SELECT 

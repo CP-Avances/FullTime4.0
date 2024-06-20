@@ -1,19 +1,17 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { VerListadoNivelComponent } from './ver-listado-nivel.component';
 
-describe('EditarDepartamentoComponent', () => {
+describe('VerListadoNivelComponent', () => {
   let component: VerListadoNivelComponent;
   let fixture: ComponentFixture<VerListadoNivelComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ VerListadoNivelComponent ]
     })
     .compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(VerListadoNivelComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

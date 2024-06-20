@@ -23,7 +23,7 @@ class EmpleadoControlador {
       SELECT * FROM e_codigo
       `
     );
-    if (VALOR.rowCount > 0) {
+    if (VALOR.rowCount != 0) {
       return res.jsonp(VALOR.rows)
     }
     else {
@@ -50,7 +50,7 @@ class EmpleadoControlador {
         SELECT MAX(codigo::BIGINT) AS codigo FROM eu_empleados
         `
       ); //TODO Revisar Instrucción SQL max codigo
-      if (VALOR.rowCount > 0) {
+      if (VALOR.rowCount != 0) {
         return res.jsonp(VALOR.rows)
       }
       else {
@@ -311,7 +311,7 @@ class EmpleadoControlador {
       SELECT * FROM eu_empleados WHERE id = $1
       `
       , [id]);
-    if (EMPLEADO.rowCount > 0) {
+    if (EMPLEADO.rowCount != 0) {
       return res.jsonp(EMPLEADO.rows)
     }
     else {
@@ -463,7 +463,7 @@ class EmpleadoControlador {
       `
       , [id]);
 
-    if (unEmpleado.rowCount > 0) {
+    if (unEmpleado.rowCount != 0) {
 
       unEmpleado.rows.map(async (obj: any) => {
 
@@ -543,7 +543,7 @@ class EmpleadoControlador {
         ORDER BY id
         `
       , [id_empleado]);
-    if (unEmpleadoTitulo.rowCount > 0) {
+    if (unEmpleadoTitulo.rowCount != 0) {
       return res.jsonp(unEmpleadoTitulo.rows)
     }
     else {
@@ -561,7 +561,7 @@ class EmpleadoControlador {
       WHERE et.id_empleado = $1 AND et.id_titulo = $2
       `
       , [id_empleado, id_titulo]);
-    if (unEmpleadoTitulo.rowCount > 0) {
+    if (unEmpleadoTitulo.rowCount != 0) {
       return res.jsonp(unEmpleadoTitulo.rows)
     }
     else {
@@ -616,7 +616,7 @@ class EmpleadoControlador {
       SELECT longitud, latitud FROM eu_empleados WHERE id = $1
       `
       , [id]);
-    if (UBICACION.rowCount > 0) {
+    if (UBICACION.rowCount != 0) {
       return res.jsonp(UBICACION.rows)
     }
     else {
@@ -640,7 +640,7 @@ class EmpleadoControlador {
       (UPPER (apellido) || \' \' || UPPER (nombre)) = $1
       `
       , [informacion]);
-    if (EMPLEADO.rowCount > 0) {
+    if (EMPLEADO.rowCount != 0) {
       return res.jsonp(EMPLEADO.rows)
     }
     else {
@@ -706,7 +706,7 @@ class EmpleadoControlador {
       id_cargo = $2
       `
       , [id_emple, id_cargo]);
-    if (DEPARTAMENTO.rowCount > 0) {
+    if (DEPARTAMENTO.rowCount != 0) {
       return res.jsonp(DEPARTAMENTO.rows)
     }
     else {

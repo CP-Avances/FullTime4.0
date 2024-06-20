@@ -29,7 +29,7 @@ class PermisosControlador {
             SELECT MAX(p.numero_permiso) FROM mp_solicitud_permiso AS p, eu_empleados AS e 
             WHERE p.codigo = e.codigo AND e.id = $1
             `, [id_empleado]);
-            if (NUMERO_PERMISO.rowCount > 0) {
+            if (NUMERO_PERMISO.rowCount != 0) {
                 return res.jsonp(NUMERO_PERMISO.rows);
             }
             else {
@@ -245,8 +245,8 @@ class PermisosControlador {
     }
     // REGISTRAR DOCUMENTO DE RESPALDO DE PERMISO  
     GuardarDocumentoPermiso(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             // FECHA DEL SISTEMA
             var fecha = (0, moment_1.default)();
             var anio = fecha.format('YYYY');
@@ -341,7 +341,7 @@ class PermisosControlador {
                 AND s.id = ce.id_sucursal AND s.id_ciudad = c.id AND s.id_empresa = e.id AND tc.id = ce.id_tipo_cargo
                 AND p.id = $1
             `, [id]);
-            if (PERMISOS.rowCount > 0) {
+            if (PERMISOS.rowCount != 0) {
                 return res.json(PERMISOS.rows);
             }
             else {
@@ -785,7 +785,7 @@ class PermisosControlador {
             const PERMISOS = yield database_1.default.query(`
             SELECT * FROM mp_solicitud_permiso
             `);
-            if (PERMISOS.rowCount > 0) {
+            if (PERMISOS.rowCount != 0) {
                 return res.jsonp(PERMISOS.rows);
             }
             else {
@@ -807,7 +807,7 @@ class PermisosControlador {
                 AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 1 OR p.estado = 2)
             ORDER BY estado DESC, fecha_creacion DESC
             `);
-            if (PERMISOS.rowCount > 0) {
+            if (PERMISOS.rowCount != 0) {
                 return res.jsonp(PERMISOS.rows);
             }
             else {
@@ -829,7 +829,7 @@ class PermisosControlador {
                 AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 3 OR p.estado = 4)
             ORDER BY estado ASC, fecha_creacion DESC
             `);
-            if (PERMISOS.rowCount > 0) {
+            if (PERMISOS.rowCount != 0) {
                 return res.jsonp(PERMISOS.rows);
             }
             else {
@@ -843,7 +843,7 @@ class PermisosControlador {
             const PERMISOS = yield database_1.default.query(`
             SELECT * FROM mp_solicitud_permiso WHERE id = $1
             `, [id]);
-            if (PERMISOS.rowCount > 0) {
+            if (PERMISOS.rowCount != 0) {
                 return res.jsonp(PERMISOS.rows);
             }
             else {
@@ -896,7 +896,7 @@ class PermisosControlador {
             const SOLICITUD = yield database_1.default.query(`
             SELECT * FROM vista_datos_solicitud_permiso WHERE id_emple_permiso = $1
             `, [id]);
-            if (SOLICITUD.rowCount > 0) {
+            if (SOLICITUD.rowCount != 0) {
                 return res.json(SOLICITUD.rows);
             }
             else {
@@ -913,7 +913,7 @@ class PermisosControlador {
             FROM ecm_autorizaciones AS a, mp_solicitud_permiso AS p 
             WHERE p.id = a.id_permiso AND p.id = $1
             `, [id]);
-            if (SOLICITUD.rowCount > 0) {
+            if (SOLICITUD.rowCount != 0) {
                 return res.json(SOLICITUD.rows);
             }
             else {
@@ -931,7 +931,7 @@ class PermisosControlador {
             WHERE (pg.tipo_accion = \'E\' OR pg.tipo_accion = \'S\') AND pg.codigo = $3 
                 AND (pg.fecha_hora_horario:: date = $1 OR pg.fecha_hora_horario:: date = $2)
             `, [fec_inicio, fec_final, codigo]);
-            if (PERMISOS.rowCount > 0) {
+            if (PERMISOS.rowCount != 0) {
                 return res.jsonp(PERMISOS.rows);
             }
             else {
@@ -985,7 +985,7 @@ class PermisosControlador {
             WHERE p.id = $1 AND p.id_empleado_contrato = ec.id AND ec.id_empleado = e.id 
                 AND p.id_tipo_permiso = cp.id
             `, [id]);
-            if (PERMISOS.rowCount > 0) {
+            if (PERMISOS.rowCount != 0) {
                 return res.json(PERMISOS.rows);
             }
             else {

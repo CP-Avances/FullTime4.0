@@ -397,7 +397,7 @@ class DatosGeneralesControlador {
             WHERE da.id_cargo = ce.id AND da.id_rol = r.id 
             ORDER BY da.apellido ASC
             `);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -792,7 +792,7 @@ class DatosGeneralesControlador {
             const DATOS = yield database_1.default.query(`
             SELECT * FROM datos_actuales_empleado WHERE id = $1
             `, [empleado_id]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -1250,7 +1250,7 @@ class DatosGeneralesControlador {
                 e_datos.id_contrato = co.id AND co.id_regimen = r.id 
             ORDER BY e_datos.nombre ASC
             `);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -1269,7 +1269,7 @@ class DatosGeneralesControlador {
             WHERE da.id_cargo = ec.id AND ec.id_tipo_cargo = tc.id AND cd.id = da.id_departamento AND 
             da.id = $1
             `, [empleado_id]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -1373,7 +1373,7 @@ class DatosGeneralesControlador {
                 "WHERE da.id_cargo = ce.id AND da.id_rol = r.id AND s.id = da.id_sucursal " +
                 "   AND da.estado = $1 AND us.id_empleado = da.id AND us.id_sucursal IN (" + lista_sucursales + ") " +
                 "ORDER BY da.apellido ASC ", [estado]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {

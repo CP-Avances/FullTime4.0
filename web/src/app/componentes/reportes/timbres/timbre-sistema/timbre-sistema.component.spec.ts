@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TimbreSistemaComponent } from './timbre-sistema.component';
 
@@ -6,14 +6,12 @@ describe('TimbreSistemaComponent', () => {
   let component: TimbreSistemaComponent;
   let fixture: ComponentFixture<TimbreSistemaComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ TimbreSistemaComponent ]
     })
     .compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(TimbreSistemaComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

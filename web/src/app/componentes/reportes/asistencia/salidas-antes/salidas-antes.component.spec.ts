@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SalidasAntesComponent } from './salidas-antes.component';
 
@@ -6,14 +6,12 @@ describe('SalidasAntesComponent', () => {
   let component: SalidasAntesComponent;
   let fixture: ComponentFixture<SalidasAntesComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ SalidasAntesComponent ]
     })
     .compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(SalidasAntesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

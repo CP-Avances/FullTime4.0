@@ -23,7 +23,7 @@ class TipoComidasControlador {
             WHERE ctc.id_comida = tc.id
             ORDER BY tc.nombre ASC, ctc.id ASC
             `);
-            if (TIPO_COMIDAS.rowCount > 0) {
+            if (TIPO_COMIDAS.rowCount != 0) {
                 return res.jsonp(TIPO_COMIDAS.rows);
             }
             else {
@@ -40,7 +40,7 @@ class TipoComidasControlador {
             WHERE ctc.id_comida = tc.id AND dm.id_horario_comida = ctc.id 
             ORDER BY tc.nombre ASC, ctc.id ASC
             `);
-            if (TIPO_COMIDAS.rowCount > 0) {
+            if (TIPO_COMIDAS.rowCount != 0) {
                 return res.jsonp(TIPO_COMIDAS.rows);
             }
             else {
@@ -56,7 +56,7 @@ class TipoComidasControlador {
             FROM ma_horario_comidas AS ctc, ma_cat_comidas AS tc 
             WHERE ctc.id_comida = tc.id AND ctc.id = $1
             `, [id]);
-            if (TIPO_COMIDAS.rowCount > 0) {
+            if (TIPO_COMIDAS.rowCount != 0) {
                 return res.jsonp(TIPO_COMIDAS.rows);
             }
             else {
@@ -74,7 +74,7 @@ class TipoComidasControlador {
             WHERE ctc.id_comida = tc.id AND tc.id = $1 
             ORDER BY tc.nombre ASC
             `, [id]);
-            if (TIPO_COMIDAS.rowCount > 0) {
+            if (TIPO_COMIDAS.rowCount != 0) {
                 return res.jsonp(TIPO_COMIDAS.rows);
             }
             else {
@@ -122,7 +122,7 @@ class TipoComidasControlador {
             const TIPO_COMIDAS = yield database_1.default.query(`
             SELECT MAX (id) FROM ma_horario_comidas
             `);
-            if (TIPO_COMIDAS.rowCount > 0) {
+            if (TIPO_COMIDAS.rowCount != 0) {
                 return res.jsonp(TIPO_COMIDAS.rows);
             }
             else {
@@ -151,7 +151,7 @@ class TipoComidasControlador {
             FROM ma_cat_comidas AS tc, ma_horario_comidas AS menu, ma_detalle_comida AS dm 
             WHERE tc.id = menu.id_comida AND dm.id_horario_comida = menu.id AND menu.id = $1
             `, [id]);
-            if (TIPO_COMIDAS.rowCount > 0) {
+            if (TIPO_COMIDAS.rowCount != 0) {
                 return res.jsonp(TIPO_COMIDAS.rows);
             }
             else {

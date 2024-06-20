@@ -24,7 +24,7 @@ class AutorizacionesControlador {
             const AUTORIZACIONES = yield database_1.default.query(`
             SELECT * FROM ecm_autorizaciones WHERE id_permiso = $1
             `, [id]);
-            if (AUTORIZACIONES.rowCount > 0) {
+            if (AUTORIZACIONES.rowCount != 0) {
                 return res.jsonp(AUTORIZACIONES.rows);
             }
             else {
@@ -37,7 +37,7 @@ class AutorizacionesControlador {
             const AUTORIZACIONES = yield database_1.default.query(`
             SELECT * FROM ecm_autorizaciones ORDER BY id
             `);
-            if (AUTORIZACIONES.rowCount > 0) {
+            if (AUTORIZACIONES.rowCount != 0) {
                 return res.jsonp(AUTORIZACIONES.rows);
             }
             else {
@@ -51,7 +51,7 @@ class AutorizacionesControlador {
             const AUTORIZACIONES = yield database_1.default.query(`
             SELECT * FROM ecm_autorizaciones WHERE id_vacacion = $1
             `, [id]);
-            if (AUTORIZACIONES.rowCount > 0) {
+            if (AUTORIZACIONES.rowCount != 0) {
                 return res.jsonp(AUTORIZACIONES.rows);
             }
             else {
@@ -65,7 +65,7 @@ class AutorizacionesControlador {
             const AUTORIZACIONES = yield database_1.default.query(`
             SELECT * FROM ecm_autorizaciones WHERE id_hora_extra = $1
             `, [id]);
-            if (AUTORIZACIONES.rowCount > 0) {
+            if (AUTORIZACIONES.rowCount != 0) {
                 return res.jsonp(AUTORIZACIONES.rows);
             }
             else {

@@ -18,7 +18,7 @@ class PeriodoVacacionControlador {
                            WHERE pv.codigo = e.codigo AND e.id = $1 )
             `
             , [id_empleado]);
-        if (VACACIONES.rowCount > 0) {
+        if (VACACIONES.rowCount != 0) {
             return res.jsonp(VACACIONES.rows)
         }
         res.status(404).jsonp({ text: 'Registro no encontrado' });
@@ -34,7 +34,7 @@ class PeriodoVacacionControlador {
             SELECT * FROM mv_periodo_vacacion WHERE estado = 1 ORDER BY fecha_inicio DESC
             `
         );
-        if (VACACIONES.rowCount > 0) {
+        if (VACACIONES.rowCount != 0) {
             return res.jsonp(VACACIONES.rows)
         }
         else {
@@ -63,7 +63,7 @@ class PeriodoVacacionControlador {
             SELECT * FROM mv_periodo_vacacion AS p WHERE p.codigo = $1
             `
             , [codigo]);
-        if (PERIODO_VACACIONES.rowCount > 0) {
+        if (PERIODO_VACACIONES.rowCount != 0) {
             return res.jsonp(PERIODO_VACACIONES.rows)
         }
         res.status(404).jsonp({ text: 'Registro no encontrado.' });

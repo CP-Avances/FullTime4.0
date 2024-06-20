@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ListarPlanificacionComponent } from './listar-planificacion.component';
 
@@ -6,14 +6,12 @@ describe('ListarPlanificacionComponent', () => {
   let component: ListarPlanificacionComponent;
   let fixture: ComponentFixture<ListarPlanificacionComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ ListarPlanificacionComponent ]
     })
     .compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(ListarPlanificacionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

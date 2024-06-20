@@ -128,12 +128,12 @@ export class LoginComponent implements OnInit {
       "codigo_empresa": form.empresaF.toString()
     };
 
-    //Validacion de empresa para direccionamiento
+    //VALIDACION DE EMPRESA PARA DIRECCIONAMIENTO
     this.rest.getEmpresa(empresas).subscribe(
       {
         next: (v) => 
         {
-          //Segun el valor de la respuesta guardamos la IP o devolvemos error.
+          //GUARDAMOS IP O DEVOLVEMOS ERROR
           this.mensaje = v;
           if (this.mensaje.message === 'ok') {
             localStorage.setItem("empresaURL", this.mensaje.empresas[0].empresa_direccion);

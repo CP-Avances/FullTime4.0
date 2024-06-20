@@ -32,7 +32,7 @@ class EmpleadoControlador {
             const VALOR = yield database_1.default.query(`
       SELECT * FROM e_codigo
       `);
-            if (VALOR.rowCount > 0) {
+            if (VALOR.rowCount != 0) {
                 return res.jsonp(VALOR.rows);
             }
             else {
@@ -57,7 +57,7 @@ class EmpleadoControlador {
                 const VALOR = yield database_1.default.query(`
         SELECT MAX(codigo::BIGINT) AS codigo FROM eu_empleados
         `); //TODO Revisar Instrucción SQL max codigo
-                if (VALOR.rowCount > 0) {
+                if (VALOR.rowCount != 0) {
                     return res.jsonp(VALOR.rows);
                 }
                 else {
@@ -292,7 +292,7 @@ class EmpleadoControlador {
             const EMPLEADO = yield database_1.default.query(`
       SELECT * FROM eu_empleados WHERE id = $1
       `, [id]);
-            if (EMPLEADO.rowCount > 0) {
+            if (EMPLEADO.rowCount != 0) {
                 return res.jsonp(EMPLEADO.rows);
             }
             else {
@@ -415,7 +415,7 @@ class EmpleadoControlador {
             const unEmpleado = yield database_1.default.query(`
       SELECT * FROM eu_empleados WHERE id = $1
       `, [id]);
-            if (unEmpleado.rowCount > 0) {
+            if (unEmpleado.rowCount != 0) {
                 unEmpleado.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
                     var _a;
                     let imagen = obj.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
@@ -486,7 +486,7 @@ class EmpleadoControlador {
         WHERE et.id_empleado = $1 AND et.id_titulo = ct.id AND ct.id_nivel = nt.id
         ORDER BY id
         `, [id_empleado]);
-            if (unEmpleadoTitulo.rowCount > 0) {
+            if (unEmpleadoTitulo.rowCount != 0) {
                 return res.jsonp(unEmpleadoTitulo.rows);
             }
             else {
@@ -503,7 +503,7 @@ class EmpleadoControlador {
       FROM eu_empleado_titulos AS et
       WHERE et.id_empleado = $1 AND et.id_titulo = $2
       `, [id_empleado, id_titulo]);
-            if (unEmpleadoTitulo.rowCount > 0) {
+            if (unEmpleadoTitulo.rowCount != 0) {
                 return res.jsonp(unEmpleadoTitulo.rows);
             }
             else {
@@ -552,7 +552,7 @@ class EmpleadoControlador {
             const UBICACION = yield database_1.default.query(`
       SELECT longitud, latitud FROM eu_empleados WHERE id = $1
       `, [id]);
-            if (UBICACION.rowCount > 0) {
+            if (UBICACION.rowCount != 0) {
                 return res.jsonp(UBICACION.rows);
             }
             else {
@@ -568,7 +568,7 @@ class EmpleadoControlador {
       SELECT * FROM eu_empleados WHERE
       (UPPER (apellido) || \' \' || UPPER (nombre)) = $1
       `, [informacion]);
-            if (EMPLEADO.rowCount > 0) {
+            if (EMPLEADO.rowCount != 0) {
                 return res.jsonp(EMPLEADO.rows);
             }
             else {
@@ -625,7 +625,7 @@ class EmpleadoControlador {
       SELECT * FROM VistaDepartamentoEmpleado WHERE id_emple = $1 AND
       id_cargo = $2
       `, [id_emple, id_cargo]);
-            if (DEPARTAMENTO.rowCount > 0) {
+            if (DEPARTAMENTO.rowCount != 0) {
                 return res.jsonp(DEPARTAMENTO.rows);
             }
             else {
@@ -652,8 +652,8 @@ class EmpleadoControlador {
      ** **                      CARGAR INFORMACIÓN MEDIANTE PLANTILLA                            **
      ** **************************************************************************************** **/
     VerificarPlantilla_Automatica(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_2.ObtenerRutaLeerPlantillas)() + separador + documento;
@@ -1133,8 +1133,8 @@ class EmpleadoControlador {
     }
     /** METODOS PARA VERIFICAR PLANTILLA CON CÓDIGO INGRESADO DE FORMA MANUAL */
     VerificarPlantilla_Manual(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_2.ObtenerRutaLeerPlantillas)() + separador + documento;

@@ -56,7 +56,7 @@ class DepartamentoControlador {
       WHERE d.id = $1 AND s.id = d.id_sucursal
       `
       , [id]);
-    if (DEPARTAMENTO.rowCount > 0) {
+    if (DEPARTAMENTO.rowCount != 0) {
       return res.jsonp(DEPARTAMENTO.rows)
     }
     res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
@@ -71,7 +71,7 @@ class DepartamentoControlador {
       SELECT * FROM ed_departamentos WHERE id_sucursal = $1
       `
       , [id_sucursal]);
-    if (DEPARTAMENTO.rowCount > 0) {
+    if (DEPARTAMENTO.rowCount != 0) {
       return res.jsonp(DEPARTAMENTO.rows)
     }
     res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
@@ -85,7 +85,7 @@ class DepartamentoControlador {
       SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND NOT id = $2
       `
       , [id_sucursal, id]);
-    if (DEPARTAMENTO.rowCount > 0) {
+    if (DEPARTAMENTO.rowCount != 0) {
       return res.jsonp(DEPARTAMENTO.rows)
     }
     res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -118,18 +118,18 @@ class DepartamentoControlador {
       `
     );
 
-    if (DEPARTAMENTOS.rowCount > 0 && NIVELES.rowCount > 0) {
+    if (DEPARTAMENTOS.rowCount != 0 && NIVELES.rowCount != 0) {
       NIVELES.rows.forEach((obj: any) => {
         DEPARTAMENTOS.rows.push(obj);
       });
       return res.jsonp(DEPARTAMENTOS.rows);
     }
 
-    else if (DEPARTAMENTOS.rowCount > 0) {
+    else if (DEPARTAMENTOS.rowCount != 0) {
       return res.jsonp(DEPARTAMENTOS.rows);
     }
 
-    else if (NIVELES.rowCount > 0) {
+    else if (NIVELES.rowCount != 0) {
       return res.jsonp(NIVELES.rows);
     }
 
@@ -169,18 +169,18 @@ class DepartamentoControlador {
       , [id]
     );
 
-    if (DEPARTAMENTO.rowCount > 0 && NIVEL.rowCount > 0) {
+    if (DEPARTAMENTO.rowCount != 0 && NIVEL.rowCount != 0) {
       DEPARTAMENTO.rows.forEach((obj: any) => {
         NIVEL.rows.push(obj);
       });
       return res.jsonp(NIVEL.rows);
     }
 
-    else if (DEPARTAMENTO.rowCount > 0) {
+    else if (DEPARTAMENTO.rowCount != 0) {
       return res.jsonp(DEPARTAMENTO.rows);
     }
 
-    else if (NIVEL.rowCount > 0) {
+    else if (NIVEL.rowCount != 0) {
       return res.jsonp(NIVEL.rows);
     }
 
@@ -249,7 +249,7 @@ class DepartamentoControlador {
       ORDER BY nivel DESC 
       `
       , [id_departamento, id_establecimiento]);
-    if (NIVELESDEP.rowCount > 0) {
+    if (NIVELESDEP.rowCount != 0) {
       return res.jsonp(NIVELESDEP.rows)
     }
     res.status(404).jsonp({ text: 'Registros no encontrados.' });
@@ -531,7 +531,7 @@ class DepartamentoControlador {
       SELECT * FROM ed_departamentos
       `
     );
-    if (DEPARTAMENTOS.rowCount > 0) {
+    if (DEPARTAMENTOS.rowCount != 0) {
       return res.jsonp(DEPARTAMENTOS.rows)
     }
     else {
@@ -546,7 +546,7 @@ class DepartamentoControlador {
       SELECT * FROM ed_departamentos WHERE nombre = $1
       `
       , [nombre]);
-    if (DEPARTAMENTOS.rowCount > 0) {
+    if (DEPARTAMENTOS.rowCount != 0) {
       return res.jsonp(DEPARTAMENTOS.rows)
     }
     else {
@@ -561,7 +561,7 @@ class DepartamentoControlador {
       SELECT id FROM ed_departamentos WHERE nombre = $1
       `
       , [nombre]);
-    if (DEPARTAMENTO.rowCount > 0) {
+    if (DEPARTAMENTO.rowCount != 0) {
       return res.jsonp(DEPARTAMENTO.rows);
     }
     res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -574,7 +574,7 @@ class DepartamentoControlador {
       SELECT * FROM ed_departamentos WHERE id = $1
       `
       , [id]);
-    if (DEPARTAMENTO.rowCount > 0) {
+    if (DEPARTAMENTO.rowCount != 0) {
       return res.jsonp(DEPARTAMENTO.rows[0])
     }
     res.status(404).jsonp({ text: 'Registro no encontrado' });
@@ -597,7 +597,7 @@ class DepartamentoControlador {
       ORDER BY cargo DESC
       `
       , [id]);
-    if (departamento.rowCount > 0) {
+    if (departamento.rowCount != 0) {
       return res.json([departamento.rows[0]]);
     } else {
       return res.status(404).json({ text: 'No se encuentran registros' });
@@ -618,7 +618,7 @@ class DepartamentoControlador {
       GROUP BY d.id, d.nombre
       `
       , [id]);
-    if (DEPARTAMENTOS.rowCount > 0) {
+    if (DEPARTAMENTOS.rowCount != 0) {
       res.jsonp(DEPARTAMENTOS.rows);
     }
     else {

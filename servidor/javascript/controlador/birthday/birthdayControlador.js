@@ -26,7 +26,7 @@ class BirthdayControlador {
             const DAY = yield database_1.default.query(`
             SELECT * FROM e_message_birthday WHERE id_empresa = $1
             `, [id_empresa]);
-            if (DAY.rowCount > 0) {
+            if (DAY.rowCount != 0) {
                 return res.jsonp(DAY.rows);
             }
             else {
@@ -50,8 +50,8 @@ class BirthdayControlador {
     }
     // METODO PARA CARGAR MENSAJE DE CUMPLEANIOS    --**VERIFICADO
     CrearImagenEmpleado(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             // FECHA DEL SISTEMA
             var fecha = (0, moment_1.default)();
             var anio = fecha.format('YYYY');
@@ -63,7 +63,7 @@ class BirthdayControlador {
             const unEmpleado = yield database_1.default.query(`
             SELECT * FROM e_message_birthday WHERE id = $1
             `, [id]);
-            if (unEmpleado.rowCount > 0) {
+            if (unEmpleado.rowCount != 0) {
                 unEmpleado.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
                     if (obj.img != null) {
                         try {

@@ -22,7 +22,7 @@ class ProvinciaControlador {
             const CONTINENTE = yield database_1.default.query(`
       SELECT * FROM e_cat_paises WHERE continente = $1 ORDER BY nombre ASC
       `, [continente]);
-            if (CONTINENTE.rowCount > 0) {
+            if (CONTINENTE.rowCount != 0) {
                 return res.jsonp(CONTINENTE.rows);
             }
             else {
@@ -36,7 +36,7 @@ class ProvinciaControlador {
             const CONTINENTE = yield database_1.default.query(`
       SELECT continente FROM e_cat_paises GROUP BY continente ORDER BY continente ASC
       `);
-            if (CONTINENTE.rowCount > 0) {
+            if (CONTINENTE.rowCount != 0) {
                 return res.jsonp(CONTINENTE.rows);
             }
             else {
@@ -51,7 +51,7 @@ class ProvinciaControlador {
             const UNA_PROVINCIA = yield database_1.default.query(`
       SELECT * FROM e_provincias WHERE id_pais = $1
       `, [id_pais]);
-            if (UNA_PROVINCIA.rowCount > 0) {
+            if (UNA_PROVINCIA.rowCount != 0) {
                 return res.jsonp(UNA_PROVINCIA.rows);
             }
             else {
@@ -67,7 +67,7 @@ class ProvinciaControlador {
       FROM e_provincias pro, e_cat_paises pa
       WHERE pro.id_pais = pa.id;
       `);
-            if (PROVINCIA.rowCount > 0) {
+            if (PROVINCIA.rowCount != 0) {
                 return res.jsonp(PROVINCIA.rows);
             }
             else {
@@ -107,7 +107,7 @@ class ProvinciaControlador {
             const PAIS = yield database_1.default.query(`
       SELECT * FROM e_cat_paises WHERE id = $1
       `, [id]);
-            if (PAIS.rowCount > 0) {
+            if (PAIS.rowCount != 0) {
                 return res.jsonp(PAIS.rows);
             }
             else {
@@ -121,7 +121,7 @@ class ProvinciaControlador {
             const UNA_PROVINCIA = yield database_1.default.query(`
       SELECT * FROM e_provincias WHERE id = $1
       `, [id]);
-            if (UNA_PROVINCIA.rowCount > 0) {
+            if (UNA_PROVINCIA.rowCount != 0) {
                 return res.jsonp(UNA_PROVINCIA.rows);
             }
             else {
@@ -135,7 +135,7 @@ class ProvinciaControlador {
             const UNA_PROVINCIA = yield database_1.default.query(`
       SELECT * FROM e_provincias WHERE nombre = $1
       `, [nombre]);
-            if (UNA_PROVINCIA.rowCount > 0) {
+            if (UNA_PROVINCIA.rowCount != 0) {
                 return res.jsonp(UNA_PROVINCIA.rows);
             }
             else {
@@ -148,7 +148,7 @@ class ProvinciaControlador {
             const PAIS = yield database_1.default.query(`
       SELECT * FROM e_cat_paises
       `);
-            if (PAIS.rowCount > 0) {
+            if (PAIS.rowCount != 0) {
                 return res.jsonp(PAIS.rows);
             }
             else {

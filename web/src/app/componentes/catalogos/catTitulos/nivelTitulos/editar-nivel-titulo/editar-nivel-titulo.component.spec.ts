@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EditarNivelTituloComponent } from './editar-nivel-titulo.component';
 
@@ -6,14 +6,12 @@ describe('EditarNivelTituloComponent', () => {
   let component: EditarNivelTituloComponent;
   let fixture: ComponentFixture<EditarNivelTituloComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ EditarNivelTituloComponent ]
     })
     .compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(EditarNivelTituloComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

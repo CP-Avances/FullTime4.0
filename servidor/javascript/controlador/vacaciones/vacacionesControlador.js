@@ -28,7 +28,7 @@ class VacacionesControlador {
       WHERE v.id_periodo_vacacion = p.id AND p.id = $1 
       ORDER BY v.id DESC
       `, [id]);
-            if (VACACIONES.rowCount > 0) {
+            if (VACACIONES.rowCount != 0) {
                 return res.jsonp(VACACIONES.rows);
             }
             else {
@@ -53,7 +53,7 @@ class VacacionesControlador {
         AND da.estado = $1
       ORDER BY id DESC
       `, [estado]);
-            if (VACACIONES.rowCount > 0) {
+            if (VACACIONES.rowCount != 0) {
                 return res.jsonp(VACACIONES.rows);
             }
             else {
@@ -72,7 +72,7 @@ class VacacionesControlador {
 	      AND (v.estado = 3 OR v.estado = 4) 
       ORDER BY id DESC
       `);
-            if (VACACIONES.rowCount > 0) {
+            if (VACACIONES.rowCount != 0) {
                 return res.jsonp(VACACIONES.rows);
             }
             else {
@@ -86,7 +86,7 @@ class VacacionesControlador {
             const FECHAS = yield database_1.default.query(`
       SELECT fecha FROM ef_cat_feriados WHERE fecha BETWEEN $1 AND $2 ORDER BY fecha ASC
       `, [fechaSalida, fechaIngreso]);
-            if (FECHAS.rowCount > 0) {
+            if (FECHAS.rowCount != 0) {
                 return res.jsonp(FECHAS.rows);
             }
             else {
@@ -100,7 +100,7 @@ class VacacionesControlador {
             const SOLICITUD = yield database_1.default.query(`
       SELECT * FROM vista_datos_solicitud_vacacion WHERE id_emple_vacacion = $1
       `, [id]);
-            if (SOLICITUD.rowCount > 0) {
+            if (SOLICITUD.rowCount != 0) {
                 return res.json(SOLICITUD.rows);
             }
             else {
@@ -117,7 +117,7 @@ class VacacionesControlador {
       FROM ecm_autorizaciones AS a, mv_solicitud_vacacion AS v 
       WHERE v.id = a.id_vacacion AND v.id = $1
       `, [id]);
-            if (SOLICITUD.rowCount > 0) {
+            if (SOLICITUD.rowCount != 0) {
                 return res.json(SOLICITUD.rows);
             }
             else {
@@ -208,7 +208,7 @@ class VacacionesControlador {
       FROM mv_solicitud_vacacion AS v, eu_empleados AS e, datos_actuales_empleado AS de
 	    WHERE v.id = $1 AND e.codigo = v.codigo AND e.id = de.id AND de.estado = $2
       `, [id, estado]);
-            if (VACACIONES.rowCount > 0) {
+            if (VACACIONES.rowCount != 0) {
                 return res.jsonp(VACACIONES.rows);
             }
             else {
@@ -240,7 +240,7 @@ class VacacionesControlador {
       FROM mv_solicitud_vacacion AS v, eu_empleados AS e 
       WHERE v.id = $1 AND e.codigo = v.codigo::varchar
       `, [id]);
-            if (VACACIONES.rowCount > 0) {
+            if (VACACIONES.rowCount != 0) {
                 return res.jsonp(VACACIONES.rows);
             }
             else {

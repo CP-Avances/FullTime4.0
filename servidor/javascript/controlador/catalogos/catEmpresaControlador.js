@@ -26,7 +26,7 @@ class EmpresaControlador {
             const EMPRESA = yield database_1.default.query(`
             SELECT cadena FROM e_empresa
             `);
-            if (EMPRESA.rowCount > 0) {
+            if (EMPRESA.rowCount != 0) {
                 return res.jsonp(EMPRESA.rows);
             }
             else {
@@ -58,8 +58,8 @@ class EmpresaControlador {
     }
     // METODO PARA EDITAR LOGO DE EMPRESA
     ActualizarLogoEmpresa(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             // FECHA DEL SISTEMA
             var fecha = (0, moment_1.default)();
             var anio = fecha.format('YYYY');
@@ -121,7 +121,7 @@ class EmpresaControlador {
             const EMPRESA = yield database_1.default.query(`
             SELECT * FROM e_empresa WHERE id = $1
             `, [id]);
-            if (EMPRESA.rowCount > 0) {
+            if (EMPRESA.rowCount != 0) {
                 return res.jsonp(EMPRESA.rows);
             }
             else {
@@ -175,8 +175,8 @@ class EmpresaControlador {
     }
     // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO
     ActualizarCabeceraCorreo(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             // FECHA DEL SISTEMA
             var fecha = (0, moment_1.default)();
             var anio = fecha.format('YYYY');
@@ -247,8 +247,8 @@ class EmpresaControlador {
     }
     // METODO PARA ACTUALIZAR PIE DE FIRMA DE CORREO
     ActualizarPieCorreo(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             // FECHA DEL SISTEMA
             var fecha = (0, moment_1.default)();
             var anio = fecha.format('YYYY');
@@ -353,7 +353,7 @@ class EmpresaControlador {
                 color_principal, color_secundario, numero_partida, marca_agua, correo_empresa 
             FROM e_empresa ORDER BY nombre ASC
             `);
-            if (EMPRESA.rowCount > 0) {
+            if (EMPRESA.rowCount != 0) {
                 return res.jsonp(EMPRESA.rows);
             }
             else {

@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { VerRegimenComponent } from './ver-regimen.component';
 
@@ -6,14 +6,12 @@ describe('VerRegimenComponent', () => {
   let component: VerRegimenComponent;
   let fixture: ComponentFixture<VerRegimenComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ VerRegimenComponent ]
     })
     .compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(VerRegimenComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

@@ -14,7 +14,7 @@ class AuditoriaControlador {
             ORDER BY fecha_hora::date DESC
             `
             , [tabla, desde, hasta]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {

@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { InasistenciaMacroComponent } from './inasistencia-macro.component';
 
@@ -6,14 +6,12 @@ describe('InasistenciaMacroComponent', () => {
   let component: InasistenciaMacroComponent;
   let fixture: ComponentFixture<InasistenciaMacroComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ InasistenciaMacroComponent ]
     })
     .compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(InasistenciaMacroComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

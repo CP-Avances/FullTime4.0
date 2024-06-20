@@ -38,7 +38,7 @@ class TituloControlador {
             const TITULO = yield database_1.default.query(`
       SELECT * FROM et_titulos WHERE UPPER(nombre) = $1 AND id_nivel = $2
       `, [nombre, nivel]);
-            if (TITULO.rowCount > 0) {
+            if (TITULO.rowCount != 0) {
                 return res.jsonp(TITULO.rows);
             }
             else {
@@ -77,7 +77,7 @@ class TituloControlador {
             const unTitulo = yield database_1.default.query(`
       SELECT * FROM et_titulos WHERE id = $1
       `, [id]);
-            if (unTitulo.rowCount > 0) {
+            if (unTitulo.rowCount != 0) {
                 return res.jsonp(unTitulo.rows);
             }
             res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -95,8 +95,8 @@ class TituloControlador {
     }
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
     RevisarDatos(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;

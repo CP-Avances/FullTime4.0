@@ -52,7 +52,7 @@ class UbicacionControlador {
             const UBICACIONES = yield database_1.default.query(`
             SELECT * FROM mg_cat_ubicaciones
             `);
-            if (UBICACIONES.rowCount > 0) {
+            if (UBICACIONES.rowCount != 0) {
                 return res.jsonp(UBICACIONES.rows);
             }
             else {
@@ -67,7 +67,7 @@ class UbicacionControlador {
             const UBICACIONES = yield database_1.default.query(`
             SELECT * FROM mg_cat_ubicaciones WHERE NOT id = $1
             `, [id]);
-            if (UBICACIONES.rowCount > 0) {
+            if (UBICACIONES.rowCount != 0) {
                 return res.jsonp(UBICACIONES.rows);
             }
             else {
@@ -82,7 +82,7 @@ class UbicacionControlador {
             const UBICACIONES = yield database_1.default.query(`
             SELECT * FROM mg_cat_ubicaciones WHERE id = $1
             `, [id]);
-            if (UBICACIONES.rowCount > 0) {
+            if (UBICACIONES.rowCount != 0) {
                 return res.jsonp(UBICACIONES.rows);
             }
             else {
@@ -96,7 +96,7 @@ class UbicacionControlador {
             const UBICACIONES = yield database_1.default.query(`
             SELECT MAX(id) AS id FROM mg_cat_ubicaciones
             `);
-            if (UBICACIONES.rowCount > 0) {
+            if (UBICACIONES.rowCount != 0) {
                 return res.jsonp(UBICACIONES.rows);
             }
             else {
@@ -132,7 +132,7 @@ class UbicacionControlador {
             FROM mg_empleado_ubicacion AS eu, mg_cat_ubicaciones AS cu 
             WHERE eu.id_ubicacion = cu.id AND eu.id_empleado = $1
             `, [id_empl]);
-            if (UBICACIONES.rowCount > 0) {
+            if (UBICACIONES.rowCount != 0) {
                 return res.jsonp(UBICACIONES.rows);
             }
             else {
@@ -161,7 +161,7 @@ class UbicacionControlador {
             FROM mg_empleado_ubicacion AS eu, mg_cat_ubicaciones AS cu, eu_empleados AS e 
             WHERE eu.id_ubicacion = cu.id AND e.codigo = eu.codigo AND cu.id = $1
             `, [id_ubicacion]);
-            if (UBICACIONES.rowCount > 0) {
+            if (UBICACIONES.rowCount != 0) {
                 return res.jsonp(UBICACIONES.rows);
             }
             else {

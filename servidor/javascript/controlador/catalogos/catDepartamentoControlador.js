@@ -61,7 +61,7 @@ class DepartamentoControlador {
       FROM ed_departamentos AS d, e_sucursales AS s 
       WHERE d.id = $1 AND s.id = d.id_sucursal
       `, [id]);
-            if (DEPARTAMENTO.rowCount > 0) {
+            if (DEPARTAMENTO.rowCount != 0) {
                 return res.jsonp(DEPARTAMENTO.rows);
             }
             res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
@@ -74,7 +74,7 @@ class DepartamentoControlador {
             const DEPARTAMENTO = yield database_1.default.query(`
       SELECT * FROM ed_departamentos WHERE id_sucursal = $1
       `, [id_sucursal]);
-            if (DEPARTAMENTO.rowCount > 0) {
+            if (DEPARTAMENTO.rowCount != 0) {
                 return res.jsonp(DEPARTAMENTO.rows);
             }
             res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
@@ -87,7 +87,7 @@ class DepartamentoControlador {
             const DEPARTAMENTO = yield database_1.default.query(`
       SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND NOT id = $2
       `, [id_sucursal, id]);
-            if (DEPARTAMENTO.rowCount > 0) {
+            if (DEPARTAMENTO.rowCount != 0) {
                 return res.jsonp(DEPARTAMENTO.rows);
             }
             res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -112,16 +112,16 @@ class DepartamentoControlador {
         s.id = cd.id_sucursal
       ORDER BY s.nombre, cd.nombre ASC;
       `);
-            if (DEPARTAMENTOS.rowCount > 0 && NIVELES.rowCount > 0) {
+            if (DEPARTAMENTOS.rowCount != 0 && NIVELES.rowCount != 0) {
                 NIVELES.rows.forEach((obj) => {
                     DEPARTAMENTOS.rows.push(obj);
                 });
                 return res.jsonp(DEPARTAMENTOS.rows);
             }
-            else if (DEPARTAMENTOS.rowCount > 0) {
+            else if (DEPARTAMENTOS.rowCount != 0) {
                 return res.jsonp(DEPARTAMENTOS.rows);
             }
-            else if (NIVELES.rowCount > 0) {
+            else if (NIVELES.rowCount != 0) {
                 return res.jsonp(NIVELES.rows);
             }
             else {
@@ -150,16 +150,16 @@ class DepartamentoControlador {
         s.id = cd.id_sucursal AND s.id = $1
       ORDER BY s.nombre, cd.nombre ASC
       `, [id]);
-            if (DEPARTAMENTO.rowCount > 0 && NIVEL.rowCount > 0) {
+            if (DEPARTAMENTO.rowCount != 0 && NIVEL.rowCount != 0) {
                 DEPARTAMENTO.rows.forEach((obj) => {
                     NIVEL.rows.push(obj);
                 });
                 return res.jsonp(NIVEL.rows);
             }
-            else if (DEPARTAMENTO.rowCount > 0) {
+            else if (DEPARTAMENTO.rowCount != 0) {
                 return res.jsonp(DEPARTAMENTO.rows);
             }
-            else if (NIVEL.rowCount > 0) {
+            else if (NIVEL.rowCount != 0) {
                 return res.jsonp(NIVEL.rows);
             }
             else {
@@ -210,7 +210,7 @@ class DepartamentoControlador {
         AND s.id = n.id_sucursal_departamento_nivel
       ORDER BY nivel DESC 
       `, [id_departamento, id_establecimiento]);
-            if (NIVELESDEP.rowCount > 0) {
+            if (NIVELESDEP.rowCount != 0) {
                 return res.jsonp(NIVELESDEP.rows);
             }
             res.status(404).jsonp({ text: 'Registros no encontrados.' });
@@ -273,8 +273,8 @@ class DepartamentoControlador {
       */
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
     RevisarDatos(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
@@ -435,7 +435,7 @@ class DepartamentoControlador {
             const DEPARTAMENTOS = yield database_1.default.query(`
       SELECT * FROM ed_departamentos
       `);
-            if (DEPARTAMENTOS.rowCount > 0) {
+            if (DEPARTAMENTOS.rowCount != 0) {
                 return res.jsonp(DEPARTAMENTOS.rows);
             }
             else {
@@ -449,7 +449,7 @@ class DepartamentoControlador {
             const DEPARTAMENTOS = yield database_1.default.query(`
       SELECT * FROM ed_departamentos WHERE nombre = $1
       `, [nombre]);
-            if (DEPARTAMENTOS.rowCount > 0) {
+            if (DEPARTAMENTOS.rowCount != 0) {
                 return res.jsonp(DEPARTAMENTOS.rows);
             }
             else {
@@ -463,7 +463,7 @@ class DepartamentoControlador {
             const DEPARTAMENTO = yield database_1.default.query(`
       SELECT id FROM ed_departamentos WHERE nombre = $1
       `, [nombre]);
-            if (DEPARTAMENTO.rowCount > 0) {
+            if (DEPARTAMENTO.rowCount != 0) {
                 return res.jsonp(DEPARTAMENTO.rows);
             }
             res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -475,7 +475,7 @@ class DepartamentoControlador {
             const DEPARTAMENTO = yield database_1.default.query(`
       SELECT * FROM ed_departamentos WHERE id = $1
       `, [id]);
-            if (DEPARTAMENTO.rowCount > 0) {
+            if (DEPARTAMENTO.rowCount != 0) {
                 return res.jsonp(DEPARTAMENTO.rows[0]);
             }
             res.status(404).jsonp({ text: 'Registro no encontrado' });
@@ -490,7 +490,7 @@ class DepartamentoControlador {
       WHERE d.id = ec.id_departamento AND ec.id = $1
       ORDER BY cargo DESC
       `, [id]);
-            if (departamento.rowCount > 0) {
+            if (departamento.rowCount != 0) {
                 return res.json([departamento.rows[0]]);
             }
             else {
@@ -507,7 +507,7 @@ class DepartamentoControlador {
       WHERE c.id_regimen = r.id AND c.id = ec.id_contrato AND ec.id_departamento = d.id AND r.id = $1 
       GROUP BY d.id, d.nombre
       `, [id]);
-            if (DEPARTAMENTOS.rowCount > 0) {
+            if (DEPARTAMENTOS.rowCount != 0) {
                 res.jsonp(DEPARTAMENTOS.rows);
             }
             else {

@@ -32,7 +32,7 @@ class ProcesoControlador {
       SELECT * FROM map_cat_procesos WHERE id = $1
       `
       , [id]);
-    if (unaProvincia.rowCount > 0) {
+    if (unaProvincia.rowCount != 0) {
       return res.jsonp(unaProvincia.rows)
     }
     res.status(404).jsonp({ text: 'El proceso no ha sido encontrado.' });

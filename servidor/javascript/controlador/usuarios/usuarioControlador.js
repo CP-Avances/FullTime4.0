@@ -43,7 +43,7 @@ class UsuarioControlador {
             const UN_USUARIO = yield database_1.default.query(`
       SELECT * FROM eu_usuarios WHERE id_empleado = $1
       `, [id_empleado]);
-            if (UN_USUARIO.rowCount > 0) {
+            if (UN_USUARIO.rowCount != 0) {
                 return res.jsonp(UN_USUARIO.rows);
             }
             else {
@@ -60,7 +60,7 @@ class UsuarioControlador {
       INNER JOIN ed_departamentos ON e.id_departamento = ed_departamentos.id 
       WHERE id_contrato = $1
       `, [id_empleado]);
-            if (EMPLEADO.rowCount > 0) {
+            if (EMPLEADO.rowCount != 0) {
                 return res.jsonp(EMPLEADO.rows);
             }
             else {
@@ -1102,7 +1102,7 @@ class UsuarioControlador {
             const USUARIOS = yield database_1.default.query(`
       SELECT * FROM eu_usuarios
       `);
-            if (USUARIOS.rowCount > 0) {
+            if (USUARIOS.rowCount != 0) {
                 return res.jsonp(USUARIOS.rows);
             }
             else {
@@ -1116,7 +1116,7 @@ class UsuarioControlador {
             const unUsuario = yield database_1.default.query(`
       SELECT id FROM eu_usuarios WHERE usuario = $1
       `, [usuario]);
-            if (unUsuario.rowCount > 0) {
+            if (unUsuario.rowCount != 0) {
                 return res.jsonp(unUsuario.rows);
             }
             else {
@@ -1134,7 +1134,7 @@ class UsuarioControlador {
             const USUARIOS = yield database_1.default.query(`
       SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1
       `, [id_empleado]);
-            if (USUARIOS.rowCount > 0) {
+            if (USUARIOS.rowCount != 0) {
                 return res.jsonp(USUARIOS.rows);
             }
             else {
@@ -1165,7 +1165,7 @@ class UsuarioControlador {
             const USUARIOS = yield database_1.default.query(`
       SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1 AND principal = true;
       `, [id_empleado]);
-            if (USUARIOS.rowCount > 0) {
+            if (USUARIOS.rowCount != 0) {
                 return res.jsonp(USUARIOS.rows);
             }
             else {

@@ -22,7 +22,7 @@ class VacunaControlador {
                 const VACUNA = yield database_1.default.query(`
                 SELECT * FROM e_cat_vacuna ORDER BY nombre ASC
                 `);
-                if (VACUNA.rowCount > 0) {
+                if (VACUNA.rowCount != 0) {
                     return res.jsonp(VACUNA.rows);
                 }
                 else {

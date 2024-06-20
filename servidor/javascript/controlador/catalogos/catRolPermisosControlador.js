@@ -21,7 +21,7 @@ class RolPermisosControlador {
             const Roles = yield database_1.default.query(`
       SELECT * FROM es_paginas WHERE modulo = false
       `);
-            if (Roles.rowCount > 0) {
+            if (Roles.rowCount != 0) {
                 return res.jsonp(Roles.rows);
             }
             else {
@@ -35,7 +35,7 @@ class RolPermisosControlador {
             const Roles = yield database_1.default.query(`
       SELECT * FROM es_paginas WHERE modulo = true
       `);
-            if (Roles.rowCount > 0) {
+            if (Roles.rowCount != 0) {
                 return res.jsonp(Roles.rows);
             }
             else {
@@ -50,7 +50,7 @@ class RolPermisosControlador {
             const Roles = yield database_1.default.query(`
       SELECT * FROM es_paginas WHERE nombre_modulo = $1
       `, [nombre_modulo]);
-            if (Roles.rowCount > 0) {
+            if (Roles.rowCount != 0) {
                 return res.jsonp(Roles.rows);
             }
             else {
@@ -65,7 +65,7 @@ class RolPermisosControlador {
             const PAGINA_ROL = yield database_1.default.query(`
       SELECT * FROM ero_rol_permisos WHERE pagina = $1  AND id_rol = $2 
       `, [funcion, id_rol]);
-            if (PAGINA_ROL.rowCount > 0) {
+            if (PAGINA_ROL.rowCount != 0) {
                 return res.jsonp(PAGINA_ROL.rows);
             }
             else {
@@ -80,7 +80,7 @@ class RolPermisosControlador {
             const PAGINA_ROL = yield database_1.default.query(`
       SELECT * FROM ero_rol_permisos WHERE pagina = $1 AND id_rol = $2 AND id_accion = $3
       `, [funcion, id_rol, id_accion]);
-            if (PAGINA_ROL.rowCount > 0) {
+            if (PAGINA_ROL.rowCount != 0) {
                 return res.jsonp(PAGINA_ROL.rows);
             }
             else {
@@ -115,7 +115,7 @@ class RolPermisosControlador {
         WHERE ero_rol_permisos.id_rol = $1 
         ORDER BY 6, 5
       `, [id_rol]);
-            if (PAGINA_ROL.rowCount > 0) {
+            if (PAGINA_ROL.rowCount != 0) {
                 return res.jsonp(PAGINA_ROL.rows);
             }
             else {
@@ -167,7 +167,7 @@ class RolPermisosControlador {
             const PAGINA_ROL = yield database_1.default.query(`
       SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
       `, [id_funcion]);
-            if (PAGINA_ROL.rowCount > 0) {
+            if (PAGINA_ROL.rowCount != 0) {
                 return res.jsonp(PAGINA_ROL.rows);
             }
             else {
@@ -182,7 +182,7 @@ class RolPermisosControlador {
             const PAGINA_ROL = yield database_1.default.query(`
           SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
           `, [id_funcion]);
-            if (PAGINA_ROL.rowCount > 0) {
+            if (PAGINA_ROL.rowCount != 0) {
                 return res.jsonp(PAGINA_ROL.rows);
             }
             else {
@@ -196,7 +196,7 @@ class RolPermisosControlador {
             const Roles = yield database_1.default.query(`
       SELECT * FROM es_acciones_paginas
       `);
-            if (Roles.rowCount > 0) {
+            if (Roles.rowCount != 0) {
                 return res.jsonp(Roles.rows);
             }
             else {
