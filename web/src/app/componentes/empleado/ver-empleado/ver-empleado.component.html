@@ -1,8 +1,8 @@
 <br>
-<mat-tab-group [(selectedIndex)]=selectedIndex>
+<mat-tab-group [(selectedIndex)]=selectedIndex (selectedTabChange)="DetectarEventoTab($event)">
 
     <!-- INFORMACION OFICIAL DEL EMPLEADO -->
-    <mat-tab>
+    <mat-tab label="perfil">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">person_pin</mat-icon>
             <h6 id="items">Perfil Usuario</h6>
@@ -182,7 +182,7 @@
     </mat-tab>
 
     <!-- DISCAPACIDAD Y TITULO DEL EMPLEADO -->
-    <mat-tab>
+    <mat-tab label="asignaciones">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">school</mat-icon>
             <h6 id="items">Asignaciones</h6>
@@ -283,8 +283,9 @@
             </div>
         </div>
     </mat-tab>
+   
     <!-- REGISTRO DE VACUNACION -->
-    <mat-tab>
+    <mat-tab label="vacunacion">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">local_hospital</mat-icon>
             <h6 id="items">Vacunación</h6>
@@ -361,7 +362,7 @@
     </mat-tab>
 
     <!-- CONTRATO DEL EMPLEADO Y CARGO DEL EMPLEADO -->
-    <mat-tab>
+    <mat-tab label="contrato_cargo">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">description</mat-icon>
             <h6 id="items">Contrato y Cargo</h6>
@@ -785,7 +786,7 @@
     </mat-tab>
 
     <!-- HORARIO DEL EMPLEADO -->
-    <mat-tab>
+    <mat-tab label="planificacion">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">event</mat-icon>
             <h6 id="items">Planificación horaria</h6>
@@ -1449,7 +1450,7 @@
     </mat-tab>
 
     <!-- PLANTILLAS DE CARGA DE HORARIOS -->
-    <mat-tab *ngIf="plantillas">
+    <mat-tab *ngIf="plantillas" label="cargar_plantilla">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">today</mat-icon>
             <h6 id="items">Plantillas</h6>
@@ -1491,7 +1492,7 @@
     </mat-tab>
 
     <!-- PERMISOS -->
-    <mat-tab *ngIf="HabilitarPermisos">
+    <mat-tab *ngIf="HabilitarPermisos" label="solicitudes_permisos">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">transfer_within_a_station</mat-icon>
             <h6 id="items">Permisos</h6>
@@ -1636,7 +1637,7 @@
     </mat-tab>
 
     <!-- PERIODO DE VACACIONES DEL EMPLEADO Y VACACIONES DEL EMPLEADO -->
-    <mat-tab *ngIf="habilitarVacaciones">
+    <mat-tab *ngIf="habilitarVacaciones" label="periodo_vacaciones">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">flight_takeoff</mat-icon>
             <h6 id="items"> Vacaciones</h6>
@@ -1791,9 +1792,8 @@
         </div>
     </mat-tab>
 
-
     <!-- HORAS EXTRAS -->
-    <mat-tab *ngIf="HabilitarHorasE">
+    <mat-tab *ngIf="HabilitarHorasE" label="solicitudes_horas_extras">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">query_builder</mat-icon>
             <h6 id="items"> Horas Extras</h6>
@@ -1960,7 +1960,7 @@
     </mat-tab>
 
     <!-- PLANIFICACION DE ALMUERZO -->
-    <mat-tab *ngIf="HabilitarAlimentacion">
+    <mat-tab *ngIf="HabilitarAlimentacion" label="alimentacion">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">local_dining</mat-icon>
             <h6 id="items"> Alimentación</h6>
@@ -2142,7 +2142,7 @@
     </mat-tab>
 
     <!-- PROCESOS DEL EMPLEADO -->
-    <mat-tab *ngIf="HabilitarAccion">
+    <mat-tab *ngIf="HabilitarAccion" label="accion_personal">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">wc</mat-icon>
             <h6 id="items"> Procesos</h6>
@@ -2207,7 +2207,7 @@
     </mat-tab>
 
     <!-- AUTORIZACIONES -->
-    <mat-tab *ngIf="autorizar">
+    <mat-tab *ngIf="autorizar" label="autorizar">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">supervisor_account</mat-icon>
             <h6 id="items">Autorización</h6>

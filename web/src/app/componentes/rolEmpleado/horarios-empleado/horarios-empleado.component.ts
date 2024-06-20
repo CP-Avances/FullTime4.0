@@ -110,7 +110,7 @@ export class HorariosEmpleadoComponent implements OnInit {
     this.cargoEmpleado = [];
     this.restCargo.BuscarCargoID(id_cargo).subscribe(datos => {
       this.cargoEmpleado = datos;
-      this.cargoEmpleado.forEach(data => {
+      this.cargoEmpleado.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
         data.fec_final_ = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
       })
