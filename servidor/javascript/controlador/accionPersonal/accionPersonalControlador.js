@@ -16,6 +16,8 @@ exports.ACCION_PERSONAL_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const ImagenCodificacion_1 = require("../../libs/ImagenCodificacion");
 const database_1 = __importDefault(require("../../database"));
+const path_1 = __importDefault(require("path"));
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 class AccionPersonalControlador {
     ListarTipoAccion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -516,7 +518,10 @@ class AccionPersonalControlador {
     verLogoMinisterio(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const file_name = 'ministerio_trabajo.png';
-            const codificado = yield (0, ImagenCodificacion_1.ImagenBase64LogosEmpresas)(file_name);
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + file_name;
+            //console.log( 'solo ruta ', ruta)
+            const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
             if (codificado === 0) {
                 res.send({ imagen: 0 });
             }
