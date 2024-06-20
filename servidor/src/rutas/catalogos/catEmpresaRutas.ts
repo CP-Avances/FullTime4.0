@@ -1,23 +1,16 @@
 import EMPRESA_CONTROLADOR from '../../controlador/catalogos/catEmpresaControlador';
-import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
+import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { TokenValidation } from '../../libs/verificarToken';
 import { Router } from 'express';
-import moment from 'moment';
 import multer from 'multer';
 
 const storage = multer.diskStorage({
+
     destination: function (req, file, cb) {
-        var ruta = ObtenerRutaLogos();
-        cb(null, ruta)
+        cb(null, ObtenerRutaLeerPlantillas())
     },
     filename: function (req, file, cb) {
-        // FECHA DEL SISTEMA
-        var fecha = moment();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
-
-        let documento = anio + '_' + mes + '_' + dia + '_' + file.originalname;
+        let documento = file.originalname;
 
         cb(null, documento);
     }

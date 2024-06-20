@@ -20,6 +20,7 @@ const moment_1 = __importDefault(require("moment"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const fs_1 = __importDefault(require("fs"));
+const sharp = require('sharp');
 class EmpresaControlador {
     // BUSCAR DATOS DE EMPRESA PARA RECUPERAR CUENTA
     BuscarCadena(req, res) {
@@ -47,8 +48,11 @@ class EmpresaControlador {
             if (file_name.logo === null) {
                 file_name.logo = 'logo_reportes.png';
             }
-            const codificado = yield (0, ImagenCodificacion_1.ImagenBase64LogosEmpresas)(file_name.logo);
-            console.log('empresa ', codificado);
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + file_name.logo;
+            //console.log( 'solo ruta ', ruta)
+            const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
+            //console.log('empresa ', codificado)
             if (codificado === 0) {
                 res.status(200).jsonp({ imagen: 0, nom_empresa: file_name.nombre });
             }
@@ -60,72 +64,85 @@ class EmpresaControlador {
     // METODO PARA EDITAR LOGO DE EMPRESA
     ActualizarLogoEmpresa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
+            var _a, _b;
+            sharp.cache(false);
             // FECHA DEL SISTEMA
             var fecha = (0, moment_1.default)();
             var anio = fecha.format('YYYY');
             var mes = fecha.format('MM');
             var dia = fecha.format('DD');
+            // IMAGEN ORIGINAL
+            const separador = path_1.default.sep;
+            let ruta_temporal = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
             // LEER DATOS DE IMAGEN
-            let logo = anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
+            let logo = anio + '_' + mes + '_' + dia + '_' + ((_b = req.file) === null || _b === void 0 ? void 0 : _b.originalname);
             let id = req.params.id_empresa;
-            let separador = path_1.default.sep;
-            const { user_name, ip } = req.body;
-            // CONSULTAR SI EXISTE UNA IMAGEN
-            const logo_name = yield database_1.default.query(`
-            SELECT nombre, logo FROM e_empresa WHERE id = $1
-            `, [id]);
-            if (logo_name.rows.length === 0) {
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'e_empresa',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: '',
-                    datosNuevos: '',
-                    ip,
-                    observacion: `Error al actualizar logo de empresa con id: ${id}`
-                });
-                res.status(404).jsonp({ message: 'error' });
-            }
-            logo_name.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                if (obj.logo != null && obj.logo != logo) {
-                    let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + obj.logo;
-                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                        if (!err) {
-                            // ELIMINAR LOGO DEL SERVIDOR
-                            fs_1.default.unlinkSync(ruta);
-                        }
-                    });
-                }
-                try {
-                    // INICIAR TRANSACCION
-                    yield database_1.default.query('BEGIN');
-                    // ACTUALIZAR REGISTRO DE IMAGEN
-                    yield database_1.default.query(`
-                    UPDATE e_empresa SET logo = $2 WHERE id = $1
-                    `, [id, logo]);
-                    // AUDITORIA
+            let ruta_guardar = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + logo;
+            //console.log('ruta 1 ', ruta_temporal)
+            let comprimir = yield (0, ImagenCodificacion_1.ComprimirImagen)(ruta_temporal, ruta_guardar);
+            if (comprimir != false) {
+                const { user_name, ip } = req.body;
+                // CONSULTAR SI EXISTE UNA IMAGEN
+                const logo_name = yield database_1.default.query(`
+                SELECT nombre, logo FROM e_empresa WHERE id = $1
+                `, [id]);
+                if (logo_name.rows.length === 0) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'e_empresa',
                         usuario: user_name,
                         accion: 'U',
-                        datosOriginales: JSON.stringify(obj),
-                        datosNuevos: `{"logo": "${logo}"}`,
+                        datosOriginales: '',
+                        datosNuevos: '',
                         ip,
-                        observacion: null
+                        observacion: `Error al actualizar logo de empresa con id: ${id}`
                     });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
+                    res.status(404).jsonp({ message: 'error' });
                 }
-                catch (error) {
-                    // REVERTIR TRANSACCION
-                    yield database_1.default.query('ROLLBACK');
-                }
-            }));
-            // LEER DATOS DE IMAGEN
-            const codificado = yield (0, ImagenCodificacion_1.ImagenBase64LogosEmpresas)(logo);
-            res.send({ imagen: codificado, nom_empresa: logo_name.rows[0].nombre, message: 'Logo actualizado.' });
+                logo_name.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                    if (obj.logo != null && obj.logo != logo) {
+                        let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + obj.logo;
+                        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                        fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                            if (!err) {
+                                // ELIMINAR LOGO DEL SERVIDOR
+                                fs_1.default.unlinkSync(ruta);
+                            }
+                        });
+                    }
+                    try {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // ACTUALIZAR REGISTRO DE IMAGEN
+                        yield database_1.default.query(`
+                        UPDATE e_empresa SET logo = $2 WHERE id = $1
+                        `, [id, logo]);
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'e_empresa',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: JSON.stringify(obj),
+                            datosNuevos: `{"logo": "${logo}"}`,
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                    }
+                    catch (error) {
+                        // REVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
+                    }
+                }));
+                // LEER DATOS DE IMAGEN
+                let ruta_almacenamiento = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + logo;
+                //console.log('ruta alma ', ruta_almacenamiento)
+                const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta_almacenamiento);
+                res.send({ imagen: codificado, nom_empresa: logo_name.rows[0].nombre, message: 'Logo actualizado.' });
+            }
+            else {
+                res.status(404).jsonp({ message: 'error' });
+            }
         });
     }
     // METODO PARA BUSCAR DATOS GENERALES DE EMPRESA
@@ -342,70 +359,82 @@ class EmpresaControlador {
     // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO
     ActualizarCabeceraCorreo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
+            var _a, _b;
+            sharp.cache(false);
             // FECHA DEL SISTEMA
             var fecha = (0, moment_1.default)();
             var anio = fecha.format('YYYY');
             var mes = fecha.format('MM');
             var dia = fecha.format('DD');
+            // IMAGEN ORIGINAL
+            const separador = path_1.default.sep;
+            let ruta_temporal = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
             // LEER DATOS DE IMAGEN
-            let logo = anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
+            let logo = anio + '_' + mes + '_' + dia + '_' + ((_b = req.file) === null || _b === void 0 ? void 0 : _b.originalname);
             let id = req.params.id_empresa;
-            let separador = path_1.default.sep;
-            const { user_name, ip } = req.body;
-            const logo_name = yield database_1.default.query(`
+            let ruta_guardar = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + logo;
+            let comprimir = yield (0, ImagenCodificacion_1.ComprimirImagen)(ruta_temporal, ruta_guardar);
+            if (comprimir != false) {
+                const { user_name, ip } = req.body;
+                const logo_name = yield database_1.default.query(`
             SELECT cabecera_firma FROM e_empresa WHERE id = $1
             `, [id]);
-            if (logo_name.rows.length === 0) {
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'e_empresa',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: '',
-                    datosNuevos: '',
-                    ip,
-                    observacion: `Error al actualizar cabecera de correo de empresa con id: ${id}`
-                });
-                res.status(404).jsonp({ message: 'error' });
-            }
-            logo_name.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                if (obj.cabecera_firma != null && obj.cabecera_firma != logo) {
-                    let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + obj.cabecera_firma;
-                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                        if (!err) {
-                            // ELIMINAR LOGO DEL SERVIDOR
-                            fs_1.default.unlinkSync(ruta);
-                        }
-                    });
-                }
-                try {
-                    // INICIAR TRANSACCION
-                    yield database_1.default.query('BEGIN');
-                    // ACTUALIZAR REGISTRO DE IMAGEN
-                    yield database_1.default.query(`
-                    UPDATE e_empresa SET cabecera_firma = $2 WHERE id = $1
-                    `, [id, logo]);
-                    // AUDITORIA
+                if (logo_name.rows.length === 0) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'e_empresa',
                         usuario: user_name,
                         accion: 'U',
-                        datosOriginales: JSON.stringify(obj),
-                        datosNuevos: `{"cabecera_firma": "${logo}"}`,
+                        datosOriginales: '',
+                        datosNuevos: '',
                         ip,
-                        observacion: null
+                        observacion: `Error al actualizar cabecera de correo de empresa con id: ${id}`
                     });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
+                    res.status(404).jsonp({ message: 'error' });
                 }
-                catch (error) {
-                    // REVERTIR TRANSACCION
-                    yield database_1.default.query('ROLLBACK');
-                }
-            }));
-            const codificado = yield (0, ImagenCodificacion_1.ImagenBase64LogosEmpresas)(logo);
-            res.send({ imagen: codificado, message: 'Registro actualizado.' });
+                logo_name.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                    if (obj.cabecera_firma != null && obj.cabecera_firma != logo) {
+                        let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + obj.cabecera_firma;
+                        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                        fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                            if (!err) {
+                                // ELIMINAR LOGO DEL SERVIDOR
+                                fs_1.default.unlinkSync(ruta);
+                            }
+                        });
+                    }
+                    try {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // ACTUALIZAR REGISTRO DE IMAGEN
+                        yield database_1.default.query(`
+                    UPDATE e_empresa SET cabecera_firma = $2 WHERE id = $1
+                    `, [id, logo]);
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'e_empresa',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: JSON.stringify(obj),
+                            datosNuevos: `{"cabecera_firma": "${logo}"}`,
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                    }
+                    catch (error) {
+                        // REVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
+                    }
+                }));
+                // LEER DATOS DE IMAGEN
+                let ruta_almacenamiento = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + logo;
+                const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta_almacenamiento);
+                res.send({ imagen: codificado, message: 'Registro actualizado.' });
+            }
+            else {
+                res.status(404).jsonp({ message: 'error' });
+            }
         });
     }
     // METODO PARA CONSULTAR IMAGEN DE CABECERA DE CORREO
@@ -417,7 +446,9 @@ class EmpresaControlador {
                 .then((result) => {
                 return result.rows[0];
             });
-            const codificado = yield (0, ImagenCodificacion_1.ImagenBase64LogosEmpresas)(file_name.cabecera_firma);
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + file_name.cabecera_firma;
+            const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
             if (codificado === 0) {
                 res.status(200).jsonp({ imagen: 0 });
             }
@@ -429,70 +460,83 @@ class EmpresaControlador {
     // METODO PARA ACTUALIZAR PIE DE FIRMA DE CORREO
     ActualizarPieCorreo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
+            var _a, _b;
+            sharp.cache(false);
             // FECHA DEL SISTEMA
             var fecha = (0, moment_1.default)();
             var anio = fecha.format('YYYY');
             var mes = fecha.format('MM');
             var dia = fecha.format('DD');
+            // IMAGEN ORIGINAL
+            const separador = path_1.default.sep;
+            let ruta_temporal = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
             // LEER DATOS DE IMAGEN
-            let logo = anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
+            let logo = anio + '_' + mes + '_' + dia + '_' + ((_b = req.file) === null || _b === void 0 ? void 0 : _b.originalname);
             let id = req.params.id_empresa;
-            let separador = path_1.default.sep;
-            const { user_name, ip } = req.body;
-            const logo_name = yield database_1.default.query(`
+            let ruta_guardar = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + logo;
+            //console.log('ruta 1 ', ruta_temporal)
+            let comprimir = yield (0, ImagenCodificacion_1.ComprimirImagen)(ruta_temporal, ruta_guardar);
+            if (comprimir != false) {
+                const { user_name, ip } = req.body;
+                const logo_name = yield database_1.default.query(`
             SELECT pie_firma FROM e_empresa WHERE id = $1
             `, [id]);
-            if (logo_name.rows.length === 0) {
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'e_empresa',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: '',
-                    datosNuevos: '',
-                    ip,
-                    observacion: `Error al actualizar pie de firma de empresa con id: ${id}. Registro no encontrado.`
-                });
-                res.status(404).jsonp({ message: 'error' });
-            }
-            logo_name.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                if (obj.pie_firma != null && obj.pie_firma != logo) {
-                    let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + obj.pie_firma;
-                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                        if (!err) {
-                            // ELIMINAR LOGO DEL SERVIDOR
-                            fs_1.default.unlinkSync(ruta);
-                        }
-                    });
-                }
-                try {
-                    // INICIAR TRANSACCION
-                    yield database_1.default.query('BEGIN');
-                    // ACTUALIZAR REGISTRO DE IMAGEN
-                    yield database_1.default.query(`
-                    UPDATE e_empresa SET pie_firma = $2 WHERE id = $1
-                    `, [id, logo]);
-                    // AUDITORIA
+                if (logo_name.rows.length === 0) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'e_empresa',
                         usuario: user_name,
                         accion: 'U',
-                        datosOriginales: JSON.stringify(obj),
-                        datosNuevos: `{"pie_firma": "${logo}"}`,
+                        datosOriginales: '',
+                        datosNuevos: '',
                         ip,
-                        observacion: null
+                        observacion: `Error al actualizar pie de firma de empresa con id: ${id}. Registro no encontrado.`
                     });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
+                    res.status(404).jsonp({ message: 'error' });
                 }
-                catch (error) {
-                    // REVERTIR TRANSACCION
-                    yield database_1.default.query('ROLLBACK');
-                }
-            }));
-            const codificado = yield (0, ImagenCodificacion_1.ImagenBase64LogosEmpresas)(logo);
-            res.send({ imagen: codificado, message: 'Registro actualizado.' });
+                logo_name.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                    if (obj.pie_firma != null && obj.pie_firma != logo) {
+                        let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + obj.pie_firma;
+                        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                        fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                            if (!err) {
+                                // ELIMINAR LOGO DEL SERVIDOR
+                                fs_1.default.unlinkSync(ruta);
+                            }
+                        });
+                    }
+                    try {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // ACTUALIZAR REGISTRO DE IMAGEN
+                        yield database_1.default.query(`
+                    UPDATE e_empresa SET pie_firma = $2 WHERE id = $1
+                    `, [id, logo]);
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'e_empresa',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: JSON.stringify(obj),
+                            datosNuevos: `{"pie_firma": "${logo}"}`,
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                    }
+                    catch (error) {
+                        // REVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
+                    }
+                }));
+                // LEER DATOS DE IMAGEN
+                let ruta_almacenamiento = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + logo;
+                const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta_almacenamiento);
+                res.send({ imagen: codificado, message: 'Registro actualizado.' });
+            }
+            else {
+                res.status(404).jsonp({ message: 'error' });
+            }
         });
     }
     // METODO PARA CONSULTAR IMAGEN DE PIE DE FIRMA DE CORREO
@@ -504,7 +548,9 @@ class EmpresaControlador {
                 .then((result) => {
                 return result.rows[0];
             });
-            const codificado = yield (0, ImagenCodificacion_1.ImagenBase64LogosEmpresas)(file_name.pie_firma);
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + file_name.pie_firma;
+            const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
             if (codificado === 0) {
                 res.status(200).jsonp({ imagen: 0 });
             }
@@ -614,6 +660,7 @@ class EmpresaControlador {
             }
         });
     }
+    // METODO PARA LISTAR EMPRESA
     ListarEmpresa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const EMPRESA = yield database_1.default.query(`

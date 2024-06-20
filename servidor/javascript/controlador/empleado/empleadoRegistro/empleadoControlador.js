@@ -752,7 +752,7 @@ class EmpleadoControlador {
     // CARGAR IMAGEN DE EMPLEADO
     CrearImagenEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a;
+            var _a, _b;
             sharp.cache(false);
             try {
                 // FECHA DEL SISTEMA
@@ -766,26 +766,48 @@ class EmpleadoControlador {
                 const unEmpleado = yield database_1.default.query(`
         SELECT * FROM eu_empleados WHERE id = $1
         `, [id]);
-                let ruta1 = (0, accesoCarpetas_2.ObtenerRutaLeerPlantillas)() + separador + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
+                let ruta_temporal = (0, accesoCarpetas_2.ObtenerRutaLeerPlantillas)() + separador + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
                 if (unEmpleado.rowCount != 0) {
-                    const promises = unEmpleado.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                        var _b;
-                        const imagen = `${obj.codigo}_${anio}_${mes}_${dia}_${(_b = req.file) === null || _b === void 0 ? void 0 : _b.originalname}`;
-                        let ruta_final = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(obj.id)) + separador + imagen;
-                        console.log('ruta 1 ++++++++++++', ruta1);
-                        fs_2.default.access(ruta1, fs_2.default.constants.F_OK, (err) => {
+                    const imagen = `${unEmpleado.rows[0].codigo}_${anio}_${mes}_${dia}_${(_b = req.file) === null || _b === void 0 ? void 0 : _b.originalname}`;
+                    let verificar_imagen = 0;
+                    // RUTA DE LA CARPETA IMAGENES DEL USUARIO
+                    const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id);
+                    // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
+                    fs_2.default.access(carpetaImagenes, fs_2.default.constants.F_OK, (err) => {
+                        if (err) {
+                            // METODO MKDIR PARA CREAR LA CARPETA
+                            fs_2.default.mkdir(carpetaImagenes, { recursive: true }, (err) => {
+                                if (err) {
+                                    verificar_imagen = 1;
+                                }
+                                else {
+                                    verificar_imagen = 0;
+                                }
+                            });
+                        }
+                        else {
+                            verificar_imagen = 0;
+                        }
+                    });
+                    // VERIFICAR SI LA CARPETA DE IMAGENES SE CREO
+                    if (verificar_imagen === 0) {
+                        let ruta_guardar = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(unEmpleado.rows[0].id)) + separador + imagen;
+                        //console.log('ruta 1 ', ruta1)
+                        fs_2.default.access(ruta_temporal, fs_2.default.constants.F_OK, (err) => {
                             if (!err) {
-                                sharp(ruta1)
-                                    .resize(800) // CAMBIA EL TAMAÑO DE LA IMAGEN A UN ANCHO DE 800 PÍXELES, MANTIENE LA RELACIÓN DE ASPECTO
+                                sharp(ruta_temporal)
+                                    .resize(800) // CAMBIA EL TAMAÑO DE LA IMAGEN A UN ANCHO DE 800 PIXELES, MANTIENE LA RELACION DE ASPECTO
                                     .jpeg({ quality: 80 }) // CONFIGURA LA CALIDAD DE LA IMAGEN JPEG AL 80%
-                                    .toFile(ruta_final);
+                                    .toFile(ruta_guardar);
+                                // ELIMIAR EL ARCHIVO ORIGINAL
                                 setTimeout(() => __awaiter(this, void 0, void 0, function* () {
-                                    fs_2.default.unlinkSync(ruta1);
+                                    fs_2.default.unlinkSync(ruta_temporal);
                                 }), 1000); // ESPERAR 1 SEGUNDO
                             }
                         });
-                        if (obj.imagen && obj.imagen !== 'null') {
-                            const ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(obj.id)) + separador + obj.imagen;
+                        // VERIFICAR EXISTENCIA DE IMAGEN Y ELIMINARLA PARA ACTUALIZAR
+                        if (unEmpleado.rows[0].imagen && unEmpleado.rows[0].imagen !== 'null') {
+                            const ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(unEmpleado.rows[0].id)) + separador + unEmpleado.rows[0].imagen;
                             fs_2.default.access(ruta, fs_2.default.constants.F_OK, (err) => {
                                 if (!err) {
                                     fs_2.default.unlinkSync(ruta);
@@ -828,9 +850,11 @@ class EmpleadoControlador {
                         });
                         // FINALIZAR TRANSACCION
                         yield database_1.default.query('COMMIT');
-                    }));
-                    yield Promise.all(promises);
-                    res.jsonp({ message: 'Imagen actualizada.' });
+                        res.jsonp({ message: 'Imagen actualizada.' });
+                    }
+                    else {
+                        res.jsonp({ message: 'error' });
+                    }
                 }
             }
             catch (error) {
@@ -1131,7 +1155,7 @@ class EmpleadoControlador {
                 }
             });
             if (verificador === 0) {
-                const codificado = (0, ImagenCodificacion_1.ImagenBase64LogosEmpleado)(ruta);
+                const codificado = (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
                 //console.log('codificado ', codificado)
                 if (codificado === 0) {
                     res.status(200).jsonp({ imagen: 0 });
@@ -1302,7 +1326,7 @@ class EmpleadoControlador {
                                                     //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
                                                     if (regex.test(data.telefono.toString())) {
                                                         if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                            data.observacion = 'El teléfono ingresada no es válido';
+                                                            data.observacion = 'El teléfono ingresado no es válido';
                                                         }
                                                         else {
                                                             if (duplicados.find((p) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
@@ -1313,7 +1337,7 @@ class EmpleadoControlador {
                                                         }
                                                     }
                                                     else {
-                                                        data.observacion = 'El teléfono ingresada no es válido';
+                                                        data.observacion = 'El teléfono ingresado no es válido';
                                                     }
                                                 }
                                             }
@@ -1322,7 +1346,7 @@ class EmpleadoControlador {
                                             }
                                         }
                                         else {
-                                            data.observacion = 'La contraseña debe ser maximo de 10 caracteres';
+                                            data.observacion = 'La contraseña debe tener máximo 10 caracteres';
                                         }
                                     }
                                     else {
@@ -1453,7 +1477,7 @@ class EmpleadoControlador {
                                                     }
                                                 }
                                                 else {
-                                                    data.observacion = 'La contraseña debe ser maximo de 10 caracteres';
+                                                    data.observacion = 'La contraseña debe tener máximo 10 caracteres';
                                                 }
                                             }
                                             else {
@@ -1729,64 +1753,6 @@ class EmpleadoControlador {
                         ip,
                         observacion: null
                     });
-                    // CREACION DE CARPETAS DE LOS USUARIOS REGISTRADOS
-                    if (empleado) {
-                        let verificar = 0;
-                        // RUTA DE LA CARPETA PRINCIPAL PERMISOS
-                        const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
-                        // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_2.default.mkdir(carpetaPermisos, { recursive: true }, (err) => {
-                            if (err) {
-                                verificar = 1;
-                            }
-                            else {
-                                verificar = 0;
-                            }
-                        });
-                        // RUTA DE LA CARPETA PRINCIPAL PERMISOS
-                        const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(empleado.id);
-                        // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_2.default.mkdir(carpetaImagenes, { recursive: true }, (err) => {
-                            if (err) {
-                                verificar = 1;
-                            }
-                            else {
-                                verificar = 0;
-                            }
-                        });
-                        // RUTA DE LA CARPETA DE ALMACENAMIENTO DE VACUNAS
-                        const carpetaVacunas = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(empleado.id);
-                        // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_2.default.mkdir(carpetaVacunas, { recursive: true }, (err) => {
-                            if (err) {
-                                verificar = 1;
-                            }
-                            else {
-                                verificar = 0;
-                            }
-                        });
-                        // RUTA DE LA CARPETA DE ALMACENAMIENTO DE CONTRATOS
-                        const carpetaContratos = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(empleado.id);
-                        // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_2.default.mkdir(carpetaContratos, { recursive: true }, (err) => {
-                            if (err) {
-                                verificar = 1;
-                            }
-                            else {
-                                verificar = 0;
-                            }
-                        });
-                        // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
-                        if (verificar === 1) {
-                            console.error('Error al crear las carpetas.');
-                        }
-                    }
-                    else {
-                        ocurrioError = true;
-                        mensajeError = 'error';
-                        codigoError = 404;
-                        break;
-                    }
                     if (contador === plantilla.length) {
                         // ACTUALIZACION DEL CODIGO
                         if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
@@ -1913,7 +1879,7 @@ class EmpleadoControlador {
                                         if (!valiContra.test(data.contrasena.toString())) {
                                             //console.log('entro ', data.contrasena.toString().length);
                                             if (data.contrasena.toString().length > 10) {
-                                                data.observacion = 'La contraseña debe ser maximo de 10 caracteres';
+                                                data.observacion = 'La contraseña debe tener máximo 10 caracteres';
                                             }
                                             else {
                                                 // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
@@ -1922,7 +1888,7 @@ class EmpleadoControlador {
                                                     if (TELEFONO != undefined) {
                                                         if (rege.test(data.telefono)) {
                                                             if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                                data.observacion = 'El teléfono ingresada no es válido';
+                                                                data.observacion = 'El teléfono ingresado no es válido';
                                                             }
                                                             else {
                                                                 if (duplicados.find((p) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
@@ -2048,7 +2014,7 @@ class EmpleadoControlador {
                                         if (!valiContra.test(data.contrasena.toString())) {
                                             //console.log(data.contrasena, ' entro ', data.contrasena.toString().length);
                                             if (data.contrasena.toString().length > 10) {
-                                                data.observacion = 'La contraseña debe ser maximo de 10 caracteres';
+                                                data.observacion = 'La contraseña debe tener máximo 10 caracteres';
                                             }
                                             else {
                                                 // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
@@ -2140,11 +2106,11 @@ class EmpleadoControlador {
                         SELECT * FROM e_cat_nacionalidades WHERE UPPER(nombre) = $1
                         `, [valor.nacionalidad.toUpperCase()]);
                                                 if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
-                                                    // DISCRIMINACIÓN DE ELEMENTOS IGUALES
+                                                    // DISCRIMINACION DE ELEMENTOS IGUALES
                                                     if (duplicados1.find((p) => p.cedula === valor.cedula) == undefined) {
                                                         // DISCRIMINACIÓN DE ELEMENTOS IGUALES
                                                         if (duplicados3.find((c) => c.codigo === valor.codigo) == undefined) {
-                                                            // DISCRIMINACIÓN DE ELEMENTOS IGUALES
+                                                            // DISCRIMINACION DE ELEMENTOS IGUALES
                                                             if (duplicados2.find((a) => a.usuario === valor.usuario) == undefined) {
                                                                 //valor.observacion = 'ok'
                                                                 duplicados2.push(valor);
@@ -2178,7 +2144,7 @@ class EmpleadoControlador {
                     }));
                     setTimeout(() => {
                         listEmpleadosManual.sort((a, b) => {
-                            // COMPARA LOS NÚMEROS DE LOS OBJETOS
+                            // COMPARA LOS NUMEROS DE LOS OBJETOS
                             if (a.fila < b.fila) {
                                 return -1;
                             }
@@ -2336,11 +2302,8 @@ class EmpleadoControlador {
                         ip,
                         observacion: null
                     });
-                    // OBTENER EL ID DEL EMPLEADO INGRESADO
-                    const oneEmpley = yield database_1.default.query(`
-          SELECT id FROM eu_empleados WHERE cedula = $1
-          `, [cedula]);
-                    const id_empleado = oneEmpley.rows[0].id;
+                    // OBTENER EL ID DEL EMPELADO
+                    const id_empleado = empleado.id;
                     // REGISTRO DE LOS DATOS DE USUARIO
                     yield database_1.default.query(`
           INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita)
@@ -2357,66 +2320,8 @@ class EmpleadoControlador {
                         ip,
                         observacion: null
                     });
-                    // CREACION DE CARPETAS DE LOS USUARIOS REGISTRADOS
-                    if (empleado) {
-                        let verificar = 0;
-                        // RUTA DE LA CARPETA PRINCIPAL PERMISOS
-                        const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
-                        // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_2.default.mkdir(carpetaPermisos, { recursive: true }, (err) => {
-                            if (err) {
-                                verificar = 1;
-                            }
-                            else {
-                                verificar = 0;
-                            }
-                        });
-                        // RUTA DE LA CARPETA PRINCIPAL PERMISOS
-                        const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(empleado.id);
-                        // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_2.default.mkdir(carpetaImagenes, { recursive: true }, (err) => {
-                            if (err) {
-                                verificar = 1;
-                            }
-                            else {
-                                verificar = 0;
-                            }
-                        });
-                        // RUTA DE LA CARPETA DE ALMACENAMIENTO DE VACUNAS
-                        const carpetaVacunas = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(empleado.id);
-                        // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_2.default.mkdir(carpetaVacunas, { recursive: true }, (err) => {
-                            if (err) {
-                                verificar = 1;
-                            }
-                            else {
-                                verificar = 0;
-                            }
-                        });
-                        // RUTA DE LA CARPETA DE ALMACENAMIENTO DE CONTRATOS
-                        const carpetaContratos = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(empleado.id);
-                        // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_2.default.mkdir(carpetaContratos, { recursive: true }, (err) => {
-                            if (err) {
-                                verificar = 1;
-                            }
-                            else {
-                                verificar = 0;
-                            }
-                        });
-                        // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
-                        if (verificar === 1) {
-                            console.error('Error al crear las carpetas.');
-                        }
-                    }
-                    else {
-                        ocurrioError = true;
-                        mensajeError = 'error';
-                        codigoError = 404;
-                        break;
-                    }
                     if (contador === plantilla.length) {
-                        // ACTUALIZACIÓN DEL CÓDIGO
+                        // ACTUALIZACION DEL CODIGO
                         yield database_1.default.query(`
             UPDATE e_codigo SET valor = null WHERE id = 1
             `);

@@ -510,6 +510,7 @@ export class VerEmpleadoComponent implements OnInit {
     formData.append('ip', this.ip as string);
 
     this.restEmpleado.SubirImagen(formData, parseInt(this.idEmpleado)).subscribe(res => {
+      console.log('rees ', res)
       this.toastr.success('Operación exitosa.', 'Imagen registrada.', {
         timeOut: 6000,
       });
