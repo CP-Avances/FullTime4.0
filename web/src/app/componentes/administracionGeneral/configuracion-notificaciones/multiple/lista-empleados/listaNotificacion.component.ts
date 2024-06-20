@@ -45,15 +45,17 @@ export class ListaNotificacionComponent implements OnInit {
         bool_cargo: false,
     };
 
+    mostrarTablas: boolean = false;
+
     public check: checkOptions[];
 
     // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
     idEmpleadoLogueado: any;
 
-    idCargosAcceso: any = [];
-    idUsuariosAcceso: any = [];
-    idSucursalesAcceso: any = [];
-    idDepartamentosAcceso: any = [];
+    idCargosAcceso: Set<any> = new Set();
+    idUsuariosAcceso: Set<any> = new Set();
+    idSucursalesAcceso: Set<any> = new Set();
+    idDepartamentosAcceso: Set<any> = new Set();
 
     departamentos: any = [];
     sucursales: any = [];
@@ -301,18 +303,20 @@ export class ListaNotificacionComponent implements OnInit {
         this.OmitirDuplicados();
 
         // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
-        this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
-        this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
-        this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
-        this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.includes(regimen.id_suc));
+        this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+        this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
+        this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
+        this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
 
         this.empleados.forEach((empleado: any) => {
-          this.idCargosAcceso = [...new Set([...this.idCargosAcceso, empleado.id_cargo_])];
+          this.idCargosAcceso.add(empleado.id_cargo_);
         });
 
         this.cargos = this.cargos.filter((cargo: any) =>
-          this.idSucursalesAcceso.includes(cargo.id_suc) && this.idCargosAcceso.includes(cargo.id)
+          this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
         );
+
+        this.mostrarTablas = true;
     }
 
     // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS

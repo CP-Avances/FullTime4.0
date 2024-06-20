@@ -41,8 +41,8 @@ export class VerEmpresaComponent implements OnInit {
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
-  idSucursalesAcceso: any = [];
-  idDepartamentosAcceso: any = [];
+  idSucursalesAcceso: Set<any> = new Set();
+  idDepartamentosAcceso: Set<any> = new Set();
 
   //IMAGEN
   logo: string;
@@ -167,7 +167,7 @@ export class VerEmpresaComponent implements OnInit {
 
   // METODO PARA FILTRAR SUCURSALES ASIGNADAS
   FiltrarSucursalesAsignadas(data: any) {
-    return data.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
+    return data.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
   }
 
   // VENTANA PARA EDITAR DATOS DE EMPRESA

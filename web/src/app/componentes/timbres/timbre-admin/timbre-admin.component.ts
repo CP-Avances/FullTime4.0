@@ -25,7 +25,7 @@ export class TimbreAdminComponent implements OnInit {
   datosEmpleado: any = [];
 
   idEmpleadoLogueado: any;
-  idUsuariosAcceso: any = [];
+  idUsuariosAcceso: Set<any> = new Set();
 
   // DATOS DEL FORMULARIO DE BUSQUEDA
   departamentoF = new FormControl('', Validators.minLength(2));
@@ -119,7 +119,7 @@ export class TimbreAdminComponent implements OnInit {
 
   // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
   FiltrarEmpleadosAsignados(data: any) {
-    return data.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
+    return data.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
 }
 
   // EVENTO PARA MANEJAR LA PAGINACION DE TABLA DE TIMBRES

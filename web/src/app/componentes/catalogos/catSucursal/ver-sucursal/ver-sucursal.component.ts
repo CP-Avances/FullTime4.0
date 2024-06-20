@@ -28,7 +28,7 @@ export class VerSucursalComponent implements OnInit {
 
   @Input() idSucursal: number;
   @Input() pagina_: string = '';
-  @Input() idDepartamentosAcceso: any = [];
+  @Input() idDepartamentosAcceso: Set<any> = new Set();
 
   datosSucursal: any = [];
   datosDepartamentos: any = [];
@@ -86,7 +86,7 @@ export class VerSucursalComponent implements OnInit {
 
   // METODO PARA FILTRAR DEPARTAMENTOS ASIGNADOS
   FiltrarDepartamentosAsignados(data: any) {
-    return data.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
+    return data.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
   }
 
   // ORDENAR LOS DATOS SEGÚN EL ID

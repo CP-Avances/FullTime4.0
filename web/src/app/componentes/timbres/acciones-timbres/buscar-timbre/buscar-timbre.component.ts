@@ -46,7 +46,7 @@ export class BuscarTimbreComponent implements OnInit {
   timbres: any = [];
   idEmpleadoLogueado: any;
 
-  idUsuariosAcceso: any = [];
+  idUsuariosAcceso: Set<any> = new Set();
 
   constructor(
     private timbresServicio: TimbresService,
@@ -103,7 +103,7 @@ export class BuscarTimbreComponent implements OnInit {
   }
 
   async FiltrarEmpleadosAsignados(data: any) {
-    return data.filter((timbre: any) => this.idUsuariosAcceso.includes(timbre.id_empleado));
+    return data.filter((timbre: any) => this.idUsuariosAcceso.has(timbre.id_empleado));
   }
 
   // METODO PARA CONTROLAR REGISTRO DE NUMEROS
