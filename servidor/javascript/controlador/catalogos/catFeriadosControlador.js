@@ -46,12 +46,18 @@ class FeriadosControlador {
                 // CONSULTAR DATOS ORIGINALES
                 const datosOriginales = yield database_1.default.query('SELECT * FROM ef_cat_feriados WHERE id = $1', [id]);
                 const [feriado] = datosOriginales.rows;
+                var fecha_formatoO = yield (0, settingsMail_1.FormatearFechaBase)(feriado.fecha, 'ddd');
+                console.log("ver fecha formateada", fecha_formatoO);
+                var fec_recuperacion_formatoO = '';
+                if (feriado.fec_recuperacion) {
+                    var fec_recuperacion_formatoO = yield (0, settingsMail_1.FormatearFechaBase)(feriado.fecha_recuperacion, 'ddd');
+                }
                 if (!feriado) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'ef_cat_feriados',
                         usuario: user_name,
                         accion: 'D',
-                        datosOriginales: '',
+                        datosOriginales: JSON.stringify(feriado),
                         datosNuevos: '',
                         ip,
                         observacion: `Error al eliminar feriado con id ${id}. Registro no encontrado.`
@@ -68,7 +74,8 @@ class FeriadosControlador {
                     tabla: 'ef_cat_feriados',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: JSON.stringify(feriado),
+                    datosOriginales: `{fecha: ${fecha_formatoO}, 
+                            descripcion: ${feriado.descripcion}, fecha_recuperacion: ${fec_recuperacion_formatoO}} `,
                     datosNuevos: '',
                     ip,
                     observacion: null
@@ -79,87 +86,9 @@ class FeriadosControlador {
             }
             catch (error) {
                 // REVERTIR TRANSACCION
+                console.log("error: ", error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ text: 'Error al eliminar el registro.' });
-            }
-        });
-    }
-    // METODO PARA CREAR REGISTRO DE FERIADO
-    CrearFeriados1(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { fecha, descripcion, fec_recuperacion, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const busqueda = yield database_1.default.query(`
-                SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1
-                `, [descripcion.toUpperCase()]);
-                const [nombres] = busqueda.rows;
-                if (nombres) {
-                    return res.jsonp({ message: 'existe', status: '300' });
-                }
-                else {
-                    yield database_1.default.query(`
-                    INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
-                    VALUES ($1, $2, $3) RETURNING *
-                    `, [fecha, descripcion, fec_recuperacion], (error, results) => __awaiter(this, void 0, void 0, function* () {
-                        // const [feriado] = response.rows;
-                        var fecha_formato_hora = yield (0, settingsMail_1.FormatearHora)(fecha.toLocaleString().split('T')[1]);
-                        var fecha_formato = yield (0, settingsMail_1.FormatearFecha)(fecha.toLocaleString(), 'ddd');
-                        var fec_recuperacion_formato_hora = '';
-                        var fec_recuperacion_formato = '';
-                        if (fec_recuperacion) {
-                            var fec_recuperacion_formato_hora = yield (0, settingsMail_1.FormatearHora)(fec_recuperacion.split('T')[1]);
-                            var fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha)(fec_recuperacion, 'ddd');
-                        }
-                        // var fec_recuperacion_formato_hora = await FormatearHora(fec_recuperacion.split('T')[1])
-                        var fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha)(fec_recuperacion, 'ddd');
-                        // AUDITORIA
-                        yield auditoriaControlador_1.default.InsertarAuditoria({
-                            tabla: 'ef_cat_feriados',
-                            usuario: user_name,
-                            accion: 'I',
-                            datosOriginales: '',
-                            //datosNuevos: JSON.stringify(feriado),
-                            datosNuevos: `{fecha: ${fecha_formato + ' ' + fecha_formato_hora}, 
-                            descripcion: ${descripcion}, fecha_recuperacion: ${fec_recuperacion_formato + ' ' + fec_recuperacion_formato_hora}} `,
-                            ip,
-                            observacion: null
-                        });
-                        yield database_1.default.query('COMMIT');
-                        res.status(200).jsonp({ message: 'Registro guardado.' });
-                    }));
-                    return res.status(500).jsonp({ message: 'Ups!!! algo ha salido mal.' });
-                    /*
-                                    if (feriado) {
-                                        return res.status(200).jsonp(feriado);
-                                    }
-                                    else {
-                                        return res.status(404).jsonp({ message: 'error' });
-                                    }
-                                        */
-                }
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                console.log(error);
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
-        });
-    }
-    // CONSULTA DE FERIDOS EXCEPTO EL REGISTRO QUE SE VA A ACTUALIZAR
-    ListarFeriadosActualiza(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const FERIADOS = yield database_1.default.query(`
-            SELECT * FROM ef_cat_feriados WHERE NOT id = $1
-            `, [id]);
-            if (FERIADOS.rowCount != 0) {
-                return res.jsonp(FERIADOS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -170,6 +99,7 @@ class FeriadosControlador {
                 const { fecha, descripcion, fec_recuperacion, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
+                // Buscar si ya existe un feriado con la misma descripción
                 const busqueda = yield database_1.default.query(`
                 SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1
                 `, [descripcion.toUpperCase()]);
@@ -178,18 +108,25 @@ class FeriadosControlador {
                     return res.jsonp({ message: 'existe', status: '300' });
                 }
                 else {
+                    // Obtener los datos originales (en este caso, no hay datos originales porque es una inserción nueva)
                     const response = yield database_1.default.query(`
                     INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
                     VALUES ($1, $2, $3) RETURNING *
                     `, [fecha, descripcion, fec_recuperacion]);
                     const [feriado] = response.rows;
+                    var fecha_formato = yield (0, settingsMail_1.FormatearFecha2)(fecha.toLocaleString(), 'ddd');
+                    var fec_recuperacion_formato = '';
+                    if (fec_recuperacion) {
+                        var fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha2)(fec_recuperacion, 'ddd');
+                    }
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'ef_cat_feriados',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: JSON.stringify(feriado),
+                        datosNuevos: `{fecha: ${fecha_formato}, 
+                            descripcion: ${descripcion}, fecha_recuperacion: ${fec_recuperacion_formato} `,
                         ip,
                         observacion: null
                     });
@@ -207,6 +144,21 @@ class FeriadosControlador {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
+            }
+        });
+    }
+    // CONSULTA DE FERIDOS EXCEPTO EL REGISTRO QUE SE VA A ACTUALIZAR
+    ListarFeriadosActualiza(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            const FERIADOS = yield database_1.default.query(`
+            SELECT * FROM ef_cat_feriados WHERE NOT id = $1
+            `, [id]);
+            if (FERIADOS.rowCount != 0) {
+                return res.jsonp(FERIADOS.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -238,14 +190,26 @@ class FeriadosControlador {
                 UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
                 WHERE id = $4
                 `, [fecha, descripcion, fec_recuperacion, id]);
+                var fecha_formato = yield (0, settingsMail_1.FormatearFecha2)(fecha.toLocaleString(), 'ddd');
+                var fec_recuperacion_formato = '';
+                if (fec_recuperacion) {
+                    var fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha2)(fec_recuperacion, 'ddd');
+                }
+                var fecha_formatoO = yield (0, settingsMail_1.FormatearFecha2)(feriado.fecha, 'ddd');
+                console.log("ver fecha formateada", fecha_formatoO);
+                var fec_recuperacion_formatoO = '';
+                if (feriado.fecha_recuperacion) {
+                    var fec_recuperacion_formatoO = yield (0, settingsMail_1.FormatearFechaBase)(feriado.fecha_recuperacion, 'ddd');
+                }
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ef_cat_feriados',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(feriado),
-                    datosNuevos: JSON.stringify({ fecha, descripcion, fec_recuperacion }),
-                    ip,
+                    datosOriginales: `{fecha: ${fecha_formatoO}, 
+                            descripcion: ${feriado.descripcion}, fecha_recuperacion: ${fec_recuperacion_formatoO}} `,
+                    datosNuevos: `{fecha: ${fecha_formato}, 
+                            descripcion: ${descripcion}, fecha_recuperacion: ${fec_recuperacion_formato}} `, ip,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -254,6 +218,7 @@ class FeriadosControlador {
             }
             catch (error) {
                 // REVERTIR TRANSACCION
+                console.log(error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }

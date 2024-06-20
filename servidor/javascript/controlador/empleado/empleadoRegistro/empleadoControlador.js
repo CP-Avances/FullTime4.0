@@ -25,6 +25,7 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const fs_2 = require("fs");
 const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
+const settingsMail_1 = require("../../../libs/settingsMail");
 const sharp = require('sharp');
 class EmpleadoControlador {
     /** ** ********************************************************************************************* **
@@ -211,13 +212,15 @@ class EmpleadoControlador {
         `, [cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio,
                     telefono, id_nacionalidad, codigo]);
                 const [empleado] = response.rows;
+                const fechaNacimiento = yield (0, settingsMail_1.FormatearFecha2)(fec_nacimiento.toLocaleString(), 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleados',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(empleado),
+                    datosNuevos: `{cedula:${cedula}, apellido:${apellido}, nombre:${nombre}, estado_civil:${esta_civil}, genero: ${genero}, correo: ${correo}, 
+          fecha_nacimiento:${fechaNacimiento}, estado:${estado}, domicilio:${domicilio}, telefono:${telefono}, id_nacionalidad:${id_nacionalidad}, codigo:${codigo}`,
                     ip,
                     observacion: null
                 });

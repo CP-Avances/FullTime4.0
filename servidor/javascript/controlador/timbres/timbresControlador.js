@@ -347,7 +347,7 @@ class TimbresControlador {
                 `, [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
                     id_reloj, ip_cliente, servidor], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.split('T')[1]);
-                    const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fec_hora_timbre.toLocaleString(), 'ddd');
+                    const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre.toLocaleString(), 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_timbres',
                         usuario: 'admin',

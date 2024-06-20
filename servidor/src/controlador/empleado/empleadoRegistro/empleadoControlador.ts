@@ -12,6 +12,8 @@ import path from 'path';
 import fs from 'fs';
 import { promises as pr } from 'fs';
 import { ImagenBase64LogosEmpleado, ImagenBase64LogosEmpresas } from '../../../libs/ImagenCodificacion';
+import { FormatearFecha2 } from '../../../libs/settingsMail';
+
 
 const sharp = require('sharp');
 
@@ -230,13 +232,19 @@ class EmpleadoControlador {
 
       const [empleado] = response.rows;
 
+
+      const fechaNacimiento = await FormatearFecha2(fec_nacimiento.toLocaleString(), 'ddd')
+
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eu_empleados',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: JSON.stringify(empleado),
+
+        datosNuevos:  `{cedula:${cedula}, apellido:${apellido}, nombre:${nombre}, estado_civil:${esta_civil}, genero: ${genero}, correo: ${correo}, 
+          fecha_nacimiento:${fechaNacimiento}, estado:${estado}, domicilio:${domicilio}, telefono:${telefono}, id_nacionalidad:${id_nacionalidad}, codigo:${codigo}`,
         ip,
         observacion: null
       });

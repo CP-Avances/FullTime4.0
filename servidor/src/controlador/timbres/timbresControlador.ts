@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
-import { FormatearFecha, FormatearHora } from '../../libs/settingsMail';
+import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
 
 
 class TimbresControlador {
@@ -383,7 +383,7 @@ class TimbresControlador {
 
                 , async (error, results) => {
                     const fechaHora = await FormatearHora(fec_hora_timbre.split('T')[1])
-                    const fechaTimbre = await FormatearFecha(fec_hora_timbre.toLocaleString(), 'ddd')
+                    const fechaTimbre = await FormatearFecha2(fec_hora_timbre.toLocaleString(), 'ddd')
 
 
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
