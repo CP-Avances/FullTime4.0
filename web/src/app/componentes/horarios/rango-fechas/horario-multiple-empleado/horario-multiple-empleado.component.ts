@@ -3,7 +3,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { ToastrService } from 'ngx-toastr';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
-import { firstValueFrom } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
 import moment from 'moment';
@@ -15,12 +14,13 @@ import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.mode
 // IMPORTAR SERVICIOS
 import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
+import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 @Component({
   selector: 'app-horario-multiple-empleado',
@@ -37,9 +37,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   ventana_busqueda: boolean = false;
 
   idEmpleadoLogueado: any;
-  rolEmpleado: number;
-  isEmpleado: boolean = false;
-  asignacionesAcceso: any;
   idUsuariosAcceso: any = [];
   idDepartamentosAcceso: any = [];
   idSucursalesAcceso: any = [];
@@ -122,7 +119,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   constructor(
     public informacion: DatosGeneralesService, // SERVICIO DE DATOS INFORMATIVOS DE USUARIOS
-    public restUsuario: UsuarioService,
     public restCargo: EmplCargosService,
     public restPerV: PeriodoVacacionesService, // SERVICIO DATOS PERIODO DE VACACIONES
     public validar: ValidacionesService, // VARIABLE USADA PARA VALIDACIONES DE INGRESO DE LETRAS - NUMEROS
@@ -130,14 +126,17 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     public restR: ReportesService,
     public plan: PlanGeneralService,
     private toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES
+    private restUsuario: UsuarioService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
-    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
-    this.isEmpleado = this.rolEmpleado != 1 ? true : false;
   }
 
   ngOnInit(): void {
     this.check = this.restR.checkOptions([{ opcion: 'r' }, { opcion: 'd' }, { opcion: 'c' }, { opcion: 'e' }]);
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
     this.PresentarInformacion();
   }
 
@@ -149,13 +148,10 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   }
 
   // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
-  async PresentarInformacion() {
+  PresentarInformacion() {
     let informacion = { id_empleado: this.idEmpleadoLogueado };
     let respuesta: any = [];
-    if (this.isEmpleado) {
-      this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
-      await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
-    }
+
     this.informacion.ObtenerInformacionUserRol(informacion).subscribe(res => {
       respuesta = res[0];
       this.AdministrarInformacion(respuesta, informacion);
@@ -304,20 +300,19 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     this.OmitirDuplicados();
 
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
-    if (this.isEmpleado) {
-      this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
-      this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
-      this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
-      this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.includes(regimen.id_suc));
 
-      this.empleados.forEach((empleado: any) => {
-        this.idCargosAcceso = [...new Set([...this.idCargosAcceso, empleado.id_cargo_])];
-      });
+    this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
+    this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
+    this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
+    this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.includes(regimen.id_suc));
 
-      this.cargos = this.cargos.filter((cargo: any) =>
-        this.idSucursalesAcceso.includes(cargo.id_suc) && this.idCargosAcceso.includes(cargo.id)
-      );
-    }
+    this.empleados.forEach((empleado: any) => {
+      this.idCargosAcceso = [...new Set([...this.idCargosAcceso, empleado.id_cargo_])];
+    });
+
+    this.cargos = this.cargos.filter((cargo: any) =>
+      this.idSucursalesAcceso.includes(cargo.id_suc) && this.idCargosAcceso.includes(cargo.id)
+    );
   }
 
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
@@ -346,32 +341,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     });
     this.cargos = verificados_car;
   }
-
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const data = {
-      id_empleado: Number(idEmpleado)
-    }
-
-    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(data));
-    this.asignacionesAcceso = res;
-
-    const promises = this.asignacionesAcceso.map((asignacion: any) => {
-      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
-      this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
-
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
-    });
-
-    const results = await Promise.all(promises);
-
-    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    this.idUsuariosAcceso.push(...ids);
-
-  }
-
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE
   plan_multiple: boolean = false;

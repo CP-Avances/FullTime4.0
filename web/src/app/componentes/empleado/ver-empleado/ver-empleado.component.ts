@@ -144,8 +144,8 @@ export class VerEmpleadoComponent implements OnInit {
     public validar: ValidacionesService,
     public ventana: MatDialog, // VARIABLE MANEJO DE VENTANAS
     public router: Router, // VARIABLE NAVEGACIÓN DE RUTAS URL
-    public restU: UsuarioService, // SERVICIO DATOS USUARIO
     public aviso: RealTimeService,
+    private restU: UsuarioService, // SERVICIO DATOS USUARIO
     private restF: FuncionesService, // SERVICIO DATOS FUNCIONES DEL SISTEMA
     private toastr: ToastrService, // VARIABLE MANEJO DE MENSAJES DE NOTIFICACIONES
     private restHE: PedHoraExtraService, // SERVICIO DATOS PEDIDO HORA EXTRA
@@ -510,6 +510,7 @@ export class VerEmpleadoComponent implements OnInit {
     formData.append('ip', this.ip as string);
 
     this.restEmpleado.SubirImagen(formData, parseInt(this.idEmpleado)).subscribe(res => {
+      console.log('rees ', res)
       this.toastr.success('Operación exitosa.', 'Imagen registrada.', {
         timeOut: 6000,
       });

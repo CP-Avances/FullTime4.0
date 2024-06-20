@@ -1,6 +1,7 @@
 <button mat-mini-fab style="margin-right: 8px;" [matMenuTriggerFor]="timbre" (click)="numeroTimbres()">
     <mat-icon id="iconos-navegador" [matBadgeHidden]="estadoTimbres" matBadge="{{num_timbre_false}}"
-        matBadgeColor="warn" style="margin-left: 8px; margin-right: 8px;" matSuffix matTooltip="Avisos Generales">
+        matBadgeColor="warn" style="margin-left: 8px; margin-right: 8px;" matSuffix matTooltip="Avisos Generales"
+        aria-hidden="false">
         report
     </mat-icon>
 </button>

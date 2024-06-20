@@ -21,6 +21,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 import { RegistroDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/registro-departamento/registro-departamento.component';
 import { EditarDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/editar-departamento/editar-departamento.component';
@@ -44,6 +45,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
   depainfo: any = [];
   empleado: any = [];
   idEmpleado: number;
+
+  idDepartamentosAcceso: any = [];
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   departamentoPadreF = new FormControl('');
@@ -84,6 +87,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   ip: string | null;
 
   constructor(
+    private asignacionesService: AsignacionesService,
     private scriptService: ScriptService,
     private toastr: ToastrService,
     private router: Router,
@@ -99,6 +103,9 @@ export class PrincipalDepartamentoComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+
+    this.idDepartamentosAcceso = this.asignacionesService.idDepartamentosAcceso;
+    console.log('idDepartamentosAcceso: ', this.idDepartamentosAcceso);
 
     this.ListaDepartamentos();
     this.ObtenerEmpleados(this.idEmpleado);
@@ -140,15 +147,21 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1
   }
 
+
   niveles: number = 0;
   depaSuperior: string = '';
   // METODO PARA BUSCAR DEPARTAMENTOS
   ListaDepartamentos() {
     this.departamentos = []
     this.rest.ConsultarDepartamentos().subscribe(datos => {
-      this.departamentos = datos;
+      this.departamentos = this.FiltrarDepartamentosAsignados(datos);
       this.OrdenarDatos(this.departamentos);
     })
+  }
+
+  // METODO PARA FILTRAR DEPARTAMENTOS ASIGNADOS
+  FiltrarDepartamentosAsignados(data: any) {
+    return data.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
   }
 
   // METODO PARA ABRIR VENTANA DE REGISTRO DE DEPARTAMENTO

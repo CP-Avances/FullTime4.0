@@ -24,7 +24,7 @@ export class VisualizarAsignacionesComponent {
   pageSizeOptions = [5, 10, 20, 50];
 
   constructor(
-    public usuario: UsuarioService,
+    private usuario: UsuarioService,
     public dialogo: MatDialog,
     public ventana: MatDialogRef<VisualizarAsignacionesComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any

@@ -17,6 +17,8 @@ import { EmpresaService } from "src/app/servicios/catalogos/catEmpresa/empresa.s
 import { ProcesoService } from "src/app/servicios/catalogos/catProcesos/proceso.service";
 import { MainNavService } from "src/app/componentes/administracionGeneral/main-nav/main-nav.service";
 import { CiudadService } from "src/app/servicios/ciudad/ciudad.service";
+import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
+import { AsignacionesService } from "src/app/servicios/asignaciones/asignaciones.service";
 
 @Component({
   selector: "app-crear-pedido-accion",
@@ -144,6 +146,8 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   // INICIACION DE VARIABLES
   idEmpleadoLogueado: any;
+  idUsuariosAcceso: any = [];
+
   empleados: any = [];
   ciudades: any = [];
   departamento: any;
@@ -157,12 +161,14 @@ export class CrearPedidoAccionComponent implements OnInit {
     public restAccion: AccionPersonalService,
     public restProcesos: ProcesoService,
     public restEmpresa: EmpresaService,
+    private restUsuario: UsuarioService,
     private toastr: ToastrService,
     public restE: EmpleadoService,
     public restC: CiudadService,
     public router: Router,
     private funciones: MainNavService,
-    private validar: ValidacionesService
+    private validar: ValidacionesService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem("empleado") as string);
     this.departamento = parseInt(localStorage.getItem("departamento") as string);
@@ -181,6 +187,9 @@ export class CrearPedidoAccionComponent implements OnInit {
       };
       return this.validar.RedireccionarHomeAdmin(mensaje);
     } else {
+
+      this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
       // INICIALIZACION DE FECHA Y MOSTRAR EN FORMULARIO
       var f = moment();
       this.FechaActual = f.format("YYYY-MM-DD");
@@ -356,13 +365,19 @@ export class CrearPedidoAccionComponent implements OnInit {
   ObtenerEmpleados() {
     this.empleados = [];
     this.restE.BuscarListaEmpleados().subscribe((data) => {
-      this.empleados = data;
+      this.empleados = this.FiltrarEmpleadosAsignados(data);
       this.seleccionarEmpleados = "";
       this.seleccionEmpleadoH = "";
       this.seleccionEmpleadoG = "";
       this.seleccionarEmpResponsable = "";
-      console.log("empleados", this.empleados);
     });
+  }
+
+  // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
+  FiltrarEmpleadosAsignados(data: any) {
+    if (this.idUsuariosAcceso.length > 0) {
+      return data.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
+    }
   }
 
   // METODO PARA OBTENER LISTA DE CIUDADES

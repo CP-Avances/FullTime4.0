@@ -5,7 +5,6 @@ import { Validators, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
-import { firstValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
@@ -17,10 +16,11 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 moment.locale('es');
 
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
@@ -72,7 +72,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   get filtroNombreReg() { return this.restR.filtroNombreReg };
 
   idEmpleadoLogueado: any;
-  asignacionesAcceso: any;
+
   idUsuariosAcceso: any = [];
   idDepartamentosAcceso: any = [];
   idSucursalesAcceso: any = [];
@@ -137,8 +137,9 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     public validar: ValidacionesService,
     private toastr: ToastrService,
     public informacion: DatosGeneralesService,
-    public restUsuario: UsuarioService,
-    private funciones: MainNavService
+    private restUsuario: UsuarioService,
+    private funciones: MainNavService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -155,6 +156,10 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     }
     else {
       this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 'r' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
+      this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+      this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
+      this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
       this.PresentarInformacion();
     }
   }
@@ -168,11 +173,10 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
 
 
   // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
-  async PresentarInformacion() {
+  PresentarInformacion() {
     let informacion = { id_empleado: this.idEmpleadoLogueado };
     let respuesta: any = [];
-    this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
-    await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
+
     this.informacion.ObtenerInformacionUserRol(informacion).subscribe(res => {
       respuesta = res[0];
       this.AdministrarInformacion(respuesta, informacion);
@@ -195,7 +199,6 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
 
     this.usua_sucursales = [];
 
-    console.log('empleado ', empleado)
     this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
       const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
 
@@ -360,31 +363,6 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
       return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
     });
     this.cargos = verificados_car;
-  }
-
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const data = {
-      id_empleado: Number(idEmpleado)
-    }
-
-    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(data));
-    this.asignacionesAcceso = res;
-
-    const promises = this.asignacionesAcceso.map((asignacion: any) => {
-      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
-      this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
-
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
-    });
-
-    const results = await Promise.all(promises);
-
-    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    this.idUsuariosAcceso.push(...ids);
-
   }
 
 

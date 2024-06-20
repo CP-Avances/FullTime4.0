@@ -79,32 +79,44 @@
 <!--  ****  LISTA DE EMPLEADOS QUE HAN SIDO INACTIVADOS O QUE YA NO FORMAN PARTE DE LA EMPRESA  ****  -->
 <div *ngIf="Hab_Deshabilitados && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container"
     style="padding-bottom: 50px; text-align: center;">
+    <div style="text-align: center; padding-bottom: 12px;" *ngIf="btnCheckDeshabilitado">
+        <div class="row">
+            <div class="col-md">
+                <button class="btn btn-primary btn-outline-light" style="margin-left: 20px; padding-left: 20px;"
+                    (click)="Deshabilitar(2)">
+                    Habilitar
+                </button>
+            </div>
+            <div class="col-md">
+                <button class="btn btn-primary btn-outline-light" style="margin-left: 10px ; padding-left: 20px;"
+                    (click)="Deshabilitar(3)">
+                    Reincorporar
+                </button>
+            </div>
+            <div class="col-md">
+                <button class="btn btn-primary btn-outline-light" style="margin-right: 10px; padding-left: 10px;"
+                    (click)="CrearCarpeta(2)">
+                    Crear Carpeta
+                </button>
+            </div>
+            <div class="col-md">
+                <button class="btn btn-primary btn-outline-light" style="margin-right: 10px;"
+                    (click)="ConfirmarDeleteMultipleInactivos()">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccionDesactivados()" matSuffix
                 matTooltipPosition="right" matTooltip="Selección múltiple para habilitar empleados." id="SelectCheck">
                 library_add_check
             </mat-icon>
-            <button *ngIf="btnCheckDeshabilitado" class="btn btn-primary btn-outline-light"
-                style="float: left; margin-left: 20px; padding-left: 20px;" (click)="Deshabilitar(2)">
-                Habilitar
-            </button>
-            <button *ngIf="btnCheckDeshabilitado" class="btn btn-info btn-outline-light"
-                style="float: left; margin-left: 10px ; padding-left: 20px;" (click)="Deshabilitar(3)">
-                Reincorporar
-            </button>
             <span class="w-100 bd-highlight">
                 LISTA DE USUARIOS INACTIVOS
             </span>
-
-            <button *ngIf="btnCheckDeshabilitado" class="btn btn-primary btn-outline-light"
-                style="float: left; margin-right: 10px; padding-left: 10px;" (click)="CrearCarpeta(2)">
-                Crear Carpeta
-            </button>
-            <button *ngIf="btnCheckDeshabilitado" class="btn btn-info btn-outline-light"
-                style="float: left; margin-right: 10px;" (click)="ConfirmarDeleteMultipleInactivos()">
-                Eliminar
-            </button>
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
@@ -171,34 +183,37 @@
             </div>
         </div>
     </div>
+
 </div>
 
 <!--  ********************  LISTA DE EMPLEADOS QUE FORMAN PARTE DE LA EMPRESA  ***********************  -->
 <div *ngIf="tabla_activos && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container"
     style="padding-bottom: 50px; text-align: center;">
+
+    <div style="text-align: center; padding-bottom: 12px;" *ngIf="btnCheckHabilitar">
+        <button class="btn btn-primary btn-outline-light" style="float: left; margin-left: 10px; padding-left: 10px;"
+            (click)="Deshabilitar(1)">
+            Confirmar
+        </button>
+        <button class="btn btn-primary btn-outline-light"
+            style="text-align: center; margin-right: 10px; padding-left: 10px;" (click)="CrearCarpeta(1)">
+            Crear Carpeta
+        </button>
+        <button class="btn btn-primary btn-outline-light" style="float: right; margin-right: 10px;"
+            (click)="ConfirmarDeleteMultipleActivos()">
+            Eliminar
+        </button>
+    </div>
+
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
                 matTooltipPosition="right" matTooltip="Selección múltiple para inhabilitar empleados." id="SelectCheck">
                 library_add_check
             </mat-icon>
-
-            <button *ngIf="btnCheckHabilitar" class="btn btn-primary btn-outline-light"
-                style="float: left; margin-left: 20px; padding-left: 10px;" (click)="Deshabilitar(1)">
-                Confirmar
-            </button>
-
             <span class="w-100 bd-highlight">
                 LISTA DE USUARIOS ACTIVOS
             </span>
-            <button *ngIf="btnCheckHabilitar" class="btn btn-primary btn-outline-light"
-                style="float: left; margin-right: 10px; padding-left: 10px;" (click)="CrearCarpeta(1)">
-                Crear Carpeta
-            </button>
-            <button *ngIf="btnCheckHabilitar" class="btn btn-primary btn-outline-light"
-                style="float: left; margin-right: 10px;" (click)="ConfirmarDeleteMultipleActivos()">
-                Eliminar
-            </button>
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
@@ -356,27 +371,27 @@
                 <tbody>
                     <tr *ngFor="let e of DataEmpleados | paginate:tamanio_paginaMul:numero_paginaMul ">
                         <td style="width: 400px;">
-                            <div id="t-editar" class="circulo" [style.background-color]="stiloCelda(e.observacion)">
+                            <div id="t-editar" class="circulo" [style.background-color]="EstiloCelda(e.observacion)">
                             </div>
                             {{e.observacion}}
                         </td>
                         <td style="font-size: 14px; width: 50px;" align="center">{{e.fila}}</td>
-                        <td [style.color]="stiloTextoCelda(e.cedula)">{{e.cedula}}</td>
-                        <td [style.color]="stiloTextoCelda(e.codigo)" *ngIf="datosManuales">{{e.codigo}}</td>
-                        <td [style.color]="stiloTextoCelda(e.apellido)">{{e.apellido}}</td>
-                        <td [style.color]="stiloTextoCelda(e.nombre)">{{e.nombre}}</td>
-                        <td [style.color]="stiloTextoCelda(e.estado_civil)">{{e.estado_civil}}</td>
-                        <td [style.color]="stiloTextoCelda(e.genero)">{{e.genero}}</td>
-                        <td [style.color]="stiloTextoCelda(e.fec_nacimiento)">{{e.fec_nacimiento}}</td>
-                        <td [style.color]="stiloTextoCelda(e.domicilio)">{{e.domicilio}}</td>
-                        <td [style.color]="stiloTextoCelda(e.telefono)">{{e.telefono}}</td>
-                        <td [style.color]="stiloTextoCelda(e.nacionalidad)">{{e.nacionalidad}}</td>
-                        <td [style.color]="stiloTextoCelda(e.correo)">{{e.correo}}</td>
-                        <td [style.color]="stiloTextoCelda(e.latitud)">{{e.latitud}}</td>
-                        <td [style.color]="stiloTextoCelda(e.longitud)">{{e.longitud}}</td>
-                        <td [style.color]="stiloTextoCelda(e.usuario)">{{e.usuario}}</td>
-                        <td [style.color]="stiloTextoCelda(e.contrasena)">{{e.contrasena}}</td>
-                        <td [style.color]="stiloTextoCelda(e.rol)">{{e.rol}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.cedula)">{{e.cedula}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.codigo)" *ngIf="datosManuales">{{e.codigo}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.apellido)">{{e.apellido}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.nombre)">{{e.nombre}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.estado_civil)">{{e.estado_civil}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.genero)">{{e.genero}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.fec_nacimiento)">{{e.fec_nacimiento}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.domicilio)">{{e.domicilio}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.telefono)">{{e.telefono}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.nacionalidad)">{{e.nacionalidad}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.correo)">{{e.correo}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.latitud)">{{e.latitud}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.longitud)">{{e.longitud}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.usuario)">{{e.usuario}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.contrasena)">{{e.contrasena}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.rol)">{{e.rol}}</td>
                     </tr>
                 </tbody>
             </table>

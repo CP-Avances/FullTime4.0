@@ -19,13 +19,16 @@ import { RelojesComponent } from 'src/app/componentes/catalogos/catRelojes/reloj
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableDispositivos } from 'src/app/model/reportes.model';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+
 
 @Component({
   selector: 'app-listar-relojes',
@@ -45,6 +48,9 @@ export class ListarRelojesComponent implements OnInit {
 
   empleado: any = [];
   idEmpleado: number;
+
+  idDepartamentosAcceso: any = [];
+
   listar_relojes: boolean = true;
   dispositivosEliminar: any = [];
 
@@ -91,6 +97,8 @@ export class ListarRelojesComponent implements OnInit {
     public restE: EmpleadoService,
     private rest: RelojesService,
     private toastr: ToastrService,
+    private restUsuario: UsuarioService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -98,6 +106,7 @@ export class ListarRelojesComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
@@ -143,8 +152,14 @@ export class ListarRelojesComponent implements OnInit {
   ObtenerReloj() {
     this.relojes = [];
     this.rest.ConsultarRelojes().subscribe(datos => {
-      this.relojes = datos;
+      this.relojes = this.FiltrarRelojesAsignados(datos);
+      console.log('probando relojes', this.relojes);
     })
+  }
+
+  // METODO PARA FILTRAR RELOJES POR ASIGNACION USUARIO - DEPARTAMENTO
+  FiltrarRelojesAsignados(data: any) {
+    return data.filter((reloj: any) => this.idDepartamentosAcceso.includes(reloj.id_departamento));
   }
 
   // METODO PARA INGRESAR IP

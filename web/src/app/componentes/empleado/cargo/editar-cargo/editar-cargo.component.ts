@@ -11,6 +11,7 @@ import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-editar-cargo',
@@ -33,6 +34,11 @@ export class EditarCargoComponent implements OnInit {
   ver_personal: boolean = false;
   personal: boolean = false;
   idAsignacion: number;
+
+  idEmpleadoAcceso: any;
+  asignacionesAcceso: any;
+  idSucursalesAcceso: any = [];
+  idDepartamentosAcceso: any = [];
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -72,17 +78,19 @@ export class EditarCargoComponent implements OnInit {
     private verEmpleado: VerEmpleadoComponent,
     private validar: ValidacionesService,
     private toastr: ToastrService,
-    public usuario: UsuarioService,
+    private usuario: UsuarioService,
     public tipocargo: CatTipoCargosService,
   ) { }
 
   ngOnInit(): void {
+    this.idEmpleadoAcceso = localStorage.getItem('empleado');
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
     if (this.idRol != 2) {
       this.ver_jefe = true;
     }
+    this.ObtenerAsignacionesUsuario(this.idEmpleadoAcceso);
     this.BuscarUsuarioDepartamento();
     this.ObtenerCargoEmpleado();
     this.FiltrarSucursales();
@@ -95,12 +103,38 @@ export class EditarCargoComponent implements OnInit {
     let idEmpre = parseInt(localStorage.getItem('empresa') as string);
     this.sucursales = [];
     this.restSucursales.BuscarSucursalEmpresa(idEmpre).subscribe(datos => {
-      this.sucursales = datos;
+      this.sucursales = this.FiltrarSucursalesAsignadas(datos);
     }, error => {
-      this.toastr.info('No se han encontrado datos de Sucursales.', '', {
+      this.toastr.info('No se han encontrado registros de Sucursales.', '', {
         timeOut: 6000,
       })
     })
+  }
+
+  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
+  async ObtenerAsignacionesUsuario(idEmpleado: any) {
+    const dataEmpleado = {
+      id_empleado: Number(idEmpleado)
+    }
+
+    const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(dataEmpleado));
+    this.asignacionesAcceso = res;
+
+    this.asignacionesAcceso.map((asignacion: any) => {
+      if (asignacion.principal && !asignacion.administra) {
+        return;
+      }
+
+      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
+      this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
+
+    });
+
+  }
+
+  // METODO PARA FILTRAR SUCURSALES ASIGNADAS
+  FiltrarSucursalesAsignadas(data: any) {
+    return data.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
   }
 
   // METODO PARA LISTAR DEARTAMENTOS SEGUN SUCURSAL
@@ -108,19 +142,24 @@ export class EditarCargoComponent implements OnInit {
     this.departamento = [];
     let idSucursal = form.idSucursalForm;
     this.restCatDepartamento.BuscarDepartamentoSucursal(idSucursal).subscribe(datos => {
-      this.departamento = datos;
+      this.departamento = this.FiltrarDepartamentosAsignados(datos);
     }, error => {
-      this.toastr.info('Sucursal no cuenta con departamentos registrados', '', {
+      this.toastr.info('Sucursal no cuenta con departamentos registrados.', '', {
         timeOut: 6000,
       })
     });
+  }
+
+  // METODO PARA FILTRAR DEPARTAMENTOS ASIGNADOS
+  FiltrarDepartamentosAsignados(data: any) {
+    return data.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
   }
 
   // METODO DE BUSQUEDA DE DEPARTAMENTOS
   ObtenerDepartamentosImprimir(id: number) {
     this.departamento = [];
     this.restCatDepartamento.BuscarDepartamentoSucursal(id).subscribe(datos => {
-      this.departamento = datos;
+      this.departamento = this.FiltrarDepartamentosAsignados(datos);
     }, error => {
       this.toastr.info('Sucursal no cuenta con departamentos registrados.', '', {
         timeOut: 6000,

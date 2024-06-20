@@ -14,15 +14,17 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 moment.locale("es");
 
 // LLAMADO DE SERVICIOS
-import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
 import { EmpleadoProcesosService } from "src/app/servicios/empleado/empleadoProcesos/empleado-procesos.service";
-import { AccionPersonalService } from "src/app/servicios/accionPersonal/accion-personal.service";
-import { ValidacionesService } from "src/app/servicios/validaciones/validaciones.service";
-import { EmplCargosService } from "src/app/servicios/empleado/empleadoCargo/empl-cargos.service";
-import { ParametrosService } from "src/app/servicios/parametrosGenerales/parametros.service";
-import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
-import { EmpresaService } from "src/app/servicios/catalogos/catEmpresa/empresa.service";
+import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
 import { MainNavService } from "src/app/componentes/administracionGeneral/main-nav/main-nav.service";
+import { AccionPersonalService } from "src/app/servicios/accionPersonal/accion-personal.service";
+import { EmplCargosService } from "src/app/servicios/empleado/empleadoCargo/empl-cargos.service";
+import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
+import { ParametrosService } from "src/app/servicios/parametrosGenerales/parametros.service";
+import { ValidacionesService } from "src/app/servicios/validaciones/validaciones.service";
+import { AsignacionesService } from "src/app/servicios/asignaciones/asignaciones.service";
+import { EmpresaService } from "src/app/servicios/catalogos/catEmpresa/empresa.service";
+import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
 
 @Component({
   selector: "app-listar-pedido-accion",
@@ -55,6 +57,8 @@ export class ListarPedidoAccionComponent implements OnInit {
   decreto: string[];
   tipoAccion: string[];
 
+  idUsuariosAcceso: any = [];
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string {
     return this.plantillaPDF.color_Secundary;
@@ -80,10 +84,12 @@ export class ListarPedidoAccionComponent implements OnInit {
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
     public parametro: ParametrosService,
     private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
+    private restUsuario: UsuarioService,
     private toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES
     private validar: ValidacionesService,
     private funciones: MainNavService,
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem("empleado") as string);
   }
@@ -98,6 +104,8 @@ export class ListarPedidoAccionComponent implements OnInit {
       };
       return this.validar.RedireccionarHomeAdmin(mensaje);
     } else {
+      this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
       this.ObtenerLogo();
       this.ObtenerEmpresa();
       this.VerDatosAcciones();
@@ -177,7 +185,7 @@ export class ListarPedidoAccionComponent implements OnInit {
   VerDatosAcciones() {
     this.listaPedidos = [];
     this.restAccion.BuscarDatosPedido().subscribe((data) => {
-      this.listaPedidos = data;
+      this.listaPedidos = this.FiltrarEmpleadosAsignados(data);
       this.FormatearDatos(
         this.listaPedidos,
         this.formato_fecha,
@@ -185,6 +193,12 @@ export class ListarPedidoAccionComponent implements OnInit {
       );
     });
   }
+
+  // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
+  FiltrarEmpleadosAsignados(data: any) {
+      return data.filter((pedido: any) => this.idUsuariosAcceso.includes(pedido.id_empleado));
+  }
+
 
   // METODO PARA FORMATEAR DATOS DE FECHA
   FormatearDatos(lista: any, formato_fecha: string, formato_hora: string) {
@@ -281,7 +295,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     });
   }
 
-  // METODO PARA MOSTRAR DATOS DE LOS EMPLEADOS SELECCIONADOS EN EL PEDIDO 
+  // METODO PARA MOSTRAR DATOS DE LOS EMPLEADOS SELECCIONADOS EN EL PEDIDO
   BuscarPedidoEmpleado(pedido: any, tipo: string) {
     this.restAccion
       .BuscarDatosPedidoEmpleados(pedido[0].id_empleado)
@@ -303,7 +317,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     });
   }
 
-  // METODO PARA BUSCAR PROCESOS QUE TIENE EL EMPLEADO DE ACUERDO AL CARGO 
+  // METODO PARA BUSCAR PROCESOS QUE TIENE EL EMPLEADO DE ACUERDO AL CARGO
   BuscarProcesosCargo(id_cargo: any, valor: any, contar: any, tipo: string) {
     // revisar
     this.restEmpleadoProcesos
@@ -349,7 +363,7 @@ export class ListarPedidoAccionComponent implements OnInit {
       );
   }
 
-  // METODO PARA BUSCAR INFORMACIÓN DE LOS EMPLEADOS RESPONSABLES / FIRMAS 
+  // METODO PARA BUSCAR INFORMACIÓN DE LOS EMPLEADOS RESPONSABLES / FIRMAS
   BusquedaInformacion(tipo: string) {
     this.restAccion
       .BuscarDatosPedidoEmpleados(parseInt(this.datosPedido[0].firma_empleado_uno))
@@ -461,7 +475,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     }
   }
 
-  // METODO PARA REALIZAR BUSQUEDA DE PROCESOS QUE TIENEN REGISTRADOS EL EMPLEADO 
+  // METODO PARA REALIZAR BUSQUEDA DE PROCESOS QUE TIENEN REGISTRADOS EL EMPLEADO
   nombre_procesos_a: string = "";
   proceso_padre_a: string = "";
   EscribirProcesosActuales(array) {
@@ -3934,7 +3948,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     xlsx.utils.sheet_add_aoa(worksheet,
       [[
         `POSESIÓN DEL CARGO\n\n
-        YO ${this.empleado_1[0].apellido.toUpperCase()} ${this.empleado_1[0].nombre.toUpperCase()}     CON CÉDULA DE CIUDADANÍA No. 
+        YO ${this.empleado_1[0].apellido.toUpperCase()} ${this.empleado_1[0].nombre.toUpperCase()}     CON CÉDULA DE CIUDADANÍA No.
         ${this.empleado_1[0].cedula.toUpperCase()}\n
         JURO LEALTAD AL ESTADO ECUATORIANO.\n\n\n
         LUGAR:  ___________________________________\n\n
@@ -3944,7 +3958,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     xlsx.utils.sheet_add_aoa(worksheet,
       [[
         `f. ______________________________________\n
-        Funcionario\n\n 
+        Funcionario\n\n
         `
       ]], { origin: 'C107' });
     xlsx.utils.sheet_add_aoa(worksheet,
