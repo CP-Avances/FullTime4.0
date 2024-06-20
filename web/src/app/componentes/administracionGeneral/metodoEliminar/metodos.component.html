@@ -85,6 +85,23 @@
     </mat-card-content>
 </ng-container>
 
+<ng-container *ngIf="mensaje == 'deshabilitar'">
+    <div id="resultados" >
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+            DESHABILITAR REGISTRO
+        </span>
+    </div>
+    <mat-card-content *ngIf="eliminar">
+        <div style="padding: 2%;">
+            <p>Se le recuerda que al deshabilitar este registro automáticamente se deshabilitaran <b>TODOS</b> los registro con los
+                que guarde alguna relación.
+                <b>Podría afectar al buen funcionamiento del sistema.</b>
+            </p>
+            <p id="mensaje">¿ESTÁ SEGURO DE DESHABILITAR ESTE REGISTRO?</p>
+        </div>
+    </mat-card-content>
+</ng-container>
+
 <div style="text-align: center; margin-bottom: 3%;">
     <button mat-raised-button id="aceptar" class="btn-sm" color="primary" (click)="Confirmar()">
         Aceptar

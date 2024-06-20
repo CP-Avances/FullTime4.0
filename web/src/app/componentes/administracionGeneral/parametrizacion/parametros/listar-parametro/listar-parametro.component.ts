@@ -1,18 +1,16 @@
 // SECCIÓN DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as xlsx from 'xlsx';
 import * as moment from 'moment';
+import * as xml2js from 'xml2js';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
 
 import { EditarParametroComponent } from '../editar-parametro/editar-parametro.component';
 
@@ -28,16 +26,14 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 
 export class ListarParametroComponent implements OnInit {
 
-  tipoPermiso: any = [];
-  filtroDescripcion = '';
-
   // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
-
+  
   empleado: any = [];
   idEmpleado: number;
+  tipoPermiso: any = [];
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -56,8 +52,6 @@ export class ListarParametroComponent implements OnInit {
     public ventana: MatDialog,
     public restEmpre: EmpresaService,
     private restP: ParametrosService,
-    private toastr: ToastrService,
-    private router: Router,
 
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -219,7 +213,7 @@ export class ListarParametroComponent implements OnInit {
                 { text: 'Descripción', style: 'tableHeader' },
                 { text: 'Detalle', style: 'tableHeader' },
               ],
-              ...this.parametros.map(obj => {
+              ...this.parametros.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTable' },

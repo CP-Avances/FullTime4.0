@@ -53,7 +53,7 @@ const BuscarVacaciones = function (id, desde, hasta) {
         WHERE v.id = a.id_vacacion AND v.codigo = $1 AND fecha_inicio BETWEEN $2 AND $3
         `, [id, desde, hasta])
             .then((res) => {
-            if (res.rowCount > 0) {
+            if (res.rowCount != 0) {
                 res.rows.map((obj) => {
                     if (obj.id_autoriza_estado != null && obj.id_autoriza_estado != '' && obj.estado != 1) {
                         var autorizaciones = obj.id_autoriza_estado.split(',');

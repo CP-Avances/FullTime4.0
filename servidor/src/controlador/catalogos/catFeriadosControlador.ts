@@ -18,7 +18,7 @@ class FeriadosControlador {
             SELECT * FROM ef_cat_feriados ORDER BY descripcion ASC
             `
         );
-        if (FERIADOS.rowCount > 0) {
+        if (FERIADOS.rowCount != 0) {
             return res.jsonp(FERIADOS.rows)
         }
         else {
@@ -148,7 +148,7 @@ class FeriadosControlador {
             SELECT * FROM ef_cat_feriados WHERE NOT id = $1
             `
             , [id]);
-        if (FERIADOS.rowCount > 0) {
+        if (FERIADOS.rowCount != 0) {
             return res.jsonp(FERIADOS.rows)
         }
         else {
@@ -221,7 +221,7 @@ class FeriadosControlador {
             SELECT * FROM ef_cat_feriados WHERE id = $1
             `
             , [id]);
-        if (FERIADO.rowCount > 0) {
+        if (FERIADO.rowCount != 0) {
             return res.jsonp(FERIADO.rows)
         }
         res.status(404).jsonp({ text: 'Registros no encontrados.' });
@@ -241,7 +241,7 @@ class FeriadosControlador {
                 `
                 , [fecha_inicio, fecha_final, id_empleado]);
 
-            if (FERIADO.rowCount > 0) {
+            if (FERIADO.rowCount != 0) {
                 return res.jsonp(FERIADO.rows)
             }
             else {
@@ -268,7 +268,7 @@ class FeriadosControlador {
                 `
                 , [fecha_inicio, fecha_final, id_empleado]);
 
-            if (FERIADO.rowCount > 0) {
+            if (FERIADO.rowCount != 0) {
                 return res.jsonp(FERIADO.rows)
             }
             else {
@@ -321,7 +321,7 @@ class FeriadosControlador {
             var fecha_igual: any = [];
             var mensaje: string = 'correcto';
             // LECTURA DE LOS DATOS DE LA PLANTILLA
-            plantilla.forEach(async (dato: any, indice: any, array: any) => {
+            plantilla.forEach(async (dato: any) => {
                 var { ITEM, FECHA, DESCRIPCION, FECHA_RECUPERACION } = dato;
 
                 if ((ITEM != undefined && ITEM != '') &&
@@ -501,9 +501,9 @@ class FeriadosControlador {
 
                 }
 
-                //Valida si los datos de la columna N son numeros.
+                // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                 if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                    //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                    // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                     if (item.fila == filaDuplicada) {
                         mensaje = 'error';
                     }
@@ -546,9 +546,9 @@ class FeriadosControlador {
                     }
                 }
 
-                //Valida si los datos de la columna N son numeros.
+                // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                 if (typeof value.fila === 'number' && !isNaN(value.fila)) {
-                    //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                    // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                     if (value.fila == filaDuplicada_fc) {
                         mensaje = 'error';
                     }
@@ -566,25 +566,25 @@ class FeriadosControlador {
                 fecha_igual = listFeriados;
 
                 listFeriados.sort((a: any, b: any) => {
-                    // Compara los números de los objetos
+                    // COMPARA LOS NUMEROS DE LOS OBJETOS
                     if (a.fila < b.fila) {
                         return -1;
                     }
                     if (a.fila > b.fila) {
                         return 1;
                     }
-                    return 0; // Son iguales
+                    return 0; // SON IGUALES
                 });
 
                 listFeriados_ciudades.sort((a: any, b: any) => {
-                    // Compara los números de los objetos
+                    // COMPARA LOS NUMEROS DE LOS OBJETOS
                     if (a.fila < b.fila) {
                         return -1;
                     }
                     if (a.fila > b.fila) {
                         return 1;
                     }
-                    return 0; // Son iguales
+                    return 0; // SON IGUALES
                 });
 
                 listFeriados.forEach((item: any) => {

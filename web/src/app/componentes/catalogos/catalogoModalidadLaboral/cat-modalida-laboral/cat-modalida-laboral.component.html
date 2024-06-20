@@ -38,14 +38,14 @@
                             <label for="file" matSuffix matTooltipPosition="right"
                                 *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
                                 style="height: 65px; padding-top: 25px;"
-                                matTooltip="Presionar para seleccionar Plantilla con nombre Modalidad.">
+                                matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
                                 Subir nueva plantilla
-                           </label>
+                            </label>
                         </form>
                     </div>
                     <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                         <div *ngIf="!Datos_modalidad_laboral" class="d-flex flex-wrap justify-content-around">
-                            <a id="descargar" class="btn m-auto"  matSuffix matTooltipPosition="right"
+                            <a id="descargar" class="btn m-auto" matSuffix matTooltipPosition="right"
                                 matTooltip="Dar click para ver o descargar el documento."
                                 href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
                                 <br>
@@ -106,8 +106,7 @@
                         <td></td>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [formControl]="buscarModalidad"
-                                    [(ngModel)]="filtroModalidad">
+                                <input matInput placeholder="Buscar" [formControl]="buscarModalidad">
                             </mat-form-field>
                         </td>
                         <td>
@@ -117,11 +116,13 @@
                             </mat-icon>
                         </td>
                     </tr>
-                    <tr *ngFor="let modalidad of listaModalida_Laboral | modalidadLaboral: filtroModalidad |  paginate:tamanio_pagina:numero_pagina">
+                    <tr
+                        *ngFor="let modalidad of listaModalida_Laboral | modalidadLaboral: buscarModalidad.value |  paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionModalidad.toggle(modalidad) : null"
-                                [checked]="selectionModalidad.isSelected(modalidad)" [aria-label]="checkboxLabelPag(modalidad)">
+                                [checked]="selectionModalidad.isSelected(modalidad)"
+                                [aria-label]="checkboxLabelPag(modalidad)">
                             </mat-checkbox>
                         </td>
                         <td>{{modalidad.descripcion}}</td>
@@ -204,7 +205,8 @@
                             </div>
                         </td>
                         <td [style.color]="stiloTextoCelda(dm.modalida_laboral)" style="font-size: 12px;">
-                            {{dm.modalida_laboral}}</td>
+                            {{dm.modalida_laboral}}
+                        </td>
                     </tr>
                 </tbody>
             </table>

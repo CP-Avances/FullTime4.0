@@ -27,7 +27,7 @@ class VacunaControlador {
                 const VACUNA = yield database_1.default.query(`
                 SELECT * FROM e_cat_vacuna ORDER BY nombre ASC
                 `);
-                if (VACUNA.rowCount > 0) {
+                if (VACUNA.rowCount != 0) {
                     return res.jsonp(VACUNA.rows);
                 }
                 else {
@@ -93,8 +93,26 @@ class VacunaControlador {
                 var VERIFICAR_VACUNA = yield database_1.default.query(`
                 SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1 AND NOT id = $2
                 `, [nombre.toUpperCase(), id]);
+                const consulta = yield database_1.default.query('SELECT * FROM e_cat_vacuna WHERE id = $1', [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_cat_vacuna',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
                 if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
                     const vacunaEditar = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
                     const response = yield database_1.default.query(`
                 UPDATE e_cat_vacuna SET nombre = $2
                 WHERE id = $1 RETURNING *
@@ -103,9 +121,9 @@ class VacunaControlador {
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'e_cat_vacuna',
-                        usuario: user_name,
+                        usuario: req.body.user_name,
                         accion: 'U',
-                        datosOriginales: JSON.stringify(VERIFICAR_VACUNA.rows),
+                        datosOriginales: JSON.stringify(datosOriginales),
                         datosNuevos: JSON.stringify(vacunaInsertada),
                         ip,
                         observacion: null
@@ -125,6 +143,7 @@ class VacunaControlador {
             }
             catch (error) {
                 // ROLLBACK
+                console.log(error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error', status: '500' });
             }
@@ -206,7 +225,7 @@ class VacunaControlador {
                     var duplicados = [];
                     var mensaje = 'correcto';
                     // LECTURA DE LOS DATOS DE LA PLANTILLA
-                    plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                    plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                         var { ITEM, VACUNA } = dato;
                         // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                         if ((ITEM != undefined && ITEM != '') &&
@@ -298,11 +317,11 @@ class VacunaControlador {
                 }
             }
             catch (error) {
-                return res.status(500).jsonp({ message: 'Error con el servidor metodo RevisarDatos', status: '500' });
+                return res.status(500).jsonp({ message: 'Error con el servidor método RevisarDatos.', status: '500' });
             }
         });
     }
-    // REGISTRAR PLANTILLA MODALIDAD_CARGO 
+    // REGISTRAR PLANTILLA TIPO VACUNA
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -311,7 +330,7 @@ class VacunaControlador {
                 var respuesta;
                 plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                     // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
-                    const { item, vacuna, observacion } = data;
+                    const { vacuna } = data;
                     const vacu = vacuna.charAt(0).toUpperCase() + vacuna.slice(1).toLowerCase();
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
@@ -346,7 +365,7 @@ class VacunaControlador {
             catch (error) {
                 // ROLLBACK
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error con el servidor metodo CargarPlantilla', status: '500' });
+                return res.status(500).jsonp({ message: 'Error con el servidor metodo CargarPlantilla.', status: '500' });
             }
         });
     }

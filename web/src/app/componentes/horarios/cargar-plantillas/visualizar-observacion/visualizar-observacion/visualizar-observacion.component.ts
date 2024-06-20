@@ -11,8 +11,6 @@ export class VisualizarObservacionComponent {
   observaciones: string[] = [];
   dia: string = '';
 
-
-
   constructor(
     public ventana: MatDialogRef<VisualizarObservacionComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any

@@ -25,7 +25,7 @@ class CiudadControlador {
             FROM e_cat_paises AS p, e_provincias AS pro, e_ciudades AS c
             WHERE c.id = $1 AND c.id_provincia = pro.id AND p.id = pro.id_pais
             `, [id_ciudad]);
-            if (CIUDAD.rowCount > 0) {
+            if (CIUDAD.rowCount != 0) {
                 return res.jsonp(CIUDAD.rows);
             }
             else {
@@ -39,7 +39,7 @@ class CiudadControlador {
             const CIUDAD = yield database_1.default.query(`
             SELECT * FROM e_ciudades
             `);
-            if (CIUDAD.rowCount > 0) {
+            if (CIUDAD.rowCount != 0) {
                 return res.jsonp(CIUDAD.rows);
             }
             else {
@@ -54,7 +54,7 @@ class CiudadControlador {
             const CIUDAD = yield database_1.default.query(`
             SELECT * FROM e_ciudades WHERE id_provincia = $1
             `, [id_provincia]);
-            if (CIUDAD.rowCount > 0) {
+            if (CIUDAD.rowCount != 0) {
                 return res.jsonp(CIUDAD.rows);
             }
             else {
@@ -102,7 +102,7 @@ class CiudadControlador {
             WHERE c.id_provincia = p.id
             ORDER BY provincia, nombre ASC
             `);
-            if (CIUDAD.rowCount > 0) {
+            if (CIUDAD.rowCount != 0) {
                 return res.jsonp(CIUDAD.rows);
             }
             else {
@@ -156,7 +156,8 @@ class CiudadControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+                //return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+                return res.jsonp({ message: 'error' });
             }
         });
     }
@@ -167,7 +168,7 @@ class CiudadControlador {
             const CIUDAD = yield database_1.default.query(`
             SELECT * FROM e_ciudades WHERE id = $1
             `, [id]);
-            if (CIUDAD.rowCount > 0) {
+            if (CIUDAD.rowCount != 0) {
                 return res.jsonp(CIUDAD.rows);
             }
             else {

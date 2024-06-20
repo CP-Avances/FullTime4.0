@@ -234,7 +234,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
         })
         //console.log('ver duracion ', diferencias)
         // ENCUENTRA EL VALOR MINIMO
-        var minValue = Math.min(...diferencias.map(x => x.duracion))
+        var minValue = Math.min(...diferencias.map((x: any)  => x.duracion))
         // FILTRA EL OBJETO TAL QUE LOS VALORES SEAN IGUAL AL MINIMO
         var resultado = diferencias.filter(x => x.duracion == minValue)
         // IMPRIME EL RESULTADO

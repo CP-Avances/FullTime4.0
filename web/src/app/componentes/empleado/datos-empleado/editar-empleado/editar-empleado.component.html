@@ -46,9 +46,9 @@
                             <mat-form-field>
                                 <mat-label>Código</mat-label>
                                 <input matInput type="text" formControlName="codigoForm" [readonly]="escritura"
-                                    required>
+                                    (keypress)="IngresarSoloLetrasNumeros($event)" required maxlength="10">
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Ingrese un Código de identificacion, este campo es alternativo.">
+                                    matTooltip="Ingresar el código del colaborador.">
                                     help_outline
                                 </mat-icon>
                             </mat-form-field>
@@ -57,10 +57,12 @@
                                 <input matInput type="text" placeholder="1788300293" maxlength="10"
                                     formControlName="cedulaForm"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                    (keypress)="IngresarSoloNumeros($event)" required>
+                                    (keypress)="IngresarSoloNumeros($event)" required
+                                    (input)="LlenarCodigo(primeroFormGroup.value)">
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Ingresar la cédula de identidad o pasaporte del nuevo empleado">
-                                    help_outline</mat-icon>
+                                    help_outline
+                                </mat-icon>
                             </mat-form-field>
                         </div>
                     </div>
@@ -81,14 +83,14 @@
                                     required>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Ingrese un correo electrónico valido">
-                                    mail_outline</mat-icon>
+                                    mail_outline
+                                </mat-icon>
                             </mat-form-field>
                         </div>
                     </div>
                 </div>
             </form>
             <div>
-                <!--button mat-raised-button id="btn-raised" (click)="Cancelar()">Cancelar</button-->
                 <button mat-raised-button id="btn-raised" matStepperNext class="float-right">Siguiente</button>
             </div>
         </mat-step>
@@ -113,7 +115,7 @@
                             <mat-form-field>
                                 <mat-label>Domicilio</mat-label>
                                 <input matInput placeholder="Sector, Avenida, Calle" type="text"
-                                    formControlName="domicilioForm" required>
+                                    formControlName="domicilioForm">
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Ingrese la dirección de domicilio en donde reside, Av, interseción, numero de casa">
                                     my_location
@@ -124,7 +126,7 @@
                                 <input matInput placeholder="0984297443" type="text" maxlength="10"
                                     formControlName="telefonoForm"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                    (keypress)="IngresarSoloNumeros($event)" required>
+                                    (keypress)="IngresarSoloNumeros($event)">
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Ingresar número telefónico convencional o celular">
                                     phone
@@ -191,7 +193,6 @@
             </form>
             <div style="text-align: center;">
                 <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
-                <!--button mat-raised-button id="btn-raised" (click)="Cancelar()">Cancelar</button-->
                 <button mat-raised-button id="btn-raised" matStepperNext class="float-right">Siguiente</button>
             </div>
         </mat-step>
@@ -229,16 +230,17 @@
                         <input matInput placeholder="Ej: kevin.curay" formControlName="userForm" type="text" required>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Nombre del usuario con el cual podrá ingresar al sistema">
-                            account_circle</mat-icon>
+                            account_circle
+                        </mat-icon>
                     </mat-form-field>
                 </div>
                 <div style="text-align: center;">
                     <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
                     <button mat-raised-button id="btn-raised" class="float-right"
                         (click)="ActualizarEmpleado(primeroFormGroup.value, segundoFormGroup.value, terceroFormGroup.value);"
-                        type="submit" [disabled]="!terceroFormGroup.valid">Guardar
+                        type="submit" [disabled]="!terceroFormGroup.valid">
+                        Guardar
                     </button>
-                    <!--button mat-raised-button id="btn-raised" (click)="Cancelar()" class="float-right">Cancelar</button-->
                 </div>
             </form>
         </mat-step>

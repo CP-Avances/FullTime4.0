@@ -282,7 +282,7 @@ export class MainNavComponent implements OnInit {
           { name: 'Cargar Plantillas', url: '/cargarPlantilla', color: true, ver: true },
           { name: 'Modalida Laboral', url: '/modalidaLaboral', color: true, ver: true },
           { name: 'Tipo Cargos', url: '/tipoCargos', color: true, ver: true },
-          { name: 'Administrar Información', url: '/administrarSucursales', color: true, ver: this.superadmin },
+          { name: 'Administrar Información', url: '/administrarInformacion', color: true, ver: this.superadmin },
         ]
       },
       {
@@ -548,6 +548,18 @@ export class MainNavComponent implements OnInit {
               { name: 'Planificación Horaria', url: '/reporte-planificacion-horaria', color: true, ver: true },
               //{ name: 'Entradas Salidas', url: '/reporteEntradaSalida', color: true, ver: true },
               //{ name: 'Asistencia Detalle Consolidado', url: '/reporteAsistenciaConsolidado', color: true, ver: true },
+            ]
+          },
+          {
+            name: 'Auditoría',
+            accion: true,
+            estado: true,
+            subtitulo: true,
+            icono: 'check_circle_outline',
+            color: true,
+            children: [
+              { name: 'Auditoría', url: '/reporte-auditoria', color: true, ver: true },
+
             ]
           },
           {

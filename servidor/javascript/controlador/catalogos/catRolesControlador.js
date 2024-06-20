@@ -21,7 +21,7 @@ class RolesControlador {
             const ROL = yield database_1.default.query(`
       SELECT id, nombre FROM ero_cat_roles ORDER BY nombre ASC
       `);
-            if (ROL.rowCount > 0) {
+            if (ROL.rowCount != 0) {
                 return res.jsonp(ROL.rows);
             }
             else {
@@ -75,7 +75,7 @@ class RolesControlador {
             catch (error) {
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+                return res.jsonp({ message: 'error' });
             }
         });
     }
@@ -116,7 +116,7 @@ class RolesControlador {
             const ROL = yield database_1.default.query(`
       SELECT * FROM ero_cat_roles WHERE NOT id = $1
       `, [id]);
-            if (ROL.rowCount > 0) {
+            if (ROL.rowCount != 0) {
                 return res.jsonp(ROL.rows);
             }
             else {
@@ -130,7 +130,7 @@ class RolesControlador {
             const ROL = yield database_1.default.query(`
       SELECT * FROM ero_cat_roles WHERE id = $1
       `, [id]);
-            if (ROL.rowCount > 0) {
+            if (ROL.rowCount != 0) {
                 return res.jsonp(ROL.rows);
             }
             else {

@@ -120,8 +120,8 @@ function ListaHorasExtrasGrafica(fec_desde, fec_hasta) {
         let arrayUno = yield HorasExtrasSolicitadasGrafica(fec_desde, fec_hasta);
         let arrayDos = yield PlanificacionHorasExtrasSolicitadasGrafica(fec_desde, fec_hasta);
         let arrayUnido = arrayUno.concat(arrayDos);
-        let set = new Set(arrayUnido.map(obj => { return JSON.stringify(obj); }));
-        arrayUnido = Array.from(set).map(obj => { return JSON.parse(obj); });
+        let set = new Set(arrayUnido.map((obj) => { return JSON.stringify(obj); }));
+        arrayUnido = Array.from(set).map((obj) => { return JSON.parse(obj); });
         for (let j = 0; j < arrayUnido.length; j++) {
             let numMin;
             let i = numMin = j;
@@ -261,8 +261,8 @@ function EmpleadoHorasExtrasGrafica(codigo, fec_desde, fec_hasta) {
         let arrayDos = yield EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(codigo, fec_desde, fec_hasta);
         // let arrayUnido  = [...new Set(arrayUno.concat(arrayDos))];  
         let arrayUnido = arrayUno.concat(arrayDos);
-        let set = new Set(arrayUnido.map(obj => { return JSON.stringify(obj); }));
-        arrayUnido = Array.from(set).map(obj => { return JSON.parse(obj); });
+        let set = new Set(arrayUnido.map((obj) => { return JSON.stringify(obj); }));
+        arrayUnido = Array.from(set).map((obj) => { return JSON.parse(obj); });
         for (let j = 0; j < arrayUnido.length; j++) {
             let numMin;
             let i = numMin = j;
@@ -423,7 +423,7 @@ const ModelarFechas = function (desde, hasta, horario) {
     };
     let objeto = DiasConEstado(horario, fechasRango);
     // console.log('Objeto JSON: ', objeto);
-    return objeto.filter(obj => { return (obj.estado === false); }).map(obj => { return { fecha: obj.fecha }; });
+    return objeto.filter(obj => { return (obj.estado === false); }).map((obj) => { return { fecha: obj.fecha }; });
 };
 exports.ModelarFechas = ModelarFechas;
 /**

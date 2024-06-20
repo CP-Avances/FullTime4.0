@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.rolPermisosControlador = void 0;
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class RolPermisosControlador {
     //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
@@ -21,7 +22,7 @@ class RolPermisosControlador {
             const Roles = yield database_1.default.query(`
       SELECT * FROM es_paginas WHERE modulo = false
       `);
-            if (Roles.rowCount > 0) {
+            if (Roles.rowCount != 0) {
                 return res.jsonp(Roles.rows);
             }
             else {
@@ -35,7 +36,7 @@ class RolPermisosControlador {
             const Roles = yield database_1.default.query(`
       SELECT * FROM es_paginas WHERE modulo = true
       `);
-            if (Roles.rowCount > 0) {
+            if (Roles.rowCount != 0) {
                 return res.jsonp(Roles.rows);
             }
             else {
@@ -50,7 +51,7 @@ class RolPermisosControlador {
             const Roles = yield database_1.default.query(`
       SELECT * FROM es_paginas WHERE nombre_modulo = $1
       `, [nombre_modulo]);
-            if (Roles.rowCount > 0) {
+            if (Roles.rowCount != 0) {
                 return res.jsonp(Roles.rows);
             }
             else {
@@ -65,7 +66,7 @@ class RolPermisosControlador {
             const PAGINA_ROL = yield database_1.default.query(`
       SELECT * FROM ero_rol_permisos WHERE pagina = $1  AND id_rol = $2 
       `, [funcion, id_rol]);
-            if (PAGINA_ROL.rowCount > 0) {
+            if (PAGINA_ROL.rowCount != 0) {
                 return res.jsonp(PAGINA_ROL.rows);
             }
             else {
@@ -80,7 +81,7 @@ class RolPermisosControlador {
             const PAGINA_ROL = yield database_1.default.query(`
       SELECT * FROM ero_rol_permisos WHERE pagina = $1 AND id_rol = $2 AND id_accion = $3
       `, [funcion, id_rol, id_accion]);
-            if (PAGINA_ROL.rowCount > 0) {
+            if (PAGINA_ROL.rowCount != 0) {
                 return res.jsonp(PAGINA_ROL.rows);
             }
             else {
@@ -107,10 +108,24 @@ class RolPermisosControlador {
     AsignarPaginaRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { funcion, link, id_rol, id_accion } = req.body;
+                const { funcion, link, id_rol, id_accion, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
         INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion) VALUES ($1, $2, $3, $4) RETURNING *
         `, [funcion, link, id_rol, id_accion]);
+                const [datosOriginales] = response.rows;
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ero_rol_permisos',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(datosOriginales),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 const [rol] = response.rows;
                 if (rol) {
                     return res.status(200).jsonp({ message: 'OK', reloj: rol });
@@ -128,10 +143,41 @@ class RolPermisosControlador {
     EliminarPaginaRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id } = req.body;
+                const { id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const rol = yield database_1.default.query('SELECT * FROM ero_rol_permisos WHERE id = $1', [id]);
+                const [datosOriginales] = rol.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ero_rol_permisos',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar el tipo de permiso con id ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+                }
                 yield database_1.default.query(`
       DELETE FROM ero_rol_permisos WHERE id = $1
       `, [id]);
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ero_rol_permisos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
@@ -146,7 +192,7 @@ class RolPermisosControlador {
             const PAGINA_ROL = yield database_1.default.query(`
       SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
       `, [id_funcion]);
-            if (PAGINA_ROL.rowCount > 0) {
+            if (PAGINA_ROL.rowCount != 0) {
                 return res.jsonp(PAGINA_ROL.rows);
             }
             else {
@@ -161,7 +207,7 @@ class RolPermisosControlador {
             const PAGINA_ROL = yield database_1.default.query(`
           SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
           `, [id_funcion]);
-            if (PAGINA_ROL.rowCount > 0) {
+            if (PAGINA_ROL.rowCount != 0) {
                 return res.jsonp(PAGINA_ROL.rows);
             }
             else {
@@ -175,7 +221,7 @@ class RolPermisosControlador {
             const Roles = yield database_1.default.query(`
       SELECT * FROM es_acciones_paginas
       `);
-            if (Roles.rowCount > 0) {
+            if (Roles.rowCount != 0) {
                 return res.jsonp(Roles.rows);
             }
             else {

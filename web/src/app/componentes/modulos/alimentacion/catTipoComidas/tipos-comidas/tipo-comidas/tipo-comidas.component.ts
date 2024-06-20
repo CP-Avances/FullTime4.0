@@ -98,7 +98,7 @@ export class TipoComidasComponent implements OnInit {
       this.tipoComidas = [];
       this.rest.ConsultarUnServicio(form.tipoForm).subscribe(datos => {
         this.tipoComidas = datos;
-        this.tipoComidas.map(obj => {
+        this.tipoComidas.map((obj: any) => {
           if (obj.nombre.toUpperCase() === form.nombreForm.toUpperCase()) {
             this.duplicidad = this.duplicidad + 1;
           }

@@ -25,7 +25,7 @@ export const conteoPermisos = function () {
                 ORDER BY p.fecha_final DESC
                 `
                 , [fecha]);
-            if (permiso.rowCount > 0) {
+            if (permiso.rowCount != 0) {
                 console.log(permiso.rows);
 
                 permiso.rows.forEach(async (obj) => {

@@ -93,7 +93,7 @@ class PlanGeneralControlador {
             SELECT id FROM eu_asistencia_general 
             WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND codigo = $4
             `, [fec_inicio, fec_final, id_horario, codigo]);
-            if (FECHAS.rowCount > 0) {
+            if (FECHAS.rowCount != 0) {
                 return res.jsonp(FECHAS.rows);
             }
             else {
@@ -193,7 +193,7 @@ class PlanGeneralControlador {
                     AND (pg.tipo_accion = 'E' OR pg.tipo_accion = 'S') 
                 ORDER BY pg.fecha_horario ASC
                 `, [codigo]);
-                if (HORARIO.rowCount > 0) {
+                if (HORARIO.rowCount != 0) {
                     return res.jsonp(HORARIO.rows);
                 }
                 else {
@@ -256,7 +256,7 @@ class PlanGeneralControlador {
                     ") AS datos " +
                     "GROUP BY codigo_e, nombre_e, anio, mes " +
                     "ORDER BY 3,4,1", [fecha_inicio, fecha_final]);
-                if (HORARIO.rowCount > 0) {
+                if (HORARIO.rowCount != 0) {
                     return res.jsonp({ message: 'OK', data: HORARIO.rows });
                 }
                 else {
@@ -282,7 +282,7 @@ class PlanGeneralControlador {
                     "WHERE fecha_horario BETWEEN $1 AND $2 " +
                     "GROUP BY codigo_dia, tipo_dia, horario.nombre, dh.id_horario, dh.hora, dh.tipo_accion, dh.id " +
                     "ORDER BY dh.id_horario, dh.hora ASC", [fecha_inicio, fecha_final]);
-                if (HORARIO.rowCount > 0) {
+                if (HORARIO.rowCount != 0) {
                     return res.jsonp({ message: 'OK', data: HORARIO.rows });
                 }
                 else {
@@ -305,7 +305,7 @@ class PlanGeneralControlador {
                     "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
                     "WHERE fecha_horario BETWEEN $1 AND $2 " +
                     "GROUP BY codigo_horario, p_g.id_horario", [fecha_inicio, fecha_final]);
-                if (HORARIO.rowCount > 0) {
+                if (HORARIO.rowCount != 0) {
                     return res.jsonp({ message: 'OK', data: HORARIO.rows });
                 }
                 else {
@@ -425,7 +425,7 @@ class PlanGeneralControlador {
                     ip,
                     observacion: null
                 });
-                if (PLAN.rowCount > 0) {
+                if (PLAN.rowCount != 0) {
                     const TIMBRE = yield database_1.default.query(`
                     UPDATE eu_timbres SET accion = $1 WHERE id = $2
                     `, [accion, id_timbre]);
@@ -463,7 +463,7 @@ class PlanGeneralControlador {
             SELECT id FROM eu_asistencia_general 
             WHERE fecha_horario = $1 AND id_horario = $2 AND codigo = $3
             `, [fec_inicio, id_horario, codigo]);
-            if (FECHAS.rowCount > 0) {
+            if (FECHAS.rowCount != 0) {
                 return res.jsonp(FECHAS.rows);
             }
             else {

@@ -213,7 +213,7 @@ export class HoraExtraRealComponent implements OnInit {
     console.log('pedidos', listaPedidos);
     console.log('timbres', listaTimbres);
     listaPedidos.forEach((obj: any) => {
-      listaTimbres.forEach(element => {
+      listaTimbres.forEach((element: any) => {
         if (obj.fec_inicio.split('T')[0] === element.fecha_inicio.split('T')[0]) {
           if (element.fecha_inicio.split('T')[1] <= obj.fec_inicio.split('T')[1]) {
             if (element.fecha_fin.split('T')[1] <= obj.fec_final.split('T')[1]) {
@@ -241,7 +241,7 @@ export class HoraExtraRealComponent implements OnInit {
     console.log('pedidos', listaPedidos);
     console.log('timbres', listaTimbres);
     listaPedidos.forEach((obj: any) => {
-      listaTimbres.forEach(element => {
+      listaTimbres.forEach((element: any) => {
         if (obj.fec_inicio.split('T')[0] === element.fecha_inicio.split('T')[0] && obj.id_usua_solicita === element.id_empleado) {
           if (element.fecha_inicio.split('T')[1] <= obj.fec_inicio.split('T')[1]) {
             if (element.fecha_fin.split('T')[1] <= obj.fec_final.split('T')[1]) {
@@ -463,12 +463,12 @@ export class HoraExtraRealComponent implements OnInit {
                 { text: 'Estado', style: 'tableHeader' },
                 { text: 'Nacionalidad', style: 'tableHeader' },
               ],
-              ...this.empleado.map(obj => {
+              ...this.empleado.map((obj: any) => {
                 var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
                 var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
                 let nacionalidad;
-                this.nacionalidades.forEach(element => {
+                this.nacionalidades.forEach((element: any) => {
                   if (obj.id_nacionalidad == element.id) {
                     nacionalidad = element.nombre;
                   }
@@ -520,7 +520,7 @@ export class HoraExtraRealComponent implements OnInit {
       var genero = this.GeneroSelect[obj.genero - 1];
       var estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
@@ -708,12 +708,12 @@ export class HoraExtraRealComponent implements OnInit {
                 { text: 'Estado', style: 'tableHeader' },
                 { text: 'Nacionalidad', style: 'tableHeader' },
               ],
-              ...this.empleadoTimbre.map(obj => {
+              ...this.empleadoTimbre.map((obj: any) => {
                 var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
                 var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
                 let nacionalidad;
-                this.nacionalidades.forEach(element => {
+                this.nacionalidades.forEach((element: any) => {
                   if (obj.id_nacionalidad == element.id) {
                     nacionalidad = element.nombre;
                   }

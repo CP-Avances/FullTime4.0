@@ -38,12 +38,12 @@ export class CiudadService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarCiudad(id: number, datos: any) {
+  EliminarCiudad(id: any, datos: any) {
     const url = `${environment.url}/ciudades/eliminar/${id}`;
     const httpOtions = {
       body: datos
     };
-    return this.http.request('delete', url, httpOtions);
+    return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
 
   // METODO PARA BUSCAR INFORMACION DE UNA CIUDAD

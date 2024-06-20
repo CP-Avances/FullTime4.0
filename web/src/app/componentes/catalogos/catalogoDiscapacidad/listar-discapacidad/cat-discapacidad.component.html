@@ -43,7 +43,7 @@
                             </label>
                         </form>
                     </div>
-                    <div class="col-12 col-md-auto m-auto w-auto"  style="padding-top: 5px; padding-bottom: 5px;">
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                         <div *ngIf="!Datos_discapacidad" class="d-flex flex-wrap justify-content-around">
                             <a id="descargar" class="btn m-auto" matSuffix matTooltipPosition="right"
                                 matTooltip="Dar click para ver o descargar el documento."
@@ -107,7 +107,7 @@
                         <td>
                             <mat-form-field id="t-inputs">
                                 <input matInput placeholder="Buscar" [formControl]="nombreF"
-                                    [(ngModel)]="filtradoDiscapacidad" (keypress)="IngresarSoloLetras($event)">
+                                    (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
@@ -118,7 +118,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let discapacidad of discapacidades| filtrosNombres: filtradoDiscapacidad |  paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let discapacidad of discapacidades| filtrosNombres: nombreF.value |  paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionDiscapacidad.toggle(discapacidad) : null"

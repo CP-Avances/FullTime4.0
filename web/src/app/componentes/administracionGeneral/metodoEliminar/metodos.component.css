@@ -1,4 +1,4 @@
-.btn{
+.btn {
     background-color: rgb(80, 87, 97);
     color: white;
     margin: 5px 10px 5px 10px;
@@ -20,7 +20,7 @@ p {
     color: red;
 }
 
-#aceptar{
+#aceptar {
     margin: 5px 10px 5px 10px;
     font-size: 14px;
     color: white;
@@ -30,9 +30,9 @@ p {
     word-wrap: break-word;
 }
 
-.circulo{
-    width: 15px;
-    height: 15px;
+.circulo {
+    width: 12px;
+    height: 12px;
     border-radius: 50px;
     z-index: 0;
     background-color: rgb(36, 169, 118);

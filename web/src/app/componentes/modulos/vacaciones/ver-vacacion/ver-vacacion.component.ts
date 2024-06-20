@@ -515,7 +515,7 @@ export class VerVacacionComponent implements OnInit {
 
           [{
             columns: [
-              ...this.fila1firmas.map(obj => {
+              ...this.fila1firmas.map((obj: any) => {
                 return {
                   columns: [
                     { width: '*', text: '' },

@@ -12,8 +12,7 @@
                         <mat-form-field>
                             <mat-label>Ciudad</mat-label>
                             <input matInput placeholder="Buscar" placeholder="Buscar"
-                                (keypress)="IngresarSoloLetras($event)" [formControl]="buscarCiudad"
-                                [(ngModel)]="filtroCiudadSuc">
+                                (keypress)="IngresarSoloLetras($event)" [formControl]="buscarCiudad">
                             <mat-icon matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda de ciudades por nombre.">
                                 help_outline
@@ -25,8 +24,7 @@
                     <div class="d-flex flex-wrap justify-content-center">
                         <mat-form-field>
                             <mat-label>Establecimiento</mat-label>
-                            <input matInput placeholder="Buscar" [formControl]="buscarNombre"
-                                [(ngModel)]="filtroNombreSuc">
+                            <input matInput placeholder="Buscar" [formControl]="buscarNombre">
                             <mat-icon matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda de establecimiento por nombre.">
                                 help_outline
@@ -38,7 +36,7 @@
         </form>
     </div>
     <hr>
-    <!------------------ LISTA DE ESTABLECIMIENTOS ------------------------------------------------->
+    <!--  ********************************* LISTA DE ESTABLECIMIENTOS  **********************************  -->
     <div class="container" style="padding-bottom: 50px; text-align: center;">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="resultados">RESULTADO DE BÚSQUEDA</div>
@@ -53,7 +51,7 @@
                     </thead>
                     <tbody>
                         <tr
-                            *ngFor="let s of sucursales | sucCiudad: filtroCiudadSuc | sucNombre: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let s of sucursales | sucCiudad: buscarCiudad.value | sucNombre: buscarNombre.value | paginate:tamanio_pagina:numero_pagina">
                             <td>{{s.descripcion}}</td>
                             <td>{{s.nombre}}</td>
                             <td class="justify-content-center">
@@ -74,7 +72,7 @@
     </div>
 </div>
 
-<!-- ************** PANTALLA DE USUARIOS ASIGNADOS ************************* -->
+<!--  **************  PANTALLA DE USUARIOS ASIGNADOS  *************************  -->
 <div *ngIf="ver_informacion">
     <app-asignar-usuario [pagina_]="pagina" [data]="datos_sucursal"></app-asignar-usuario>
 </div>

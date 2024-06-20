@@ -32,7 +32,8 @@ const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
         return __awaiter(this, void 0, void 0, function* () {
             let id = req.params.id_empleado;
-            var ruta = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id);
+            var ruta = yield (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)();
+            //var ruta = await ObtenerRutaUsuario(id);
             cb(null, ruta);
         });
     },
@@ -48,14 +49,15 @@ const storage = multer_1.default.diskStorage({
             const usuario = yield database_1.default.query(`
             SELECT codigo FROM eu_empleados WHERE id = $1
             `, [id]);
-            let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
+            //let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
+            let documento = file.originalname;
             cb(null, documento);
         });
     }
 });
 const upload = (0, multer_1.default)({ storage: storage });
 /** ************************************************************************************** **
- ** **                   METODO PARA OBTENER CARPETA IMAGENES DE USUARIO                   **
+ ** **                   METODO PARA OBTENER CARPETA DE PLANTILLAS                         **
  ** ************************************************************************************** **/
 const storage_plantilla = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
@@ -146,6 +148,10 @@ class EmpleadoRutas {
         this.router.post('/verificar/manual/plantillaExcel/', [verificarToken_1.TokenValidation, upload_plantilla.single('uploads')], empleadoControlador_1.default.VerificarPlantilla_Manual);
         //this.router.post('/verificar/datos/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosManual);
         this.router.post('/cargar_manual/plantillaExcel/', verificarToken_1.TokenValidation, empleadoControlador_1.default.CargarPlantilla_Manual);
+        /** **************************************************************************************** **
+         ** **                CREACION DE CARPETAS DE LOS EMPLEADOS SELECCIONADOS                 ** **
+         ** **************************************************************************************** **/
+        //this.router.post('/crear_carpetas/', TokenValidation, EMPLEADO_CONTROLADOR.CrearCarpetasEmpleado);
     }
 }
 const EMPLEADO_RUTAS = new EmpleadoRutas();

@@ -70,6 +70,9 @@ class CiudadRutas {
         // METODO PARA BUSCAR ADMNISTRADORES Y JEFES
         this.router.post('/datos-actuales-sucursales', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarAdminJefes);
 
+        // METODO PARA BUSCAR USUARIOS DE UNA SUCURSAL
+        this.router.post('/datos-actuales-sucursal', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarUsuariosSucursal);
+
 
 
     }

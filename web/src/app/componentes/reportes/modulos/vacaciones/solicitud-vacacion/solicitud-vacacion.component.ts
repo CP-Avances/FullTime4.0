@@ -93,7 +93,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
       sessionStorage.setItem('reporte_vacunas_multiples', JSON.stringify(res))
 
       // BUSQUEDA DE SUCURSALES
-      this.sucursales = res.map(obj => {
+      this.sucursales = res.map((obj: any) => {
         return {
           id: obj.id_suc,
           nombre: obj.name_suc
@@ -212,7 +212,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
   ModelarEmpleados(accion) {
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_vacunas_multiples') as any)
     respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach(element => {
+      obj.departamentos.forEach((element: any) => {
         element.empleado = element.empleado.filter((o: any) => {
           var bool = this.selectionEmp.selected.find(obj1 => {
             return obj1.id === o.id
@@ -318,7 +318,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: (localStorage.getItem('name_empresa') as string).toLocaleUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
         { text: 'Reporte - Solicitud Vacaciones', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 5] },
-        ...this.impresionDatosPDF(this.data_pdf).map(obj => {
+        ...this.impresionDatosPDF(this.data_pdf).map((obj: any) => {
           return obj
         })
       ],

@@ -13,7 +13,7 @@ class RolPermisosControlador {
       SELECT * FROM es_paginas WHERE modulo = false
       `
     );
-    if (Roles.rowCount > 0) {
+    if (Roles.rowCount != 0) {
       return res.jsonp(Roles.rows);
     }
     else {
@@ -28,7 +28,7 @@ class RolPermisosControlador {
       SELECT * FROM es_paginas WHERE modulo = true
       `
     );
-    if (Roles.rowCount > 0) {
+    if (Roles.rowCount != 0) {
       return res.jsonp(Roles.rows);
     }
     else {
@@ -45,7 +45,7 @@ class RolPermisosControlador {
       `
       , [nombre_modulo]
     );
-    if (Roles.rowCount > 0) {
+    if (Roles.rowCount != 0) {
       return res.jsonp(Roles.rows);
     }
     else {
@@ -61,7 +61,7 @@ class RolPermisosControlador {
       SELECT * FROM ero_rol_permisos WHERE pagina = $1  AND id_rol = $2 
       `
       , [funcion, id_rol]);
-    if (PAGINA_ROL.rowCount > 0) {
+    if (PAGINA_ROL.rowCount != 0) {
       return res.jsonp(PAGINA_ROL.rows)
     }
     else {
@@ -77,7 +77,7 @@ class RolPermisosControlador {
       SELECT * FROM ero_rol_permisos WHERE pagina = $1 AND id_rol = $2 AND id_accion = $3
       `
       , [funcion, id_rol, id_accion]);
-    if (PAGINA_ROL.rowCount > 0) {
+    if (PAGINA_ROL.rowCount != 0) {
       return res.jsonp(PAGINA_ROL.rows)
     }
     else {
@@ -102,11 +102,28 @@ class RolPermisosControlador {
   // METODO PARA ASIGNAR FUNCIONES AL ROL
   public async AsignarPaginaRol(req: Request, res: Response) {
     try {
-      const { funcion, link, id_rol, id_accion } = req.body;
+      const { funcion, link, id_rol, id_accion, user_name, ip } = req.body;
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
       const response: QueryResult = await pool.query(
         `
         INSERT INTO ero_rol_permisos (pagina, link, id_rol, id_accion) VALUES ($1, $2, $3, $4) RETURNING *
         `, [funcion, link, id_rol, id_accion]);
+      const [datosOriginales] = response.rows;
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ero_rol_permisos',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: JSON.stringify(datosOriginales),
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
       const [rol] = response.rows;
       if (rol) {
         return res.status(200).jsonp({ message: 'OK', reloj: rol })
@@ -122,12 +139,51 @@ class RolPermisosControlador {
   // METODO PARA ELIMINAR REGISTRO
   public async EliminarPaginaRol(req: Request, res: Response): Promise<any> {
     try {
-      const { id } = req.body
+      const { id, user_name, ip } = req.body
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const rol = await pool.query('SELECT * FROM ero_rol_permisos WHERE id = $1', [id]);
+      const [datosOriginales] = rol.rows;
+
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'ero_rol_permisos',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar el tipo de permiso con id ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+      }
+
       await pool.query(
         `
       DELETE FROM ero_rol_permisos WHERE id = $1
       `
         , [id]);
+
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ero_rol_permisos',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
       res.jsonp({ message: 'Registro eliminado.' });
     } catch (error) {
       return res.jsonp({ message: 'error' });
@@ -142,7 +198,7 @@ class RolPermisosControlador {
       SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
       `
       , [id_funcion]);
-    if (PAGINA_ROL.rowCount > 0) {
+    if (PAGINA_ROL.rowCount != 0) {
       return res.jsonp(PAGINA_ROL.rows)
     }
     else {
@@ -158,7 +214,7 @@ class RolPermisosControlador {
           SELECT * FROM es_acciones_paginas WHERE id_pagina = $1 
           `
       , [id_funcion]);
-    if (PAGINA_ROL.rowCount > 0) {
+    if (PAGINA_ROL.rowCount != 0) {
       return res.jsonp(PAGINA_ROL.rows)
     }
     else {
@@ -173,7 +229,7 @@ class RolPermisosControlador {
       SELECT * FROM es_acciones_paginas
       `
     );
-    if (Roles.rowCount > 0) {
+    if (Roles.rowCount != 0) {
       return res.jsonp(Roles.rows);
     }
     else {

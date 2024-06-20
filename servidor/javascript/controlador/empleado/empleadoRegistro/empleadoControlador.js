@@ -14,15 +14,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPLEADO_CONTROLADOR = void 0;
 // SECCION LIBRERIAS
+const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
 const ts_md5_1 = require("ts-md5");
-const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../../database"));
 const moment_1 = __importDefault(require("moment"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const fs_2 = require("fs");
+const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
+const sharp = require('sharp');
 class EmpleadoControlador {
     /** ** ********************************************************************************************* **
      ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
@@ -33,7 +36,7 @@ class EmpleadoControlador {
             const VALOR = yield database_1.default.query(`
       SELECT * FROM e_codigo
       `);
-            if (VALOR.rowCount > 0) {
+            if (VALOR.rowCount != 0) {
                 return res.jsonp(VALOR.rows);
             }
             else {
@@ -80,7 +83,7 @@ class EmpleadoControlador {
                 const VALOR = yield database_1.default.query(`
         SELECT MAX(codigo::BIGINT) AS codigo FROM eu_empleados
         `);
-                if (VALOR.rowCount > 0) {
+                if (VALOR.rowCount != 0) {
                     return res.jsonp(VALOR.rows);
                 }
                 else {
@@ -444,7 +447,7 @@ class EmpleadoControlador {
             const EMPLEADO = yield database_1.default.query(`
       SELECT * FROM eu_empleados WHERE id = $1
       `, [id]);
-            if (EMPLEADO.rowCount > 0) {
+            if (EMPLEADO.rowCount != 0) {
                 return res.jsonp(EMPLEADO.rows);
             }
             else {
@@ -730,21 +733,37 @@ class EmpleadoControlador {
     }
     // CARGAR IMAGEN DE EMPLEADO
     CrearImagenEmpleado(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            // FECHA DEL SISTEMA
-            const fecha = (0, moment_1.default)();
-            const anio = fecha.format('YYYY');
-            const mes = fecha.format('MM');
-            const dia = fecha.format('DD');
-            const id = req.params.id_empleado;
-            const separador = path_1.default.sep;
-            const { user_name, ip } = req.body;
-            const unEmpleado = yield database_1.default.query('SELECT * FROM eu_empleados WHERE id = $1', [id]);
-            if (unEmpleado.rowCount > 0) {
-                const promises = unEmpleado.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                    var _a;
-                    try {
-                        const imagen = `${obj.codigo}_${anio}_${mes}_${dia}_${(_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname}`;
+            sharp.cache(false);
+            try {
+                // FECHA DEL SISTEMA
+                const fecha = (0, moment_1.default)();
+                const anio = fecha.format('YYYY');
+                const mes = fecha.format('MM');
+                const dia = fecha.format('DD');
+                const id = req.params.id_empleado;
+                const separador = path_1.default.sep;
+                const { user_name, ip } = req.body;
+                const unEmpleado = yield database_1.default.query('SELECT * FROM eu_empleados WHERE id = $1', [id]);
+                let ruta1 = (0, accesoCarpetas_2.ObtenerRutaLeerPlantillas)() + separador + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
+                if (unEmpleado.rowCount != 0) {
+                    const promises = unEmpleado.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                        var _b;
+                        const imagen = `${obj.codigo}_${anio}_${mes}_${dia}_${(_b = req.file) === null || _b === void 0 ? void 0 : _b.originalname}`;
+                        let ruta_final = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(obj.id)) + separador + imagen;
+                        console.log('ruta 1 ++++++++++++', ruta1);
+                        fs_1.default.access(ruta1, fs_1.default.constants.F_OK, (err) => {
+                            if (!err) {
+                                sharp(ruta1)
+                                    .resize(800) // CAMBIA EL TAMAÑO DE LA IMAGEN A UN ANCHO DE 800 PÍXELES, MANTIENE LA RELACIÓN DE ASPECTO
+                                    .jpeg({ quality: 80 }) // CONFIGURA LA CALIDAD DE LA IMAGEN JPEG AL 80%
+                                    .toFile(ruta_final);
+                                setTimeout(() => __awaiter(this, void 0, void 0, function* () {
+                                    fs_1.default.unlinkSync(ruta1);
+                                }), 1000); // ESPERAR 1 SEGUNDO
+                            }
+                        });
                         if (obj.imagen && obj.imagen !== 'null') {
                             const ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(obj.id)) + separador + obj.imagen;
                             fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
@@ -756,7 +775,9 @@ class EmpleadoControlador {
                         // INICIAR TRANSACCION
                         yield database_1.default.query('BEGIN');
                         // CONSULTAR DATOSORIGINALES
-                        const empleado = yield database_1.default.query('SELECT * FROM empleados WHERE id = $1', [id]);
+                        const empleado = yield database_1.default.query(`
+            SELECT * FROM eu_empleados WHERE id = $1
+            `, [id]);
                         const [datosOriginales] = empleado.rows;
                         if (!datosOriginales) {
                             yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -766,11 +787,11 @@ class EmpleadoControlador {
                                 datosOriginales: '',
                                 datosNuevos: '',
                                 ip,
-                                observacion: `Error al actualizar imagen de empleado con id: ${id}. Registro no encontrado.`
+                                observacion: `Error al actualizar imagen del usuario con id: ${id}. Registro no encontrado.`
                             });
                             // FINALIZAR TRANSACCION
                             yield database_1.default.query('COMMIT');
-                            throw new Error('Error al actualizar imagen de empleado con id: ' + id);
+                            throw new Error('Error al actualizar imagen del usuario con id: ' + id);
                         }
                         yield database_1.default.query('UPDATE eu_empleados SET imagen = $2 WHERE id = $1', [id, imagen]);
                         // AUDITORIA
@@ -785,18 +806,85 @@ class EmpleadoControlador {
                         });
                         // FINALIZAR TRANSACCION
                         yield database_1.default.query('COMMIT');
-                    }
-                    catch (error) {
-                        // REVERTIR TRANSACCION
-                        yield database_1.default.query('ROLLBACK');
-                        res.status(500).jsonp({ message: 'Error al actualizar imagen de empleado.' });
-                    }
-                }));
-                yield Promise.all(promises);
-                res.jsonp({ message: 'Imagen actualizada.' });
+                    }));
+                    yield Promise.all(promises);
+                    res.jsonp({ message: 'Imagen actualizada.' });
+                }
+            }
+            catch (error) {
+                console.log('error ---- ', error);
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'Error al actualizar imagen del usuario.' });
             }
         });
     }
+    /*
+    
+      // CARGAR IMAGEN DE EMPLEADO
+      public async CrearImagenEmpleado(req: Request, res: Response): Promise<void> {
+    
+        // FECHA DEL SISTEMA
+        var fecha = moment();
+        var anio = fecha.format('YYYY');
+        var mes = fecha.format('MM');
+        var dia = fecha.format('DD');
+    
+        let id = req.params.id_empleado;
+        let separador = path.sep;
+    
+        const unEmpleado = await pool.query(
+          `
+        SELECT * FROM eu_empleados WHERE id = $1
+        `
+          , [id]);
+    
+        if (unEmpleado.rowCount != 0) {
+    
+          unEmpleado.rows.map(async (obj: any) => {
+    
+            let imagen = obj.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
+    
+            if (obj.imagen != 'null' && obj.imagen != '' && obj.imagen != null) {
+              try {
+                // ELIMINAR IMAGEN DE SERVIDOR
+                let ruta = await ObtenerRutaUsuario(obj.id) + separador + obj.imagen;
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs.access(ruta, fs.constants.F_OK, (err) => {
+                  if (err) {
+                  } else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs.unlinkSync(ruta);
+                  }
+                });
+    
+                await pool.query(
+                  `
+                UPDATE eu_empleados SET imagen = $2 Where id = $1
+                `
+                  , [id, imagen]);
+                res.jsonp({ message: 'Imagen actualizada.' });
+    
+              } catch (error) {
+                await pool.query(
+                  `
+                UPDATE eu_empleados SET imagen = $2 Where id = $1
+                `
+                  , [id, imagen]);
+                res.jsonp({ message: 'Imagen actualizada.' });
+              }
+            } else {
+              await pool.query(
+                `
+              UPDATE eu_empleados SET imagen = $2 Where id = $1
+              `
+                , [id, imagen]);
+              res.jsonp({ message: 'Imagen actualizada.' });
+            }
+          });
+        }
+      }
+        */
     // METODO PARA TOMAR DATOS DE LA UBICACION DEL DOMICILIO DEL EMPLEADO
     GeolocalizacionCrokis(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -807,7 +895,7 @@ class EmpleadoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const empleado = yield database_1.default.query('SELECT * FROM empleados WHERE id = $1', [id]);
+                const empleado = yield database_1.default.query('SELECT * FROM eu_empleados WHERE id = $1', [id]);
                 const [datosOriginales] = empleado.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -862,7 +950,7 @@ class EmpleadoControlador {
         WHERE et.id_empleado = $1 AND et.id_titulo = ct.id AND ct.id_nivel = nt.id
         ORDER BY id
         `, [id_empleado]);
-            if (unEmpleadoTitulo.rowCount > 0) {
+            if (unEmpleadoTitulo.rowCount != 0) {
                 return res.jsonp(unEmpleadoTitulo.rows);
             }
             else {
@@ -879,7 +967,7 @@ class EmpleadoControlador {
       FROM eu_empleado_titulos AS et
       WHERE et.id_empleado = $1 AND et.id_titulo = $2
       `, [id_empleado, id_titulo]);
-            if (unEmpleadoTitulo.rowCount > 0) {
+            if (unEmpleadoTitulo.rowCount != 0) {
                 return res.jsonp(unEmpleadoTitulo.rows);
             }
             else {
@@ -1026,7 +1114,7 @@ class EmpleadoControlador {
             const UBICACION = yield database_1.default.query(`
       SELECT longitud, latitud FROM eu_empleados WHERE id = $1
       `, [id]);
-            if (UBICACION.rowCount > 0) {
+            if (UBICACION.rowCount != 0) {
                 return res.jsonp(UBICACION.rows);
             }
             else {
@@ -1042,7 +1130,7 @@ class EmpleadoControlador {
       SELECT * FROM eu_empleados WHERE
       (UPPER (apellido) || \' \' || UPPER (nombre)) = $1
       `, [informacion]);
-            if (EMPLEADO.rowCount > 0) {
+            if (EMPLEADO.rowCount != 0) {
                 return res.jsonp(EMPLEADO.rows);
             }
             else {
@@ -1073,25 +1161,32 @@ class EmpleadoControlador {
             const id = req.params.id;
             let separador = path_1.default.sep;
             let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id)) + separador + imagen;
+            let verificador = 0;
+            console.log('imagen ------ ', ruta);
             fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                 if (err) {
+                    verificador = 1;
+                }
+                else {
+                    verificador = 0;
+                }
+            });
+            if (verificador === 0) {
+                const codificado = yield (0, ImagenCodificacion_1.ImagenBase64LogosEmpleado)(ruta);
+                console.log('codificado ', codificado);
+                if (codificado === 0) {
                     res.status(200).jsonp({ imagen: 0 });
                 }
                 else {
-                    let path_file = path_1.default.resolve(ruta);
-                    let data = fs_1.default.readFileSync(path_file);
-                    let codificado = data.toString('base64');
-                    if (codificado === null) {
-                        res.status(200).jsonp({ imagen: 0 });
-                    }
-                    else {
-                        res.status(200).jsonp({ imagen: codificado });
-                    }
+                    res.status(200).jsonp({ imagen: codificado });
                 }
-            });
+            }
+            else {
+                res.status(200).jsonp({ imagen: 0 });
+            }
         });
     }
-    // BUSQUEDA INFORMACIÓN DEPARTAMENTOS EMPLEADO
+    // BUSQUEDA INFORMACION DEPARTAMENTOS EMPLEADO
     ObtenerDepartamentoEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_emple, id_cargo } = req.body;
@@ -1099,7 +1194,7 @@ class EmpleadoControlador {
       SELECT * FROM VistaDepartamentoEmpleado WHERE id_emple = $1 AND
       id_cargo = $2
       `, [id_emple, id_cargo]);
-            if (DEPARTAMENTO.rowCount > 0) {
+            if (DEPARTAMENTO.rowCount != 0) {
                 return res.jsonp(DEPARTAMENTO.rows);
             }
             else {
@@ -1198,7 +1293,7 @@ class EmpleadoControlador {
                     var duplicados1 = [];
                     var duplicados2 = [];
                     var mensaje = 'correcto';
-                    plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                    plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                         // Datos que se leen de la plantilla ingresada
                         var { ITEM, CEDULA, APELLIDO, NOMBRE, USUARIO, CONTRASENA, ROL, ESTADO_CIVIL, GENERO, CORREO, FECHA_NACIMIENTO, LATITUD, LONGITUD, DOMICILIO, TELEFONO, NACIONALIDAD } = dato;
                         //Verificar que el registo no tenga datos vacios
@@ -1478,14 +1573,14 @@ class EmpleadoControlador {
                     }));
                     setTimeout(() => {
                         listEmpleados.sort((a, b) => {
-                            // Compara los números de los objetos
+                            // COMPARA LOS NUMEROS DE LOS OBJETOS
                             if (a.fila < b.fila) {
                                 return -1;
                             }
                             if (a.fila > b.fila) {
                                 return 1;
                             }
-                            return 0; // Son iguales
+                            return 0; // SON IGUALES
                         });
                         var filaDuplicada = 0;
                         listEmpleados.forEach((item) => {
@@ -1504,9 +1599,9 @@ class EmpleadoControlador {
                             else {
                                 item.observacion = 'Datos no registrado';
                             }
-                            //Valida si los datos de la columna N son numeros.
+                            // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                             if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                                //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                                // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                                 if (item.fila == filaDuplicada) {
                                     mensaje = 'error';
                                 }
@@ -1809,7 +1904,7 @@ class EmpleadoControlador {
                     var duplicados2 = [];
                     var duplicados3 = [];
                     var mensaje = 'correcto';
-                    plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                    plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                         // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
                         var { ITEM, CODIGO, CEDULA, APELLIDO, NOMBRE, USUARIO, CONTRASENA, ROL, ESTADO_CIVIL, GENERO, CORREO, FECHA_NACIMIENTO, LATITUD, LONGITUD, DOMICILIO, TELEFONO, NACIONALIDAD, estado_user, app_habilita } = dato;
                         //VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
@@ -2442,6 +2537,125 @@ class EmpleadoControlador {
             }));
         });
     }
+    /** **************************************************************************************** **
+   ** **                      CREAR CARPETAS EMPLEADOS SELECCIONADOS                           **
+   ** **************************************************************************************** **/
+    CrearCarpetasEmpleado(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id, codigo } = req.body;
+            let verificar_permisos = 0;
+            let verificar_imagen = 0;
+            let verificar_vacunas = 0;
+            let verificar_contrato = 0;
+            try {
+                const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
+                try {
+                    yield fs_2.promises.access(carpetaPermisos, fs_1.default.constants.F_OK);
+                    verificar_permisos = 2; // La carpeta ya existe
+                }
+                catch (_a) {
+                    try {
+                        yield fs_2.promises.mkdir(carpetaPermisos, { recursive: true });
+                        verificar_permisos = 0; // Carpeta creada con éxito
+                    }
+                    catch (_b) {
+                        verificar_permisos = 1; // Error al crear la carpeta
+                    }
+                }
+                const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id);
+                try {
+                    yield fs_2.promises.access(carpetaImagenes, fs_1.default.constants.F_OK);
+                    verificar_imagen = 2; // La carpeta ya existe
+                }
+                catch (_c) {
+                    try {
+                        yield fs_2.promises.mkdir(carpetaImagenes, { recursive: true });
+                        verificar_imagen = 0; // Carpeta creada con éxito
+                    }
+                    catch (_d) {
+                        verificar_imagen = 1; // Error al crear la carpeta
+                    }
+                }
+                const carpetaVacunas = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(id);
+                try {
+                    yield fs_2.promises.access(carpetaVacunas, fs_1.default.constants.F_OK);
+                    verificar_vacunas = 2; // La carpeta ya existe
+                }
+                catch (_e) {
+                    try {
+                        yield fs_2.promises.mkdir(carpetaVacunas, { recursive: true });
+                        verificar_vacunas = 0; // Carpeta creada con éxito
+                    }
+                    catch (_f) {
+                        verificar_vacunas = 1; // Error al crear la carpeta
+                    }
+                }
+                const carpetaContratos = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(id);
+                try {
+                    yield fs_2.promises.access(carpetaContratos, fs_1.default.constants.F_OK);
+                    verificar_contrato = 2; // La carpeta ya existe
+                }
+                catch (_g) {
+                    try {
+                        yield fs_2.promises.mkdir(carpetaContratos, { recursive: true });
+                        verificar_contrato = 0; // Carpeta creada con éxito
+                    }
+                    catch (_h) {
+                        verificar_contrato = 1; // Error al crear la carpeta
+                    }
+                }
+                // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
+                if (verificar_permisos === 1 && verificar_imagen === 1 && verificar_vacunas === 1 && verificar_contrato === 1) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos, permisos, imagenes y vacunación del usuario.' });
+                }
+                else if (verificar_permisos === 1 && verificar_imagen === 0 && verificar_vacunas === 0 && verificar_contrato === 0) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos del usuario.' });
+                }
+                else if (verificar_permisos === 0 && verificar_imagen === 1 && verificar_vacunas === 0 && verificar_contrato === 0) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de imagenes del usuario.' });
+                }
+                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 0) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de vacunación del usuario.' });
+                }
+                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 1) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos del usuario.' });
+                }
+                else if (verificar_permisos === 2 && verificar_imagen === 2 && verificar_vacunas === 2 && verificar_contrato === 2) {
+                    res.jsonp({ message: 'Ya existen carpetas creadas de ' + codigo });
+                }
+                else {
+                    res.jsonp({ message: 'Carpetas creadas con exito.' });
+                }
+            }
+            catch (error) {
+                res.status(500).json({ message: 'Error al procesar la solicitud.', error: error.message });
+            }
+        });
+    }
 }
 exports.EMPLEADO_CONTROLADOR = new EmpleadoControlador();
 exports.default = exports.EMPLEADO_CONTROLADOR;
+// Función para comprimir la imagen
+function compressImage(imagen, ruta) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield sharp(imagen)
+                .resize(800) // Cambia el tamaño de la imagen a un ancho de 800 píxeles, mantiene la relación de aspecto
+                .jpeg({ quality: 80 }) // Configura la calidad de la imagen JPEG al 80%
+                .toFile(ruta);
+            console.log('Imagen comprimida con éxito');
+            return true;
+        }
+        catch (error) {
+            console.error('Error al comprimir la imagen:', error);
+        }
+    });
+}
+// Función para verificar si un archivo existe
+function fileExists(filePath) {
+    return new Promise((resolve, reject) => {
+        fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+            resolve(!err);
+        });
+    });
+}

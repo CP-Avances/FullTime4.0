@@ -32,7 +32,7 @@ class PlanHoraExtraControlador {
         ON tehe.fecha_timbre_e = tshe.fecha_timbre AND tehe.id_empl = tshe.id_empleado) AS t
       WHERE t.observacion = false AND (e.codigo = t.id_empleado OR e.codigo = t.id_empl) AND (t.estado = 1 OR t.estado = 2)
       `);
-            if (PLAN.rowCount > 0) {
+            if (PLAN.rowCount != 0) {
                 res.jsonp(PLAN.rows);
             }
             else {
@@ -54,7 +54,7 @@ class PlanHoraExtraControlador {
         ON tehe.fecha_timbre_e = tshe.fecha_timbre AND tehe.id_empl = tshe.id_empleado) AS t 
       WHERE t.observacion = true AND (e.codigo = t.id_empleado OR e.codigo = t.id_empl) AND (t.estado = 1 OR t.estado = 2)
       `);
-            if (PLAN.rowCount > 0) {
+            if (PLAN.rowCount != 0) {
                 res.jsonp(PLAN.rows);
             }
             else {
@@ -76,7 +76,7 @@ class PlanHoraExtraControlador {
         ON tehe.fecha_timbre_e = tshe.fecha_timbre AND tehe.id_empl = tshe.id_empleado) AS t 
       WHERE (e.codigo = t.id_empleado OR e.codigo = t.id_empl) AND (t.estado = 3 OR t.estado = 4)
       `);
-            if (PLAN.rowCount > 0) {
+            if (PLAN.rowCount != 0) {
                 res.jsonp(PLAN.rows);
             }
             else {
@@ -93,7 +93,7 @@ class PlanHoraExtraControlador {
       FROM ecm_autorizaciones AS a, mhe_detalle_plan_hora_extra AS p, mhe_empleado_plan_hora_extra AS pe 
       WHERE pe.id = a.id_plan_hora_extra AND pe.id_detalle_plan = p.id AND p.id = $1
       `, [id]);
-            if (SOLICITUD.rowCount > 0) {
+            if (SOLICITUD.rowCount != 0) {
                 return res.json(SOLICITUD.rows);
             }
             else {
@@ -288,7 +288,7 @@ class PlanHoraExtraControlador {
             const PLAN = yield database_1.default.query(`
       SELECT * FROM mhe_detalle_plan_hora_extra ORDER BY fecha_desde DESC
       `);
-            if (PLAN.rowCount > 0) {
+            if (PLAN.rowCount != 0) {
                 res.jsonp(PLAN.rows);
             }
             else {
@@ -307,7 +307,7 @@ class PlanHoraExtraControlador {
       FROM mhe_empleado_plan_hora_extra AS pe, mhe_detalle_plan_hora_extra AS p, eu_empleados AS e
       WHERE pe.id_detalle_plan = $1 AND pe.id_detalle_plan = p.id AND e.id = pe.id_empleado_realiza
       `, [id]);
-            if (PLAN.rowCount > 0) {
+            if (PLAN.rowCount != 0) {
                 res.jsonp(PLAN.rows);
             }
             else {
@@ -426,7 +426,7 @@ class PlanHoraExtraControlador {
       FROM mhe_empleado_plan_hora_extra AS pe, mhe_detalle_plan_hora_extra AS p, datos_actuales_empleado AS da
       WHERE pe.id_empleado_realiza = $1 AND pe.id_detalle_plan = p.id AND da.id = pe.id_empleado_realiza
       `, [id]);
-            if (PLAN.rowCount > 0) {
+            if (PLAN.rowCount != 0) {
                 res.jsonp(PLAN.rows);
             }
             else {

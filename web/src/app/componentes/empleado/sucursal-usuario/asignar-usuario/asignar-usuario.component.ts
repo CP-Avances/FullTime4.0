@@ -7,6 +7,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
+import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
@@ -14,6 +15,8 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { PrincipalSucursalUsuarioComponent } from '../principal-sucursal-usuario/principal-sucursal-usuario.component';
+import { firstValueFrom } from 'rxjs';
+import { VisualizarAsignacionesComponent } from '../visualizar-asignaciones/visualizar-asignaciones.component';
 
 @Component({
   selector: 'app-asignar-usuario',
@@ -51,10 +54,24 @@ export class AsignarUsuarioComponent implements OnInit {
   nombre = new FormControl('', [Validators.minLength(2)]);
   departamento = new FormControl('', [Validators.minLength(2)]);
 
+  // VARIABLE PARA SELECCION MULTIPLE USUARIOS
+  usuariosSeleccionados = new SelectionModel<any>(true, []);
+
+  // VARIABLE PARA SELECCION MULTIPLE DE DEPARTAMENTOS
+  departamentosSeleccionados: any = [];
+  deshabilitarTodos: boolean = false;
+
+  // VARIABLES PARA VISUALIZAR DATOS
+  ver_guardar: boolean = false;
+  ver_departamentos: boolean = false;
+  ver_personal: boolean = false;
+  isPersonal: boolean = false;
+
 
   constructor(
     public ventanasu: PrincipalSucursalUsuarioComponent,
     public sucursal: SucursalService,
+    public departamentoService: DepartamentosService,
     public ventana: MatDialog,
     public general: DatosGeneralesService,
     public toastr: ToastrService,
@@ -69,9 +86,8 @@ export class AsignarUsuarioComponent implements OnInit {
     this.ip = localStorage.getItem('ip');
 
     this.name_sucursal = this.data.nombre.toUpperCase();
-    this.BuscarAdministradoresJefes();
+    this.BuscarUsuariosSucursal();
     this.ObtenerSucursales();
-    console.log('ver datos ', this.data)
   }
 
   // METODO PARA VER PANTALLA PRINCIPAL SUCURSAL USUARIO
@@ -100,46 +116,31 @@ export class AsignarUsuarioComponent implements OnInit {
   usuarios: any = [];
   ver_principal: boolean = false;
   ver_asignados: boolean = false;
-  BuscarAdministradoresJefes() {
+  BuscarUsuariosSucursal() {
     let data = {
-      lista_sucursales: '\'' + this.data.id + '\'',
+      sucursal:  this.data.id,
       estado: 1
     }
-    //console.log('ver datos ', data)
+
     this.usuarios = [];
     this.asignados = [];
     this.principales = [];
-    this.general.ObtenerAdminJefes(data).subscribe(res => {
+    this.general.ObtenerUsuariosSucursal(data).subscribe(res => {
       this.usuarios = res;
       if (this.usuarios.length != 0) {
-        this.usuarios.forEach(elemento => {
-          if (elemento.principal !== false) {
-            this.principales.push(elemento);
+        this.usuarios.forEach((elemento: any) => {
+          const data = {
+            id_empleado: elemento.id,
           }
-          else {
-            this.asignados.push(elemento);
-          }
+          this.usuario.BuscarUsuarioDepartamento(data).subscribe(datos => {
+            elemento.asignaciones = datos;
+          });
         });
       }
-      // METODO PARA VER TABLAS DE USUARIOS
-      if (this.principales.length != 0) {
-        this.ver_principal = true;
-      }
-      else {
-        this.ver_principal = false;
-      }
 
-      if (this.asignados.length != 0) {
-        this.ver_asignados = true;
-      }
-      else {
-        this.ver_asignados = false;
-      }
-      //console.log('ver sucursal ', this.usuarios)
+      this.ver_principal = true;
+
     });
-
-    console.log('ver datos ', this.principales)
-
   }
 
 
@@ -163,15 +164,47 @@ export class AsignarUsuarioComponent implements OnInit {
   ObtenerSucursales() {
     this.sucursal.BuscarSucursal().subscribe(res => {
       this.sucursales = res;
-      // OMITIR SUCURSAL SELECCIONADA
-      this.sucursales = this.sucursales.filter(elemento => elemento.id !== this.data.id);
-      // APLICACION DE BUSQUEDA CON FILTROS
+
       this.filteredOptions = this.sucursalForm.valueChanges
         .pipe(
           startWith(''),
           map((value: any) => this._filter(value))
         );
     });
+  }
+
+  // METODO PARA OBTENER DEPARTAMENTOS DEL ESTABLECIMIENTO SELECCIONADO
+  departamentos: any = [];
+  ObtenerDepartamentos() {
+    this.QuitarTodos();
+    this.ver_seleccion = true;
+    this.isChecked = false;
+    this.isPersonal = false;
+    this.deshabilitarTodos = false;
+
+    const [elemento] = this.sucursales.filter((o: any) => {
+      return o.nombre === this.sucursalForm.value
+    });
+
+    this.departamentos = [];
+    const id_sucursal = elemento.id;
+    this.departamentoService.BuscarDepartamentoSucursal(id_sucursal).subscribe(datos => {
+      this.departamentos = datos;
+      this.ver_departamentos = true;
+    });
+
+    // GREGAR PROPIEDAD SELECCIONADO A TODOS LOS DEPARTAMENTOS
+    this.departamentos.forEach((obj: any) => {
+      obj.seleccionado = false;
+    });
+
+    if (elemento.nombre.toLowerCase() === this.name_sucursal.toLowerCase()) {
+      this.ver_personal = true;
+    }
+    else {
+      this.ver_personal = false;
+    }
+
   }
 
   // VARIABLES DE ACTIVACION DE FUNCIONES
@@ -181,171 +214,210 @@ export class AsignarUsuarioComponent implements OnInit {
 
   // METODO PARA LISTAR USUARIOS
   adminSeleccionados: any = [];
-  ObtenerUsuarios() {
-    this.ver_seleccion = true;
-    //console.log('ver datos ', this.sucursalForm.value)
-    // RETORNAR DATOS DE SUCURSAL SELECCIONADA
-    const [elemento] = this.sucursales.filter((o: any) => {
-      return o.nombre === this.sucursalForm.value
-    })
-    //console.log('ver elementos ', elemento)
-    this.administradores = [];
-    let data = {
-      lista_sucursales: '\'' + elemento.id + '\'',
-      estado: 1
-    }
-    this.general.ObtenerAdminJefes(data).subscribe(datos => {
-      let respuesta: any = [];
-      respuesta = datos;
-      respuesta.forEach((obj: any) => {
-        if (obj.jefe === false) {
-          this.administradores.push(obj);
-        }
-      })
-      this.ver_administradores = true;
-      this.ver_guardar = false;
-      if (this.administradores.length != 0) {
-        (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
-      }
 
-    }, error => {
-      this.toastr.info('No se han encontrado registros.', '', {
-        timeOut: 6000,
-      });
-      this.ver_seleccion = false
-    })
+  // METODO PARA SELECCIONAR DEPARTAMENTOS
+  SeleccionarDepartamento(data: any) {
+    this.departamentosSeleccionados.push(data);
   }
 
-  // METODO PARA SELECCIONAR AGREGAR CIUDADES
-  AgregarCiudad(data: string) {
-    this.adminSeleccionados.push(data);
-  }
-
-  // METODO PARA RETIRAR CIUDADES
-  QuitarCiudad(data: any) {
-    this.adminSeleccionados = this.adminSeleccionados.filter(s => s !== data);
+  // METODO PARA RETIRAR DEPARTAMENTOS
+  QuitarDepartamento(data: any) {
+    this.departamentosSeleccionados = this.departamentosSeleccionados.filter((d: any) => d !== data);
   }
 
   // AGREGAR DATOS MULTIPLES DE CIUDADES DE LA PROVINCIA INDICADA
   AgregarTodos() {
-    this.adminSeleccionados = this.administradores;
+    this.departamentosSeleccionados = this.departamentos;
     for (var i = 0; i <= this.administradores.length - 1; i++) {
-      (<HTMLInputElement>document.getElementById('adminSeleccionados' + i)).checked = true;
+      (<HTMLInputElement>document.getElementById('departamentosSeleccionados' + i)).checked = true;
     }
   }
 
   // QUITAR TODOS LOS DATOS SELECCIONADOS DE LA PROVINCIA INDICADA
   limpiarData: any = [];
   QuitarTodos() {
-    this.limpiarData = this.administradores;
+    this.limpiarData = this.departamentos;
     for (var i = 0; i <= this.limpiarData.length - 1; i++) {
-      (<HTMLInputElement>document.getElementById('adminSeleccionados' + i)).checked = false;
-      this.adminSeleccionados = this.adminSeleccionados.filter(s => s !== this.administradores[i]);
+      (<HTMLInputElement>document.getElementById('departamentosSeleccionados' + i)).checked = false;
+      this.departamentosSeleccionados = this.departamentosSeleccionados.filter((d:any) => d !== this.departamentos[i]);
     }
   }
 
   // METODO PARA VERIFICAR SELECCION DE OPCION "Todas"
   isChecked: boolean = false;
   SeleccionarTodas(event: any) {
+    this.deshabilitarTodos = !this.deshabilitarTodos;
     if (event === true) {
       this.AgregarTodos();
+      this.ver_guardar = true;
     }
     else {
       this.QuitarTodos();
+      this.ver_guardar = false;
     }
+
   }
 
   // METODO PARA VERIFICAR SELECCION DE CIUDADES
   SeleccionarIndividual(event: any, valor: any) {
     const target = event.target as HTMLInputElement;
     if (target.checked === true) {
-      this.AgregarCiudad(valor);
+      this.SeleccionarDepartamento(valor);
     }
     else {
-      this.QuitarCiudad(valor);
+      this.QuitarDepartamento(valor);
     }
+    if (this.departamentosSeleccionados.length != 0) {
+      this.ver_guardar = true;
+    } else {
+      this.ver_guardar = false;
+    }
+  }
+
+  // METODO PARA DESHABILITAR OPCIONES DEPARTAMENTOS
+  ModificarPersonal(event: any) {
+
+    const target = event.target as HTMLInputElement;
+    this.isPersonal = target.checked;
+
+    if (this.isPersonal === true || this.departamentosSeleccionados.length != 0) {
+      this.ver_guardar = true;
+    } else {
+      this.ver_guardar = false;
+    }
+
   }
 
   // METODO PARA RETIRAR DE LISTA DE SELECCIONADOS
   RetirarLista(seleccionado: any) {
-    this.adminSeleccionados = this.adminSeleccionados.filter(elemento => elemento.id !== seleccionado);
-    //console.log('ver seleccionados ', this.adminSeleccionados)
+    this.departamentosSeleccionados = this.departamentosSeleccionados.filter(elemento => elemento.id !== seleccionado);
+
+    const departamento = this.departamentos.find((departamento: any) => departamento.id === seleccionado);
+    if (departamento) {
+      departamento.seleccionado = false;
+    }
+    if (this.departamentosSeleccionados.length === 0) {
+      this.ver_guardar = false;
+      this.isChecked = false;
+    }
   }
 
-  // METODO PARA VERIFICAR QUE NO SE ENCUENTREN DATOS DUPLICADOS
-  VerificarDatos() {
-    // FILTRA LOS ARRAYS PARA ELIMINAR OBJETOS DUPLICADOS
-    let verificados = this.adminSeleccionados.filter((objeto, indice, valor) => {
-      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
-      for (let i = 0; i < indice; i++) {
-        if (valor[i].id === objeto.id) {
-          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
-        }
-      }
-      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
-    });
-    // VERIFICAMOS QUE EXISTAN DATOS PARA VERIFICAR EXISTENCIAS EN LA BASE DE DATOS
-    if (verificados != 0) {
-      if (this.asignados != 0) {
-        // FILTRA LOS ELEMENTOS DEL PRIMER ARRAY QUE NO SE REPITEN EN EL SEGUNDO ARRAY
-        let noRegistradoas = verificados.filter(elemento => !this.asignados.find(item => item.id === elemento.id));
-        this.adminSeleccionados = noRegistradoas;
-      }
-      else {
-        // AHORA 'verificados' CONTIENE SOLO OBJETOS UNICOS
-        this.adminSeleccionados = verificados;
-      }
-    }
-    // ACTIVAR BOTON GUARDAR DATOS Y LIMPIAR LISTA SELECCION DE USUARIOS
-    if (this.adminSeleccionados.length != 0) {
-      this.ver_guardar = true;
-    }
-    else {
-      this.ver_guardar = false;
-      this.toastr.warning('Usuarios seleccionados ya se encuentran registrados en el sistema.', 'VERIFICAR PROCESO.', {
+  // METODO PARA ASIGNAR ADMINISTRACION DE DATOS A OTROS USUARIOS - DEPARTAMENTOS
+  async IngresarUsuarioDepartamento() {
+    if (this.usuariosSeleccionados.selected.length === 0) {
+      this.toastr.warning('No se han seleccionado usuarios.', 'VERIFICAR PROCESO.', {
         timeOut: 6000,
       });
+      return;
     }
-    this.LimpiarDatos();
-    console.log('ver admin ', this.adminSeleccionados)
+
+    const requests: Promise<any>[] = [];
+
+    for (const objeto of this.usuariosSeleccionados.selected) {
+
+      let datos: Datos = {
+        id: '',
+        id_empleado: objeto.id,
+        id_departamento: '',
+        principal: false,
+        personal: false,
+        administra: false,
+        user_name: this.user_name,
+        ip: this.ip,
+      };
+
+      if (this.isPersonal) {
+        datos.id_departamento = objeto.id_departamento;
+
+        const verificacion = await this.VerificarAsignaciones(datos, true);
+
+        if (verificacion === 2 ) {
+          requests.push(firstValueFrom(this.usuario.ActualizarUsuarioDepartamento(datos)));
+        }
+
+      }
+
+      for (const departamento of this.departamentosSeleccionados) {
+
+        datos.id_departamento = departamento.id;
+        datos.administra = true;
+        datos.principal = false;
+        datos.personal = false;
+
+        const verificacion = await this.VerificarAsignaciones(datos, false);
+
+        if (verificacion === 1 || verificacion === 2) {
+          const accion = verificacion === 1 ? this.usuario.RegistrarUsuarioDepartamento.bind(this.usuario) : this.usuario.ActualizarUsuarioDepartamento.bind(this.usuario);
+          requests.push(firstValueFrom(accion(datos)));
+        }
+      };
+    };
+
+    Promise.allSettled(requests).then(() => {
+      this.toastr.success('Registros guardados exitosamente.', 'PROCESO EXITOSO.', {
+        timeOut: 6000,
+      });
+      // LIMPIAR DATOS Y REFRESCAR LAS CONSULTAS
+      this.LimpiarDatos();
+      this.BuscarUsuariosSucursal();
+    }).catch(() => {
+      this.toastr.error('Error al guardar registros.', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
+      });
+    });
   }
 
-  // METODO PARA ASIGNAR ADMINISTRACION DE DATOS A OTROS USUARIOS
-  ver_guardar: boolean = false;
-  IngresarUsuarioSucursal() {
-    let cont = 0;
-    let datos = {
-      id_empleado: '',
-      id_sucursal: this.data.id,
-      principal: false,
-      user_name: this.user_name,
-      ip: this.ip,
+  // METODO PARA OMITIR ASIGNACIONES EXISTENTES
+  /* @return
+    CASOS DE RETORNO
+    0: USUARIO NO EXISTE => NO SE EJECUTA NINGUNA ACCION
+    1: NO EXISTE LA ASIGNACION => SE PUEDE ASIGNAR (INSERTAR)
+    2: EXISTE LA ASIGNACION Y ES PRINCIPAL => SE ACTUALIZA LA ASIGNACION (PRINCIPAL)
+    3: EXISTE LA ASIGNACION Y NO ES PRINCIPAL => NO SE EJECUTA NINGUNA ACCION
+  */
+  async VerificarAsignaciones(datos: Datos, personal: boolean): Promise<number>  {
+
+    const usuario = this.usuarios.find((u: any) => u.id === datos.id_empleado);
+
+    if (!usuario) return 0;
+
+    const asignacion = usuario.asignaciones?.find((a: any) => a.id_departamento === datos.id_departamento);
+
+
+    if (!asignacion) return 1;
+
+    if (asignacion.principal) {
+      datos.principal = true;
+      datos.id = asignacion.id;
+      datos.personal = asignacion.personal;
+
+      if (this.isPersonal) {
+        datos.personal = true;
+      }
+
+      if (personal) {
+        datos.administra = asignacion.administra;
+      }
+      return 2;
     }
-    this.adminSeleccionados.forEach(objeto => {
-      datos.id_empleado = objeto.id;
-      this.usuario.RegistrarUsuarioSucursal(datos).subscribe(res => {
-        //console.log('res', res)
-        cont = cont + 1;
-        if (cont === this.adminSeleccionados.length) {
-          this.toastr.success('Registros guardados exitosamente.', 'PROCESO EXITOSO.', {
-            timeOut: 6000,
-          });
-          // LIMPIAR DATOS Y REFRESCAR LAS CONSULTAS
-          this.LimpiarDatos();
-          this.adminSeleccionados = [];
-          this.ver_guardar = false;
-          this.ver_administradores = false;
-          this.BuscarAdministradoresJefes();
-        }
-      });
-    })
+
+    return 3;
   }
 
   // METODO PARA LIMPIAR SELECCION DE USUARIOS
   LimpiarDatos() {
-    this.sucursalForm.setValue('');
+    this.sucursalForm.patchValue('');
+    this.usuariosSeleccionados.clear();
+
+    this.departamentos = [];
     this.administradores = [];
+    this.adminSeleccionados = [];
+    this.departamentosSeleccionados = [];
+
+    this.ver_guardar = false;
     this.ver_seleccion = false;
+    this.ver_departamentos = false;
+    this.ver_administradores = false;
   }
 
   // METODO DE GUARDADO EN UNA LISTA LOS ELEMENTOS SELECCIONADOS
@@ -365,11 +437,31 @@ export class AsignarUsuarioComponent implements OnInit {
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
-  checkboxLabelDep(row?: ITableEmpleados): string {
+  checkboxLabelDep(row?: any): string {
     if (!row) {
       return `${this.isAllSelectedDep() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionAsignados.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  isAllSelectedU() {
+    const numSelected = this.usuariosSeleccionados.selected.length;
+    return numSelected === this.principales.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS
+  masterToggleU() {
+    this.isAllSelectedU() ?
+      this.usuariosSeleccionados.clear() :
+      this.principales.forEach((row: any) => this.usuariosSeleccionados.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelU(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedU() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.usuariosSeleccionados.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE
@@ -380,7 +472,6 @@ export class AsignarUsuarioComponent implements OnInit {
     this.plan_multiple = true;
     this.plan_multiple_ = true;
     this.activar_seleccion = false;
-    //console.log('ver datos seleccionados,,, ', this.selectionAsignados.selected.length)
   }
 
   // METODO PARA NO MOSTRAR ITEMS DE SELECCION
@@ -390,68 +481,47 @@ export class AsignarUsuarioComponent implements OnInit {
       this.plan_multiple = false;
       this.plan_multiple_ = false;
     }
-    //console.log('ver datos seleccionados ', this.selectionAsignados.selected.length)
   }
 
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDeleteProceso() {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.MetodoEliminar()
-        }
-      });
-  }
-
-  // METODO PARA ELIMINAR DATOS ASIGNADOS
-  MetodoEliminar() {
-    let cont = 0;
-
+  VisualizarAsignaciones(usuario: any) {
     const datos = {
+      nombre: `${usuario.nombre} ${usuario.apellido}`,
+      asignaciones: usuario.asignaciones,
       user_name: this.user_name,
-      ip: this.ip
+      ip: this.ip,
+      id: usuario.id
     }
-    let lista_eliminar = this.selectionAsignados.selected.map(obj => {
-      return {
-        id_usucursal: obj.id_usucursal
-      }
-    })
-    // PROCESO PARA ELIMINAR LOS REGISTROS SELECCIONADOS
-    lista_eliminar.forEach(obj => {
-      this.usuario.EliminarUsuarioSucursal(obj.id_usucursal, datos).subscribe(res => {
-        cont = cont + 1;
-
-        if (cont === lista_eliminar.length) {
-          this.toastr.error('Registros eliminados.', 'PROCESO EXITOSO.', {
-            timeOut: 6000,
-          });
-          this.LimpiarAsignados();
+    this.ventana.open(VisualizarAsignacionesComponent, {
+      data: datos,
+      width: '700px',
+      height: 'auto',
+    }).afterClosed().subscribe((datos: any) => {
+      if (datos) {
+        const usuarioIndex = this.usuarios.findIndex((u: any) => u.id === datos.id);
+        if (usuarioIndex !== -1) {
+          this.usuarios[usuarioIndex].asignaciones = datos.asignaciones;
         }
-      });
-    })
-    //console.log('ver datos ', lista_eliminar)
+      }
+    }
+    );
   }
+
 
   // METODO PARA LIMPOIAR DATOS DE SELECCION MULTIPLE
   LimpiarAsignados() {
     this.selectionAsignados.clear();
     this.InhabilitarSeleccion();
-    this.BuscarAdministradoresJefes();
+    this.BuscarUsuariosSucursal();
   }
+}
 
-  usuariosSeleccionados: any = [];
-  // METODO PARA SELECCIONAR USUARIOS
-  SeleccionarEmpleado(p) {
-    if (p.seleccionado) {
-      this.usuariosSeleccionados.push(p);
-    } else {
-      const index = this.usuariosSeleccionados.indexOf(p);
-      if (index > -1) {
-        this.usuariosSeleccionados.splice(index, 1);
-      }
-    }
-    console.log('ver datos seleccionados ', this.usuariosSeleccionados)
-  }
-
+interface Datos {
+  id: string;
+  id_empleado: string;
+  id_departamento: string;
+  principal: boolean;
+  personal: boolean;
+  administra: boolean;
+  user_name: string | null;
+  ip: string | null;
 }

@@ -336,7 +336,7 @@ export class ListaHorasExtrasComponent implements OnInit {
                 { text: 'Tipo Día', style: 'tableHeader' },
                 { text: 'Incluir Almuerzo', style: 'tableHeader' },
               ],
-              ...this.horasExtras.map(obj => {
+              ...this.horasExtras.map((obj: any) => {
                 var incluirAlmuerzo = this.Almuerzo[obj.minutos_comida - 1];
                 return [
                   { text: obj.id, style: 'itemsTable' },

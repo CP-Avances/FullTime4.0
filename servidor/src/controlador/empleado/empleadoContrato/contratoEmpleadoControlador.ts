@@ -153,7 +153,7 @@ class ContratoEmpleadoControlador {
             WHERE ec.id_empleado = $1 ORDER BY ec.id ASC
             `
             , [id_empleado]);
-        if (CONTRATO_EMPLEADO_REGIMEN.rowCount > 0) {
+        if (CONTRATO_EMPLEADO_REGIMEN.rowCount != 0) {
             return res.jsonp(CONTRATO_EMPLEADO_REGIMEN.rows)
         }
         else {
@@ -321,7 +321,7 @@ class ContratoEmpleadoControlador {
             WHERE ec.id_empleado = e.id AND e.id = $1
             `
             , [id_empleado]);
-        if (CONTRATO.rowCount > 0) {
+        if (CONTRATO.rowCount != 0) {
             if (CONTRATO.rows[0]['max'] != null) {
                 return res.jsonp(CONTRATO.rows)
             }
@@ -346,7 +346,7 @@ class ContratoEmpleadoControlador {
             WHERE ec.id = $1 AND ec.id_regimen = cr.id AND mt.id = ec.id_modalidad_laboral
             `
             , [id]);
-        if (CONTRATO.rowCount > 0) {
+        if (CONTRATO.rowCount != 0) {
             return res.jsonp(CONTRATO.rows)
         }
         else {
@@ -364,7 +364,7 @@ class ContratoEmpleadoControlador {
             WHERE ca.id = $1 AND ec.id = ca.id_contrato
             `
             , [id_empleado]);
-        if (FECHA.rowCount > 0) {
+        if (FECHA.rowCount != 0) {
             return res.jsonp(FECHA.rows)
         }
         else {
@@ -384,7 +384,7 @@ class ContratoEmpleadoControlador {
             SELECT * FROM e_cat_modalidad_trabajo
             `
         );
-        if (CONTRATOS.rowCount > 0) {
+        if (CONTRATOS.rowCount != 0) {
             return res.jsonp(CONTRATOS.rows)
         }
         else {
@@ -443,7 +443,7 @@ class ContratoEmpleadoControlador {
             `
             , [nombre]
         );
-        if (CONTRATOS.rowCount > 0) {
+        if (CONTRATOS.rowCount != 0) {
             return res.jsonp(CONTRATOS.rows)
         }
         else {
@@ -459,7 +459,7 @@ class ContratoEmpleadoControlador {
             WHERE contrato.id = $1
             `
             , [id_contrato]);
-        if (FECHA.rowCount > 0) {
+        if (FECHA.rowCount != 0) {
             return res.jsonp(FECHA.rows)
         }
         else {
@@ -499,7 +499,7 @@ class ContratoEmpleadoControlador {
 
 
             // LECTURA DE LOS DATOS DE LA PLANTILLA
-            plantilla.forEach(async (dato: any, indice: any, array: any) => {
+            plantilla.forEach(async (dato: any) => {
                 var { ITEM, CEDULA, PAIS, REGIMEN_LABORAL, MODALIDAD_LABORAL, FECHA_DESDE, FECHA_HASTA,
                     CONTROLAR_ASISTENCIA, CONTROLAR_VACACIONES, TIPO_CARGO } = dato;
 
@@ -717,14 +717,14 @@ class ContratoEmpleadoControlador {
             setTimeout(() => {
 
                 listContratos.sort((a: any, b: any) => {
-                    // Compara los números de los objetos
+                    // COMPARA LOS NUMEROS DE LOS OBJETOS
                     if (a.fila < b.fila) {
                         return -1;
                     }
                     if (a.fila > b.fila) {
                         return 1;
                     }
-                    return 0; // Son iguales
+                    return 0; // SON IGUALES
                 });
 
                 var filaDuplicada: number = 0;
@@ -741,9 +741,9 @@ class ContratoEmpleadoControlador {
                         }
                     }
 
-                    //Valida si los datos de la columna N son numeros.
+                    // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                     if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                        //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                        // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                         if (item.fila == filaDuplicada) {
                             mensaje = 'error';
                         }

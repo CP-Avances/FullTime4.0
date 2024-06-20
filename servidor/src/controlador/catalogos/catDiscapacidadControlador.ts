@@ -17,7 +17,7 @@ class DiscapacidadControlador {
                 SELECT * FROM e_cat_discapacidad ORDER BY nombre ASC
                 `
             );
-            if (DISCAPACIDAD.rowCount > 0) {
+            if (DISCAPACIDAD.rowCount != 0) {
                 return res.jsonp(DISCAPACIDAD.rows)
             } else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.' });
@@ -92,9 +92,27 @@ class DiscapacidadControlador {
                 `
                 , [nombre.toUpperCase(), id])
 
+            const consulta = await pool.query('SELECT * FROM e_cat_discapacidad WHERE id = $1', [id]);
+            const [datosOriginales] = consulta.rows;
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_discapacidad',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+            }
+
+
             if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
                 const nombreConFormato = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
-
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
 
@@ -111,7 +129,7 @@ class DiscapacidadControlador {
                     tabla: 'e_cat_discapacidad',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(VERIFICAR_DISCAPACIDAD.rows),
+                    datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(discapacidadEditada),
                     ip,
                     observacion: null
@@ -224,7 +242,7 @@ class DiscapacidadControlador {
                 var mensaje: string = 'correcto';
 
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach(async (dato: any, indice: any, array: any) => {
+                plantilla.forEach(async (dato: any) => {
                     var { ITEM, DISCAPACIDAD } = dato;
                     // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                     if ((ITEM != undefined && ITEM != '') &&
@@ -378,19 +396,14 @@ class DiscapacidadControlador {
                         return respuesta = res.status(404).jsonp({ message: 'error', status: '400' })
                     }
                 }
-
                 contador = contador + 1;
-
             });
-
         } catch (error) {
             // ROLLBACK
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'Error con el servidor metodo CargarPlantilla', status: '500' });
+            return res.status(500).jsonp({ message: 'Error con el servidor método CargarPlantilla.', status: '500' });
         }
     }
-
-
 
 }
 

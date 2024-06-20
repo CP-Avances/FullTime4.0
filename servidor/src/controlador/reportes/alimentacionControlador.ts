@@ -19,7 +19,7 @@ class AlimentacionControlador {
             GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion
             `
             , [fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -42,7 +42,7 @@ class AlimentacionControlador {
             GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion
             `
             , [fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -65,7 +65,7 @@ class AlimentacionControlador {
             GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion
             `
             , [fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -88,7 +88,7 @@ class AlimentacionControlador {
             GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion
             `
             , [fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -113,7 +113,7 @@ class AlimentacionControlador {
                 e.apellido, e.cedula, e.codigo ORDER BY e.apellido ASC
             `
             , [fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -139,7 +139,7 @@ class AlimentacionControlador {
             ORDER BY e.apellido ASC
             `
             , [fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -165,7 +165,7 @@ class AlimentacionControlador {
             ORDER BY e.apellido ASC
             `
             , [fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -191,7 +191,7 @@ class AlimentacionControlador {
             ORDER BY e.apellido ASC
             `
             , [fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {
@@ -215,7 +215,7 @@ class AlimentacionControlador {
                 ci.nombre_invitado, ci.apellido_invitado, ci.cedula_invitado, ci.ticket
             `
             , [fec_inicio, fec_final]);
-        if (DATOS.rowCount > 0) {
+        if (DATOS.rowCount != 0) {
             return res.jsonp(DATOS.rows)
         }
         else {

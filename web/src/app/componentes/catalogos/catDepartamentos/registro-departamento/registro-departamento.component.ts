@@ -8,7 +8,6 @@ import { Router } from '@angular/router';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
-import { use } from 'echarts';
 
 @Component({
   selector: 'app-registro-departamento',
@@ -146,7 +145,7 @@ export class RegistroDepartamentoComponent implements OnInit {
     // VERIFICAR DUPLICIDAD EN NOMBRES
     if (this.contador === 1) {
       this.contador = 0;
-      this.toastr.error('Nombre de departamento ya se encuentra registrado.', '', {
+      this.toastr.warning('Nombre de departamento ya se encuentra registrado.', '', {
         timeOut: 6000,
       });
     }

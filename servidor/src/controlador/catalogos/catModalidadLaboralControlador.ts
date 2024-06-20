@@ -17,7 +17,7 @@ class ModalidaLaboralControlador {
                 SELECT * FROM e_cat_modalidad_trabajo ORDER BY descripcion ASC
                 `
             );
-            if (MODALIDAL_LABORAL.rowCount > 0) {
+            if (MODALIDAL_LABORAL.rowCount != 0) {
                 return res.jsonp(MODALIDAL_LABORAL.rows)
             } else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.' });
@@ -94,6 +94,25 @@ class ModalidaLaboralControlador {
                 `
                 , [modali.toUpperCase()]);
 
+            const consulta = await pool.query('SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1', [id]);
+            const [datosOriginales] = consulta.rows;
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_modalidad_trabajo',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+            }
+
+
             if (modalExiste.rows[0] != undefined && modalExiste.rows[0].descripcion != '' && modalExiste.rows[0].descripcion != null) {
                 return res.status(200).jsonp({ message: 'Modalidad Laboral ya esiste en el sistema.', status: '300' })
             } else {
@@ -114,7 +133,7 @@ class ModalidaLaboralControlador {
                     tabla: 'e_cat_modalidad_trabajo',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(modalExiste.rows),
+                    datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(modalidadLaboral),
                     ip,
                     observacion: null
@@ -218,7 +237,6 @@ class ModalidaLaboralControlador {
                     modalida_laboral: '',
                     observacion: ''
                 };
-
                 var listModalidad: any = [];
                 var duplicados: any = [];
                 var mensaje: string = 'correcto';
@@ -232,7 +250,6 @@ class ModalidaLaboralControlador {
                         data.fila = ITEM;
                         data.modalida_laboral = MODALIDAD_LABORAL;
                         data.observacion = 'no registrada';
-
                         listModalidad.push(data);
                     } else {
                         data.fila = ITEM;
@@ -248,7 +265,6 @@ class ModalidaLaboralControlador {
                             data.modalida_laboral = 'No registrado';
                             data.observacion = 'Modalidad Laboral ' + data.observacion;
                         }
-
                         listModalidad.push(data);
                     }
                     data = {};
@@ -267,8 +283,8 @@ class ModalidaLaboralControlador {
                     if (item.observacion == 'no registrada') {
                         var VERIFICAR_MODALIDAD = await pool.query(
                             `
-                        SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
-                        `
+                            SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                            `
                             , [item.modalida_laboral.toUpperCase()])
                         if (VERIFICAR_MODALIDAD.rows[0] == undefined || VERIFICAR_MODALIDAD.rows[0] == '') {
                             item.observacion = 'ok'
@@ -276,7 +292,7 @@ class ModalidaLaboralControlador {
                             item.observacion = 'Ya existe en el sistema'
                         }
 
-                        // Discriminación de elementos iguales
+                        // DISCRIMINACIÓN DE ELEMENTOS IGUALES
                         if (duplicados.find((p: any) => p.modalida_laboral.toLowerCase() === item.modalida_laboral.toLowerCase()) == undefined) {
                             duplicados.push(item);
                         } else {
@@ -324,14 +340,12 @@ class ModalidaLaboralControlador {
                     return res.jsonp({ message: mensaje, data: listModalidad });
                 }, 1000)
             }
-
-
         } catch (error) {
             return res.status(500).jsonp({ message: error });
         }
     }
 
-    // REGISTRAR PLANTILLA MODALIDAD_CARGO 
+    // REGISTRAR PLANTILLA MODALIDAD_LABORAL
     public async CargarPlantilla(req: Request, res: Response) {
         try {
             const { plantilla, user_name, ip } = req.body;
@@ -341,7 +355,7 @@ class ModalidaLaboralControlador {
 
             plantilla.forEach(async (data: any) => {
                 // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
-                const { item, modalida_laboral, observacion } = data;
+                const { modalida_laboral } = data;
                 const modalidad = modalida_laboral.charAt(0).toUpperCase() + modalida_laboral.slice(1).toLowerCase();
 
                 // INICIO DE TRANSACCION
@@ -377,11 +391,8 @@ class ModalidaLaboralControlador {
                         return respuesta = res.status(404).jsonp({ message: 'error' })
                     }
                 }
-
                 contador = contador + 1;
-
             });
-
 
         } catch (error) {
             // ROLLBACK SI HAY ERROR

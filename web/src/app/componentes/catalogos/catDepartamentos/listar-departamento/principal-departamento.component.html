@@ -33,17 +33,17 @@
                     <div class="row m-auto">
                         <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                             <form method="post" class="btn-2" enctype="multipart/form-data">
-                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm"
-                                    id="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                 <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
                                     style="height: 65px;  padding-top: 25px;"
-                                    matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
                                     Subir plantilla
                                 </label>
                                 <label for="file" matSuffix matTooltipPosition="right"
                                     *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
                                     style="height: 65px;  padding-top: 25px;"
-                                    matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
                                     Subir nueva plantilla
                                 </label>
                             </form>
@@ -115,21 +115,18 @@
                             <td></td>
                             <td>
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" [formControl]="buscarNombre"
-                                        [(ngModel)]="filtroNombreSuc">
+                                    <input matInput placeholder="Buscar" [formControl]="buscarNombre">
                                 </mat-form-field>
                             </td>
                             <td>
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" [formControl]="departamentoF"
-                                        [(ngModel)]="filtroNombre">
+                                    <input matInput placeholder="Buscar" [formControl]="departamentoF">
                                 </mat-form-field>
                             </td>
                             <td></td>
                             <td>
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" [formControl]="departamentoPadreF"
-                                        [(ngModel)]="filtroDeparPadre">
+                                    <input matInput placeholder="Buscar" [formControl]="departamentoPadreF">
                                 </mat-form-field>
                             </td>
                             <td>
@@ -140,7 +137,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let departamento of departamentos | filtroDepartamento: filtroNombre | departamentoPadre: filtroDeparPadre | filtroSucursalR: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let departamento of departamentos | filtroDepartamento: departamentoF.value | departamentoPadre: departamentoPadreF.value | filtroSucursalR: buscarNombre.value | paginate:tamanio_pagina:numero_pagina">
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionDepartamentos.toggle(departamento) : null"
@@ -239,7 +236,8 @@
                             </td>
                             <td [style.color]="stiloTextoCelda(d.nombre)" style="font-size: 12px;">{{d.nombre}}</td>
                             <td [style.color]="stiloTextoCelda(d.sucursal)" id="letras" style="font-size: 12px;">
-                                {{d.sucursal}}</td>
+                                {{d.sucursal}}
+                            </td>
                         </tr>
                     </tbody>
                 </table>

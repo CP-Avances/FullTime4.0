@@ -420,7 +420,7 @@ var documentDefinition: any;
                 { text: 'Fecha Final', style: 'tableHeader' },
                 { text: 'Estado', style: 'tableHeader' }
               ],
-              ...datos.map(obj => {
+              ...datos.map((obj: any) => {
                 return [
                   { text: obj.create_at.split('T')[0], style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -566,7 +566,7 @@ var documentDefinition: any;
                 { text: 'Horas Autorizadas', style: 'tableHeader' },
                 { text: 'Estado', style: 'tableHeader' }
               ],
-              ...datos.map(obj => {
+              ...datos.map((obj: any) => {
                 return [
                   { text: obj.create_at.split('T')[0], style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -714,7 +714,7 @@ var documentDefinition: any;
                 { text: 'Fecha Ingreso', style: 'tableHeader' },
                 { text: 'Estado', style: 'tableHeader' }
               ],
-              ...datos.map(obj => {
+              ...datos.map((obj: any) => {
                 return [
                   { text: obj.create_at.split('T')[0], style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -853,7 +853,7 @@ var documentDefinition: any;
                 { text: 'Cédula', style: 'tableHeader' },
                 { text: 'Descripción', style: 'tableHeader' },
               ],
-              ...datos.map(obj => {
+              ...datos.map((obj: any) => {
                 return [
                   { text: obj.create_at.split('T')[0], style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },

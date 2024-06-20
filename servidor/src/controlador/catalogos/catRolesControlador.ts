@@ -12,7 +12,7 @@ class RolesControlador {
       SELECT id, nombre FROM ero_cat_roles ORDER BY nombre ASC
       `
     );
-    if (ROL.rowCount > 0) {
+    if (ROL.rowCount != 0) {
       return res.jsonp(ROL.rows)
     } else {
       res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -69,10 +69,11 @@ class RolesControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro eliminado.' });
+      
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+      return res.jsonp({ message: 'error' });
     }
   }
 
@@ -119,7 +120,7 @@ class RolesControlador {
       SELECT * FROM ero_cat_roles WHERE NOT id = $1
       `
       , [id]);
-    if (ROL.rowCount > 0) {
+    if (ROL.rowCount != 0) {
       return res.jsonp(ROL.rows)
     }
     else {
@@ -134,7 +135,7 @@ class RolesControlador {
       SELECT * FROM ero_cat_roles WHERE id = $1
       `
       , [id]);
-    if (ROL.rowCount > 0) {
+    if (ROL.rowCount != 0) {
       return res.jsonp(ROL.rows)
     } else {
       res.status(404).jsonp({ text: 'Registro no encontrado.' });

@@ -1,11 +1,10 @@
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 
-import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
-
-import pool from '../../database';
 import excel from 'xlsx';
+import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
 
@@ -20,7 +19,7 @@ class SucursalControlador {
       `
       , [nombre]);
 
-    if (SUCURSAL.rowCount > 0) {
+    if (SUCURSAL.rowCount != 0) {
       return res.jsonp(SUCURSAL.rows)
     }
     else {
@@ -135,7 +134,7 @@ class SucursalControlador {
       SELECT * FROM e_sucursales WHERE id_empresa = $1
       `
       , [id_empresa]);
-    if (SUCURSAL.rowCount > 0) {
+    if (SUCURSAL.rowCount != 0) {
       return res.jsonp(SUCURSAL.rows)
     }
     else {
@@ -153,7 +152,7 @@ class SucursalControlador {
       ORDER BY s.id
       `
     );
-    if (SUCURSAL.rowCount > 0) {
+    if (SUCURSAL.rowCount != 0) {
       return res.jsonp(SUCURSAL.rows)
     }
     else {
@@ -214,7 +213,9 @@ class SucursalControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'error' });
+      //return res.status(500).jsonp({ message: 'error' });
+      return res.jsonp({ message: 'error' });
+
     }
   }
 
@@ -228,7 +229,7 @@ class SucursalControlador {
       WHERE s.id_ciudad = c.id AND s.id_empresa = ce.id AND s.id = $1
       `
       , [id]);
-    if (SUCURSAL.rowCount > 0) {
+    if (SUCURSAL.rowCount != 0) {
       return res.jsonp(SUCURSAL.rows)
     }
     else {
@@ -236,14 +237,14 @@ class SucursalControlador {
     }
   }
 
-
-
   // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
   public async RevisarDatos(req: Request, res: Response): Promise<any> {
     const documento = req.file?.originalname;
     let separador = path.sep;
+
     let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
     const workbook = excel.readFile(ruta);
+
     let verificador = ObtenerIndicePlantilla(workbook, 'SUCURSALES');
     if (verificador === false) {
       return res.jsonp({ message: 'no_existe', data: undefined });
@@ -257,16 +258,13 @@ class SucursalControlador {
         ciudad: '',
         observacion: ''
       };
-
       var mensaje: string = 'correcto';
-
       var listSucursales: any = [];
       var duplicados: any = [];
 
       // LECTURA DE LOS DATOS DE LA PLANTILLA
-      plantilla.forEach(async (dato: any, indice: any, array: any) => {
+      plantilla.forEach(async (dato: any) => {
         var { ITEM, NOMBRE, CIUDAD } = dato;
-
         data.fila = dato.ITEM
         data.nom_sucursal = dato.NOMBRE;
         data.ciudad = dato.CIUDAD;
@@ -275,32 +273,34 @@ class SucursalControlador {
           (data.nom_sucursal != undefined && data.nom_sucursal != '') &&
           (data.ciudad != undefined && data.ciudad != '')) {
 
-          //Validar primero que exista la ciudad en la tabla ciudades
+          // VALIDAR PRIMERO QUE EXISTA LA CIUDAD EN LA TABLA CIUDADES
           const existe_ciudad = await pool.query(
             `
-        SELECT id FROM e_ciudades WHERE UPPER(descripcion) = UPPER($1)
-        `
+            SELECT id FROM e_ciudades WHERE UPPER(descripcion) = UPPER($1)
+            `
             , [CIUDAD]);
           var id_ciudad = existe_ciudad.rows[0];
+
           if (id_ciudad != undefined && id_ciudad != '') {
-            // VERIFICACIÓN SI LA SUCURSAL NO ESTE REGISTRADA EN EL SISTEMA
+            // VERIFICACION SI LA SUCURSAL NO ESTE REGISTRADA EN EL SISTEMA
             const VERIFICAR_SUCURSAL = await pool.query(
               `
-          SELECT * FROM e_sucursales 
-          WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2
-          `
+              SELECT * FROM e_sucursales 
+              WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2
+              `
               , [NOMBRE, id_ciudad.id]);
+
             if (VERIFICAR_SUCURSAL.rowCount === 0) {
               data.fila = ITEM
               data.nom_sucursal = NOMBRE;
               data.ciudad = CIUDAD;
-              // Discriminación de elementos iguales
-              if (duplicados.find((p: any) => p.nombre.toLowerCase() === dato.NOMBRE.toLowerCase() &&
-                p.ciudad.toLowerCase() === dato.CIUDAD.toLowerCase()) == undefined) {
+              // DISCRIMINACION DE ELEMENTOS IGUALES
+
+              if (duplicados.find((p: any) => p.NOMBRE.toLowerCase() === dato.NOMBRE.toLowerCase() &&
+                p.CIUDAD.toLowerCase() === dato.CIUDAD.toLowerCase()) == undefined) {
                 data.observacion = 'ok';
                 duplicados.push(dato);
               }
-
               listSucursales.push(data);
 
             } else {
@@ -308,7 +308,6 @@ class SucursalControlador {
               data.nom_sucursal = NOMBRE;
               data.ciudad = CIUDAD;
               data.observacion = 'Ya existe en el sistema';
-
               listSucursales.push(data);
             }
 
@@ -322,7 +321,6 @@ class SucursalControlador {
             }
 
             data.observacion = 'Ciudad no existe en el sistema';
-
             listSucursales.push(data);
           }
 
@@ -333,7 +331,7 @@ class SucursalControlador {
 
           if (data.fila == '' || data.fila == undefined) {
             data.fila = 'error';
-            mensaje = 'error'
+            mensaje = 'error';
           }
 
           if (data.nom_sucursal == '' || data.nom_sucursal == undefined) {
@@ -347,14 +345,13 @@ class SucursalControlador {
           }
 
           if ((data.nom_sucursal == '' || data.nom_sucursal == undefined) && (data.ciudad == '' || data.ciudad == undefined)) {
-            data.observacion = 'Sucursal y ciudad no registrado';
+            data.observacion = 'Sucursal y ciudad no registrada';
           }
 
           listSucursales.push(data);
         }
 
         data = {};
-
       });
 
       // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
@@ -367,16 +364,15 @@ class SucursalControlador {
       });
 
       setTimeout(() => {
-
         listSucursales.sort((a: any, b: any) => {
-          // Compara los números de los objetos
+          // COMPARA LOS NUMEROS DE LOS OBJETOS
           if (a.fila < b.fila) {
             return -1;
           }
           if (a.fila > b.fila) {
             return 1;
           }
-          return 0; // Son iguales
+          return 0; // SON IGUALES
         });
 
         var filaDuplicada: number = 0;
@@ -386,31 +382,25 @@ class SucursalControlador {
             item.observacion = 'Registro duplicado'
           }
 
-          //Valida si los datos de la columna N son numeros.
+          // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
           if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
             if (item.fila == filaDuplicada) {
               mensaje = 'error';
             }
           } else {
             return mensaje = 'error';
           }
-
           filaDuplicada = item.fila;
-
         });
 
         if (mensaje == 'error') {
           listSucursales = undefined;
         }
-
         return res.jsonp({ message: mensaje, data: listSucursales });
-
       }, 1500)
-
     }
   }
-
 }
 
 export const SUCURSAL_CONTROLADOR = new SucursalControlador();

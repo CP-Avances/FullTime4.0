@@ -16,7 +16,7 @@ class EmpresaControlador {
             SELECT cadena FROM e_empresa
             `
         );
-        if (EMPRESA.rowCount > 0) {
+        if (EMPRESA.rowCount != 0) {
             return res.jsonp(EMPRESA.rows)
         }
         else {
@@ -41,6 +41,8 @@ class EmpresaControlador {
         }
 
         const codificado = await ImagenBase64LogosEmpresas(file_name.logo);
+
+        console.log('empresa ', codificado)
 
         if (codificado === 0) {
             res.status(200).jsonp({ imagen: 0, nom_empresa: file_name.nombre })
@@ -143,7 +145,7 @@ class EmpresaControlador {
             SELECT * FROM e_empresa WHERE id = $1
             `
             , [id]);
-        if (EMPRESA.rowCount > 0) {
+        if (EMPRESA.rowCount != 0) {
             return res.jsonp(EMPRESA.rows)
         }
         else {
@@ -717,7 +719,7 @@ class EmpresaControlador {
             FROM e_empresa ORDER BY nombre ASC
             `
         );
-        if (EMPRESA.rowCount > 0) {
+        if (EMPRESA.rowCount != 0) {
             return res.jsonp(EMPRESA.rows)
         }
         else {

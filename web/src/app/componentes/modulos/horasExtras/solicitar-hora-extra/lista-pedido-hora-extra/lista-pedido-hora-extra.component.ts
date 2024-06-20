@@ -658,7 +658,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       dato = this.selectionUnoObserva;
     }
     let EmpleadosSeleccionados: any;
-    EmpleadosSeleccionados = dato.selected.map(obj => {
+    EmpleadosSeleccionados = dato.selected.map((obj: any) => {
       return {
         id: obj.id,
         empleado: obj.nombre + ' ' + obj.apellido,
@@ -876,7 +876,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
    exportToExcel(opcion: string) {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Solicitudes de horas extras con observaciones"?this.lista_pedidosFiltradas:(
       opcion=="Solicitudes de horas extras con observaciones"?this.listaHorasExtrasObservaFiltradas:this.listaHorasExtrasAutorizadasFiltradas
-      )).map(obj => {
+      )).map((obj: any) => {
       return {
         Nombre: obj.nombre +' '+ obj.apellido,
         Estado: obj.estado,
@@ -907,7 +907,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
    exportToCVS(opcion: string) {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Solicitudes de horas extras con observaciones"?this.lista_pedidosFiltradas:(
       opcion=="Solicitudes de horas extras con observaciones"?this.listaHorasExtrasObservaFiltradas:this.listaHorasExtrasAutorizadasFiltradas
-      )).map(obj => {
+      )).map((obj: any) => {
       return {
         Nombre: obj.nombre +' '+ obj.apellido,
         Estado: obj.estado,

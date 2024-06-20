@@ -57,7 +57,7 @@ const BuscarVacaciones = async function (id: string | number, desde: string, has
         `
         , [id, desde, hasta])
         .then((res: any) => {
-            if (res.rowCount > 0) {
+            if (res.rowCount != 0) {
                 res.rows.map((obj: any) => {
                     if (obj.id_autoriza_estado != null && obj.id_autoriza_estado != '' && obj.estado != 1) {
                         var autorizaciones = obj.id_autoriza_estado.split(',');

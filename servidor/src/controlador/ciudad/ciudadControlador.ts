@@ -15,7 +15,7 @@ class CiudadControlador {
             `
             , [id_ciudad]
         );
-        if (CIUDAD.rowCount > 0) {
+        if (CIUDAD.rowCount != 0) {
             return res.jsonp(CIUDAD.rows)
         }
         else {
@@ -30,7 +30,7 @@ class CiudadControlador {
             SELECT * FROM e_ciudades
             `
         );
-        if (CIUDAD.rowCount > 0) {
+        if (CIUDAD.rowCount != 0) {
             return res.jsonp(CIUDAD.rows)
         }
         else {
@@ -49,7 +49,7 @@ class CiudadControlador {
             `
             , [id_provincia]);
 
-        if (CIUDAD.rowCount > 0) {
+        if (CIUDAD.rowCount != 0) {
             return res.jsonp(CIUDAD.rows)
         }
         else {
@@ -102,7 +102,7 @@ class CiudadControlador {
             ORDER BY provincia, nombre ASC
             `
         );
-        if (CIUDAD.rowCount > 0) {
+        if (CIUDAD.rowCount != 0) {
             return res.jsonp(CIUDAD.rows)
         }
         else {
@@ -163,7 +163,9 @@ class CiudadControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+            //return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+            return res.jsonp({ message: 'error' });
+
         }
     }
 
@@ -175,7 +177,7 @@ class CiudadControlador {
             SELECT * FROM e_ciudades WHERE id = $1
             `
             , [id]);
-        if (CIUDAD.rowCount > 0) {
+        if (CIUDAD.rowCount != 0) {
             return res.jsonp(CIUDAD.rows)
         }
         else {

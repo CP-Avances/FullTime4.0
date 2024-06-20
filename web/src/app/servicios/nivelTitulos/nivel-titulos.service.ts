@@ -18,12 +18,12 @@ export class NivelTitulosService {
   }
 
   // ELIMIAR REGISTRO
-  EliminarNivel(id: number, datos: any) {
+  EliminarNivel(id: any, datos: any) {
     const url = `${environment.url}/nivel-titulo/eliminar/${id}`;
     const httpOtions = {
       body: datos
     };
-    return this.http.request('delete', url, httpOtions);
+    return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
   // METODO PARA REGISTRAR NIVEL DE TITULO
   RegistrarNivel(data: any) {

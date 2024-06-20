@@ -234,7 +234,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
     var usuario = '';
     var cont = 0;
     var contPlan = 0;
-    this.data.planifica.map(obj => {
+    this.data.planifica.map((obj: any) => {
 
       // LECTURA DE NOMBRES DE USUARIOS
       usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.cedula + '</th></tr>';

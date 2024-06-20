@@ -202,7 +202,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
   ValidarCiudadFeriado(id_seleccionado, datosFecha, archivo, form, fechasTotales) {
     this.feriadosTotales = [];
     this.ciudadFeriados = [];
-    this.datosEmpleado.map(obj => {
+    this.datosEmpleado.map((obj: any) => {
       if (obj.codigo === id_seleccionado) {
         this.restCF.BuscarFeriados(obj.id_ciudad).subscribe(data => {
           this.ciudadFeriados = data;
@@ -443,7 +443,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
       // Título e imagen del archivo PDF - Contenido del archivo
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        ...this.datosEmpleado.map(obj => {
+        ...this.datosEmpleado.map((obj: any) => {
           if (obj.codigo === id_seleccionado) {
             return [
               {
@@ -675,7 +675,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
             { text: 'TIMBRE', style: 'tableHeaderESC' },
             '',
           ],
-          ...fechasTotales.map(obj => {
+          ...fechasTotales.map((obj: any) => {
             // Inicialización de variables
             var fecha_timbre, fechaFeriado, dayFecha, day;
             var entrada = '', salida = '', almuerzoS = '', almuerzoE = '', sinTimbre = '';
@@ -688,7 +688,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
             //console.log('ver fecha map ', obj + ' ' + dayFecha + ' ' + day);
 
             // BUSQUEDA de los datos
-            this.totalEntradasSalidas.forEach(element => {
+            this.totalEntradasSalidas.forEach((element: any) => {
               fecha_timbre = moment(element.fecha_hora_timbre).format('DD/MM/YYYY');
               // TIMBRE EXISTENTE - ESTADO Y HORA DEL TIMBRE
 
@@ -872,7 +872,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        ...this.datosEmpleado.map(obj => {
+        ...this.datosEmpleado.map((obj: any) => {
           if (obj.codigo === id_seleccionado) {
             return [
               { text: obj.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, -30, 0, 5] },
@@ -990,7 +990,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     }
     wse["!cols"] = wscolsE;
 
-    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(fechasTotales.map(obj => {
+    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(fechasTotales.map((obj: any) => {
       // Inicialización de variables
       var fecha_timbre, fechaFeriado, dayFecha, day;
       var entrada = '', salida = '', almuerzoS = '', almuerzoE = '', sinTimbre = '';
@@ -1000,7 +1000,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
       day = obj.split(' ')[0].charAt(0).toUpperCase() + obj.split(' ')[0].slice(1);
 
       // BUSQUEDA de los datos
-      this.totalEntradasSalidas.forEach(element => {
+      this.totalEntradasSalidas.forEach((element: any) => {
         fecha_timbre = moment(element.fecha_hora_timbre).format('DD/MM/YYYY');
         // TIMBRE EXISTENTE - ESTADO Y HORA DEL TIMBRE
         if (dayFecha === fecha_timbre && element.accion === 'E') {

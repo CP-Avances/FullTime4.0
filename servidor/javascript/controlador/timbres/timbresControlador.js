@@ -216,7 +216,7 @@ class TimbresControlador {
                     AND da.cedula = $3
                 `, [codigo, fecha, cedula]).then((result) => {
                     timbresRows = result.rowCount;
-                    if (result.rowCount > 0) {
+                    if (result.rowCount != 0) {
                         return res.status(200).jsonp({ message: 'timbres encontrados', timbres: result.rows });
                     }
                 });
@@ -421,7 +421,7 @@ class TimbresControlador {
             ORDER BY (visto is FALSE) DESC, id DESC LIMIT 20
             `, [id_empleado])
                 .then((result) => __awaiter(this, void 0, void 0, function* () {
-                if (result.rowCount > 0) {
+                if (result.rowCount != 0) {
                     return yield Promise.all(result.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
                         let nombre = yield database_1.default.query(`
                             SELECT nombre, apellido FROM eu_empleados WHERE id = $1
@@ -458,7 +458,7 @@ class TimbresControlador {
             FROM ecm_realtime_timbres AS r, eu_empleados AS e 
             WHERE r.id = $1 AND e.id = r.id_empleado_envia
             `, [id]);
-            if (AVISOS.rowCount > 0) {
+            if (AVISOS.rowCount != 0) {
                 return res.jsonp(AVISOS.rows[0]);
             }
             else {
@@ -622,7 +622,7 @@ class TimbresControlador {
             WHERE codigo = $1 AND fecha_hora_timbre_servidor::date = $2 AND tecla_funcion = $3 
             ORDER BY t.fecha_hora_timbre_servidor ASC;
             `, [codigo, fecha, funcion]);
-            if (TIMBRE.rowCount > 0) {
+            if (TIMBRE.rowCount != 0) {
                 return res.jsonp({ message: 'OK', respuesta: TIMBRE.rows });
             }
             else {

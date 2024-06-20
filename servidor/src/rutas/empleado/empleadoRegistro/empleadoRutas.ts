@@ -22,9 +22,11 @@ const storage = multer.diskStorage({
 
     destination: async function (req, file, cb) {
         let id = req.params.id_empleado;
-        var ruta = await ObtenerRutaUsuario(id);
+        var ruta = await ObtenerRutaLeerPlantillas();
+        //var ruta = await ObtenerRutaUsuario(id);
         cb(null, ruta)
     },
+
     filename: async function (req, file, cb) {
 
         // FECHA DEL SISTEMA
@@ -42,7 +44,9 @@ const storage = multer.diskStorage({
             `
             , [id]);
 
-        let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
+        //let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
+
+        let documento = file.originalname;
 
         cb(null, documento)
     }
@@ -52,7 +56,7 @@ const upload = multer({ storage: storage });
 
 
 /** ************************************************************************************** **
- ** **                   METODO PARA OBTENER CARPETA IMAGENES DE USUARIO                   **   
+ ** **                   METODO PARA OBTENER CARPETA DE PLANTILLAS                         **   
  ** ************************************************************************************** **/
 
 const storage_plantilla = multer.diskStorage({
@@ -159,7 +163,7 @@ class EmpleadoRutas {
 
         // INFORMACIÓN DE LA IMAGEN
         this.router.get('/img/codificado/:id/:imagen', EMPLEADO_CONTROLADOR.getImagenBase64);
-        
+
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMÁTICA 
         this.router.post('/verificar/automatico/plantillaExcel/', [TokenValidation, upload_plantilla.single('uploads')], EMPLEADO_CONTROLADOR.VerificarPlantilla_Automatica);
         //this.router.post('/verificar/datos/automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosAutomatico);
@@ -170,6 +174,11 @@ class EmpleadoRutas {
         //this.router.post('/verificar/datos/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosManual);
         this.router.post('/cargar_manual/plantillaExcel/', TokenValidation, EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
 
+
+        /** **************************************************************************************** **
+         ** **                CREACION DE CARPETAS DE LOS EMPLEADOS SELECCIONADOS                 ** ** 
+         ** **************************************************************************************** **/
+        //this.router.post('/crear_carpetas/', TokenValidation, EMPLEADO_CONTROLADOR.CrearCarpetasEmpleado);
 
     }
 

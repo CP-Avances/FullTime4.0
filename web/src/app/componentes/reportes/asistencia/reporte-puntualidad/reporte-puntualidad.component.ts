@@ -70,7 +70,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     sessionStorage.removeItem('reporte_puntualidad');
     this.R_asistencias.DatosGeneralesUsuarios().subscribe((res: any[]) => {
       sessionStorage.setItem('reporte_puntualidad', JSON.stringify(res))
-      this.sucursales = res.map(obj => {
+      this.sucursales = res.map((obj: any) => {
         return {
           id: obj.id_suc,
           nombre: obj.name_suc
@@ -213,7 +213,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_puntualidad') as any)
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach(element => {
+      obj.departamentos.forEach((element: any) => {
         element.empleado = element.empleado.filter((o: any) => {
           var bool =  this.selectionEmp.selected.find(obj1 => {
             return obj1.id === o.id
@@ -327,7 +327,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
         { text: localStorage.getItem('name_empresa'), bold: true, fontSize: 21, alignment: 'center', margin: [0, -40, 0, 10] },
         { text: 'Reporte de Empleados Puntuales', bold: true, fontSize: 13, alignment: 'center', margin: [0, 0, 0, 10] },
         { text: 'Periodo del: ' + this.rangoFechas.fec_inico  + " al " + this.rangoFechas.fec_final , bold: true, fontSize: 13, alignment: 'center' },
-        ...this.impresionDatosPDF(this.data_pdf).map(obj => {
+        ...this.impresionDatosPDF(this.data_pdf).map((obj: any) => {
           return obj
         })
       ],
@@ -396,7 +396,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
             { text: 'Color', style: 'tableHeader'},
             { text: 'Días Puntuales', style: 'tableHeader'}
           ],
-          ...arr_aux.map(obj => {
+          ...arr_aux.map((obj: any) => {
             c = c + 1
             return [
               { style: 'itemsTableCentrado', text: c },

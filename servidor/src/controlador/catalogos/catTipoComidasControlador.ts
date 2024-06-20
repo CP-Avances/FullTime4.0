@@ -15,7 +15,7 @@ class TipoComidasControlador {
             ORDER BY tc.nombre ASC, ctc.id ASC
             `
         );
-        if (TIPO_COMIDAS.rowCount > 0) {
+        if (TIPO_COMIDAS.rowCount != 0) {
             return res.jsonp(TIPO_COMIDAS.rows)
         }
         else {
@@ -34,7 +34,7 @@ class TipoComidasControlador {
             ORDER BY tc.nombre ASC, ctc.id ASC
             `
         );
-        if (TIPO_COMIDAS.rowCount > 0) {
+        if (TIPO_COMIDAS.rowCount != 0) {
             return res.jsonp(TIPO_COMIDAS.rows)
         }
         else {
@@ -52,7 +52,7 @@ class TipoComidasControlador {
             WHERE ctc.id_comida = tc.id AND ctc.id = $1
             `
             , [id]);
-        if (TIPO_COMIDAS.rowCount > 0) {
+        if (TIPO_COMIDAS.rowCount != 0) {
             return res.jsonp(TIPO_COMIDAS.rows)
         }
         else {
@@ -72,7 +72,7 @@ class TipoComidasControlador {
             ORDER BY tc.nombre ASC
             `
             , [id]);
-        if (TIPO_COMIDAS.rowCount > 0) {
+        if (TIPO_COMIDAS.rowCount != 0) {
             return res.jsonp(TIPO_COMIDAS.rows)
         }
         else {
@@ -155,7 +155,7 @@ class TipoComidasControlador {
       await pool.query(
         `
         UPDATE ma_horario_comidas SET nombre = $1, id_comida = $2, hora_inicio = $3, hora_fin = $4
-        WHERE id = $5'
+        WHERE id = $5
         `
 ,
         [nombre, tipo_comida, hora_inicio, hora_fin, id]
@@ -176,6 +176,7 @@ class TipoComidasControlador {
       await pool.query("COMMIT");
       return res.jsonp({ message: "Registro actualizado exitosamente" });
     } catch (error) {
+      console.log(error)
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
       return res.status(404).jsonp({ message: "Error al actualizar el registro." });
@@ -287,7 +288,7 @@ class TipoComidasControlador {
             WHERE tc.id = menu.id_comida AND dm.id_horario_comida = menu.id AND menu.id = $1
             `
             , [id]);
-        if (TIPO_COMIDAS.rowCount > 0) {
+        if (TIPO_COMIDAS.rowCount != 0) {
             return res.jsonp(TIPO_COMIDAS.rows)
         }
         else {

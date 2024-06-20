@@ -400,7 +400,12 @@ export class EditarContratoComponent implements OnInit {
     this.rest.SubirContrato(formData, id).subscribe(res => {
       this.archivoForm.reset();
       this.nameFile = '';
-    });
+    }, error => {
+      this.toastr.info('Verifique que este usuario tenga creadas capetas', 'No se ha podido cargar el archivo.', {
+        timeOut: 6000,
+      });
+    }
+    );
   }
 
   // RETIRAR ARCHIVO SELECCIONADO

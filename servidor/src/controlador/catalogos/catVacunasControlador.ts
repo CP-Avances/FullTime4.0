@@ -17,7 +17,7 @@ class VacunaControlador {
                 SELECT * FROM e_cat_vacuna ORDER BY nombre ASC
                 `
             );
-            if (VACUNA.rowCount > 0) {
+            if (VACUNA.rowCount != 0) {
                 return res.jsonp(VACUNA.rows)
             } else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.' });
@@ -92,8 +92,29 @@ class VacunaControlador {
                 `
                 , [nombre.toUpperCase(), id]);
 
+            const consulta = await pool.query('SELECT * FROM e_cat_vacuna WHERE id = $1', [id]);
+            const [datosOriginales] = consulta.rows;
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_vacuna',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip: ip,
+                    observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+            }
+
             if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
                 const vacunaEditar = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
 
                 const response: QueryResult = await pool.query(
                     `
@@ -107,9 +128,9 @@ class VacunaControlador {
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'e_cat_vacuna',
-                    usuario: user_name,
+                    usuario: req.body.user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(VERIFICAR_VACUNA.rows),
+                    datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: JSON.stringify(vacunaInsertada),
                     ip,
                     observacion: null
@@ -130,6 +151,7 @@ class VacunaControlador {
         }
         catch (error) {
             // ROLLBACK
+            console.log(error);
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error', status: '500' });
         }
@@ -224,7 +246,7 @@ class VacunaControlador {
                 var mensaje: string = 'correcto';
 
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach(async (dato: any, indice: any, array: any) => {
+                plantilla.forEach(async (dato: any) => {
                     var { ITEM, VACUNA } = dato;
                     // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                     if ((ITEM != undefined && ITEM != '') &&
@@ -330,21 +352,20 @@ class VacunaControlador {
             }
 
         } catch (error) {
-            return res.status(500).jsonp({ message: 'Error con el servidor metodo RevisarDatos', status: '500' });
+            return res.status(500).jsonp({ message: 'Error con el servidor método RevisarDatos.', status: '500' });
         }
     }
 
-    // REGISTRAR PLANTILLA MODALIDAD_CARGO 
+    // REGISTRAR PLANTILLA TIPO VACUNA
     public async CargarPlantilla(req: Request, res: Response) {
         try {
             const { plantilla, user_name, ip } = req.body;
-
             var contador = 1;
             var respuesta: any
 
             plantilla.forEach(async (data: any) => {
                 // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
-                const { item, vacuna, observacion } = data;
+                const { vacuna } = data;
                 const vacu = vacuna.charAt(0).toUpperCase() + vacuna.slice(1).toLowerCase();
 
                 // INICIAR TRANSACCION
@@ -380,16 +401,12 @@ class VacunaControlador {
                         return respuesta = res.status(404).jsonp({ message: 'error', status: '400' })
                     }
                 }
-
                 contador = contador + 1;
-
             });
-
-
         } catch (error) {
             // ROLLBACK
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'Error con el servidor metodo CargarPlantilla', status: '500' });
+            return res.status(500).jsonp({ message: 'Error con el servidor metodo CargarPlantilla.', status: '500' });
         }
     }
 

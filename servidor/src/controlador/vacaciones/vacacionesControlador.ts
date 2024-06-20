@@ -23,7 +23,7 @@ class VacacionesControlador {
       ORDER BY v.id DESC
       `
       , [id]);
-    if (VACACIONES.rowCount > 0) {
+    if (VACACIONES.rowCount != 0) {
       return res.jsonp(VACACIONES.rows)
     }
     else {
@@ -51,7 +51,7 @@ class VacacionesControlador {
       , [estado]
     );
 
-    if (VACACIONES.rowCount > 0) {
+    if (VACACIONES.rowCount != 0) {
       return res.jsonp(VACACIONES.rows)
     }
     else {
@@ -71,7 +71,7 @@ class VacacionesControlador {
       ORDER BY id DESC
       `
     );
-    if (VACACIONES.rowCount > 0) {
+    if (VACACIONES.rowCount != 0) {
       return res.jsonp(VACACIONES.rows)
     }
     else {
@@ -86,7 +86,7 @@ class VacacionesControlador {
       SELECT fecha FROM ef_cat_feriados WHERE fecha BETWEEN $1 AND $2 ORDER BY fecha ASC
       `
       , [fechaSalida, fechaIngreso]);
-    if (FECHAS.rowCount > 0) {
+    if (FECHAS.rowCount != 0) {
       return res.jsonp(FECHAS.rows)
     }
     else {
@@ -101,7 +101,7 @@ class VacacionesControlador {
       SELECT * FROM vista_datos_solicitud_vacacion WHERE id_emple_vacacion = $1
       `
       , [id]);
-    if (SOLICITUD.rowCount > 0) {
+    if (SOLICITUD.rowCount != 0) {
       return res.json(SOLICITUD.rows)
     }
     else {
@@ -119,7 +119,7 @@ class VacacionesControlador {
       WHERE v.id = a.id_vacacion AND v.id = $1
       `
       , [id]);
-    if (SOLICITUD.rowCount > 0) {
+    if (SOLICITUD.rowCount != 0) {
       return res.json(SOLICITUD.rows)
     }
     else {
@@ -395,7 +395,7 @@ class VacacionesControlador {
 	    WHERE v.id = $1 AND e.codigo = v.codigo AND e.id = de.id AND de.estado = $2
       `
       , [id, estado]);
-    if (VACACIONES.rowCount > 0) {
+    if (VACACIONES.rowCount != 0) {
       return res.jsonp(VACACIONES.rows)
     }
     else {
@@ -475,7 +475,7 @@ class VacacionesControlador {
       WHERE v.id = $1 AND e.codigo = v.codigo::varchar
       `
       , [id]);
-    if (VACACIONES.rowCount > 0) {
+    if (VACACIONES.rowCount != 0) {
       return res.jsonp(VACACIONES.rows)
     }
     else {

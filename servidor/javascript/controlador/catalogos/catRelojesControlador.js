@@ -31,7 +31,7 @@ class RelojesControlador {
             WHERE cr.id_departamento = cd.id AND cd.id_sucursal = cr.id_sucursal AND 
                 cr.id_sucursal = s.id AND s.id_empresa = e.id AND s.id_ciudad = c.id;
             `);
-            if (RELOJES.rowCount > 0) {
+            if (RELOJES.rowCount != 0) {
                 return res.jsonp(RELOJES.rows);
             }
             else {
@@ -142,7 +142,7 @@ class RelojesControlador {
             const RELOJES = yield database_1.default.query(`
             SELECT * FROM ed_relojes WHERE id = $1
             `, [id]);
-            if (RELOJES.rowCount > 0) {
+            if (RELOJES.rowCount != 0) {
                 return res.jsonp(RELOJES.rows);
             }
             else {
@@ -225,7 +225,7 @@ class RelojesControlador {
             WHERE cr.id_departamento = cd.id AND cd.id_sucursal = cr.id_sucursal AND cr.id_sucursal = s.id 
                 AND s.id_empresa = e.id AND s.id_ciudad = c.id AND cr.id = $1
             `, [id]);
-            if (RELOJES.rowCount > 0) {
+            if (RELOJES.rowCount != 0) {
                 return res.jsonp(RELOJES.rows);
             }
             else {
@@ -283,13 +283,13 @@ class RelojesControlador {
                 const VERIFICAR_SUCURSAL = yield database_1.default.query(`
                 SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
                 `, [sucursal.toUpperCase()]);
-                if (VERIFICAR_SUCURSAL.rowCount > 0) {
+                if (VERIFICAR_SUCURSAL.rowCount != 0) {
                     contarSucursal = contarSucursal + 1;
                     // Verificar que el departamento exista dentro del sistema
                     const VERIFICAR_DEPARTAMENTO = yield database_1.default.query(`
                     SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1 AND id_sucursal = $2
                     `, [departamento.toUpperCase(), VERIFICAR_SUCURSAL.rows[0]['id']]);
-                    if (VERIFICAR_DEPARTAMENTO.rowCount > 0) {
+                    if (VERIFICAR_DEPARTAMENTO.rowCount != 0) {
                         contarDepartamento = contarDepartamento + 1;
                     }
                 }
@@ -577,14 +577,14 @@ class RelojesControlador {
                     }));
                     setTimeout(() => {
                         listDispositivos.sort((a, b) => {
-                            // Compara los números de los objetos
+                            // COMPARA LOS NUMEROS DE LOS OBJETOS
                             if (a.fila < b.fila) {
                                 return -1;
                             }
                             if (a.fila > b.fila) {
                                 return 1;
                             }
-                            return 0; // Son iguales
+                            return 0; // SON IGUALES
                         });
                         var filaDuplicada = 0;
                         //VALIDACIONES DE LOS DATOS

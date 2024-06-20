@@ -101,14 +101,6 @@ export const ObtenerRutaLeerPlantillas = function () {
     return ruta + separador + 'leerPlantillas';
 }
 
-// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE ARCHIVOS DE DATOS
-export const ObtenerRutaLeerPlantillas1 = function () {
-    let ruta = '';
-    let separador = path.sep;
-    ruta = path.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'leerPlantillas';
-}
-
 // METODO PARA OBTENER POSICION DE PLANTILLA
 export const ObtenerIndicePlantilla = function (libroExcel: any, hoja: string) {
     const sheet_name_list = libroExcel.SheetNames;

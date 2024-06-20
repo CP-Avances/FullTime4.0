@@ -15,7 +15,6 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { use } from 'echarts';
 
 @Component({
   selector: 'app-editar-plan-comidas',
@@ -353,7 +352,7 @@ export class EditarPlanComidasComponent implements OnInit {
           let h_inicio = this.validar.FormatearHora(plan.hora_inicio, this.formato_hora);
           let h_fin = this.validar.FormatearHora(plan.hora_fin, this.formato_hora);
 
-          this.fechasHorario.map(obj => {
+          this.fechasHorario.map((obj: any) => {
             planEmpleado.fecha = obj;
             this.restPlan.CrearPlanComidasEmpleado(planEmpleado).subscribe(res => {
               this.contadorFechas = this.contadorFechas + 1;
@@ -409,7 +408,7 @@ export class EditarPlanComidasComponent implements OnInit {
     this.empleados_conPlanificacion = [];
     this.empleados_sinPlanificacion = [];
     var contar_seleccionados = 0;
-    this.data.solicitud.map(obj => {
+    this.data.solicitud.map((obj: any) => {
       let datosDuplicados = {
         fecha_inicio: form.fechaInicioForm,
         fecha_fin: form.fechaFinForm,
@@ -437,7 +436,7 @@ export class EditarPlanComidasComponent implements OnInit {
   empleados_sinHorario: any = [];
   VerificarHorariosEmpleadosMultiples(form, datosPlanComida, sin_planificacion, con_planificacion) {
     var contar_horario = 0;
-    sin_planificacion.map(obj => {
+    sin_planificacion.map((obj: any) => {
       let datosHorario = {
         fechaInicio: form.fechaInicioForm,
         fechaFinal: form.fechaFinForm
@@ -473,7 +472,7 @@ export class EditarPlanComidasComponent implements OnInit {
       }
       else {
         var nombres_empleados = '';
-        array_datos.map(obj => {
+        array_datos.map((obj: any) => {
           nombres_empleados = nombres_empleados + ' - ' + obj.nombre + ' ' + obj.apellido
         })
         this.toastr.info('No se ha registrado la planificación de los empleados ' + nombres_empleados, 'Empleados ya cuenta con una planificación registrada en las fechas indicas.', {
@@ -494,7 +493,7 @@ export class EditarPlanComidasComponent implements OnInit {
       }
       else {
         var nombres_empleados = '';
-        array_datos.map(obj => {
+        array_datos.map((obj: any) => {
           nombres_empleados = nombres_empleados + ' - ' + obj.nombre + ' ' + obj.apellido
         })
         this.toastr.info('No se ha registrado la planificación de los empleados ' + nombres_empleados, 'Empleados no tienen registrado un horario laboral en las fechas indicadas.', {
@@ -513,7 +512,7 @@ export class EditarPlanComidasComponent implements OnInit {
     }
     if (empleados_planificados.length != 0) {
       this.contar_eliminar = 0;
-      empleados_planificados.map(obj => {
+      empleados_planificados.map((obj: any) => {
         this.restPlan.EliminarPlanComida(obj.id, obj.id_empleado, datos).subscribe(plan => {
           this.contar_eliminar = this.contar_eliminar + 1;
           if (this.contar_eliminar === empleados_planificados.length) {
@@ -567,7 +566,7 @@ export class EditarPlanComidasComponent implements OnInit {
       }
 
       // LEER DATOS DE CADA USUARIOS
-      empleados_planificados.map(obj => {
+      empleados_planificados.map((obj: any) => {
         planEmpleado.codigo = obj.codigo;
         planEmpleado.id_empleado = obj.id;
 

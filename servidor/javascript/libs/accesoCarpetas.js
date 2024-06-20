@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ObtenerIndicePlantilla = exports.ObtenerRutaLeerPlantillas1 = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaContrato = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = void 0;
+exports.ObtenerIndicePlantilla = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaContrato = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = void 0;
 const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE IMAGENES DE USUARIO
@@ -114,14 +114,6 @@ const ObtenerRutaLeerPlantillas = function () {
     return ruta + separador + 'leerPlantillas';
 };
 exports.ObtenerRutaLeerPlantillas = ObtenerRutaLeerPlantillas;
-// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE ARCHIVOS DE DATOS
-const ObtenerRutaLeerPlantillas1 = function () {
-    let ruta = '';
-    let separador = path_1.default.sep;
-    ruta = path_1.default.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'leerPlantillas';
-};
-exports.ObtenerRutaLeerPlantillas1 = ObtenerRutaLeerPlantillas1;
 // METODO PARA OBTENER POSICION DE PLANTILLA
 const ObtenerIndicePlantilla = function (libroExcel, hoja) {
     const sheet_name_list = libroExcel.SheetNames;

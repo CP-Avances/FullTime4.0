@@ -39,7 +39,8 @@ export class RolPermisosService {
 
   // METODO PARA ASIGNAR PERMISOS AL ROL
   crearPaginaRol(data: any) {
-    return this.http.post(`${environment.url}/rolPermisos/menu/paginas/insertar`, data);
+    return this.http.post(`${environment.url}/rolPermisos/menu/paginas/insertar`, data).pipe(
+      catchError(data));;
   }
 
   //METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL

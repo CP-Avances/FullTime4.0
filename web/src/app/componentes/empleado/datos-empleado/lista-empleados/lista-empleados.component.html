@@ -38,19 +38,19 @@
                 <div class="row m-auto">
                     <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                         <form method="post" class="btn-2" enctype="multipart/form-data">
-                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
-                                    style="height: 65px; padding-top: 25px;"
-                                    matTooltip="Dar click para selecionar plantilla y cargar registros.">
-                                    Subir plantilla
-                                </label>
-                                <label for="file" matSuffix matTooltipPosition="right"
-                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
-                                    style="height: 65px; padding-top: 25px;"
-                                    matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                    Subir nueva plantilla
-                                </label>
+                            <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                            <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                style="height: 65px; padding-top: 25px;"
+                                matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                Subir plantilla
+                            </label>
+                            <label for="file" matSuffix matTooltipPosition="right"
+                                *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                style="height: 65px; padding-top: 25px;"
+                                matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                Subir nueva plantilla
+                            </label>
                         </form>
                     </div>
                     <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
@@ -96,6 +96,11 @@
             <span class="w-100 bd-highlight">
                 LISTA DE USUARIOS INACTIVOS
             </span>
+
+            <button *ngIf="btnCheckDeshabilitado" class="btn btn-primary btn-outline-light"
+                style="float: left; margin-right: 10px; padding-left: 10px;" (click)="CrearCarpeta(2)">
+                Crear Carpeta
+            </button>
             <button *ngIf="btnCheckDeshabilitado" class="btn btn-info btn-outline-light"
                 style="float: left; margin-right: 10px;" (click)="ConfirmarDeleteMultipleInactivos()">
                 Eliminar
@@ -177,13 +182,19 @@
                 matTooltipPosition="right" matTooltip="Selección múltiple para inhabilitar empleados." id="SelectCheck">
                 library_add_check
             </mat-icon>
+
             <button *ngIf="btnCheckHabilitar" class="btn btn-primary btn-outline-light"
                 style="float: left; margin-left: 20px; padding-left: 10px;" (click)="Deshabilitar(1)">
                 Confirmar
             </button>
+
             <span class="w-100 bd-highlight">
                 LISTA DE USUARIOS ACTIVOS
             </span>
+            <button *ngIf="btnCheckHabilitar" class="btn btn-primary btn-outline-light"
+                style="float: left; margin-right: 10px; padding-left: 10px;" (click)="CrearCarpeta(1)">
+                Crear Carpeta
+            </button>
             <button *ngIf="btnCheckHabilitar" class="btn btn-primary btn-outline-light"
                 style="float: left; margin-right: 10px;" (click)="ConfirmarDeleteMultipleActivos()">
                 Eliminar
@@ -214,25 +225,25 @@
                         <td></td>
                         <td>
                             <mat-form-field class="input-tables codigo">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo" [formControl]="codigo"
+                                <input matInput placeholder="Buscar" [formControl]="codigo"
                                     (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field class="input-tables cedula">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombre" [formControl]="nombre"
-                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field class="input-tables cedula">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroApellido"
-                                    [formControl]="apellido" type="text" (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" [formControl]="apellido" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field class="input-tables cedula">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula" maxlength="10"
+                                <input matInput placeholder="Buscar" maxlength="10"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
@@ -247,7 +258,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let e of empleado | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombre | emplApellido: filtroApellido | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let e of empleado | emplCodigo: codigo.value | emplCedula: cedula.value | emplNombre: nombre.value | emplApellido: apellido.value | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionUno.toggle(e) : null" [checked]="selectionUno.isSelected(e)"

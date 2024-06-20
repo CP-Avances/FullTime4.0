@@ -9,7 +9,6 @@ import fs from 'fs';
 
 import excel from 'xlsx';
 
-
 class EmpleadoCargosControlador {
 
   // METODO BUSQUEDA DATOS DEL CARGO DE UN USUARIO
@@ -27,7 +26,7 @@ class EmpleadoCargosControlador {
       ORDER BY ec.id
       `
       , [id]);
-    if (unEmplCargp.rowCount > 0) {
+    if (unEmplCargp.rowCount != 0) {
       return res.jsonp(unEmplCargp.rows)
     }
     else {
@@ -151,7 +150,7 @@ class EmpleadoCargosControlador {
       WHERE ec.id_contrato = $1 AND ec.id_sucursal = s.id AND ec.id_departamento = d.id
       `
       , [id_empl_contrato]);
-    if (unEmplCargp.rowCount > 0) {
+    if (unEmplCargp.rowCount != 0) {
       return res.jsonp(unEmplCargp.rows)
     }
     else {
@@ -170,7 +169,7 @@ class EmpleadoCargosControlador {
       WHERE ec.id = dc.cargo_id AND dc.empl_id = $1 AND $2 < ec.fecha_final
       `
       , [id_empleado, fecha_verificar]);
-    if (CARGOS.rowCount > 0) {
+    if (CARGOS.rowCount != 0) {
       return res.jsonp(CARGOS.rows)
     }
     else {
@@ -188,7 +187,7 @@ class EmpleadoCargosControlador {
         WHERE ec.id = dc.cargo_id AND dc.empl_id = $1 AND $2 < ec.fecha_final AND NOT ec.id = $3
         `
       , [id_empleado, fecha_verificar, id_cargo]);
-    if (CARGOS.rowCount > 0) {
+    if (CARGOS.rowCount != 0) {
       return res.jsonp(CARGOS.rows)
     }
     else {
@@ -207,7 +206,7 @@ class EmpleadoCargosControlador {
       WHERE ce.id_empleado = e.id AND ec.id_contrato = ce.id AND e.id = $1
       `
       , [id_empleado]);
-    if (CARGO.rowCount > 0) {
+    if (CARGO.rowCount != 0) {
       return res.jsonp(CARGO.rows)
     }
     else {
@@ -225,7 +224,7 @@ class EmpleadoCargosControlador {
       `
       ,
       [id_empleado]);
-    if (CARGO.rowCount > 0 && CARGO.rows[0]['max'] != null) {
+    if (CARGO.rowCount != 0 && CARGO.rows[0]['max'] != null) {
       return res.jsonp(CARGO.rows)
     }
     else {
@@ -252,7 +251,7 @@ class EmpleadoCargosControlador {
       GROUP BY tc.cargo, tc.id
       `
       , [id]);
-    if (Cargos.rowCount > 0) {
+    if (Cargos.rowCount != 0) {
       return res.jsonp(Cargos.rows);
     }
     else {
@@ -270,7 +269,7 @@ class EmpleadoCargosControlador {
       GROUP BY tc.cargo, tc.id
       `
       , [id]);
-    if (Cargos.rowCount > 0) {
+    if (Cargos.rowCount != 0) {
       return res.jsonp(Cargos.rows);
     }
     else {
@@ -288,7 +287,7 @@ class EmpleadoCargosControlador {
       GROUP BY tc.id, tc.cargo
       `
       , [id]);
-    if (Cargos.rowCount > 0) {
+    if (Cargos.rowCount != 0) {
       return res.jsonp(Cargos.rows);
     }
     else {
@@ -307,7 +306,7 @@ class EmpleadoCargosControlador {
       SELECT * FROM e_cat_tipo_cargo
       `
     );
-    if (Cargos.rowCount > 0) {
+    if (Cargos.rowCount != 0) {
       return res.jsonp(Cargos.rows);
     }
     else {
@@ -394,7 +393,7 @@ class EmpleadoCargosControlador {
   
   
       // LECTURA DE LOS DATOS DE LA PLANTILLA
-      plantilla.forEach(async (dato: any, indice: any, array: any) => {
+      plantilla.forEach(async (dato: any) => {
         var { ITEM, CEDULA, DEPARTAMENTO, FECHA_DESDE, FECHA_HASTA, SUCURSAL, SUELDO,
           CARGO, HORA_TRABAJA, JEFE } = dato;
   
@@ -638,14 +637,14 @@ class EmpleadoCargosControlador {
       setTimeout(() => {
   
         listCargos.sort((a: any, b: any) => {
-          // Compara los números de los objetos
+          // COMPARA LOS NUMEROS DE LOS OBJETOS
           if (a.fila < b.fila) {
             return -1;
           }
           if (a.fila > b.fila) {
             return 1;
           }
-          return 0; // Son iguales
+          return 0; // SON IGUALES
         });
   
         var filaDuplicada: number = 0;
@@ -662,9 +661,9 @@ class EmpleadoCargosControlador {
             }
           }
   
-          //Valida si los datos de la columna N son numeros.
+          // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
           if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
             if (item.fila == filaDuplicada) {
               mensaje = 'error';
             }

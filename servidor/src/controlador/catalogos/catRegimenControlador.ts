@@ -261,7 +261,7 @@ class RegimenControlador {
       SELECT descripcion FROM ere_cat_regimenes
       `
     );
-    if (REGIMEN.rowCount > 0) {
+    if (REGIMEN.rowCount != 0) {
       return res.jsonp(REGIMEN.rows);
     } else {
       return res.status(404).jsonp({ text: "No se encuentran registros." });
@@ -278,7 +278,7 @@ class RegimenControlador {
       ORDER BY r.descripcion ASC
       `
     );
-    if (REGIMEN.rowCount > 0) {
+    if (REGIMEN.rowCount != 0) {
       return res.jsonp(REGIMEN.rows);
     } else {
       return res.status(404).jsonp({ text: "No se encuentran registros." });
@@ -294,7 +294,7 @@ class RegimenControlador {
       `
       , [id]
     );
-    if (REGIMEN.rowCount > 0) {
+    if (REGIMEN.rowCount != 0) {
       return res.jsonp(REGIMEN.rows[0]);
     } else {
       return res.status(404).jsonp({ text: "No se encuentran registros." });
@@ -311,7 +311,7 @@ class RegimenControlador {
       `
       , [nombre]
     );
-    if (REGIMEN.rowCount > 0) {
+    if (REGIMEN.rowCount != 0) {
       return res.jsonp(REGIMEN.rows);
     } else {
       return res.status(404).jsonp({ text: "No se encuentran registros." });
@@ -377,7 +377,9 @@ class RegimenControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
-      return res.status(500).jsonp({ message: error });
+      //return res.status(500).jsonp({ message:'error'});
+      return res.jsonp({ message: 'error' });
+
     }
   }
 
@@ -503,7 +505,7 @@ class RegimenControlador {
       `
       , [id]
     );
-    if (PERIODO.rowCount > 0) {
+    if (PERIODO.rowCount != 0) {
       return res.jsonp(PERIODO.rows);
     } else {
       return res.status(404).jsonp({ text: "No se encuentran registros." });
@@ -692,7 +694,7 @@ class RegimenControlador {
       `
       , [id]
     );
-    if (ANTIGUO.rowCount > 0) {
+    if (ANTIGUO.rowCount != 0) {
       return res.jsonp(ANTIGUO.rows);
     } else {
       return res.status(404).jsonp({ text: "No se encuentran registros." });
@@ -776,7 +778,7 @@ class RegimenControlador {
       `
       , [id]
     );
-    if (REGIMEN.rowCount > 0) {
+    if (REGIMEN.rowCount != 0) {
       return res.jsonp(REGIMEN.rows);
     } else {
       return res.status(404).jsonp({ text: "No se encuentran registros." });

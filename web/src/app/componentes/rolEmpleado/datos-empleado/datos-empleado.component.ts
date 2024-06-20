@@ -326,6 +326,11 @@ export class DatosEmpleadoComponent implements OnInit {
       this.archivoForm.reset();
       this.nameFile = '';
       this.ResetDataMain();
+    }, error => {
+        this.toastr.info('Verifique que este usuario tenga creadas capetas', 'No se ha podido cargar el archivo.', {
+        timeOut: 6000,
+      });
+
     });
   }
 
@@ -592,7 +597,7 @@ export class DatosEmpleadoComponent implements OnInit {
     let genero = this.GeneroSelect[this.empleadoUno[0].genero - 1];
     let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
     let nacionalidad: any;
-    this.nacionalidades.forEach(element => {
+    this.nacionalidades.forEach((element: any) => {
       if (this.empleadoUno[0].id_nacionalidad == element.id) {
         nacionalidad = element.nombre;
       }
@@ -687,7 +692,7 @@ export class DatosEmpleadoComponent implements OnInit {
               { text: 'NOMBRE', style: 'tableHeader' },
               { text: 'NIVEL', style: 'tableHeader' }
             ],
-            ...this.tituloEmpleado.map(obj => {
+            ...this.tituloEmpleado.map((obj: any) => {
               return [{ text: obj.nombre, style: 'tableCell' }, { text: obj.nivel, style: 'tableCell' }];
             })
           ]
@@ -767,7 +772,7 @@ export class DatosEmpleadoComponent implements OnInit {
               { text: 'PORCENTAJE', style: 'tableHeader' },
               { text: 'TIPO', style: 'tableHeader' },
             ],
-            ...this.discapacidadUser.map(obj => {
+            ...this.discapacidadUser.map((obj: any) => {
               return [
                 { text: obj.carnet_conadis, style: 'tableCell' },
                 { text: obj.porcentaje + ' %', style: 'tableCell' },
@@ -796,7 +801,7 @@ export class DatosEmpleadoComponent implements OnInit {
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
@@ -928,7 +933,7 @@ export class DatosEmpleadoComponent implements OnInit {
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }

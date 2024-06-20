@@ -30,7 +30,7 @@ class TituloControlador {
       `
       , [nombre, nivel]);
 
-    if (TITULO.rowCount > 0) {
+    if (TITULO.rowCount != 0) {
       return res.jsonp(TITULO.rows)
     }
     else {
@@ -92,7 +92,9 @@ class TituloControlador {
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+      //return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+      return res.jsonp({ message: 'error' });
+
     }
   }
 
@@ -211,8 +213,8 @@ class TituloControlador {
       var mensaje: string = 'correcto';
 
       // LECTURA DE LOS DATOS DE LA PLANTILLA
-      plantilla.forEach(async (dato: any, indice: any, array: any) => {
-        var { ITEM, NOMBRE, NIVEL } = dato;
+      plantilla.forEach(async (dato: any) => {
+        var { NOMBRE, NIVEL } = dato;
         data.fila = dato.ITEM
         data.titulo = dato.NOMBRE;
         data.nivel = dato.NIVEL;
@@ -221,10 +223,14 @@ class TituloControlador {
           (data.titulo != undefined && data.titulo != '') &&
           (data.nivel != undefined && data.nivel != '')) {
           // VALIDAR PRIMERO QUE EXISTA NIVELES EN LA TABLA NIVELES
-          const existe_nivel = await pool.query('SELECT id FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [NIVEL]);
+          const existe_nivel = await pool.query(
+            `
+            SELECT id FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
+            `
+            , [NIVEL]);
           var id_nivel = existe_nivel.rows[0];
           if (id_nivel != undefined && id_nivel != '') {
-            // VERIFICACIÓN SI LA SUCURSAL NO ESTE REGISTRADA EN EL SISTEMA
+            // VERIFICACION SI EL TITULO NO ESTE REGISTRADO EN EL SISTEMA
             const VERIFICAR_Titulos = await pool.query(
               `
               SELECT * FROM et_titulos
@@ -235,19 +241,17 @@ class TituloControlador {
               data.fila = dato.ITEM
               data.titulo = dato.NOMBRE;
               data.nivel = dato.NIVEL
-              if (duplicados.find((p: any) => p.nombre.toLowerCase() === dato.NOMBRE.toLowerCase() && p.nivel.toLowerCase() === dato.NIVEL.toLowerCase()) == undefined) {
+              if (duplicados.find((p: any) => p.NOMBRE.toLowerCase() === dato.NOMBRE.toLowerCase() &&
+                p.NIVEL.toLowerCase() === dato.NIVEL.toLowerCase()) == undefined) {
                 data.observacion = 'ok';
                 duplicados.push(dato);
               }
-
               listTitulosProfesionales.push(data);
-
             } else {
               data.fila = dato.ITEM
               data.titulo = NOMBRE;
               data.nivel = NIVEL
               data.observacion = 'Ya esta registrado en base';
-
               listTitulosProfesionales.push(data);
             }
           } else {
@@ -259,9 +263,7 @@ class TituloControlador {
               data.nivel = 'No registrado';
               data.observacion = 'Nivel no registrado';
             }
-
             data.observacion = 'Nivel no existe en el sistema'
-
             listTitulosProfesionales.push(data);
           }
 
@@ -288,13 +290,9 @@ class TituloControlador {
           if ((data.titulo == '' || data.titulo == undefined) && (data.nivel == '' || data.nivel == undefined)) {
             data.observacion = 'Título y Nivel no registrado';
           }
-
           listTitulosProfesionales.push(data);
-
         }
-
         data = {};
-
       });
 
       // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
@@ -307,9 +305,8 @@ class TituloControlador {
       });
 
       setTimeout(() => {
-
         listTitulosProfesionales.sort((a: any, b: any) => {
-          // COMPARA LOS NÚMEROS DE LOS OBJETOS
+          // COMPARA LOS NUMEROS DE LOS OBJETOS
           if (a.fila < b.fila) {
             return -1;
           }
@@ -342,9 +339,7 @@ class TituloControlador {
         if (mensaje == 'error') {
           listTitulosProfesionales = undefined;
         }
-
         return res.jsonp({ message: mensaje, data: listTitulosProfesionales });
-
       }, 1500)
     }
 

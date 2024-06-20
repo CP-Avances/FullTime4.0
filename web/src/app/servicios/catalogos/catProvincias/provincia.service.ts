@@ -35,12 +35,12 @@ export class ProvinciaService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarProvincia(id: number, datos: any) {
+  EliminarProvincia(id: any, datos: any) {
     const url = `${environment.url}/provincia/eliminar/${id}`;
     const httpOtions = {
       body: datos
     };
-    return this.http.request('delete', url, httpOtions);
+    return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
 
   // METODO PARA REGISTRAR PROVINCIA

@@ -53,12 +53,12 @@ export class DepartamentosService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarRegistro(id: number, datos: any) {
+  EliminarRegistro(id: any, datos: any) {
     const url = `${environment.url}/departamento/eliminar/${id}`;
     const httpOtions = {
       body: datos
     };
-    return this.http.request('delete', url, httpOtions);
+    return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
 
   // REGISTRAR NIVELDEPARTAMENTO  --**VERIFICADO

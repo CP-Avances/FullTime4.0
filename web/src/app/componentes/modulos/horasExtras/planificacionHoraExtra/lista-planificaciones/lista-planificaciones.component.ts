@@ -400,7 +400,7 @@ export class ListaPlanificacionesComponent implements OnInit {
       ip: this.ip
     }
 
-    datos.map(obj => {
+    datos.map((obj: any) => {
 
       console.log('ver datos seleccionados', obj)
 
@@ -741,7 +741,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   ** ************************************************************************************************* **/
 
   exportToExcel() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaPlan.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaPlan.map((obj: any) => {
       return {
         Descripcion: obj.descripcion,
         Fecha_Inicio: obj.fecha_desde_,
@@ -768,7 +768,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   ** ************************************************************************************************** **/
 
   exportToCVS() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaPlan.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaPlan.map((obj: any) => {
       return {
         Descripcion: obj.descripcion,
         Fecha_Inicio: obj.fecha_desde_,

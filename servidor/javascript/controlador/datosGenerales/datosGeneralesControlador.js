@@ -396,7 +396,7 @@ class DatosGeneralesControlador {
             WHERE da.id_cargo = ce.id AND da.id_rol = r.id AND NOT da.id_rol = 2 AND da.id = $1
             ORDER BY da.apellido ASC
             `, [id_empleado]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -791,7 +791,7 @@ class DatosGeneralesControlador {
             const DATOS = yield database_1.default.query(`
             SELECT * FROM datos_actuales_empleado WHERE id = $1
             `, [empleado_id]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -1249,7 +1249,7 @@ class DatosGeneralesControlador {
                 e_datos.id_contrato = co.id AND co.id_regimen = r.id 
             ORDER BY e_datos.nombre ASC
             `);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -1268,7 +1268,7 @@ class DatosGeneralesControlador {
             WHERE da.id_cargo = ec.id AND ec.id_tipo_cargo = tc.id AND cd.id = da.id_departamento AND 
             da.id = $1
             `, [empleado_id]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {
@@ -1361,12 +1361,12 @@ class DatosGeneralesControlador {
     }
     ;
     // METODO PARA BUSCAR USUARIOS ADMINISTRADORES Y JEFES DE UNA SUCURSAL
+    // TODO: VER DONDE SE UTILIZA  MODIFICAR Y ELIMINAR METODO
     BuscarAdminJefes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { lista_sucursales, estado } = req.body;
-            console.log('lista_sucursales', lista_sucursales);
             const DATOS = yield database_1.default.query(`SELECT da.id, da.nombre, da.apellido, da.id_sucursal AS suc_pertenece, s.nombre AS sucursal,ce.jefe, r.nombre AS rol, 
-            us.id_sucursal, us.principal, us.id AS id_usucursal, d.nombre AS departamento 
+            us.id_sucursal, us.principal, us.id AS id_usucursal, d.nombre AS departamento, d.id AS id_departamento
         FROM datos_actuales_empleado AS da
         JOIN eu_empleado_cargos AS ce ON da.id_cargo = ce.id
         JOIN ero_cat_roles AS r ON da.id_rol = r.id
@@ -1377,7 +1377,27 @@ class DatosGeneralesControlador {
             AND da.estado = $1 AND us.id_sucursal IN (${lista_sucursales})
         ORDER BY 
             da.apellido ASC`, [estado]);
-            if (DATOS.rowCount > 0) {
+            if (DATOS.rowCount != 0) {
+                return res.jsonp(DATOS.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'error' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR USUARIOS DE UNA SUCURSAL
+    BuscarUsuariosSucursal(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { sucursal, estado } = req.body;
+            const DATOS = yield database_1.default.query(`
+            SELECT  da.id, da.nombre, da.apellido, r.nombre AS rol, d.nombre AS departamento, d.id AS id_departamento
+            FROM datos_actuales_empleado AS da
+            JOIN ero_cat_roles AS r ON da.id_rol = r.id
+            JOIN ed_departamentos AS d ON da.id_departamento = d.id
+            WHERE da.id_sucursal = $1 AND da.estado = $2
+            ORDER BY da.apellido ASC
+            `, [sucursal, estado]);
+            if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }
             else {

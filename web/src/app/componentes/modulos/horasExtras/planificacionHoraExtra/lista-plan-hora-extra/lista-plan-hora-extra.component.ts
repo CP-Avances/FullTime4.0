@@ -402,7 +402,7 @@ export class ListaPlanHoraExtraComponent implements OnInit {
       dato = this.selectionDos;
     }
     let EmpleadosSeleccionados: any;
-    EmpleadosSeleccionados = dato.selected.map(obj => {
+    EmpleadosSeleccionados = dato.selected.map((obj: any) => {
       return {
         id_plan_extra: obj.id_plan_extra,
         hora_total_timbre: obj.hora_total_timbre,

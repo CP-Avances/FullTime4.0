@@ -87,7 +87,7 @@ class NotificacionTiempoRealControlador {
                 const CONFIG_NOTI = yield database_1.default.query(`
         SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1
         `, [id_empleado]);
-                if (CONFIG_NOTI.rowCount > 0) {
+                if (CONFIG_NOTI.rowCount != 0) {
                     return res.jsonp(CONFIG_NOTI.rows);
                 }
                 else {
@@ -252,7 +252,7 @@ class NotificacionTiempoRealControlador {
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_configurar_alertas',
                     usuario: user_name,
-                    accion: 'C',
+                    accion: 'I',
                     datosOriginales: '',
                     datosNuevos: `{"id_empleado": "${id_empleado}", "vacacion_mail": "${vaca_mail}", "vacacion_notificacion": "${vaca_noti}", permiso_mail: "${permiso_mail}", permiso_notificacion: "${permiso_noti}", hora_extra_mail: "${hora_extra_mail}", hora_extra_notificacion: "${hora_extra_noti}", comida_mail: "${comida_mail}", comida_notificacion: "${comida_noti}", comunicado_mail: "${comunicado_mail}", comunicado_notificacion: "${comunicado_noti}"}`,
                     ip,
@@ -337,7 +337,7 @@ class NotificacionTiempoRealControlador {
         WHERE r.id_empleado_recibe = $1 AND e.id = r.id_empleado_envia 
         ORDER BY (visto is FALSE) DESC, id DESC LIMIT 20
         `, [id]);
-                if (REAL_TIME_NOTIFICACION.rowCount > 0) {
+                if (REAL_TIME_NOTIFICACION.rowCount != 0) {
                     return res.jsonp(REAL_TIME_NOTIFICACION.rows);
                 }
                 else {
@@ -360,7 +360,7 @@ class NotificacionTiempoRealControlador {
       FROM ecm_realtime_notificacion AS r, eu_empleados AS e 
       WHERE r.id = $1 AND e.id = r.id_empleado_envia
       `, [id]);
-            if (REAL_TIME_NOTIFICACION_VACACIONES.rowCount > 0) {
+            if (REAL_TIME_NOTIFICACION_VACACIONES.rowCount != 0) {
                 return res.jsonp(REAL_TIME_NOTIFICACION_VACACIONES.rows[0]);
             }
             else {

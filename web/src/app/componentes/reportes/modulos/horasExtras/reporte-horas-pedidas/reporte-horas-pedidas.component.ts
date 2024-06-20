@@ -343,7 +343,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
             { text: 'APELLIDO', style: 'tableHeader' },
             '', '', '', ''
           ],
-          ...solicitudHoras.map(obj => {
+          ...solicitudHoras.map((obj: any) => {
             this.contarRegistros = this.contarRegistros + 1;
             return [
               { text: this.contarRegistros, style: 'itemsTableD' },
@@ -384,7 +384,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
 
   ExportarExcelSolicitudes(datos) {
     this.contarRegistros = 0;
-    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos.map(obj => {
+    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos.map((obj: any) => {
       this.contarRegistros = this.contarRegistros + 1;
       return {
         N_REGISTROS: this.contarRegistros,
@@ -488,7 +488,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
             { text: 'APELLIDO', style: 'tableHeader' },
             '', '', '', '', ''
           ],
-          ...horasAutorizadas.map(obj => {
+          ...horasAutorizadas.map((obj: any) => {
             if (obj.estado === 3) {
               obj.estado = 'Autorizado'
             }
@@ -524,7 +524,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
 
   ExportarExcelSolicitudesAutorizadas(datos) {
     this.contarRegistros = 0;
-    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos.map(obj => {
+    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos.map((obj: any) => {
       if (obj.estado === 3) {
         obj.estado = 'Autorizado'
       }
@@ -610,7 +610,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
       // TÍTULOS DEL ARCHIVO PDF Y CONTENIDO GENERAL
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        ...this.datosEmpleado.map(obj => {
+        ...this.datosEmpleado.map((obj: any) => {
           if (obj.id === id_seleccionado) {
             return [
               { text: obj.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, -30, 0, 5] },
@@ -711,7 +711,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
             { text: 'HORA FINAL', style: 'tableHeader' },
             { text: 'HORAS SOLICITADAS', style: 'tableHeader' },
           ],
-          ...this.solicitudes_empleado.map(obj => {
+          ...this.solicitudes_empleado.map((obj: any) => {
             this.contarRegistros = this.contarRegistros + 1;
             return [
               { text: this.contarRegistros, style: 'itemsTableD' },
@@ -777,7 +777,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     }
     wse["!cols"] = wscolsE;
 
-    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.solicitudes_empleado.map(obj => {
+    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.solicitudes_empleado.map((obj: any) => {
       this.contarRegistros = this.contarRegistros + 1;
       return {
         N_REGISTROS: this.contarRegistros,
@@ -841,7 +841,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
       // TÍTULOS DEL ARCHIVO PDF Y CONTENIDO GENERAL
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        ...this.datosEmpleado.map(obj => {
+        ...this.datosEmpleado.map((obj: any) => {
           if (obj.id === id_seleccionado) {
             return [
               { text: obj.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, -30, 0, 5] },
@@ -943,7 +943,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
             { text: 'ESTADO', style: 'tableHeader' },
             { text: 'HORAS AUTORIZADAS', style: 'tableHeader' },
           ],
-          ...this.solicitudes_empleado.map(obj => {
+          ...this.solicitudes_empleado.map((obj: any) => {
             if (obj.estado === 3) {
               obj.estado = 'Autorizado'
             }
@@ -1004,7 +1004,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     }
     wse["!cols"] = wscolsE;
 
-    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.solicitudes_empleado.map(obj => {
+    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.solicitudes_empleado.map((obj: any) => {
       if (obj.estado === 3) {
         obj.estado = 'Autorizado'
       }

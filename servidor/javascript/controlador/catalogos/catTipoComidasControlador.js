@@ -24,7 +24,7 @@ class TipoComidasControlador {
             WHERE ctc.id_comida = tc.id
             ORDER BY tc.nombre ASC, ctc.id ASC
             `);
-            if (TIPO_COMIDAS.rowCount > 0) {
+            if (TIPO_COMIDAS.rowCount != 0) {
                 return res.jsonp(TIPO_COMIDAS.rows);
             }
             else {
@@ -41,7 +41,7 @@ class TipoComidasControlador {
             WHERE ctc.id_comida = tc.id AND dm.id_horario_comida = ctc.id 
             ORDER BY tc.nombre ASC, ctc.id ASC
             `);
-            if (TIPO_COMIDAS.rowCount > 0) {
+            if (TIPO_COMIDAS.rowCount != 0) {
                 return res.jsonp(TIPO_COMIDAS.rows);
             }
             else {
@@ -57,7 +57,7 @@ class TipoComidasControlador {
             FROM ma_horario_comidas AS ctc, ma_cat_comidas AS tc 
             WHERE ctc.id_comida = tc.id AND ctc.id = $1
             `, [id]);
-            if (TIPO_COMIDAS.rowCount > 0) {
+            if (TIPO_COMIDAS.rowCount != 0) {
                 return res.jsonp(TIPO_COMIDAS.rows);
             }
             else {
@@ -75,7 +75,7 @@ class TipoComidasControlador {
             WHERE ctc.id_comida = tc.id AND tc.id = $1 
             ORDER BY tc.nombre ASC
             `, [id]);
-            if (TIPO_COMIDAS.rowCount > 0) {
+            if (TIPO_COMIDAS.rowCount != 0) {
                 return res.jsonp(TIPO_COMIDAS.rows);
             }
             else {
@@ -146,7 +146,7 @@ class TipoComidasControlador {
                 }
                 yield database_1.default.query(`
         UPDATE ma_horario_comidas SET nombre = $1, id_comida = $2, hora_inicio = $3, hora_fin = $4
-        WHERE id = $5'
+        WHERE id = $5
         `, [nombre, tipo_comida, hora_inicio, hora_fin, id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -163,6 +163,7 @@ class TipoComidasControlador {
                 return res.jsonp({ message: "Registro actualizado exitosamente" });
             }
             catch (error) {
+                console.log(error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query("ROLLBACK");
                 return res.status(404).jsonp({ message: "Error al actualizar el registro." });
@@ -260,7 +261,7 @@ class TipoComidasControlador {
             FROM ma_cat_comidas AS tc, ma_horario_comidas AS menu, ma_detalle_comida AS dm 
             WHERE tc.id = menu.id_comida AND dm.id_horario_comida = menu.id AND menu.id = $1
             `, [id]);
-            if (TIPO_COMIDAS.rowCount > 0) {
+            if (TIPO_COMIDAS.rowCount != 0) {
                 return res.jsonp(TIPO_COMIDAS.rows);
             }
             else {

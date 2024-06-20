@@ -44,9 +44,6 @@ export class ListaSucursalesComponent implements OnInit {
   buscarNombre = new FormControl('', [Validators.minLength(2)]);
   buscarCiudad = new FormControl('', [Validators.minLength(2)]);
   buscarEmpresa = new FormControl('', [Validators.minLength(2)]);
-  filtroNombreSuc = '';
-  filtroCiudadSuc = '';
-  filtroEmpresaSuc = '';
 
   public formulario = new FormGroup({
     buscarNombreForm: this.buscarNombre,
@@ -298,7 +295,7 @@ export class ListaSucursalesComponent implements OnInit {
                 { text: 'Establecimiento', style: 'tableHeader' },
                 { text: 'Ciudad', style: 'tableHeader' }
               ],
-              ...this.sucursales.map(obj => {
+              ...this.sucursales.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.nomempresa, style: 'itemsTable' },

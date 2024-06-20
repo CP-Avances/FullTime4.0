@@ -220,7 +220,7 @@ class PlanificacionHorariaControlador {
                                 const horarioRegistrado = yield database_1.default.query(`
                             SELECT * FROM eu_asistencia_general WHERE codigo = $1 AND fecha_horario = $2 AND id_horario = $3
                         `, [data.codigo_usuario, horario.dia, horarioDefaultLibre.entrada.id_horario]);
-                                if (horarioRegistrado.rowCount > 0) {
+                                if (horarioRegistrado.rowCount != 0) {
                                     continue;
                                 }
                                 const fecha_horario_entrada = `${horario.dia} ${horarioDefaultLibre.entrada.hora}`;
@@ -271,7 +271,7 @@ class PlanificacionHorariaControlador {
                                 const horarioRegistrado = yield database_1.default.query(`
                             SELECT * FROM eu_asistencia_general WHERE codigo = $1 AND fecha_horario = $2 AND id_horario = $3
                         `, [data.codigo_usuario, horario.dia, horarioDefaultFeriado.entrada.id_horario]);
-                                if (horarioRegistrado.rowCount > 0) {
+                                if (horarioRegistrado.rowCount != 0) {
                                     continue;
                                 }
                                 const fecha_horario_entrada = `${horario.dia} ${horarioDefaultFeriado.entrada.hora}`;
@@ -428,7 +428,7 @@ function VerificarHorario(codigo) {
         try {
             const horario = yield database_1.default.query('SELECT * FROM eh_cat_horarios WHERE LOWER(codigo) = $1', [codigo.toLowerCase()]);
             // SI EXISTE HORARIO VERIFICAR SI HORARIO.HORA_TRABAJO ESTE EN FORMATO HH:MM:SS
-            const existe = horario.rowCount > 0;
+            const existe = horario.rowCount != 0;
             if (existe) {
                 const formatoHora = /^\d{2}:[0-5][0-9]:[0-5][0-9]$/;
                 return [formatoHora.test(horario.rows[0].hora_trabajo), horario.rows[0]];
@@ -573,7 +573,7 @@ function ListarPlanificacionHoraria(codigo, fecha_inicio, fecha_final) {
             GROUP BY codigo_e, fecha, codigo_dia, p_g.id_horario 
             ORDER BY p_g.codigo, fecha, p_g.id_horario
         `, [fecha_inicio, fecha_final, codigo]);
-            if (horario.rowCount > 0) {
+            if (horario.rowCount != 0) {
                 return horario.rows;
             }
             else {
@@ -596,7 +596,7 @@ function ConsultarFeriados(fecha_inicio, fecha_final, id_usuario) {
             WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
                 AND s.id_ciudad = cf.id_ciudad AND de.id_sucursal = s.id AND de.id = $3
             `, [fecha_inicio, fecha_final, id_usuario]);
-            if (FERIADO.rowCount > 0) {
+            if (FERIADO.rowCount != 0) {
                 return FERIADO.rows;
             }
             else {
@@ -618,7 +618,7 @@ function ConsultarHorarioDefault(codigo) {
         INNER JOIN eh_detalle_horarios AS d ON h.id = d.id_horario
         WHERE h.codigo = $1
         `, [codigo]);
-            if (horario.rowCount > 0) {
+            if (horario.rowCount != 0) {
                 //SEPARAR LOS TIPOS DE ACCIONES DE LOS HORARIOS
                 let horarioEstructurado;
                 const entrada = horario.rows.find((o) => o.tipo_accion === 'E');

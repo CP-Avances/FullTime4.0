@@ -27,7 +27,7 @@ class DiscapacidadControlador {
                 const DISCAPACIDAD = yield database_1.default.query(`
                 SELECT * FROM e_cat_discapacidad ORDER BY nombre ASC
                 `);
-                if (DISCAPACIDAD.rowCount > 0) {
+                if (DISCAPACIDAD.rowCount != 0) {
                     return res.jsonp(DISCAPACIDAD.rows);
                 }
                 else {
@@ -93,6 +93,22 @@ class DiscapacidadControlador {
                 var VERIFICAR_DISCAPACIDAD = yield database_1.default.query(`
                 SELECT * FROM e_cat_discapacidad WHERE UPPER(nombre) = $1 AND NOT id = $2
                 `, [nombre.toUpperCase(), id]);
+                const consulta = yield database_1.default.query('SELECT * FROM e_cat_discapacidad WHERE id = $1', [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_cat_discapacidad',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
                 if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
                     const nombreConFormato = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
                     // INICIAR TRANSACCION
@@ -107,7 +123,7 @@ class DiscapacidadControlador {
                         tabla: 'e_cat_discapacidad',
                         usuario: user_name,
                         accion: 'U',
-                        datosOriginales: JSON.stringify(VERIFICAR_DISCAPACIDAD.rows),
+                        datosOriginales: JSON.stringify(datosOriginales),
                         datosNuevos: JSON.stringify(discapacidadEditada),
                         ip,
                         observacion: null
@@ -208,7 +224,7 @@ class DiscapacidadControlador {
                     var duplicados = [];
                     var mensaje = 'correcto';
                     // LECTURA DE LOS DATOS DE LA PLANTILLA
-                    plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                    plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                         var { ITEM, DISCAPACIDAD } = dato;
                         // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
                         if ((ITEM != undefined && ITEM != '') &&
@@ -348,7 +364,7 @@ class DiscapacidadControlador {
             catch (error) {
                 // ROLLBACK
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error con el servidor metodo CargarPlantilla', status: '500' });
+                return res.status(500).jsonp({ message: 'Error con el servidor método CargarPlantilla.', status: '500' });
             }
         });
     }

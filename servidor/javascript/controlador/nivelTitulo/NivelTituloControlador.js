@@ -26,7 +26,7 @@ class NivelTituloControlador {
             const titulo = yield database_1.default.query(`
       SELECT * FROM et_cat_nivel_titulo ORDER BY nombre ASC
       `);
-            if (titulo.rowCount > 0) {
+            if (titulo.rowCount != 0) {
                 return res.jsonp(titulo.rows);
             }
             else {
@@ -79,7 +79,8 @@ class NivelTituloControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+                //return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+                return res.jsonp({ message: 'error' });
             }
         });
     }
@@ -146,7 +147,7 @@ class NivelTituloControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
                 yield database_1.default.query(`
-        UPDATE et_cat_nivel_titulo SET nombre = $1 WHERE id = $2
+        UPDATE et_cat_nivel_titulo SET nombre = $1 WHERE id = $2 
         `, [nombre, id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -176,7 +177,7 @@ class NivelTituloControlador {
             const unNivelTitulo = yield database_1.default.query(`
       SELECT * FROM et_cat_nivel_titulo WHERE UPPER(nombre) = $1
       `, [nombre]);
-            if (unNivelTitulo.rowCount > 0) {
+            if (unNivelTitulo.rowCount != 0) {
                 return res.jsonp(unNivelTitulo.rows);
             }
             else {
@@ -208,20 +209,20 @@ class NivelTituloControlador {
                 var duplicados = [];
                 var mensaje = 'correcto';
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
                     var { ITEM, NOMBRE } = dato;
                     data.fila = dato.ITEM;
                     data.nombre = dato.NOMBRE;
                     if ((data.fila != undefined && data.fila != '') &&
                         (data.nombre != undefined && data.nombre != '' && data.nombre != null)) {
-                        //Validar primero que exista la ciudad en la tabla ciudades
+                        // VALIDAR PRIMERO QUE EXISTA EL NIVEL DE TITULO
                         const existe_nivelProfecional = yield database_1.default.query(`
             SELECT nombre FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
             `, [data.nombre]);
                         if (existe_nivelProfecional.rowCount == 0) {
                             data.fila = ITEM;
                             data.nombre = NOMBRE;
-                            if (duplicados.find((p) => p.nombre.toLowerCase() === data.nombre.toLowerCase()) == undefined) {
+                            if (duplicados.find((p) => p.NOMBRE.toLowerCase() === data.nombre.toLowerCase()) == undefined) {
                                 data.observacion = 'ok';
                                 duplicados.push(dato);
                             }
@@ -257,23 +258,23 @@ class NivelTituloControlador {
                 });
                 setTimeout(() => {
                     listNivelesProfesionales.sort((a, b) => {
-                        // Compara los números de los objetos
+                        // COMPARA LOS NUMEROS DE LOS OBJETOS
                         if (a.fila < b.fila) {
                             return -1;
                         }
                         if (a.fila > b.fila) {
                             return 1;
                         }
-                        return 0; // Son iguales
+                        return 0; // SON IGUALES
                     });
                     var filaDuplicada = 0;
                     listNivelesProfesionales.forEach((item) => {
                         if (item.observacion == undefined || item.observacion == null || item.observacion == '') {
                             item.observacion = 'Registro duplicado';
                         }
-                        //Valida si los datos de la columna N son numeros.
+                        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
                             if (item.fila == filaDuplicada) {
                                 mensaje = 'error';
                             }

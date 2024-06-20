@@ -1374,7 +1374,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
     // BUSCAR FERIADOS
     if (this.feriados.length != 0) {
-      this.fechas_solicitud.map(obj => {
+      this.fechas_solicitud.map((obj: any) => {
         for (let i = 0; i < this.feriados.length; i++) {
           if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
             this.contar_feriados = this.contar_feriados + 1;
@@ -1387,7 +1387,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
     // BUSCAR FECHAS DE RECUPERACION DE FERIADOS
     if (this.recuperar.length != 0) {
-      this.fechas_solicitud.map(obj => {
+      this.fechas_solicitud.map((obj: any) => {
         for (let j = 0; j < this.recuperar.length; j++) {
           if (moment(this.recuperar[j].fecha_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
             this.contar_recuperables = this.contar_recuperables + 1;

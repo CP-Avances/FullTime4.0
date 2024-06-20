@@ -24,7 +24,7 @@ function ListaTimbresDiarioToEmpleado(hoy) {
         WHERE CAST(fecha_hora_timbre AS VARCHAR) like $1 || \'%\'
         `, [hoy])
             .then(result => {
-            return result.rows.map(obj => {
+            return result.rows.map((obj) => {
                 return {
                     codigo: obj.codigo,
                     fec_hora_timbre: obj.fecha_hora_timbre

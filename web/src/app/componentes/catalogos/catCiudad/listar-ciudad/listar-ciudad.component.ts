@@ -36,9 +36,6 @@ export class ListarCiudadComponent implements OnInit {
 
   // ALMACENAMIENTO DE DATOS
   datosCiudades: any = [];
-  filtroCiudad = '';
-  filtroProvincias = '';
-  filtrodatosCiudades = '';
   empleado: any = [];
   idEmpleado: number;
 
@@ -123,7 +120,7 @@ export class ListarCiudadComponent implements OnInit {
     this.datosCiudades = [];
     this.rest.ListarNombreCiudadProvincia().subscribe(datos => {
       this.datosCiudades = datos;
-      console.log('ciudades ', this.datosCiudades)
+      //console.log('ciudades ', this.datosCiudades)
     })
   }
 

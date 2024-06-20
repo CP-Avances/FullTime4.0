@@ -164,6 +164,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.scriptService.load('pdfMake', 'vfsFonts');
 
     console.log('cadena: ', cadena);
+    console.log('logo ', this.logoE)
   }
 
   ngOnInit(): void {
@@ -349,14 +350,15 @@ export class VerEmpleadoComponent implements OnInit {
         this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
         this.restEmpleado.obtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
           console.log('ver imagen data ', data)
-          if (data.imagen != 0) {
-            this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
-          }
-          else {
+          if (data.imagen === 0) {
             this.ImagenLocalUsuario("assets/imagenes/user.png").then(
               (result) => (this.imagenEmpleado = result)
             );
           }
+          else {
+            this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
+          }
+          console.log('imagen codificado ', this.imagenEmpleado)
         });
         //console.log('ver urlImagen ', this.urlImagen)
         this.mostrarImagen = true;
@@ -515,7 +517,12 @@ export class VerEmpleadoComponent implements OnInit {
       this.archivoForm.reset();
       this.nameFile = '';
       this.ResetDataMain();
-    });
+    }, error => {
+      this.toastr.info('No se ha encontrado el directorio.', 'No se ha podido cargar el archivo.', {
+        timeOut: 6000,
+      });
+    }
+    );
   }
 
   ResetDataMain() {
@@ -1366,7 +1373,7 @@ export class VerEmpleadoComponent implements OnInit {
         ip: this.ip,
         id_plan: '',
       }
-      this.id_planificacion_general.map(obj => {
+      this.id_planificacion_general.map((obj: any) => {
         datos.id_plan = obj.id;
         this.restPlanGeneral.EliminarRegistro(datos).subscribe(res => {
         })
@@ -1385,7 +1392,7 @@ export class VerEmpleadoComponent implements OnInit {
     };
     this.restPlanGeneral.BuscarFecha(plan_fecha).subscribe(res => {
       this.id_planificacion_general = res;
-      this.id_planificacion_general.map(obj => {
+      this.id_planificacion_general.map((obj: any) => {
         this.restPlanGeneral.EliminarRegistro(obj.id).subscribe(res => {
         })
       })
@@ -2797,7 +2804,7 @@ export class VerEmpleadoComponent implements OnInit {
     let genero = this.GeneroSelect[this.empleadoUno[0].genero - 1];
     let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
     let nacionalidad: any;
-    this.nacionalidades.forEach(element => {
+    this.nacionalidades.forEach((element: any) => {
       if (this.empleadoUno[0].id_nacionalidad == element.id) {
         nacionalidad = element.nombre;
       }
@@ -2892,7 +2899,7 @@ export class VerEmpleadoComponent implements OnInit {
               { text: 'NOMBRE', style: 'tableHeader' },
               { text: 'NIVEL', style: 'tableHeader' }
             ],
-            ...this.tituloEmpleado.map(obj => {
+            ...this.tituloEmpleado.map((obj: any) => {
               return [{ text: obj.nombre, style: 'tableCell' }, { text: obj.nivel, style: 'tableCell' }];
             })
           ]
@@ -2972,7 +2979,7 @@ export class VerEmpleadoComponent implements OnInit {
               { text: 'TIPO', style: 'tableHeader' },
               { text: 'PORCENTAJE', style: 'tableHeader' },
             ],
-            ...this.discapacidadUser.map(obj => {
+            ...this.discapacidadUser.map((obj: any) => {
               return [
                 { text: obj.carnet_conadis, style: 'tableCell' },
                 { text: obj.tipo, style: 'tableCell' },
@@ -3005,7 +3012,7 @@ export class VerEmpleadoComponent implements OnInit {
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
@@ -3156,7 +3163,7 @@ export class VerEmpleadoComponent implements OnInit {
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
@@ -3248,7 +3255,7 @@ export class VerEmpleadoComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;

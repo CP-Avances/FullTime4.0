@@ -38,12 +38,12 @@ export class SucursalService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarRegistro(id: number, datos: any) {
+  EliminarRegistro(id: any, datos: any) {
     const url = `${environment.url}/sucursales/eliminar/${id}`;
     const httpOptions = {
       body: datos
     };
-    return this.http.request('delete', url, httpOptions);
+    return this.http.request('delete', url, httpOptions).pipe(catchError(id));
   }
 
   // METODO PARA BUSCAR DATOS DE UNA SUCURSAL

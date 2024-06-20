@@ -881,7 +881,7 @@ export class VerCoordenadasComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip
     };
-    EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
+    EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
       return {
         id_emplu: obj.id_emplu,
         empleado: obj.nombre + ' ' + obj.apellido,

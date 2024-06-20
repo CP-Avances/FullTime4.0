@@ -230,7 +230,8 @@ export class AutorizacionesComponent implements OnInit {
   ChangeDepa(e: any, select: MatSelect) {
     if (e != null && e != undefined) {
       select.value = null;
-      select.defaultTabIndex = 0;
+      //select.defaultTabIndex = 0;
+      select.tabIndex = 0;
       const [departamento] = this.ArrayAutorizacionTipos.filter((o: any) => {
         return o.id_departamento === e
       })
@@ -473,7 +474,7 @@ export class AutorizacionesComponent implements OnInit {
         }
 
         if (this.data.carga === 'multiple') {
-          this.NuevaListaAprobada.map(obj => {
+          this.NuevaListaAprobada.map((obj: any) => {
             if (obj.estado === 'Pre-autorizado') {
               this.restP.BuscarDatosAutorizacion(obj.id).subscribe(data => {
                 var documento = data[0].empleado_estado;

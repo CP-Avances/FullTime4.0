@@ -1,35 +1,38 @@
-import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ThemePalette } from '@angular/material/core';
-import { MatDialog } from '@angular/material/dialog';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
+import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
-import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/metodos.component';
 import { PageEvent } from '@angular/material/paginator';
-import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
-import { RegistrarCargoComponent } from '../registrar-cargo/registrar-cargo.component';
-import { EditarTipoCargoComponent } from '../editar-tipo-cargo/editar-tipo-cargo.component';
+import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 
-import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
+import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
-import { PlantillaReportesService } from '../../../reportes/plantilla-reportes.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
-import { SelectionModel } from '@angular/cdk/collections';
 import { ITableTipoCargo } from 'src/app/model/reportes.model';
+
+import { PlantillaReportesService } from '../../../reportes/plantilla-reportes.service';
+import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+
+import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/metodos.component';
+import { RegistrarCargoComponent } from '../registrar-cargo/registrar-cargo.component';
+import { EditarTipoCargoComponent } from '../editar-tipo-cargo/editar-tipo-cargo.component';
 
 @Component({
   selector: 'app-cat-tipo-cargos',
   templateUrl: './cat-tipo-cargos.component.html',
   styleUrls: ['./cat-tipo-cargos.component.css']
 })
+
 export class CatTipoCargosComponent {
 
   tiposCargoEliminar: any = [];
@@ -62,7 +65,6 @@ export class CatTipoCargosComponent {
   user_name: string | null;
   ip: string | null;
 
-  filtroCargo = ''; // VARIABLE DE BUSQUEDA DE DATOS
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   buscarCargo = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
 
@@ -80,10 +82,10 @@ export class CatTipoCargosComponent {
   constructor(
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
     private _TipoCargos: CatTipoCargosService,
-    public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
-    public parametro: ParametrosService,
     private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
+    public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
+    public parametro: ParametrosService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -113,29 +115,29 @@ export class CatTipoCargosComponent {
     this.parametro.ListarDetalleParametros(25).subscribe(
       res => {
         this.formato_fecha = res[0].descripcion;
-        this.obtenerCargos();
+        this.ObtenerCargos();
       },
       vacio => {
-        this.obtenerCargos();
+        this.ObtenerCargos();
       });
   }
 
-  obtenerCargos() {
+  ObtenerCargos() {
     this._TipoCargos.listaCargos().subscribe(res => {
-      console.log('lista ', res);
+      //console.log('lista ', res);
       this.listaTipoCargos = res
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
-      if(error.status == 400 || error.status == 404){
+      //console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      if (error.status == 400 || error.status == 404) {
         this.toastr.info('Registro vacio', 'Cargos', {
           timeOut: 3500,
         });
-      }else{
+      } else {
         this.toastr.error('Error al cargar los datos', 'Cargos', {
           timeOut: 3500,
         });
       }
-      
+
     });
   }
 
@@ -143,11 +145,13 @@ export class CatTipoCargosComponent {
     this.Datos_tipo_cargos = null;
     this.archivoSubido = [];
     this.nameFile = '';
+    this.formulario.setValue({
+      nombreForm: '',
+    });
     this.ngOnInit();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
     this.messajeExcel = '';
-    this.filtroCargo = '';
   }
 
   AbrirVentanaRegistrarCargo(): void {
@@ -178,7 +182,7 @@ export class CatTipoCargosComponent {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this._TipoCargos.Eliminar(cargo.id, data).subscribe(res => {
-            console.log('res eliminado: ', res);
+            //console.log('res eliminado: ', res);
             this.toastr.error('Registro eliminado.', '', {
               timeOut: 4000,
             });
@@ -204,8 +208,6 @@ export class CatTipoCargosComponent {
       });
   }
 
-
-
   // CONTROL DE PAGINACION
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
@@ -222,7 +224,7 @@ export class CatTipoCargosComponent {
   nameFile: string;
   archivoSubido: Array<File>;
   mostrarbtnsubir: boolean = false;
-  // METODO PARA SELECCIONAR PLANTILLA DE DATOS -----------------------------------------------------------------
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS 
   FileChange(element: any) {
     this.archivoSubido = [];
     this.nameFile = '';
@@ -231,7 +233,7 @@ export class CatTipoCargosComponent {
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0];
-    console.log('itemName: ', itemName);
+    //console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
@@ -245,10 +247,9 @@ export class CatTipoCargosComponent {
         this.nameFile = '';
       }
     } else {
-      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+      this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
         timeOut: 6000,
       });
-
       this.nameFile = '';
     }
     this.archivoForm.reset();
@@ -268,11 +269,11 @@ export class CatTipoCargosComponent {
 
     this.progreso = true;
 
-    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this._TipoCargos.RevisarFormato(formData).subscribe(res => {
       this.Datos_tipo_cargos = res.data;
       this.messajeExcel = res.message;
-      console.log('probando plantilla tipo cargos', this.Datos_tipo_cargos);
+      //console.log('probando plantilla tipo cargos', this.Datos_tipo_cargos);
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -294,7 +295,7 @@ export class CatTipoCargosComponent {
         });
       }
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      //console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
@@ -333,7 +334,7 @@ export class CatTipoCargosComponent {
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
-    console.log('listaCargosCorrectas: ', this.listaCargosCorrectas.length);
+    //console.log('listaCargosCorrectas: ', this.listaCargosCorrectas.length);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -350,11 +351,10 @@ export class CatTipoCargosComponent {
         ip: this.ip,
       }
       this._TipoCargos.SubirArchivoExcel(data).subscribe(response => {
-        console.log('respuesta: ', response);
+        //console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de Tipo Cargos importada.', {
           timeOut: 3000,
         });
-        //window.location.reload();
         this.LimpiarCampos();
         this.archivoForm.reset();
         this.nameFile = '';
@@ -383,13 +383,13 @@ export class CatTipoCargosComponent {
   }
 
   /** ************************************************************************************************* **
- ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
- ** ************************************************************************************************* **/
+   ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
+   ** ************************************************************************************************* **/
 
   GenerarPdf(action = 'open') {
     this.OrdenarDatos(this.listaTipoCargos);
     const documentDefinition = this.GetDocumentDefinicion();
-    console.log('this.listaTipoCargos: ', this.listaTipoCargos)
+    //console.log('this.listaTipoCargos: ', this.listaTipoCargos)
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -451,7 +451,7 @@ export class CatTipoCargosComponent {
                 { text: 'Item', style: 'tableHeader' },
                 { text: 'Cargos', style: 'tableHeader' },
               ],
-              ...this.listaTipoCargos.map(obj => {
+              ...this.listaTipoCargos.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.cargo, style: 'itemsTableD' },
@@ -477,7 +477,7 @@ export class CatTipoCargosComponent {
 
   ExportToExcel() {
     this.OrdenarDatos(this.listaTipoCargos);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaTipoCargos.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaTipoCargos.map((obj: any) => {
       return {
         ITEM: obj.id,
         CARGO: obj.cargo,
@@ -520,27 +520,26 @@ export class CatTipoCargosComponent {
     const xml = xmlBuilder.buildObject(arregloFeriados);
 
     if (xml === undefined) {
-      console.error('Error al construir el objeto XML.');
+      //console.error('Error al construir el objeto XML.');
       return;
     }
 
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
-    // Abrir una nueva pestaña o ventana con el contenido XML
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
-      newTab.focus(); // Dar foco a la nueva pestaña
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
 
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Cargos.xml';
-    // Simular un clic en el enlace para iniciar la descarga
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
 
     this.BuscarParametro();
@@ -552,7 +551,7 @@ export class CatTipoCargosComponent {
 
   ExportToCVS() {
     this.OrdenarDatos(this.listaTipoCargos);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaTipoCargos.map(obj => {
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaTipoCargos.map((obj: any) => {
       return {
         ITEM: obj.id,
         CARGOS: obj.cargos,
@@ -603,8 +602,6 @@ export class CatTipoCargosComponent {
   }
 
 
-
-
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
@@ -632,7 +629,7 @@ export class CatTipoCargosComponent {
             timeOut: 6000,
           });
         } else {
-          this.toastr.error(error.error.message, 'Error al eliminar dato', {
+          this.toastr.error(error.error.message, 'Error al eliminar dato.', {
             timeOut: 6000,
           });
         }
@@ -656,7 +653,7 @@ export class CatTipoCargosComponent {
             this.selectionTipoCargo.clear();
             this.ngOnInit();
           } else {
-            this.toastr.warning('No ha seleccionado PROVINCIAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado TIPO CARGO.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
           }

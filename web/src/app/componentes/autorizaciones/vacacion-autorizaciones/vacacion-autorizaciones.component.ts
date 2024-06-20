@@ -314,7 +314,7 @@ export class VacacionAutorizacionesComponent implements OnInit {
 
   insertarAutorizacion(form: any) {
     if (this.data.carga === 'multiple') {
-      this.listafiltrada.map(obj => {
+      this.listafiltrada.map((obj: any) => {
         if (obj.estado === 'Pre-autorizado') {
           this.restV.BuscarDatosAutorizacion(obj.id).subscribe(data => {
             var documento = data[0].empleado_estado;

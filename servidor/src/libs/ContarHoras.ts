@@ -12,7 +12,7 @@ async function ListaTimbresDiarioToEmpleado(hoy: any) {
         `
         , [hoy])
         .then(result => {
-            return result.rows.map(obj => {
+            return result.rows.map((obj: any) => {
                 return {
                     codigo: obj.codigo,
                     fec_hora_timbre: obj.fecha_hora_timbre

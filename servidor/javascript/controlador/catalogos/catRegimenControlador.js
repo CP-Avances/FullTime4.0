@@ -198,7 +198,7 @@ class RegimenControlador {
             const REGIMEN = yield database_1.default.query(` 
       SELECT descripcion FROM ere_cat_regimenes
       `);
-            if (REGIMEN.rowCount > 0) {
+            if (REGIMEN.rowCount != 0) {
                 return res.jsonp(REGIMEN.rows);
             }
             else {
@@ -215,7 +215,7 @@ class RegimenControlador {
       INNER JOIN e_cat_paises p ON r.id_pais = p.id 
       ORDER BY r.descripcion ASC
       `);
-            if (REGIMEN.rowCount > 0) {
+            if (REGIMEN.rowCount != 0) {
                 return res.jsonp(REGIMEN.rows);
             }
             else {
@@ -230,7 +230,7 @@ class RegimenControlador {
             const REGIMEN = yield database_1.default.query(`
       SELECT * FROM ere_cat_regimenes WHERE id = $1
       `, [id]);
-            if (REGIMEN.rowCount > 0) {
+            if (REGIMEN.rowCount != 0) {
                 return res.jsonp(REGIMEN.rows[0]);
             }
             else {
@@ -246,7 +246,7 @@ class RegimenControlador {
       SELECT r.* FROM ere_cat_regimenes AS r, e_cat_paises AS p 
       WHERE r.id_pais = p.id AND p.nombre = $1
       `, [nombre]);
-            if (REGIMEN.rowCount > 0) {
+            if (REGIMEN.rowCount != 0) {
                 return res.jsonp(REGIMEN.rows);
             }
             else {
@@ -302,7 +302,8 @@ class RegimenControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query("ROLLBACK");
-                return res.status(500).jsonp({ message: error });
+                //return res.status(500).jsonp({ message:'error'});
+                return res.jsonp({ message: 'error' });
             }
         });
     }
@@ -406,7 +407,7 @@ class RegimenControlador {
       SELECT * FROM ere_dividir_vacaciones WHERE id_regimen = $1 
       ORDER BY id
       `, [id]);
-            if (PERIODO.rowCount > 0) {
+            if (PERIODO.rowCount != 0) {
                 return res.jsonp(PERIODO.rows);
             }
             else {
@@ -563,7 +564,7 @@ class RegimenControlador {
             const ANTIGUO = yield database_1.default.query(`
       SELECT * FROM ere_antiguedad WHERE id_regimen = $1 ORDER BY id
       `, [id]);
-            if (ANTIGUO.rowCount > 0) {
+            if (ANTIGUO.rowCount != 0) {
                 return res.jsonp(ANTIGUO.rows);
             }
             else {
@@ -632,7 +633,7 @@ class RegimenControlador {
       WHERE c.id_regimen = r.id AND c.id = ec.id_contrato AND ec.id_sucursal = $1
       GROUP BY r.id, r.descripcion
       `, [id]);
-            if (REGIMEN.rowCount > 0) {
+            if (REGIMEN.rowCount != 0) {
                 return res.jsonp(REGIMEN.rows);
             }
             else {
