@@ -1,8 +1,8 @@
 // SECCION LIBRERIAS
 import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import { ObtenerRutaUsuario, ObtenerRutaVacuna, ObtenerRutaPermisos, ObtenerRutaContrato, ObtenerIndicePlantilla } from '../../../libs/accesoCarpetas';
-import { ConvertirImagenBase64 } from '../../../libs/ImagenCodificacion';
 import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
+import { ConvertirImagenBase64 } from '../../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import { Md5 } from 'ts-md5';
@@ -1682,7 +1682,7 @@ class EmpleadoControlador {
             `
             , [valor.cedula]);
           if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-            valor.observacion = 'Cédula ya existe en el sistema'
+            valor.observacion = 'Cédula ya existe en el sistema';
           } else {
             var VERIFICAR_USUARIO = await pool.query(
               `
@@ -1690,7 +1690,7 @@ class EmpleadoControlador {
               `
               , [valor.usuario]);
             if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
-              valor.observacion = 'Usuario ya existe en el sistema'
+              valor.observacion = 'Usuario ya existe en el sistema';
             } else {
               if (valor.rol != 'No registrado') {
                 var VERIFICAR_ROL = await pool.query(
@@ -1714,11 +1714,11 @@ class EmpleadoControlador {
                           //valor.observacion = 'ok'
                           duplicados2.push(valor);
                         } else {
-                          valor.observacion = '2'
+                          valor.observacion = '2';
                         }
                         duplicados1.push(valor);
                       } else {
-                        valor.observacion = '1'
+                        valor.observacion = '1';
                       }
                     } else {
                       valor.observacion = 'Nacionalidad no existe en el sistema';
@@ -1748,9 +1748,9 @@ class EmpleadoControlador {
 
           listEmpleados.forEach((item: any) => {
             if (item.observacion == '1') {
-              item.observacion = 'Registro duplicado (cédula)'
+              item.observacion = 'Registro duplicado (cédula)';
             } else if (item.observacion == '2') {
-              item.observacion = 'Registro duplicado (usuario)'
+              item.observacion = 'Registro duplicado (usuario)';
             }
 
             if (item.observacion != undefined) {
@@ -1759,7 +1759,7 @@ class EmpleadoControlador {
                 item.observacion = 'ok'
               }
             } else {
-              item.observacion = 'Datos no registrado'
+              item.observacion = 'Datos no registrado';
             }
 
             // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
@@ -1875,7 +1875,6 @@ class EmpleadoControlador {
           _longitud = longitud;
         }
 
-
         var _latitud = null
         if (latitud != 'No registrado') {
           _latitud = latitud;
@@ -1927,7 +1926,6 @@ class EmpleadoControlador {
 
         const [empleado] = response.rows;
 
-        //console.log('empleados insertados ', empleado.id)
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
           tabla: 'eu_empleados',
@@ -2610,9 +2608,6 @@ class EmpleadoControlador {
   public async CrearCarpetasEmpleado(req: Request, res: Response) {
     const { id, codigo } = req.body;
     let verificar_permisos = 0;
-    let verificar_imagen = 0;
-    let verificar_vacunas = 0;
-    let verificar_contrato = 0;
     try {
       const carpetaPermisos = await ObtenerRutaPermisos(codigo);
       try {
@@ -2621,66 +2616,19 @@ class EmpleadoControlador {
       } catch {
         try {
           await pr.mkdir(carpetaPermisos, { recursive: true });
-          verificar_permisos = 0; // CARPETA CREADA CON ÉXITO
+          verificar_permisos = 0; // CARPETA CREADA CON EXITO
         } catch {
           verificar_permisos = 1; // ERROR AL CREAR LA CARPETA
         }
       }
 
-      const carpetaImagenes = await ObtenerRutaUsuario(id);
-      try {
-        await pr.access(carpetaImagenes, fs.constants.F_OK);
-        verificar_imagen = 2; // LA CARPETA YA EXISTE
-      } catch {
-        try {
-          await pr.mkdir(carpetaImagenes, { recursive: true });
-          verificar_imagen = 0; // CARPETA CREADA CON ÉXITO
-        } catch {
-          verificar_imagen = 1; // ERROR AL CREAR LA CARPETA
-        }
-      }
-
-      const carpetaVacunas = await ObtenerRutaVacuna(id);
-      try {
-        await pr.access(carpetaVacunas, fs.constants.F_OK);
-        verificar_vacunas = 2; // LA CARPETA YA EXISTE
-      } catch {
-        try {
-          await pr.mkdir(carpetaVacunas, { recursive: true });
-          verificar_vacunas = 0; // CARPETA CREADA CON ÉXITO
-        } catch {
-          verificar_vacunas = 1; // ERROR AL CREAR LA CARPETA
-        }
-      }
-
-      const carpetaContratos = await ObtenerRutaContrato(id);
-      try {
-        await pr.access(carpetaContratos, fs.constants.F_OK);
-        verificar_contrato = 2; // LA CARPETA YA EXISTE
-      } catch {
-        try {
-          await pr.mkdir(carpetaContratos, { recursive: true });
-          verificar_contrato = 0; // CARPETA CREADA CON ÉXITO
-        } catch {
-          verificar_contrato = 1; // ERROR AL CREAR LA CARPETA
-        }
-      }
-
       // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
-      if (verificar_permisos === 1 && verificar_imagen === 1 && verificar_vacunas === 1 && verificar_contrato === 1) {
-        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos, permisos, imagenes y vacunación del usuario.' });
-      } else if (verificar_permisos === 1 && verificar_imagen === 0 && verificar_vacunas === 0 && verificar_contrato === 0) {
-        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos del usuario.' });
-      } else if (verificar_permisos === 0 && verificar_imagen === 1 && verificar_vacunas === 0 && verificar_contrato === 0) {
-        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de imagenes del usuario.' });
-      } else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 0) {
-        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de vacunación del usuario.' });
-      } else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 1) {
-        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos del usuario.' });
-      } else if (verificar_permisos === 2 && verificar_imagen === 2 && verificar_vacunas === 2 && verificar_contrato === 2) {
+      if (verificar_permisos === 1) {
+        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos.' });
+      } else if (verificar_permisos === 2) {
         res.jsonp({ message: 'Ya existen carpetas creadas de ' + codigo });
       } else {
-        res.jsonp({ message: 'Carpetas creadas con exito.' });
+        res.jsonp({ message: 'Carpetas creadas con éxito.' });
       }
     } catch (error) {
       res.status(500).json({ message: 'Error al procesar la solicitud.', error: error.message });
