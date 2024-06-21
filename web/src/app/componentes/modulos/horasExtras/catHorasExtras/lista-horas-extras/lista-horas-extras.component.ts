@@ -151,7 +151,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     this.rest.ListarHorasExtras().subscribe(datos => {
       this.horasExtras = datos;
 
-      this.horasExtras.forEach(data => {
+      this.horasExtras.forEach((data: any) => {
         data.h_inicio_ = this.validar.FormatearHora(data.hora_inicio, formato_hora);
         data.h_final_ = this.validar.FormatearHora(data.hora_final, formato_hora);
 

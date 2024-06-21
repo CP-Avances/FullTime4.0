@@ -146,7 +146,7 @@ export class ListarTipoComidasComponent implements OnInit {
     this.tipoComidas = [];
     this.rest.ConsultarTipoComida().subscribe(datos => {
       this.tipoComidas = datos;
-      this.tipoComidas.forEach(data => {
+      this.tipoComidas.forEach((data: any) => {
         data.horaInicio = this.validar.FormatearHora(data.hora_inicio, formato_hora);
         data.horaFin = this.validar.FormatearHora(data.hora_fin, formato_hora);
       })

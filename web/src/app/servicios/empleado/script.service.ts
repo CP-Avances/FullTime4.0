@@ -5,8 +5,8 @@ interface Scripts {
   src: string;
 }
 export const ScriptStore: Scripts[] = [
-  { name: 'pdfMake', src: 'build/pdfmake.min.js' },
-  { name: 'vfsFonts', src: 'build/vfs_fonts.js' }
+  { name: 'pdfMake', src: 'assets/build/pdfmake.min.js' },
+  { name: 'vfsFonts', src: 'assets/build/vfs_fonts.js' }
 ];
 
 @Injectable({
@@ -33,20 +33,19 @@ export class ScriptService {
 
   loadScript(name: string) {
     return new Promise((resolve, reject) => {
-      // resolve if already loaded
+      // RESOLVE IF ALREADY LOADED
       if (this.scripts[name].loaded) {
         resolve({ script: name, loaded: true, status: 'Already Loaded' });
       } else {
-        // load script
+        // LOAD SCRIPT
         const script = document.createElement('script');
         script.type = 'text/javascript';
         script.src = this.scripts[name].src;
         script.onload = () => {
           this.scripts[name].loaded = true;
-          // console.log(`${name} Loaded.`);
           resolve({ script: name, loaded: true, status: 'Loaded' });
         };
-        script.onerror = (error: any) => resolve({ script: name, loaded: false, status: 'Loaded' });
+        script.onerror = (error: any) => reject({ script: name, loaded: false, status: 'Failed to load' });
         document.getElementsByTagName('head')[0].appendChild(script);
       }
     });
