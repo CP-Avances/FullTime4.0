@@ -17,7 +17,7 @@ export class EmpleadoService {
   constructor(
     private http: HttpClient
   ) { }
-  
+
   /** ** ********************************************************************************************* **
    ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
    ** ** ********************************************************************************************* **/
@@ -71,7 +71,10 @@ export class EmpleadoService {
   // ACTUALIZAR EMPLEADOS
   ActualizarEmpleados(data: any, id: number) {
     return this.http.put(`${environment.url}/empleado/${id}/usuario`, data).pipe(
-      catchError(data));
+      catchError(error => {
+        throw error;
+      })
+    );
   }
 
   // SERVICIO PARA OBTENER LISTA DE NACIONALIDADES
@@ -190,9 +193,9 @@ export class EmpleadoService {
   BuscarModalidadLaboralNombre(datos: any) {
     return this.http.post<any>(`${environment.url}/contratoEmpleado/modalidad/trabajo/nombre`, datos);
   }
-  
-  /** ***************************************************************************************** ** 
-   ** **                        MANEJO DE DATOS DE CONTRATOS                                 ** ** 
+
+  /** ***************************************************************************************** **
+   ** **                        MANEJO DE DATOS DE CONTRATOS                                 ** **
    ** ***************************************************************************************** **/
 
   // REGISTRO DE DATOS DE CONTRATO
@@ -240,7 +243,7 @@ export class EmpleadoService {
     return this.http.post(`${environment.url}/contratoEmpleado/buscarFecha`, datos);
   }
 
-  // BUSQUEDA DE EMPLEADOS INGRESANDO NOMBRE Y APELLIDO 
+  // BUSQUEDA DE EMPLEADOS INGRESANDO NOMBRE Y APELLIDO
   BuscarEmpleadoNombre(data: any) {
     return this.http.post(`${environment.url}/empleado/buscar/informacion`, data);
   }
@@ -293,6 +296,6 @@ export class EmpleadoService {
     return this.http.post<any>(`${environment.url}/empleado/crear_carpetas`, data)
   }
 
-   
+
 
 }

@@ -1,6 +1,14 @@
 import pool from '../database';
 import path from 'path';
 
+// METODO PARA OBTENER RUTAS ORIGINALES
+export const ObtenerRuta = async function (codigo: string, cedula: string, directorio: string) {
+    let ruta = '';
+    let separador = path.sep;
+    ruta = path.join(__dirname, `..${separador}..`);
+    return `${ruta}${separador}${directorio}${separador}${codigo}_${cedula}`;
+}
+
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE IMAGENES DE USUARIO
 export const ObtenerRutaUsuario = async function (id: any) {
     let ruta = '';
@@ -41,6 +49,19 @@ export const ObtenerRutaPermisos = async function (codigo: any) {
     return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula;
 }
 
+// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE CONTRATOS DEL USUARIO
+export const ObtenerRutaContrato = async function (id: any) {
+    let ruta = '';
+    let separador = path.sep;
+    const usuario = await pool.query(
+        `
+        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
+        `
+        , [id]);
+    ruta = path.join(__dirname, `..${separador}..`);
+    return ruta + separador + 'contratos' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
+}
+
 export const ObtenerRutaHorarios = function () {
     let ruta = '';
     let separador = path.sep;
@@ -72,18 +93,6 @@ export const ObtenerRutaLogos = function () {
     return ruta + separador + 'logos';
 }
 
-// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE CONTRATOS DEL USUARIO
-export const ObtenerRutaContrato = async function (id: any) {
-    let ruta = '';
-    let separador = path.sep;
-    const usuario = await pool.query(
-        `
-        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
-        `
-        , [id]);
-    ruta = path.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'contratos' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
-}
 
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO
 export const ObtenerRutaPlatilla = function () {

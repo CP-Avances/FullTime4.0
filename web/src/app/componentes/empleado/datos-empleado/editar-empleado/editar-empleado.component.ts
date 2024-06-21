@@ -237,16 +237,18 @@ export class EditarEmpleadoComponent implements OnInit {
 
     // CONTADOR 0 EL REGISTRO SE REALIZA UNA SOL VEZ, CONTADOR 1 SE DIO UN ERROR Y SE REALIZA NUEVAMENTE EL PROCESO
     if (this.contador === 0) {
-      this.rest.ActualizarEmpleados(empleado, this.idEmpleado).subscribe(response => {
-        if (response.message === 'error') {
-          this.toastr.error('Código o cédula ya se encuentran registrados.', 'Upss!!! algo slaio mal.', {
+      this.rest.ActualizarEmpleados(empleado, this.idEmpleado).subscribe(
+        (response: any) => {
+          if (response.message === 'Registro actualizado.') {
+            this.ActualizarUser(form3, form1);
+          }
+        },
+        error => {
+          this.toastr.error(error.error.message, 'Upss!!! algo salió mal.', {
             timeOut: 6000,
           });
         }
-        else {
-          this.ActualizarUser(form3, form1);
-        }
-      });
+      );
     }
     else {
       this.ActualizarUser(form3, form1);

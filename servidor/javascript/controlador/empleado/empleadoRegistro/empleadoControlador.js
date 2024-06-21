@@ -305,6 +305,8 @@ class EmpleadoControlador {
         SELECT * FROM eu_empleados WHERE id = $1
         `, [id]);
                 const [datosOriginales] = empleado.rows;
+                const codigoAnterior = datosOriginales.codigo;
+                const cedulaAnterior = datosOriginales.cedula;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleados',
@@ -336,110 +338,114 @@ class EmpleadoControlador {
                     ip,
                     observacion: null
                 });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
+                // VARIABLES PARA VERIFICAR RENOBRAMIENTO DE CARPETAS
+                // 0 => CORRECTO 1 => ERROR
                 let verificar_permisos = 0;
-                // RUTA DE LA CARPETA PERMISOS DEL USUARIO
-                const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
-                // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
-                fs_2.default.access(carpetaPermisos, fs_2.default.constants.F_OK, (err) => {
-                    if (err) {
-                        // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_2.default.mkdir(carpetaPermisos, { recursive: true }, (err) => {
-                            if (err) {
-                                verificar_permisos = 1;
-                            }
-                            else {
-                                verificar_permisos = 0;
-                            }
-                        });
-                    }
-                    else {
-                        verificar_permisos = 0;
-                    }
-                });
                 let verificar_imagen = 0;
-                // RUTA DE LA CARPETA IMAGENES DEL USUARIO
-                const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id);
-                // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
-                fs_2.default.access(carpetaImagenes, fs_2.default.constants.F_OK, (err) => {
-                    if (err) {
-                        // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_2.default.mkdir(carpetaImagenes, { recursive: true }, (err) => {
-                            if (err) {
-                                verificar_imagen = 1;
-                            }
-                            else {
-                                verificar_imagen = 0;
-                            }
-                        });
-                    }
-                    else {
-                        verificar_imagen = 0;
-                    }
-                });
                 let verificar_vacunas = 0;
-                // RUTA DE LA CARPETA VACUNAS DEL USUARIO
-                const carpetaVacunas = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(id);
-                // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
-                fs_2.default.access(carpetaVacunas, fs_2.default.constants.F_OK, (err) => {
-                    if (err) {
-                        // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_2.default.mkdir(carpetaVacunas, { recursive: true }, (err) => {
-                            if (err) {
-                                verificar_vacunas = 1;
-                            }
-                            else {
-                                verificar_vacunas = 0;
-                            }
-                        });
-                    }
-                    else {
-                        verificar_vacunas = 0;
-                    }
-                });
                 let verificar_contrato = 0;
-                // RUTA DE LA CARPETA CONTRATOS DEL USUARIO
-                const carpetaContratos = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(id);
-                // VERIFICACION DE EXISTENCIA CARPETA CONTRATOS DE USUARIO
-                fs_2.default.access(carpetaContratos, fs_2.default.constants.F_OK, (err) => {
-                    if (err) {
-                        // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_2.default.mkdir(carpetaContratos, { recursive: true }, (err) => {
-                            if (err) {
-                                verificar_contrato = 1;
-                            }
-                            else {
-                                verificar_contrato = 0;
-                            }
-                        });
-                    }
-                    else {
-                        verificar_contrato = 0;
-                    }
-                });
-                // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
-                if (verificar_permisos === 1 && verificar_imagen === 1 && verificar_vacunas === 1 && verificar_contrato === 1) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos, permisos, imagenes y vacunación del usuario.' });
+                if (codigoAnterior !== codigo || cedulaAnterior !== cedula) {
+                    // RUTA DE LA CARPETA PERMISOS DEL USUARIO
+                    const carpetaPermisosAnterior = yield (0, accesoCarpetas_1.ObtenerRuta)(codigoAnterior, cedulaAnterior, 'permisos');
+                    const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
+                    // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
+                    fs_2.default.access(carpetaPermisosAnterior, fs_2.default.constants.F_OK, (err) => {
+                        if (err) {
+                            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+                        }
+                        else {
+                            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+                            fs_2.default.rename(carpetaPermisosAnterior, carpetaPermisos, (err) => {
+                                if (err) {
+                                    verificar_permisos = 1;
+                                }
+                                else {
+                                    verificar_permisos = 0;
+                                }
+                            });
+                        }
+                    });
+                    // RUTA DE LA CARPETA IMAGENES DEL USUARIO
+                    const carpetaImagenesAnterior = yield (0, accesoCarpetas_1.ObtenerRuta)(codigoAnterior, cedulaAnterior, 'imagenesEmpleados');
+                    const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id);
+                    // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
+                    fs_2.default.access(carpetaImagenesAnterior, fs_2.default.constants.F_OK, (err) => {
+                        if (err) {
+                            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+                        }
+                        else {
+                            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+                            fs_2.default.rename(carpetaImagenesAnterior, carpetaImagenes, (err) => {
+                                if (err) {
+                                    verificar_imagen = 1;
+                                }
+                                else {
+                                    verificar_imagen = 0;
+                                }
+                            });
+                        }
+                    });
+                    // RUTA DE LA CARPETA VACUNAS DEL USUARIO
+                    const carpetaVacunasAnterior = yield (0, accesoCarpetas_1.ObtenerRuta)(codigoAnterior, cedulaAnterior, 'carnetVacuna');
+                    const carpetaVacunas = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(id);
+                    // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
+                    fs_2.default.access(carpetaVacunasAnterior, fs_2.default.constants.F_OK, (err) => {
+                        if (err) {
+                            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+                        }
+                        else {
+                            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+                            fs_2.default.rename(carpetaVacunasAnterior, carpetaVacunas, (err) => {
+                                if (err) {
+                                    verificar_vacunas = 1;
+                                }
+                                else {
+                                    verificar_vacunas = 0;
+                                }
+                            });
+                        }
+                    });
+                    // RUTA DE LA CARPETA CONTRATOS DEL USUARIO
+                    const carpetaContratosAnterior = yield (0, accesoCarpetas_1.ObtenerRuta)(codigoAnterior, cedulaAnterior, 'contratos');
+                    const carpetaContratos = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(id);
+                    // VERIFICACION DE EXISTENCIA CARPETA CONTRATOS DE USUARIO
+                    fs_2.default.access(carpetaContratosAnterior, fs_2.default.constants.F_OK, (err) => {
+                        if (err) {
+                            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+                        }
+                        else {
+                            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+                            fs_2.default.rename(carpetaContratosAnterior, carpetaContratos, (err) => {
+                                if (err) {
+                                    verificar_contrato = 1;
+                                }
+                                else {
+                                    verificar_contrato = 0;
+                                }
+                            });
+                        }
+                    });
                 }
-                else if (verificar_permisos === 1 && verificar_imagen === 0 && verificar_vacunas === 0 && verificar_contrato === 0) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos del usuario.' });
-                }
-                else if (verificar_permisos === 0 && verificar_imagen === 1 && verificar_vacunas === 0 && verificar_contrato === 0) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de imagenes del usuario.' });
-                }
-                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 0) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de vacunación del usuario.' });
-                }
-                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 1) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos del usuario.' });
+                // METODO DE VERIFICACION DE MODIFICACION DE DIRECTORIOS
+                const errores = {
+                    '1': 'permisos',
+                    '2': 'imagenes',
+                    '3': 'vacunación',
+                    '4': 'contratos'
+                };
+                const verificaciones = [verificar_permisos, verificar_imagen, verificar_vacunas, verificar_contrato];
+                const mensajesError = verificaciones.map((verificacion, index) => verificacion === 1 ? errores[(index + 1).toString()] : null).filter(Boolean);
+                if (mensajesError.length > 0) {
+                    yield database_1.default.query('ROLLBACK');
+                    return res.status(500).jsonp({ message: `Ups!!! no fue posible modificar el directorio de ${mensajesError.join(', ')} del usuario.` });
                 }
                 else {
-                    res.jsonp({ message: 'Registro actualizado.' });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.jsonp({ message: 'Registro actualizado.' });
                 }
             }
             catch (error) {
-                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
