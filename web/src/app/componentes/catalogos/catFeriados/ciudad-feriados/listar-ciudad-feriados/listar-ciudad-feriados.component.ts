@@ -149,7 +149,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
         ip: this.ip,
       };
 
-      datos.forEach(obj => {
+      datos.forEach((obj: any) => {
         this.restF.EliminarRegistro(obj.idciudad_asignada, data).subscribe(res => {
           this.eliminar = this.eliminar + 1;
           if (this.eliminar === datos.length) {

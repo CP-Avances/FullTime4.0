@@ -20,12 +20,11 @@ class PlanGeneralControlador {
     CrearPlanificacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var errores = 0;
-            var iterar = 0;
-            var cont = 0;
+            let ocurrioError = false;
+            let mensajeError = '';
+            let codigoError = 0;
             // CONTADORES INICIAN EN CERO (0)
             errores = 0;
-            iterar = 0;
-            cont = 0;
             const { user_name, ip, plan_general } = req.body;
             for (var i = 0; i < plan_general.length; i++) {
                 try {
@@ -41,7 +40,6 @@ class PlanGeneralControlador {
                         plan_general[i].tipo_entr_salida, plan_general[i].codigo, plan_general[i].id_horario, plan_general[i].tipo_dia,
                         plan_general[i].salida_otro_dia, plan_general[i].min_antes, plan_general[i].min_despues, plan_general[i].estado_origen,
                         plan_general[i].min_alimentacion], (error, results) => __awaiter(this, void 0, void 0, function* () {
-                        iterar = iterar + 1;
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
                             tabla: 'eu_asistencia_general',
@@ -54,33 +52,30 @@ class PlanGeneralControlador {
                         });
                         // FINALIZAR TRANSACCION
                         yield database_1.default.query('COMMIT');
-                        try {
-                            console.log('if ', error);
-                            if (error) {
-                                errores = errores + 1;
-                                if (iterar === plan_general.length && errores > 0) {
-                                    return res.status(200).jsonp({ message: 'error' });
-                                }
-                            }
-                            else {
-                                cont = cont + 1;
-                                if (iterar === plan_general.length && cont === plan_general.length) {
-                                    return res.status(200).jsonp({ message: 'OK' });
-                                }
-                                else if (iterar === plan_general.length && cont != plan_general.length) {
-                                    return res.status(200).jsonp({ message: 'error' });
-                                }
-                            }
-                        }
-                        catch (error) {
-                            throw error;
+                        //console.log('if ', error)
+                        if (error) {
+                            errores = errores + 1;
                         }
                     }));
                 }
                 catch (error) {
                     // REVERTIR TRANSACCION
                     yield database_1.default.query('ROLLBACK');
-                    return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
+                    ocurrioError = true;
+                    mensajeError = error;
+                    codigoError = 500;
+                    break;
+                }
+            }
+            if (ocurrioError) {
+                return res.status(500).jsonp({ message: mensajeError });
+            }
+            else {
+                if (errores > 0) {
+                    return res.status(200).jsonp({ message: 'error' });
+                }
+                else {
+                    return res.status(200).jsonp({ message: 'OK' });
                 }
             }
         });
@@ -105,12 +100,11 @@ class PlanGeneralControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var errores = 0;
-            var iterar = 0;
-            var cont = 0;
+            let ocurrioError = false;
+            let mensajeError = '';
+            let codigoError = 0;
             // CONTADORES INICIAN EN CERO (0)
             errores = 0;
-            iterar = 0;
-            cont = 0;
             const { user_name, ip, id_plan } = req.body;
             for (var i = 0; i < id_plan.length; i++) {
                 try {
@@ -136,7 +130,6 @@ class PlanGeneralControlador {
                     database_1.default.query(`
                     DELETE FROM eu_asistencia_general WHERE id = $1
                     `, [id_plan[i].id], (error) => __awaiter(this, void 0, void 0, function* () {
-                        iterar = iterar + 1;
                         // AUDITORIA
                         yield auditoriaControlador_1.default.InsertarAuditoria({
                             tabla: 'eu_asistencia_general',
@@ -149,35 +142,31 @@ class PlanGeneralControlador {
                         });
                         // FINALIZAR TRANSACCION
                         yield database_1.default.query('COMMIT');
-                        try {
-                            if (error) {
-                                errores = errores + 1;
-                                if (iterar === id_plan.length && errores > 0) {
-                                    return res.status(200).jsonp({ message: 'error' });
-                                }
-                            }
-                            else {
-                                cont = cont + 1;
-                                if (iterar === id_plan.length && cont === id_plan.length) {
-                                    return res.status(200).jsonp({ message: 'OK' });
-                                }
-                                else if (iterar === id_plan.length && cont != id_plan.length) {
-                                    return res.status(200).jsonp({ message: 'error' });
-                                }
-                            }
-                        }
-                        catch (error) {
-                            throw error;
+                        if (error) {
+                            errores = errores + 1;
                         }
                     }));
                 }
                 catch (error) {
                     // REVERTIR TRANSACCION
                     yield database_1.default.query('ROLLBACK');
-                    return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
+                    ocurrioError = true;
+                    mensajeError = error;
+                    codigoError = 500;
+                    break;
                 }
             }
-            return res.status(200).jsonp({ message: 'OK' });
+            if (ocurrioError) {
+                return res.status(500).jsonp({ message: mensajeError });
+            }
+            else {
+                if (errores > 0) {
+                    return res.status(200).jsonp({ message: 'error' });
+                }
+                else {
+                    return res.status(200).jsonp({ message: 'OK' });
+                }
+            }
         });
     }
     // METODO PARA BUSCAR PLANIFICACION EN UN RANGO DE FECHAS

@@ -164,6 +164,7 @@ export class RegistroContratoComponent implements OnInit {
   InsertarContrato(form: any) {
     let datosContrato = {
       id_tipo_contrato: form.tipoForm,
+      subir_documento: false,
       vaca_controla: form.controlVacacionesForm,
       asis_controla: form.controlAsistenciaForm,
       id_empleado: this.datoEmpleado,
@@ -227,12 +228,23 @@ export class RegistroContratoComponent implements OnInit {
 
   // METODO PARA REGISTRAR DATOS DE CONTRATO
   RegistrarContrato(form: any, datos: any) {
+    if (this.isChecked === true && form.documentoForm != '') {
+      datos.subir_documento = true;
+    }
     this.rest.CrearContratoEmpleado(datos).subscribe(response => {
-      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
-        timeOut: 6000,
-      })
-      if (this.isChecked === true && form.documentoForm != '') {
-        this.CargarContrato(response.id, form);
+      //console.log('res ', response)
+      if (response.message === 'error' || response.message === 'error_carpeta') {
+        this.toastr.success('Intente nuevamente.', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        })
+      }
+      else {
+        this.toastr.success('Operación exitosa.', 'Registro guardado.', {
+          timeOut: 6000,
+        })
+        if (this.isChecked === true && form.documentoForm != '') {
+          this.CargarContrato(response.id, form);
+        }
       }
       this.CerrarVentana();
     }, error => {
@@ -314,7 +326,7 @@ export class RegistroContratoComponent implements OnInit {
       this.archivoForm.reset();
       this.nameFile = '';
     }, error => {
-      this.toastr.info('Verifique que este usuario tenga creadas capetas', 'No se ha podido cargar el archivo.', {
+      this.toastr.info('Intente cargar nuevamente el archivo.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       });
     }

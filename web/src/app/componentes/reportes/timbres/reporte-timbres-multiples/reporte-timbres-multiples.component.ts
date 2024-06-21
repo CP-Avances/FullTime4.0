@@ -895,7 +895,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
           })
         }
 
-        obj.departamentos.forEach(obj1 => {
+        obj.departamentos.forEach((obj1: any) => {
 
           // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
           if (this.bool.bool_dep === true) {
@@ -1168,7 +1168,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     let accionT = '';
     let n = 0;
     array.forEach((obj1: IReporteTimbres) => {
-      obj1.departamentos.forEach(obj2 => {
+      obj1.departamentos.forEach((obj2: any) => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             n++;
@@ -1300,7 +1300,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     let n = 0;
     let accionT = '';
     this.data_pdf.forEach((obj1: IReporteTimbres) => {
-      obj1.departamentos.forEach(obj2 => {
+      obj1.departamentos.forEach((obj2: any) => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             n = n + 1;

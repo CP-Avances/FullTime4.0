@@ -209,8 +209,8 @@ export class EliminarIndividualComponent implements OnInit {
       ip: this.ip
     };
 
-    this.horariosSeleccionados.forEach(obj => {
-      this.datosEliminar.usuario.forEach(usu => {
+    this.horariosSeleccionados.forEach((obj: any) => {
+      this.datosEliminar.usuario.forEach((usu: any) => {
         let plan_fecha = {
           codigo: usu.codigo,
           fec_final: final,
@@ -289,6 +289,7 @@ export class EliminarIndividualComponent implements OnInit {
     if (this.datosEliminar.pagina === 'ver_empleado') {
       this.ventana.eliminar_plan = false;
       this.ventana.ver_tabla_horarios = true;
+      this.ventana.BuscarHorarioPeriodo();
     }
     else if (this.datosEliminar.pagina === 'planificar') {
       this.componentem.eliminar_plan = false;

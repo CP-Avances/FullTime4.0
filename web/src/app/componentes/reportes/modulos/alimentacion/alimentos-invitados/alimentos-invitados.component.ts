@@ -310,7 +310,7 @@ export class AlimentosInvitadosComponent implements OnInit {
   presentarSumatoriaTotal(arreglo1: any) {
     var t_total1 = 0;
     var suma_total = 0;
-    arreglo1.forEach(obj1 => {
+    arreglo1.forEach((obj1: any) => {
       t_total1 = t_total1 + parseFloat(obj1.total)
     })
     suma_total = t_total1

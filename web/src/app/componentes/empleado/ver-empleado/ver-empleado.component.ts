@@ -12,11 +12,22 @@ import { default as _rollupMoment, Moment } from 'moment';
 import * as FileSaver from 'file-saver';
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
-import * as L from 'leaflet';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as xml2js from 'xml2js';
+
+// USO DE MAPAS EN EL SISTEMA
+import * as L from 'leaflet';
+// ELIMINA LAS URLS POR DEFECTO
+delete L.Icon.Default.prototype._getIconUrl;
+
+// ESTABLECE LAS NUEVAS RUTAS DE LAS IMAGENES
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
+  iconUrl: 'assets/leaflet/marker-icon.png',
+  shadowUrl: 'assets/leaflet/marker-shadow.png',
+});
 
 // IMPORTAR SERVICIOS
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
@@ -216,7 +227,7 @@ export class VerEmpleadoComponent implements OnInit {
         this.vacunacion = 1;
       }
     }
-    else if (event.tab.textLabel === 'contrato_cargo') {
+    else if (event.tab.textLabel === 'contrato_cargo' || event.tab.textLabel === 'planificacion') {
       if (this.contrato_cargo === 0) {
         this.VerDatosActuales(this.formato_fecha);
         this.ObtenerContratosEmpleado(this.formato_fecha);

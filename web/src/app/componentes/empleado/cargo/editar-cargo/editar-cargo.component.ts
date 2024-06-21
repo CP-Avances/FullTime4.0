@@ -30,7 +30,6 @@ export class EditarCargoComponent implements OnInit {
   sucursales: any = [];
   empresas: any = [];
   cargo: any = [];
-  ver_jefe: boolean = false;
   ver_personal: boolean = false;
   personal: boolean = false;
   idAsignacion: number;
@@ -87,9 +86,6 @@ export class EditarCargoComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
-    if (this.idRol != 2) {
-      this.ver_jefe = true;
-    }
     this.ObtenerAsignacionesUsuario(this.idEmpleadoAcceso);
     this.BuscarUsuarioDepartamento();
     this.ObtenerCargoEmpleado();
@@ -194,7 +190,6 @@ export class EditarCargoComponent implements OnInit {
           idDeparForm: obj.id_departamento,
           sueldoForm: obj.sueldo.split('.')[0],
           tipoForm: obj.id_tipo_cargo,
-          jefeForm: obj.jefe,
           personalForm: this.personal,
         })
       });
@@ -247,7 +242,6 @@ export class EditarCargoComponent implements OnInit {
       fec_final: form.fecFinalForm,
       sueldo: form.sueldoForm,
       cargo: form.tipoForm,
-      jefe: form.jefeForm,
       user_name: this.user_name,
       ip: this.ip,
     }

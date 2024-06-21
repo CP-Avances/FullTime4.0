@@ -39,15 +39,6 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
-  // VARIABLES QUE ALMACENAN SELECCION DE DIAS LIBRES
-  lunes = false;
-  martes = false;
-  miercoles = false;
-  jueves = false;
-  viernes = false;
-  sabado = false;
-  domingo = false;
-
   // VARIABLE DE ALMACENAMIENTO
   horarios: any = [];
   feriados: any = [];
@@ -824,6 +815,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     }
+    console.log('existencia ', this.existencias)
     this.existencias.forEach((he: any) => {
       if (he.default_ === 'N' || he.default_ === 'DHA' || he.default_ === 'L' || he.default_ === 'FD') {
         sumaN = sumaN + 1;
@@ -833,21 +825,22 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       }
     })
     //---console.log('ver suma ', suma)
-    let data_eliminar = {
-      id: form.horarioForm,
-    }
-    this.eliminar_horarios = this.eliminar_horarios.concat(data_eliminar);
+
+    this.eliminar_horarios.push({ id: form.horarioForm })
+    console.log('ver horarios eliminar------ ', this.eliminar_horarios)
     // SI EXISTENTE SOLO UN HORARIO SE ELIMINA HORARIOS DE DESCANSO
     if (sumaN === 1 && sumaO > 0) {
+      console.log('descanso ', this.lista_descanso)
       this.lista_descanso.forEach((obj: any) => {
-        data_eliminar = {
-          id: obj.id_horario,
-        }
-        this.eliminar_horarios = this.eliminar_horarios.concat(data_eliminar);
+        this.existencias.forEach((he: any) => {
+          if ((he.default_ === 'DL' && obj.tipo === 'DL') || (he.default_ === 'DFD' && obj.tipo === 'DFD')) {
+            this.eliminar_horarios.push({ id: obj.id_horario });
+          }
+        })
       })
     }
 
-    //---console.log('ver horarios eliminar ', this.eliminar_horarios)
+    console.log('ver horarios eliminar ', this.eliminar_horarios)
     // METODO PARA ELIMINAR HORARIOS
     this.eliminar_horarios.forEach((h: any) => {
       let plan_fecha = {
@@ -857,16 +850,18 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         id_horario: h.id,
       };
       this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
-        //console.log('ids ', res)
+        console.log('ids ', res, ' h ', this.eliminar_horarios.length)
         fechas = fechas + 1;
+        console.log('fechas--- ', fechas)
         datos.id_plan = res;
         // METODO PARA ELIMINAR DE LA BASE DE DATOS
         this.restP.EliminarRegistro(datos).subscribe(datos => {
-          //console.log('ver datos de eliminacion ', datos)
+          console.log('ver datos de eliminacion ', datos)
+          console.log('fechas ', fechas)
           verificador = verificador + 1;
           if (datos.message === 'OK') {
             eliminar = eliminar + 1;
-            //---console.log('verificador ', verificador, ' eliminar ', eliminar, 'fechas ', fechas)
+            console.log('verificador ', verificador, ' eliminar ', eliminar, 'fechas ', fechas)
             if (verificador === this.eliminar_horarios.length) {
               this.progreso = false;
               this.ControlarBotones(true, true, true, false, false);
@@ -876,7 +871,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
                 });
               }
               else {
-                this.toastr.error('Ups!!! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
+                this.toastr.warning('Ups!!! algo salio mal. Intentar eliminar los registros nuevamente.', '', {
                   timeOut: 6000,
                 });
               }
@@ -925,6 +920,116 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       })
     })
   }
+
+  /*
+  async EliminarPlanificacion(form: any) {
+    this.progreso = true;
+    let sumaN = 0;
+    let sumaO = 0;
+    let fechas = 0;
+    let eliminar = 0;
+    let verificador = 0;
+    let vacio = 0;
+ 
+    const datos: any = {
+        id_plan: [],
+        user_name: this.user_name,
+        ip: this.ip,
+    };
+ 
+    // Calcular sumaN y sumaO
+    this.existencias.forEach((he: any) => {
+        if (['N', 'DHA', 'L', 'FD'].includes(he.default_)) {
+            sumaN++;
+        } else {
+            sumaO++;
+        }
+    });
+ 
+    let data_eliminar = [{ id: form.horarioForm }];
+    this.eliminar_horarios = [...this.eliminar_horarios, ...data_eliminar];
+ 
+    // Eliminar horarios de descanso si es necesario
+    if (sumaN === 1 && sumaO > 0) {
+        this.lista_descanso.forEach((obj: any) => {
+            this.existencias.forEach((he: any) => {
+                if ((he.default_ === 'DL' && obj.tipo === 'DL') || (he.default_ === 'DFD' && obj.tipo === 'DFD')) {
+                    this.eliminar_horarios.push({ id: obj.id_horario });
+                }
+            });
+        });
+    }
+ 
+    console.log('ver horarios eliminar ', this.eliminar_horarios);
+ 
+    for (const h of this.eliminar_horarios) {
+        try {
+            const plan_fecha = {
+                codigo: this.data_horario.codigo,
+                fec_final: form.fechaFinalForm,
+                fec_inicio: form.fechaInicioForm,
+                id_horario: h.id,
+            };
+ 
+            const res = await this.restP.BuscarFechas(plan_fecha).toPromise();
+            fechas++;
+ 
+            datos.id_plan = res;
+ 
+            try {
+                const response = await this.restP.EliminarRegistro(datos).toPromise();
+                verificador++;
+ 
+                if (response.message === 'OK') {
+                    eliminar++;
+                }
+ 
+                if (verificador === this.eliminar_horarios.length) {
+                    this.progreso = false;
+                    this.ControlarBotones(true, true, true, false, false);
+ 
+                    if (eliminar === fechas) {
+                        this.toastr.success('Operación exitosa.', 'Registros eliminados.', {
+                            timeOut: 6000,
+                        });
+                    } else {
+                        this.toastr.warning('Ups!!! algo salio mal. Intentar eliminar los registros nuevamente.', '', {
+                            timeOut: 6000,
+                        });
+                    }
+ 
+                    if (this.data_horario.pagina === 'busqueda') {
+                        this.busqueda.buscar_fechas = true;
+                    }
+                }
+            } catch (error) {
+                this.handleDeleteError(verificador);
+            }
+        } catch (error) {
+            verificador++;
+            vacio++;
+            this.handleDeleteError(verificador, vacio);
+        }
+    }
+}
+ 
+handleDeleteError(verificador: number, vacio: number = 0) {
+    if (verificador === this.eliminar_horarios.length) {
+        this.progreso = false;
+        this.ControlarBotones(false, true, false, false, false);
+ 
+        if (vacio === this.eliminar_horarios.length) {
+            this.toastr.success('Continuar...', 'No se han encontrado registros para eliminar.', {
+                timeOut: 6000,
+            });
+        } else {
+            this.toastr.error('Ups!!! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
+                timeOut: 6000,
+            });
+        }
+    }
+}
+*/
 
   // METODO PARA SUMAR HORAS
   StringTimeToSegundosTime(stringTime: string) {
