@@ -13,9 +13,9 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 export class ConfirmarCrearCarpetaComponent implements OnInit {
 
   empleados: any = [];
-  contenidoHabilitar: boolean = false;
-  contenidoDeshabilitar: boolean = false;
-  contenidoReactivar: boolean = false;
+  permisos: boolean = false;
+  vacaciones: boolean = false;
+  horasExtras: boolean = false;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -25,71 +25,44 @@ export class ConfirmarCrearCarpetaComponent implements OnInit {
     private toastr: ToastrService,
     private restE: EmpleadoService,
     public ventana: MatDialogRef<ConfirmarCrearCarpetaComponent>,
-    @Inject(MAT_DIALOG_DATA) public Empleados: any,
+    @Inject(MAT_DIALOG_DATA) public data: any,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
-    this.empleados = this.Empleados.lista.map((obj: any) => {
+    this.empleados = this.data.empleados.map((obj: any) => {
       return obj;
     });
-    this.Opcion();
-  }
 
-  // METODO PARA ACTIVAR - INACTIVAR - REACTIVAR USUARIO
-  Opcion() {
-    // INACTIVAR EMPLEADOS
-    if (this.Empleados.opcion === 1) {
-      this.contenidoDeshabilitar = true;
+    this.permisos = this.data.permisos;
+    this.vacaciones = this.data.vacaciones;
+    this.horasExtras = this.data.horasExtras;
 
-      // ACTIVAR EMPLEADOS
-    } else if (this.Empleados.opcion === 2) {
-      this.contenidoHabilitar = true;
-
-      // REACTIVAR EMPLEADOS
-    } else if (this.Empleados.opcion === 3) {
-      this.contenidoReactivar = true;
-    }
   }
 
   // METODO PARA GUARDAR CAMBIOS EN BASE DE DATOS
   ConfirmarCrearCarpetaEmpleados() {
 
-    this.empleados.map((e: any) => {
-      const datos = {
-        id: e.id,
-        codigo: e.codigo
-      }
+    const datos = {
+      empleados: this.empleados,
+      permisos: this.permisos,
+      vacaciones: this.vacaciones,
+      horasExtras: this.horasExtras,
+    }
 
-      // INACTIVAR EMPLEADOS
-      if (this.Empleados.opcion === 1) {
-        this.restE.CrearCarpetasUsuarios(datos).subscribe(res => {
-          this.toastr.success(res.message, '', {
-            timeOut: 6000,
-          })
+    this.restE.CrearCarpetasUsuarios(datos).subscribe(res => {
+      if (res.error) {
+        this.toastr.error(res.message, '', {
+          timeOut: 6000,
         });
-
-        // ACTIVAR EMPLEADOS
-      } else if (this.Empleados.opcion === 2) {
-        this.restE.CrearCarpetasUsuarios(datos).subscribe(res => {
-          this.toastr.success(res.message, '', {
-            timeOut: 6000,
-          })
-        });
-
-
-
-        // REACTIVAR EMPLEADOS
-      } else if (this.Empleados.opcion === 3) {
-        this.restE.CrearCarpetasUsuarios(datos).subscribe(res => {
-          this.toastr.success(res.message, '', {
-            timeOut: 6000,
-          })
+      } else {
+        this.toastr.success(res.message, '', {
+          timeOut: 6000,
         });
       }
-    })
+    });
 
     this.ventana.close(true);
 

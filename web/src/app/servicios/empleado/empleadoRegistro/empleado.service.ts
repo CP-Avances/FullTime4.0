@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -293,7 +294,11 @@ export class EmpleadoService {
 
   // CREAR CARPETA PARA EMPLEADOS SELECCIONADOS
   CrearCarpetasUsuarios(data: any) {
-    return this.http.post<any>(`${environment.url}/empleado/crear_carpetas`, data)
+    return this.http.post<any>(`${environment.url}/empleado/crear_carpetas`, data).pipe(
+      catchError(error => {
+        return of({ error: true, message: error.error.message });
+      })
+    );
   }
 
 

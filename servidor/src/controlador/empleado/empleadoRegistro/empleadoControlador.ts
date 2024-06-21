@@ -2612,33 +2612,57 @@ class EmpleadoControlador {
    ** **                      CREAR CARPETAS EMPLEADOS SELECCIONADOS                           ** 
    ** **************************************************************************************** **/
 
-  public async CrearCarpetasEmpleado(req: Request, res: Response) {
-    const { id, codigo } = req.body;
-    let verificar_permisos = 0;
-    try {
-      const carpetaPermisos = await ObtenerRutaPermisos(codigo);
-      try {
-        await pr.access(carpetaPermisos, fs.constants.F_OK);
-        verificar_permisos = 2; // LA CARPETA YA EXISTE
-      } catch {
+   public async CrearCarpetasEmpleado(req: Request, res: Response) {
+    const { empleados, permisos, vacaciones, horasExtras } = req.body;
+    let errorOccurred = false;
+  
+    for (const e of empleados) {
+      const { codigo, cedula } = e;
+  
+      if (permisos) {
+        const carpetaPermisos = await ObtenerRuta(codigo, cedula, 'permisos');
         try {
-          await pr.mkdir(carpetaPermisos, { recursive: true });
-          verificar_permisos = 0; // CARPETA CREADA CON EXITO
-        } catch {
-          verificar_permisos = 1; // ERROR AL CREAR LA CARPETA
+          await fs.promises.access(carpetaPermisos, fs.constants.F_OK);
+        } catch (error) {
+          try {
+            await fs.promises.mkdir(carpetaPermisos, { recursive: true });
+          } catch (error) {
+            errorOccurred = true;
+          }
         }
       }
-
-      // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
-      if (verificar_permisos === 1) {
-        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos.' });
-      } else if (verificar_permisos === 2) {
-        res.jsonp({ message: 'Ya existen carpetas creadas de ' + codigo });
-      } else {
-        res.jsonp({ message: 'Carpetas creadas con éxito.' });
+  
+      if (vacaciones) {
+        const carpetaVacaciones = await ObtenerRuta(codigo, cedula, 'vacaciones');
+        try {
+          await fs.promises.access(carpetaVacaciones, fs.constants.F_OK);
+        } catch (error) {
+          try {
+            await fs.promises.mkdir(carpetaVacaciones, { recursive: true });
+          } catch (error) {
+            errorOccurred = true;
+          }
+        }
       }
-    } catch (error) {
-      res.status(500).json({ message: 'Error al procesar la solicitud.', error: error.message });
+  
+      if (horasExtras) {
+        const carpetaHorasExtras = await ObtenerRuta(codigo, cedula, 'horasExtras');
+        try {
+          await fs.promises.access(carpetaHorasExtras, fs.constants.F_OK);
+        } catch (error) {
+          try {
+            await fs.promises.mkdir(carpetaHorasExtras, { recursive: true });
+          } catch (error) {
+            errorOccurred = true;
+          }
+        }
+      }
+    }
+  
+    if (errorOccurred) {
+      res.status(500).jsonp({ message: 'Ups!!! se produjo un error al crear las carpetas.' });
+    } else {
+      res.jsonp({ message: 'Carpetas creadas con éxito.' });
     }
   }
 }

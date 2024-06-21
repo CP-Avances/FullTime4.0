@@ -28,6 +28,7 @@ import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-ge
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
@@ -51,7 +52,12 @@ export class ListaEmpleadosComponent implements OnInit {
   idUsuariosAcceso:   Set<any> = new Set();// VARIABLE DE ALMACENAMIENTO DE IDs DE USUARIOS A LOS QUE TIENE ACCESO EL USURIO QUE INICIO SESION
 
   mostarTabla: boolean = false;
+  mostrarCrearCarpeta: boolean = false;
 
+  // BUSQUEDA DE MODULOS ACTIVOS
+  get habilitarPermisos(): boolean { return this.funciones.permisos; }
+  get habilitarVacaciones(): boolean { return this.funciones.vacaciones; }
+  get habilitarHorasExtras(): boolean { return this.funciones.horasExtras; }
 
   // CAMPOS DEL FORMULARIO
   apellido = new FormControl('', [Validators.minLength(2)]);
@@ -103,6 +109,7 @@ export class ListaEmpleadosComponent implements OnInit {
     private usuario: UsuarioService,
     private asignaciones: AsignacionesService,
     private datosGenerales: DatosGeneralesService,
+    private funciones: MainNavService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -114,6 +121,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
     this.GetEmpleados();
     this.ObtenerEmpleados(this.idEmpleado);
+    this.VerificarModulosActivos();
     this.ObtenerNacionalidades();
     this.DescargarPlantilla();
     this.ObtenerColores();
@@ -171,6 +179,10 @@ export class ListaEmpleadosComponent implements OnInit {
     this.Hab_Deshabilitados = false;
   }
 
+  VerificarModulosActivos() {
+    this.mostrarCrearCarpeta = this.habilitarPermisos || this.habilitarVacaciones || this.habilitarHorasExtras;
+  }
+
   // METODO PARA ACTIVAR O DESACTIVAR CHECK LIST DE TABLA EMPLEADOS DESACTIVADOS
   Hab_Deshabilitados: boolean = false;
   btnCheckDeshabilitado: boolean = false;
@@ -210,11 +222,13 @@ export class ListaEmpleadosComponent implements OnInit {
   CrearCarpeta(opcion: number) {
     let EmpleadosSeleccionados: any;
     if (opcion === 1) {
+      console.log('this.selectionUno.selected', this.selectionUno.selected);
       EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
         return {
           id: obj.id,
           codigo: obj.codigo,
-          empleado: obj.nombre + ' ' + obj.apellido
+          empleado: obj.nombre + ' ' + obj.apellido,
+          cedula: obj.cedula,
         }
       })
     } else if (opcion === 2 || opcion === 3) {
@@ -222,7 +236,8 @@ export class ListaEmpleadosComponent implements OnInit {
         return {
           id: obj.id,
           codigo: obj.codigo,
-          empleado: obj.nombre + ' ' + obj.apellido
+          empleado: obj.nombre + ' ' + obj.apellido,
+          cedula: obj.cedula,
         }
       })
     }
@@ -231,7 +246,12 @@ export class ListaEmpleadosComponent implements OnInit {
     if (EmpleadosSeleccionados.length != 0) {
       this.ventana.open(ConfirmarCrearCarpetaComponent, {
         width: '500px',
-        data: { opcion: opcion, lista: EmpleadosSeleccionados }
+        data: {
+          empleados: EmpleadosSeleccionados,
+          vacaciones: this.habilitarVacaciones,
+          permisos: this.habilitarPermisos,
+          horasExtras: this.habilitarHorasExtras
+        }
       })
         .afterClosed().subscribe(item => {
           if (item === true) {
