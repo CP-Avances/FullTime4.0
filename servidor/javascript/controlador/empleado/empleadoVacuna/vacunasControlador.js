@@ -19,6 +19,7 @@ const moment_1 = __importDefault(require("moment"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const settingsMail_1 = require("../../../libs/settingsMail");
 class VacunasControlador {
     // LISTAR REGISTROS DE VACUNACIÓN DEL EMPLEADO POR SU ID
     ListarUnRegistro(req, res) {
@@ -79,13 +80,14 @@ class VacunasControlador {
                 VALUES ($1, $2, $3, $4) RETURNING *
                 `, [id_empleado, descripcion, fecha, id_tipo_vacuna]);
                 const [vacuna] = response.rows;
+                var fechaN = yield (0, settingsMail_1.FormatearFecha2)(fecha, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{id_empleado: ${id_empleado}, descripcion: ${descripcion}, fecha: ${fecha}, id_tipo_vacuna: ${id_tipo_vacuna}}`,
+                    datosNuevos: `{id_empleado: ${id_empleado}, id_vacuna: ${id_tipo_vacuna}, fecha: ${fechaN}, carnet: null , descripcion: ${descripcion}}`,
                     ip,
                     observacion: null
                 });
@@ -145,13 +147,14 @@ class VacunasControlador {
                 yield database_1.default.query(`
                 UPDATE eu_empleado_vacunas SET carnet = $2 WHERE id = $1
                 `, [id, documento]);
+                var fechaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: '',
-                    datosNuevos: `{carnet: ${documento}}`,
+                    datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
+                    datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${documento} , descripcion: ${datosOriginales.descripcion}}`,
                     ip,
                     observacion: null
                 });
@@ -196,12 +199,14 @@ class VacunasControlador {
                 WHERE id = $5
                 `, [id_empleado, descripcion, fecha, id_tipo_vacuna, id]);
                 // AUDITORIA
+                var fechaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
+                var fechaN = yield (0, settingsMail_1.FormatearFecha2)(fecha, 'ddd');
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{id_empleado: ${id_empleado}, descripcion: ${descripcion}, fecha: ${fecha}, id_vacuna: ${id_tipo_vacuna}}`,
+                    datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
+                    datosNuevos: `{id_empleado: ${id_empleado}, id_vacuna: ${id_tipo_vacuna}, fecha: ${fechaN}, carnet: ${datosOriginales.carnet} , descripcion: ${descripcion}}`,
                     ip,
                     observacion: null
                 });
@@ -265,13 +270,14 @@ class VacunasControlador {
                 UPDATE eu_empleado_vacunas SET carnet = null WHERE id = $1 RETURNING *
                 `, [id]);
                 const [vacuna] = response.rows;
+                var fechaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{carnet: null}`,
+                    datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
+                    datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: null, descripcion: ${datosOriginales.descripcion}}`,
                     ip,
                     observacion: null
                 });
@@ -328,12 +334,13 @@ class VacunasControlador {
                 DELETE FROM eu_empleado_vacunas WHERE id = $1 RETURNING *
                 `, [id]);
                 const [vacuna] = response.rows;
+                var fechaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
                     datosNuevos: '',
                     ip,
                     observacion: null

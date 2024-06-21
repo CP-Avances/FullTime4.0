@@ -144,6 +144,12 @@ class PlanComidasControlador {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
         `, [fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, fec_inicio, fec_final]);
                 const [planAlimentacion] = response.rows;
+                console.log("fecha: ", fec_inicio);
+                const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_inicio.split('T')[1]);
+                console.log("fecha: ", fechaHora);
+                const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio.toLocaleString(), 'ddd');
+                console.log("fecha: ", fechaTimbre);
+                console.log(fec_inicio);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ma_detalle_plan_comida',

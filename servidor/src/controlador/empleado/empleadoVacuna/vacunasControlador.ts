@@ -6,7 +6,7 @@ import moment from 'moment';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
-
+import { FormatearFecha2 } from '../../../libs/settingsMail';
 class VacunasControlador {
 
     // LISTAR REGISTROS DE VACUNACIÓN DEL EMPLEADO POR SU ID
@@ -74,8 +74,10 @@ class VacunasControlador {
                 VALUES ($1, $2, $3, $4) RETURNING *
                 `
                 , [id_empleado, descripcion, fecha, id_tipo_vacuna]);
-    
+
             const [vacuna] = response.rows;
+
+            var fechaN = await FormatearFecha2(fecha, 'ddd');
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -83,14 +85,14 @@ class VacunasControlador {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{id_empleado: ${id_empleado}, descripcion: ${descripcion}, fecha: ${fecha}, id_tipo_vacuna: ${id_tipo_vacuna}}`,
-                ip, 
+                datosNuevos: `{id_empleado: ${id_empleado}, id_vacuna: ${id_tipo_vacuna}, fecha: ${fechaN}, carnet: null , descripcion: ${descripcion}}`,
+                ip,
                 observacion: null
             });
 
             // FINALIZAR TRANSACCION|
             await pool.query('COMMIT');
-    
+
             if (vacuna) {
                 return res.status(200).jsonp(vacuna)
             }
@@ -113,22 +115,22 @@ class VacunasControlador {
             var anio = fecha.format('YYYY');
             var mes = fecha.format('MM');
             var dia = fecha.format('DD');
-    
+
             const { user_name, ip } = req.body;
             let id = req.params.id;
             let id_empleado = req.params.id_empleado;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
-    
+
             const response: QueryResult = await pool.query(
                 `
                 SELECT codigo FROM eu_empleados WHERE id = $1
                 `
                 , [id_empleado]);
-    
+
             const [vacuna] = response.rows;
-    
+
             let documento = vacuna.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
 
             // CONSULTAR DATOSORIGINALES
@@ -142,35 +144,37 @@ class VacunasControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip, 
+                    ip,
                     observacion: `Error al guardar documento de vacuna con id: ${id}`
                 });
-    
+
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Registro no encontrado.' });
             }
-    
+
             await pool.query(
                 `
                 UPDATE eu_empleado_vacunas SET carnet = $2 WHERE id = $1
                 `
                 , [id, documento]);
-            
+            var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_empleado_vacunas',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: '',
-                datosNuevos: `{carnet: ${documento}}`,
-                ip, 
+                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
+                datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${documento} , descripcion: ${datosOriginales.descripcion}}`,
+                ip,
                 observacion: null
             });
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-    
+
             return res.jsonp({ message: 'Registro guardado.' });
         } catch (error) {
             // REVERTIR TRANSACCION
@@ -198,11 +202,11 @@ class VacunasControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
-                    datosNuevos:'',
-                    ip, 
+                    datosNuevos: '',
+                    ip,
                     observacion: `Error al actualizar vacuna con id: ${id}`
                 });
-    
+
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Registro no encontrado.' });
@@ -214,15 +218,21 @@ class VacunasControlador {
                 WHERE id = $5
                 `
                 , [id_empleado, descripcion, fecha, id_tipo_vacuna, id]);
-            
+
             // AUDITORIA
+            var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+
+            var fechaN = await FormatearFecha2(fecha, 'ddd');
+
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_empleado_vacunas',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: `{id_empleado: ${id_empleado}, descripcion: ${descripcion}, fecha: ${fecha}, id_vacuna: ${id_tipo_vacuna}}`,
-                ip, 
+                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
+
+
+                datosNuevos: `{id_empleado: ${id_empleado}, id_vacuna: ${id_tipo_vacuna}, fecha: ${fechaN}, carnet: ${datosOriginales.carnet} , descripcion: ${descripcion}}`,
+                ip,
                 observacion: null
             });
 
@@ -274,38 +284,41 @@ class VacunasControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
-                    datosNuevos:'',
-                    ip, 
+                    datosNuevos: '',
+                    ip,
                     observacion: `Error al eliminar documento de vacuna con id: ${id}`
                 });
-    
+
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Registro no encontrado.' });
             }
-    
+
             const response: QueryResult = await pool.query(
                 `
                 UPDATE eu_empleado_vacunas SET carnet = null WHERE id = $1 RETURNING *
                 `
                 , [id]);
-    
+
             const [vacuna] = response.rows;
+
+            var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_empleado_vacunas',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: `{carnet: null}`,
-                ip, 
+                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
+                datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: null, descripcion: ${datosOriginales.descripcion}}`,
+                ip,
                 observacion: null
             });
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-    
+
             if (documento != 'null' && documento != '' && documento != null) {
                 let ruta = await ObtenerRutaVacuna(vacuna.id_empleado) + separador + documento;
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
@@ -317,7 +330,7 @@ class VacunasControlador {
                     }
                 });
             }
-    
+
             return res.jsonp({ message: 'Documento eliminado.' });
         } catch (error) {
             // REVERTIR TRANSACCION
@@ -330,7 +343,7 @@ class VacunasControlador {
     public async EliminarRegistro(req: Request, res: Response): Promise<Response> {
         try {
             let separador = path.sep;
-            
+
             const { user_name, ip } = req.body;
             const { id, documento } = req.params;
 
@@ -347,11 +360,11 @@ class VacunasControlador {
                     usuario: user_name,
                     accion: 'D',
                     datosOriginales: '',
-                    datosNuevos:'',
-                    ip, 
+                    datosNuevos: '',
+                    ip,
                     observacion: `Error al eliminar vacuna con id: ${id}`
                 });
-    
+
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Registro no encontrado.' });
@@ -362,17 +375,20 @@ class VacunasControlador {
                 DELETE FROM eu_empleado_vacunas WHERE id = $1 RETURNING *
                 `
                 , [id]);
-    
+
             const [vacuna] = response.rows;
-    
+
+
+            var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_empleado_vacunas',
                 usuario: user_name,
                 accion: 'D',
-                datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos:'',
-                ip, 
+                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
+                datosNuevos: '',
+                ip,
                 observacion: null
             });
 
@@ -394,7 +410,7 @@ class VacunasControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'Error al eliminar registro.' });  
+            return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
         }
     }
 
@@ -419,21 +435,21 @@ class VacunasControlador {
                     `
                     , [vacuna]);
 
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'e_cat_vacuna',
-                usuario: user_name,
-                accion: 'I',
-                datosOriginales: '',
-                datosNuevos: `{nombre: ${vacuna}}`,
-                ip, 
-                observacion: null
-            });
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_vacuna',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{nombre: ${vacuna}}`,
+                    ip,
+                    observacion: null
+                });
 
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
 
-            const [vacunaInsertada] = response.rows;
+                const [vacunaInsertada] = response.rows;
 
                 if (vacunaInsertada) {
                     return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' })

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import {
   enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
-  FormatearFecha, FormatearHora, dia_completo
+  FormatearFecha, FormatearHora, dia_completo, FormatearFecha2
 }
   from '../../libs/settingsMail';
 
@@ -153,6 +153,20 @@ class PlanComidasControlador {
         [fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, fec_inicio, fec_final]);
 
       const [planAlimentacion] = response.rows;
+
+
+      console.log("fecha: ",fec_inicio);
+
+      const fechaHora = await FormatearHora(fec_inicio.split('T')[1]);
+      console.log("fecha: ",fechaHora);
+
+      const fechaTimbre = await FormatearFecha2(fec_inicio.toLocaleString(), 'ddd')
+      console.log("fecha: ",fechaTimbre);
+
+      console.log(fec_inicio)
+
+
+
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({

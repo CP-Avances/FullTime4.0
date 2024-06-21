@@ -8,6 +8,7 @@ import excel from 'xlsx';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
+import { FormatearFecha2 } from '../../../libs/settingsMail';
 
 class ContratoEmpleadoControlador {
 
@@ -31,13 +32,17 @@ class ContratoEmpleadoControlador {
 
             const [contrato] = response.rows;
 
+            var fechaIngresoN = await FormatearFecha2(fec_ingreso, 'ddd');
+            var fechaSalidaN = await FormatearFecha2(fec_salida, 'ddd');
+
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_empleado_contratos',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{id_empleado: ${id_empleado}, fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
+                datosNuevos: `{id_empleado: ${id_empleado}, fec_ingreso: ${fechaIngresoN}, fec_salida: ${fechaSalidaN}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
                 ip,
                 observacion: null
             });
@@ -76,7 +81,7 @@ class ContratoEmpleadoControlador {
 
             const response: QueryResult = await pool.query(
                 `
-                SELECT codigo FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+                SELECT * FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
                 `
                 , [id]);
 
@@ -107,13 +112,15 @@ class ContratoEmpleadoControlador {
                 `
                 , [id, documento]);
 
+            var fechaIngresoO = await FormatearFecha2(empleado.fecha_ingreso, 'ddd');
+            var fechaSalidaO = await FormatearFecha2(empleado.fecha_salida, 'ddd');
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_empleado_contratos',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: JSON.stringify(empleado),
-                datosNuevos: `{documento: ${documento}}`,
+                datosOriginales: `{id: ${empleado.id}, id_empleado: ${empleado.id_empleado}, id_regimen: ${empleado.id_regimen}, id_modalidad_laboral: ${empleado.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${empleado.controlar_vacacion}, controlar_asistencia: ${empleado.controlar_asistencia}, documento: ${empleado.documento}}`,
+                datosNuevos: `{id: ${empleado.id}, id_empleado: ${empleado.id_empleado}, id_regimen: ${empleado.id_regimen}, id_modalidad_laboral: ${empleado.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${empleado.controlar_vacacion}, controlar_asistencia: ${empleado.controlar_asistencia}, documento: ${documento}}`,
                 ip,
                 observacion: null
             });
@@ -201,13 +208,22 @@ class ContratoEmpleadoControlador {
                 , [fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
                     id_tipo_contrato, id]);
 
+
+            var fechaIngresoO = await FormatearFecha2(datosOriginales.fecha_ingreso, 'ddd');
+            var fechaSalidaO = await FormatearFecha2(datosOriginales.fecha_salida, 'ddd');
+            // AUDITORIA
+
+            var fechaIngresoN = await FormatearFecha2(fec_ingreso, 'ddd');
+            var fechaSalidaN = await FormatearFecha2(fec_salida, 'ddd');
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_empleado_contratos',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: `{fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
+                datosOriginales: `{id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, id_regimen: ${datosOriginales.id_regimen}, id_modalidad_laboral: ${datosOriginales.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${datosOriginales.controlar_vacacion}, controlar_asistencia: ${datosOriginales.controlar_asistencia}, documento: ${datosOriginales.documento}}`,
+                
+                datosNuevos:`{id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, id_regimen: ${id_regimen}, id_modalidad_laboral: ${id_tipo_contrato}, fecha_ingreso: ${fechaIngresoN}, fecha_salida: ${fechaSalidaN}, controlar_vacacion: ${vaca_controla}, controlar_asistencia: ${asis_controla}, documento: ${datosOriginales.documento}}`,
                 ip,
                 observacion: null
             });
@@ -234,6 +250,7 @@ class ContratoEmpleadoControlador {
             // CONSULTAR DATOS ORIGINALES
             const contratoConsulta = await pool.query('SELECT * FROM eu_empleado_contratos WHERE id = $1', [id]);
             const [datosOriginales] = contratoConsulta.rows;
+            console.log("ver datos buscados",datosOriginales);
 
             if (!datosOriginales) {
                 // AUDITORIA
@@ -259,14 +276,16 @@ class ContratoEmpleadoControlador {
                 , [id]);
 
             const [contrato] = response.rows;
+            var fechaIngresoO = await FormatearFecha2(datosOriginales.fecha_ingreso, 'ddd');
+            var fechaSalidaO = await FormatearFecha2(datosOriginales.fecha_salida, 'ddd');
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_empleado_contratos',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: `{documento: null}`,
+                datosOriginales: `{id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, id_regimen: ${datosOriginales.id_regimen}, id_modalidad_laboral: ${datosOriginales.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${datosOriginales.controlar_vacacion}, controlar_asistencia: ${datosOriginales.controlar_asistencia}, documento: ${datosOriginales.documento}}`,
+                datosNuevos: `{id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, id_regimen: ${datosOriginales.id_regimen}, id_modalidad_laboral: ${datosOriginales.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${datosOriginales.controlar_vacacion}, controlar_asistencia: ${datosOriginales.controlar_asistencia}, documento: null}`,
                 ip,
                 observacion: null
             });

@@ -20,6 +20,7 @@ const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const settingsMail_1 = require("../../../libs/settingsMail");
 class ContratoEmpleadoControlador {
     // REGISTRAR CONTRATOS
     CrearContrato(req, res) {
@@ -35,13 +36,15 @@ class ContratoEmpleadoControlador {
                 `, [id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
                     id_tipo_contrato]);
                 const [contrato] = response.rows;
+                var fechaIngresoN = yield (0, settingsMail_1.FormatearFecha2)(fec_ingreso, 'ddd');
+                var fechaSalidaN = yield (0, settingsMail_1.FormatearFecha2)(fec_salida, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_contratos',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{id_empleado: ${id_empleado}, fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
+                    datosNuevos: `{id_empleado: ${id_empleado}, fec_ingreso: ${fechaIngresoN}, fec_salida: ${fechaSalidaN}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
                     ip,
                     observacion: null
                 });
@@ -76,7 +79,7 @@ class ContratoEmpleadoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-                SELECT codigo FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+                SELECT * FROM eu_empleados AS e, eu_empleado_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
                 `, [id]);
                 const [empleado] = response.rows;
                 let documento = empleado.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
@@ -98,13 +101,15 @@ class ContratoEmpleadoControlador {
                 yield database_1.default.query(`
                 UPDATE eu_empleado_contratos SET documento = $2 WHERE id = $1
                 `, [id, documento]);
+                var fechaIngresoO = yield (0, settingsMail_1.FormatearFecha2)(empleado.fecha_ingreso, 'ddd');
+                var fechaSalidaO = yield (0, settingsMail_1.FormatearFecha2)(empleado.fecha_salida, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_contratos',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(empleado),
-                    datosNuevos: `{documento: ${documento}}`,
+                    datosOriginales: `{id: ${empleado.id}, id_empleado: ${empleado.id_empleado}, id_regimen: ${empleado.id_regimen}, id_modalidad_laboral: ${empleado.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${empleado.controlar_vacacion}, controlar_asistencia: ${empleado.controlar_asistencia}, documento: ${empleado.documento}}`,
+                    datosNuevos: `{id: ${empleado.id}, id_empleado: ${empleado.id_empleado}, id_regimen: ${empleado.id_regimen}, id_modalidad_laboral: ${empleado.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${empleado.controlar_vacacion}, controlar_asistencia: ${empleado.controlar_asistencia}, documento: ${documento}}`,
                     ip,
                     observacion: null
                 });
@@ -184,13 +189,18 @@ class ContratoEmpleadoControlador {
                 WHERE id = $7
                 `, [fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
                     id_tipo_contrato, id]);
+                var fechaIngresoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_ingreso, 'ddd');
+                var fechaSalidaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_salida, 'ddd');
+                // AUDITORIA
+                var fechaIngresoN = yield (0, settingsMail_1.FormatearFecha2)(fec_ingreso, 'ddd');
+                var fechaSalidaN = yield (0, settingsMail_1.FormatearFecha2)(fec_salida, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_contratos',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
+                    datosOriginales: `{id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, id_regimen: ${datosOriginales.id_regimen}, id_modalidad_laboral: ${datosOriginales.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${datosOriginales.controlar_vacacion}, controlar_asistencia: ${datosOriginales.controlar_asistencia}, documento: ${datosOriginales.documento}}`,
+                    datosNuevos: `{id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, id_regimen: ${id_regimen}, id_modalidad_laboral: ${id_tipo_contrato}, fecha_ingreso: ${fechaIngresoN}, fecha_salida: ${fechaSalidaN}, controlar_vacacion: ${vaca_controla}, controlar_asistencia: ${asis_controla}, documento: ${datosOriginales.documento}}`,
                     ip,
                     observacion: null
                 });
@@ -216,6 +226,7 @@ class ContratoEmpleadoControlador {
                 // CONSULTAR DATOS ORIGINALES
                 const contratoConsulta = yield database_1.default.query('SELECT * FROM eu_empleado_contratos WHERE id = $1', [id]);
                 const [datosOriginales] = contratoConsulta.rows;
+                console.log("ver datos buscados", datosOriginales);
                 if (!datosOriginales) {
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -235,13 +246,15 @@ class ContratoEmpleadoControlador {
                 UPDATE eu_empleado_contratos SET documento = null WHERE id = $1 RETURNING *
                 `, [id]);
                 const [contrato] = response.rows;
+                var fechaIngresoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_ingreso, 'ddd');
+                var fechaSalidaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_salida, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_contratos',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{documento: null}`,
+                    datosOriginales: `{id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, id_regimen: ${datosOriginales.id_regimen}, id_modalidad_laboral: ${datosOriginales.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${datosOriginales.controlar_vacacion}, controlar_asistencia: ${datosOriginales.controlar_asistencia}, documento: ${datosOriginales.documento}}`,
+                    datosNuevos: `{id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, id_regimen: ${datosOriginales.id_regimen}, id_modalidad_laboral: ${datosOriginales.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${datosOriginales.controlar_vacacion}, controlar_asistencia: ${datosOriginales.controlar_asistencia}, documento: null}`,
                     ip,
                     observacion: null
                 });

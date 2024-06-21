@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../../database"));
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
+const settingsMail_1 = require("../../libs/settingsMail");
 class TipoComidasControlador {
     ListarTipoComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -93,6 +94,8 @@ class TipoComidasControlador {
         INSERT INTO ma_horario_comidas (nombre, id_comida, hora_inicio, hora_fin)
         VALUES ($1, $2, $3, $4) RETURNING *
               `, [nombre, tipo_comida, hora_inicio, hora_fin]);
+                var horaInicioN = yield (0, settingsMail_1.FormatearHora)(hora_inicio);
+                var horaFinN = yield (0, settingsMail_1.FormatearHora)(hora_fin);
                 const [tipos_comida] = response.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -100,7 +103,7 @@ class TipoComidasControlador {
                     usuario: user_name,
                     accion: "I",
                     datosOriginales: "",
-                    datosNuevos: `{nombre: ${nombre}, tipo_comida: ${tipo_comida}, hora_inicio: ${hora_inicio}, hora_fin: ${hora_fin}}`,
+                    datosNuevos: `{nombre: ${nombre}, tipo_comida: ${tipo_comida}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}}`,
                     ip,
                     observacion: null,
                 });
@@ -148,13 +151,17 @@ class TipoComidasControlador {
         UPDATE ma_horario_comidas SET nombre = $1, id_comida = $2, hora_inicio = $3, hora_fin = $4
         WHERE id = $5
         `, [nombre, tipo_comida, hora_inicio, hora_fin, id]);
+                var horaInicioN = yield (0, settingsMail_1.FormatearHora)(hora_inicio);
+                var horaFinN = yield (0, settingsMail_1.FormatearHora)(hora_fin);
+                var horaInicioO = yield (0, settingsMail_1.FormatearHora)(datos.hora_inicio);
+                var horaFinO = yield (0, settingsMail_1.FormatearHora)(datos.hora_fin);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: "ma_horario_comidas",
                     usuario: user_name,
                     accion: "U",
-                    datosOriginales: JSON.stringify(datos),
-                    datosNuevos: `{nombre: ${nombre}, tipo_comida: ${tipo_comida}, hora_inicio: ${hora_inicio}, hora_fin: ${hora_fin}}`,
+                    datosOriginales: `{nombre: ${datos.nombre}, id_comida: ${datos.id_comida}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}}`,
+                    datosNuevos: `{nombre: ${nombre}, tipo_comida: ${tipo_comida}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}}`,
                     ip,
                     observacion: null,
                 });
@@ -198,12 +205,14 @@ class TipoComidasControlador {
                 yield database_1.default.query(`
         DELETE FROM ma_horario_comidas WHERE id = $1
         `, [id]);
+                var horaInicioO = yield (0, settingsMail_1.FormatearHora)(datos.hora_inicio);
+                var horaFinO = yield (0, settingsMail_1.FormatearHora)(datos.hora_fin);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: "ma_horario_comidas",
                     usuario: user_name,
                     accion: "D",
-                    datosOriginales: JSON.stringify(datos),
+                    datosOriginales: `{nombre: ${datos.nombre}, id_comida: ${datos.id_comida}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}}`,
                     datosNuevos: "",
                     ip,
                     observacion: null,
