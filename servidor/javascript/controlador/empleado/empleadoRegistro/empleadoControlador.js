@@ -751,8 +751,8 @@ class EmpleadoControlador {
     }
     // CARGAR IMAGEN DE EMPLEADO
     CrearImagenEmpleado(req, res) {
-        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b;
             sharp.cache(false);
             try {
                 // FECHA DEL SISTEMA
@@ -1240,8 +1240,8 @@ class EmpleadoControlador {
      ** **                      CARGAR INFORMACION MEDIANTE PLANTILLA                            **
      ** **************************************************************************************** **/
     VerificarPlantilla_Automatica(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
                 let separador = path_1.default.sep;
@@ -1610,8 +1610,8 @@ class EmpleadoControlador {
         });
     }
     CargarPlantilla_Automatico(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const { plantilla, user_name, ip } = req.body;
             const VALOR = yield database_1.default.query(`
       SELECT * FROM e_codigo
@@ -1795,8 +1795,8 @@ class EmpleadoControlador {
     }
     // METODOS PARA VERIFICAR PLANTILLA CON CODIGO INGRESADO DE FORMA MANUAL 
     VerificarPlantilla_Manual(req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
                 let separador = path_1.default.sep;

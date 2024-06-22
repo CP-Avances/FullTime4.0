@@ -977,6 +977,13 @@ class DepartamentoControlador {
             }
         });
 
+        var tiempo = 1500;
+        if(listNivelesDep.length > 500 && listNivelesDep.length <= 1000){
+          tiempo = 3000;
+        }else if(listNivelesDep.length > 1000){
+          tiempo = 6000;
+        }
+
         setTimeout(() => {
           listNivelesDep.sort((a: any, b: any) => {
             // COMPARA LOS NUMEROS DE LOS OBJETOS
@@ -1021,7 +1028,7 @@ class DepartamentoControlador {
 
           return res.jsonp({ message: mensaje, data: listNivelesDep });
 
-        }, 1000)
+        }, tiempo)
 
 
 

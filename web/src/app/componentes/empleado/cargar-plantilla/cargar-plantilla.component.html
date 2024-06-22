@@ -294,14 +294,13 @@
                                     <th scope="col">Item</th>
                                     <th scope="col">Observación</th>
                                     <th scope="col">Cédula</th>
+                                    <th scope="col">Sucursal</th>
                                     <th scope="col">Departamento</th>
+                                    <th scope="col">Cargo</th>
                                     <th scope="col">Fecha desde</th>
                                     <th scope="col">Fecha hasta</th>
-                                    <th scope="col">Sucursal</th>
                                     <th scope="col">Sueldo</th>
-                                    <th scope="col">Cargo</th>
                                     <th scope="col">Hora de trabajo</th>
-                                    <th scope="col">Jefe</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -316,14 +315,13 @@
                                         </div>
                                     </td>
                                     <td [style.color]="stiloTextoCelda(cargo.cedula)" style="font-size: 12px;">{{cargo.cedula}}</td>
+                                    <td [style.color]="stiloTextoCelda(cargo.sucursal)" style="font-size: 12px;">{{cargo.sucursal}}</td>
                                     <td [style.color]="stiloTextoCelda(cargo.departamento)" style="font-size: 12px;">{{cargo.departamento}}</td>
+                                    <td [style.color]="stiloTextoCelda(cargo.cargo)" id="letras" style="font-size: 12px;">{{cargo.cargo}}</td>
                                     <td [style.color]="stiloTextoCelda(cargo.fecha_inicio)" style="font-size: 12px;">{{cargo.fecha_inicio}}</td>
                                     <td [style.color]="stiloTextoCelda(cargo.fecha_final)" style="font-size: 12px;">{{cargo.fecha_final}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.sucursal)" style="font-size: 12px;">{{cargo.sucursal}}</td>
                                     <td [style.color]="stiloTextoCelda(cargo.sueldo)" style="font-size: 12px;">{{cargo.sueldo}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.cargo)" id="letras" style="font-size: 12px;">{{cargo.cargo}}</td>
                                     <td [style.color]="stiloTextoCelda(cargo.hora_trabaja)" id="letras" style="font-size: 12px;">{{cargo.hora_trabaja}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.jefe)" style="font-size: 12px;">{{cargo.jefe}}</td>
                                 </tr>
                             </tbody>
                         </table>
