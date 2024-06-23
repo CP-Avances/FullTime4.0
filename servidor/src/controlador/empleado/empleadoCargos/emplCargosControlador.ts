@@ -16,7 +16,7 @@ class EmpleadoCargosControlador {
     const { id } = req.params;
     const unEmplCargp = await pool.query(
       `
-      SELECT ec.id, ec.id_contrato, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.jefe, ec.sueldo, 
+      SELECT ec.id, ec.id_contrato, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.sueldo, 
         ec.hora_trabaja, ec.id_sucursal, s.nombre AS sucursal, ec.id_departamento, 
         d.nombre AS departamento, e.id AS id_empresa, e.nombre AS empresa, tc.cargo AS nombre_cargo 
       FROM eu_empleado_cargos AS ec, e_sucursales AS s, ed_departamentos AS d, e_empresa AS e, 
@@ -39,24 +39,24 @@ class EmpleadoCargosControlador {
   public async Crear(req: Request, res: Response): Promise<void> {
     try {
       const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo,
-        jefe, user_name, ip } = req.body;
-      
+        user_name, ip } = req.body;
+
       const datosNuevos = req.body;
-      
+
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       await pool.query(
         `
         INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal,
-           sueldo, hora_trabaja, id_tipo_cargo, jefe) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+           sueldo, hora_trabaja, id_tipo_cargo) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         `
-        , [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe]);
+        , [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo]);
 
       delete datosNuevos.user_name;
       delete datosNuevos.ip;
-      
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eu_empleado_cargos',
@@ -70,7 +70,7 @@ class EmpleadoCargosControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-  
+
       res.jsonp({ message: 'Registro guardado.' });
     } catch (error) {
       // REVERTIR TRANSACCION
@@ -83,13 +83,17 @@ class EmpleadoCargosControlador {
   public async EditarCargo(req: Request, res: Response): Promise<Response> {
     try {
       const { id_empl_contrato, id } = req.params;
-      const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe, user_name, ip } = req.body;
-  
+      const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, user_name, ip } = req.body;
+
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const cargoConsulta = await pool.query('SELECT * FROM eu_empleado_cargos WHERE id = $1', [id]);
+      const cargoConsulta = await pool.query(
+        `
+        SELECT * FROM eu_empleado_cargos WHERE id = $1
+        `
+        , [id]);
       const [datosOriginales] = cargoConsulta.rows;
 
       if (!datosOriginales) {
@@ -112,19 +116,19 @@ class EmpleadoCargosControlador {
       await pool.query(
         `
         UPDATE eu_empleado_cargos SET id_departamento = $1, fecha_inicio = $2, fecha_final = $3, id_sucursal = $4, 
-          sueldo = $5, hora_trabaja = $6, id_tipo_cargo = $7, jefe = $8  
-        WHERE id_contrato = $9 AND id = $10
+          sueldo = $5, hora_trabaja = $6, id_tipo_cargo = $7  
+        WHERE id_contrato = $8 AND id = $9
         `
-        , [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe,
+        , [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo,
           id_empl_contrato, id]);
-        
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eu_empleado_cargos',
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{id_departamento: ${id_departamento}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, id_sucursal: ${id_sucursal}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, cargo: ${cargo}, jefe: ${jefe}}`,
+        datosNuevos: `{id_departamento: ${id_departamento}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, id_sucursal: ${id_sucursal}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, cargo: ${cargo}}`,
         ip,
         observacion: null
       });
@@ -239,7 +243,7 @@ class EmpleadoCargosControlador {
 
 
 
- 
+
 
   public async BuscarTipoDepartamento(req: Request, res: Response) {
     const id = req.params.id;
@@ -318,7 +322,7 @@ class EmpleadoCargosControlador {
   public async CrearTipoCargo(req: Request, res: Response): Promise<Response> {
     try {
       const { cargo, user_name, ip } = req.body;
-      
+
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
@@ -327,7 +331,7 @@ class EmpleadoCargosControlador {
         INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
         `
         , [cargo]);
-  
+
       const [tipo_cargo] = response.rows;
 
       // AUDITORIA
@@ -340,7 +344,7 @@ class EmpleadoCargosControlador {
         ip,
         observacion: null
       });
-  
+
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
 
@@ -383,31 +387,33 @@ class EmpleadoCargosControlador {
         sueldo: '',
         cargo: '',
         hora_trabaja: '',
+        admini_depa: '',
         observacion: ''
       };
-  
+
       var listCargos: any = [];
       var duplicados: any = [];
       var mensaje: string = 'correcto';
-  
-  
+
+
       // LECTURA DE LOS DATOS DE LA PLANTILLA
       plantilla.forEach(async (dato: any) => {
         var { ITEM, CEDULA, DEPARTAMENTO, FECHA_DESDE, FECHA_HASTA, SUCURSAL, SUELDO,
-          CARGO, HORA_TRABAJA} = dato;
+          CARGO, HORA_TRABAJA, ADMINISTRAR_DEPARTAMENTO} = dato;
   
         //Verificar que el registo no tenga datos vacios
         if ((ITEM != undefined && ITEM != '') && (CEDULA != undefined) && (DEPARTAMENTO != undefined) &&
           (FECHA_DESDE != undefined) && (FECHA_HASTA != undefined) && (SUCURSAL != undefined) &&
-          (SUELDO != undefined) && (CARGO != undefined) && (HORA_TRABAJA != undefined)) {
+          (SUELDO != undefined) && (CARGO != undefined) && (HORA_TRABAJA != undefined) && 
+          (ADMINISTRAR_DEPARTAMENTO != undefined)) {
           data.fila = ITEM;
           data.cedula = CEDULA; data.departamento = DEPARTAMENTO;
           data.fecha_inicio = FECHA_DESDE; data.fecha_final = FECHA_HASTA;
           data.sucursal = SUCURSAL; data.sueldo = SUELDO;
           data.cargo = CARGO; data.hora_trabaja = HORA_TRABAJA;
-  
+          data.admini_depa = ADMINISTRAR_DEPARTAMENTO;
           data.observacion = 'no registrado';
-  
+
           //Valida si los datos de la columna cedula son numeros.
           const rege = /^[0-9]+$/;
           if (rege.test(data.cedula)) {
@@ -422,33 +428,34 @@ class EmpleadoCargosControlador {
               if (moment(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) { } else {
                 data.observacion = 'Formato de fecha final incorrecto (YYYY-MM-DD)';
               }
-  
+
               //Verifica el valor del suelo que sea solo numeros
-              if(typeof data.sueldo != 'number' && isNaN(data.sueldo)){
+              if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
                 data.observacion = 'El sueldo es incorrecto';
               }
-  
+
               if (data.hora_trabaja != 'No registrado') {
                 if (moment(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) { } else {
                   data.observacion = 'Formato horas invalido  (HH:mm:ss)';
                 }
               }
-  
+
             }
           } else {
             data.observacion = 'La cédula ingresada no es válida';
           }
-  
+
           listCargos.push(data);
-  
+
         } else {
           data.fila = ITEM;
           data.cedula = CEDULA; data.departamento = DEPARTAMENTO;
           data.fecha_inicio = FECHA_DESDE; data.fecha_final = FECHA_HASTA;
           data.sucursal = SUCURSAL; data.sueldo = SUELDO;
           data.cargo = CARGO; data.hora_trabaja = HORA_TRABAJA;
+          data.admini_depa = ADMINISTRAR_DEPARTAMENTO;
           data.observacion = 'no registrado';
-  
+
           if (data.fila == '' || data.fila == undefined) {
             data.fila = 'error';
             mensaje = 'error'
@@ -481,6 +488,9 @@ class EmpleadoCargosControlador {
             data.hora_trabaja = 'No registrado';
             data.observacion = 'Hora trabaja ' + data.observacion;
           }
+          if (ADMINISTRAR_DEPARTAMENTO == undefined) {
+            data.admini_depa = 'No registrado';
+          }
   
           if (CEDULA == undefined) {
             data.cedula = 'No registrado'
@@ -491,7 +501,7 @@ class EmpleadoCargosControlador {
             if (rege.test(data.cedula)) {
               if (data.cedula.toString().length != 10) {
                 data.observacion = 'La cédula ingresada no es válida';
-              }else{
+              } else {
                 // Verificar si la variable tiene el formato de fecha correcto con moment
                 if (data.fecha_inicio != 'No registrado') {
                   if (moment(data.fecha_inicio, 'yyyy-mm-dd', true).isValid()) { } else {
@@ -518,20 +528,20 @@ class EmpleadoCargosControlador {
             } else {
               data.observacion = 'La cédula ingresada no es válida';
             }
-  
+
           }
-  
-  
-  
+
+
+
           listCargos.push(data);
-  
-  
+
+
         }
-  
+
         data = {}
-  
+
       });
-  
+
       // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
       fs.access(ruta, fs.constants.F_OK, (err) => {
         if (err) {
@@ -540,7 +550,7 @@ class EmpleadoCargosControlador {
           fs.unlinkSync(ruta);
         }
       });
-  
+
       listCargos.forEach(async (valor: any) => {
         
           if (valor.observacion == 'no registrado') {
@@ -580,7 +590,7 @@ class EmpleadoCargosControlador {
 
                                   const fechaRango: any = await pool.query(
                                   `
-                                  SELECT * FROM eu_empleado_cargos 
+                                  SELECT id FROM eu_empleado_cargos 
                                   WHERE id_contrato = $1 AND 
                                   ($2  BETWEEN fecha_inicio and fecha_final or $3 BETWEEN fecha_inicio and fecha_final or 
                                   fecha_inicio BETWEEN $2 AND $3)
@@ -593,8 +603,8 @@ class EmpleadoCargosControlador {
 
                                     // Discriminación de elementos iguales
                                     if (duplicados.find((p: any) => p.cedula === valor.cedula) == undefined) {
-                                      valor.observacion = 'ok';
                                       duplicados.push(valor);
+                                      valor.observacion = 'ok';
                                     } else {
                                       valor.observacion = '1';
                                     }
@@ -631,11 +641,11 @@ class EmpleadoCargosControlador {
       if(listCargos.length > 500 && listCargos.length <= 1000){
         tiempo = 4000;
       }else if(listCargos.length > 1000){
-        tiempo = 6000;
+        tiempo = 7000;
       }
       
       setTimeout(() => {
-  
+
         listCargos.sort((a: any, b: any) => {
           // COMPARA LOS NUMEROS DE LOS OBJETOS
           if (a.fila < b.fila) {
@@ -646,9 +656,9 @@ class EmpleadoCargosControlador {
           }
           return 0; // SON IGUALES
         });
-  
+
         var filaDuplicada: number = 0;
-  
+
         listCargos.forEach((item: any) => {
           if (item.observacion == '1') {
             item.observacion = 'Registro duplicado (cédula)'
@@ -663,11 +673,11 @@ class EmpleadoCargosControlador {
           } else {
             return mensaje = 'error';
           }
-  
+
           filaDuplicada = item.fila;
-  
+
         });
-  
+
         if (mensaje == 'error') {
           listCargos = undefined;
         }
@@ -686,7 +696,7 @@ class EmpleadoCargosControlador {
     plantilla.forEach(async (data: any) => {
       // Datos que se guardaran de la plantilla ingresada
       const { item, cedula, departamento, fecha_inicio, fecha_final, sucursal, sueldo,
-        cargo, hora_trabaja} = data;
+        cargo, hora_trabaja, admini_depa} = data;
 
       const ID_EMPLEADO: any = await pool.query(
         `
@@ -714,9 +724,6 @@ class EmpleadoCargosControlador {
         `
         , [cargo.toUpperCase()]);
 
-      var Jefe: any;
-      Jefe = false;
-
       console.log('id_empleado: ', ID_EMPLEADO.rows[0]);
       console.log('depa: ', departamento.toUpperCase());
 
@@ -724,7 +731,12 @@ class EmpleadoCargosControlador {
       var id_contrato = ID_CONTRATO.rows[0].id_contrato;
       var id_departamento = ID_DEPARTAMENTO.rows[0].id;
       var id_sucursal = ID_SUCURSAL.rows[0].id;
-      var id_cargo = ID_TIPO_CARGO.rows[0].id
+      var id_cargo = ID_TIPO_CARGO.rows[0].id;
+      var admin_dep = false;
+
+      if(admini_depa.toLowerCase() == 'si'){
+          admin_dep = true;
+      }
 
       console.log('id_empleado: ', id_empleado);
       console.log('departamento: ', id_departamento);
@@ -749,7 +761,7 @@ class EmpleadoCargosControlador {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
         `
         , [id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal, sueldo, id_cargo,
-          hora_trabaja, Jefe]);
+          hora_trabaja, admin_dep]);
 
       const [cargos] = response.rows;
 
@@ -758,7 +770,7 @@ class EmpleadoCargosControlador {
         INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
         VALUES ($1, $2, $3, $4, $5)
         `
-        , [id_empleado, id_departamento, true, true, false])
+        , [id_empleado, id_departamento, true, true, admin_dep])
 
       console.log(contador,' == ', plantilla.length);
       if (contador === plantilla.length) {

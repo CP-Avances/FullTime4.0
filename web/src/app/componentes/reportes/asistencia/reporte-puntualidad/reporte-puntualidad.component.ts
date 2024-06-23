@@ -351,8 +351,8 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     let cont_color_rojo = 0;
 
     data.forEach((obj: IReportePuntualidad) => {
-      obj.departamentos.forEach(obj1 => {
-        obj1.empleado.forEach(obj2 => {
+      obj.departamentos.forEach((obj1: any) => {
+        obj1.empleado.forEach((obj2: any) => {
           let e = {
             cargo: obj2.cargo,
             cedula: obj2.cedula,
@@ -505,8 +505,8 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   MapingDataPdfDefault(array: Array<any>) {
     let nuevo: Array<any> = [];
     array.forEach((obj1: IReportePuntualidad) => {
-      obj1.departamentos.forEach(obj2 => {
-        obj2.empleado.forEach(obj3 => {
+      obj1.departamentos.forEach((obj2: any) => {
+        obj2.empleado.forEach((obj3: any) => {
           let ele = {
             'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
             'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,

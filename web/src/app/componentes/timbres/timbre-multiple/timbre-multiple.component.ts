@@ -9,8 +9,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 // IMPORTAR SERVICIOS
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
@@ -27,11 +28,6 @@ import { SeguridadComponent } from 'src/app/componentes/administracionGeneral/fr
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
-import { firstValueFrom } from 'rxjs';
-
-
-
-
 
 @Component({
   selector: 'app-timbre-multiple',
@@ -44,11 +40,11 @@ import { firstValueFrom } from 'rxjs';
 export class TimbreMultipleComponent implements OnInit {
 
   idEmpleadoLogueado: any;
-  asignacionesAcceso: any;
-  idCargosAcceso: any = [];
-  idUsuariosAcceso: any = [];
-  idSucursalesAcceso: any = [];
-  idDepartamentosAcceso: any = [];
+
+  idCargosAcceso: Set<any> = new Set();
+  idUsuariosAcceso: Set<any> = new Set();
+  idSucursalesAcceso: Set<any> = new Set();
+  idDepartamentosAcceso: Set<any> = new Set();
 
   // CONTROL DE CRITERIOS DE BUSQUEDA
   codigo = new FormControl('');
@@ -69,6 +65,8 @@ export class TimbreMultipleComponent implements OnInit {
     bool_reg: false,
     bool_cargo: false,
   };
+
+  mostrarTablas: boolean = false;
 
   public check: checkOptions[];
 
@@ -152,6 +150,7 @@ export class TimbreMultipleComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router,
     private restR: ReportesService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -159,6 +158,10 @@ export class TimbreMultipleComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
 
     this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'd' }, { opcion: 'c' }, { opcion: 'e' }]);
     this.PresentarInformacion();
@@ -171,11 +174,10 @@ export class TimbreMultipleComponent implements OnInit {
   }
 
   // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
-  async PresentarInformacion() {
+  PresentarInformacion() {
     let informacion = { id_empleado: this.idEmpleadoLogueado };
     let respuesta: any = [];
 
-    await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
     this.informacion.ObtenerInformacionUserRol(informacion).subscribe(res => {
       respuesta = res[0];
       this.AdministrarInformacion(respuesta, informacion);
@@ -325,18 +327,20 @@ export class TimbreMultipleComponent implements OnInit {
 
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
 
-    this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
-    this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
-    this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
-    this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.includes(regimen.id_suc));
+    this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+    this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
+    this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
+    this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
 
     this.empleados.forEach((empleado: any) => {
-      this.idCargosAcceso = [...new Set([...this.idCargosAcceso, empleado.id_cargo_])];
+      this.idCargosAcceso.add(empleado.id_cargo_);
     });
 
     this.cargos = this.cargos.filter((cargo: any) =>
-      this.idSucursalesAcceso.includes(cargo.id_suc) && this.idCargosAcceso.includes(cargo.id)
+      this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
     );
+
+    this.mostrarTablas = true;
   }
 
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
@@ -364,49 +368,6 @@ export class TimbreMultipleComponent implements OnInit {
       return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
     });
     this.cargos = verificados_car;
-  }
-
-  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const dataEmpleado = {
-      id_empleado: Number(idEmpleado)
-    }
-
-    let noPersonal: boolean = false;
-
-    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
-    this.asignacionesAcceso = res;
-
-    const promises = this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal) {
-        if (!asignacion.administra && !asignacion.personal) {
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        } else if (asignacion.administra && !asignacion.personal) {
-          noPersonal = true;
-        } else if (asignacion.personal && !asignacion.administra) {
-          this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        }
-      }
-
-      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
-      this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
-
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
-    });
-
-    const results = await Promise.all(promises);
-
-    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    this.idUsuariosAcceso.push(...ids);
-
-    if (noPersonal) {
-      this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleadoLogueado);
-    }
-
   }
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE

@@ -1186,7 +1186,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
           })
         }
 
-        obj.departamentos.forEach(obj1 => {
+        obj.departamentos.forEach((obj1: any) => {
           totalTiempoLaboradoDepartamento = 0;
           totalTiempoAtrasosDepartamento = 0;
           totalTiempoSalidasDepartamento = 0;
@@ -1617,7 +1617,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
     let nuevo: Array<any> = [];
     let n = 0;
     array.forEach((obj1: IReporteHorasTrabaja) => {
-      obj1.departamentos.forEach(obj2 => {
+      obj1.departamentos.forEach((obj2: any) => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             n++;
@@ -1755,7 +1755,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
     this.timbres = [];
     let n = 0;
     this.data_pdf.forEach((obj1: IReporteHorasTrabaja) => {
-      obj1.departamentos.forEach(obj2 => {
+      obj1.departamentos.forEach((obj2: any) => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             //CAMBIO DE FORMATO EN FECHA Y HORAS (HORARIO Y TIMBRE)

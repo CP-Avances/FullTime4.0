@@ -26,7 +26,7 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const unEmplCargp = yield database_1.default.query(`
-      SELECT ec.id, ec.id_contrato, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.jefe, ec.sueldo, 
+      SELECT ec.id, ec.id_contrato, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.sueldo, 
         ec.hora_trabaja, ec.id_sucursal, s.nombre AS sucursal, ec.id_departamento, 
         d.nombre AS departamento, e.id AS id_empresa, e.nombre AS empresa, tc.cargo AS nombre_cargo 
       FROM eu_empleado_cargos AS ec, e_sucursales AS s, ed_departamentos AS d, e_empresa AS e, 
@@ -47,15 +47,15 @@ class EmpleadoCargosControlador {
     Crear(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe, user_name, ip } = req.body;
+                const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, user_name, ip } = req.body;
                 const datosNuevos = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
         INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal,
-           sueldo, hora_trabaja, id_tipo_cargo, jefe) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-        `, [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe]);
+           sueldo, hora_trabaja, id_tipo_cargo) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `, [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo]);
                 delete datosNuevos.user_name;
                 delete datosNuevos.ip;
                 // AUDITORIA
@@ -84,11 +84,13 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empl_contrato, id } = req.params;
-                const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe, user_name, ip } = req.body;
+                const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const cargoConsulta = yield database_1.default.query('SELECT * FROM eu_empleado_cargos WHERE id = $1', [id]);
+                const cargoConsulta = yield database_1.default.query(`
+        SELECT * FROM eu_empleado_cargos WHERE id = $1
+        `, [id]);
                 const [datosOriginales] = cargoConsulta.rows;
                 if (!datosOriginales) {
                     // AUDITORIA
@@ -107,9 +109,9 @@ class EmpleadoCargosControlador {
                 }
                 yield database_1.default.query(`
         UPDATE eu_empleado_cargos SET id_departamento = $1, fecha_inicio = $2, fecha_final = $3, id_sucursal = $4, 
-          sueldo = $5, hora_trabaja = $6, id_tipo_cargo = $7, jefe = $8  
-        WHERE id_contrato = $9 AND id = $10
-        `, [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe,
+          sueldo = $5, hora_trabaja = $6, id_tipo_cargo = $7  
+        WHERE id_contrato = $8 AND id = $9
+        `, [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo,
                     id_empl_contrato, id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -117,7 +119,7 @@ class EmpleadoCargosControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{id_departamento: ${id_departamento}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, id_sucursal: ${id_sucursal}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, cargo: ${cargo}, jefe: ${jefe}}`,
+                    datosNuevos: `{id_departamento: ${id_departamento}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, id_sucursal: ${id_sucursal}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, cargo: ${cargo}}`,
                     ip,
                     observacion: null
                 });
@@ -346,6 +348,7 @@ class EmpleadoCargosControlador {
                     sueldo: '',
                     cargo: '',
                     hora_trabaja: '',
+                    admini_depa: '',
                     observacion: ''
                 };
                 var listCargos = [];
@@ -353,11 +356,12 @@ class EmpleadoCargosControlador {
                 var mensaje = 'correcto';
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
                 plantilla.forEach((dato) => __awaiter(this, void 0, void 0, function* () {
-                    var { ITEM, CEDULA, DEPARTAMENTO, FECHA_DESDE, FECHA_HASTA, SUCURSAL, SUELDO, CARGO, HORA_TRABAJA } = dato;
+                    var { ITEM, CEDULA, DEPARTAMENTO, FECHA_DESDE, FECHA_HASTA, SUCURSAL, SUELDO, CARGO, HORA_TRABAJA, ADMINISTRAR_DEPARTAMENTO } = dato;
                     //Verificar que el registo no tenga datos vacios
                     if ((ITEM != undefined && ITEM != '') && (CEDULA != undefined) && (DEPARTAMENTO != undefined) &&
                         (FECHA_DESDE != undefined) && (FECHA_HASTA != undefined) && (SUCURSAL != undefined) &&
-                        (SUELDO != undefined) && (CARGO != undefined) && (HORA_TRABAJA != undefined)) {
+                        (SUELDO != undefined) && (CARGO != undefined) && (HORA_TRABAJA != undefined) &&
+                        (ADMINISTRAR_DEPARTAMENTO != undefined)) {
                         data.fila = ITEM;
                         data.cedula = CEDULA;
                         data.departamento = DEPARTAMENTO;
@@ -367,6 +371,7 @@ class EmpleadoCargosControlador {
                         data.sueldo = SUELDO;
                         data.cargo = CARGO;
                         data.hora_trabaja = HORA_TRABAJA;
+                        data.admini_depa = ADMINISTRAR_DEPARTAMENTO;
                         data.observacion = 'no registrado';
                         //Valida si los datos de la columna cedula son numeros.
                         const rege = /^[0-9]+$/;
@@ -412,6 +417,7 @@ class EmpleadoCargosControlador {
                         data.sueldo = SUELDO;
                         data.cargo = CARGO;
                         data.hora_trabaja = HORA_TRABAJA;
+                        data.admini_depa = ADMINISTRAR_DEPARTAMENTO;
                         data.observacion = 'no registrado';
                         if (data.fila == '' || data.fila == undefined) {
                             data.fila = 'error';
@@ -444,6 +450,9 @@ class EmpleadoCargosControlador {
                         if (HORA_TRABAJA == undefined) {
                             data.hora_trabaja = 'No registrado';
                             data.observacion = 'Hora trabaja ' + data.observacion;
+                        }
+                        if (ADMINISTRAR_DEPARTAMENTO == undefined) {
+                            data.admini_depa = 'No registrado';
                         }
                         if (CEDULA == undefined) {
                             data.cedula = 'No registrado';
@@ -524,7 +533,7 @@ class EmpleadoCargosControlador {
                                             }
                                             else {
                                                 const fechaRango = yield database_1.default.query(`
-                                  SELECT * FROM eu_empleado_cargos 
+                                  SELECT id FROM eu_empleado_cargos 
                                   WHERE id_contrato = $1 AND 
                                   ($2  BETWEEN fecha_inicio and fecha_final or $3 BETWEEN fecha_inicio and fecha_final or 
                                   fecha_inicio BETWEEN $2 AND $3)
@@ -535,8 +544,8 @@ class EmpleadoCargosControlador {
                                                 else {
                                                     // Discriminación de elementos iguales
                                                     if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
-                                                        valor.observacion = 'ok';
                                                         duplicados.push(valor);
+                                                        valor.observacion = 'ok';
                                                     }
                                                     else {
                                                         valor.observacion = '1';
@@ -570,7 +579,7 @@ class EmpleadoCargosControlador {
                     tiempo = 4000;
                 }
                 else if (listCargos.length > 1000) {
-                    tiempo = 6000;
+                    tiempo = 7000;
                 }
                 setTimeout(() => {
                     listCargos.sort((a, b) => {
@@ -614,7 +623,7 @@ class EmpleadoCargosControlador {
             var contador = 1;
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                 // Datos que se guardaran de la plantilla ingresada
-                const { item, cedula, departamento, fecha_inicio, fecha_final, sucursal, sueldo, cargo, hora_trabaja } = data;
+                const { item, cedula, departamento, fecha_inicio, fecha_final, sucursal, sueldo, cargo, hora_trabaja, admini_depa } = data;
                 const ID_EMPLEADO = yield database_1.default.query(`
         SELECT id FROM eu_empleados WHERE cedula = $1
         `, [cedula]);
@@ -630,8 +639,6 @@ class EmpleadoCargosControlador {
                 const ID_TIPO_CARGO = yield database_1.default.query(`
         SELECT id FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
         `, [cargo.toUpperCase()]);
-                var Jefe;
-                Jefe = false;
                 console.log('id_empleado: ', ID_EMPLEADO.rows[0]);
                 console.log('depa: ', departamento.toUpperCase());
                 var id_empleado = ID_EMPLEADO.rows[0].id;
@@ -639,6 +646,10 @@ class EmpleadoCargosControlador {
                 var id_departamento = ID_DEPARTAMENTO.rows[0].id;
                 var id_sucursal = ID_SUCURSAL.rows[0].id;
                 var id_cargo = ID_TIPO_CARGO.rows[0].id;
+                var admin_dep = false;
+                if (admini_depa.toLowerCase() == 'si') {
+                    admin_dep = true;
+                }
                 console.log('id_empleado: ', id_empleado);
                 console.log('departamento: ', id_departamento);
                 /*
@@ -658,12 +669,12 @@ class EmpleadoCargosControlador {
           sueldo, id_tipo_cargo, hora_trabaja, jefe) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
         `, [id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal, sueldo, id_cargo,
-                    hora_trabaja, Jefe]);
+                    hora_trabaja, admin_dep]);
                 const [cargos] = response.rows;
                 yield database_1.default.query(`
         INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
         VALUES ($1, $2, $3, $4, $5)
-        `, [id_empleado, id_departamento, true, true, false]);
+        `, [id_empleado, id_departamento, true, true, admin_dep]);
                 console.log(contador, ' == ', plantilla.length);
                 if (contador === plantilla.length) {
                     if (cargos) {

@@ -151,7 +151,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     this.rest.ListarHorasExtras().subscribe(datos => {
       this.horasExtras = datos;
 
-      this.horasExtras.forEach(data => {
+      this.horasExtras.forEach((data: any) => {
         data.h_inicio_ = this.validar.FormatearHora(data.hora_inicio, formato_hora);
         data.h_final_ = this.validar.FormatearHora(data.hora_final, formato_hora);
 
@@ -405,7 +405,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     } else {
       var objeto;
       var arreglohorasExtras: any = [];
-      this.horasExtras.forEach(obj => {
+      this.horasExtras.forEach((obj: any) => {
         var incluirAlmuerzo = this.Almuerzo[obj.minutos_comida - 1];
         objeto = {
           "horas_extras": {

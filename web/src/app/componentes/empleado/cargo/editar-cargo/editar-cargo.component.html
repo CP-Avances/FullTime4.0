@@ -43,12 +43,12 @@
                                     <mat-option *ngFor="let d of departamento" [value]="d.id">{{d.nombre}}</mat-option>
                                 </mat-select>
                             </mat-form-field>
-                            <div class="d-flex flex-wrap justify-content-start" style="position: relative; right: 10px;"
-                                *ngIf="ver_jefe">
+                            <div class="d-flex flex-wrap justify-content-start"
+                                style="position: relative; right: 10px;">
                                 <mat-checkbox id="check" matSuffix matTooltipPosition="right" [formControl]="jefeF"
-                                    matTooltip="Indicar si el usuario es Jefe o Coordinador del departamento.">
+                                    matTooltip="Indicar si el usuario administra información del departamento.">
                                     <label id="textoradiobtn" style="font-size: 12px;">
-                                      Administrar de departamento
+                                        Administrar departamento
                                     </label>
                                 </mat-checkbox>
                                 <mat-checkbox id="check2" matSuffix matTooltipPosition="right" [formControl]="personalF"

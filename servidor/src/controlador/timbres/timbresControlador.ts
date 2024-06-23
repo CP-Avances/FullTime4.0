@@ -7,7 +7,7 @@ class TimbresControlador {
     // ELIMINAR NOTIFICACIONES TABLA DE AVISOS --**VERIFICADO
     public async EliminarMultiplesAvisos(req: Request, res: Response): Promise<any> {
         try {
-            const {arregloAvisos, user_name, ip} = req.body;
+            const { arregloAvisos, user_name, ip } = req.body;
             let contador: number = 0;
             if (arregloAvisos.length > 0) {
                 contador = 0;
@@ -198,7 +198,7 @@ class TimbresControlador {
             }
 
             let timbresRows: any = 0;
-         
+
             let timbres = await pool.query(
                 `
                 SELECT (da.nombre || ' ' || da.apellido) AS empleado, da.id AS id_empleado, CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
@@ -309,7 +309,7 @@ class TimbresControlador {
                         ip,
                         observacion: null
                     });
-                    
+
                     //FINALIZAR TRANSACCION
                     await pool.query('COMMIT');
                     return result.rows
@@ -485,11 +485,14 @@ class TimbresControlador {
                 return []
             });
 
-        if (TIMBRES_NOTIFICACION.length > 0) {
+        if (TIMBRES_NOTIFICACION.length != 0) {
             return res.jsonp(TIMBRES_NOTIFICACION)
         }
+        else {
+            return res.status(404).jsonp({ message: 'No se encuentran registros.' });
+        }
 
-        return res.status(404).jsonp({ message: 'No se encuentran registros.' });
+
     }
 
     // METODO DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA
@@ -562,10 +565,10 @@ class TimbresControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const consulta = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1',[id]);
+            const consulta = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [id]);
             const [datosOriginales] = consulta.rows;
 
-            if (!datosOriginales){
+            if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'ecm_realtime_timbres',
                     usuario: user_name,
@@ -580,7 +583,7 @@ class TimbresControlador {
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Registro no encontrado.' });
             }
-        
+
             await pool.query(
                 `
                 UPDATE ecm_realtime_timbres SET visto = $1 WHERE id = $2
@@ -604,7 +607,7 @@ class TimbresControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'Error al actualizar la vista.' }); 
+            return res.status(500).jsonp({ message: 'Error al actualizar la vista.' });
         }
     }
 

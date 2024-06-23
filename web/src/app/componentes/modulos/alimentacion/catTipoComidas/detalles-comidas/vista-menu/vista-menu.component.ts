@@ -89,7 +89,7 @@ export class VistaMenuComponent implements OnInit {
     this.datosMenu = [];
     this.rest.ConsultarUnMenu(id_menu).subscribe(datos => {
       this.datosMenu = datos;
-      this.datosMenu.forEach(data => {
+      this.datosMenu.forEach((data: any) => {
         data.hora_inicio_ = this.validar.FormatearHora(data.hora_inicio, formato_hora);
         data.hora_fin_ = this.validar.FormatearHora(data.hora_fin, formato_hora);
       })

@@ -25,9 +25,9 @@ export class RelojesComponent implements OnInit {
 
   idEmpleadoLogueado: any;
 
-  idUsuariosAcceso: any = [];
-  idSucursalesAcceso: any = [];
-  idDepartamentosAcceso: any = [];
+  idUsuariosAcceso: Set<any> = new Set();
+  idSucursalesAcceso: Set<any> = new Set();
+  idDepartamentosAcceso: Set<any> = new Set();
 
   // CONTROL DE FORMULARIOS
   isLinear = true;
@@ -126,7 +126,7 @@ export class RelojesComponent implements OnInit {
 
   // METODO PARA FILTRAR SUCURSALES ASIGNADAS
   FiltrarSucursalesAsignadas(data: any) {
-    return data.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
+    return data.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
   }
 
   // METODO PARA LISTAR DEPARTAMENTOS DE ESTABLECIMIENTO
@@ -144,7 +144,7 @@ export class RelojesComponent implements OnInit {
 
   // METODO PARA FILTRAR DEPARTAMENTOS ASIGNADOS
   FiltrarDepartamentosAsignados(data: any) {
-    return data.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
+    return data.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
   }
 
   // METODO PARA REGISTRAR DISPOSITIVO

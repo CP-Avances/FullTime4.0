@@ -13,10 +13,10 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { firstValueFrom } from 'rxjs';
 
 export interface EmpleadoElemento {
   comunicado_mail: boolean;
@@ -47,11 +47,11 @@ export class ComunicadosComponent implements OnInit {
   seleccion = new FormControl('');
 
   idEmpleadoLogueado: any;
-  asignacionesAcceso: any;
-  idCargosAcceso: any = [];
-  idUsuariosAcceso: any = [];
-  idSucursalesAcceso: any = [];
-  idDepartamentosAcceso: any = [];
+
+  idCargosAcceso: Set<any> = new Set();
+  idUsuariosAcceso: Set<any> = new Set();
+  idSucursalesAcceso: Set<any> = new Set();
+  idDepartamentosAcceso: Set<any> = new Set();
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_suc: false,
@@ -60,6 +60,8 @@ export class ComunicadosComponent implements OnInit {
     bool_reg: false,
     bool_cargo: false,
   };
+
+  mostrarTablas: boolean = false;
 
   public check: checkOptions[];
 
@@ -147,6 +149,7 @@ export class ComunicadosComponent implements OnInit {
     private restR: ReportesService,
     private restP: ParametrosService,
     private restUsuario: UsuarioService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -154,6 +157,10 @@ export class ComunicadosComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
 
     this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 'r' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
     this.PresentarInformacion();
@@ -168,10 +175,9 @@ export class ComunicadosComponent implements OnInit {
   }
 
   // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
-  async PresentarInformacion() {
+  PresentarInformacion() {
     let informacion = { id_empleado: this.idEmpleadoLogueado };
     let respuesta: any = [];
-    await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
     this.informacion.ObtenerInformacionUserRol(informacion).subscribe(res => {
       respuesta = res[0];
       this.AdministrarInformacion(respuesta, informacion);
@@ -324,18 +330,20 @@ export class ComunicadosComponent implements OnInit {
 
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
 
-    this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
-    this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
-    this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
-    this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.includes(regimen.id_suc));
+    this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+    this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
+    this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
+    this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
 
     this.empleados.forEach((empleado: any) => {
-      this.idCargosAcceso = [...new Set([...this.idCargosAcceso, empleado.id_cargo_])];
+      this.idCargosAcceso.add(empleado.id_cargo_);
     });
 
     this.cargos = this.cargos.filter((cargo: any) =>
-      this.idSucursalesAcceso.includes(cargo.id_suc) && this.idCargosAcceso.includes(cargo.id)
+      this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
     );
+
+    this.mostrarTablas = true;
   }
 
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
@@ -363,49 +371,6 @@ export class ComunicadosComponent implements OnInit {
       return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
     });
     this.cargos = verificados_car;
-  }
-
-  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const dataEmpleado = {
-      id_empleado: Number(idEmpleado)
-    }
-
-    let noPersonal: boolean = false;
-
-    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
-    this.asignacionesAcceso = res;
-
-    const promises = this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal) {
-        if (!asignacion.administra && !asignacion.personal) {
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        } else if (asignacion.administra && !asignacion.personal) {
-          noPersonal = true;
-        } else if (asignacion.personal && !asignacion.administra) {
-          this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        }
-      }
-
-      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
-      this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
-
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
-    });
-
-    const results = await Promise.all(promises);
-
-    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    this.idUsuariosAcceso.push(...ids);
-
-    if (noPersonal) {
-      this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleadoLogueado);
-    }
-
   }
 
   // METODO PARA MOSTRAR OPCIONES DE SELECCION

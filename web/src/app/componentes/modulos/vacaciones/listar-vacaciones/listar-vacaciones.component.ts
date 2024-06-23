@@ -205,7 +205,7 @@ export class ListarVacacionesComponent implements OnInit {
         }
       })
 
-      this.listaVacacionesFiltrada.forEach(data => {
+      this.listaVacacionesFiltrada.forEach((data: any) => {
 
         if (data.estado === 1) {
           data.estado = 'Pendiente';
@@ -283,7 +283,7 @@ export class ListarVacacionesComponent implements OnInit {
         }
       })
 
-      this.listaVacacionesFiltradaAutorizada.forEach(data => {
+      this.listaVacacionesFiltradaAutorizada.forEach((data: any) => {
 
         if (data.estado === 1) {
           data.estado = 'Pendiente';

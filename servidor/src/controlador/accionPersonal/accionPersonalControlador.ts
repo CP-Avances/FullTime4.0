@@ -1,8 +1,10 @@
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
-import { ImagenBase64LogosEmpresas } from '../../libs/ImagenCodificacion';
+import { ConvertirImagenBase64 } from '../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import pool from '../../database';
+import path from 'path';
+import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 
 class AccionPersonalControlador {
 
@@ -588,7 +590,10 @@ class AccionPersonalControlador {
 
     public async verLogoMinisterio(req: Request, res: Response): Promise<any> {
         const file_name = 'ministerio_trabajo.png';
-        const codificado = await ImagenBase64LogosEmpresas(file_name);
+        let separador = path.sep;
+        let ruta = ObtenerRutaLogos() + separador + file_name;
+        //console.log( 'solo ruta ', ruta)
+        const codificado = await ConvertirImagenBase64(ruta);
         if (codificado === 0) {
             res.send({ imagen: 0 })
         } else {

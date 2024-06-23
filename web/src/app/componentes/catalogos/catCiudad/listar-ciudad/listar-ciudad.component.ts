@@ -256,13 +256,14 @@ export class ListarCiudadComponent implements OnInit {
             widths: ["auto", "auto"],
             body: [
               [
-                { text: "Ciudad", style: "tableHeader" },
                 { text: "Provincia", style: "tableHeader" },
+                { text: "Ciudad", style: "tableHeader" },
+                
               ],
               ...this.datosCiudades.map((obj) => {
                 return [
-                  { text: obj.nombre, style: "itemsTableC" },
                   { text: obj.provincia, style: "itemsTableC" },
+                  { text: obj.nombre, style: "itemsTableC" },
                 ];
               }),
             ],

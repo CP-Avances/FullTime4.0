@@ -182,7 +182,7 @@ export class ListaPlanificacionesComponent implements OnInit {
 
       console.log('ver data ... ', this.listaPlan)
 
-      this.listaPlan.forEach(data => {
+      this.listaPlan.forEach((data: any) => {
         data.fecha_desde_ = this.validar.FormatearFecha(data.fecha_desde, formato_fecha, this.validar.dia_abreviado);
         data.fecha_hasta_ = this.validar.FormatearFecha(data.fecha_hasta, formato_fecha, this.validar.dia_abreviado);
         data.hora_inicio_ = this.validar.FormatearHora(data.hora_inicio, formato_hora);
@@ -224,7 +224,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   }
 
   FormatearDatos(lista: any) {
-    lista.forEach(data => {
+    lista.forEach((data: any) => {
       data.fecDesde = this.validar.FormatearFecha(data.fecha_desde, this.formato_fecha, this.validar.dia_abreviado);
       data.fecHasta = this.validar.FormatearFecha(data.fecha_hasta, this.formato_fecha, this.validar.dia_abreviado);
       data.horaInicio = this.validar.FormatearHora(data.hora_inicio, this.formato_hora);

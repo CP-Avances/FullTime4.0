@@ -212,7 +212,7 @@ export class EmpleadoService {
 
   // EDITAR DATOS DE CONTRATO
   ActualizarContratoEmpleado(id: number, data: any) {
-    return this.http.put(`${environment.url}/contratoEmpleado/${id}/actualizar/`, data);
+    return this.http.put<any>(`${environment.url}/contratoEmpleado/${id}/actualizar/`, data);
   }
 
   // ELIMINAR DOCUMENTO DE CONTRATO

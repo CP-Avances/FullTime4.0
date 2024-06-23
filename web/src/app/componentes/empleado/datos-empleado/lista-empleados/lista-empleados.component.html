@@ -187,7 +187,7 @@
 </div>
 
 <!--  ********************  LISTA DE EMPLEADOS QUE FORMAN PARTE DE LA EMPRESA  ***********************  -->
-<div *ngIf="tabla_activos && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container"
+<div *ngIf="tabla_activos && !DataEmpleados && mostarTabla && (messajeExcel == 'error' || messajeExcel == '')" class="container"
     style="padding-bottom: 50px; text-align: center;">
 
     <div style="text-align: center; padding-bottom: 12px;" *ngIf="btnCheckHabilitar">

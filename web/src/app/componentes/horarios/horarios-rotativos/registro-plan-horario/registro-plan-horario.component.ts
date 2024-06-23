@@ -503,6 +503,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
   IngresarHorario(index: number) {
     //---console.log('verificar existencias ', this.fechas_mes[index])
     //---console.log('tipo dia origen', this.fechas_mes[index].tipo_dia_origen)
+    this.cargar = false;
     let verificador = 0;
     let procesar = 0;
     this.ControlarBotones(true, false);
@@ -626,6 +627,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
   // METODO PARA INGRESAR HORARIO
   IngresarLibre(index: number) {
+    this.cargar = false;
     let verificador = 0;
     this.ControlarBotones(true, false);
     const [datoHorario] = this.horarios.filter((o: any) => {

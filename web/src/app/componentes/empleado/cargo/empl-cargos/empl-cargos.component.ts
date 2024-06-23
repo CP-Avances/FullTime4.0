@@ -5,14 +5,13 @@ import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
+import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
-import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-empl-cargos',
@@ -24,9 +23,6 @@ export class EmplCargosComponent implements OnInit {
 
   habilitarCargo: boolean = false;
   idEmpleado: string;
-  ver_jefe: boolean = false;
-  ver_personal: boolean = false;
-
 
   idSucursalesAcceso: any = [];
   idDepartamentosAcceso: any = [];
@@ -94,10 +90,6 @@ export class EmplCargosComponent implements OnInit {
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
 
-    if (this.datoEmpleado.idRol != 2) {
-      this.ver_jefe = true;
-      this.ver_personal = true;
-    }
     this.FiltrarSucursales();
     this.BuscarTiposCargos();
     this.tipoCargo[this.tipoCargo.length] = { cargo: "OTRO" };
@@ -209,7 +201,6 @@ export class EmplCargosComponent implements OnInit {
       fec_final: form.fecFinalForm,
       sueldo: form.sueldoForm,
       cargo: form.tipoForm,
-      jefe: form.jefeForm,
       user_name: this.user_name,
       ip: this.ip,
     }

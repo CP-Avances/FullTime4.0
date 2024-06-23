@@ -259,9 +259,11 @@ export class EditarContratoComponent implements OnInit {
   // METODO PARA TOMAR DATOS DEL CONTRATO
   ActualizarContrato(form: any) {
     let datosContrato = {
+      subir_documento: false,
       id_tipo_contrato: form.tipoForm,
       vaca_controla: form.controlVacacionesForm,
       asis_controla: form.controlAsistenciaForm,
+      id_empleado: this.idEmpleado,
       fec_ingreso: form.fechaIngresoForm,
       fec_salida: form.fechaSalidaForm,
       id_regimen: form.idRegimenForm,
@@ -311,9 +313,21 @@ export class EditarContratoComponent implements OnInit {
   // GUARDAR DATOS DE CONTRATO
   GuardarDatos(datos: any) {
     this.rest.ActualizarContratoEmpleado(this.idSelectContrato, datos).subscribe(response => {
-      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
-        timeOut: 6000,
-      });
+      if (response.message === 'error') {
+        this.toastr.warning('Intente nuevamente.', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        });
+      }
+      else {
+        if (this.opcion === 2) {
+          this.EliminarDocumentoServidor();
+          this.CargarContrato(this.contrato.id);
+        }
+        this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
+          timeOut: 6000,
+        });
+      }
+
     }, error => {
       this.toastr.error('Ups!!! algo salio mal.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
@@ -337,9 +351,8 @@ export class EditarContratoComponent implements OnInit {
     }
     else if (this.opcion === 2) {
       if (form.documentoForm != '' && form.documentoForm != null) {
-        this.EliminarDocumentoServidor();
+        datos.subir_documento = true;
         this.GuardarDatos(datos);
-        this.CargarContrato(this.contrato.id);
         this.Cancelar(2);
       }
       else {

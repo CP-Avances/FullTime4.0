@@ -206,18 +206,16 @@ export class ListarParametroComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto', 'auto'],
+            widths: ['auto', 'auto'],
             body: [
               [
                 { text: 'Código', style: 'tableHeader' },
                 { text: 'Descripción', style: 'tableHeader' },
-                { text: 'Detalle', style: 'tableHeader' },
               ],
               ...this.parametros.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTable' },
-                  { text: obj.detalle, style: 'itemsTable' },
                 ];
               })
             ]

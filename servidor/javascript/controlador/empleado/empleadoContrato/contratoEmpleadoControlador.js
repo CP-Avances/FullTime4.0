@@ -24,40 +24,68 @@ class ContratoEmpleadoControlador {
     // REGISTRAR CONTRATOS
     CrearContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen, id_tipo_contrato, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const response = yield database_1.default.query(`
-                INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
-                controlar_asistencia, id_regimen, id_modalidad_laboral) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-                `, [id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
-                    id_tipo_contrato]);
-                const [contrato] = response.rows;
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_empleado_contratos',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{id_empleado: ${id_empleado}, fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
-                    ip,
-                    observacion: null
+            const { id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen, id_tipo_contrato, user_name, ip, subir_documento } = req.body;
+            let verificar_contrato = 0;
+            // CREAR CARPETA DE CONTRATOS
+            if (subir_documento === true) {
+                // RUTA DE LA CARPETA CONTRATOS DEL USUARIO
+                const carpetaContratos = yield (0, accesoCarpetas_2.ObtenerRutaContrato)(id_empleado);
+                // VERIFICACION DE EXISTENCIA CARPETA CONTRATOS DE USUARIO
+                fs_1.default.access(carpetaContratos, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                        // METODO MKDIR PARA CREAR LA CARPETA
+                        fs_1.default.mkdir(carpetaContratos, { recursive: true }, (err) => {
+                            if (err) {
+                                verificar_contrato = 1;
+                            }
+                            else {
+                                verificar_contrato = 0;
+                            }
+                        });
+                    }
+                    else {
+                        verificar_contrato = 0;
+                    }
                 });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                if (contrato) {
-                    return res.status(200).jsonp(contrato);
+            }
+            if (verificar_contrato === 0) {
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const response = yield database_1.default.query(`
+                    INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
+                        controlar_asistencia, id_regimen, id_modalidad_laboral) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+                    `, [id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
+                        id_tipo_contrato]);
+                    const [contrato] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_contratos',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{id_empleado: ${id_empleado}, fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    if (contrato) {
+                        return res.status(200).jsonp(contrato);
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'error' });
+                    }
                 }
-                else {
-                    return res.status(404).jsonp({ message: 'error' });
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    return res.status(500).jsonp({ message: 'Error al guardar el registro.' });
                 }
             }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al guardar el registro.' });
+            else {
+                return res.jsonp({ message: 'error_carpeta' });
             }
         });
     }
@@ -155,53 +183,83 @@ class ContratoEmpleadoControlador {
     // EDITAR DATOS DE CONTRATO
     EditarContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id } = req.params;
-                const { fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen, id_tipo_contrato, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOS ORIGINALES
-                const contrato = yield database_1.default.query('SELECT * FROM eu_empleado_contratos WHERE id = $1', [id]);
-                const [datosOriginales] = contrato.rows;
-                if (!datosOriginales) {
+            const { id } = req.params;
+            const { fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen, id_tipo_contrato, user_name, ip, subir_documento, id_empleado } = req.body;
+            let verificar_contrato = 0;
+            // CREAR CARPETA DE CONTRATOS
+            if (subir_documento === true) {
+                // RUTA DE LA CARPETA CONTRATOS DEL USUARIO
+                const carpetaContratos = yield (0, accesoCarpetas_2.ObtenerRutaContrato)(id_empleado);
+                // VERIFICACION DE EXISTENCIA CARPETA CONTRATOS DE USUARIO
+                fs_1.default.access(carpetaContratos, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                        // METODO MKDIR PARA CREAR LA CARPETA
+                        fs_1.default.mkdir(carpetaContratos, { recursive: true }, (err) => {
+                            if (err) {
+                                verificar_contrato = 1;
+                            }
+                            else {
+                                verificar_contrato = 0;
+                            }
+                        });
+                    }
+                    else {
+                        verificar_contrato = 0;
+                    }
+                });
+            }
+            if (verificar_contrato === 0) {
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    // CONSULTAR DATOS ORIGINALES
+                    const contrato = yield database_1.default.query(`
+                    SELECT * FROM eu_empleado_contratos WHERE id = $1
+                    `, [id]);
+                    const [datosOriginales] = contrato.rows;
+                    if (!datosOriginales) {
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'eu_empleado_contratos',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip,
+                            observacion: `Error al actualizar el contrato con id ${id}. Registro no encontrado.`
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+                    }
+                    yield database_1.default.query(`
+                    UPDATE eu_empleado_contratos SET fecha_ingreso = $1, fecha_salida = $2, controlar_vacacion = $3,
+                        controlar_asistencia = $4, id_regimen = $5, id_modalidad_laboral = $6 
+                    WHERE id = $7
+                    `, [fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
+                        id_tipo_contrato, id]);
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleado_contratos',
                         usuario: user_name,
                         accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
+                        datosOriginales: JSON.stringify(datosOriginales),
+                        datosNuevos: `{fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
                         ip,
-                        observacion: `Error al actualizar el contrato con id ${id}. Registro no encontrado.`
+                        observacion: null
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+                    return res.jsonp({ message: 'Registro actualizado exitosamente.' });
                 }
-                yield database_1.default.query(`
-                UPDATE eu_empleado_contratos SET fecha_ingreso = $1, fecha_salida = $2, controlar_vacacion = $3,
-                controlar_asistencia = $4, id_regimen = $5, id_modalidad_laboral = $6 
-                WHERE id = $7
-                `, [fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen,
-                    id_tipo_contrato, id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_empleado_contratos',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{fec_ingreso: ${fec_ingreso}, fec_salida: ${fec_salida}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro actualizado exitosamente.' });
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+                }
             }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+            else {
+                return res.jsonp({ message: 'error' });
             }
         });
     }

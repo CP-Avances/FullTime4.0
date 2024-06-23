@@ -16,8 +16,8 @@ exports.EMPLEADO_CONTROLADOR = void 0;
 // SECCION LIBRERIAS
 const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
-const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
+const ImagenCodificacion_1 = require("../../../libs/ImagenCodificacion");
 const ts_md5_1 = require("ts-md5");
 const fs_1 = require("fs");
 const database_1 = __importDefault(require("../../../database"));
@@ -358,85 +358,7 @@ class EmpleadoControlador {
                         verificar_permisos = 0;
                     }
                 });
-                let verificar_imagen = 0;
-                // RUTA DE LA CARPETA IMAGENES DEL USUARIO
-                const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id);
-                // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
-                fs_2.default.access(carpetaImagenes, fs_2.default.constants.F_OK, (err) => {
-                    if (err) {
-                        // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_2.default.mkdir(carpetaImagenes, { recursive: true }, (err) => {
-                            if (err) {
-                                verificar_imagen = 1;
-                            }
-                            else {
-                                verificar_imagen = 0;
-                            }
-                        });
-                    }
-                    else {
-                        verificar_imagen = 0;
-                    }
-                });
-                let verificar_vacunas = 0;
-                // RUTA DE LA CARPETA VACUNAS DEL USUARIO
-                const carpetaVacunas = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(id);
-                // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
-                fs_2.default.access(carpetaVacunas, fs_2.default.constants.F_OK, (err) => {
-                    if (err) {
-                        // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_2.default.mkdir(carpetaVacunas, { recursive: true }, (err) => {
-                            if (err) {
-                                verificar_vacunas = 1;
-                            }
-                            else {
-                                verificar_vacunas = 0;
-                            }
-                        });
-                    }
-                    else {
-                        verificar_vacunas = 0;
-                    }
-                });
-                let verificar_contrato = 0;
-                // RUTA DE LA CARPETA CONTRATOS DEL USUARIO
-                const carpetaContratos = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(id);
-                // VERIFICACION DE EXISTENCIA CARPETA CONTRATOS DE USUARIO
-                fs_2.default.access(carpetaContratos, fs_2.default.constants.F_OK, (err) => {
-                    if (err) {
-                        // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_2.default.mkdir(carpetaContratos, { recursive: true }, (err) => {
-                            if (err) {
-                                verificar_contrato = 1;
-                            }
-                            else {
-                                verificar_contrato = 0;
-                            }
-                        });
-                    }
-                    else {
-                        verificar_contrato = 0;
-                    }
-                });
-                // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
-                if (verificar_permisos === 1 && verificar_imagen === 1 && verificar_vacunas === 1 && verificar_contrato === 1) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos, permisos, imagenes y vacunación del usuario.' });
-                }
-                else if (verificar_permisos === 1 && verificar_imagen === 0 && verificar_vacunas === 0 && verificar_contrato === 0) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos del usuario.' });
-                }
-                else if (verificar_permisos === 0 && verificar_imagen === 1 && verificar_vacunas === 0 && verificar_contrato === 0) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de imagenes del usuario.' });
-                }
-                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 0) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de vacunación del usuario.' });
-                }
-                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 1) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos del usuario.' });
-                }
-                else {
-                    res.jsonp({ message: 'Registro actualizado.' });
-                }
+                res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
                 console.log('error ', error);
@@ -1273,6 +1195,14 @@ class EmpleadoControlador {
                         rol: '',
                         observacion: '',
                     };
+                    const estadoCivilArray = ['Soltero/a', 'Union de Hecho', 'Casado/a', 'Divorciado/a', 'Viudo/a'];
+                    const tipogenero = ['masculino', 'femenino'];
+                    // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
+                    const regex = /^[0-9]+$/;
+                    const valiContra = /\s/;
+                    // Expresión regular para validar la latitud y longitud
+                    const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
+                    const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
                     var listEmpleados = [];
                     var duplicados = [];
                     var duplicados1 = [];
@@ -1308,9 +1238,6 @@ class EmpleadoControlador {
                             data.telefono = TELEFONO;
                             data.nacionalidad = NACIONALIDAD;
                             data.observacion = 'no registrado';
-                            // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
-                            const regex = /^[0-9]+$/;
-                            const valiContra = /\s/;
                             if (regex.test(data.cedula)) {
                                 if (data.cedula.toString().length != 10) {
                                     data.observacion = 'La cédula ingresada no es válida';
@@ -1319,30 +1246,44 @@ class EmpleadoControlador {
                                     if (!valiContra.test(data.contrasena.toString())) {
                                         //console.log('entro ', data.contrasena.toString().length);
                                         if (data.contrasena.toString().length <= 10) {
-                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                                            if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
-                                                // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS
-                                                if (TELEFONO != undefined) {
-                                                    //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
-                                                    if (regex.test(data.telefono.toString())) {
-                                                        if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                            data.observacion = 'El teléfono ingresado no es válido';
-                                                        }
-                                                        else {
-                                                            if (duplicados.find((p) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
-                                                                data.observacion = 'ok';
-                                                                duplicados.push(dato);
+                                            if (estadoCivilArray.includes(data.estado_civil)) {
+                                                if (tipogenero.includes(data.genero.toLowerCase())) {
+                                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
+                                                    if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                                                        // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS
+                                                        if (TELEFONO != undefined) {
+                                                            //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
+                                                            if (regex.test(data.telefono.toString())) {
+                                                                if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                                                                    data.observacion = 'El teléfono ingresado no es válido';
+                                                                }
+                                                                else {
+                                                                    if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                                                        data.observacion = 'ok (Verificar ubicación)';
+                                                                    }
+                                                                    else {
+                                                                        if (duplicados.find((p) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
+                                                                            data.observacion = 'ok';
+                                                                            duplicados.push(dato);
+                                                                        }
+                                                                    }
+                                                                }
                                                             }
-                                                            //console.log(data.telefono);
+                                                            else {
+                                                                data.observacion = 'El teléfono ingresado no es válido';
+                                                            }
                                                         }
                                                     }
                                                     else {
-                                                        data.observacion = 'El teléfono ingresado no es válido';
+                                                        data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                                                     }
+                                                }
+                                                else {
+                                                    data.observacion = 'Genero no es válido';
                                                 }
                                             }
                                             else {
-                                                data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                                                data.observacion = 'Estado civil no es válido';
                                             }
                                         }
                                         else {
@@ -1407,16 +1348,18 @@ class EmpleadoControlador {
                             }
                             if (LATITUD == undefined) {
                                 data.latitud = 'No registrado';
+                                data.observacion = 'Latitud ' + data.observacion;
                             }
                             if (LONGITUD == undefined) {
                                 data.longitud = 'No registrado';
+                                data.observacion = 'Longitud ' + data.observacion;
                             }
                             if (DOMICILIO == undefined) {
-                                data.domicilio = '-';
+                                data.domicilio = 'No registrado';
                                 data.observacion = " ";
                             }
                             if (TELEFONO == undefined) {
-                                data.telefono = '-';
+                                data.telefono = 'No registrado';
                                 data.observacion = " ";
                             }
                             if (NACIONALIDAD == undefined) {
@@ -1440,10 +1383,7 @@ class EmpleadoControlador {
                                 data.observacion = 'Cédula ' + data.observacion;
                             }
                             else {
-                                // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
-                                const rege = /^[0-9]+$/;
-                                const valiContra = /\s/;
-                                if (rege.test(data.cedula)) {
+                                if (regex.test(data.cedula)) {
                                     if (data.cedula.toString().length != 10) {
                                         data.observacion = 'La cédula ingresada no es válida';
                                     }
@@ -1451,29 +1391,46 @@ class EmpleadoControlador {
                                         if (data.contrasena != 'No registrado') {
                                             if (!valiContra.test(data.contrasena.toString())) {
                                                 if (data.contrasena.toString().length <= 10) {
-                                                    // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                                                    if (data.fec_nacimiento != 'No registrado') {
-                                                        if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
-                                                            // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
-                                                            if (TELEFONO != undefined) {
-                                                                const regex = /^[0-9]+$/;
-                                                                //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
-                                                                if (regex.test(data.telefono.toString())) {
-                                                                    if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                                        //console.log('ent: ', data.telefono);
-                                                                        data.observacion = 'El teléfono ingresado no es válido';
+                                                    if (estadoCivilArray.includes(data.estado_civil)) {
+                                                        if (tipogenero.includes(data.genero.toLowerCase())) {
+                                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
+                                                            if (data.fec_nacimiento != 'No registrado') {
+                                                                if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                                                                    // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
+                                                                    if (TELEFONO != undefined) {
+                                                                        //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
+                                                                        if (regex.test(data.telefono.toString())) {
+                                                                            if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                                                                                //console.log('ent: ', data.telefono);
+                                                                                data.observacion = 'El teléfono ingresado no es válido';
+                                                                            }
+                                                                            else {
+                                                                                if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                                                                    data.observacion = 'ok (Verificar ubicación)';
+                                                                                }
+                                                                                else {
+                                                                                    data.observacion = 'ok';
+                                                                                }
+                                                                            }
+                                                                            //console.log(data.telefono);
+                                                                        }
+                                                                        else {
+                                                                            console.log(' entr ', data.telefono);
+                                                                            data.observacion = 'El teléfono ingresado no es válido';
+                                                                        }
                                                                     }
-                                                                    //console.log(data.telefono);
                                                                 }
                                                                 else {
-                                                                    console.log(' entr ', data.telefono);
-                                                                    data.observacion = 'El teléfono ingresado no es válido';
+                                                                    data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                                                                 }
                                                             }
                                                         }
                                                         else {
-                                                            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                                                            data.observacion = 'Genero no es válido';
                                                         }
+                                                    }
+                                                    else {
+                                                        data.observacion = 'Estado civil no es válido';
                                                     }
                                                 }
                                                 else {
@@ -1613,6 +1570,9 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             const { plantilla, user_name, ip } = req.body;
+            // Expresión regular para validar la latitud y longitud
+            const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
+            const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
             const VALOR = yield database_1.default.query(`
       SELECT * FROM e_codigo
       `);
@@ -1684,11 +1644,15 @@ class EmpleadoControlador {
                     }
                     var _longitud = null;
                     if (longitud != 'No registrado') {
-                        _longitud = longitud;
+                        if (regexLongitud.test(data.longitud)) {
+                            _longitud = longitud;
+                        }
                     }
                     var _latitud = null;
                     if (latitud != 'No registrado') {
-                        _latitud = latitud;
+                        if (regexLatitud.test(data.latitud)) {
+                            _latitud = latitud;
+                        }
                     }
                     //OBTENER ID DEL ESTADO
                     var id_estado = 1;
@@ -1723,7 +1687,6 @@ class EmpleadoControlador {
                         id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
                         domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
                     const [empleado] = response.rows;
-                    //console.log('empleados insertados ', empleado.id)
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleados',
@@ -1829,6 +1792,14 @@ class EmpleadoControlador {
                         rol: '',
                         observacion: '',
                     };
+                    const estadoCivilArray = ['Soltero/a', 'Union de Hecho', 'Casado/a', 'Divorciado/a', 'Viudo/a'];
+                    const tipogenero = ['masculino', 'femenino'];
+                    // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
+                    const regex = /^[0-9]+$/;
+                    const valiContra = /\s/;
+                    // Expresión regular para validar la latitud y longitud
+                    const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
+                    const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
                     var listEmpleadosManual = [];
                     var duplicados = [];
                     var duplicados1 = [];
@@ -1866,49 +1837,63 @@ class EmpleadoControlador {
                             data.telefono = TELEFONO;
                             data.nacionalidad = NACIONALIDAD;
                             data.observacion = 'no registrado';
-                            // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
-                            const rege = /^[0-9]+$/;
-                            const valiContra = /\s/;
-                            if (rege.test(data.cedula)) {
+                            if (regex.test(data.cedula)) {
                                 if (data.cedula.toString().length > 10 || data.cedula.toString().length < 10) {
                                     data.observacion = 'La cédula ingresada no es válida';
                                 }
                                 else {
-                                    if (rege.test(data.codigo)) {
-                                        //console.log(!valiContra.test(data.contrasena));
-                                        if (!valiContra.test(data.contrasena.toString())) {
-                                            //console.log('entro ', data.contrasena.toString().length);
-                                            if (data.contrasena.toString().length > 10) {
-                                                data.observacion = 'La contraseña debe tener máximo 10 caracteres';
-                                            }
-                                            else {
-                                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                                                if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
-                                                    // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
-                                                    if (TELEFONO != undefined) {
-                                                        if (rege.test(data.telefono)) {
-                                                            if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                                data.observacion = 'El teléfono ingresado no es válido';
+                                    if (regex.test(data.codigo)) {
+                                        if (data.codigo.toString().length > 10) {
+                                            data.observacion = 'El codigo debe tener máximo 10 caracteres';
+                                        }
+                                        else {
+                                            //console.log(!valiContra.test(data.contrasena));
+                                            if (!valiContra.test(data.contrasena.toString())) {
+                                                //console.log('entro ', data.contrasena.toString().length);
+                                                if (data.contrasena.toString().length > 10) {
+                                                    data.observacion = 'La contraseña debe tener máximo 10 caracteres';
+                                                }
+                                                else {
+                                                    if (estadoCivilArray.includes(data.estado_civil)) {
+                                                        if (tipogenero.includes(data.genero.toLowerCase())) {
+                                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
+                                                            if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                                                                // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
+                                                                if (TELEFONO != undefined) {
+                                                                    if (regex.test(data.telefono)) {
+                                                                        if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                                                                            data.observacion = 'El teléfono ingresado no es válido';
+                                                                        }
+                                                                        else {
+                                                                            if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                                                                data.observacion = 'ok (Verificar ubicación)';
+                                                                            }
+                                                                            else {
+                                                                                data.observacion = 'ok';
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    else {
+                                                                        data.observacion = 'El teléfono ingresado no es válido';
+                                                                    }
+                                                                }
                                                             }
                                                             else {
-                                                                if (duplicados.find((p) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
-                                                                    data.observacion = 'ok';
-                                                                    duplicados.push(dato);
-                                                                }
+                                                                data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                                                             }
                                                         }
                                                         else {
-                                                            data.observacion = 'El teléfono ingresado no es válido';
+                                                            data.observacion = 'Genero no es válido';
                                                         }
                                                     }
-                                                }
-                                                else {
-                                                    data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                                                    else {
+                                                        data.observacion = 'Estado civil no es válido';
+                                                    }
                                                 }
                                             }
-                                        }
-                                        else {
-                                            data.observacion = 'La contraseña ingresada no es válida';
+                                            else {
+                                                data.observacion = 'La contraseña ingresada no es válida';
+                                            }
                                         }
                                     }
                                     else {
@@ -1979,11 +1964,11 @@ class EmpleadoControlador {
                                 data.longitud = 'No registrado';
                             }
                             if (DOMICILIO == undefined) {
-                                data.domicilio = '-';
+                                data.domicilio = 'No registrado';
                                 data.observacion = " ";
                             }
                             if (TELEFONO == undefined) {
-                                data.telefono = '-';
+                                data.telefono = 'No registrado';
                                 data.observacion = " ";
                             }
                             if (NACIONALIDAD == undefined) {
@@ -2003,44 +1988,65 @@ class EmpleadoControlador {
                                 data.observacion = 'Rol ' + data.observacion;
                             }
                             if (CODIGO != undefined) {
-                                const rege = /^[0-9]+$/;
-                                const valiContra = /\s/;
-                                if (!rege.test(data.codigo)) {
+                                if (!regex.test(data.codigo)) {
                                     data.observacion = 'Formato de código incorrecto';
                                 }
                                 else {
-                                    if (CONTRASENA != undefined) {
-                                        //console.log('data: ', data.contrasena);
-                                        if (!valiContra.test(data.contrasena.toString())) {
-                                            //console.log(data.contrasena, ' entro ', data.contrasena.toString().length);
-                                            if (data.contrasena.toString().length > 10) {
-                                                data.observacion = 'La contraseña debe tener máximo 10 caracteres';
-                                            }
-                                            else {
-                                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                                                if (data.fec_nacimiento != 'No registrado') {
-                                                    if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
-                                                        // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
-                                                        if (TELEFONO != undefined) {
-                                                            const regex = /^[0-9]+$/;
-                                                            if (regex.test(data.telefono)) {
-                                                                if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                                    data.observacion = 'El teléfono ingresado no es válido';
+                                    if (data.codigo.toString().length > 10) {
+                                        data.observacion = 'El codigo debe tener máximo 10 caracteres';
+                                    }
+                                    else {
+                                        if (CONTRASENA != undefined) {
+                                            //console.log('data: ', data.contrasena);
+                                            if (!valiContra.test(data.contrasena.toString())) {
+                                                //console.log(data.contrasena, ' entro ', data.contrasena.toString().length);
+                                                if (data.contrasena.toString().length > 10) {
+                                                    data.observacion = 'La contraseña debe tener máximo 10 caracteres';
+                                                }
+                                                else {
+                                                    if (estadoCivilArray.includes(data.estado_civil)) {
+                                                        if (tipogenero.includes(data.genero.toLowerCase())) {
+                                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
+                                                            if (data.fec_nacimiento != 'No registrado') {
+                                                                if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                                                                    // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
+                                                                    if (TELEFONO != undefined) {
+                                                                        const regex = /^[0-9]+$/;
+                                                                        if (regex.test(data.telefono)) {
+                                                                            if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                                                                                data.observacion = 'El teléfono ingresado no es válido';
+                                                                            }
+                                                                            else {
+                                                                                if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                                                                    data.observacion = 'ok (Verificar ubicación)';
+                                                                                }
+                                                                                else {
+                                                                                    data.observacion = 'ok';
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                        else {
+                                                                            data.observacion = 'El teléfono ingresado no es válido';
+                                                                        }
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                                                                 }
                                                             }
-                                                            else {
-                                                                data.observacion = 'El teléfono ingresado no es válido';
-                                                            }
+                                                        }
+                                                        else {
+                                                            data.observacion = 'Genero no es válido';
                                                         }
                                                     }
                                                     else {
-                                                        data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                                                        data.observacion = 'Estado civil no es válido';
                                                     }
                                                 }
                                             }
-                                        }
-                                        else {
-                                            data.observacion = 'La contraseña ingresada no es válida';
+                                            else {
+                                                data.observacion = 'La contraseña ingresada no es válida';
+                                            }
                                         }
                                     }
                                 }
@@ -2142,6 +2148,13 @@ class EmpleadoControlador {
                             }
                         }
                     }));
+                    var tiempo = 2000;
+                    if (listEmpleadosManual.length > 500 && listEmpleadosManual.length <= 1000) {
+                        tiempo = 4000;
+                    }
+                    else if (listEmpleadosManual.length > 1000) {
+                        tiempo = 7000;
+                    }
                     setTimeout(() => {
                         listEmpleadosManual.sort((a, b) => {
                             // COMPARA LOS NUMEROS DE LOS OBJETOS
@@ -2186,7 +2199,7 @@ class EmpleadoControlador {
                             listEmpleadosManual = undefined;
                         }
                         return res.jsonp({ message: mensaje, data: listEmpleadosManual });
-                    }, 1500);
+                    }, tiempo);
                 }
             }
             catch (error) {
@@ -2197,6 +2210,9 @@ class EmpleadoControlador {
     CargarPlantilla_Manual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip } = req.body;
+            // Expresión regular para validar la latitud y longitud
+            const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
+            const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
             var contador = 1;
             let ocurrioError = false;
             let mensajeError = '';
@@ -2260,11 +2276,15 @@ class EmpleadoControlador {
                     }
                     var _longitud = null;
                     if (longitud != 'No registrado') {
-                        _longitud = longitud;
+                        if (regexLongitud.test(data.longitud)) {
+                            _longitud = longitud;
+                        }
                     }
                     var _latitud = null;
                     if (latitud != 'No registrado') {
-                        _latitud = latitud;
+                        if (!regexLatitud.test(data.latitud)) {
+                            _latitud = latitud;
+                        }
                     }
                     // OBTENER ID DEL ESTADO
                     var id_estado = 1;
@@ -2365,9 +2385,6 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id, codigo } = req.body;
             let verificar_permisos = 0;
-            let verificar_imagen = 0;
-            let verificar_vacunas = 0;
-            let verificar_contrato = 0;
             try {
                 const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
                 try {
@@ -2377,75 +2394,21 @@ class EmpleadoControlador {
                 catch (_a) {
                     try {
                         yield fs_1.promises.mkdir(carpetaPermisos, { recursive: true });
-                        verificar_permisos = 0; // CARPETA CREADA CON ÉXITO
+                        verificar_permisos = 0; // CARPETA CREADA CON EXITO
                     }
                     catch (_b) {
                         verificar_permisos = 1; // ERROR AL CREAR LA CARPETA
                     }
                 }
-                const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id);
-                try {
-                    yield fs_1.promises.access(carpetaImagenes, fs_2.default.constants.F_OK);
-                    verificar_imagen = 2; // LA CARPETA YA EXISTE
-                }
-                catch (_c) {
-                    try {
-                        yield fs_1.promises.mkdir(carpetaImagenes, { recursive: true });
-                        verificar_imagen = 0; // CARPETA CREADA CON ÉXITO
-                    }
-                    catch (_d) {
-                        verificar_imagen = 1; // ERROR AL CREAR LA CARPETA
-                    }
-                }
-                const carpetaVacunas = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(id);
-                try {
-                    yield fs_1.promises.access(carpetaVacunas, fs_2.default.constants.F_OK);
-                    verificar_vacunas = 2; // LA CARPETA YA EXISTE
-                }
-                catch (_e) {
-                    try {
-                        yield fs_1.promises.mkdir(carpetaVacunas, { recursive: true });
-                        verificar_vacunas = 0; // CARPETA CREADA CON ÉXITO
-                    }
-                    catch (_f) {
-                        verificar_vacunas = 1; // ERROR AL CREAR LA CARPETA
-                    }
-                }
-                const carpetaContratos = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(id);
-                try {
-                    yield fs_1.promises.access(carpetaContratos, fs_2.default.constants.F_OK);
-                    verificar_contrato = 2; // LA CARPETA YA EXISTE
-                }
-                catch (_g) {
-                    try {
-                        yield fs_1.promises.mkdir(carpetaContratos, { recursive: true });
-                        verificar_contrato = 0; // CARPETA CREADA CON ÉXITO
-                    }
-                    catch (_h) {
-                        verificar_contrato = 1; // ERROR AL CREAR LA CARPETA
-                    }
-                }
                 // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
-                if (verificar_permisos === 1 && verificar_imagen === 1 && verificar_vacunas === 1 && verificar_contrato === 1) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos, permisos, imagenes y vacunación del usuario.' });
+                if (verificar_permisos === 1) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos.' });
                 }
-                else if (verificar_permisos === 1 && verificar_imagen === 0 && verificar_vacunas === 0 && verificar_contrato === 0) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos del usuario.' });
-                }
-                else if (verificar_permisos === 0 && verificar_imagen === 1 && verificar_vacunas === 0 && verificar_contrato === 0) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de imagenes del usuario.' });
-                }
-                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 0) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de vacunación del usuario.' });
-                }
-                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 1) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos del usuario.' });
-                }
-                else if (verificar_permisos === 2 && verificar_imagen === 2 && verificar_vacunas === 2 && verificar_contrato === 2) {
+                else if (verificar_permisos === 2) {
                     res.jsonp({ message: 'Ya existen carpetas creadas de ' + codigo });
                 }
                 else {
-                    res.jsonp({ message: 'Carpetas creadas con exito.' });
+                    res.jsonp({ message: 'Carpetas creadas con éxito.' });
                 }
             }
             catch (error) {

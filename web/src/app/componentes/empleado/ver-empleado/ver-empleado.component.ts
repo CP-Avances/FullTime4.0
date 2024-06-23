@@ -3,18 +3,31 @@ import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { MatDatepicker } from '@angular/material/datepicker';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { switchMap } from 'rxjs/operators';
+import { default as _rollupMoment, Moment } from 'moment';
 import * as FileSaver from 'file-saver';
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
-import * as L from 'leaflet';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as xml2js from 'xml2js';
+
+// USO DE MAPAS EN EL SISTEMA
+import * as L from 'leaflet';
+// ELIMINA LAS URLS POR DEFECTO
+delete L.Icon.Default.prototype._getIconUrl;
+
+// ESTABLECE LAS NUEVAS RUTAS DE LAS IMAGENES
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
+  iconUrl: 'assets/leaflet/marker-icon.png',
+  shadowUrl: 'assets/leaflet/marker-shadow.png',
+});
 
 // IMPORTAR SERVICIOS
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
@@ -76,8 +89,9 @@ import { EmplCargosComponent } from 'src/app/componentes/empleado/cargo/empl-car
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
-import { MatDatepicker } from '@angular/material/datepicker';
-import { default as _rollupMoment, Moment } from 'moment';
+import { MatTabChangeEvent } from '@angular/material/tabs';
+import { NumericLiteral } from 'typescript';
+
 
 @Component({
   selector: 'app-ver-empleado',
@@ -162,15 +176,13 @@ export class VerEmpleadoComponent implements OnInit {
     var cadena = this.router.url.split('#')[0];
     this.idEmpleado = cadena.split("/")[2];
     this.scriptService.load('pdfMake', 'vfsFonts');
-
-    console.log('cadena: ', cadena);
-    console.log('logo ', this.logoE)
+    //console.log('cadena: ', cadena);
+    //console.log('logo ', this.logoE)
   }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
     var a = moment();
     this.FechaActual = a.format('YYYY-MM-DD');
     this.activatedRoute.params
@@ -179,14 +191,88 @@ export class VerEmpleadoComponent implements OnInit {
       )
       .subscribe(() => {
         this.ObtenerEmpleadoLogueado(this.idEmpleadoLogueado);
-        this.ObtenerTituloEmpleado();
-        this.ObtenerDiscapacidadEmpleado();
         this.VerAccionContrasena();
         this.ObtenerNacionalidades();
         this.VerFuncionalidades();
         this.VerEmpresa();
       });
+  }
 
+  // VARIABLES PARA DETECTAR EVENTO DE PESTAÑA
+  solicitudes_horas_extras: number = 0;
+  solicitudes_permisos: number = 0;
+  periodo_vacciones: number = 0;
+  accion_personal: number = 0;
+  contrato_cargo: number = 0;
+  autorizacion: number = 0;
+  alimentacion: number = 0;
+  asignacion: number = 0;
+  vacunacion: number = 0;
+
+  // METODO PARA DETECTAR EVENTO DE PESTAÑA
+  DetectarEventoTab(event: MatTabChangeEvent) {
+    /*console.log('Index: ', event.index);
+    console.log('Tab: ', event.tab);
+    console.log('label: ', event.tab.textLabel);*/
+    if (event.tab.textLabel === 'asignaciones') {
+      if (this.asignacion === 0) {
+        this.ObtenerTituloEmpleado();
+        this.ObtenerDiscapacidadEmpleado();
+        this.asignacion = 1;
+      }
+    }
+    else if (event.tab.textLabel === 'vacunacion') {
+      if (this.vacunacion === 0) {
+        this.ObtenerDatosVacunas(this.formato_fecha);
+        this.vacunacion = 1;
+      }
+    }
+    else if (event.tab.textLabel === 'contrato_cargo' || event.tab.textLabel === 'planificacion') {
+      if (this.contrato_cargo === 0) {
+        this.VerDatosActuales(this.formato_fecha);
+        this.ObtenerContratosEmpleado(this.formato_fecha);
+        this.contrato_cargo = 1;
+      }
+
+    }
+    else if (event.tab.textLabel === 'solicitudes_permisos') {
+      if (this.HabilitarPermisos === true && this.solicitudes_permisos === 0) {
+        this.ObtenerPermisos(this.formato_fecha, this.formato_hora);
+        this.solicitudes_permisos = 1;
+      }
+    }
+    else if (event.tab.textLabel === 'periodo_vacaciones') {
+      if (this.habilitarVacaciones === true && this.periodo_vacciones === 0) {
+        this.ObtenerVacaciones(this.formato_fecha);
+        this.periodo_vacciones = 1;
+      }
+    }
+    else if (event.tab.textLabel === 'solicitudes_horas_extras') {
+      if (this.HabilitarHorasE === true && this.solicitudes_horas_extras === 0) {
+        this.ObtenerlistaHorasExtrasEmpleado(this.formato_fecha, this.formato_hora);
+        this.ObtenerPlanHorasExtras(this.formato_fecha, this.formato_hora);
+        this.solicitudes_horas_extras = 1;
+      }
+    }
+    else if (event.tab.textLabel === 'alimentacion') {
+      if (this.HabilitarAlimentacion === true && this.alimentacion === 0) {
+        this.ObtenerPlanComidasEmpleado(this.formato_fecha, this.formato_hora);
+        this.ObtenerSolComidas(this.formato_fecha, this.formato_hora);
+        this.alimentacion = 1;
+      }
+    }
+    else if (event.tab.textLabel === 'accion_personal') {
+      if (this.HabilitarAccion === true && this.accion_personal === 0) {
+        this.ObtenerEmpleadoProcesos(this.formato_fecha);
+        this.accion_personal = 1;
+      }
+    }
+    else if (event.tab.textLabel === 'autorizar') {
+      if (this.autorizacion === 0) {
+        this.VerRegistroAutorizar();
+        this.autorizacion = 1;
+      }
+    }
   }
 
   /** ***************************************************************************************** **
@@ -202,29 +288,30 @@ export class VerEmpleadoComponent implements OnInit {
   autorizar: boolean = false;
   aprobacion: boolean = false;
 
+  funcionalidades: any = [];
   VerFuncionalidades() {
     this.restF.ListarFunciones().subscribe(datos => {
-      if (datos[0].hora_extra === true) {
+      this.funcionalidades = datos[0];
+      if (this.funcionalidades.permisos === true) {
+        this.HabilitarPermisos = true;
+        this.VerRegistroAutorizar();
+      }
+      if (this.funcionalidades.vacaciones === true) {
+        this.habilitarVacaciones = true;
+        this.VerRegistroAutorizar();
+      }
+      if (this.funcionalidades.hora_extra === true) {
         if (this.idEmpleadoLogueado === parseInt(this.idEmpleado)) {
           this.HabilitarHorasE = true;
         }
-        this.VerRegistroAutorizar();
       }
-      if (datos[0].accion_personal === true) {
-        this.HabilitarAccion = true;
-      }
-      if (datos[0].alimentacion === true) {
+      if (this.funcionalidades.alimentacion === true) {
         this.HabilitarAlimentacion = true;
         this.autorizar = true;
         this.VerAdminComida();
       }
-      if (datos[0].permisos === true) {
-        this.HabilitarPermisos = true;
-        this.VerRegistroAutorizar();
-      }
-      if (datos[0].vacaciones === true) {
-        this.habilitarVacaciones = true;
-        this.VerRegistroAutorizar();
+      if (this.funcionalidades.accion_personal === true) {
+        this.HabilitarAccion = true;
       }
       // METODOS DE CONSULTAS GENERALES
       this.BuscarParametro();
@@ -265,37 +352,13 @@ export class VerEmpleadoComponent implements OnInit {
       res => {
         this.formato_hora = res[0].descripcion;
         // LLAMADO A PRESENTACION DE DATOS
-        this.LlamarMetodos(fecha, this.formato_hora);
+        this.VerEmpleado(fecha);
       },
       vacio => {
-        this.LlamarMetodos(fecha, this.formato_hora);
+        this.VerEmpleado(fecha);
       });
   }
 
-  // LLAMAR METODOS DE PRESENTACION DE INFORMACION
-  LlamarMetodos(formato_fecha: string, formato_hora: string) {
-    this.VerDatosActuales(formato_fecha);
-    this.VerEmpleado(formato_fecha);
-    this.ObtenerDatosVacunas(formato_fecha);
-    this.ObtenerContratosEmpleado(formato_fecha);
-    if (this.habilitarVacaciones === true) {
-      this.ObtenerVacaciones(formato_fecha);
-    }
-    if (this.HabilitarPermisos === true) {
-      this.ObtenerPermisos(formato_fecha, formato_hora);
-    }
-    if (this.HabilitarAlimentacion === true) {
-      this.ObtenerPlanComidasEmpleado(formato_fecha, formato_hora);
-      this.ObtenerSolComidas(formato_fecha, formato_hora);
-    }
-    if (this.HabilitarAccion === true) {
-      this.ObtenerEmpleadoProcesos(formato_fecha);
-    }
-    if (this.HabilitarHorasE === true) {
-      this.ObtenerlistaHorasExtrasEmpleado(formato_fecha, formato_hora);
-      this.ObtenerPlanHorasExtras(formato_fecha, formato_hora);
-    }
-  }
 
   /** **************************************************************************************** **
    ** **                       METODOS GENERALES DEL SISTEMA                                ** **
@@ -345,11 +408,11 @@ export class VerEmpleadoComponent implements OnInit {
     this.restEmpleado.BuscarUnEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
       this.empleadoUno = data;
       this.empleadoUno[0].fec_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fecha_nacimiento, formato_fecha, this.validar.dia_abreviado);
-      var empleado = data[0].nombre + data[0].apellido;
+      var empleado = data[0].nombre + ' ' + data[0].apellido;
       if (data[0].imagen != null) {
         this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
         this.restEmpleado.obtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
-          console.log('ver imagen data ', data)
+          //console.log('ver imagen data ', data)
           if (data.imagen === 0) {
             this.ImagenLocalUsuario("assets/imagenes/user.png").then(
               (result) => (this.imagenEmpleado = result)
@@ -358,7 +421,7 @@ export class VerEmpleadoComponent implements OnInit {
           else {
             this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
           }
-          console.log('imagen codificado ', this.imagenEmpleado)
+          //console.log('imagen codificado ', this.imagenEmpleado)
         });
         //console.log('ver urlImagen ', this.urlImagen)
         this.mostrarImagen = true;
@@ -401,31 +464,36 @@ export class VerEmpleadoComponent implements OnInit {
   MAP: any;
   MapGeolocalizar(latitud: number, longitud: number, empleado: string) {
     let zoom = 19;
-    if (latitud === null && longitud === null) {
+    if (latitud === null || longitud === null) {
       latitud = -0.1918213;
       longitud = -78.4875258;
-      zoom = 7
+      zoom = 7;
     }
 
-    if (this.MAP) {
-      this.MAP = this.MAP.remove();
+    if (!this.MAP) {
+      // INICIALIZAR EL MAPA SOLO SI NO ESTA YA INICIALIZADO
+      this.MAP = L.map('geolocalizacion', {
+        center: [latitud, longitud],
+        zoom: zoom
+      });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+      }).addTo(this.MAP);
+    } else {
+      // SOLO ACTUALIZAR LA VISTA DEL MAPA SI YA ESTA INICIALIZADO
+      this.MAP.setView([latitud, longitud], zoom);
     }
 
-    this.MAP = L.map('geolocalizacion', {
-      center: [latitud, longitud],
-      zoom: zoom
-    });
-    const marker = L.marker([latitud, longitud]);
-    if (this.MARKER !== undefined) {
-      this.MAP.removeLayer(this.MARKER);
+    if (this.MARKER) {
+      // SI EL MARCADOR YA EXISTE, ACTUALIZA SU POSICION
+      this.MARKER.setLatLng([latitud, longitud]);
+    } else {
+      // CREAR UN NUEVO MARCADOR SI NO EXISTE
+      this.MARKER = L.marker([latitud, longitud]).addTo(this.MAP);
     }
-    else {
-      marker.setLatLng([latitud, longitud]);
-    }
-    marker.bindPopup(empleado);
-    this.MAP.addLayer(marker);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>' }).addTo(this.MAP);
-    this.MARKER = marker;
+
+    // ACTUALIZAR EL POPUP DEL MARCADOR
+    this.MARKER.bindPopup(empleado).openPopup();
   }
 
   // METODO INCLUIR EL CROKIS
@@ -677,7 +745,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.datosVacuna = [];
     this.restVacuna.ObtenerVacunaEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
       this.datosVacuna = data;
-      this.datosVacuna.forEach(data => {
+      this.datosVacuna.forEach((data: any) => {
         data.fecha_ = this.validar.FormatearFecha(data.fecha, formato_fecha, this.validar.dia_completo);
       })
     });
@@ -747,7 +815,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.contratoEmpleado = [];
     this.restEmpleado.BuscarDatosContrato(id_contrato).subscribe(res => {
       this.contratoEmpleado = res;
-      this.contratoEmpleado.forEach(data => {
+      this.contratoEmpleado.forEach((data: any) => {
         data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, formato_fecha, this.validar.dia_abreviado);
         data.fec_salida_ = this.validar.FormatearFecha(data.fecha_salida, formato_fecha, this.validar.dia_abreviado);
       })
@@ -760,7 +828,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.contratoBuscado = [];
     this.restEmpleado.BuscarContratosEmpleado(parseInt(this.idEmpleado)).subscribe(res => {
       this.contratoBuscado = res;
-      this.contratoBuscado.forEach(data => {
+      this.contratoBuscado.forEach((data: any) => {
         data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, formato_fecha, this.validar.dia_abreviado);
       })
     });
@@ -778,14 +846,14 @@ export class VerEmpleadoComponent implements OnInit {
     this.contratoSeleccionado = [];
     this.restEmpleado.BuscarDatosContrato(form.fechaContratoForm).subscribe(res => {
       this.contratoSeleccionado = res;
-      this.contratoSeleccionado.forEach(data => {
+      this.contratoSeleccionado.forEach((data: any) => {
         data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, this.formato_fecha, this.validar.dia_abreviado);
         data.fec_salida_ = this.validar.FormatearFecha(data.fecha_salida, this.formato_fecha, this.validar.dia_abreviado);
       })
     });
     this.restCargo.BuscarCargoIDContrato(form.fechaContratoForm).subscribe(datos => {
       this.listaCargos = datos;
-      this.listaCargos.forEach(data => {
+      this.listaCargos.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
       })
     }, error => {
@@ -850,7 +918,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.cargoEmpleado = [];
     this.restCargo.BuscarCargoID(id_cargo).subscribe(datos => {
       this.cargoEmpleado = datos;
-      this.cargoEmpleado.forEach(data => {
+      this.cargoEmpleado.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado);
         data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, formato_fecha, this.validar.dia_abreviado);
       })
@@ -874,7 +942,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.cargoSeleccionado = [];
     this.restCargo.BuscarCargoID(form.fechaICargoForm).subscribe(datos => {
       this.cargoSeleccionado = datos;
-      this.cargoSeleccionado.forEach(data => {
+      this.cargoSeleccionado.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
         data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, this.formato_fecha, this.validar.dia_abreviado);
       })
@@ -2580,7 +2648,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.empleadoProcesos = [];
     this.restEmpleadoProcesos.ObtenerProcesoUsuario(parseInt(this.idEmpleado)).subscribe(datos => {
       this.empleadoProcesos = datos;
-      this.empleadoProcesos.forEach(data => {
+      this.empleadoProcesos.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
         data.fec_final_ = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
       })

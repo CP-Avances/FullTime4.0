@@ -133,9 +133,20 @@ export class EditarVacunaComponent implements OnInit {
   // METODO PARA ACTUALIZAR DATOS DE REGISTRO DE VACUNACION
   GuardarDatos(datos: any) {
     this.restVacuna.ActualizarVacunacion(this.dvacuna.id, datos).subscribe(response => {
-      this.toastr.success('', 'Registro Vacunación guardado.', {
-        timeOut: 6000,
-      });
+      if (response.message === 'error') {
+        this.toastr.info('Intente otra vez.', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        });
+      }
+      else {
+        if (this.opcion === 2) {
+          this.EliminarCarnetServidor();
+          this.CargarDocumento();
+        }
+        this.toastr.success('', 'Registro Vacunación guardado.', {
+          timeOut: 6000,
+        });
+      }
     });
   }
 
@@ -143,6 +154,7 @@ export class EditarVacunaComponent implements OnInit {
   VerificarInformacion(datos: any, form: any) {
     if (this.opcion === 1) {
       let eliminar = {
+        subir_documento: false,
         documento: this.dvacuna.carnet,
         id: parseInt(this.dvacuna.id),
         user_name: this.user_name,
@@ -156,9 +168,8 @@ export class EditarVacunaComponent implements OnInit {
     else if (this.opcion === 2) {
       if (form.certificadoForm != '' && form.certificadoForm != null) {
         if (this.archivoSubido[0].size <= 2e+6) {
-          this.EliminarCarnetServidor();
+          datos.subir_documento = true;
           this.GuardarDatos(datos);
-          this.CargarDocumento(form);
           this.CerrarRegistro();
         }
         else {
@@ -222,7 +233,7 @@ export class EditarVacunaComponent implements OnInit {
   }
 
   // METODO PARA GUARDAR ARCHIVO SELECCIONADO
-  CargarDocumento(form: any) {
+  CargarDocumento() {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
@@ -235,12 +246,10 @@ export class EditarVacunaComponent implements OnInit {
       this.archivoF.reset();
       this.nameFile = '';
     }, error => {
-      this.toastr.info('Verifique que este usuario tenga creadas capetas', 'No se ha podido cargar el archivo.', {
+      this.toastr.warning('Intente cargar nuevamente el archivo.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       });
-
     }
-
     );
   }
 

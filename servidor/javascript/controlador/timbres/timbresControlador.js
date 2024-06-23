@@ -442,10 +442,12 @@ class TimbresControlador {
                 }
                 return [];
             }));
-            if (TIMBRES_NOTIFICACION.length > 0) {
+            if (TIMBRES_NOTIFICACION.length != 0) {
                 return res.jsonp(TIMBRES_NOTIFICACION);
             }
-            return res.status(404).jsonp({ message: 'No se encuentran registros.' });
+            else {
+                return res.status(404).jsonp({ message: 'No se encuentran registros.' });
+            }
         });
     }
     // METODO DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA
