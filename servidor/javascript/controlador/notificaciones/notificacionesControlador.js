@@ -546,8 +546,8 @@ class NotificacionTiempoRealControlador {
         `, [create_at, id_empl_envia, id_empl_recive, mensaje, tipo]);
                 console.log("par visualizar la fecha", create_at);
                 const [notificiacion] = response.rows;
-                const fechaHoraN = yield (0, settingsMail_1.FormatearHora)(create_at.toLocaleString().split(' ')[1]);
-                const fechaN = yield (0, settingsMail_1.FormatearFecha2)(create_at.toLocaleString(), 'ddd');
+                const fechaHoraN = yield (0, settingsMail_1.FormatearHora)(create_at.split(' ')[1]);
+                const fechaN = yield (0, settingsMail_1.FormatearFecha2)(create_at, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ecm_realtime_timbres',

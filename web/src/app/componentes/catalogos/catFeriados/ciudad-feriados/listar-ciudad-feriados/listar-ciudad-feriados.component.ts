@@ -100,7 +100,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
     this.datosFeriado = [];
     this.rest.ConsultarUnFeriado(idFeriado).subscribe(data => {
       this.datosFeriado = data;
-      this.datosFeriado.forEach(data => {
+      this.datosFeriado.forEach((data: any) => {
         data.fecha_ = this.validar.FormatearFecha(data.fecha, formato_fecha, this.validar.dia_abreviado);
         if (data.fecha_recuperacion != null) {
           data.fec_recuperacion_ = this.validar.FormatearFecha(data.fecha_recuperacion, formato_fecha, this.validar.dia_abreviado);
@@ -149,7 +149,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
         ip: this.ip,
       };
 
-      datos.forEach(obj => {
+      datos.forEach((obj: any) => {
         this.restF.EliminarRegistro(obj.idciudad_asignada, data).subscribe(res => {
           this.eliminar = this.eliminar + 1;
           if (this.eliminar === datos.length) {

@@ -8,7 +8,6 @@ import { ListaEmpleadosComponent } from './componentes/empleado/datos-empleado/l
 import { LoginComponent } from './componentes/iniciarSesion/login/login.component';
 import { HomeComponent } from './componentes/home/home.component';
 import { VerEmpleadoComponent } from './componentes/empleado/ver-empleado/ver-empleado.component';
-import { SeleccionarRolPermisoComponent } from './componentes/catalogos/catRoles/seleccionar-rol-permiso/seleccionar-rol-permiso.component'
 import { ListarRegimenComponent } from './componentes/catalogos/catRegimen/listar-regimen/listar-regimen.component';
 import { RelojesComponent } from './componentes/catalogos/catRelojes/relojes/relojes.component'
 import { PrincipalProcesoComponent } from './componentes/modulos/accionesPersonal/catProcesos/principal-proceso/principal-proceso.component';

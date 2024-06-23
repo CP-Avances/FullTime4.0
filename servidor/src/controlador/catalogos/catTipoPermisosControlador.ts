@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
+import { FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
 
 class TipoPermisosControlador {
 
@@ -55,13 +56,19 @@ class TipoPermisosControlador {
         DELETE FROM mp_cat_tipo_permisos WHERE id = $1
         `
         , [id]);
+      const fechaHoraO = await FormatearHora(datosOriginales.horas_maximo_permiso)
+      const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd')
+      const fechaFinO = await FormatearFecha2(datosOriginales.fecha_fin, 'ddd')
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'mp_cat_tipo_permisos',
         usuario: user_name,
         accion: 'D',
-        datosOriginales: JSON.stringify(datosOriginales),
+        datosOriginales: `{descripcion: ${datosOriginales.descripcion}, tipo_descuento: ${datosOriginales.tipo_descuento}, dias_maximo_permiso: ${datosOriginales.dias_maximo_permiso}, dias_anticipar_permiso: ${datosOriginales.dias_anticipar_permiso}, 
+        justificar: ${datosOriginales.justificar}, fecha_restriccion: ${datosOriginales.fecha_restriccion}, solicita_empleado: ${datosOriginales.solicita_empleado}, legalizar: ${datosOriginales.legalizar}, incluir_minutos_comida: ${datosOriginales.incluir_minutos_comida}, dias_justificar: ${datosOriginales.dias_justificar}, 
+        horas_maximo_permiso: ${fechaHoraO}, fecha_inicio: ${fechaInicioO}, documento: ${datosOriginales.documento}, contar_feriados: ${datosOriginales.contar_feriados}, correo_crear: ${datosOriginales.correo_crear}, correo_editar: ${datosOriginales.correo_editar}, correo_eliminar: ${datosOriginales.correo_eliminar}, 
+        correo_preautorizar: ${datosOriginales.correo_preautorizar}, correo_autorizar: ${datosOriginales.correo_autorizar}, correo_negar: ${datosOriginales.correo_negar}, correo_legalizar: ${datosOriginales.correo_legalizar}, fecha_fin: ${fechaFinO}, crear_dias_anteriores: ${datosOriginales.crear_dias_anteriores}}`,
         datosNuevos: '',
         ip,
         observacion: null
@@ -140,13 +147,26 @@ class TipoPermisosControlador {
 
       const [tipoPermiso] = response.rows;
 
+      const fechaHoraO = await FormatearHora(datosOriginales.horas_maximo_permiso)
+      const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd')
+      const fechaFinO = await FormatearFecha2(datosOriginales.fecha_fin, 'ddd')
+      const fechaHora = await FormatearHora(num_hora_maximo)
+      const fechaInicio = await FormatearFecha2(fecha_inicio, 'ddd')
+      const fechaFin = await FormatearFecha2(fecha_fin, 'ddd')
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'mp_cat_tipo_permisos',
         usuario: user_name,
         accion: 'U',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: JSON.stringify(tipoPermiso),
+        datosOriginales: `{descripcion: ${datosOriginales.descripcion}, tipo_descuento: ${datosOriginales.tipo_descuento}, dias_maximo_permiso: ${datosOriginales.dias_maximo_permiso}, dias_anticipar_permiso: ${datosOriginales.dias_anticipar_permiso}, 
+        justificar: ${datosOriginales.justificar}, fecha_restriccion: ${datosOriginales.fecha_restriccion}, solicita_empleado: ${datosOriginales.solicita_empleado}, legalizar: ${datosOriginales.legalizar}, incluir_minutos_comida: ${datosOriginales.incluir_minutos_comida}, dias_justificar: ${datosOriginales.dias_justificar}, 
+        horas_maximo_permiso: ${fechaHoraO}, fecha_inicio: ${fechaInicioO}, documento: ${datosOriginales.documento}, contar_feriados: ${datosOriginales.contar_feriados}, correo_crear: ${datosOriginales.correo_crear}, correo_editar: ${datosOriginales.correo_editar}, correo_eliminar: ${datosOriginales.correo_eliminar}, 
+        correo_preautorizar: ${datosOriginales.correo_preautorizar}, correo_autorizar: ${datosOriginales.correo_autorizar}, correo_negar: ${datosOriginales.correo_negar}, correo_legalizar: ${datosOriginales.correo_legalizar}, fecha_fin: ${fechaFinO}, crear_dias_anteriores: ${datosOriginales.crear_dias_anteriores}}`,
+        datosNuevos: `{descripcion: ${descripcion}, tipo_descuento: ${tipo_descuento}, dias_maximo_permiso: ${num_dia_maximo}, dias_anticipar_permiso: ${num_dia_anticipo}, 
+        justificar: ${gene_justificacion}, fecha_restriccion: ${fec_validar}, solicita_empleado: ${acce_empleado}, legalizar: ${legalizar}, incluir_minutos_comida: ${almu_incluir}, dias_justificar: ${num_dia_justifica}, 
+        horas_maximo_permiso: ${fechaHora}, fecha_inicio: ${fechaInicio}, documento: ${documento}, contar_feriados: ${contar_feriados}, correo_crear: ${correo_crear}, correo_editar: ${correo_editar}, correo_eliminar: ${correo_eliminar}, 
+        correo_preautorizar: ${correo_preautorizar}, correo_autorizar: ${correo_autorizar}, correo_negar: ${correo_negar}, correo_legalizar: ${correo_legalizar}, fecha_fin: ${fechaFin}, crear_dias_anteriores: ${num_dia_anterior}}`,
         ip,
         observacion: null
       });
@@ -189,13 +209,21 @@ class TipoPermisosControlador {
 
       const [tipo] = response.rows;
 
+      const fechaHora = await FormatearHora(num_hora_maximo)
+      const fechaInicio = await FormatearFecha2(fecha_inicio, 'ddd')
+      const fechaFin = await FormatearFecha2(fecha_fin, 'ddd')
+
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'mp_cat_tipo_permisos',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: JSON.stringify(tipo),
+        datosNuevos: `{descripcion: ${descripcion}, tipo_descuento: ${tipo_descuento}, dias_maximo_permiso: ${num_dia_maximo}, dias_anticipar_permiso: ${num_dia_anticipo}, 
+          justificar: ${gene_justificacion}, fecha_restriccion: ${fec_validar}, solicita_empleado: ${acce_empleado}, legalizar: ${legalizar}, incluir_minutos_comida: ${almu_incluir}, dias_justificar: ${num_dia_justifica}, 
+          horas_maximo_permiso: ${fechaHora}, fecha_inicio: ${fechaInicio}, documento: ${documento}, contar_feriados: ${contar_feriados}, correo_crear: ${correo_crear}, correo_editar: ${correo_editar}, correo_eliminar: ${correo_eliminar}, 
+          correo_preautorizar: ${correo_preautorizar}, correo_autorizar: ${correo_autorizar}, correo_negar: ${correo_negar}, correo_legalizar: ${correo_legalizar}, fecha_fin: ${fechaFin}, crear_dias_anteriores: ${num_dia_anterior}}`,
         ip,
         observacion: null
       });

@@ -299,6 +299,7 @@ class TimbresControlador {
                         ip,
                         observacion: null
                     });
+                    //FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     res.status(200).jsonp({ message: 'Registro guardado.' });
                 }));
@@ -346,8 +347,9 @@ class TimbresControlador {
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 `, [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
                     id_reloj, ip_cliente, servidor], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                    console.log("ver fecha", fec_hora_timbre);
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.split('T')[1]);
-                    const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre.toLocaleString(), 'ddd');
+                    const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre, 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_timbres',
                         usuario: 'admin',
@@ -436,10 +438,12 @@ class TimbresControlador {
                 }
                 return [];
             }));
-            if (TIMBRES_NOTIFICACION.length > 0) {
+            if (TIMBRES_NOTIFICACION.length != 0) {
                 return res.jsonp(TIMBRES_NOTIFICACION);
             }
-            return res.status(404).jsonp({ message: 'No se encuentran registros.' });
+            else {
+                return res.status(404).jsonp({ message: 'No se encuentran registros.' });
+            }
         });
     }
     // METODO DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA

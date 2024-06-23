@@ -331,7 +331,7 @@ export class ListarPlanificacionComponent implements OnInit {
   }
 
   FormatearDatos(lista: any, formato_fecha: string, formato_hora: string) {
-    lista.forEach(data => {
+    lista.forEach((data: any) => {
       data.fecInicio = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
       data.fecFinal = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
       data.horaInicio = this.validar.FormatearHora(data.hora_inicio, formato_hora);

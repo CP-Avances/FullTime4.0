@@ -366,7 +366,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
         })
       }
 
-      obj.departamentos.forEach(obj1 => {
+      obj.departamentos.forEach((obj1: any) => {
 
         // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
         if (this.bool.bool_dep === true) {
@@ -488,7 +488,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
   MapingDataPdfDefault(array: Array<any>) {
     let nuevo: Array<any> = [];
     array.forEach((obj1: ReporteHoraExtra) => {
-      obj1.departamentos.forEach(obj2 => {
+      obj1.departamentos.forEach((obj2: any) => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.horaE.forEach((obj4: hora) => {
             /* let ele = {

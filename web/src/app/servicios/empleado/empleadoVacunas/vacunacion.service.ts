@@ -34,13 +34,13 @@ export class VacunacionService {
   }
 
   // METODO PARA SUBIR UN DOCUMENTO
-  SubirDocumento(formData: any, id: number, nombre: string) {
-    return this.http.put(`${environment.url}/vacunas/${id}/documento/${nombre}`, formData)
+  SubirDocumento(formData: any, id: number, id_empleado: any) {
+    return this.http.put<any>(`${environment.url}/vacunas/${id}/documento/${id_empleado}`, formData)
   }
 
   // METODO PARA ACTUALIZAR REGISTRO
   ActualizarVacunacion(id: number, data: any) {
-    return this.http.put(`${environment.url}/vacunas/${id}`, data);
+    return this.http.put<any>(`${environment.url}/vacunas/${id}`, data);
   }
 
   // ELIMINAR CARNET DE VACUNA DEL SERVIDOR

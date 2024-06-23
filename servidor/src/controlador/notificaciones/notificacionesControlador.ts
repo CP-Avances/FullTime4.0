@@ -631,8 +631,8 @@ class NotificacionTiempoRealControlador {
 
       const [notificiacion] = response.rows;
 
-      const fechaHoraN = await FormatearHora(create_at.toLocaleString().split(' ')[1])
-      const fechaN = await FormatearFecha2(create_at.toLocaleString(), 'ddd')
+      const fechaHoraN = await FormatearHora(create_at.split(' ')[1])
+      const fechaN = await FormatearFecha2(create_at, 'ddd')
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({

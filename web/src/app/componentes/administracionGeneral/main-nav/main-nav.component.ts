@@ -151,12 +151,6 @@ export class MainNavComponent implements OnInit {
         });
       }
     });
-
-    var f = moment();
-    let hora: number = parseInt(moment(f).format('HH'));
-    let fecha: string = moment(f).format('YYYY-MM-DD');
-    console.log('HORAS ', hora, ' fechas ', fecha)
-
   }
 
   // METODO PARA REGISTRAR FRASE DE SEGURIDAD

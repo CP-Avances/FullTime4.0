@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { QueryResult } from "pg";
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
+import { FormatearHora } from '../../libs/settingsMail';
 
 class HorasExtrasControlador {
   public async ListarHorasExtras(req: Request, res: Response) {
@@ -37,10 +38,10 @@ class HorasExtrasControlador {
     try {
       const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo,
         incl_almuerzo, tipo_funcion, user_name, ip } = req.body;
-  
+
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
-      
+
       const response: QueryResult = await pool.query(
         `
         INSERT INTO mhe_configurar_hora_extra ( descripcion, tipo_descuento, recargo_porcentaje, hora_inicio, hora_final, 
@@ -48,8 +49,11 @@ class HorasExtrasControlador {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
         `
         , [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion]);
-  
+
       const [HORA] = response.rows;
+
+      const horaInicio = await FormatearHora(hora_inicio)
+      const horaFinal = await FormatearHora(hora_final)
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -57,14 +61,15 @@ class HorasExtrasControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: JSON.stringify(HORA),
+        datosNuevos: `{descripcion: ${descripcion}, tipo_descuento: ${tipo_descuento}, recargo_porcentaje: ${reca_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, 
+          hora_jornada: ${hora_jornada}, tipo_dia: ${tipo_dia}, codigo: ${codigo}, minutos_comida: ${incl_almuerzo}, tipo_funcion: ${tipo_funcion}}`,
         ip: ip,
         observacion: null
       });
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-  
+
       if (HORA) {
         return res.status(200).jsonp(HORA);
       } else {
@@ -108,12 +113,15 @@ class HorasExtrasControlador {
 
       await pool.query('DELETE FROM mhe_configurar_hora_extra WHERE id = $1', [id]);
 
+      const horaInicio = await FormatearHora(datosOriginales.hora_inicio)
+      const horaFinal = await FormatearHora(datosOriginales.hora_final)
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'mhe_configurar_hora_extra',
         usuario: user_name,
         accion: 'D',
-        datosOriginales: JSON.stringify(datosOriginales),
+        datosOriginales: `{ codigo: ${datosOriginales.codigo}, descripcion: ${datosOriginales.descripcion}, tipo_descuento: ${datosOriginales.tipo_descuento}, recargo_porcentaje: ${datosOriginales.recargo_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, hora_jornada: ${datosOriginales.hora_jornada}, minutos_comida: ${datosOriginales.minutos_comida}, tipo_dia: ${datosOriginales.tipo_dia}, tipo_funcion: ${datosOriginales.tipo_funcion}}`,
         datosNuevos: '',
         ip: ip,
         observacion: null
@@ -127,14 +135,14 @@ class HorasExtrasControlador {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: error });
-      
+
     }
   }
 
   public async ActualizarHoraExtra(req: Request, res: Response): Promise<Response> {
     try {
       const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, id, user_name, ip } = req.body;
-      
+
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
@@ -166,14 +174,17 @@ class HorasExtrasControlador {
         WHERE id = $11
         `
         , [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, id]);
-      
+      const horaInicio = await FormatearHora(datosOriginales.hora_inicio)
+      const horaFinal = await FormatearHora(datosOriginales.hora_final)
+      const horaInicioN = await FormatearHora(hora_inicio)
+      const horaFinalN = await FormatearHora(hora_final)
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'mhe_configurar_hora_extra',
         usuario: user_name,
         accion: 'U',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{"descripcion": "${descripcion}", "tipo_descuento": "${tipo_descuento}", "reca_porcentaje": "${reca_porcentaje}", "hora_inicio": "${hora_inicio}", "hora_final": "${hora_final}", "hora_jornada": "${hora_jornada}", "tipo_dia": "${tipo_dia}", "codigo": "${codigo}", "incl_almuerzo": "${incl_almuerzo}", "tipo_funcion": "${tipo_funcion}"}`,
+        datosOriginales: `{ codigo: ${datosOriginales.codigo}, descripcion: ${datosOriginales.descripcion}, tipo_descuento: ${datosOriginales.tipo_descuento}, recargo_porcentaje: ${datosOriginales.recargo_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, hora_jornada: ${datosOriginales.hora_jornada}, minutos_comida: ${datosOriginales.minutos_comida}, tipo_dia: ${datosOriginales.tipo_dia}, tipo_funcion: ${datosOriginales.tipo_funcion}}`,
+        datosNuevos: `{codigo: ${codigo}, descripcion: ${descripcion}, tipo_descuento: ${tipo_descuento}, recargo_porcentaje: ${reca_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, hora_jornada: ${hora_jornada}, minutos_comida: ${incl_almuerzo}, tipo_dia: ${tipo_dia}, tipo_funcion: ${tipo_funcion}}`,
         ip: ip,
         observacion: null
       });

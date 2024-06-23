@@ -1,6 +1,6 @@
 import {
     enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, Credenciales, fechaHora,
-    FormatearFecha, FormatearHora, dia_completo
+    FormatearFecha, FormatearHora, dia_completo, FormatearFecha2
 } from '../../libs/settingsMail';
 import { ObtenerRutaPermisos } from '../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
@@ -164,7 +164,7 @@ class PermisosControlador {
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
-    
+
             const response: QueryResult = await pool.query(
                 `
                 INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, 
@@ -176,8 +176,14 @@ class PermisosControlador {
                 [fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
                     id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
                     estado, id_empl_cargo, hora_salida, hora_ingreso, codigo]);
-    
+
             const [objetoPermiso] = response.rows;
+            var fechaCreacionN = await FormatearFecha2(fec_creacion, 'ddd');
+            var fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');
+            var fechaFinalN = await FormatearFecha2(fec_final, 'ddd');
+            const horaSalidaN = await FormatearHora(hora_salida);
+            const horaIngresoN = await FormatearHora(hora_ingreso);
+
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -185,15 +191,15 @@ class PermisosControlador {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: JSON.stringify(objetoPermiso),
+                datosNuevos: `{codigo: ${codigo}, id_empleado_contrato: ${id_empl_contrato}, id_empleado_cargo: ${id_empl_cargo}, id_periodo_vacacion: ${id_peri_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: null, numero_permiso: ${num_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dia}, dia_libre: ${dia_libre}, horas_permiso: ${hora_numero}, documento: null, legalizado: ${legalizado}, estado: ${estado}}`,
                 ip, observacion: null
             });
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-    
+
             if (!objetoPermiso) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
-    
+
             const permiso = objetoPermiso
             const JefesDepartamentos = await pool.query(
                 `
@@ -211,7 +217,7 @@ class PermisosControlador {
                 `
                 ,
                 [depa_user_loggin]).then((result: any) => { return result.rows });
-    
+
             if (JefesDepartamentos.length === 0) {
                 return res.status(400)
                     .jsonp({
@@ -236,10 +242,10 @@ class PermisosControlador {
 
         try {
             const id = req.params.id;
-    
+
             const { descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso,
                 hora_salida, hora_ingreso, depa_user_loggin, id_peri_vacacion, fec_edicion, user_name, ip } = req.body;
-    
+
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
@@ -254,7 +260,7 @@ class PermisosControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip, 
+                    ip,
                     observacion: `Error al intentar actualizar permiso con id: ${id}`
                 });
 
@@ -272,16 +278,28 @@ class PermisosControlador {
                 `
                 , [descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso,
                     hora_salida, hora_ingreso, id_peri_vacacion, fec_edicion, id]);
-    
+
             const [objetoPermiso] = response.rows;
-    
+            var fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');
+            var fechaFinalN = await FormatearFecha2(fec_final, 'ddd');
+            var fechaEdicionN = await FormatearFecha2(fec_edicion, 'ddd');
+            const horaSalidaN = await FormatearHora(hora_salida);
+            const horaIngresoN = await FormatearHora(hora_ingreso);
+
+            var fechaCreacionN = await FormatearFecha2(datosOriginales.fecha_creacion, 'ddd');
+            var fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+            var fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
+            var fechaEdicionO = await FormatearFecha2(datosOriginales.fecha_edicion, 'ddd');
+            const horaSalidaO = await FormatearHora(datosOriginales.hora_salida);
+            const horaIngresoO = await FormatearHora(datosOriginales.hora_ingreso);
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'mp_solicitud_permiso',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: JSON.stringify(objetoPermiso),
+                datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                datosNuevos: `{codigo: , id_empleado_contrato: , id_empleado_cargo: , id_periodo_vacacion: ${id_peri_vacacion}, fecha_creacion: , fecha_edicion: ${fechaEdicionN}, numero_permiso: ${num_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dia}, dia_libre: ${dia_libre}, horas_permiso: ${hora_numero}, documento: null, legalizado: , estado: }`,
                 ip, observacion: null
             });
 
@@ -289,9 +307,9 @@ class PermisosControlador {
             await pool.query('COMMIT');
 
             if (!objetoPermiso) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
-    
+
             const permiso = objetoPermiso;
-    
+
             const JefesDepartamentos = await pool.query(
                 `
                 SELECT n.id_departamento, cg.nombre, n.id_departamento_nivel, n.departamento_nombre_nivel, n.nivel,
@@ -308,7 +326,7 @@ class PermisosControlador {
                 `
                 ,
                 [depa_user_loggin]).then((result: any) => { return result.rows });
-    
+
             if (JefesDepartamentos.length === 0) {
                 return res.status(400)
                     .jsonp({
@@ -339,7 +357,7 @@ class PermisosControlador {
             var anio = fecha.format('YYYY');
             var mes = fecha.format('MM');
             var dia = fecha.format('DD');
-    
+
             // LEER DATOS DE IMAGEN
             let id = req.params.id
             let { archivo, codigo } = req.params;
@@ -348,13 +366,13 @@ class PermisosControlador {
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
-    
+
             const permiso = await pool.query(
                 `
                 SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1
                 `
                 , [id]);
-    
+
             let documento = permiso.rows[0].num_permiso + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
             let separador = path.sep;
 
@@ -369,7 +387,7 @@ class PermisosControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip, 
+                    ip,
                     observacion: `Error al intentar actualizar permiso con id: ${id}`
                 });
 
@@ -377,30 +395,36 @@ class PermisosControlador {
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
             }
-    
+
             // ACTUALIZAR REGISTRO
             await pool.query(
                 `
                 UPDATE mp_solicitud_permiso SET documento = $2 WHERE id = $1
                 `
                 , [id, documento]);
+            var fechaCreacionN = await FormatearFecha2(datosOriginales.fecha_creacion, 'ddd');
+            var fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+            var fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
+            var fechaEdicionO = await FormatearFecha2(datosOriginales.fecha_edicion, 'ddd');
+            const horaSalidaO = await FormatearHora(datosOriginales.hora_salida);
+            const horaIngresoO = await FormatearHora(datosOriginales.hora_ingreso);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'mp_solicitud_permiso',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: `{"documento": "${documento}"}`,
-                ip, 
+                datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                datosNuevos: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                ip,
                 observacion: null
             });
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-    
+
             res.jsonp({ message: 'Documento actualizado.' });
-    
+
             if (archivo != 'null' && archivo != '' && archivo != null) {
                 if (archivo != documento) {
                     let ruta = await ObtenerRutaPermisos(codigo) + separador + archivo;
@@ -442,7 +466,7 @@ class PermisosControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip, 
+                    ip,
                     observacion: `Error al intentar actualizar permiso con id: ${id}`
                 });
 
@@ -450,25 +474,33 @@ class PermisosControlador {
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
             }
-    
+
             // ACTUALIZAR REGISTRO
             await pool.query(
                 `
                 UPDATE mp_solicitud_permiso SET documento = null WHERE id = $1
                 `
                 , [id]);
-    
+
+            // AUDITORIA
+            var fechaCreacionN = await FormatearFecha2(datosOriginales.fecha_creacion, 'ddd');
+            var fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+            var fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
+            var fechaEdicionO = await FormatearFecha2(datosOriginales.fecha_edicion, 'ddd');
+            const horaSalidaO = await FormatearHora(datosOriginales.hora_salida);
+            const horaIngresoO = await FormatearHora(datosOriginales.hora_ingreso);
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'mp_solicitud_permiso',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: '{"documento": null}',
-                ip, 
+                datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                datosNuevos: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: null, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                ip,
                 observacion: null
             });
-            
+
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
 
@@ -559,7 +591,7 @@ class PermisosControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip, 
+                    ip,
                     observacion: `Error al intentar eliminar permiso con id: ${id_permiso}`
                 });
 
@@ -581,7 +613,7 @@ class PermisosControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginalesRealTime),
                 datosNuevos: '',
-                ip, 
+                ip,
                 observacion: null
             });
 
@@ -596,7 +628,7 @@ class PermisosControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip, 
+                    ip,
                     observacion: `Error al intentar eliminar permiso con id: ${id_permiso}`
                 });
 
@@ -604,7 +636,7 @@ class PermisosControlador {
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
             }
-           
+
             await pool.query(
                 `
                 DELETE FROM ecm_autorizaciones WHERE id_permiso = $1
@@ -618,7 +650,7 @@ class PermisosControlador {
                 accion: 'D',
                 datosOriginales: JSON.stringify(datosOriginalesAutorizaciones),
                 datosNuevos: '',
-                ip, 
+                ip,
                 observacion: null
             });
 
@@ -633,7 +665,7 @@ class PermisosControlador {
                     accion: 'D',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip, 
+                    ip,
                     observacion: `Error al intentar eliminar permiso con id: ${id_permiso}`
                 });
 
@@ -641,27 +673,34 @@ class PermisosControlador {
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
             }
-    
+
             const response: QueryResult = await pool.query(
                 `
                 DELETE FROM mp_solicitud_permiso WHERE id = $1 RETURNING *
                 `
                 , [id_permiso]);
 
+                var fechaCreacionN = await FormatearFecha2(datosOriginalesPermisos.fecha_creacion, 'ddd');
+                var fechaInicioO = await FormatearFecha2(datosOriginalesPermisos.fecha_inicio, 'ddd');
+                var fechaFinalO = await FormatearFecha2(datosOriginalesPermisos.fecha_final, 'ddd');
+                var fechaEdicionO = await FormatearFecha2(datosOriginalesPermisos.fecha_edicion, 'ddd');
+                const horaSalidaO = await FormatearHora(datosOriginalesPermisos.hora_salida);
+                const horaIngresoO = await FormatearHora(datosOriginalesPermisos.hora_ingreso);
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'mp_solicitud_permiso',
                 usuario: user_name,
                 accion: 'D',
-                datosOriginales: JSON.stringify(datosOriginalesPermisos),
+                datosOriginales: `{codigo: ${datosOriginalesPermisos.codigo}, id_empleado_contrato: ${datosOriginalesPermisos.id_empleado_contrato}, id_empleado_cargo: ${datosOriginalesPermisos.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginalesPermisos.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginalesPermisos.numero_permiso}, descripcion: ${datosOriginalesPermisos.descripcion}, id_tipo_permiso: ${datosOriginalesPermisos.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginalesPermisos.dias_permiso}, dia_libre: ${datosOriginalesPermisos.dia_libre}, horas_permiso: ${datosOriginalesPermisos.horas_permiso}, documento: ${datosOriginalesPermisos.documento}, legalizado: ${datosOriginalesPermisos.legalizado}, estado: ${datosOriginalesPermisos.estado}}`,
                 datosNuevos: '',
-                ip, 
+                ip,
                 observacion: null
             });
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-    
+
             if (doc != 'null' && doc != '' && doc != null) {
                 console.log(id_permiso, doc, ' entra ');
                 let ruta = await ObtenerRutaPermisos(codigo) + separador + doc;
@@ -674,9 +713,9 @@ class PermisosControlador {
                     }
                 });
             }
-    
+
             const [objetoPermiso] = response.rows;
-    
+
             if (objetoPermiso) {
                 return res.status(200).jsonp(objetoPermiso)
             }
@@ -1273,7 +1312,7 @@ class PermisosControlador {
                     accion: 'U',
                     datosOriginales: '',
                     datosNuevos: '',
-                    ip, 
+                    ip,
                     observacion: `Error al actualizar estado del permiso con id ${id}`
                 });
                 await pool.query('ROLLBACK');
@@ -1285,7 +1324,7 @@ class PermisosControlador {
                 UPDATE mp_solicitud_permiso SET estado = $1 WHERE id = $2
                 `
                 , [estado, id]);
-            
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'mp_solicitud_permiso',
@@ -1293,7 +1332,7 @@ class PermisosControlador {
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: `{"estado": ${estado}}`,
-                ip, 
+                ip,
                 observacion: null
             });
 
@@ -1304,7 +1343,7 @@ class PermisosControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'Error al actualizar estado del permiso' });   
+            return res.status(500).jsonp({ message: 'Error al actualizar estado del permiso' });
         }
     }
 

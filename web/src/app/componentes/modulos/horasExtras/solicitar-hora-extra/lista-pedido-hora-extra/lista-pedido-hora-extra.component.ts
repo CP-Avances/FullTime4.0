@@ -258,7 +258,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         }
       })
 
-      this.lista_pedidosFiltradas.forEach(data => {
+      this.lista_pedidosFiltradas.forEach((data: any) => {
 
         if (data.estado === 1) {
           data.estado = 'Pendiente';
@@ -394,7 +394,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         }
       });
 
-      this.listaHorasExtrasObservaFiltradas.forEach(data => {
+      this.listaHorasExtrasObservaFiltradas.forEach((data: any) => {
 
         if (data.estado === 1) {
           data.estado = 'Pendiente';
@@ -597,7 +597,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         this.lista_autorizacion = false;
       }
 
-      this.listaHorasExtrasAutorizadasFiltradas.forEach(data => {
+      this.listaHorasExtrasAutorizadasFiltradas.forEach((data: any) => {
 
         if (data.estado === 1) {
           data.estado = 'Pendiente';

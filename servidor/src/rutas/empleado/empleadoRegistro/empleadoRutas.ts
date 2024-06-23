@@ -1,58 +1,11 @@
 // SECCIÓN DE LIBRERIAS
 import EMPLEADO_CONTROLADOR from '../../../controlador/empleado/empleadoRegistro/empleadoControlador';
-import { ObtenerRutaUsuario, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
+import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { TokenValidation } from '../../../libs/verificarToken';
 import { Router } from 'express';
 import multer from 'multer';
-import pool from '../../../database';
 import moment from 'moment';
 moment.locale('es');
-
-const multipart = require('connect-multiparty');
-
-const multipartMiddlewarePlantilla = multipart({
-    uploadDir: './plantillas',
-});
-
-/** ************************************************************************************** **
- ** **                   METODO PARA OBTENER CARPETA IMAGENES DE USUARIO                   **   
- ** ************************************************************************************** **/
-
-const storage = multer.diskStorage({
-
-    destination: async function (req, file, cb) {
-        let id = req.params.id_empleado;
-        var ruta = await ObtenerRutaLeerPlantillas();
-        //var ruta = await ObtenerRutaUsuario(id);
-        cb(null, ruta)
-    },
-
-    filename: async function (req, file, cb) {
-
-        // FECHA DEL SISTEMA
-        var fecha = moment();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
-
-        // DATOS DOCUMENTO
-        let id = req.params.id_empleado;
-
-        const usuario = await pool.query(
-            `
-            SELECT codigo FROM eu_empleados WHERE id = $1
-            `
-            , [id]);
-
-        //let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
-
-        let documento = file.originalname;
-
-        cb(null, documento)
-    }
-})
-
-const upload = multer({ storage: storage });
 
 
 /** ************************************************************************************** **
@@ -122,7 +75,7 @@ class EmpleadoRutas {
         // METODO PARA REACTIVAR EMPLEADOS
         this.router.put('/re-activar/masivo', TokenValidation, EMPLEADO_CONTROLADOR.ReactivarMultiplesEmpleados);
         // METODO PARA CARGAR IMAGEN DEL USUARIO
-        this.router.put('/:id_empleado/uploadImage', [TokenValidation, upload.single('image')], EMPLEADO_CONTROLADOR.CrearImagenEmpleado);
+        this.router.put('/:id_empleado/uploadImage', [TokenValidation, upload_plantilla.single('image')], EMPLEADO_CONTROLADOR.CrearImagenEmpleado);
         // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO
         this.router.put('/geolocalizacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.GeolocalizacionCrokis);
         // METODO PARA ELIMINAR EMPLEADOS
@@ -178,7 +131,7 @@ class EmpleadoRutas {
         /** **************************************************************************************** **
          ** **                CREACION DE CARPETAS DE LOS EMPLEADOS SELECCIONADOS                 ** ** 
          ** **************************************************************************************** **/
-        //this.router.post('/crear_carpetas/', TokenValidation, EMPLEADO_CONTROLADOR.CrearCarpetasEmpleado);
+        this.router.post('/crear_carpetas/', TokenValidation, EMPLEADO_CONTROLADOR.CrearCarpetasEmpleado);
 
     }
 

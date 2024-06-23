@@ -316,7 +316,7 @@ class TimbresControlador {
                         observacion: null
                     });
 
-
+                    //FINALIZAR TRANSACCION
                     await pool.query('COMMIT');
                     res.status(200).jsonp({ message: 'Registro guardado.' });
                    
@@ -382,8 +382,10 @@ class TimbresControlador {
                     id_reloj, ip_cliente, servidor]
 
                 , async (error, results) => {
+
+                    console.log("ver fecha",fec_hora_timbre )
                     const fechaHora = await FormatearHora(fec_hora_timbre.split('T')[1])
-                    const fechaTimbre = await FormatearFecha2(fec_hora_timbre.toLocaleString(), 'ddd')
+                    const fechaTimbre = await FormatearFecha2(fec_hora_timbre, 'ddd')
 
 
                     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -494,11 +496,14 @@ class TimbresControlador {
                 return []
             });
 
-        if (TIMBRES_NOTIFICACION.length > 0) {
+        if (TIMBRES_NOTIFICACION.length != 0) {
             return res.jsonp(TIMBRES_NOTIFICACION)
         }
+        else {
+            return res.status(404).jsonp({ message: 'No se encuentran registros.' });
+        }
 
-        return res.status(404).jsonp({ message: 'No se encuentran registros.' });
+
     }
 
     // METODO DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA

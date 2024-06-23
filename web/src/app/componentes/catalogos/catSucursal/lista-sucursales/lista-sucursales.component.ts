@@ -20,10 +20,10 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 import { environment } from 'src/environments/environment';
 
@@ -67,9 +67,8 @@ export class ListaSucursalesComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
-  asignacionesAcceso: any;
-  idSucursalesAcceso: any = [];
-  idDepartamentosAcceso: any = [];
+  idSucursalesAcceso: Set<any> = new Set();
+  idDepartamentosAcceso: Set<any> = new Set();
 
   expansion: boolean = false;
 
@@ -96,7 +95,7 @@ export class ListaSucursalesComponent implements OnInit {
     public ventana: MatDialog,
     public validar: ValidacionesService,
     public restE: EmpleadoService,
-    private usuario: UsuarioService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -104,8 +103,9 @@ export class ListaSucursalesComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
 
-    this.ObtenerAsignacionesUsuario(this.idEmpleado);
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerSucursal();
     this.ObtenerColores();
@@ -165,30 +165,9 @@ export class ListaSucursalesComponent implements OnInit {
     });
   }
 
-  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const dataEmpleado = {
-      id_empleado: Number(idEmpleado)
-    }
-
-    const res = await firstValueFrom(this.usuario.BuscarUsuarioDepartamento(dataEmpleado));
-    this.asignacionesAcceso = res;
-
-    this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal && !asignacion.administra) {
-        return;
-      }
-
-      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
-      this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
-
-    });
-
-  }
-
   // METODO PARA FILTRAR SUCURSALES ASIGNADAS
   FiltrarSucursalesAsignadas(data: any) {
-    return data.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
+    return data.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
   }
 
   // METODO PARA REGISTRAR SUCURSAL

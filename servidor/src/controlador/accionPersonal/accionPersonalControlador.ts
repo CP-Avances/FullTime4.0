@@ -1,8 +1,11 @@
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
-import { ImagenBase64LogosEmpresas } from '../../libs/ImagenCodificacion';
+import { ConvertirImagenBase64 } from '../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import pool from '../../database';
+import path from 'path';
+import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
+import { FormatearFecha2 } from '../../libs/settingsMail';
 
 class AccionPersonalControlador {
 
@@ -485,13 +488,27 @@ class AccionPersonalControlador {
             delete datosNuevos.user_name;
             delete datosNuevos.ip;
 
+            var fechaCreacionN = await FormatearFecha2(fec_creacion, 'ddd');
+            var fecha_rige_desdeN = await FormatearFecha2(fec_rige_desde, 'ddd');
+            var fecha_rige_hastaN  =  await FormatearFecha2(fec_rige_hasta, 'ddd');
+            var primera_fecha_reemplazoN = await FormatearFecha2(primera_fecha_reemp, 'ddd');
+            var fecha_acta_final_concurso = await FormatearFecha2(fec_act_final_concurso, 'ddd');
+
             // INSERTAR REGISTRO DE AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'map_solicitud_accion_personal',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: JSON.stringify(datosNuevos),
+                
+                datosNuevos: `{id_empleado: ${id_empleado}, fecha_creacion: ${fechaCreacionN}, fecha_rige_desde: ${fecha_rige_desdeN}, 
+                    fecha_rige_hasta: ${fecha_rige_hastaN}, identificacion_accion_personal: ${identi_accion_p}, numero_partida_empresa: ${num_partida}, id_contexto_legal: ${decre_acue_resol}, 
+                    titulo_empleado_uno: ${abrev_empl_uno}, firma_empleado_uno: ${firma_empl_uno}, titulo_empleado_dos: ${abrev_empl_dos}, firma_empleado_dos: ${firma_empl_dos}, adicion_legal: ${adicion_legal}, 
+                    id_detalle_tipo_accion_personal: ${tipo_accion}, id_cargo_propuesto: ${cargo_propuesto}, id_proceso_propuesto: ${proceso_propuesto}, numero_partida_propuesta: ${num_partida_propuesta}, 
+                    salario_propuesto: ${salario_propuesto}, id_ciudad: ${id_ciudad}, id_empleado_responsable: ${id_empl_responsable}, numero_partida_individual: ${num_partida_individual}, acta_final_concurso: ${act_final_concurso}, 
+                    fecha_acta_final_concurso: ${fecha_acta_final_concurso}, nombre_reemplazo: ${nombre_reemp}, puesto_reemplazo: ${puesto_reemp}, funciones_reemplazo: ${funciones_reemp}, 
+                    numero_accion_reemplazo: ${num_accion_reemp},primera_fecha_reemplazo: ${primera_fecha_reemplazoN}, posesion_notificacion: ${posesion_notificacion}, 
+                    descripcion_posesion_notificacion: ${descripcion_pose_noti}}`,
                 ip,
                 observacion: null
             });
@@ -564,14 +581,38 @@ class AccionPersonalControlador {
 
             delete datosNuevos.user_name;
             delete datosNuevos.ip;
+            var fechaCreacionN = await FormatearFecha2(fec_creacion, 'ddd');
+            var fecha_rige_desdeN = await FormatearFecha2(fec_rige_desde, 'ddd');
+            var fecha_rige_hastaN  =  await FormatearFecha2(fec_rige_hasta, 'ddd');
+            var primera_fecha_reemplazoN = await FormatearFecha2(primera_fecha_reemp, 'ddd');
+            var fecha_acta_final_concursoN = await FormatearFecha2(fec_act_final_concurso, 'ddd');
+            var fechaCreacionO = await FormatearFecha2(datos.fecha_creacion, 'ddd');
+            var fecha_rige_desdeO = await FormatearFecha2(datos.fecha_rige_desde, 'ddd');
+            var fecha_rige_hastaO  =  await FormatearFecha2(datos.fecha_rige_hasta, 'ddd');
+            var primera_fecha_reemplazoO = await FormatearFecha2(datos.primera_fecha_reemplazo, 'ddd');
+            var fecha_acta_final_concursoO = await FormatearFecha2(datos.fecha_acta_final_concurso, 'ddd');
 
             // INSERTAR REGISTRO DE AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'map_solicitud_accion_personal',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: JSON.stringify(datos),
-                datosNuevos: JSON.stringify(datosNuevos),
+                datosOriginales: `{id_empleado: ${datos.id_empleado}, fecha_creacion: ${fechaCreacionO}, fecha_rige_desde: ${fecha_rige_desdeO}, 
+                fecha_rige_hasta: ${fecha_rige_hastaO}, identificacion_accion_personal: ${datos.identificacion_accion_personal}, numero_partida_empresa: ${datos.numero_partida_empresa}, id_contexto_legal: ${datos.id_contexto_legal}, 
+                titulo_empleado_uno: ${datos.titulo_empleado_uno}, firma_empleado_uno: ${datos.firma_empleado_uno}, titulo_empleado_dos: ${datos.titulo_empleado_dos}, firma_empleado_dos: ${datos.firma_empleado_dos}, adicion_legal: ${datos.adicion_legal}, 
+                id_detalle_tipo_accion_personal: ${datos.id_detalle_tipo_accion_personal}, id_cargo_propuesto: ${datos.id_cargo_propuesto}, id_proceso_propuesto: ${datos.id_proceso_propuesto}, numero_partida_propuesta: ${datos.numero_partida_propuesta}, 
+                salario_propuesto: ${datos.salario_propuesto}, id_ciudad: ${datos.id_ciudad}, id_empleado_responsable: ${datos.id_empleado_responsable}, numero_partida_individual: ${datos.numero_partida_individual}, acta_final_concurso: ${datos.acta_final_concurso}, 
+                fecha_acta_final_concurso: ${fecha_acta_final_concursoO}, nombre_reemplazo: ${datos.nombre_reemplazo}, puesto_reemplazo: ${datos.puesto_reemplazo}, funciones_reemplazo: ${datos.funciones_reemplazo}, 
+                numero_accion_reemplazo: ${datos.numero_accion_reemplazo},primera_fecha_reemplazo: ${primera_fecha_reemplazoO}, posesion_notificacion: ${datos.posesion_notificacion}, 
+                descripcion_posesion_notificacion: ${datos.descripcion_posesion_notificacion}}`, 
+                datosNuevos: `{id_empleado: ${id_empleado}, fecha_creacion: ${fechaCreacionN}, fecha_rige_desde: ${fecha_rige_desdeN}, 
+                fecha_rige_hasta: ${fecha_rige_hastaN}, identificacion_accion_personal: ${identi_accion_p}, numero_partida_empresa: ${num_partida}, id_contexto_legal: ${decre_acue_resol}, 
+                titulo_empleado_uno: ${abrev_empl_uno}, firma_empleado_uno: ${firma_empl_uno}, titulo_empleado_dos: ${abrev_empl_dos}, firma_empleado_dos: ${firma_empl_dos}, adicion_legal: ${adicion_legal}, 
+                id_detalle_tipo_accion_personal: ${tipo_accion}, id_cargo_propuesto: ${cargo_propuesto}, id_proceso_propuesto: ${proceso_propuesto}, numero_partida_propuesta: ${num_partida_propuesta}, 
+                salario_propuesto: ${salario_propuesto}, id_ciudad: ${id_ciudad}, id_empleado_responsable: ${id_empl_responsable}, numero_partida_individual: ${num_partida_individual}, acta_final_concurso: ${act_final_concurso}, 
+                fecha_acta_final_concurso: ${fecha_acta_final_concursoN}, nombre_reemplazo: ${nombre_reemp}, puesto_reemplazo: ${puesto_reemp}, funciones_reemplazo: ${funciones_reemp}, 
+                numero_accion_reemplazo: ${num_accion_reemp},primera_fecha_reemplazo: ${primera_fecha_reemplazoN}, posesion_notificacion: ${posesion_notificacion}, 
+                descripcion_posesion_notificacion: ${descripcion_pose_noti}}`,                
                 ip,
                 observacion: null
             });
@@ -588,7 +629,10 @@ class AccionPersonalControlador {
 
     public async verLogoMinisterio(req: Request, res: Response): Promise<any> {
         const file_name = 'ministerio_trabajo.png';
-        const codificado = await ImagenBase64LogosEmpresas(file_name);
+        let separador = path.sep;
+        let ruta = ObtenerRutaLogos() + separador + file_name;
+        //console.log( 'solo ruta ', ruta)
+        const codificado = await ConvertirImagenBase64(ruta);
         if (codificado === 0) {
             res.send({ imagen: 0 })
         } else {

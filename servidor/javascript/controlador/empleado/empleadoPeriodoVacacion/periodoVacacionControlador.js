@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../../database"));
+const settingsMail_1 = require("../../../libs/settingsMail");
 class PeriodoVacacionControlador {
     // METODO PARA BUSCAR ID DE PERIODO DE VACACIONES
     EncontrarIdPerVacaciones(req, res) {
@@ -45,13 +46,15 @@ class PeriodoVacacionControlador {
         `, [id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
                     fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones,
                     codigo,]);
+                const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
+                const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: "mv_periodo_vacacion",
                     usuario: user_name,
                     accion: "I",
                     datosOriginales: "",
-                    datosNuevos: `{id_empleado_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, estado: ${estado}, fecha_inicio: ${fec_inicio}, fecha_final: ${fec_final}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, minutos_vacaciones: ${min_vacaciones}, codigo: ${codigo}}`,
+                    datosNuevos: `{codigo: ${codigo}, id_empleado_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, minutos_vacaciones: ${min_vacaciones}, estado: ${estado}}`,
                     ip,
                     observacion: null,
                 });
@@ -108,13 +111,17 @@ class PeriodoVacacionControlador {
         WHERE id = $11
         `, [id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
                     fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id,]);
+                const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
+                const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
+                const fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
+                const fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: "mv_periodo_vacacion",
                     usuario: user_name,
                     accion: "U",
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{id_empleado_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, estado: ${estado}, fecha_inicio: ${fec_inicio}, fecha_final: ${fec_final}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, minutos_vacaciones: ${min_vacaciones}}`,
+                    datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, descripcion: ${datosOriginales.descripcion}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, dia_vacacion: ${datosOriginales.dia_vacacion}, dia_antiguedad: ${datosOriginales.dia_antiguedad}, dia_perdido: ${datosOriginales.dia_perdido}, horas_vacaciones: ${datosOriginales.horas_vacaciones}, minutos_vacaciones: ${datosOriginales.minutos_vacaciones}, estado: ${datosOriginales.estado}}`,
+                    datosNuevos: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, minutos_vacaciones: ${min_vacaciones}, estado: ${estado}}`,
                     ip,
                     observacion: null,
                 });

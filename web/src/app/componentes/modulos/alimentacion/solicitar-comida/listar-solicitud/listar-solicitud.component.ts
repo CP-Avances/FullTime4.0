@@ -173,7 +173,7 @@ export class ListarSolicitudComponent implements OnInit {
   }
 
   FormatearDatos(lista: any, formato_fecha: string, formato_hora: string) {
-    lista.forEach(data => {
+    lista.forEach((data: any) => {
       data.fec_comida_ = this.validar.FormatearFecha(data.fec_comida, formato_fecha, this.validar.dia_abreviado);
       data.hora_inicio_ = this.validar.FormatearHora(data.hora_inicio, formato_hora);
       data.hora_fin_ = this.validar.FormatearHora(data.hora_fin, formato_hora);

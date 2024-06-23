@@ -79,32 +79,44 @@
 <!--  ****  LISTA DE EMPLEADOS QUE HAN SIDO INACTIVADOS O QUE YA NO FORMAN PARTE DE LA EMPRESA  ****  -->
 <div *ngIf="Hab_Deshabilitados && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container"
     style="padding-bottom: 50px; text-align: center;">
+    <div style="text-align: center; padding-bottom: 12px;" *ngIf="btnCheckDeshabilitado">
+        <div class="row">
+            <div class="col-md">
+                <button class="btn btn-primary btn-outline-light" style="margin-left: 20px; padding-left: 20px;"
+                    (click)="Deshabilitar(2)">
+                    Habilitar
+                </button>
+            </div>
+            <div class="col-md">
+                <button class="btn btn-primary btn-outline-light" style="margin-left: 10px ; padding-left: 20px;"
+                    (click)="Deshabilitar(3)">
+                    Reincorporar
+                </button>
+            </div>
+            <div class="col-md">
+                <button class="btn btn-primary btn-outline-light" style="margin-right: 10px; padding-left: 10px;"
+                    (click)="CrearCarpeta(2)">
+                    Crear Carpeta
+                </button>
+            </div>
+            <div class="col-md">
+                <button class="btn btn-primary btn-outline-light" style="margin-right: 10px;"
+                    (click)="ConfirmarDeleteMultipleInactivos()">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccionDesactivados()" matSuffix
                 matTooltipPosition="right" matTooltip="Selección múltiple para habilitar empleados." id="SelectCheck">
                 library_add_check
             </mat-icon>
-            <button *ngIf="btnCheckDeshabilitado" class="btn btn-primary btn-outline-light"
-                style="float: left; margin-left: 20px; padding-left: 20px;" (click)="Deshabilitar(2)">
-                Habilitar
-            </button>
-            <button *ngIf="btnCheckDeshabilitado" class="btn btn-info btn-outline-light"
-                style="float: left; margin-left: 10px ; padding-left: 20px;" (click)="Deshabilitar(3)">
-                Reincorporar
-            </button>
             <span class="w-100 bd-highlight">
                 LISTA DE USUARIOS INACTIVOS
             </span>
-
-            <button *ngIf="btnCheckDeshabilitado" class="btn btn-primary btn-outline-light"
-                style="float: left; margin-right: 10px; padding-left: 10px;" (click)="CrearCarpeta(2)">
-                Crear Carpeta
-            </button>
-            <button *ngIf="btnCheckDeshabilitado" class="btn btn-info btn-outline-light"
-                style="float: left; margin-right: 10px;" (click)="ConfirmarDeleteMultipleInactivos()">
-                Eliminar
-            </button>
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
@@ -171,10 +183,11 @@
             </div>
         </div>
     </div>
+
 </div>
 
 <!--  ********************  LISTA DE EMPLEADOS QUE FORMAN PARTE DE LA EMPRESA  ***********************  -->
-<div *ngIf="tabla_activos && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container"
+<div *ngIf="tabla_activos && !DataEmpleados && mostarTabla && (messajeExcel == 'error' || messajeExcel == '')" class="container"
     style="padding-bottom: 50px; text-align: center;">
 
     <div style="text-align: center; padding-bottom: 12px;" *ngIf="btnCheckHabilitar">

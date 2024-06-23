@@ -155,13 +155,13 @@ class PlanComidasControlador {
       const [planAlimentacion] = response.rows;
 
 
-      console.log("fecha: ",fec_inicio);
+      console.log("fecha: ", fec_inicio);
 
       const fechaHora = await FormatearHora(fec_inicio.split('T')[1]);
-      console.log("fecha: ",fechaHora);
+      console.log("fecha: ", fechaHora);
 
       const fechaTimbre = await FormatearFecha2(fec_inicio.toLocaleString(), 'ddd')
-      console.log("fecha: ",fechaTimbre);
+      console.log("fecha: ", fechaTimbre);
 
       console.log(fec_inicio)
 
@@ -288,7 +288,7 @@ class PlanComidasControlador {
         `
         INSERT INTO ma_cat_comidas (nombre) VALUES ($1) RETURNING *
         `
-      ,
+        ,
         [nombre]);
       const [tipo] = response.rows;
 
@@ -302,7 +302,7 @@ class PlanComidasControlador {
         ip,
         observacion: null
       });
-  
+
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
 
@@ -342,13 +342,19 @@ class PlanComidasControlador {
         , [id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, verificar]);
       const [objetoAlimento] = response.rows;
 
+      var fechaN = await FormatearFecha2(fecha, 'ddd');
+      var fechaComidaN = await FormatearFecha2(fec_comida, 'ddd');
+      var horaInicioN = await FormatearHora(hora_inicio);
+      var horaFinN = await FormatearHora(hora_fin);
+
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'ma_solicitud_comida',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: JSON.stringify(objetoAlimento),
+        datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}, observacion: ${observacion}, extra: ${extra}, verificar: ${verificar}} `,
         ip,
         observacion: null
       });
@@ -399,7 +405,7 @@ class PlanComidasControlador {
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'Registro no encontrado' });
       }
-  
+
       const response: QueryResult = await pool.query(
         `
         UPDATE ma_solicitud_comida SET id_empleado = $1, fecha = $2, id_comida = $3, 
@@ -407,29 +413,42 @@ class PlanComidasControlador {
         WHERE id = $9 RETURNING *
         `
         , [id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id]);
-  
+
       const [objetoAlimento] = response.rows;
+
+
+      var fechaN = await FormatearFecha2(fecha, 'ddd');
+      var fechaComidaN = await FormatearFecha2(fec_comida, 'ddd');
+      var horaInicioN = await FormatearHora(hora_inicio);
+      var horaFinN = await FormatearHora(hora_fin);
+
+
+      var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+      var fechaComidaO = await FormatearFecha2(datosOriginales.fecha_comida, 'ddd');
+      var horaInicioO = await FormatearHora(datosOriginales.hora_inicio);
+      var horaFinO = await FormatearHora(datosOriginales.hora_fin);
+
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'ma_solicitud_comida',
         usuario: user_name,
         accion: 'U',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: JSON.stringify(objetoAlimento),
+        datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_detalle_comida: ${datosOriginales.id_detalle_comida}, fecha: ${fechaO}, fecha_comida: ${fechaComidaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${datosOriginales.observacion}, extra: ${datosOriginales.extra}, verificar: ${datosOriginales.verificar}} `,
+        datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}, observacion: ${observacion}, extra: ${extra}}} `,
         ip,
         observacion: null
       });
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-  
+
       if (!objetoAlimento) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
-  
+
       const alimento = objetoAlimento;
 
       return res.status(200).jsonp(alimento);
-      
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -443,7 +462,7 @@ class PlanComidasControlador {
     try {
       const { user_name, ip } = req.body;
       const id = req.params.id;
-  
+
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
@@ -470,15 +489,19 @@ class PlanComidasControlador {
         `
         DELETE FROM ma_solicitud_comida WHERE id = $1 RETURNING *
         `, [id]);
-  
+
       const [alimentacion] = response.rows;
+      var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+      var fechaComidaO = await FormatearFecha2(datosOriginales.fecha_comida, 'ddd');
+      var horaInicioO = await FormatearHora(datosOriginales.hora_inicio);
+      var horaFinO = await FormatearHora(datosOriginales.hora_fin);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'ma_solicitud_comida',
         usuario: user_name,
         accion: 'D',
-        datosOriginales: JSON.stringify(datosOriginales),
+        datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_detalle_comida: ${datosOriginales.id_detalle_comida}, fecha: ${fechaO}, fecha_comida: ${fechaComidaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${datosOriginales.observacion}, extra: ${datosOriginales.extra}, verificar: ${datosOriginales.verificar}} `,
         datosNuevos: '',
         ip,
         observacion: null
@@ -486,7 +509,7 @@ class PlanComidasControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-  
+
       if (alimentacion) {
         return res.status(200).jsonp(alimentacion)
       }
@@ -529,13 +552,13 @@ class PlanComidasControlador {
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'Registro no encontrado' });
       }
-  
+
       const response: QueryResult = await pool.query(
         `
         UPDATE ma_solicitud_comida SET aprobada = $1, verificar = $2 WHERE id = $3 RETURNING *
         `
         , [aprobada, verificar, id]);
-  
+
       const [objetoAlimento] = response.rows;
 
       // AUDITORIA
@@ -551,7 +574,7 @@ class PlanComidasControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-  
+
       if (objetoAlimento) {
         return res.status(200).jsonp(objetoAlimento)
       }
@@ -573,16 +596,22 @@ class PlanComidasControlador {
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
-  
+
       const response: QueryResult = await pool.query(
         `
-        INSERT INTO ma_empleado_plan_comida_general (codigo, id_empleado, id_sol_comida, fecha,
+        INSERT INTO ma_empleado_plan_comida_general (codigo, id_empleado, id_solicitud_comida, fecha,
           hora_inicio, hora_fin, consumido) 
         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
         `
         , [codigo, id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido]);
-  
+
       const [objetoAlimento] = response.rows;
+
+
+      var fechaN = await FormatearFecha2(fecha, 'ddd');
+      var horaInicio = await FormatearHora(hora_inicio)
+      var horaFin = await FormatearHora(hora_fin)
+
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -590,14 +619,14 @@ class PlanComidasControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: JSON.stringify(objetoAlimento),
+        datosNuevos: `{codigo: ${codigo}, id_empleado: ${id_empleado}, id_detalle_plan: null, id_solicitud_comida: ${id_sol_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
         ip,
         observacion: null
       });
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-  
+
       if (objetoAlimento) {
         return res.status(200).jsonp(objetoAlimento)
       }
@@ -618,7 +647,7 @@ class PlanComidasControlador {
       const id = req.params.id;
       const fecha = req.params.fecha;
       const id_empleado = req.params.id_empleado;
-      
+
       const { user_name, ip } = req.body;
 
       // INICIAR TRANSACCION
@@ -655,15 +684,18 @@ class PlanComidasControlador {
         RETURNING *
         `
         , [id, fecha, id_empleado]);
-  
+
       const [objetoAlimento] = response.rows;
+      var fechaN = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+      var horaInicio = await FormatearHora(datosOriginales.hora_inicio)
+      var horaFin = await FormatearHora(datosOriginales.hora_fin)
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'ma_empleado_plan_comida_general',
         usuario: user_name,
         accion: 'D',
-        datosOriginales: JSON.stringify(datosOriginales),
+        datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado: ${datosOriginales.id_empleado}, id_detalle_plan: ${datosOriginales.id_detalle_plan}, id_solicitud_comida: ${datosOriginales.id_solicitud_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: ${datosOriginales.ticket}, consumido: ${datosOriginales.consumido}}`,
         datosNuevos: '',
         ip,
         observacion: null
@@ -671,7 +703,7 @@ class PlanComidasControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-  
+
       if (objetoAlimento) {
         return res.status(200).jsonp(objetoAlimento)
       }
@@ -748,7 +780,7 @@ class PlanComidasControlador {
 
       const id = req.params.id;
       const id_empleado = req.params.id_empleado;
-      
+
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
@@ -781,13 +813,17 @@ class PlanComidasControlador {
         DELETE FROM ma_empleado_plan_comida_general WHERE id_detalle_plan = $1 AND id_empleado = $2
         `
         , [id, id_empleado]);
+        
+      var fechaN = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+      var horaInicio = await FormatearHora(datosOriginales.hora_inicio)
+      var horaFin = await FormatearHora(datosOriginales.hora_fin)
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'ma_empleado_plan_comida_general',
         usuario: user_name,
         accion: 'D',
-        datosOriginales: JSON.stringify(datosOriginales),
+        datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado: ${datosOriginales.id_empleado}, id_detalle_plan: ${datosOriginales.id_detalle_plan}, id_solicitud_comida: ${datosOriginales.id_solicitud_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: ${datosOriginales.ticket}, consumido: ${datosOriginales.consumido}}`,
         datosNuevos: '',
         ip,
         observacion: null
@@ -795,7 +831,7 @@ class PlanComidasControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-  
+
       return res.jsonp({ message: 'Registro eliminado.' });
     } catch (error) {
       // REVERTIR TRANSACCION
@@ -834,7 +870,7 @@ class PlanComidasControlador {
 
       // INICIAR TRANSACCION
       await pool.query('COMMIT');
-  
+
       const response = await pool.query(
         `
         INSERT INTO ma_empleado_plan_comida_general (codigo, id_empleado, id_detalle_plan, fecha, 
@@ -844,6 +880,9 @@ class PlanComidasControlador {
         , [codigo, id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido]);
 
       const [planAlimentacion] = response.rows;
+      var fechaN = await FormatearFecha2(fecha, 'ddd');
+      var horaInicio = await FormatearHora(hora_inicio)
+      var horaFin = await FormatearHora(hora_fin)
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -851,7 +890,7 @@ class PlanComidasControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: JSON.stringify(planAlimentacion),
+        datosNuevos: `{codigo: ${codigo}, id_empleado: ${id_empleado}, id_detalle_plan: ${id_plan_comida}, id_solicitud_comida: null, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
         ip,
         observacion: null
       });
@@ -906,12 +945,12 @@ class PlanComidasControlador {
         WHERE tc.id = ctc.id_comida AND ctc.id = dm.id_horario_comida AND dm.id = $1
         `,
         [id_comida]);
-  
+
       let notifica = mensaje + SERVICIO_SOLICITADO.rows[0].servicio;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
-  
+
       const response: QueryResult = await pool.query(
         `
         INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
@@ -919,8 +958,10 @@ class PlanComidasControlador {
         RETURNING *
         `,
         [create_at, id_empl_envia, id_empl_recive, notifica, tipo]);
-  
+
       const [notificiacion] = response.rows;
+      const fechaHoraN = await FormatearHora(create_at.toLocaleString().split(' ')[1])
+      const fechaN = await FormatearFecha2(create_at.toLocaleString(), 'ddd')
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -928,25 +969,25 @@ class PlanComidasControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: JSON.stringify(notificiacion),
+        datosNuevos: `id_empleado_envia: ${id_empl_envia}, id_empleado_recibe: ${id_empl_recive}, fecha_hora: ${fechaN + ' ' + fechaHoraN}, descripcion: ${notifica}, id_timbre: null, visto: null, tipo: ${tipo}`,
         ip,
         observacion: null
       });
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-  
+
       if (!notificiacion) return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
-  
+
       const USUARIO = await pool.query(
         `
         SELECT (nombre || ' ' || apellido) AS usuario
         FROM eu_empleados WHERE id = $1
         `,
         [id_empl_envia]);
-  
+
       notificiacion.usuario = USUARIO.rows[0].usuario;
-  
+
       return res.status(200)
         .jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
     } catch (error) {

@@ -27,7 +27,7 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const unEmplCargp = yield database_1.default.query(`
-      SELECT ec.id, ec.id_contrato, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.jefe, ec.sueldo, 
+      SELECT ec.id, ec.id_contrato, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.sueldo, 
         ec.hora_trabaja, ec.id_sucursal, s.nombre AS sucursal, ec.id_departamento, 
         d.nombre AS departamento, e.id AS id_empresa, e.nombre AS empresa, tc.cargo AS nombre_cargo 
       FROM eu_empleado_cargos AS ec, e_sucursales AS s, ed_departamentos AS d, e_empresa AS e, 
@@ -48,15 +48,15 @@ class EmpleadoCargosControlador {
     Crear(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe, user_name, ip } = req.body;
+                const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, user_name, ip } = req.body;
                 const datosNuevos = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
         INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal,
-           sueldo, hora_trabaja, id_tipo_cargo, jefe) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-        `, [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe]);
+           sueldo, hora_trabaja, id_tipo_cargo) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `, [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo]);
                 delete datosNuevos.user_name;
                 delete datosNuevos.ip;
                 var fechaIngresoN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
@@ -67,11 +67,10 @@ class EmpleadoCargosControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{id_contrato: ${id_empl_contrato}, id_departamento: ${id_departamento}, id_sucursal: ${id_sucursal}, id_tipo_cargo: ${cargo}, fecha_inicio: ${fechaIngresoN}, fecha_final: ${fechaSalidaN}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, jefe: ${jefe}}`,
+                    datosNuevos: `{id_contrato: ${id_empl_contrato}, id_departamento: ${id_departamento}, id_sucursal: ${id_sucursal}, id_tipo_cargo: ${cargo}, fecha_inicio: ${fechaIngresoN}, fecha_final: ${fechaSalidaN}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}}`,
                     ip,
                     observacion: null
                 });
-                jefe;
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 res.jsonp({ message: 'Registro guardado.' });
@@ -88,11 +87,13 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empl_contrato, id } = req.params;
-                const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe, user_name, ip } = req.body;
+                const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const cargoConsulta = yield database_1.default.query('SELECT * FROM eu_empleado_cargos WHERE id = $1', [id]);
+                const cargoConsulta = yield database_1.default.query(`
+        SELECT * FROM eu_empleado_cargos WHERE id = $1
+        `, [id]);
                 const [datosOriginales] = cargoConsulta.rows;
                 if (!datosOriginales) {
                     // AUDITORIA
@@ -111,9 +112,9 @@ class EmpleadoCargosControlador {
                 }
                 yield database_1.default.query(`
         UPDATE eu_empleado_cargos SET id_departamento = $1, fecha_inicio = $2, fecha_final = $3, id_sucursal = $4, 
-          sueldo = $5, hora_trabaja = $6, id_tipo_cargo = $7, jefe = $8  
-        WHERE id_contrato = $9 AND id = $10
-        `, [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe,
+          sueldo = $5, hora_trabaja = $6, id_tipo_cargo = $7  
+        WHERE id_contrato = $8 AND id = $9
+        `, [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo,
                     id_empl_contrato, id]);
                 var fechaIngresoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
                 var fechaSalidaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
@@ -124,8 +125,8 @@ class EmpleadoCargosControlador {
                     tabla: 'eu_empleado_cargos',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: `{id_contrato: ${datosOriginales.id_contrato}, id_departamento: ${datosOriginales.id_departamento}, id_sucursal: ${datosOriginales.id_sucursal}, id_tipo_cargo: ${datosOriginales.id_tipo_cargo}, fecha_inicio: ${fechaIngresoO}, fecha_final: ${fechaSalidaO}, sueldo: ${datosOriginales.sueldo}, hora_trabaja: ${datosOriginales.hora_trabaja}, jefe: ${datosOriginales.jefe}}`,
-                    datosNuevos: `{id_contrato: ${id_empl_contrato}, id_departamento: ${id_departamento}, id_sucursal: ${id_sucursal}, id_tipo_cargo: ${cargo}, fecha_inicio: ${fechaIngresoN}, fecha_final: ${fechaSalidaN}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, jefe: ${jefe}}`,
+                    datosOriginales: `{id_contrato: ${datosOriginales.id_contrato}, id_departamento: ${datosOriginales.id_departamento}, id_sucursal: ${datosOriginales.id_sucursal}, id_tipo_cargo: ${datosOriginales.id_tipo_cargo}, fecha_inicio: ${fechaIngresoO}, fecha_final: ${fechaSalidaO}, sueldo: ${datosOriginales.sueldo}, hora_trabaja: ${datosOriginales.hora_trabaja}}`,
+                    datosNuevos: `{id_contrato: ${id_empl_contrato}, id_departamento: ${id_departamento}, id_sucursal: ${id_sucursal}, id_tipo_cargo: ${cargo}, fecha_inicio: ${fechaIngresoN}, fecha_final: ${fechaSalidaN}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}}`,
                     ip,
                     observacion: null
                 });

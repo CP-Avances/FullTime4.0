@@ -205,7 +205,7 @@
 
             <hr>
             <!-- TABLA PARA SUCURSALES -->
-            <div *ngIf="_booleanOptions.bool_suc" class="mat-elevation-z8" style="background: white;">
+            <div *ngIf="_booleanOptions.bool_suc && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
                         RESULTADO SUCURSALES
@@ -265,7 +265,7 @@
             </div>
 
             <!-- TABLA PARA REGIMEN -->
-            <div *ngIf="_booleanOptions.bool_reg" class="mat-elevation-z8" style="background: white;">
+            <div *ngIf="_booleanOptions.bool_reg && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
                         RESULTADO REGIMEN LABORAL
@@ -327,7 +327,7 @@
             </div>
 
             <!-- TABLA PARA CARGOS -->
-            <div *ngIf="_booleanOptions.bool_cargo" class="mat-elevation-z8" style="background: white;">
+            <div *ngIf="_booleanOptions.bool_cargo && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
                         RESULTADO CARGOS
@@ -387,7 +387,7 @@
             </div>
 
             <!-- TABLA PARA DEPARTAMENTOS -->
-            <div *ngIf="_booleanOptions.bool_dep" class="mat-elevation-z8" style="background: white;">
+            <div *ngIf="_booleanOptions.bool_dep && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
                         RESULTADO DEPARTAMENTOS
@@ -449,7 +449,7 @@
             </div>
 
             <!-- TABLA PARA EMPLEADOS -->
-            <div *ngIf="_booleanOptions.bool_emp" class="mat-elevation-z8" style="background: white;">
+            <div *ngIf="_booleanOptions.bool_emp && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
                         RESULTADO USUARIOS

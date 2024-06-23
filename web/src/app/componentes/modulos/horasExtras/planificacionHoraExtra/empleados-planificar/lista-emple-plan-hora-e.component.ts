@@ -5,7 +5,6 @@ import { Validators, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
-import { firstValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
@@ -17,10 +16,11 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 moment.locale('es');
 
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
@@ -72,11 +72,11 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   get filtroNombreReg() { return this.restR.filtroNombreReg };
 
   idEmpleadoLogueado: any;
-  asignacionesAcceso: any;
-  idUsuariosAcceso: any = [];
-  idDepartamentosAcceso: any = [];
-  idSucursalesAcceso: any = [];
-  idCargosAcceso: any = [];
+
+  idUsuariosAcceso: Set<any> = new Set();
+  idDepartamentosAcceso: Set<any> = new Set();
+  idSucursalesAcceso: Set<any> = new Set();
+  idCargosAcceso: Set<any> = new Set();
 
   // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
   departamentos: any = [];
@@ -124,6 +124,8 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     bool_cargo: false,
   };
 
+  mostrarTablas: boolean = false;
+
   public check: checkOptions[];
   habilitado: any;
 
@@ -138,7 +140,8 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     private toastr: ToastrService,
     public informacion: DatosGeneralesService,
     private restUsuario: UsuarioService,
-    private funciones: MainNavService
+    private funciones: MainNavService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -155,6 +158,10 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     }
     else {
       this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 'r' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
+      this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+      this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
+      this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
       this.PresentarInformacion();
     }
   }
@@ -168,10 +175,10 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
 
 
   // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
-  async PresentarInformacion() {
+  PresentarInformacion() {
     let informacion = { id_empleado: this.idEmpleadoLogueado };
     let respuesta: any = [];
-    await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
+
     this.informacion.ObtenerInformacionUserRol(informacion).subscribe(res => {
       respuesta = res[0];
       this.AdministrarInformacion(respuesta, informacion);
@@ -319,18 +326,20 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
 
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
 
-    this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.includes(empleado.id));
-    this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
-    this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
-    this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.includes(regimen.id_suc));
+    this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+    this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
+    this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
+    this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
 
     this.empleados.forEach((empleado: any) => {
-      this.idCargosAcceso = [...new Set([...this.idCargosAcceso, empleado.id_cargo_])];
+      this.idCargosAcceso.add(empleado.id_cargo_);
     });
 
     this.cargos = this.cargos.filter((cargo: any) =>
-      this.idSucursalesAcceso.includes(cargo.id_suc) && this.idCargosAcceso.includes(cargo.id)
+      this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
     );
+
+    this.mostrarTablas = true;
   }
 
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
@@ -360,47 +369,6 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     this.cargos = verificados_car;
   }
 
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const dataEmpleado = {
-      id_empleado: Number(idEmpleado)
-    }
-
-    let noPersonal: boolean = false;
-
-    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
-    this.asignacionesAcceso = res;
-
-    const promises = this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal) {
-        if (!asignacion.administra && !asignacion.personal) {
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        } else if (asignacion.administra && !asignacion.personal) {
-          noPersonal = true;
-        } else if (asignacion.personal && !asignacion.administra) {
-          this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        }
-      }
-
-      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
-      this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
-
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
-    });
-
-    const results = await Promise.all(promises);
-
-    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    this.idUsuariosAcceso.push(...ids);
-
-    if (noPersonal) {
-      this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleadoLogueado);
-    }
-
-  }
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE
   plan_multiple: boolean = false;

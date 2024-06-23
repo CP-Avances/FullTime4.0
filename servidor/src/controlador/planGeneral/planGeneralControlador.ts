@@ -8,23 +8,21 @@ class PlanGeneralControlador {
     // METODO PARA REGISTRAR PLAN GENERAL   --**VERIFICADO
     public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
         var errores: number = 0;
-        var iterar: number = 0;
-        var cont: number = 0;
+
+        let ocurrioError = false;
+        let mensajeError = '';
+        let codigoError = 0;
 
         // CONTADORES INICIAN EN CERO (0)
         errores = 0;
-        iterar = 0;
-        cont = 0;
 
         const { user_name, ip, plan_general } = req.body;
 
         for (var i = 0; i < plan_general.length; i++) {
 
             try {
-
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
-
                 pool.query(
                     `
                     INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
@@ -39,7 +37,6 @@ class PlanGeneralControlador {
                     plan_general[i].min_alimentacion]
                     , async (error, results) => {
 
-                        iterar = iterar + 1;
                         
 
                         //const fechaHora = await FormatearHora(plan_general[i].fec_hora_horario.toLocaleString().split(' ')[1])
@@ -78,31 +75,31 @@ class PlanGeneralControlador {
                         // FINALIZAR TRANSACCION
                         await pool.query('COMMIT');
 
-                        try {
-                            console.log('if ', error)
-                            if (error) {
-                                errores = errores + 1;
-                                if (iterar === plan_general.length && errores > 0) {
-                                    return res.status(200).jsonp({ message: 'error' });
-                                }
-                            } else {
-                                cont = cont + 1;
-                                if (iterar === plan_general.length && cont === plan_general.length) {
-                                    return res.status(200).jsonp({ message: 'OK' });
-                                }
-                                else if (iterar === plan_general.length && cont != plan_general.length) {
-                                    return res.status(200).jsonp({ message: 'error' });
-                                }
-                            }
-
-                        } catch (error) {
-                            throw error;
+                        //console.log('if ', error)
+                        if (error) {
+                            errores = errores + 1;
                         }
+
                     });
+
             } catch (error) {
                 // REVERTIR TRANSACCION
                 await pool.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
+                ocurrioError = true;
+                mensajeError = error;
+                codigoError = 500;
+                break;
+            }
+        }
+
+        if (ocurrioError) {
+            return res.status(500).jsonp({ message: mensajeError });
+        } else {
+            if (errores > 0) {
+                return res.status(200).jsonp({ message: 'error' });
+            }
+            else {
+                return res.status(200).jsonp({ message: 'OK' });
             }
         }
     }
@@ -128,13 +125,12 @@ class PlanGeneralControlador {
     public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
 
         var errores: number = 0;
-        var iterar: number = 0;
-        var cont: number = 0;
+        let ocurrioError = false;
+        let mensajeError = '';
+        let codigoError = 0;
 
         // CONTADORES INICIAN EN CERO (0)
         errores = 0;
-        iterar = 0;
-        cont = 0;
 
         const { user_name, ip, id_plan } = req.body;
 
@@ -171,8 +167,6 @@ class PlanGeneralControlador {
                     [id_plan[i].id]
                     , async (error) => {
 
-                        iterar = iterar + 1;
-
                         // AUDITORIA
                         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                             tabla: 'eu_asistencia_general',
@@ -187,33 +181,31 @@ class PlanGeneralControlador {
                         // FINALIZAR TRANSACCION
                         await pool.query('COMMIT');
 
-                        try {
-                            if (error) {
-                                errores = errores + 1;
-                                if (iterar === id_plan.length && errores > 0) {
-                                    return res.status(200).jsonp({ message: 'error' });
-                                }
-                            } else {
-                                cont = cont + 1;
-                                if (iterar === id_plan.length && cont === id_plan.length) {
-                                    return res.status(200).jsonp({ message: 'OK' });
-                                }
-                                else if (iterar === id_plan.length && cont != id_plan.length) {
-                                    return res.status(200).jsonp({ message: 'error' });
-                                }
-                            }
-
-                        } catch (error) {
-                            throw error;
+                        if (error) {
+                            errores = errores + 1;
                         }
                     });
+
             } catch (error) {
                 // REVERTIR TRANSACCION
                 await pool.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
+                ocurrioError = true;
+                mensajeError = error;
+                codigoError = 500;
+                break;
             }
         }
-        return res.status(200).jsonp({ message: 'OK' });
+
+        if (ocurrioError) {
+            return res.status(500).jsonp({ message: mensajeError });
+        } else {
+            if (errores > 0) {
+                return res.status(200).jsonp({ message: 'error' });
+            }
+            else {
+                return res.status(200).jsonp({ message: 'OK' });
+            }
+        }
     }
 
     // METODO PARA BUSCAR PLANIFICACION EN UN RANGO DE FECHAS

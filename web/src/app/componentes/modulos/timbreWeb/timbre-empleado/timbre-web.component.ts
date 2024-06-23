@@ -134,7 +134,7 @@ export class TimbreWebComponent implements OnInit {
       this.timbres = this.dataSource.data;
       this.cuenta = res.cuenta;
       this.info = res.info;
-      this.timbres.forEach(data => {
+      this.timbres.forEach((data: any) => {
         data.fecha = this.validar.FormatearFecha(data.fec_hora_timbre, formato_fecha, this.validar.dia_abreviado);
         data.hora = this.validar.FormatearHora(data.fec_hora_timbre.split(' ')[1], formato_hora);
       })

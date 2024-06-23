@@ -1,11 +1,12 @@
-import { ImagenBase64LogosEmpresas } from '../../libs/ImagenCodificacion';
+import { ComprimirImagen, ConvertirImagenBase64 } from '../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
-import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
+import { ObtenerRutaLeerPlantillas, ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import moment from 'moment';
 import path from 'path';
 import pool from '../../database';
 import fs from 'fs';
+const sharp = require('sharp');
 
 class EmpresaControlador {
 
@@ -40,10 +41,12 @@ class EmpresaControlador {
             file_name.logo = 'logo_reportes.png';
         }
 
-        const codificado = await ImagenBase64LogosEmpresas(file_name.logo);
+        let separador = path.sep;
+        let ruta = ObtenerRutaLogos() + separador + file_name.logo;
+        //console.log( 'solo ruta ', ruta)
+        const codificado = await ConvertirImagenBase64(ruta);
 
-        console.log('empresa ', codificado)
-
+        //console.log('empresa ', codificado)
         if (codificado === 0) {
             res.status(200).jsonp({ imagen: 0, nom_empresa: file_name.nombre })
         } else {
@@ -51,9 +54,9 @@ class EmpresaControlador {
         }
     }
 
-
     // METODO PARA EDITAR LOGO DE EMPRESA
     public async ActualizarLogoEmpresa(req: Request, res: Response): Promise<any> {
+        sharp.cache(false);
 
         // FECHA DEL SISTEMA
         var fecha = moment();
@@ -61,80 +64,95 @@ class EmpresaControlador {
         var mes = fecha.format('MM');
         var dia = fecha.format('DD');
 
+        // IMAGEN ORIGINAL
+        const separador = path.sep;
+        let ruta_temporal = ObtenerRutaLeerPlantillas() + separador + req.file?.originalname;
+
         // LEER DATOS DE IMAGEN
         let logo = anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
         let id = req.params.id_empresa;
-        let separador = path.sep;
 
-        const {user_name, ip} = req.body;
+        let ruta_guardar = ObtenerRutaLogos() + separador + logo;
+        //console.log('ruta 1 ', ruta_temporal)
 
-        // CONSULTAR SI EXISTE UNA IMAGEN
-        const logo_name = await pool.query(
-            `
-            SELECT nombre, logo FROM e_empresa WHERE id = $1
-            `
-            , [id]);
-        
-        if (logo_name.rows.length === 0) {
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'e_empresa',
-                usuario: user_name,
-                accion: 'U',
-                datosOriginales: '',
-                datosNuevos: '',
-                ip,
-                observacion: `Error al actualizar logo de empresa con id: ${id}`
-            });
+        let comprimir = await ComprimirImagen(ruta_temporal, ruta_guardar);
 
-            res.status(404).jsonp({ message: 'error' });
-        }
+        if (comprimir != false) {
+            const { user_name, ip } = req.body;
 
-        logo_name.rows.map(async (obj: any) => {
-            if (obj.logo != null && obj.logo != logo) {
-                let ruta = ObtenerRutaLogos() + separador + obj.logo;
-        
-                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                fs.access(ruta, fs.constants.F_OK, (err) => {
-                    if (!err) {
-                        // ELIMINAR LOGO DEL SERVIDOR
-                        fs.unlinkSync(ruta);
-                    }
-                });
-            } 
-        
-            try {
-                // INICIAR TRANSACCION
-                await pool.query('BEGIN');
+            // CONSULTAR SI EXISTE UNA IMAGEN
+            const logo_name = await pool.query(
+                `
+                SELECT nombre, logo FROM e_empresa WHERE id = $1
+                `
+                , [id]);
 
-                // ACTUALIZAR REGISTRO DE IMAGEN
-                await pool.query(
-                    `
-                    UPDATE e_empresa SET logo = $2 WHERE id = $1
-                    `
-                    , [id, logo]);
-                
-                // AUDITORIA
+            if (logo_name.rows.length === 0) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'e_empresa',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(obj),
-                    datosNuevos: `{"logo": "${logo}"}`,
+                    datosOriginales: '',
+                    datosNuevos: '',
                     ip,
-                    observacion: null
+                    observacion: `Error al actualizar logo de empresa con id: ${id}`
                 });
 
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-            } catch (error) {
-                // REVERTIR TRANSACCION
-                await pool.query('ROLLBACK');
+                res.status(404).jsonp({ message: 'error' });
             }
-        });
 
-        // LEER DATOS DE IMAGEN
-        const codificado = await ImagenBase64LogosEmpresas(logo);
-        res.send({ imagen: codificado, nom_empresa: logo_name.rows[0].nombre, message: 'Logo actualizado.' })
+            logo_name.rows.map(async (obj: any) => {
+                if (obj.logo != null && obj.logo != logo) {
+                    let ruta = ObtenerRutaLogos() + separador + obj.logo;
+
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs.access(ruta, fs.constants.F_OK, (err) => {
+                        if (!err) {
+                            // ELIMINAR LOGO DEL SERVIDOR
+                            fs.unlinkSync(ruta);
+                        }
+                    });
+                }
+
+                try {
+                    // INICIAR TRANSACCION
+                    await pool.query('BEGIN');
+
+                    // ACTUALIZAR REGISTRO DE IMAGEN
+                    await pool.query(
+                        `
+                        UPDATE e_empresa SET logo = $2 WHERE id = $1
+                        `
+                        , [id, logo]);
+
+                    // AUDITORIA
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'e_empresa',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: JSON.stringify(obj),
+                        datosNuevos: `{"logo": "${logo}"}`,
+                        ip,
+                        observacion: null
+                    });
+
+                    // FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
+                } catch (error) {
+                    // REVERTIR TRANSACCION
+                    await pool.query('ROLLBACK');
+                }
+            });
+
+            // LEER DATOS DE IMAGEN
+            let ruta_almacenamiento = ObtenerRutaLogos() + separador + logo;
+            //console.log('ruta alma ', ruta_almacenamiento)
+            const codificado = await ConvertirImagenBase64(ruta_almacenamiento);
+            res.send({ imagen: codificado, nom_empresa: logo_name.rows[0].nombre, message: 'Logo actualizado.' })
+        }
+        else {
+            res.status(404).jsonp({ message: 'error' });
+        }
     }
 
     // METODO PARA BUSCAR DATOS GENERALES DE EMPRESA
@@ -158,17 +176,17 @@ class EmpresaControlador {
         try {
             const { nombre, ruc, direccion, telefono, correo_empresa, tipo_empresa, representante,
                 establecimiento, dias_cambio, cambios, num_partida, id, user_name, ip } = req.body;
-    
+
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
-    
+
             // CONSULTAR DATOS ORIGINALES
             const datosOriginales = await pool.query(
                 `
                 SELECT * FROM e_empresa WHERE id = $1
                 `
                 , [id]);
-            
+
             if (datosOriginales.rows.length === 0) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'e_empresa',
@@ -179,11 +197,11 @@ class EmpresaControlador {
                     ip,
                     observacion: `Error al actualizar datos de empresa con id: ${id}`
                 });
-                
+
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'error' });
             }
-            
+
             await pool.query(
                 `
                 UPDATE e_empresa SET nombre = $1, ruc = $2, direccion = $3, telefono = $4, correo_empresa = $5,
@@ -192,7 +210,7 @@ class EmpresaControlador {
                 `
                 , [nombre, ruc, direccion, telefono, correo_empresa, tipo_empresa, representante, establecimiento,
                     dias_cambio, cambios, num_partida, id]);
-            
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'e_empresa',
@@ -218,17 +236,17 @@ class EmpresaControlador {
     public async ActualizarColores(req: Request, res: Response): Promise<Response> {
         try {
             const { color_p, color_s, id, user_name, ip } = req.body;
-    
+
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
-    
+
             // CONSULTAR DATOS ORIGINALES
             const datosOriginales = await pool.query(
                 `
                 SELECT color_principal, color_secundario FROM e_empresa WHERE id = $1
                 `
                 , [id]);
-            
+
             if (datosOriginales.rows.length === 0) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'e_empresa',
@@ -239,17 +257,17 @@ class EmpresaControlador {
                     ip,
                     observacion: `Error al actualizar colores de empresa con id: ${id}`
                 });
-                
+
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'error' });
             }
-    
+
             await pool.query(
                 `
                 UPDATE e_empresa SET color_principal = $1, color_secundario = $2 WHERE id = $3
                 `
                 , [color_p, color_s, id]);
-            
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'e_empresa',
@@ -260,7 +278,7 @@ class EmpresaControlador {
                 ip,
                 observacion: null
             });
-    
+
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Registro actualizado.' });
@@ -275,7 +293,7 @@ class EmpresaControlador {
     public async ActualizarMarcaAgua(req: Request, res: Response): Promise<Response> {
         try {
             const { marca_agua, id, user_name, ip } = req.body;
-    
+
             // INICAIAR TRANSACCION
             await pool.query('BEGIN');
 
@@ -286,7 +304,7 @@ class EmpresaControlador {
                 SELECT marca_agua FROM e_empresa WHERE id = $1
                 `
                 , [id]);
-            
+
             if (datosOriginales.rows.length === 0) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'e_empresa',
@@ -297,17 +315,17 @@ class EmpresaControlador {
                     ip,
                     observacion: `Error al actualizar marca de agua de empresa con id: ${id}. Registro no encontrado.`
                 });
-                
+
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'error' });
             }
-            
+
             await pool.query(
                 `
                 UPDATE e_empresa SET marca_agua = $1 WHERE id = $2
                 `
                 , [marca_agua, id]);
-            
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'e_empresa',
@@ -333,7 +351,7 @@ class EmpresaControlador {
     public async ActualizarSeguridad(req: Request, res: Response): Promise<Response> {
         try {
             const { seg_contrasena, seg_frase, seg_ninguna, id, user_name, ip } = req.body;
-            
+
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
@@ -343,7 +361,7 @@ class EmpresaControlador {
                 SELECT seguridad_contrasena, seguridad_frase, seguridad_ninguna FROM e_empresa WHERE id = $1
                 `
                 , [id]);
-            
+
             if (datosOriginales.rows.length === 0) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'e_empresa',
@@ -354,9 +372,9 @@ class EmpresaControlador {
                     ip,
                     observacion: `Error al actualizar niveles de seguridad de empresa con id: ${id}. Registro no encontrado.`
                 });
-                
+
                 await pool.query('COMMIT');
-                return res.status(404).jsonp({ message: 'error' }); 
+                return res.status(404).jsonp({ message: 'error' });
             }
 
             await pool.query(
@@ -365,7 +383,7 @@ class EmpresaControlador {
                 WHERE id = $4
                 `
                 , [seg_contrasena, seg_frase, seg_ninguna, id]);
-            
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'e_empresa',
@@ -389,6 +407,7 @@ class EmpresaControlador {
 
     // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO
     public async ActualizarCabeceraCorreo(req: Request, res: Response): Promise<any> {
+        sharp.cache(false);
 
         // FECHA DEL SISTEMA
         var fecha = moment();
@@ -396,83 +415,95 @@ class EmpresaControlador {
         var mes = fecha.format('MM');
         var dia = fecha.format('DD');
 
+        // IMAGEN ORIGINAL
+        const separador = path.sep;
+        let ruta_temporal = ObtenerRutaLeerPlantillas() + separador + req.file?.originalname;
+
         // LEER DATOS DE IMAGEN
         let logo = anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
         let id = req.params.id_empresa;
-        let separador = path.sep;
+        let ruta_guardar = ObtenerRutaLogos() + separador + logo;
 
-        const {user_name, ip} = req.body;
+        let comprimir = await ComprimirImagen(ruta_temporal, ruta_guardar);
 
-        const logo_name = await pool.query(
-            `
+        if (comprimir != false) {
+
+            const { user_name, ip } = req.body;
+
+            const logo_name = await pool.query(
+                `
             SELECT cabecera_firma FROM e_empresa WHERE id = $1
             `
-            , [id]);
+                , [id]);
 
-        if (logo_name.rows.length === 0) {
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'e_empresa',
-                usuario: user_name,
-                accion: 'U',
-                datosOriginales: '',
-                datosNuevos: '',
-                ip,
-                observacion: `Error al actualizar cabecera de correo de empresa con id: ${id}`
-            });
-
-            res.status(404).jsonp({ message: 'error' });
-        }
-
-        logo_name.rows.map(async (obj: any) => {
-            if (obj.cabecera_firma != null && obj.cabecera_firma != logo) {
-                let ruta = ObtenerRutaLogos() + separador + obj.cabecera_firma;
-        
-                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                fs.access(ruta, fs.constants.F_OK, (err) => {
-                    if (!err) {
-                        // ELIMINAR LOGO DEL SERVIDOR
-                        fs.unlinkSync(ruta);
-                    }
-                });
-            }
-        
-            try {
-                // INICIAR TRANSACCION
-                await pool.query('BEGIN');
-
-                // ACTUALIZAR REGISTRO DE IMAGEN
-                await pool.query(
-                    `
-                    UPDATE e_empresa SET cabecera_firma = $2 WHERE id = $1
-                    `
-                    , [id, logo]);
-                
-                // AUDITORIA
+            if (logo_name.rows.length === 0) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'e_empresa',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(obj),
-                    datosNuevos: `{"cabecera_firma": "${logo}"}`,
+                    datosOriginales: '',
+                    datosNuevos: '',
                     ip,
-                    observacion: null
+                    observacion: `Error al actualizar cabecera de correo de empresa con id: ${id}`
                 });
-            
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-            } catch (error) {
-                // REVERTIR TRANSACCION
-                await pool.query('ROLLBACK');
-            }
-        });
 
-        const codificado = await ImagenBase64LogosEmpresas(logo);
-        res.send({ imagen: codificado, message: 'Registro actualizado.' })
+                res.status(404).jsonp({ message: 'error' });
+            }
+
+            logo_name.rows.map(async (obj: any) => {
+                if (obj.cabecera_firma != null && obj.cabecera_firma != logo) {
+                    let ruta = ObtenerRutaLogos() + separador + obj.cabecera_firma;
+
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs.access(ruta, fs.constants.F_OK, (err) => {
+                        if (!err) {
+                            // ELIMINAR LOGO DEL SERVIDOR
+                            fs.unlinkSync(ruta);
+                        }
+                    });
+                }
+
+                try {
+                    // INICIAR TRANSACCION
+                    await pool.query('BEGIN');
+
+                    // ACTUALIZAR REGISTRO DE IMAGEN
+                    await pool.query(
+                        `
+                    UPDATE e_empresa SET cabecera_firma = $2 WHERE id = $1
+                    `
+                        , [id, logo]);
+
+                    // AUDITORIA
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'e_empresa',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: JSON.stringify(obj),
+                        datosNuevos: `{"cabecera_firma": "${logo}"}`,
+                        ip,
+                        observacion: null
+                    });
+
+                    // FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
+                } catch (error) {
+                    // REVERTIR TRANSACCION
+                    await pool.query('ROLLBACK');
+                }
+            });
+            // LEER DATOS DE IMAGEN
+            let ruta_almacenamiento = ObtenerRutaLogos() + separador + logo;
+            const codificado = await ConvertirImagenBase64(ruta_almacenamiento);
+            res.send({ imagen: codificado, message: 'Registro actualizado.' })
+        }
+        else {
+            res.status(404).jsonp({ message: 'error' });
+        }
     }
 
     // METODO PARA CONSULTAR IMAGEN DE CABECERA DE CORREO
     public async VerCabeceraCorreo(req: Request, res: Response): Promise<any> {
-
         const file_name =
             await pool.query(
                 `
@@ -482,7 +513,9 @@ class EmpresaControlador {
                 .then((result: any) => {
                     return result.rows[0];
                 });
-        const codificado = await ImagenBase64LogosEmpresas(file_name.cabecera_firma);
+        let separador = path.sep;
+        let ruta = ObtenerRutaLogos() + separador + file_name.cabecera_firma;
+        const codificado = await ConvertirImagenBase64(ruta);
         if (codificado === 0) {
             res.status(200).jsonp({ imagen: 0 })
         } else {
@@ -492,6 +525,7 @@ class EmpresaControlador {
 
     // METODO PARA ACTUALIZAR PIE DE FIRMA DE CORREO
     public async ActualizarPieCorreo(req: Request, res: Response): Promise<any> {
+        sharp.cache(false);
 
         // FECHA DEL SISTEMA
         var fecha = moment();
@@ -499,78 +533,93 @@ class EmpresaControlador {
         var mes = fecha.format('MM');
         var dia = fecha.format('DD');
 
+        // IMAGEN ORIGINAL
+        const separador = path.sep;
+        let ruta_temporal = ObtenerRutaLeerPlantillas() + separador + req.file?.originalname;
+
         // LEER DATOS DE IMAGEN
         let logo = anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
         let id = req.params.id_empresa;
-        let separador = path.sep;
 
-        const {user_name, ip} = req.body;
+        let ruta_guardar = ObtenerRutaLogos() + separador + logo;
+        //console.log('ruta 1 ', ruta_temporal)
 
-        const logo_name = await pool.query(
-            `
+        let comprimir = await ComprimirImagen(ruta_temporal, ruta_guardar);
+
+        if (comprimir != false) {
+
+            const { user_name, ip } = req.body;
+
+            const logo_name = await pool.query(
+                `
             SELECT pie_firma FROM e_empresa WHERE id = $1
             `
-            , [id]);
+                , [id]);
 
-        if (logo_name.rows.length === 0) {
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'e_empresa',
-                usuario: user_name,
-                accion: 'U',
-                datosOriginales: '',
-                datosNuevos: '',
-                ip,
-                observacion: `Error al actualizar pie de firma de empresa con id: ${id}. Registro no encontrado.`
-            });
-
-            res.status(404).jsonp({ message: 'error' });
-        }
-
-        logo_name.rows.map(async (obj: any) => {
-            if (obj.pie_firma != null && obj.pie_firma != logo) {
-                let ruta = ObtenerRutaLogos() + separador + obj.pie_firma;
-        
-                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                fs.access(ruta, fs.constants.F_OK, (err) => {
-                    if (!err) {
-                        // ELIMINAR LOGO DEL SERVIDOR
-                        fs.unlinkSync(ruta);
-                    }
-                });
-            }
-        
-            try {
-                // INICIAR TRANSACCION
-                await pool.query('BEGIN');
-
-                // ACTUALIZAR REGISTRO DE IMAGEN
-                await pool.query(
-                    `
-                    UPDATE e_empresa SET pie_firma = $2 WHERE id = $1
-                    `
-                    , [id, logo]);
-                
-                // AUDITORIA
+            if (logo_name.rows.length === 0) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'e_empresa',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(obj),
-                    datosNuevos: `{"pie_firma": "${logo}"}`,
+                    datosOriginales: '',
+                    datosNuevos: '',
                     ip,
-                    observacion: null
+                    observacion: `Error al actualizar pie de firma de empresa con id: ${id}. Registro no encontrado.`
                 });
 
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-            } catch (error) {
-                // REVERTIR TRANSACCION
-                await pool.query('ROLLBACK');
+                res.status(404).jsonp({ message: 'error' });
             }
-        });
 
-        const codificado = await ImagenBase64LogosEmpresas(logo);
-        res.send({ imagen: codificado, message: 'Registro actualizado.' })
+            logo_name.rows.map(async (obj: any) => {
+                if (obj.pie_firma != null && obj.pie_firma != logo) {
+                    let ruta = ObtenerRutaLogos() + separador + obj.pie_firma;
+
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs.access(ruta, fs.constants.F_OK, (err) => {
+                        if (!err) {
+                            // ELIMINAR LOGO DEL SERVIDOR
+                            fs.unlinkSync(ruta);
+                        }
+                    });
+                }
+
+                try {
+                    // INICIAR TRANSACCION
+                    await pool.query('BEGIN');
+
+                    // ACTUALIZAR REGISTRO DE IMAGEN
+                    await pool.query(
+                        `
+                    UPDATE e_empresa SET pie_firma = $2 WHERE id = $1
+                    `
+                        , [id, logo]);
+
+                    // AUDITORIA
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'e_empresa',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: JSON.stringify(obj),
+                        datosNuevos: `{"pie_firma": "${logo}"}`,
+                        ip,
+                        observacion: null
+                    });
+
+                    // FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
+                } catch (error) {
+                    // REVERTIR TRANSACCION
+                    await pool.query('ROLLBACK');
+                }
+            });
+            // LEER DATOS DE IMAGEN
+            let ruta_almacenamiento = ObtenerRutaLogos() + separador + logo;
+            const codificado = await ConvertirImagenBase64(ruta_almacenamiento);
+            res.send({ imagen: codificado, message: 'Registro actualizado.' })
+        }
+        else {
+            res.status(404).jsonp({ message: 'error' });
+        }
     }
 
     // METODO PARA CONSULTAR IMAGEN DE PIE DE FIRMA DE CORREO
@@ -584,7 +633,9 @@ class EmpresaControlador {
                 .then((result: any) => {
                     return result.rows[0];
                 });
-        const codificado = await ImagenBase64LogosEmpresas(file_name.pie_firma);
+        let separador = path.sep;
+        let ruta = ObtenerRutaLogos() + separador + file_name.pie_firma;
+        const codificado = await ConvertirImagenBase64(ruta);
         if (codificado === 0) {
             res.status(200).jsonp({ imagen: 0 })
         } else {
@@ -607,7 +658,7 @@ class EmpresaControlador {
                 SELECT correo, password_correo, servidor, puerto FROM e_empresa WHERE id = $1
                 `
                 , [id]);
-            
+
             if (datosOriginales.rows.length === 0) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'e_empresa',
@@ -618,18 +669,18 @@ class EmpresaControlador {
                     ip,
                     observacion: `Error al actualizar datos de correo de empresa con id: ${id}. Registro no encontrado.`
                 });
-                
+
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'error' });
             }
-    
+
             await pool.query(
                 `
                 UPDATE e_empresa SET correo = $1, password_correo = $2, servidor = $3, puerto = $4
                 WHERE id = $5
                 `
                 , [correo, password_correo, servidor, puerto, id]);
-            
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'e_empresa',
@@ -647,7 +698,7 @@ class EmpresaControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'error' });   
+            return res.status(500).jsonp({ message: 'error' });
         }
     }
 
@@ -665,7 +716,7 @@ class EmpresaControlador {
                 SELECT acciones_timbres FROM e_empresa WHERE id = $1
                 `
                 , [id]);
-            
+
             if (datosOriginales.rows.length === 0) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'e_empresa',
@@ -676,7 +727,7 @@ class EmpresaControlador {
                     ip,
                     observacion: `Error al actualizar acciones de empresa con id: ${id}. Registro no encontrado.`
                 });
-                
+
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'error' });
             }
@@ -686,7 +737,7 @@ class EmpresaControlador {
                 UPDATE e_empresa SET acciones_timbres = $1 WHERE id = $2
                 `
                 , [bool_acciones, id]);
-            
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'e_empresa',
@@ -711,6 +762,7 @@ class EmpresaControlador {
         }
     }
 
+    // METODO PARA LISTAR EMPRESA
     public async ListarEmpresa(req: Request, res: Response) {
         const EMPRESA = await pool.query(
             `

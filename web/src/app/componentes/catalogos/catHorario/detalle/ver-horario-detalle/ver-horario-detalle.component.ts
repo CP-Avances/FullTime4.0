@@ -122,7 +122,7 @@ export class VerHorarioDetalleComponent implements OnInit {
     this.restD.ConsultarUnDetalleHorario(id_horario).subscribe(datos => {
       this.datosDetalle = datos;
       this.detalles = datos;
-      this.datosDetalle.forEach(data => {
+      this.datosDetalle.forEach((data: any) => {
         data.hora_ = this.validar.FormatearHora(data.hora, formato_hora);
       });
       //--console.log('ver detales ', this.datosDetalle)

@@ -489,13 +489,13 @@ export class DetallePlanificadosComponent implements OnInit {
     var t_total2 = 0;
     var t_total3 = 0;
     var suma_total = 0;
-    arreglo1.forEach(obj1 => {
+    arreglo1.forEach((obj1: any) => {
       t_total1 = t_total1 + parseFloat(obj1.total)
     })
-    arreglo2.forEach(obj2 => {
+    arreglo2.forEach((obj2: any) => {
       t_total2 = t_total2 + parseFloat(obj2.total)
     })
-    arreglo3.forEach(obj3 => {
+    arreglo3.forEach((obj3: any) => {
       t_total3 = t_total3 + parseFloat(obj3.total)
     })
     suma_total = t_total1 + t_total2 + t_total3;

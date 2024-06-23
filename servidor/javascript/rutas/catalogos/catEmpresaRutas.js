@@ -7,20 +7,13 @@ const catEmpresaControlador_1 = __importDefault(require("../../controlador/catal
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const verificarToken_1 = require("../../libs/verificarToken");
 const express_1 = require("express");
-const moment_1 = __importDefault(require("moment"));
 const multer_1 = __importDefault(require("multer"));
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
-        var ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)();
-        cb(null, ruta);
+        cb(null, (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)());
     },
     filename: function (req, file, cb) {
-        // FECHA DEL SISTEMA
-        var fecha = (0, moment_1.default)();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
-        let documento = anio + '_' + mes + '_' + dia + '_' + file.originalname;
+        let documento = file.originalname;
         cb(null, documento);
     }
 });

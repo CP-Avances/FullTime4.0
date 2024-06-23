@@ -31,7 +31,7 @@ export class SearchComponent implements OnInit {
     private route: ActivatedRoute
   ) { 
     this.rol = localStorage.getItem('rol');
-    console.log('rolll: ',this.rol)
+    //console.log('rolll: ',this.rol)
   }
 
   ngOnInit(): void {

@@ -922,7 +922,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
           })
         }
 
-        obj.departamentos.forEach(obj1 => {
+        obj.departamentos.forEach((obj1: any) => {
           totalExcesoDepartamento = 0;
           // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
           if (this.bool.bool_dep === true) {
@@ -1171,7 +1171,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     let nuevo: Array<any> = [];
     let n = 0;
     array.forEach((obj1: IReporteFaltas) => {
-      obj1.departamentos.forEach(obj2 => {
+      obj1.departamentos.forEach((obj2: any) => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             n++;
@@ -1240,7 +1240,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     this.timbres = [];
     let n = 0;
     this.data_pdf.forEach((obj1: IReporteFaltas) => {
-      obj1.departamentos.forEach(obj2 => {
+      obj1.departamentos.forEach((obj2: any) => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             const fecha = this.validacionService.FormatearFecha(

@@ -5,9 +5,9 @@ import { Router } from '@angular/router';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
-import { firstValueFrom } from 'rxjs';
+import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
@@ -24,10 +24,10 @@ export class RelojesComponent implements OnInit {
   registrar: boolean = true;
 
   idEmpleadoLogueado: any;
-  asignacionesAcceso: any;
-  idUsuariosAcceso: any = [];
-  idSucursalesAcceso: any = [];
-  idDepartamentosAcceso: any = [];
+
+  idUsuariosAcceso: Set<any> = new Set();
+  idSucursalesAcceso: Set<any> = new Set();
+  idDepartamentosAcceso: Set<any> = new Set();
 
   // CONTROL DE FORMULARIOS
   isLinear = true;
@@ -71,6 +71,7 @@ export class RelojesComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router,
     private rest: RelojesService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -78,6 +79,10 @@ export class RelojesComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
 
     this.FiltrarSucursales();
     this.ValidarFormulario();
@@ -107,10 +112,9 @@ export class RelojesComponent implements OnInit {
   }
 
   // METODO PARA LISTAR ESTABLECIMIENTOS
-  async FiltrarSucursales() {
+  FiltrarSucursales() {
     let idEmpre = parseInt(localStorage.getItem('empresa') as string);
     this.sucursales = [];
-    await this.ObtenerAsignacionesUsuario(this.idEmpleadoLogueado);
     this.restSucursales.BuscarSucursalEmpresa(idEmpre).subscribe(datos => {
       this.sucursales = this.FiltrarSucursalesAsignadas(datos);
     }, error => {
@@ -120,52 +124,9 @@ export class RelojesComponent implements OnInit {
     })
   }
 
-  // METODO PARA CONSULTAR ASIGNACIONES DE ACCESO
-  async ObtenerAsignacionesUsuario(idEmpleado: any) {
-    const dataEmpleado = {
-      id_empleado: Number(idEmpleado)
-    }
-
-    let noPersonal: boolean = false;
-
-    const res = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
-    this.asignacionesAcceso = res;
-
-    const promises = this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal) {
-        if (!asignacion.administra && !asignacion.personal) {
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        } else if (asignacion.administra && !asignacion.personal) {
-          noPersonal = true;
-        } else if (asignacion.personal && !asignacion.administra) {
-          this.idUsuariosAcceso.push(this.idEmpleadoLogueado);
-          return Promise.resolve(null); // Devuelve una promesa resuelta para mantener la consistencia de los tipos de datos
-        }
-      }
-
-      this.idDepartamentosAcceso = [...new Set([...this.idDepartamentosAcceso, asignacion.id_departamento])];
-      this.idSucursalesAcceso = [...new Set([...this.idSucursalesAcceso, asignacion.id_sucursal])];
-
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
-    });
-
-    const results = await Promise.all(promises);
-
-    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    this.idUsuariosAcceso.push(...ids);
-
-    if (noPersonal) {
-      this.idUsuariosAcceso = this.idUsuariosAcceso.filter((id: any) => id !== this.idEmpleadoLogueado);
-    }
-
-  }
-
   // METODO PARA FILTRAR SUCURSALES ASIGNADAS
   FiltrarSucursalesAsignadas(data: any) {
-    return data.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
+    return data.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
   }
 
   // METODO PARA LISTAR DEPARTAMENTOS DE ESTABLECIMIENTO
@@ -183,7 +144,7 @@ export class RelojesComponent implements OnInit {
 
   // METODO PARA FILTRAR DEPARTAMENTOS ASIGNADOS
   FiltrarDepartamentosAsignados(data: any) {
-    return data.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
+    return data.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
   }
 
   // METODO PARA REGISTRAR DISPOSITIVO

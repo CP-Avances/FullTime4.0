@@ -217,13 +217,18 @@ class PlanHoraExtraControlador {
         `, [id_empl_planifica, fecha_desde, fecha_hasta,
                     hora_inicio, hora_fin, descripcion, horas_totales]);
                 const [planHoraExtra] = response.rows;
+                var fecha_DesdeN = yield (0, settingsMail_1.FormatearFecha2)(fecha_desde, 'ddd');
+                var fecha_HastaN = yield (0, settingsMail_1.FormatearFecha2)(fecha_hasta, 'ddd');
+                const horaInicio = yield (0, settingsMail_1.FormatearHora)(hora_inicio);
+                const horaFin = yield (0, settingsMail_1.FormatearHora)(hora_fin);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mhe_detalle_plan_hora_extra',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(planHoraExtra),
+                    datosNuevos: `{ id_empleado_planifica: ${id_empl_planifica}, fecha_desde: ${fecha_DesdeN}, fecha_hasta: ${fecha_HastaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, 
+          descripcion: ${descripcion}, horas_totales: ${horas_totales}}`,
                     ip,
                     observacion: null
                 });
@@ -343,12 +348,17 @@ class PlanHoraExtraControlador {
                 yield database_1.default.query(`
         DELETE FROM mhe_detalle_plan_hora_extra WHERE id = $1
         `, [id]);
+                var fecha_DesdeO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_desde, 'ddd');
+                var fecha_HastaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_hasta, 'ddd');
+                const horaInicioO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_inicio);
+                const horaFinO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_fin);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mhe_detalle_plan_hora_extra',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosOriginales: `{ id_empleado_planifica: ${datosOriginales.id_empleado_planifica}, fecha_desde: ${fecha_DesdeO}, fecha_hasta: ${fecha_HastaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, 
+          descripcion: ${datosOriginales.descripcion}, horas_totales: ${datosOriginales.horas_totales}}`,
                     datosNuevos: '',
                     ip,
                     observacion: null
