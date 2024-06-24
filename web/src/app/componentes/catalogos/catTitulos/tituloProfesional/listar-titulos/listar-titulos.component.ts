@@ -279,7 +279,7 @@ export class ListarTitulosComponent implements OnInit {
   stiloCelda(observacion: string): string {
     if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Ya esta registrado en base') {
+    } else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
     } else if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';

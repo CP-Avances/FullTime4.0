@@ -55,10 +55,6 @@ export class ListarFeriadosComponent implements OnInit {
   feriados: any = [];
   empleado: any = [];
 
-  // VARAIBLES USADAS PARA FILTROS DE BUSQUEDA
-  filtroDescripcion = '';
-  filtradoFecha = '';
-
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
 
   // ITEMS DE PAGINACION DE LA TABLA

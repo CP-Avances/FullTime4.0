@@ -251,7 +251,7 @@ class TituloControlador {
               data.fila = dato.ITEM
               data.titulo = NOMBRE;
               data.nivel = NIVEL
-              data.observacion = 'Ya esta registrado en base';
+              data.observacion = 'Ya existe en el sistema';
               listTitulosProfesionales.push(data);
             }
           } else {

@@ -1309,7 +1309,7 @@ class EmpleadoControlador {
                                                     }
                                                 }
                                                 else {
-                                                    data.observacion = 'Genero no es válido';
+                                                    data.observacion = 'Género no es válido';
                                                 }
                                             }
                                             else {
@@ -1402,7 +1402,7 @@ class EmpleadoControlador {
                             }
                             if (CONTRASENA == undefined) {
                                 data.contrasena = 'No registrado';
-                                data.observacion = 'Contraseña ' + data.observacion;
+                                data.observacion = 'Contraseña no registrada';
                             }
                             if (ROL == undefined) {
                                 data.rol = 'No registrado';
@@ -1456,7 +1456,7 @@ class EmpleadoControlador {
                                                             }
                                                         }
                                                         else {
-                                                            data.observacion = 'Genero no es válido';
+                                                            data.observacion = 'Género no es válido';
                                                         }
                                                     }
                                                     else {
@@ -1874,7 +1874,7 @@ class EmpleadoControlador {
                                 else {
                                     if (regex.test(data.codigo)) {
                                         if (data.codigo.toString().length > 10) {
-                                            data.observacion = 'El codigo debe tener máximo 10 caracteres';
+                                            data.observacion = 'El código debe tener máximo 10 caracteres';
                                         }
                                         else {
                                             //console.log(!valiContra.test(data.contrasena));
@@ -1913,7 +1913,7 @@ class EmpleadoControlador {
                                                             }
                                                         }
                                                         else {
-                                                            data.observacion = 'Genero no es válido';
+                                                            data.observacion = 'Género no es válido';
                                                         }
                                                     }
                                                     else {
@@ -2011,7 +2011,7 @@ class EmpleadoControlador {
                             }
                             if (CONTRASENA == undefined) {
                                 data.contrasena = 'No registrado';
-                                data.observacion = 'Contraseña ' + data.observacion;
+                                data.observacion = 'Contraseña no registrada';
                             }
                             if (ROL == undefined) {
                                 data.rol = 'No registrado';
@@ -2023,7 +2023,7 @@ class EmpleadoControlador {
                                 }
                                 else {
                                     if (data.codigo.toString().length > 10) {
-                                        data.observacion = 'El codigo debe tener máximo 10 caracteres';
+                                        data.observacion = 'El código debe tener máximo 10 caracteres';
                                     }
                                     else {
                                         if (CONTRASENA != undefined) {
@@ -2066,7 +2066,7 @@ class EmpleadoControlador {
                                                             }
                                                         }
                                                         else {
-                                                            data.observacion = 'Genero no es válido';
+                                                            data.observacion = 'Género no es válido';
                                                         }
                                                     }
                                                     else {
@@ -2122,7 +2122,7 @@ class EmpleadoControlador {
               SELECT * FROM eu_empleados WHERE codigo = $1
               `, [valor.codigo]);
                             if (VERIFICAR_CODIGO.rows[0] != undefined && VERIFICAR_CODIGO.rows[0] != '') {
-                                valor.observacion = 'Codigo ya existe en el sistema';
+                                valor.observacion = 'Código ya existe en el sistema';
                             }
                             else {
                                 var VERIFICAR_USUARIO = yield database_1.default.query(`

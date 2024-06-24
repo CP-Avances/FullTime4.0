@@ -628,7 +628,7 @@ export class ListaEmpleadosComponent implements OnInit {
     if (observacion == 'ok' || observacion == 'ok (Verificar ubicación)') {
       return 'rgb(159, 221, 154)';
     }
-    else if (observacion == 'Ya esta registrado en base') {
+    else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
     }
     else if ((arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Cédula ya' ||
@@ -645,16 +645,15 @@ export class ListaEmpleadosComponent implements OnInit {
     else if ((observacion == 'Código ingresado no válido') ||
       (observacion == 'El teléfono ingresado no es válido') ||
       (observacion == 'La cédula ingresada no es válida') ||
-      (observacion == 'Genero no es válido') ||
-      (observacion == 'GEstado civil no es válido')
-    ) {
+      (observacion == 'Género no es válido') ||
+      (observacion == 'Estado civil no es válido')) {
       return 'rgb(222, 162, 73)';
     }
     else if ((observacion == 'Rol no existe en el sistema') ||
       (observacion == 'Nacionalidad no existe en el sistema')) {
       return 'rgb(255, 192, 203)';
     }
-    else if ((observacion == 'La contraseña debe tener máximo 10 caracteres')) {
+    else if ((observacion == 'La contraseña debe tener máximo 10 caracteres') || (observacion == 'El código debe tener máximo 10 caracteres')) {
       return 'rgb(238, 34, 207)';
     }
     else if (arrayObservacion[0] == 'Formato') {
