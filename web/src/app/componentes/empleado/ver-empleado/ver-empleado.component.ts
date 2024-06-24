@@ -1686,7 +1686,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   // MANEJO DE FILTRO DE DATOS DE PERMISOS
-  filtradoFecha = '';
   fechaF = new FormControl('');
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO

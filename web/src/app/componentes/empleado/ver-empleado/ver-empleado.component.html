@@ -1531,8 +1531,7 @@
                             matTooltip="Búsqueda de permisos de acuerdo a la fecha ingresada en formato YYYY-MM-DD. Ejemplo: 2023-01-01">
                             search
                         </mat-icon>
-                        <input matInput placeholder="Fecha (YYYY-MM-DD)" [formControl]="fechaF"
-                            [(ngModel)]="filtradoFecha">
+                        <input matInput placeholder="Fecha (YYYY-MM-DD)" [formControl]="fechaF">
                     </mat-form-field>
                     <i class="fa fa-refresh" id="listar" style="padding-top: 10px;" (click)="LimpiarCamposPermisos()"
                         matSuffix matTooltipPosition="right"
@@ -1541,7 +1540,7 @@
                     </i>
                 </div>
                 <mat-divider style="margin-bottom: 10px;"></mat-divider>
-                <div *ngFor="let pt of permisosTotales | filtroFecha: filtradoFecha | paginate:tamanio_pagina:numero_pagina"
+                <div *ngFor="let pt of permisosTotales | filtroFecha: fechaF.value | paginate:tamanio_pagina:numero_pagina"
                     style="padding-top: 15px;">
                     <div class="container">
                         <div class="row">
