@@ -1298,63 +1298,87 @@ class EmpleadoControlador {
   // METODO PARA ELIMINAR REGISTROS
 
   public async EliminarEmpleado(req: Request, res: Response) {
-    try {
-      const id = req.params.id;
-      const { user_name, ip } = req.body;
+    const { empleados, user_name, ip } = req.body;
+    let empleadosRegistrados: boolean = false;
+    let errorEliminar: boolean = false;
+    
+    for (const e of empleados) {
+      try {
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
 
-      // INICIAR TRANSACCION
-      await pool.query('BEGIN');
+        // CONSULTAR DATOS ORIGINALES
+        const empleado = await pool.query('SELECT * FROM eu_usuarios WHERE id_empleado = $1', [e.id]);
+        const [datosOriginales] = empleado.rows;
+  
+        if (!datosOriginales) {
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'eu_usuarios',
+            usuario: user_name,
+            accion: 'D',
+            datosOriginales: '',
+            datosNuevos: '',
+            ip,
+            observacion: `Error al eliminar usuario con id: ${e.id}. Registro no encontrado.`
+          });
+          errorEliminar = true;
+          continue; 
+        }
 
-      // CONSULTAR DATOSORIGINALES
-      const empleado = await pool.query(
-        `
-        SELECT * FROM eu_empleados WHERE id = $1
-        `
-        , [id]);
-      const [datosOriginales] = empleado.rows;
+        const datosActuales = await pool.query('SELECT * FROM datos_actuales_empleado WHERE id = $1', [e.id]);
+        const [datosActualesEmpleado] = datosActuales.rows;
 
-      if (!datosOriginales) {
+        if (datosActualesEmpleado) {
+          empleadosRegistrados = true;
+          continue; 
+        }
+
+        // ELIMINAR USUARIO
+        await pool.query('DELETE FROM eu_usuarios WHERE id_empleado = $1', [e.id]);
+
+        // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'eu_empleados',
+          tabla: 'eu_usuarios',
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
           datosNuevos: '',
           ip,
-          observacion: `Error al eliminar empleado con id: ${id}. Registro no encontrado.`
+          observacion: `Usuario con id_empleado: ${e.id} eliminado correctamente.`
+        });
+  
+        // ELIMINAR EMPLEADO
+        await pool.query('DELETE FROM eu_empleados WHERE id = $1', [e.id]);
+  
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_empleados',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: JSON.stringify(datosOriginales),
+          datosNuevos: '',
+          ip,
+          observacion: `Empleado con id: ${e.id} eliminado correctamente.`
         });
 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
-        return res.status(404).jsonp({ message: 'Error al eliminar empleado.' });
+        
+      } catch (error) {
+        console.log('error ', error)
+        // REVERTIR TRANSACCION
+        await pool.query('ROLLBACK');
+        errorEliminar = true;
       }
-
-      await pool.query(
-        `
-        DELETE FROM eu_empleados WHERE id = $1
-        `
-        , [id]);
-
-      // AUDITORIA
-      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'eu_empleados',
-        usuario: user_name,
-        accion: 'D',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: '',
-        ip,
-        observacion: null
-      });
-
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-      res.jsonp({ message: 'Registro eliminado.' });
     }
-    catch (error) {
-      // REVERTIR TRANSACCION
-      await pool.query('ROLLBACK');
-      return res.jsonp({ message: 'error' });
+
+    if (errorEliminar) {
+      return res.status(500).jsonp({ message: 'Ocurrió un error al eliminar usuarios.' });
     }
+    if (empleadosRegistrados) {
+      return res.status(404).jsonp({ message: 'No se eliminaron algunos usuarios ya que tienen información registrada.' });
+    }
+    return res.jsonp({ message: 'Usuarios eliminados correctamente.' });
   }
 
 

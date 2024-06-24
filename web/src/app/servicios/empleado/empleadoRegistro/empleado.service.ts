@@ -123,8 +123,16 @@ export class EmpleadoService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarEmpleados(id: any) {
-    return this.http.delete(`${environment.url}/empleado/eliminar/${id}`).pipe(catchError(id));
+  EliminarEmpleados(empleados: any) {
+    const url = `${environment.url}/empleado/eliminar/`;
+    const httpOtions = {
+      body: empleados
+    };
+    return this.http.request('delete', url, httpOtions).pipe(
+      catchError(error => {
+        return of({ error: true, message: error.error.message, status: error.status});
+      })
+    );
   }
 
 
