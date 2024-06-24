@@ -93,7 +93,7 @@
                     Reincorporar
                 </button>
             </div>
-            <div class="col-md">
+            <div class="col-md" *ngIf="mostrarCrearCarpeta">
                 <button class="btn btn-primary btn-outline-light" style="margin-right: 10px; padding-left: 10px;"
                     (click)="CrearCarpeta(2)">
                     Crear Carpeta
@@ -191,18 +191,27 @@
     style="padding-bottom: 50px; text-align: center;">
 
     <div style="text-align: center; padding-bottom: 12px;" *ngIf="btnCheckHabilitar">
-        <button class="btn btn-primary btn-outline-light" style="float: left; margin-left: 10px; padding-left: 10px;"
-            (click)="Deshabilitar(1)">
-            Confirmar
-        </button>
-        <button class="btn btn-primary btn-outline-light"
-            style="text-align: center; margin-right: 10px; padding-left: 10px;" (click)="CrearCarpeta(1)">
-            Crear Carpeta
-        </button>
-        <button class="btn btn-primary btn-outline-light" style="float: right; margin-right: 10px;"
-            (click)="ConfirmarDeleteMultipleActivos()">
-            Eliminar
-        </button>
+      <div class="row">
+        <div class="col-md">
+          <button class="btn btn-primary btn-outline-light" style="margin-left: 20px; padding-left: 20px;"
+              (click)="Deshabilitar(1)">
+              Confirmar
+          </button>
+        </div>
+
+        <div class="col-md" *ngIf="mostrarCrearCarpeta">
+          <button class="btn btn-primary btn-outline-light" style="margin-right: 10px; padding-left: 10px;"
+              style="text-align: center; margin-right: 10px; padding-left: 10px;" (click)="CrearCarpeta(1)">
+              Crear Carpeta
+          </button>
+        </div>
+        <div class="col-md">
+          <button class="btn btn-primary btn-outline-light" style="margin-right: 10px;"
+              (click)="ConfirmarDeleteMultipleActivos()">
+              Eliminar
+          </button>
+        </div>
+      </div>
     </div>
 
     <div class="mat-elevation-z8" style="background: white;">

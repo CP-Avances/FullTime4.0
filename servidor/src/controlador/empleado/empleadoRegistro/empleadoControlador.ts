@@ -1,15 +1,14 @@
 // SECCION LIBRERIAS
 import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
-import { ObtenerRutaUsuario, ObtenerRutaVacuna, ObtenerRutaPermisos, ObtenerRutaContrato, ObtenerIndicePlantilla } from '../../../libs/accesoCarpetas';
+import { ObtenerRuta, ObtenerRutaUsuario, ObtenerRutaVacuna, ObtenerRutaPermisos, ObtenerRutaContrato, ObtenerIndicePlantilla } from '../../../libs/accesoCarpetas';
 import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { ConvertirImagenBase64 } from '../../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import { Md5 } from 'ts-md5';
-import { promises as pr } from 'fs';
-import pool from '../../../database';
 import moment from 'moment';
 import excel from 'xlsx';
+import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
 
@@ -65,7 +64,6 @@ class EmpleadoControlador {
       await pool.query('COMMIT');
       res.jsonp({ message: 'Registro guardado.' });
     } catch (error) {
-      console.log('error ---- ', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       res.status(500).jsonp({ message: 'Error al guardar código.' });
@@ -98,7 +96,7 @@ class EmpleadoControlador {
     try {
 
       const { valor, automatico, manual, cedula, id, user_name, ip } = req.body;
-      console.log('***** ', req.body)
+      
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
@@ -253,64 +251,7 @@ class EmpleadoControlador {
       await pool.query('COMMIT');
 
       if (empleado) {
-
-        let verificar = 0;
-        // RUTA DE LA CARPETA PRINCIPAL PERMISOS
-        const carpetaPermisos = await ObtenerRutaPermisos(codigo);
-
-        // METODO MKDIR PARA CREAR LA CARPETA
-        fs.mkdir(carpetaPermisos, { recursive: true }, (err: any) => {
-          if (err) {
-            verificar = 1;
-          } else {
-            verificar = 0;
-          }
-        });
-
-        // RUTA DE LA CARPETA PRINCIPAL PERMISOS
-        const carpetaImagenes = await ObtenerRutaUsuario(empleado.id);
-
-        // METODO MKDIR PARA CREAR LA CARPETA
-        fs.mkdir(carpetaImagenes, { recursive: true }, (err: any) => {
-          if (err) {
-            verificar = 1;
-          } else {
-            verificar = 0;
-          }
-        });
-
-        // RUTA DE LA CARPETA DE ALMACENAMIENTO DE VACUNAS
-        const carpetaVacunas = await ObtenerRutaVacuna(empleado.id);
-
-        // METODO MKDIR PARA CREAR LA CARPETA
-        fs.mkdir(carpetaVacunas, { recursive: true }, (err: any) => {
-          if (err) {
-            verificar = 1;
-          } else {
-            verificar = 0;
-          }
-        });
-
-        // RUTA DE LA CARPETA DE ALMACENAMIENTO DE CONTRATOS
-        const carpetaContratos = await ObtenerRutaContrato(empleado.id);
-
-        // METODO MKDIR PARA CREAR LA CARPETA
-        fs.mkdir(carpetaContratos, { recursive: true }, (err: any) => {
-          if (err) {
-            verificar = 1;
-          } else {
-            verificar = 0;
-          }
-        });
-
-        // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
-        if (verificar === 1) {
-          console.error('Error al crear las carpetas.');
-        }
-        else {
-          return res.status(200).jsonp(empleado)
-        }
-
+        return res.status(200).jsonp(empleado);
       }
       else {
         return res.status(404).jsonp({ message: 'error' })
@@ -339,7 +280,10 @@ class EmpleadoControlador {
         SELECT * FROM eu_empleados WHERE id = $1
         `
         , [id]);
+
       const [datosOriginales] = empleado.rows;
+      const codigoAnterior = datosOriginales.codigo;
+      const cedulaAnterior = datosOriginales.cedula;
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -378,34 +322,121 @@ class EmpleadoControlador {
         observacion: null
       });
 
-      // FINALIZAR TRANSACCION
-      await pool.query('COMMIT');
-
+      // VARIABLES PARA VERIFICAR RENOBRAMIENTO DE CARPETAS
+      // 0 => CORRECTO 1 => ERROR
       let verificar_permisos = 0;
+      let verificar_imagen = 0;
+      let verificar_vacunas = 0;
+      let verificar_contrato = 0;
 
-      // RUTA DE LA CARPETA PERMISOS DEL USUARIO
-      const carpetaPermisos = await ObtenerRutaPermisos(codigo);
+      if (codigoAnterior !== codigo || cedulaAnterior !== cedula) {
+        // RUTA DE LA CARPETA PERMISOS DEL USUARIO
+        const carpetaPermisosAnterior = await ObtenerRuta(codigoAnterior, cedulaAnterior, 'permisos');
+        const carpetaPermisos = await ObtenerRutaPermisos(codigo);
 
-      // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
-      fs.access(carpetaPermisos, fs.constants.F_OK, (err) => {
-        if (err) {
-          // METODO MKDIR PARA CREAR LA CARPETA
-          fs.mkdir(carpetaPermisos, { recursive: true }, (err: any) => {
-            if (err) {
-              verificar_permisos = 1;
-            } else {
-              verificar_permisos = 0;
-            }
-          });
-        } else {
-          verificar_permisos = 0;
-        }
-      });
+        // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
+        fs.access(carpetaPermisosAnterior, fs.constants.F_OK, (err) => {
+          if (err) {
+            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+          } else {
+            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+            fs.rename(carpetaPermisosAnterior, carpetaPermisos, (err) => {
+              if (err) {
+                verificar_permisos = 1;
+              } else {
+                verificar_permisos = 0;
+              }
+            });
+          }
+        });
 
-      res.jsonp({ message: 'Registro actualizado.' });
+
+        // RUTA DE LA CARPETA IMAGENES DEL USUARIO
+        const carpetaImagenesAnterior = await ObtenerRuta(codigoAnterior, cedulaAnterior, 'imagenesEmpleados');
+        const carpetaImagenes = await ObtenerRutaUsuario(id);
+
+        // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
+        fs.access(carpetaImagenesAnterior, fs.constants.F_OK, (err) => {
+          if (err) {
+            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+          } else {
+            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+            fs.rename(carpetaImagenesAnterior, carpetaImagenes, (err) => {
+              if (err) {
+                verificar_imagen = 1;
+              } else {
+                verificar_imagen = 0;
+              }
+            });
+          }
+        });
+
+
+        // RUTA DE LA CARPETA VACUNAS DEL USUARIO
+        const carpetaVacunasAnterior = await ObtenerRuta(codigoAnterior, cedulaAnterior, 'carnetVacuna');
+        const carpetaVacunas = await ObtenerRutaVacuna(id);
+
+        // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
+        fs.access(carpetaVacunasAnterior, fs.constants.F_OK, (err) => {
+          if (err) {
+            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+          } else {
+            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+            fs.rename(carpetaVacunasAnterior, carpetaVacunas, (err) => {
+              if (err) {
+                verificar_vacunas = 1;
+              } else {
+                verificar_vacunas = 0;
+              }
+            });
+          }
+        });
+
+
+        // RUTA DE LA CARPETA CONTRATOS DEL USUARIO
+        const carpetaContratosAnterior = await ObtenerRuta(codigoAnterior, cedulaAnterior, 'contratos');
+        const carpetaContratos = await ObtenerRutaContrato(id);
+
+        // VERIFICACION DE EXISTENCIA CARPETA CONTRATOS DE USUARIO
+        fs.access(carpetaContratosAnterior, fs.constants.F_OK, (err) => {
+          if (err) {
+            // SI NO EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, NO HACER NADA
+          } else {
+            // SI EXISTE LA CARPETA CON EL CÓDIGO ANTERIOR, RENOMBRARLA CON LA RUTA DEL CÓDIGO NUEVO
+            fs.rename(carpetaContratosAnterior, carpetaContratos, (err) => {
+              if (err) {
+                verificar_contrato = 1;
+              } else {
+                verificar_contrato = 0;
+              }
+            });
+          }
+        });
+
+      }
+
+      // METODO DE VERIFICACION DE MODIFICACION DE DIRECTORIOS
+      const errores: Record<string, string> = {
+        '1': 'permisos',
+        '2': 'imagenes',
+        '3': 'vacunación',
+        '4': 'contratos'
+      };
+
+      const verificaciones = [verificar_permisos, verificar_imagen, verificar_vacunas, verificar_contrato];
+      const mensajesError = verificaciones.map((verificacion, index) => verificacion === 1 ? errores[(index + 1).toString()] : null).filter(Boolean);
+
+      if (mensajesError.length > 0) {
+        await pool.query('ROLLBACK');
+        return res.status(500).jsonp({ message: `Ups!!! no fue posible modificar el directorio de ${mensajesError.join(', ')} del usuario.` });
+      } else {
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.jsonp({ message: 'Registro actualizado.' });
+      }
+
     }
     catch (error) {
-      console.log('error ', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
@@ -2523,32 +2554,56 @@ class EmpleadoControlador {
    ** **************************************************************************************** **/
 
   public async CrearCarpetasEmpleado(req: Request, res: Response) {
-    const { id, codigo } = req.body;
-    let verificar_permisos = 0;
-    try {
-      const carpetaPermisos = await ObtenerRutaPermisos(codigo);
-      try {
-        await pr.access(carpetaPermisos, fs.constants.F_OK);
-        verificar_permisos = 2; // LA CARPETA YA EXISTE
-      } catch {
+    const { empleados, permisos, vacaciones, horasExtras } = req.body;
+    let errorOccurred = false;
+
+    for (const e of empleados) {
+      const { codigo, cedula } = e;
+
+      if (permisos) {
+        const carpetaPermisos = await ObtenerRuta(codigo, cedula, 'permisos');
         try {
-          await pr.mkdir(carpetaPermisos, { recursive: true });
-          verificar_permisos = 0; // CARPETA CREADA CON EXITO
-        } catch {
-          verificar_permisos = 1; // ERROR AL CREAR LA CARPETA
+          await fs.promises.access(carpetaPermisos, fs.constants.F_OK);
+        } catch (error) {
+          try {
+            await fs.promises.mkdir(carpetaPermisos, { recursive: true });
+          } catch (error) {
+            errorOccurred = true;
+          }
         }
       }
 
-      // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
-      if (verificar_permisos === 1) {
-        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos.' });
-      } else if (verificar_permisos === 2) {
-        res.jsonp({ message: 'Ya existen carpetas creadas de ' + codigo });
-      } else {
-        res.jsonp({ message: 'Carpetas creadas con éxito.' });
+      if (vacaciones) {
+        const carpetaVacaciones = await ObtenerRuta(codigo, cedula, 'vacaciones');
+        try {
+          await fs.promises.access(carpetaVacaciones, fs.constants.F_OK);
+        } catch (error) {
+          try {
+            await fs.promises.mkdir(carpetaVacaciones, { recursive: true });
+          } catch (error) {
+            errorOccurred = true;
+          }
+        }
       }
-    } catch (error) {
-      res.status(500).json({ message: 'Error al procesar la solicitud.', error: error.message });
+
+      if (horasExtras) {
+        const carpetaHorasExtras = await ObtenerRuta(codigo, cedula, 'horasExtras');
+        try {
+          await fs.promises.access(carpetaHorasExtras, fs.constants.F_OK);
+        } catch (error) {
+          try {
+            await fs.promises.mkdir(carpetaHorasExtras, { recursive: true });
+          } catch (error) {
+            errorOccurred = true;
+          }
+        }
+      }
+    }
+
+    if (errorOccurred) {
+      res.status(500).jsonp({ message: 'Ups!!! se produjo un error al crear las carpetas.' });
+    } else {
+      res.jsonp({ message: 'Carpetas creadas con éxito.' });
     }
   }
 }
