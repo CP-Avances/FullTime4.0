@@ -299,18 +299,16 @@ export class ListaSucursalesComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto'],
             body: [
               [
                 { text: 'Código', style: 'tableHeader' },
-                { text: 'Empresa', style: 'tableHeader' },
                 { text: 'Establecimiento', style: 'tableHeader' },
                 { text: 'Ciudad', style: 'tableHeader' }
               ],
               ...this.sucursales.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
-                  { text: obj.nomempresa, style: 'itemsTable' },
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTable' }
                 ];
@@ -333,6 +331,21 @@ export class ListaSucursalesComponent implements OnInit {
    ** **                                      METODO PARA EXPORTAR A EXCEL                            ** **
    ** ************************************************************************************************** **/
   exportToExcel() {
+    var listExcelSucursales: any = [];
+    this.sucursales.forEach((item: any) => {
+      var data: any = {
+        id: '',
+        nombre: '',
+        descripcion: ''
+      }
+
+      data.id = item.id;
+      data.nombre = item.nombre;
+      data.descripcion = item.descripcion;
+
+      listExcelSucursales.push(data);
+    })
+
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.sucursales);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Establecimientos');
@@ -344,6 +357,22 @@ export class ListaSucursalesComponent implements OnInit {
    ** ************************************************************************************************** **/
 
   exportToCVS() {
+
+    var listExcelSucursales: any = [];
+    this.sucursales.forEach((item: any) => {
+      var data: any = {
+        id: '',
+        nombre: '',
+        descripcion: ''
+      }
+
+      data.id = item.id;
+      data.nombre = item.nombre;
+      data.descripcion = item.descripcion;
+
+      listExcelSucursales.push(data);
+    })
+
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.sucursales);
     const csvDataH = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
@@ -363,7 +392,6 @@ export class ListaSucursalesComponent implements OnInit {
       objeto = {
         "establecimiento": {
           "$": { "id": obj.id },
-          "empresa": obj.nomempresa,
           "establecimiento": obj.nombre,
           "ciudad": obj.descripcion,
         }

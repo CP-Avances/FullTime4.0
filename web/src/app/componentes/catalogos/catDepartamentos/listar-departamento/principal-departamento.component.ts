@@ -445,11 +445,10 @@ export class PrincipalDepartamentoComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto'],
             body: [
               [
                 { text: 'Código', style: 'tableHeader' },
-                { text: 'Empresa', style: 'tableHeader' },
                 { text: 'Establecimiento', style: 'tableHeader' },
                 { text: 'Departamento', style: 'tableHeader' },
                 { text: 'Nivel', style: 'tableHeader' },
@@ -458,7 +457,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
               ...this.departamentos.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
-                  { text: obj.nomempresa, style: 'itemsTable' },
                   { text: obj.nomsucursal, style: 'itemsTable' },
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.nivel, style: 'itemsTableC' },

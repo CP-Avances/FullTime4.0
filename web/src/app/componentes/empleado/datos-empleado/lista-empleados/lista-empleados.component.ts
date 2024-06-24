@@ -515,7 +515,7 @@ export class ListaEmpleadosComponent implements OnInit {
         this.mostrarbtnsubir = false;
       } else {
         this.DataEmpleados.forEach((item: any) => {
-          if (item.observacion.toLowerCase() == 'ok') {
+          if (item.observacion.toLowerCase() == 'ok' || item.observacion.toLowerCase() == 'ok (verificar ubicación)') {
             this.listUsuariosCorrectas.push(item);
           }
         });
@@ -553,7 +553,7 @@ export class ListaEmpleadosComponent implements OnInit {
         this.mostrarbtnsubir = false;
       } else {
         this.DataEmpleados.forEach((item: any) => {
-          if (item.observacion.toLowerCase() == 'ok') {
+          if (item.observacion.toLowerCase() == 'ok' || item.observacion.toLowerCase() == 'ok (verificar ubicación)') {
             this.listUsuariosCorrectas.push(item);
           }
         });
@@ -575,7 +575,7 @@ export class ListaEmpleadosComponent implements OnInit {
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
-    //console.log('this.listUsuariosCorrectas: ', this.listUsuariosCorrectas.length);
+    console.log('this.listUsuariosCorrectas: ', this.listUsuariosCorrectas.length);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -625,7 +625,7 @@ export class ListaEmpleadosComponent implements OnInit {
   colorCelda: string = ''
   EstiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
-    if (observacion == 'ok') {
+    if (observacion == 'ok' || observacion == 'ok (Verificar ubicación)') {
       return 'rgb(159, 221, 154)';
     }
     else if (observacion == 'Ya esta registrado en base') {
@@ -644,7 +644,9 @@ export class ListaEmpleadosComponent implements OnInit {
     }
     else if ((observacion == 'Código ingresado no válido') ||
       (observacion == 'El teléfono ingresado no es válido') ||
-      (observacion == 'La cédula ingresada no es válida')
+      (observacion == 'La cédula ingresada no es válida') ||
+      (observacion == 'Genero no es válido') ||
+      (observacion == 'GEstado civil no es válido')
     ) {
       return 'rgb(222, 162, 73)';
     }
