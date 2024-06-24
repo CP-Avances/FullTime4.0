@@ -1193,52 +1193,76 @@ class EmpleadoControlador {
     // METODO PARA ELIMINAR REGISTROS
     EliminarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const id = req.params.id;
-                const { user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOSORIGINALES
-                const empleado = yield database_1.default.query(`
-        SELECT * FROM eu_empleados WHERE id = $1
-        `, [id]);
-                const [datosOriginales] = empleado.rows;
-                if (!datosOriginales) {
+            const { empleados, user_name, ip } = req.body;
+            let empleadosRegistrados = false;
+            let errorEliminar = false;
+            for (const e of empleados) {
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    // CONSULTAR DATOS ORIGINALES
+                    const empleado = yield database_1.default.query('SELECT * FROM eu_usuarios WHERE id_empleado = $1', [e.id]);
+                    const [datosOriginales] = empleado.rows;
+                    if (!datosOriginales) {
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'eu_usuarios',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip,
+                            observacion: `Error al eliminar usuario con id: ${e.id}. Registro no encontrado.`
+                        });
+                        errorEliminar = true;
+                        continue;
+                    }
+                    const datosActuales = yield database_1.default.query('SELECT * FROM datos_actuales_empleado WHERE id = $1', [e.id]);
+                    const [datosActualesEmpleado] = datosActuales.rows;
+                    if (datosActualesEmpleado) {
+                        empleadosRegistrados = true;
+                        continue;
+                    }
+                    // ELIMINAR USUARIO
+                    yield database_1.default.query('DELETE FROM eu_usuarios WHERE id_empleado = $1', [e.id]);
+                    // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'eu_empleados',
+                        tabla: 'eu_usuarios',
                         usuario: user_name,
                         accion: 'D',
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al eliminar empleado con id: ${id}. Registro no encontrado.`
+                        observacion: `Usuario con id_empleado: ${e.id} eliminado correctamente.`
+                    });
+                    // ELIMINAR EMPLEADO
+                    yield database_1.default.query('DELETE FROM eu_empleados WHERE id = $1', [e.id]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleados',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: JSON.stringify(datosOriginales),
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Empleado con id: ${e.id} eliminado correctamente.`
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Error al eliminar empleado.' });
                 }
-                yield database_1.default.query(`
-        DELETE FROM eu_empleados WHERE id = $1
-        `, [id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'eu_empleados',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                res.jsonp({ message: 'Registro eliminado.' });
+                catch (error) {
+                    console.log('error ', error);
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    errorEliminar = true;
+                }
             }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.jsonp({ message: 'error' });
+            if (errorEliminar) {
+                return res.status(500).jsonp({ message: 'Ocurrió un error al eliminar usuarios.' });
             }
+            if (empleadosRegistrados) {
+                return res.status(404).jsonp({ message: 'No se eliminaron algunos usuarios ya que tienen información registrada.' });
+            }
+            return res.jsonp({ message: 'Usuarios eliminados correctamente.' });
         });
     }
     /** **************************************************************************************** **

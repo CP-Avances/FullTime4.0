@@ -220,55 +220,33 @@ export class ListaEmpleadosComponent implements OnInit {
 
   // METODO PARA CREAR LA CARPETA DEL USUARIO
   CrearCarpeta(opcion: number) {
-    let EmpleadosSeleccionados: any;
-    if (opcion === 1) {
-      console.log('this.selectionUno.selected', this.selectionUno.selected);
-      EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
-        return {
-          id: obj.id,
-          codigo: obj.codigo,
-          empleado: obj.nombre + ' ' + obj.apellido,
-          cedula: obj.cedula,
-        }
-      })
-    } else if (opcion === 2 || opcion === 3) {
-      EmpleadosSeleccionados = this.selectionDos.selected.map((obj: any) => {
-        return {
-          id: obj.id,
-          codigo: obj.codigo,
-          empleado: obj.nombre + ' ' + obj.apellido,
-          cedula: obj.cedula,
-        }
-      })
-    }
+    let seleccion = opcion === 1 ? this.selectionUno.selected : (opcion === 2 || opcion === 3) ? this.selectionDos.selected : [];
+    let empleadosSeleccionados = seleccion.map((obj: any) => ({
+      id: obj.id,
+      codigo: obj.codigo,
+      empleado: `${obj.nombre} ${obj.apellido}`,
+      cedula: obj.cedula,
+    }));
 
     // VERIFICAR QUE EXISTAN USUARIOS SELECCIONADOS
-    if (EmpleadosSeleccionados.length != 0) {
-      this.ventana.open(ConfirmarCrearCarpetaComponent, {
-        width: '500px',
-        data: {
-          empleados: EmpleadosSeleccionados,
-          vacaciones: this.habilitarVacaciones,
-          permisos: this.habilitarPermisos,
-          horasExtras: this.habilitarHorasExtras
-        }
-      })
-        .afterClosed().subscribe(item => {
-          if (item === true) {
-            this.GetEmpleados();
-            this.btnCheckHabilitar = false;
-            this.btnCheckDeshabilitado = false;
-            this.selectionUno.clear();
-            this.selectionDos.clear();
-            EmpleadosSeleccionados = [];
-          };
-        });
-    }
-    else {
-      this.toastr.info('No ha seleccionado usuarios.', '', {
-        timeOut: 6000,
-      })
-    }
+    empleadosSeleccionados.length > 0 ? this.ventana.open(ConfirmarCrearCarpetaComponent, {
+      width: '500px',
+      data: {
+        empleados: empleadosSeleccionados,
+        vacaciones: this.habilitarVacaciones,
+        permisos: this.habilitarPermisos,
+        horasExtras: this.habilitarHorasExtras
+      }
+    }).afterClosed().subscribe(item => {
+      if (item) {
+        this.GetEmpleados();
+        this.btnCheckHabilitar = false;
+        this.btnCheckDeshabilitado = false;
+        this.selectionUno.clear();
+        this.selectionDos.clear();
+        empleadosSeleccionados = [];
+      }
+    }) : this.toastr.info('No ha seleccionado usuarios.', '', { timeOut: 6000 });
   }
 
   // METODO PARA DESHABILITAR USUARIOS
@@ -973,7 +951,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_empleado: number) {
-    this.rest.EliminarEmpleados(id_empleado).subscribe(res => {
+    this.rest.EliminarEmpleados(id_empleado).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('No se puede eliminar.', '', {
           timeOut: 6000,
@@ -1004,56 +982,45 @@ export class ListaEmpleadosComponent implements OnInit {
   }
 
   // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
-  ConfirmarDeleteMultipleActivos() {
-    this.ingresar = false;
-    this.contador = 0;
-    let EliminarActivos = this.selectionUno.selected.map((obj: any) => {
-      return {
-        id: obj.id,
-        empleado: obj.nombre + ' ' + obj.apellido
-      }
-    })
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          if (EliminarActivos.length != 0) {
-            //ELIMINAR EMPLEADO
-            EliminarActivos.forEach((datos: any) => {
-              this.empleado = this.empleado.filter(item => item.id !== datos.id);
-              this.contador = this.contador + 1;
-              this.rest.EliminarEmpleados(datos.id).subscribe(res => {
-                if (res.message === 'error') {
-                  this.toastr.error('Existen datos relacionados con ' + datos.empleado + '.', 'No fue posible eliminar.', {
-                    timeOut: 6000,
-                  });
-                  this.contador = this.contador - 1;
-                } else {
-                  if (!this.ingresar) {
-                    this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
-                      timeOut: 6000,
-                    });
-                    this.ingresar = true;
-                  }
-                  this.GetEmpleados();
-                }
-              });
-            }
-            )
-            this.btnCheckHabilitar = false;
-            this.empleadosEliminarActivos = [];
-            this.selectionUno.clear();
-            this.GetEmpleados();
+  // 1 = ACTIVOS | 2 = INACTIVOS
+  ConfirmarDeleteMultiple(opcion: number) {
+    let seleccion = opcion === 1 ? this.selectionUno.selected : (opcion === 2 || opcion === 3) ? this.selectionDos.selected : [];
+    let empleadosSeleccionados = seleccion.filter((obj: any) => obj.id !== this.idEmpleado)
+    .map((obj: any) => ({
+      id: obj.id,
+    }));
+
+    const datos = {
+      empleados: empleadosSeleccionados,
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    // VERIFICAR QUE EXISTAN USUARIOS SELECCIONADOS
+    empleadosSeleccionados.length > 0 ? this.ventana.open(MetodosComponent, { width: '450px' })
+    .afterClosed().subscribe((confirmado: Boolean) => {
+      if (confirmado) {
+
+        this.rest.EliminarEmpleados(datos).subscribe((res: any) => {
+          console.log('res', res);
+          if (res.error) {
+            const metodo = res.status === 500 ? 'error' : 'warning';
+            const titulo = res.status === 500 ? 'Ups!!! algo salio mal.' : '';
+            this.toastr[metodo](res.message, titulo, { timeOut: 6000 });
           } else {
-            this.toastr.warning('No ha seleccionado USUARIOS.', 'Ups!!! algo salio mal.', {
-              timeOut: 6000,
-            })
+            this.toastr.success(res.message, '', { timeOut: 6000 });
           }
+          empleadosSeleccionados = [];
+          this.btnCheckHabilitar = false;
+          this.btnCheckDeshabilitado = false;
           this.selectionUno.clear();
-        } else {
-          this.router.navigate(['/empleados']);
-        }
-      }
-      );
+          this.selectionDos.clear();
+          this.GetEmpleados();
+        });
+      };
+    }) : this.toastr.info('No ha seleccionado usuarios.', '', {
+      timeOut: 6000,
+    });
   }
 
   // METODO PARA CONFIRMAR ELIMINACION DE USUARIO INACTIVOS
@@ -1073,7 +1040,7 @@ export class ListaEmpleadosComponent implements OnInit {
             EliminarInactivos.forEach((datos: any) => {
               this.empleado = this.empleado.filter(item => item.id !== datos.id);
               this.contador = this.contador + 1;
-              this.rest.EliminarEmpleados(datos.id).subscribe(res => {
+              this.rest.EliminarEmpleados(datos.id).subscribe((res: any) => {
                 if (res.message === 'error') {
                   this.toastr.error('Existen datos relacionados con ' + datos.empleado + '.', 'No fue posible eliminar.', {
                     timeOut: 6000,

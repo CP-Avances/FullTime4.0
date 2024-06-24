@@ -79,7 +79,7 @@ class EmpleadoRutas {
         // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO
         this.router.put('/geolocalizacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.GeolocalizacionCrokis);
         // METODO PARA ELIMINAR EMPLEADOS
-        this.router.delete('/eliminar/:id', TokenValidation, EMPLEADO_CONTROLADOR.EliminarEmpleado);
+        this.router.delete('/eliminar', TokenValidation, EMPLEADO_CONTROLADOR.EliminarEmpleado);
 
 
 
