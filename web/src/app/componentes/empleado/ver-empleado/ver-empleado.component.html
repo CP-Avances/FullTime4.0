@@ -1,5 +1,5 @@
 <br>
-<mat-tab-group [(selectedIndex)]=selectedIndex (selectedTabChange)="DetectarEventoTab($event)">
+<mat-tab-group (selectedTabChange)="DetectarEventoTab($event)" #pestana>
 
     <!-- INFORMACION OFICIAL DEL EMPLEADO -->
     <mat-tab label="perfil">
@@ -110,35 +110,42 @@
                                     <i class="material-icons">keyboard_backspace</i><span>Atrás</span>
                                 </button>
                             </mat-grid-tile>
-                            <mat-grid-tile>
+                            <mat-grid-tile *ngIf="ver_buscar">
+                                <button (click)="BuscarFichaEmpleado()"
+                                    class="btn btn-block d-flex align-items-center justify-content-center"
+                                    id="Selector">
+                                    <i class="material-icons">person</i><span>Ver Ficha</span>
+                                </button>
+                            </mat-grid-tile>
+                            <mat-grid-tile *ngIf="ver_ficha">
                                 <button (click)="GenerarPdf('open')"
                                     class="btn btn-block d-flex align-items-center justify-content-center"
                                     id="Selector">
                                     <i class="material-icons">picture_as_pdf</i><span>Abrir PDF</span>
                                 </button>
                             </mat-grid-tile>
-                            <mat-grid-tile>
+                            <mat-grid-tile *ngIf="ver_ficha">
                                 <button (click)="GenerarPdf('download')"
                                     class="btn btn-block d-flex align-items-center justify-content-center"
                                     id="Selector">
                                     <i class="material-icons">cloud_download</i><span>Descargar PDF</span>
                                 </button>
                             </mat-grid-tile>
-                            <mat-grid-tile>
+                            <mat-grid-tile *ngIf="ver_ficha">
                                 <button (click)="ExportToXML()"
                                     class="btn btn-block d-flex align-items-center justify-content-center"
                                     id="Selector">
                                     <i class="material-icons fas fa-file-code"></i><span>Exportar a XML</span>
                                 </button>
                             </mat-grid-tile>
-                            <mat-grid-tile>
+                            <mat-grid-tile *ngIf="ver_ficha">
                                 <button (click)="ExportToExcel()"
                                     class="btn btn-block d-flex align-items-center justify-content-center"
                                     id="Selector">
                                     <i class="material-icons fas fa-file-excel"></i><span>Exportar a Excel</span>
                                 </button>
                             </mat-grid-tile>
-                            <mat-grid-tile>
+                            <mat-grid-tile *ngIf="ver_ficha">
                                 <button (click)="ExportToCVS()"
                                     class="btn btn-block d-flex align-items-center justify-content-center"
                                     id="Selector">
@@ -2294,6 +2301,5 @@
             </div>
         </div>
     </mat-tab>
-
 
 </mat-tab-group>

@@ -384,6 +384,7 @@ class AccionPersonalControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.status(200).jsonp({ message: 'Registro actualizado.' });
+            
         } catch (error) {
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error' });

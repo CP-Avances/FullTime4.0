@@ -1,5 +1,6 @@
 // IMPORTAR LIBRERIAS
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { MatTabChangeEvent, MatTabGroup } from '@angular/material/tabs';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
@@ -21,7 +22,6 @@ import * as xml2js from 'xml2js';
 import * as L from 'leaflet';
 // ELIMINA LAS URLS POR DEFECTO
 delete L.Icon.Default.prototype._getIconUrl;
-
 // ESTABLECE LAS NUEVAS RUTAS DE LAS IMAGENES
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
@@ -40,6 +40,7 @@ import { PlanHoraExtraService } from 'src/app/servicios/planHoraExtra/plan-hora-
 import { DiscapacidadService } from 'src/app/servicios/discapacidad/discapacidad.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
+import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
 import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.service';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { VacunacionService } from 'src/app/servicios/empleado/empleadoVacunas/vacunacion.service';
@@ -55,6 +56,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
 import { ScriptService } from 'src/app/servicios/empleado/script.service';
+import { LoginService } from 'src/app/servicios/login/login.service';
 
 // IMPORTAR COMPONENTES
 import { EditarVacacionesEmpleadoComponent } from 'src/app/componentes/modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
@@ -87,11 +89,6 @@ import { EmplLeafletComponent } from '../../modulos/geolocalizacion/empl-leaflet
 import { CrearVacunaComponent } from '../vacunacion/crear-vacuna/crear-vacuna.component';
 import { EmplCargosComponent } from 'src/app/componentes/empleado/cargo/empl-cargos/empl-cargos.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { LoginService } from 'src/app/servicios/login/login.service';
-import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
-import { MatTabChangeEvent } from '@angular/material/tabs';
-import { NumericLiteral } from 'typescript';
-
 
 @Component({
   selector: 'app-ver-empleado',
@@ -99,9 +96,10 @@ import { NumericLiteral } from 'typescript';
   styleUrls: ['./ver-empleado.component.css']
 })
 
-export class VerEmpleadoComponent implements OnInit {
+export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   @ViewChild('tabla2') tabla2: ElementRef;
+  @ViewChild('pestana') pestana!: MatTabGroup;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -129,7 +127,6 @@ export class VerEmpleadoComponent implements OnInit {
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
-  selectedIndex: number;
   imagenEmpleado: any;
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
@@ -176,8 +173,6 @@ export class VerEmpleadoComponent implements OnInit {
     var cadena = this.router.url.split('#')[0];
     this.idEmpleado = cadena.split("/")[2];
     this.scriptService.load('pdfMake', 'vfsFonts');
-    //console.log('cadena: ', cadena);
-    //console.log('logo ', this.logoE)
   }
 
   ngOnInit(): void {
@@ -190,12 +185,30 @@ export class VerEmpleadoComponent implements OnInit {
         switchMap(({ id }) => this.idEmpleado = id)
       )
       .subscribe(() => {
+        this.SeleccionarPestana(0);
+        this.InicializarVariablesTab(0);
         this.ObtenerEmpleadoLogueado(this.idEmpleadoLogueado);
         this.VerAccionContrasena();
         this.ObtenerNacionalidades();
         this.VerFuncionalidades();
+        this.LeerDatosIniciales();
         this.VerEmpresa();
       });
+  }
+
+  ngAfterViewInit(): void {
+    // VERIFICAR QUE ESTA DEFINIDA LA PESTAÑA
+    if (!this.pestana) {
+    } else {
+      this.SeleccionarPestana(0);
+    }
+  }
+
+  // METODO PARA CAMBIAR DE PESTAÑA
+  SeleccionarPestana(index: number): void {
+    if (this.pestana) {
+      this.pestana.selectedIndex = index;
+    }
   }
 
   // VARIABLES PARA DETECTAR EVENTO DE PESTAÑA
@@ -209,11 +222,46 @@ export class VerEmpleadoComponent implements OnInit {
   asignacion: number = 0;
   vacunacion: number = 0;
 
+  // METODO PARA INICIALIZAR LAS VARIABLES
+  InicializarVariablesTab(valor: number) {
+    // CONTADORES
+    this.solicitudes_horas_extras = valor;
+    this.solicitudes_permisos = valor;
+    this.periodo_vacciones = valor;
+    this.accion_personal = valor;
+    this.contrato_cargo = valor;
+    this.autorizacion = valor;
+    this.alimentacion = valor;
+    this.asignacion = valor;
+    this.vacunacion = valor;
+    // ASIGNACIONES
+    this.discapacidadUser = [];
+    this.tituloEmpleado = [];
+    // CONTRATO - CARGO
+    this.contratoEmpleado = [];
+    this.cargoEmpleado = [];
+    this.datosVacuna = [];
+    this.datoActual = [];
+    // PERMISOS
+    this.permisosTotales = [];
+    // VACACIONES
+    this.idPerVacacion = [];
+    this.vacaciones = [];
+    // HORAS EXTRAS
+    this.hora_extra_plan = [];
+    this.hora_extra = [];
+    // ALIMENTACION
+    this.planComidas = [];
+    this.solicitaComida = [];
+    this.administra_comida = [];
+    // ACCIONES PERSONAL
+    this.empleadoProcesos = [];
+    // AUTORIZACIONES SOLICITUDES
+    this.autorizacionesTotales = [];
+  }
+
   // METODO PARA DETECTAR EVENTO DE PESTAÑA
   DetectarEventoTab(event: MatTabChangeEvent) {
-    /*console.log('Index: ', event.index);
-    console.log('Tab: ', event.tab);
-    console.log('label: ', event.tab.textLabel);*/
     if (event.tab.textLabel === 'asignaciones') {
       if (this.asignacion === 0) {
         this.ObtenerTituloEmpleado();
@@ -233,7 +281,6 @@ export class VerEmpleadoComponent implements OnInit {
         this.ObtenerContratosEmpleado(this.formato_fecha);
         this.contrato_cargo = 1;
       }
-
     }
     else if (event.tab.textLabel === 'solicitudes_permisos') {
       if (this.HabilitarPermisos === true && this.solicitudes_permisos === 0) {
@@ -256,6 +303,7 @@ export class VerEmpleadoComponent implements OnInit {
     }
     else if (event.tab.textLabel === 'alimentacion') {
       if (this.HabilitarAlimentacion === true && this.alimentacion === 0) {
+        this.VerAdminComida();
         this.ObtenerPlanComidasEmpleado(this.formato_fecha, this.formato_hora);
         this.ObtenerSolComidas(this.formato_fecha, this.formato_hora);
         this.alimentacion = 1;
@@ -269,10 +317,22 @@ export class VerEmpleadoComponent implements OnInit {
     }
     else if (event.tab.textLabel === 'autorizar') {
       if (this.autorizacion === 0) {
-        this.VerRegistroAutorizar();
+        this.ObtenerAutorizaciones();
         this.autorizacion = 1;
       }
     }
+  }
+
+  // METODO PARA CONSULTAR DATOS PARA REPORTES
+  ver_buscar: boolean = true;
+  ver_ficha: boolean = false;
+  BuscarFichaEmpleado() {
+    this.ver_buscar = false;
+    this.ver_ficha = true;
+    this.VerDatosActuales(this.formato_fecha);
+    this.ObtenerDatosVacunas(this.formato_fecha);
+    this.ObtenerTituloEmpleado();
+    this.ObtenerDiscapacidadEmpleado();
   }
 
   /** ***************************************************************************************** **
@@ -308,7 +368,6 @@ export class VerEmpleadoComponent implements OnInit {
       if (this.funcionalidades.alimentacion === true) {
         this.HabilitarAlimentacion = true;
         this.autorizar = true;
-        this.VerAdminComida();
       }
       if (this.funcionalidades.accion_personal === true) {
         this.HabilitarAccion = true;
@@ -322,8 +381,6 @@ export class VerEmpleadoComponent implements OnInit {
   VerRegistroAutorizar() {
     this.autorizar = true;
     this.aprobacion = true;
-    // FUNCIONES DE AUTORIZACIONES
-    this.ObtenerAutorizaciones();
   }
 
   /** **************************************************************************************** **
@@ -373,9 +430,16 @@ export class VerEmpleadoComponent implements OnInit {
       // LLAMADO A DATOS DE USUARIO
       this.ObtenerContratoEmpleado(this.datoActual.id_contrato, formato_fecha);
       this.ObtenerCargoEmpleado(this.datoActual.id_cargo, formato_fecha);
-
     }, vacio => {
       this.BuscarContratoActual(formato_fecha);
+    });
+  }
+
+  // METODO PARA LEER DATOS ACTUALES
+  LeerDatosIniciales() {
+    this.datoActual = [];
+    this.informacion.ObtenerDatosActuales(parseInt(this.idEmpleado)).subscribe(res => {
+      this.datoActual = res[0];
     });
   }
 
@@ -521,7 +585,7 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   // METODO EDICION DE REGISTRO DE EMPLEADO
-  AbirVentanaEditarEmpleado(dataEmpley) {
+  AbirVentanaEditarEmpleado(dataEmpley: any) {
     this.ventana.open(EditarEmpleadoComponent, { data: dataEmpley, width: '800px' })
       .afterClosed().subscribe(result => {
         if (result) {
@@ -529,10 +593,6 @@ export class VerEmpleadoComponent implements OnInit {
         }
       })
   }
-
-
-
-
 
   /** ********************************************************************************************* **
    ** **                            PARA LA SUBIR LA IMAGEN DEL EMPLEADO                         ** **                                 *
@@ -1559,7 +1619,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.permisosTotales.splice(0, this.permisosTotales.length);
     this.restPermiso.BuscarPermisoEmpleado(parseInt(this.idEmpleado)).subscribe(datos => {
       this.permisosTotales = datos;
-      this.permisosTotales.forEach(p => {
+      this.permisosTotales.forEach((p: any) => {
         // TRATAMIENTO DE FECHAS Y HORAS
         p.fec_creacion_ = this.validar.FormatearFecha(p.fec_creacion, formato_fecha, this.validar.dia_completo);
         p.fec_inicio_ = this.validar.FormatearFecha(p.fec_inicio, formato_fecha, this.validar.dia_completo);
@@ -2039,7 +2099,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.restPerV.ObtenerPeriodoVacaciones(this.empleadoUno[0].codigo).subscribe(datos => {
       this.peridoVacaciones = datos;
 
-      this.peridoVacaciones.forEach(v => {
+      this.peridoVacaciones.forEach((v: any) => {
         // TRATAMIENTO DE FECHAS Y HORAS
         v.fec_inicio_ = this.validar.FormatearFecha(v.fecha_inicio, formato_fecha, this.validar.dia_completo);
         v.fec_final_ = this.validar.FormatearFecha(v.fecha_final, formato_fecha, this.validar.dia_completo);
@@ -2097,7 +2157,7 @@ export class VerEmpleadoComponent implements OnInit {
       this.idPerVacacion = datos;
       this.restVacaciones.ObtenerVacacionesPorIdPeriodo(this.idPerVacacion[0].id).subscribe(res => {
         this.vacaciones = res;
-        this.vacaciones.forEach(v => {
+        this.vacaciones.forEach((v: any) => {
           // TRATAMIENTO DE FECHAS Y HORAS
           v.fec_ingreso_ = this.validar.FormatearFecha(v.fec_ingreso, formato_fecha, this.validar.dia_completo);
           v.fec_inicio_ = this.validar.FormatearFecha(v.fec_inicio, formato_fecha, this.validar.dia_completo);
@@ -2199,8 +2259,6 @@ export class VerEmpleadoComponent implements OnInit {
         h.fec_solicita_ = this.validar.FormatearFecha(h.fec_solicita, formato_fecha, this.validar.dia_completo);
       })
 
-    }, err => {
-      //return this.validar.RedireccionarEstadisticas(err.error);
     });
   }
 
@@ -2244,8 +2302,6 @@ export class VerEmpleadoComponent implements OnInit {
         h.hora_fin_ = this.validar.FormatearHora(h.hora_fin, formato_hora);
       })
 
-    }, err => {
-      // return this.validar.RedireccionarEstadisticas(err.error);
     });
   }
 
@@ -2393,7 +2449,7 @@ export class VerEmpleadoComponent implements OnInit {
    ** **         METODO PARA MOSTRAR DATOS DE ADMINISTRACION MODULO DE ALIMENTACION           ** **
    ** ****************************************************************************************** **/
 
-  // MOSTRAR DATOS DE USUARIO - ADMINISTRACIÓN DE MÓDULO DE ALIMENTACIÓN
+  // MOSTRAR DATOS DE USUARIO - ADMINISTRACION DE MODULO DE ALIMENTACION
   administra_comida: any = [];
   VerAdminComida() {
     this.administra_comida = [];
@@ -2718,7 +2774,6 @@ export class VerEmpleadoComponent implements OnInit {
     this.autorizacionesTotales = [];
     this.restAutoridad.BuscarAutoridadEmpleado(parseInt(this.idEmpleado)).subscribe(datos => {
       this.autorizacionesTotales = datos;
-      console.log('depa autoriza: ', this.autorizacionesTotales[0]);
     })
   }
 
