@@ -43,7 +43,9 @@ class FeriadosControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ORIGINALES
-                const datosOriginales = yield database_1.default.query('SELECT * FROM ef_cat_feriados WHERE id = $1', [id]);
+                const datosOriginales = yield database_1.default.query(`
+                SELECT * FROM ef_cat_feriados WHERE id = $1
+                `, [id]);
                 const [feriado] = datosOriginales.rows;
                 if (!feriado) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -57,7 +59,7 @@ class FeriadosControlador {
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+                    return res.status(404).jsonp({ message: 'error' });
                 }
                 yield database_1.default.query(`
                 DELETE FROM ef_cat_feriados WHERE id = $1
@@ -74,12 +76,12 @@ class FeriadosControlador {
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                return res.jsonp({ text: 'Registro eliminado.' });
+                return res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ text: 'Error al eliminar el registro.' });
+                return res.jsonp({ message: 'error' });
             }
         });
     }
@@ -91,10 +93,10 @@ class FeriadosControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const busqueda = yield database_1.default.query(`
-                SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1
-                `, [descripcion.toUpperCase()]);
-                const [nombres] = busqueda.rows;
-                if (nombres) {
+                SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1 OR fecha = $2 OR fecha_recuperacion = $3
+                `, [descripcion.toUpperCase(), fecha, fec_recuperacion]);
+                const [existe] = busqueda.rows;
+                if (existe) {
                     return res.jsonp({ message: 'existe', status: '300' });
                 }
                 else {
@@ -124,6 +126,7 @@ class FeriadosControlador {
                 }
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
@@ -152,42 +155,55 @@ class FeriadosControlador {
                 const { fecha, descripcion, fec_recuperacion, id, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOS ORIGINALES
-                const datosOriginales = yield database_1.default.query('SELECT * FROM ef_cat_feriados WHERE id = $1', [id]);
-                const [feriado] = datosOriginales.rows;
-                if (!feriado) {
+                const busqueda = yield database_1.default.query(`
+                SELECT * FROM ef_cat_feriados WHERE (UPPER(descripcion) = $1 OR fecha = $2 OR fecha_recuperacion = $3) AND 
+                    NOT id = $4
+                `, [descripcion.toUpperCase(), fecha, fec_recuperacion, id]);
+                const [existe] = busqueda.rows;
+                if (existe) {
+                    return res.jsonp({ message: 'existe', status: '300' });
+                }
+                else {
+                    // CONSULTAR DATOS ORIGINALES
+                    const datosOriginales = yield database_1.default.query(`
+                SELECT * FROM ef_cat_feriados WHERE id = $1
+                `, [id]);
+                    const [feriado] = datosOriginales.rows;
+                    if (!feriado) {
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'ef_cat_feriados',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip,
+                            observacion: `Error al actualizar feriado con id ${id}.`
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+                    }
+                    yield database_1.default.query(`
+                UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
+                WHERE id = $4
+                `, [fecha, descripcion, fec_recuperacion, id]);
+                    // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'ef_cat_feriados',
                         usuario: user_name,
                         accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
+                        datosOriginales: JSON.stringify(feriado),
+                        datosNuevos: JSON.stringify({ fecha, descripcion, fec_recuperacion }),
                         ip,
-                        observacion: `Error al actualizar feriado con id ${id}.`
+                        observacion: null
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+                    return res.jsonp({ message: 'Registro actualizado.' });
                 }
-                yield database_1.default.query(`
-                UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
-                WHERE id = $4
-                `, [fecha, descripcion, fec_recuperacion, id]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'ef_cat_feriados',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: JSON.stringify(feriado),
-                    datosNuevos: JSON.stringify({ fecha, descripcion, fec_recuperacion }),
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });

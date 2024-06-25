@@ -80,7 +80,6 @@ export class EditarFeriadosComponent implements OnInit {
 
   contador: number = 0;
   ActualizarFeriados(form: any) {
-    this.habilitarprogress = true;
     this.contador = 0;
     let feriado = {
       id: this.data.datosFeriado.id,
@@ -128,13 +127,13 @@ export class EditarFeriadosComponent implements OnInit {
   ValidarRecuperacion(feriado: any, form: any) {
     if (this.feriados.length != 0) {
       this.feriados.forEach((obj: any) => {
-        if (obj.fecha.split('T')[0] === moment(feriado.fecha_recuperacion).format('YYYY-MM-DD') ||
+        if (obj.fecha.split('T')[0] === moment(feriado.fec_recuperacion).format('YYYY-MM-DD') ||
           moment(obj.fecha_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
           this.contador = 1;
         }
       })
       if (this.contador === 0) {
-        if (Date.parse(form.fechaForm) < Date.parse(feriado.fecha_recuperacion)) {
+        if (Date.parse(form.fechaForm) < Date.parse(feriado.fec_recuperacion)) {
           this.RegistrarFeriado(feriado);
         }
         else {
@@ -165,13 +164,13 @@ export class EditarFeriadosComponent implements OnInit {
       this.habilitarprogress = false;
       if (response.message === 'error') {
         this.toastr.error(
-          'La fecha del feriado o la fecha de recuperación se encuentran dentro de otro registro.',
-          'Verificar las fechas', {
+          'Verificar los datos ingresados.',
+          'Ups!!! algo salio mal.', {
           timeOut: 6000,
         })
       }
       else if (response.message === 'existe') {
-        this.toastr.warning('Nombre de feriado ya existe en el sistema.', 'Upss!!! algo salio mal.', {
+        this.toastr.warning('Nombre, fecha de recuperación o fecha de feriado ya existe en el sistema.', 'Upss!!! algo salio mal.', {
           timeOut: 6000,
         })
       }

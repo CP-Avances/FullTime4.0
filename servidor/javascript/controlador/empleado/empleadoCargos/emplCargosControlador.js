@@ -27,7 +27,7 @@ class EmpleadoCargosControlador {
             const { id } = req.params;
             const unEmplCargp = yield database_1.default.query(`
       SELECT ec.id, ec.id_contrato, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.sueldo, 
-        ec.hora_trabaja, ec.id_sucursal, s.nombre AS sucursal, ec.id_departamento, 
+        ec.hora_trabaja, ec.id_sucursal, s.nombre AS sucursal, ec.id_departamento, ec.jefe,
         d.nombre AS departamento, e.id AS id_empresa, e.nombre AS empresa, tc.cargo AS nombre_cargo 
       FROM eu_empleado_cargos AS ec, e_sucursales AS s, ed_departamentos AS d, e_empresa AS e, 
         e_cat_tipo_cargo AS tc 
@@ -47,15 +47,15 @@ class EmpleadoCargosControlador {
     Crear(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, user_name, ip } = req.body;
+                const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, user_name, ip, jefe } = req.body;
                 const datosNuevos = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
         INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal,
-           sueldo, hora_trabaja, id_tipo_cargo) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        `, [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo]);
+           sueldo, hora_trabaja, id_tipo_cargo, jefe) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        `, [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe]);
                 delete datosNuevos.user_name;
                 delete datosNuevos.ip;
                 // AUDITORIA
@@ -84,7 +84,7 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empl_contrato, id } = req.params;
-                const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, user_name, ip } = req.body;
+                const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, user_name, ip, jefe } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -109,17 +109,17 @@ class EmpleadoCargosControlador {
                 }
                 yield database_1.default.query(`
         UPDATE eu_empleado_cargos SET id_departamento = $1, fecha_inicio = $2, fecha_final = $3, id_sucursal = $4, 
-          sueldo = $5, hora_trabaja = $6, id_tipo_cargo = $7  
+          sueldo = $5, hora_trabaja = $6, id_tipo_cargo = $7, jefe = $10  
         WHERE id_contrato = $8 AND id = $9
         `, [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo,
-                    id_empl_contrato, id]);
+                    id_empl_contrato, id, jefe]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_cargos',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{id_departamento: ${id_departamento}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, id_sucursal: ${id_sucursal}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, cargo: ${cargo}}`,
+                    datosNuevos: `{id_departamento: ${id_departamento}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, id_sucursal: ${id_sucursal}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, cargo: ${cargo}, jefe: ${jefe}}`,
                     ip,
                     observacion: null
                 });
@@ -140,7 +140,7 @@ class EmpleadoCargosControlador {
             const { id_empl_contrato } = req.params;
             const unEmplCargp = yield database_1.default.query(`
       SELECT ec.id, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.sueldo, ec.hora_trabaja, 
-        s.nombre AS sucursal, d.nombre AS departamento 
+        s.nombre AS sucursal, d.nombre AS departamento, ec.jefe 
       FROM eu_empleado_cargos AS ec, e_sucursales AS s, ed_departamentos AS d 
       WHERE ec.id_contrato = $1 AND ec.id_sucursal = s.id AND ec.id_departamento = d.id
       `, [id_empl_contrato]);

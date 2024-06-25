@@ -52,7 +52,8 @@ export class EditarCargoComponent implements OnInit {
   sueldo = new FormControl('', [Validators.required]);
   cargoF = new FormControl('', [Validators.minLength(3)]);
   tipoF = new FormControl('');
-  jefeF = new FormControl('');
+  jefeF = new FormControl();
+  administraF = new FormControl();
   personalF = new FormControl(false);
 
   // AGREGAR CAMPOS A UN GRUPO
@@ -66,7 +67,9 @@ export class EditarCargoComponent implements OnInit {
     cargoForm: this.cargoF,
     tipoForm: this.tipoF,
     jefeForm: this.jefeF,
+
     personalForm: this.personalF,
+    administraForm: this.administraF,
   });
 
   constructor(
@@ -170,6 +173,7 @@ export class EditarCargoComponent implements OnInit {
       this.cargo = res;
       this.id_empl_contrato = this.cargo[0].id_contrato;
       this.cargo.forEach((obj: any) => {
+        console.log('ver obj ', obj)
         this.ObtenerDepartamentosImprimir(obj.id_sucursal);
         // FORMATEAR HORAS
         if (obj.hora_trabaja.split(':').length === 3) {
@@ -190,6 +194,8 @@ export class EditarCargoComponent implements OnInit {
           idDeparForm: obj.id_departamento,
           sueldoForm: obj.sueldo.split('.')[0],
           tipoForm: obj.id_tipo_cargo,
+          jefeForm: obj.jefe,
+          administraForm: this.administra,
           personalForm: this.personal,
         })
       });
@@ -242,10 +248,11 @@ export class EditarCargoComponent implements OnInit {
       fec_final: form.fecFinalForm,
       sueldo: form.sueldoForm,
       cargo: form.tipoForm,
+      jefe: form.jefeForm,
       user_name: this.user_name,
       ip: this.ip,
     }
-    //console.log('ver cargo ', cargo)
+    console.log('ver cargo ', cargo)
 
     // FORMATEAR HORAS
     if (cargo.hora_trabaja.split(':').length === 1) {
@@ -291,7 +298,7 @@ export class EditarCargoComponent implements OnInit {
   AlmacenarDatos(form: any, datos: any) {
     this.restEmplCargos.ActualizarContratoEmpleado(this.idSelectCargo, this.id_empl_contrato, datos).subscribe(res => {
       this.verEmpleado.ObtenerCargoEmpleado(this.idSelectCargo, this.verEmpleado.formato_fecha);
-      this.  ActualizarUsuarioDepartamento(form);
+      this.ActualizarUsuarioDepartamento(form);
       this.Cancelar();
       this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
@@ -400,15 +407,16 @@ export class EditarCargoComponent implements OnInit {
    **                             METODOS TABLA USUARIO - DEPARTAMENTO                                 ** **
    ** *************************************************************************************************** **/
 
-   // METODO PARA BUSCAR USUARIO - DEPARTAMENTO
+  // METODO PARA BUSCAR USUARIO - DEPARTAMENTO
+  administra: boolean;
   BuscarUsuarioDepartamento() {
     let datos = {
       id_empleado: this.idEmpleado,
     }
-
     this.usuario.BuscarAsignacionUsuarioDepartamento(datos).subscribe(res => {
       if (res != null) {
         this.personal = res[0].personal;
+        this.administra = res[0].administra;
         this.idAsignacion = res[0].id;
       }
     });
@@ -421,7 +429,7 @@ export class EditarCargoComponent implements OnInit {
       id_departamento: form.idDeparForm,
       principal: true,
       personal: form.personalForm,
-      administra: form.jefeForm,
+      administra: form.administraForm,
       user_name: this.user_name,
       ip: this.ip,
     }

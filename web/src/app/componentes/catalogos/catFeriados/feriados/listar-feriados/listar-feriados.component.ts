@@ -745,9 +745,7 @@ export class ListarFeriadosComponent implements OnInit {
 
   }
 
-
-
-
+  // METODO PARA ELIMINAR REGISTROS
   Eliminar(id_feriado: number) {
     const datos = {
       user_name: this.user_name,
@@ -755,16 +753,14 @@ export class ListarFeriadosComponent implements OnInit {
     };
     this.rest.EliminarFeriado(id_feriado, datos).subscribe((res: any) => {
       if (res.message === 'error') {
-        this.toastr.error('No se puede eliminar.', '', {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No se puede eliminar.', {
           timeOut: 6000,
         });
       } else {
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
-        this.BuscarParametro();
       }
-
     });
   }
 
@@ -785,10 +781,9 @@ export class ListarFeriadosComponent implements OnInit {
 
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  // FUNCION PARA ELIMINAR REGISTROS MULTIPLES
   contador: number = 0;
   ingresar: boolean = false;
-
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
@@ -798,7 +793,7 @@ export class ListarFeriadosComponent implements OnInit {
     this.contador = 0;
     this.feriadosEliminar = this.selectionFeriados.selected;
     this.feriadosEliminar.forEach((datos: any) => {
-      this.feriados = this.feriados.filter(item => item.id !== datos.id);
+      this.feriados = this.feriados.filter((item: any) => item.id !== datos.id);
       this.contador = this.contador + 1;
       this.rest.EliminarFeriado(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
@@ -813,43 +808,35 @@ export class ListarFeriadosComponent implements OnInit {
             });
             this.ingresar = true;
           }
-          this.BuscarParametro();
         }
       });
     }
     )
   }
 
-
+  // FUNCION PARA CONFIRMAR ELIMINACION DE REGISTROS MULTIPLES
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-
           if (this.feriadosEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
-
             this.plan_multiple = false;
             this.plan_multiple_ = false;
             this.feriadosEliminar = [];
             this.selectionFeriados.clear();
-
             this.BuscarParametro();
 
           } else {
             this.toastr.warning('No ha seleccionado FERIADOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
-
         } else {
           this.router.navigate(['/listarFeriados']);
         }
       });
-
-
   }
 
 }

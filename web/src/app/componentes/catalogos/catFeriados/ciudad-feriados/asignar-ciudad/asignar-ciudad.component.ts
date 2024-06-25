@@ -244,9 +244,11 @@ export class AsignarCiudadComponent implements OnInit {
   // METODO PARA ASIGNAR CIUDADES A FERIADO
   contador: number = 0;
   ingresar: number = 0;
+  nota: string = '';
   InsertarFeriadoCiudad() {
     this.ingresar = 0;
     this.contador = 0;
+    this.nota = '';
     // VALIDAR SI SE HA SELECCIONADO CIUDADES
     if (this.ciudadesSeleccionadas.length != 0) {
       this.habilitarprogress = true;
@@ -264,10 +266,8 @@ export class AsignarCiudadComponent implements OnInit {
           this.contador = this.contador + 1;
           this.ciudadFeriados = datos;
           this.habilitarprogress = false;
+          this.nota = 'Algunas de las ciudades ya fueron asignadas a este Feriado.';
           this.VerMensaje();
-          this.toastr.info('Se indica que ' + obj.descripcion + ' ya fue asignada a este Feriado.', '', {
-            timeOut: 7000,
-          })
         }, error => {
           this.habilitarprogress = false;
           this.restF.CrearCiudadFeriado(buscarCiudad).subscribe(response => {
@@ -297,6 +297,12 @@ export class AsignarCiudadComponent implements OnInit {
       this.toastr.success('Operación exitosa.', 'Se ha asignado ' + this.ingresar + ' ciudades a este feriado.', {
         timeOut: 1000,
       });
+      if (this.nota != '') {
+        this.toastr.info(this.nota,
+          '', {
+          timeOut: 1000,
+        });
+      }
       this.CerrarVentana(2);
     }
   }

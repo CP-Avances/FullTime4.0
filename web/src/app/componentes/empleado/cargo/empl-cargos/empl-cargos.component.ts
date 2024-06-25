@@ -49,6 +49,7 @@ export class EmplCargosComponent implements OnInit {
   cargoF = new FormControl('', [Validators.minLength(3)]);
   tipoF = new FormControl('');
   jefeF = new FormControl(false);
+  administraF = new FormControl(false);
   personalF = new FormControl(false);
 
   // AGREGAR CAMPOS DE FORMULARIO
@@ -62,6 +63,8 @@ export class EmplCargosComponent implements OnInit {
     cargoForm: this.cargoF,
     tipoForm: this.tipoF,
     jefeForm: this.jefeF,
+
+    administraForm: this.administraF,
     personalForm: this.personalF,
   });
 
@@ -201,6 +204,7 @@ export class EmplCargosComponent implements OnInit {
       fec_final: form.fecFinalForm,
       sueldo: form.sueldoForm,
       cargo: form.tipoForm,
+      jefe: form.jefeForm,
       user_name: this.user_name,
       ip: this.ip,
     }
@@ -342,9 +346,7 @@ export class EmplCargosComponent implements OnInit {
     let datos = {
       id_empleado: this.idEmpleado,
     }
-
     this.usuario.BuscarAsignacionUsuarioDepartamento(datos).subscribe(res => {
-
       if (res != null) {
         const id = res[0].id;
         this.ActualizarUsuarioDepartamento(form, id);
@@ -362,7 +364,7 @@ export class EmplCargosComponent implements OnInit {
       id_departamento: form.idDeparForm,
       principal: true,
       personal: form.personalForm,
-      administra: form.jefeForm,
+      administra: form.administraForm,
       user_name: this.user_name,
       ip: this.ip,
     }
@@ -377,7 +379,7 @@ export class EmplCargosComponent implements OnInit {
       id_departamento: form.idDeparForm,
       principal: true,
       personal: form.personalForm,
-      administra: form.jefeForm,
+      administra: form.administraForm,
       user_name: this.user_name,
       ip: this.ip,
     }

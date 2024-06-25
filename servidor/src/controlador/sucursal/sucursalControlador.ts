@@ -210,6 +210,7 @@ class SucursalControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro eliminado.' });
+      
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');

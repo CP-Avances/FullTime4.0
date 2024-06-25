@@ -42,21 +42,6 @@
                                     <mat-option *ngFor="let d of departamento" [value]="d.id">{{d.nombre}}</mat-option>
                                 </mat-select>
                             </mat-form-field>
-                            <div class="d-flex flex-wrap justify-content-start" style="position: relative; right: 10px;"
-                                >
-                                <mat-checkbox id="check" matSuffix matTooltipPosition="right" [formControl]="jefeF"
-                                    matTooltip="Indicar si el usuario es Jefe o Coordinador del departamento.">
-                                    <label id="textoradiobtn" style="font-size: 12px;">
-                                        Administrar departamento
-                                    </label>
-                                </mat-checkbox>
-                                <mat-checkbox id="check2" matSuffix matTooltipPosition="right" [formControl]="personalF"
-                                    matTooltip="Indicar si el usuario tiene acceso a sus datos.">
-                                    <label id="textoradiobtn" style="font-size: 12px;">
-                                        Personal
-                                    </label>
-                                </mat-checkbox>
-                            </div>
                         </div>
                     </div>
                     <div class="col-md">
@@ -121,8 +106,8 @@
                                 <mat-label>Horas de trabajo</mat-label>
                                 <input matInput placeholder="Ej: 8:10 " [formControl]="horaTrabaja"
                                     (keypress)="IngresarNumeroCaracter($event)" required>
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Indicar el número de horas de trabajo.
-                                En caso de horas y minutos ingresar en el siguiente formato 10 : 35">
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Indicar el número de horas de trabajo. En caso de horas y minutos ingresar en el siguiente formato 10 : 35">
                                     help_outline
                                 </mat-icon>
                                 <mat-error id="hora" *ngIf="horaTrabaja.invalid">
@@ -130,6 +115,32 @@
                                 </mat-error>
                             </mat-form-field>
                         </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        <mat-checkbox matSuffix matTooltipPosition="right" [formControl]="administraF"
+                            matTooltip="Indicar si el usuario es Jefe o Coordinador del departamento.">
+                            <label id="textoradiobtn" style="font-size: 12px;">
+                                Jefe / Coordinador
+                            </label>
+                        </mat-checkbox>
+                    </div>
+                    <div class="col-md">
+                        <mat-checkbox matSuffix matTooltipPosition="right" [formControl]="administraF"
+                            matTooltip="Indicar si el usuario administra al personal del departamento.">
+                            <label id="textoradiobtn" style="font-size: 12px;">
+                                Administrar personal del departamento
+                            </label>
+                        </mat-checkbox>
+                    </div>
+                    <div class="col-md">
+                        <mat-checkbox matSuffix matTooltipPosition="right" [formControl]="personalF"
+                            matTooltip="Indicar si el usuario tiene acceso a sus datos.">
+                            <label id="textoradiobtn" style="font-size: 12px;">
+                                Información Personal
+                            </label>
+                        </mat-checkbox>
                     </div>
                 </div>
             </div>

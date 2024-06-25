@@ -131,23 +131,24 @@ export class RegistrarFeriadosComponent implements OnInit {
     // VERIFICAMOS SI EXISTE REGISTROS
     if (this.feriados.length != 0) {
       this.feriados.forEach((obj: any) => {
-        if (obj.fecha.split('T')[0] === moment(feriado.fecha_recuperacion).format('YYYY-MM-DD') ||
-          moment(obj.fecha_recuperacion).format('YYYY-MM-DD') === moment(feriado.fecha).format('YYYY-MM-DD')) {
+        if (moment(feriado.fecha).format('YYYY-MM-DD') === moment(obj.fecha_recuperacion).format('YYYY-MM-DD') ||
+          moment(feriado.fec_recuperacion).format('YYYY-MM-DD') === moment(obj.fecha).format('YYYY-MM-DD')
+        ) {
           this.contador = 1;
         }
       })
       if (this.contador === 0) {
-        if (Date.parse(form.fechaForm) < Date.parse(feriado.fecha_recuperacion)) {
+        if (Date.parse(form.fechaForm) < Date.parse(feriado.fec_recuperacion)) {
           this.CrearFeriado(feriado);
         }
         else {
-          this.toastr.error('La fecha de recuperación debe ser posterior a la fecha del feriado registrado.', 'Fecha de recuperación incorrecta', {
+          this.toastr.error('La fecha de recuperación debe ser posterior a la fecha del feriado registrado.', 'Fecha de recuperación incorrecta.', {
             timeOut: 6000,
           })
         }
       }
       else {
-        this.toastr.error('La fecha asignada para feriado ya se encuentra registrada como una fecha de recuperación o la fecha de recuperación ya se encuentra registrada como un feriado', 'Verificar fecha de recuperación', {
+        this.toastr.error('La fecha asignada para feriado ya se encuentra registrada como una fecha de recuperación o la fecha de recuperación ya se encuentra registrada como un feriado.', 'Verificar fecha de recuperación.', {
           timeOut: 6000,
         })
       }
@@ -164,14 +165,14 @@ export class RegistrarFeriadosComponent implements OnInit {
       this.habilitarprogress = true;
       this.rest.CrearNuevoFeriado(datos).subscribe(response => {
         this.habilitarprogress = false;
-        console.log('ver ', response, 'response ', response.message)
+        //console.log('ver ', response, 'response ', response.message)
         if (response.message === 'error') {
-          this.toastr.error('La fecha del feriado o la fecha de recuperación se encuentran dentro de otro registro.', 'Upss!!! algo salio mal.', {
+          this.toastr.error('Verificar que los datos sean los correctos.', 'Upss!!! algo salio mal.', {
             timeOut: 6000,
           })
         }
         else if (response.message === 'existe') {
-          this.toastr.warning('Nombre de feriado ya existe en el sistema.', 'Upss!!! algo salio mal.', {
+          this.toastr.warning('Nombre, fecha de recuperación o fecha de feriado ya existe en el sistema.', 'Upss!!! algo salio mal.', {
             timeOut: 6000,
           })
         }
@@ -341,7 +342,7 @@ export class RegistrarFeriadosComponent implements OnInit {
     this.limpiarData = this.nombreCiudades;
     for (var i = 0; i <= this.limpiarData.length - 1; i++) {
       (<HTMLInputElement>document.getElementById('ciudadesSeleccionadas' + i)).checked = false;
-      this.ciudadesSeleccionadas = this.ciudadesSeleccionadas.filter(s => s !== this.nombreCiudades[i]);
+      this.ciudadesSeleccionadas = this.ciudadesSeleccionadas.filter((s: any) => s !== this.nombreCiudades[i]);
     }
   }
 
@@ -371,9 +372,11 @@ export class RegistrarFeriadosComponent implements OnInit {
   // METODO PARA ASIGNAR CIUDADES A FERIADO
   contadorc: number = 0;
   ingresar: number = 0;
+  nota: string = '';
   InsertarFeriadoCiudad(id: number) {
     this.ingresar = 0;
     this.contadorc = 0;
+    this.nota = '';
 
     this.habilitarprogress = true;
     // RECORRER LA LISTA DE CIUDADES SELECCIONADAS
@@ -389,11 +392,8 @@ export class RegistrarFeriadosComponent implements OnInit {
       this.restF.BuscarIdCiudad(buscarCiudad).subscribe(datos => {
         this.contadorc = this.contadorc + 1;
         this.ciudadFeriados = datos;
+        this.nota = 'Algunas de las ciudades ya fueron asignadas a este Feriado.';
         this.VerMensaje(id);
-        this.toastr.info('',
-          'Se indica que ' + obj.descripcion + ' ya fue asignada a este Feriado.', {
-          timeOut: 7000,
-        })
       }, error => {
         this.restF.CrearCiudadFeriado(buscarCiudad).subscribe(response => {
           this.contadorc = this.contadorc + 1;
@@ -418,6 +418,12 @@ export class RegistrarFeriadosComponent implements OnInit {
         'Se ha asignado ' + this.ingresar + ' ciudades a este feriado.', {
         timeOut: 1000,
       });
+      if (this.nota != '') {
+        this.toastr.info(this.nota,
+          '', {
+          timeOut: 1000,
+        });
+      }
       this.CerrarVentana(id);
     }
   }

@@ -37,7 +37,11 @@ class FeriadosControlador {
 
             // CONSULTAR DATOS ORIGINALES
 
-            const datosOriginales = await pool.query('SELECT * FROM ef_cat_feriados WHERE id = $1', [id]);
+            const datosOriginales = await pool.query(
+                `
+                SELECT * FROM ef_cat_feriados WHERE id = $1
+                `
+                , [id]);
             const [feriado] = datosOriginales.rows;
 
             if (!feriado) {
@@ -53,8 +57,9 @@ class FeriadosControlador {
 
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+                return res.status(404).jsonp({ message: 'error' });
             }
+
             await pool.query(
                 `
                 DELETE FROM ef_cat_feriados WHERE id = $1
@@ -74,11 +79,12 @@ class FeriadosControlador {
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-            return res.jsonp({ text: 'Registro eliminado.' });
+            return res.jsonp({ message: 'Registro eliminado.' });
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ text: 'Error al eliminar el registro.' });
+            return res.jsonp({ message: 'error' });
         }
     }
 
@@ -92,13 +98,13 @@ class FeriadosControlador {
 
             const busqueda: QueryResult = await pool.query(
                 `
-                SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1
+                SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1 OR fecha = $2 OR fecha_recuperacion = $3
                 `
-                , [descripcion.toUpperCase()]);
+                , [descripcion.toUpperCase(), fecha, fec_recuperacion]);
 
-            const [nombres] = busqueda.rows;
+            const [existe] = busqueda.rows;
 
-            if (nombres) {
+            if (existe) {
                 return res.jsonp({ message: 'existe', status: '300' });
             }
             else {
@@ -134,6 +140,7 @@ class FeriadosControlador {
             }
         }
         catch (error) {
+            console.log('error ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error' });
@@ -164,49 +171,68 @@ class FeriadosControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOS ORIGINALES
-            const datosOriginales = await pool.query('SELECT * FROM ef_cat_feriados WHERE id = $1', [id]);
-            const [feriado] = datosOriginales.rows;
+            const busqueda: QueryResult = await pool.query(
+                `
+                SELECT * FROM ef_cat_feriados WHERE (UPPER(descripcion) = $1 OR fecha = $2 OR fecha_recuperacion = $3) AND 
+                    NOT id = $4
+                `
+                , [descripcion.toUpperCase(), fecha, fec_recuperacion, id]);
 
-            if (!feriado) {
+            const [existe] = busqueda.rows;
+
+            if (existe) {
+                return res.jsonp({ message: 'existe', status: '300' });
+            }
+            else {
+                // CONSULTAR DATOS ORIGINALES
+                const datosOriginales = await pool.query(
+                    `
+                SELECT * FROM ef_cat_feriados WHERE id = $1
+                `
+                    , [id]);
+                const [feriado] = datosOriginales.rows;
+
+                if (!feriado) {
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'ef_cat_feriados',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar feriado con id ${id}.`
+                    })
+
+                    // FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
+                    return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+                }
+
+                await pool.query(
+                    `
+                UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
+                WHERE id = $4
+                `
+                    , [fecha, descripcion, fec_recuperacion, id]);
+
+                // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'ef_cat_feriados',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: '',
-                    datosNuevos: '',
+                    datosOriginales: JSON.stringify(feriado),
+                    datosNuevos: JSON.stringify({ fecha, descripcion, fec_recuperacion }),
                     ip,
-                    observacion: `Error al actualizar feriado con id ${id}.`
-                })
+                    observacion: null
+                });
 
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+                return res.jsonp({ message: 'Registro actualizado.' });
             }
-
-            await pool.query(
-                `
-                UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
-                WHERE id = $4
-                `
-                , [fecha, descripcion, fec_recuperacion, id]);
-
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'ef_cat_feriados',
-                usuario: user_name,
-                accion: 'U',
-                datosOriginales: JSON.stringify(feriado),
-                datosNuevos: JSON.stringify({ fecha, descripcion, fec_recuperacion }),
-                ip,
-                observacion: null
-            });
-
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-            return res.jsonp({ message: 'Registro actualizado.' });
         }
         catch (error) {
+            console.log('error ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error' });
