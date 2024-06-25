@@ -1308,10 +1308,13 @@ class EmpleadoControlador {
         await pool.query('BEGIN');
 
         // CONSULTAR DATOS ORIGINALES
-        const empleado = await pool.query('SELECT * FROM eu_usuarios WHERE id_empleado = $1', [e.id]);
-        const [datosOriginales] = empleado.rows;
+        const usuario = await pool.query('SELECT * FROM eu_usuarios WHERE id_empleado = $1', [e.id]);
+        const [datosOriginalesUsuarios] = usuario.rows;
+
+        const empleado = await pool.query('SELECT * FROM eu_empleados WHERE id = $1', [e.id]);
+        const [datosOriginalesEmpleado] = empleado.rows;
   
-        if (!datosOriginales) {
+        if (!datosOriginalesUsuarios || !datosOriginalesEmpleado) {
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
             tabla: 'eu_usuarios',
             usuario: user_name,
@@ -1321,14 +1324,29 @@ class EmpleadoControlador {
             ip,
             observacion: `Error al eliminar usuario con id: ${e.id}. Registro no encontrado.`
           });
+
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'eu_empleados',
+            usuario: user_name,
+            accion: 'D',
+            datosOriginales: '',
+            datosNuevos: '',
+            ip,
+            observacion: `Error al eliminar empleado con id: ${e.id}. Registro no encontrado.`
+          });
+
           errorEliminar = true;
+          await pool.query('COMMIT');
           continue; 
         }
 
         const datosActuales = await pool.query('SELECT * FROM datos_actuales_empleado WHERE id = $1', [e.id]);
         const [datosActualesEmpleado] = datosActuales.rows;
 
-        if (datosActualesEmpleado) {
+        const contratos = await pool.query('SELECT * FROM eu_empleado_contratos WHERE id_empleado = $1', [e.id]);
+        const [datosContratos] = contratos.rows;
+
+        if (datosActualesEmpleado || datosContratos) {
           empleadosRegistrados = true;
           continue; 
         }
@@ -1341,7 +1359,7 @@ class EmpleadoControlador {
           tabla: 'eu_usuarios',
           usuario: user_name,
           accion: 'D',
-          datosOriginales: '',
+          datosOriginales: JSON.stringify(datosOriginalesUsuarios),
           datosNuevos: '',
           ip,
           observacion: `Usuario con id_empleado: ${e.id} eliminado correctamente.`
@@ -1355,7 +1373,7 @@ class EmpleadoControlador {
           tabla: 'eu_empleados',
           usuario: user_name,
           accion: 'D',
-          datosOriginales: JSON.stringify(datosOriginales),
+          datosOriginales: JSON.stringify(datosOriginalesEmpleado),
           datosNuevos: '',
           ip,
           observacion: `Empleado con id: ${e.id} eliminado correctamente.`
@@ -1365,7 +1383,6 @@ class EmpleadoControlador {
         await pool.query('COMMIT');
         
       } catch (error) {
-        console.log('error ', error)
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
         errorEliminar = true;

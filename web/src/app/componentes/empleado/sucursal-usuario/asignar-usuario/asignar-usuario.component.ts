@@ -113,7 +113,6 @@ export class AsignarUsuarioComponent implements OnInit {
   }
 
   // METODO PARA BUSCAR DATOS DE USUARIOS ADMINISTRADORES Y JEFES
-  principales: any = [];
   asignados: any = [];
   usuarios: any = [];
   ver_principal: boolean = false;
@@ -126,7 +125,6 @@ export class AsignarUsuarioComponent implements OnInit {
 
     this.usuarios = [];
     this.asignados = [];
-    this.principales = [];
     this.general.ObtenerUsuariosSucursal(data).subscribe(res => {
       this.usuarios = res;
       if (this.usuarios.length != 0) {
@@ -448,14 +446,14 @@ export class AsignarUsuarioComponent implements OnInit {
 
   isAllSelectedU() {
     const numSelected = this.usuariosSeleccionados.selected.length;
-    return numSelected === this.principales.length
+    return numSelected === this.usuarios.length
   }
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS
   masterToggleU() {
     this.isAllSelectedU() ?
       this.usuariosSeleccionados.clear() :
-      this.principales.forEach((row: any) => this.usuariosSeleccionados.select(row));
+      this.usuarios.forEach((row: any) => this.usuariosSeleccionados.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
