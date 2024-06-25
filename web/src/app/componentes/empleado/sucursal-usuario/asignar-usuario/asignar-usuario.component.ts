@@ -113,7 +113,6 @@ export class AsignarUsuarioComponent implements OnInit {
   }
 
   // METODO PARA BUSCAR DATOS DE USUARIOS ADMINISTRADORES Y JEFES
-  principales: any = [];
   asignados: any = [];
   usuarios: any = [];
   ver_principal: boolean = false;
@@ -126,7 +125,6 @@ export class AsignarUsuarioComponent implements OnInit {
 
     this.usuarios = [];
     this.asignados = [];
-    this.principales = [];
     this.general.ObtenerUsuariosSucursal(data).subscribe(res => {
       this.usuarios = res;
       if (this.usuarios.length != 0) {
