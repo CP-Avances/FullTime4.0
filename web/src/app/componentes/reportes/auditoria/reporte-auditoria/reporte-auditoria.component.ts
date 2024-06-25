@@ -1,25 +1,22 @@
 // IMPORTAR LIBRERIAS
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { IReporteFaltas, ITableEmpleados } from 'src/app/model/reportes.model';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { HttpResponse } from '@angular/common/http';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-import { MatTableDataSource } from '@angular/material/table';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
-import * as xlsx from 'xlsx';
-import pako from 'pako';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { ThemePalette } from '@angular/material/core';
+
 
 // IMPORTAR SERVICIOS
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { AuditoriaService } from 'src/app/servicios/auditoria/auditoria.service';
 
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
@@ -44,24 +41,32 @@ interface TablasD {
 
 export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
+
+    // VARIABLES PROGRESS SPINNER
+    habilitarprogress: boolean = false;
+    mode: ProgressSpinnerMode = 'indeterminate';
+    color: ThemePalette = 'primary';
+    value = 10;
+
+    // FORMATO FECHA HORA   
     formato_fecha: string = 'DD/MM/YYYY';
     formato_hora: string = 'HH:mm:ss';
-  
+
     // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
     BuscarParametro() {
-      // id_tipo_parametro Formato fecha = 25
-      this.parametro.ListarDetalleParametros(25).subscribe(
-        res => {
-          this.formato_fecha = res[0].descripcion;
-        });
+        // id_tipo_parametro Formato fecha = 25
+        this.parametro.ListarDetalleParametros(25).subscribe(
+            res => {
+                this.formato_fecha = res[0].descripcion;
+            });
     }
-  
+
     BuscarHora() {
-      // id_tipo_parametro Formato hora = 26
-      this.parametro.ListarDetalleParametros(26).subscribe(
-        res => {
-          this.formato_hora = res[0].descripcion;
-        });
+        // id_tipo_parametro Formato hora = 26
+        this.parametro.ListarDetalleParametros(26).subscribe(
+            res => {
+                this.formato_hora = res[0].descripcion;
+            });
     }
 
     verDetalle: boolean = false;
@@ -225,8 +230,10 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
     // VALIDACIONES DE OPCIONES DE REPORTE
     ValidarReporte(action: any) {
+
         if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '' || this.accionesSeleccionadas.length == 0) return this.toastr.error('Primero valide fechas de búsqueda y acciones.');
         this.ModelarTablasAuditoriaPorTablasEmpaquetados(action);
+
     }
 
     blobToArraynoString(blob: Blob): Promise<any[]> {
@@ -359,7 +366,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
                     console.error('Error en la consulta:', error);
                 }
             }
-        );
+        )
     }
 
     datosbusqueda: any = [];
@@ -418,9 +425,11 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
     }
 
     datosPdF: any = []
-    async ModelarTablasAuditoriaPorTablasEmpaquetados(accion: any) {
 
-        //try {
+
+    async ModelarTablasAuditoriaPorTablasEmpaquetados(accion: any) {
+        this.habilitarprogress = true;
+
         this.data_pdf = [];
         var acciones = this.accionesSeleccionadas.map(x => x).join(',');
 
@@ -428,6 +437,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         const consultasPromesas: Promise<any>[] = [];
 
         for (let i = 0; i < this.tablasSolicitadas.length; i++) {
+
             const tabla = this.tablasSolicitadas[i];
             const buscarTabla = {
                 tabla: tabla.nombre,
@@ -464,38 +474,35 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
             consultasPromesas.push(consultaPromise); // Agregar la promesa al array
         }
 
-        // Esperar a que todas las promesas se resuelvan
-        const resultados = await Promise.allSettled(consultasPromesas);
 
-        this.datosbusqueda = resultados
-            .filter(result => result.status === 'fulfilled')
-            .map(result => (result as PromiseFulfilledResult<any>).value);
+        try {
+            // Esperar a que todas las promesas se resuelvan
+            const resultados = await Promise.allSettled(consultasPromesas);
 
+            this.datosbusqueda = resultados
+                .filter(result => result.status === 'fulfilled')
+                .map(result => (result as PromiseFulfilledResult<any>).value);
 
-        // resultados ahora contiene todos los arrays de datos obtenidos
-        this.data_pdf = this.datosbusqueda.flat(); // Aplanar el array de arrays
+            // resultados ahora contiene todos los arrays de datos obtenidos
+            this.data_pdf = this.datosbusqueda.flat(); // Aplanar el array de arrays
 
-        console.log("quiero ver los datos", this.data_pdf);
-        this.datosPdF = this.data_pdf;
-        //this.dataSource = new MatTableDataSource(this.datosPdF );
+            console.log("quiero ver los datos", this.data_pdf);
+            this.datosPdF = this.data_pdf;
 
+            // Realizar la acción correspondiente
+            switch (accion) {
+                case 'ver':
+                    this.VerDatos();
+                    break;
+                default:
+                    this.GenerarPDF(this.datosPdF, accion);
+                    break;
+            }
+        } finally {
+            this.habilitarprogress = false;
 
-        // Realizar la acción correspondiente
-        switch (accion) {
-            case 'ver':
-                this.VerDatos();
-                break;
-            default:
-                this.GenerarPDF( this.datosPdF, accion);
-                break;
         }
-        // } catch (error) {
-        // console.error('Error en las consultas:', error);
-        // Aquí puedes manejar el error de manera adecuada para tu aplicación
-        //}
     }
-
-
 
 
     ngOnDestroy(): void {

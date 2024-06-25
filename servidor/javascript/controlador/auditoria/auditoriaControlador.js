@@ -41,8 +41,8 @@ class AuditoriaControlador {
                 ORDER BY 
                     fecha_hora DESC;
             `;
-            console.log('Query:', query);
-            console.log('Params:', params);
+            // console.log('Query:', query);
+            //console.log('Params:', params);
             try {
                 const result = yield database_1.default.query(query, params);
                 if (result.rowCount != 0) {

@@ -36,8 +36,8 @@ class AuditoriaControlador {
                     fecha_hora DESC;
             `;
 
-        console.log('Query:', query);
-        console.log('Params:', params);
+       // console.log('Query:', query);
+        //console.log('Params:', params);
 
 
         try {
