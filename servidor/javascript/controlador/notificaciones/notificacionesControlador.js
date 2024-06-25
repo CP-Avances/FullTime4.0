@@ -394,7 +394,7 @@ class NotificacionTiempoRealControlador {
                     html: `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -415,7 +415,7 @@ class NotificacionTiempoRealControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
         `,
                     attachments: [
@@ -618,7 +618,7 @@ class NotificacionTiempoRealControlador {
                     html: `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -644,7 +644,7 @@ class NotificacionTiempoRealControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
           `,
                     attachments: [
