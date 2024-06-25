@@ -1325,8 +1325,11 @@ class EmpleadoControlador {
                                                                     data.observacion = 'El teléfono ingresado no es válido';
                                                                 }
                                                                 else {
-                                                                    if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                                                        data.observacion = 'ok (Verificar ubicación)';
+                                                                    if (!regexLatitud.test(data.latitud) && !regexLongitud.test(data.longitud)) {
+                                                                        data.observacion = '3';
+                                                                    }
+                                                                    else if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                                                        data.observacion = 'Verificar ubicacion';
                                                                     }
                                                                     else {
                                                                         if (duplicados.find((p) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
@@ -1455,57 +1458,62 @@ class EmpleadoControlador {
                                         data.observacion = 'La cédula ingresada no es válida';
                                     }
                                     else {
-                                        if (data.contrasena != 'No registrado') {
-                                            if (!valiContra.test(data.contrasena.toString())) {
-                                                if (data.contrasena.toString().length <= 10) {
-                                                    if (estadoCivilArray.includes(data.estado_civil)) {
-                                                        if (tipogenero.includes(data.genero.toLowerCase())) {
-                                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                                                            if (data.fec_nacimiento != 'No registrado') {
-                                                                if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
-                                                                    // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
-                                                                    if (TELEFONO != undefined) {
-                                                                        //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
-                                                                        if (regex.test(data.telefono.toString())) {
-                                                                            if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                                                //console.log('ent: ', data.telefono);
-                                                                                data.observacion = 'El teléfono ingresado no es válido';
+                                        if (data.apellido != 'No registrado' && data.nombre != 'No registrado') {
+                                            if (data.contrasena != 'No registrado') {
+                                                if (!valiContra.test(data.contrasena.toString())) {
+                                                    if (data.contrasena.toString().length <= 10) {
+                                                        if (data.estado_civil != 'No registrado') {
+                                                            if (estadoCivilArray.includes(data.estado_civil)) {
+                                                                if (data.genero != 'No registrado') {
+                                                                    if (tipogenero.includes(data.genero.toLowerCase())) {
+                                                                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
+                                                                        if (data.fec_nacimiento != 'No registrado') {
+                                                                            if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                                                                                // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
+                                                                                if (TELEFONO != undefined) {
+                                                                                    //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
+                                                                                    if (regex.test(data.telefono.toString())) {
+                                                                                        if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                                                                                            //console.log('ent: ', data.telefono);
+                                                                                            data.observacion = 'El teléfono ingresado no es válido';
+                                                                                        }
+                                                                                        else {
+                                                                                            if (!regexLatitud.test(data.latitud) && !regexLongitud.test(data.longitud)) {
+                                                                                                data.observacion = '3';
+                                                                                            }
+                                                                                            else if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                                                                                data.observacion = 'Verificar ubicación';
+                                                                                            }
+                                                                                        }
+                                                                                        //console.log(data.telefono);
+                                                                                    }
+                                                                                    else {
+                                                                                        data.observacion = 'El teléfono ingresado no es válido';
+                                                                                    }
+                                                                                }
                                                                             }
                                                                             else {
-                                                                                if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                                                                    data.observacion = 'ok (Verificar ubicación)';
-                                                                                }
-                                                                                else {
-                                                                                    data.observacion = 'ok';
-                                                                                }
+                                                                                data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                                                                             }
-                                                                            //console.log(data.telefono);
-                                                                        }
-                                                                        else {
-                                                                            console.log(' entr ', data.telefono);
-                                                                            data.observacion = 'El teléfono ingresado no es válido';
                                                                         }
                                                                     }
-                                                                }
-                                                                else {
-                                                                    data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                                                                    else {
+                                                                        data.observacion = 'Género no es válido';
+                                                                    }
                                                                 }
                                                             }
-                                                        }
-                                                        else {
-                                                            data.observacion = 'Género no es válido';
+                                                            else {
+                                                                data.observacion = 'Estado civil no es válido';
+                                                            }
                                                         }
                                                     }
                                                     else {
-                                                        data.observacion = 'Estado civil no es válido';
+                                                        data.observacion = 'La contraseña debe tener máximo 10 caracteres';
                                                     }
                                                 }
                                                 else {
-                                                    data.observacion = 'La contraseña debe tener máximo 10 caracteres';
+                                                    data.observacion = 'La contraseña ingresada no es válida';
                                                 }
-                                            }
-                                            else {
-                                                data.observacion = 'La contraseña ingresada no es válida';
                                             }
                                         }
                                     }
@@ -1580,6 +1588,13 @@ class EmpleadoControlador {
                             }
                         }
                     }));
+                    var tiempo = 2000;
+                    if (listEmpleados.length > 500 && listEmpleados.length <= 1000) {
+                        tiempo = 4000;
+                    }
+                    else if (listEmpleados.length > 1000) {
+                        tiempo = 7000;
+                    }
                     setTimeout(() => {
                         listEmpleados.sort((a, b) => {
                             // COMPARA LOS NUMEROS DE LOS OBJETOS
@@ -1598,6 +1613,9 @@ class EmpleadoControlador {
                             }
                             else if (item.observacion == '2') {
                                 item.observacion = 'Registro duplicado (usuario)';
+                            }
+                            else if (item.observacion == '3') {
+                                item.observacion = 'no registrado';
                             }
                             if (item.observacion != undefined) {
                                 let arrayObservacion = item.observacion.split(" ");
@@ -1625,7 +1643,7 @@ class EmpleadoControlador {
                         }
                         //console.log('empleados: ', listEmpleados);
                         return res.jsonp({ message: mensaje, data: listEmpleados });
-                    }, 1500);
+                    }, tiempo);
                 }
             }
             catch (error) {
@@ -1932,11 +1950,17 @@ class EmpleadoControlador {
                                                                             data.observacion = 'El teléfono ingresado no es válido';
                                                                         }
                                                                         else {
-                                                                            if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                                                                data.observacion = 'ok (Verificar ubicación)';
+                                                                            if (!regexLatitud.test(data.latitud) && !regexLongitud.test(data.longitud)) {
+                                                                                data.observacion = '3';
+                                                                            }
+                                                                            else if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                                                                data.observacion = 'Verificar ubicación';
                                                                             }
                                                                             else {
-                                                                                data.observacion = 'ok';
+                                                                                if (duplicados.find((p) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
+                                                                                    data.observacion = 'ok';
+                                                                                    duplicados.push(dato);
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
@@ -2063,56 +2087,62 @@ class EmpleadoControlador {
                                         data.observacion = 'El código debe tener máximo 10 caracteres';
                                     }
                                     else {
-                                        if (CONTRASENA != undefined) {
-                                            //console.log('data: ', data.contrasena);
-                                            if (!valiContra.test(data.contrasena.toString())) {
-                                                //console.log(data.contrasena, ' entro ', data.contrasena.toString().length);
-                                                if (data.contrasena.toString().length > 10) {
-                                                    data.observacion = 'La contraseña debe tener máximo 10 caracteres';
-                                                }
-                                                else {
-                                                    if (estadoCivilArray.includes(data.estado_civil)) {
-                                                        if (tipogenero.includes(data.genero.toLowerCase())) {
-                                                            // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                                                            if (data.fec_nacimiento != 'No registrado') {
-                                                                if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
-                                                                    // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
-                                                                    if (TELEFONO != undefined) {
-                                                                        const regex = /^[0-9]+$/;
-                                                                        if (regex.test(data.telefono)) {
-                                                                            if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                                                                data.observacion = 'El teléfono ingresado no es válido';
-                                                                            }
-                                                                            else {
-                                                                                if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                                                                    data.observacion = 'ok (Verificar ubicación)';
-                                                                                }
-                                                                                else {
-                                                                                    data.observacion = 'ok';
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        else {
-                                                                            data.observacion = 'El teléfono ingresado no es válido';
-                                                                        }
-                                                                    }
-                                                                }
-                                                                else {
-                                                                    data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
-                                                                }
-                                                            }
-                                                        }
-                                                        else {
-                                                            data.observacion = 'Género no es válido';
-                                                        }
+                                        if (data.apellido != 'No registrado' && data.nombre != 'No registrado') {
+                                            if (CONTRASENA != undefined) {
+                                                //console.log('data: ', data.contrasena);
+                                                if (!valiContra.test(data.contrasena.toString())) {
+                                                    //console.log(data.contrasena, ' entro ', data.contrasena.toString().length);
+                                                    if (data.contrasena.toString().length > 10) {
+                                                        data.observacion = 'La contraseña debe tener máximo 10 caracteres';
                                                     }
                                                     else {
-                                                        data.observacion = 'Estado civil no es válido';
+                                                        if (data.estado_civil != 'No registrado') {
+                                                            if (estadoCivilArray.includes(data.estado_civil)) {
+                                                                if (data.genero != 'No registrado') {
+                                                                    if (tipogenero.includes(data.genero.toLowerCase())) {
+                                                                        // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
+                                                                        if (data.fec_nacimiento != 'No registrado') {
+                                                                            if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                                                                                // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
+                                                                                if (TELEFONO != undefined) {
+                                                                                    const regex = /^[0-9]+$/;
+                                                                                    if (regex.test(data.telefono)) {
+                                                                                        if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                                                                                            data.observacion = 'El teléfono ingresado no es válido';
+                                                                                        }
+                                                                                        else {
+                                                                                            if (!regexLatitud.test(data.latitud) && !regexLongitud.test(data.longitud)) {
+                                                                                                data.observacion = '4';
+                                                                                            }
+                                                                                            else if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                                                                                data.observacion = 'Verificar ubicación';
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                    else {
+                                                                                        data.observacion = 'El teléfono ingresado no es válido';
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            else {
+                                                                                data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    else {
+                                                                        data.observacion = 'Género no es válido';
+                                                                    }
+                                                                }
+                                                            }
+                                                            else {
+                                                                data.observacion = 'Estado civil no es válido';
+                                                            }
+                                                        }
                                                     }
                                                 }
-                                            }
-                                            else {
-                                                data.observacion = 'La contraseña ingresada no es válida';
+                                                else {
+                                                    data.observacion = 'La contraseña ingresada no es válida';
+                                                }
                                             }
                                         }
                                     }
@@ -2243,6 +2273,9 @@ class EmpleadoControlador {
                             }
                             else if (item.observacion == '3') {
                                 item.observacion = 'Registro duplicado (código)';
+                            }
+                            else if (item.observacion == '4') {
+                                item.observacion = 'no registrado';
                             }
                             if (item.observacion != undefined) {
                                 let arrayObservacion = item.observacion.split(" ");

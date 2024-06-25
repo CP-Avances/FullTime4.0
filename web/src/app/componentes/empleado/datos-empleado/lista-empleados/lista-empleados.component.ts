@@ -624,7 +624,8 @@ export class ListaEmpleadosComponent implements OnInit {
       (observacion == 'El teléfono ingresado no es válido') ||
       (observacion == 'La cédula ingresada no es válida') ||
       (observacion == 'Género no es válido') ||
-      (observacion == 'Estado civil no es válido')) {
+      (observacion == 'Estado civil no es válido') || 
+      (observacion == 'Verificar ubicación')) {
       return 'rgb(222, 162, 73)';
     }
     else if ((observacion == 'Rol no existe en el sistema') ||
