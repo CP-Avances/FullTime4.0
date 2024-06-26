@@ -564,9 +564,9 @@ class HorarioControlador {
             const response: QueryResult = await pool.query(
               `
               INSERT INTO eh_cat_horarios (nombre, minutos_comida, hora_trabajo,
-              nocturno, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+              nocturno, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
               `
-              , [DESCRIPCION, MINUTOS_ALIMENTACION, HORAS_TOTALES, HORARIO_NOCTURNO, true, CODIGO_HORARIO, TIPO_HORARIO]);
+              , [DESCRIPCION, MINUTOS_ALIMENTACION, HORAS_TOTALES, HORARIO_NOCTURNO, CODIGO_HORARIO, TIPO_HORARIO]);
 
             const [correcto] = response.rows;
 
