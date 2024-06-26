@@ -41,7 +41,7 @@ class PlanGeneralControlador {
                         plan_general[i].tipo_entr_salida, plan_general[i].codigo, plan_general[i].id_horario, plan_general[i].tipo_dia,
                         plan_general[i].salida_otro_dia, plan_general[i].min_antes, plan_general[i].min_despues, plan_general[i].estado_origen,
                         plan_general[i].min_alimentacion], (error, results) => __awaiter(this, void 0, void 0, function* () {
-                        var fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(plan_general[i].fec_hora_horario.split(' ')[1]);
+                        var fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(plan_general[i].fec_hora_horario.toLocaleString().split(' ')[1]);
                         var fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(plan_general[i].fec_hora_horario, 'ddd');
                         var fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(plan_general[i].fec_horario, 'ddd');
                         // AUDITORIA
@@ -75,6 +75,9 @@ class PlanGeneralControlador {
                             errores = errores + 1;
                         }
                     }));
+                    var fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(plan_general[i].fec_hora_horario.toLocaleString().split(' ')[1]);
+                    var fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(plan_general[i].fec_hora_horario, 'ddd');
+                    var fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(plan_general[i].fec_horario, 'ddd');
                 }
                 catch (error) {
                     // REVERTIR TRANSACCION

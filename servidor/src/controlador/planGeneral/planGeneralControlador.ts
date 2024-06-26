@@ -37,7 +37,7 @@ class PlanGeneralControlador {
                     plan_general[i].min_alimentacion]
                     , async (error, results) => {
 
-                        var fecha_hora_horario1 = await FormatearHora(plan_general[i].fec_hora_horario.split(' ')[1])
+                        var fecha_hora_horario1 = await FormatearHora(plan_general[i].fec_hora_horario.toLocaleString().split(' ')[1])
                         var fecha_hora_horario = await FormatearFecha2(plan_general[i].fec_hora_horario, 'ddd')
                         var fecha_horario = await FormatearFecha2(plan_general[i].fec_horario, 'ddd')
 
@@ -47,7 +47,7 @@ class PlanGeneralControlador {
                             usuario: user_name,
                             accion: 'I',
                             datosOriginales: '',
-                            datosNuevos: `{fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, 
+                            datosNuevos: `{fecha_hora_horario: ${fecha_hora_horario +' '+ fecha_hora_horario1 }, 
                             tolerancia: ${plan_general[i].tolerancia}, 
                             estado_timbre: ${plan_general[i].estado_timbre}, 
                             id_detalle_horario: ${plan_general[i].id_det_horario}, 
@@ -74,6 +74,12 @@ class PlanGeneralControlador {
                             errores = errores + 1;
                         }
                     });
+                
+                    var fecha_hora_horario1 = await FormatearHora(plan_general[i].fec_hora_horario.toLocaleString().split(' ')[1])
+                    var fecha_hora_horario = await FormatearFecha2(plan_general[i].fec_hora_horario, 'ddd')
+                    var fecha_horario = await FormatearFecha2(plan_general[i].fec_horario, 'ddd')
+
+        
 
             } catch (error) {
                 // REVERTIR TRANSACCION
