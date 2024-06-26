@@ -152,6 +152,7 @@ export const FormatearFecha2 = async function (fecha: string, dia: string) {
 
   return valor;
 }
+
 export const FormatearFechaBase = async function (fecha: any, dia: string) {
   let formato = await BuscarFecha();
   let diaFormateado = moment(transformDate(fecha)).format(dia);
@@ -166,7 +167,6 @@ export const FormatearFechaBase = async function (fecha: any, dia: string) {
 
 
 function transformDate(date: any): string {
-
   var f = date.toString();
   let fechaSinZona = f.split(' (')[0]; // Eliminar la zona horaria y el texto adicional
 

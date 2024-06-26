@@ -1,17 +1,14 @@
 import { ObtenerIndicePlantilla, ObtenerRutaHorarios, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import fs from 'fs';
 import path from 'path';
 import pool from '../../database';
 import excel from 'xlsx';
 import moment from 'moment';
-import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
-
 
 class HorarioControlador {
-
 
   // REGISTRAR HORARIO
   public async CrearHorario(req: Request, res: Response): Promise<Response> {
@@ -483,7 +480,7 @@ class HorarioControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos:`{codigo=${datosOriginales.codigo}, nombre=${datosOriginales.nombre}, minutos_comida=${datosOriginales.nombre}, hora_trabajo=${hora_trabajo}, nocturno=${datosOriginales.nocturno}, documento=${datosOriginales.documento}, default_=${datosOriginales.default_} } `,
+        datosNuevos: `{codigo=${datosOriginales.codigo}, nombre=${datosOriginales.nombre}, minutos_comida=${datosOriginales.nombre}, hora_trabajo=${hora_trabajo}, nocturno=${datosOriginales.nocturno}, documento=${datosOriginales.documento}, default_=${datosOriginales.default_} } `,
         ip,
         observacion: null
       });
@@ -597,6 +594,7 @@ class HorarioControlador {
             const idHorario = correcto.id;
             const codigoHorario = correcto.codigo;
             codigosHorariosCargados.push({ codigoHorario, idHorario });
+
           } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -706,7 +704,8 @@ class HorarioControlador {
         return res.status(500).jsonp({ message: 'error' })
       }
     } catch (error) {
-      return res.status(500).jsonp({ message: error });
+      console.log('error ', error)
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -891,7 +890,6 @@ class HorarioControlador {
 
       const horariosOk = plantillaHorarios.filter((horario: any) => horario.OBSERVACION === 'Ok');
 
-
       // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
       fs.access(ruta, fs.constants.F_OK, (err) => {
         if (err) {
@@ -900,9 +898,7 @@ class HorarioControlador {
           fs.unlinkSync(ruta);
         }
       });
-
       const mensaje = horariosOk.length > 0 ? 'correcto' : 'error';
-
       res.json({ plantillaHorarios, plantillaDetalles, mensaje });
     }
   }

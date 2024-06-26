@@ -1,31 +1,43 @@
+import HORARIO_CONTROLADOR from '../../controlador/catalogos/catHorarioControlador';
+import { ObtenerRutaHorarios, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { TokenValidation } from '../../libs/verificarToken';
 import { Router } from 'express';
 import multer from 'multer';
-import path from 'path';
-
-import HORARIO_CONTROLADOR from '../../controlador/catalogos/catHorarioControlador';
-import { ObtenerRutaHorarios, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import moment from 'moment';
 
+// MANEJO DE PLANTILLAS DE DATOS
 const storage = multer.diskStorage({
 
     destination: function (req, file, cb) {
         cb(null, ObtenerRutaLeerPlantillas())
     },
-    filename: function (req, file, cb) {
-        // FECHA DEL SISTEMA
-        //var fecha = moment();
-        //var anio = fecha.format('YYYY');
-        //var mes = fecha.format('MM');
-        //var dia = fecha.format('DD');
-        let documento = file.originalname;
 
+    filename: function (req, file, cb) {
+        let documento = file.originalname;
         cb(null, documento);
     }
 })
 
 const upload = multer({ storage: storage });
 
+// MANEJO DE ARCHIVOS DE HORARIOS
+const storage_horario = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, ObtenerRutaHorarios())
+    },
+
+    filename: function (req, file, cb) {
+        // FECHA DEL SISTEMA
+        var fecha = moment();
+        var anio = fecha.format('YYYY');
+        var mes = fecha.format('MM');
+        var dia = fecha.format('DD');
+        let { id, codigo } = req.params;
+        cb(null, id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname)
+    }
+})
+
+const upload_horario = multer({ storage: storage_horario });
 
 class HorarioRutas {
     public router: Router = Router();
@@ -40,7 +52,7 @@ class HorarioRutas {
         // BUSCAR HORARIO POR SU NOMBRE
         this.router.post('/buscar-horario/nombre', TokenValidation, HORARIO_CONTROLADOR.BuscarHorarioNombre);
         // CARGAR ARCHIVO DE RESPALDO  **//VERIFICADO
-        this.router.put('/:id/documento/:archivo/verificar/:codigo', [TokenValidation, upload.single('uploads')], HORARIO_CONTROLADOR.GuardarDocumentoHorario);
+        this.router.put('/:id/documento/:archivo/verificar/:codigo', [TokenValidation, upload_horario.single('uploads')], HORARIO_CONTROLADOR.GuardarDocumentoHorario);
         // ACTUALIZAR DATOS DE HORARIO
         this.router.put('/editar/:id', TokenValidation, HORARIO_CONTROLADOR.EditarHorario);
         // ELIMINAR DOCUMENTO DE HORARIO BASE DE DATOS - SERVIDOR

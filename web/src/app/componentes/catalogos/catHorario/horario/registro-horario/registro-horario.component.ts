@@ -22,7 +22,6 @@ import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.
 export class RegistroHorarioComponent implements OnInit {
 
   // VARIABLES DE OPCIONES DE REGISTRO DE HORARIO
-  nocturno = false;
   isChecked: boolean = false;
 
   // VALIDACIONES PARA EL FORMULARIO
@@ -32,7 +31,7 @@ export class RegistroHorarioComponent implements OnInit {
   documentoF = new FormControl('');
   codigoF = new FormControl('', [Validators.required]);
   nombre = new FormControl('', [Validators.required, Validators.minLength(2)]);
-  tipoF = new FormControl('');
+  tipoF = new FormControl(false);
   tipoH = new FormControl('N');
 
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO

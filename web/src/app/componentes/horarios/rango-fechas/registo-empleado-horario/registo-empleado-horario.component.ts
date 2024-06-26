@@ -199,8 +199,10 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     // METODO PARA BUSCAR FECHA DE CONTRATO REGISTRADO EN FICHA DE EMPLEADO
     this.restE.BuscarFechaContrato(datosBusqueda).subscribe(response => {
       // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS (CONTRATO)
-      if ((Date.parse(response[0].fecha_ingreso.split('T')[0]) <= Date.parse(form.fechaInicioForm)) &&
-        (Date.parse(response[0].fecha_salida.split('T')[0]) >= Date.parse(form.fechaFinalForm))) {
+      //console.log('fecha ingreso ', response[0].fecha_ingreso.split('T')[0], ' fecha salida ', response[0].fecha_salida.split('T')[0])
+      //console.log('fecha ingreso ', moment(form.fechaInicioForm).format('YYYY-MM-DD'), ' fecha salida ', moment(form.fechaFinalForm).format('YYYY-MM-DD'))
+      if ((Date.parse(response[0].fecha_ingreso.split('T')[0]) <= Date.parse(moment(form.fechaInicioForm).format('YYYY-MM-DD'))) &&
+        (Date.parse(response[0].fecha_salida.split('T')[0]) >= Date.parse(moment(form.fechaFinalForm).format('YYYY-MM-DD')))) {
         // VERIFICAR FECHAS INGRESADAS
         if (Date.parse(form.fechaInicioForm) <= Date.parse(form.fechaFinalForm)) {
           this.VerificarDuplicidad(form);

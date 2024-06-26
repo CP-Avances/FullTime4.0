@@ -54,27 +54,20 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   seleccion = new FormControl('');
 
   // FILTROS SUCURSALES
-  filtroNombreSuc_: string = '';
   get filtroNombreSuc() { return this.restR.filtroNombreSuc }
 
   // FILTROS DEPARTAMENTOS
-  filtroNombreDep_: string = '';
   get filtroNombreDep() { return this.restR.filtroNombreDep }
 
   // FILTROS EMPLEADO
-  filtroCodigo_: any;
-  filtroCedula_: string = '';
-  filtroNombreEmp_: string = '';
   get filtroNombreEmp() { return this.restR.filtroNombreEmp };
   get filtroCodigo() { return this.restR.filtroCodigo };
   get filtroCedula() { return this.restR.filtroCedula };
 
   // FILTRO CARGOS
-  filtroNombreCarg_: string = '';
   get filtroNombreCarg() { return this.restR.filtroNombreCarg };
 
   // FILTRO REGIMEN
-  filtroNombreReg_: string = '';
   get filtroNombreReg() { return this.restR.filtroNombreReg };
 
   public _booleanOptions: FormCriteriosBusqueda = {
@@ -323,7 +316,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
   OmitirDuplicados() {
     // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
-    let verificados_dep = this.departamentos.filter((objeto, indice, valor) => {
+    let verificados_dep = this.departamentos.filter((objeto: any, indice: any, valor: any) => {
       // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
       for (let i = 0; i < indice; i++) {
         if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
@@ -335,7 +328,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     this.departamentos = verificados_dep;
 
     // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
-    let verificados_car = this.cargos.filter((objeto, indice, valor) => {
+    let verificados_car = this.cargos.filter((objeto: any, indice: any, valor: any) => {
       // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
       for (let i = 0; i < indice; i++) {
         if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
@@ -776,9 +769,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   MostrarLista() {
     if (this.opcion === 'r') {
       this.nombre_reg.reset();
-      this.filtroNombreReg_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
@@ -787,9 +778,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     }
     else if (this.opcion === 'c') {
       this.nombre_carg.reset();
-      this.filtroNombreCarg_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = ''
       this.selectionEmp.clear();
       this.selectionDep.clear();
       this.Filtrar('', 1);
@@ -797,9 +786,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     }
     else if (this.opcion === 'd') {
       this.nombre_dep.reset();
-      this.filtroNombreDep_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionEmp.clear();
       this.selectionCarg.clear();
       this.Filtrar('', 2);
@@ -809,11 +796,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
-      this.filtroCodigo_ = '';
-      this.filtroCedula_ = '';
-      this.filtroNombreEmp_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.Filtrar('', 3);

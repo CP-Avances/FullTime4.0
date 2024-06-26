@@ -633,7 +633,8 @@ class HorarioControlador {
                 }
             }
             catch (error) {
-                return res.status(500).jsonp({ message: error });
+                console.log('error ', error);
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
