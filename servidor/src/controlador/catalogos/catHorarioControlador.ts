@@ -7,6 +7,8 @@ import path from 'path';
 import pool from '../../database';
 import excel from 'xlsx';
 import moment from 'moment';
+import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
+
 
 class HorarioControlador {
 
@@ -27,13 +29,15 @@ class HorarioControlador {
 
       const [horario] = response.rows;
 
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eh_cat_horarios',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: JSON.stringify(horario),
+        datosNuevos: `{codigo=${codigo}, nombre=${nombre}, minutos_comida=${min_almuerzo}, hora_trabajo=${hora_trabajo}, nocturno=${nocturno}, documento=${''}, default_=${default_} } `,
+
         ip,
         observacion: null
       })
@@ -210,7 +214,7 @@ class HorarioControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{nombre: ${nombre}, minutos_comida: ${min_almuerzo}, hora_trabajo: ${hora_trabajo}, nocturno: ${nocturno}, codigo: ${codigo}, default_: ${default_}}`,
+        datosNuevos: `{nombre: ${nombre}, minutos_comida: ${min_almuerzo}, hora_trabajo: ${hora_trabajo}, nocturno: ${nocturno}, codigo: ${codigo}, documento: ${datosOriginales.documento}, default_: ${default_}}`,
         ip,
         observacion: null
       });
@@ -479,7 +483,7 @@ class HorarioControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{hora_trabajo: ${hora_trabajo}}`,
+        datosNuevos:`{codigo=${datosOriginales.codigo}, nombre=${datosOriginales.nombre}, minutos_comida=${datosOriginales.nombre}, hora_trabajo=${hora_trabajo}, nocturno=${datosOriginales.nocturno}, documento=${datosOriginales.documento}, default_=${datosOriginales.default_} } `,
         ip,
         observacion: null
       });

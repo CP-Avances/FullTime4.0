@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
+import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
 
 class PlanGeneralControlador {
 
@@ -36,13 +37,37 @@ class PlanGeneralControlador {
                     plan_general[i].min_alimentacion]
                     , async (error, results) => {
 
+                        
+
+                        //const fechaHora = await FormatearHora(plan_general[i].fec_hora_horario.toLocaleString().split(' ')[1])
+               //         const fechaTimbre = await FormatearFecha(plan_general[i].fec_hora_horario.toLocaleString(), 'ddd')
+                
+                        var fecha_hora_horario1 =await FormatearHora(plan_general[i].fec_hora_horario.split(' ')[1])
+                        var fecha_hora_horario = await FormatearFecha2(plan_general[i].fec_hora_horario, 'ddd')
+                        var fecha_horario1 = await FormatearHora(plan_general[i].fec_horario.split(' ')[1])
+                        var fecha_horario = await FormatearFecha2(plan_general[i].fec_horario, 'ddd')
+                        // AUDITORIA
                         // AUDITORIA
                         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                             tabla: 'eu_asistencia_general',
                             usuario: user_name,
                             accion: 'I',
                             datosOriginales: '',
-                            datosNuevos: JSON.stringify(results.rows),
+                            datosNuevos: `{fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, 
+                            tolerancia: ${plan_general[i].tolerancia},  estado_timbre: ${plan_general[i].estado_timbre}, 
+                            id_detalle_horario: ${plan_general[i].id_det_horario}, 
+                            fecha_horario: ${fecha_horario}, 
+                            id_empleado_cargo: ${plan_general[i].id_empl_cargo}, 
+                            tipo_accion: ${plan_general[i].tipo_entr_salida}, 
+                            codigo: ${plan_general[i].codigo}, 
+                            id_horario: ${plan_general[i].id_horario}, 
+                            tipo_dia: ${plan_general[i].tipo_dia}, 
+                            salida_otro_dia: ${plan_general[i].salida_otro_dia}, 
+                            minutos_antes: ${plan_general[i].min_antes}, 
+                            minutos_despues: ${plan_general[i].min_despues}, 
+                            estado_origen: ${plan_general[i].estado_origen}, 
+                            minutos_alimentacion: ${plan_general[i].min_alimentacion}
+                            }`,
                             ip,
                             observacion: null
                         });

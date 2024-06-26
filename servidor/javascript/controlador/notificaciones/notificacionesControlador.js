@@ -394,7 +394,7 @@ class NotificacionTiempoRealControlador {
                     html: `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -415,7 +415,7 @@ class NotificacionTiempoRealControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
         `,
                     attachments: [
@@ -476,7 +476,7 @@ class NotificacionTiempoRealControlador {
                     html: `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -497,7 +497,7 @@ class NotificacionTiempoRealControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
           `,
                     attachments: [
@@ -544,14 +544,17 @@ class NotificacionTiempoRealControlador {
         INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
         VALUES($1, $2, $3, $4, $5) RETURNING *
         `, [create_at, id_empl_envia, id_empl_recive, mensaje, tipo]);
+                console.log("par visualizar la fecha", create_at);
                 const [notificiacion] = response.rows;
+                const fechaHoraN = yield (0, settingsMail_1.FormatearHora)(create_at.split(' ')[1]);
+                const fechaN = yield (0, settingsMail_1.FormatearFecha2)(create_at, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ecm_realtime_timbres',
                     usuario: user_name,
-                    accion: 'C',
+                    accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(notificiacion),
+                    datosNuevos: `id_empleado_envia: ${id_empl_envia}, id_empleado_recibe: ${id_empl_recive}, fecha_hora: ${fechaN + ' ' + fechaHoraN}, descripcion: ${mensaje}, id_timbre: null, visto: null, tipo: ${tipo}`,
                     ip,
                     observacion: null
                 });
@@ -569,6 +572,7 @@ class NotificacionTiempoRealControlador {
             }
             catch (error) {
                 // REVERTIR TRANSACCION
+                console.log(error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500)
                     .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
@@ -614,7 +618,7 @@ class NotificacionTiempoRealControlador {
                     html: `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -640,7 +644,7 @@ class NotificacionTiempoRealControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
           `,
                     attachments: [

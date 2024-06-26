@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.horaExtraControlador = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
+const settingsMail_1 = require("../../libs/settingsMail");
 class HorasExtrasControlador {
     ListarHorasExtras(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -55,13 +56,16 @@ class HorasExtrasControlador {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
         `, [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion]);
                 const [HORA] = response.rows;
+                const horaInicio = yield (0, settingsMail_1.FormatearHora)(hora_inicio);
+                const horaFinal = yield (0, settingsMail_1.FormatearHora)(hora_final);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mhe_configurar_hora_extra',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(HORA),
+                    datosNuevos: `{descripcion: ${descripcion}, tipo_descuento: ${tipo_descuento}, recargo_porcentaje: ${reca_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, 
+          hora_jornada: ${hora_jornada}, tipo_dia: ${tipo_dia}, codigo: ${codigo}, minutos_comida: ${incl_almuerzo}, tipo_funcion: ${tipo_funcion}}`,
                     ip: ip,
                     observacion: null
                 });
@@ -107,12 +111,14 @@ class HorasExtrasControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
                 yield database_1.default.query('DELETE FROM mhe_configurar_hora_extra WHERE id = $1', [id]);
+                const horaInicio = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_inicio);
+                const horaFinal = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_final);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mhe_configurar_hora_extra',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosOriginales: `{ codigo: ${datosOriginales.codigo}, descripcion: ${datosOriginales.descripcion}, tipo_descuento: ${datosOriginales.tipo_descuento}, recargo_porcentaje: ${datosOriginales.recargo_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, hora_jornada: ${datosOriginales.hora_jornada}, minutos_comida: ${datosOriginales.minutos_comida}, tipo_dia: ${datosOriginales.tipo_dia}, tipo_funcion: ${datosOriginales.tipo_funcion}}`,
                     datosNuevos: '',
                     ip: ip,
                     observacion: null
@@ -157,13 +163,17 @@ class HorasExtrasControlador {
           hora_final = $5, hora_jornada = $6, tipo_dia = $7, codigo = $8, minutos_comida = $9, tipo_funcion = $10 
         WHERE id = $11
         `, [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion, id]);
+                const horaInicio = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_inicio);
+                const horaFinal = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_final);
+                const horaInicioN = yield (0, settingsMail_1.FormatearHora)(hora_inicio);
+                const horaFinalN = yield (0, settingsMail_1.FormatearHora)(hora_final);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mhe_configurar_hora_extra',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"descripcion": "${descripcion}", "tipo_descuento": "${tipo_descuento}", "reca_porcentaje": "${reca_porcentaje}", "hora_inicio": "${hora_inicio}", "hora_final": "${hora_final}", "hora_jornada": "${hora_jornada}", "tipo_dia": "${tipo_dia}", "codigo": "${codigo}", "incl_almuerzo": "${incl_almuerzo}", "tipo_funcion": "${tipo_funcion}"}`,
+                    datosOriginales: `{ codigo: ${datosOriginales.codigo}, descripcion: ${datosOriginales.descripcion}, tipo_descuento: ${datosOriginales.tipo_descuento}, recargo_porcentaje: ${datosOriginales.recargo_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, hora_jornada: ${datosOriginales.hora_jornada}, minutos_comida: ${datosOriginales.minutos_comida}, tipo_dia: ${datosOriginales.tipo_dia}, tipo_funcion: ${datosOriginales.tipo_funcion}}`,
+                    datosNuevos: `{codigo: ${codigo}, descripcion: ${descripcion}, tipo_descuento: ${tipo_descuento}, recargo_porcentaje: ${reca_porcentaje}, hora_inicio: ${horaInicio}, hora_final: ${horaFinal}, hora_jornada: ${hora_jornada}, minutos_comida: ${incl_almuerzo}, tipo_dia: ${tipo_dia}, tipo_funcion: ${tipo_funcion}}`,
                     ip: ip,
                     observacion: null
                 });

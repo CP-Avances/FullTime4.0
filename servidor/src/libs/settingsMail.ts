@@ -137,6 +137,66 @@ export const FormatearFecha = async function (fecha: string, dia: string) {
   return valor;
 }
 
+export const FormatearFecha2 = async function (fecha: string, dia: string) {
+  let formato = await BuscarFecha();
+
+  let diaFormateado = moment(fecha).format(dia);
+  // Limpia el día formateado de puntos no deseados
+  diaFormateado = diaFormateado.replace('.', '');
+  // Asegúrate de que la primera letra esté en mayúscula
+  diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+
+  let fechaFormateada = moment(fecha).format(formato.fecha);
+
+  let valor = `${diaFormateado}, ${fechaFormateada}`;
+
+  return valor;
+}
+export const FormatearFechaBase = async function (fecha: any, dia: string) {
+  let formato = await BuscarFecha();
+  let diaFormateado = moment(transformDate(fecha)).format(dia);
+  // Limpia el día formateado de puntos no deseados
+  diaFormateado = diaFormateado.replace('.', '');
+  // Asegúrate de que la primera letra esté en mayúscula
+  diaFormateado = diaFormateado.charAt(0).toUpperCase() + diaFormateado.slice(1);
+  let fechaFormateada = moment(fecha).format(formato.fecha);
+  let valor = `${diaFormateado}, ${fechaFormateada}`;
+  return valor;
+}
+
+
+function transformDate(date: any): string {
+
+  var f = date.toString();
+  let fechaSinZona = f.split(' (')[0]; // Eliminar la zona horaria y el texto adicional
+
+  let partesFecha = fechaSinZona.split(' ');
+  let diaSemana = partesFecha[0]; // "Sat"
+  let mes = partesFecha[1]; // "Dec"
+  let dia = partesFecha[2]; // "23"
+  let anio = partesFecha[3]; // "2024"
+  let hora = partesFecha[4]; // "00:00:00"
+  let zonaHoraria = partesFecha[5]; // "GMT-0500"
+
+  // Construir la cadena de fecha en formato ISO 8601
+  // Primero, convertir el mes de texto a número de mes
+  let meses = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  let numeroMes = meses.indexOf(mes); // Crear objeto Date en la zona local
+  let fechaLocal = new Date(`${anio}-${('0' + (numeroMes + 1)).slice(-2)}-${dia}T${hora}`);
+
+  // Ajustar la zona horaria
+  let offset = parseInt(zonaHoraria.replace('GMT', ''));
+  let fechaUTC = new Date(fechaLocal.getTime() + (offset * 60 * 60 * 1000));
+
+  // Convertir la fecha a ISO 8601 UTC
+  let fechaISO1 = fechaUTC.toISOString();
+
+  return fechaISO1;
+}
+
+
+
+
 export const FormatearHora = async function (hora: string) {
   let formato = await BuscarHora();
   let valor = moment(hora, 'HH:mm:ss').format(formato.hora);

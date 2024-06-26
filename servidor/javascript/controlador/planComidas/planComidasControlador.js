@@ -144,6 +144,12 @@ class PlanComidasControlador {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
         `, [fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, fec_inicio, fec_final]);
                 const [planAlimentacion] = response.rows;
+                console.log("fecha: ", fec_inicio);
+                const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_inicio.split('T')[1]);
+                console.log("fecha: ", fechaHora);
+                const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio.toLocaleString(), 'ddd');
+                console.log("fecha: ", fechaTimbre);
+                console.log(fec_inicio);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ma_detalle_plan_comida',
@@ -298,13 +304,17 @@ class PlanComidasControlador {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
         `, [id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, verificar]);
                 const [objetoAlimento] = response.rows;
+                var fechaN = yield (0, settingsMail_1.FormatearFecha2)(fecha, 'ddd');
+                var fechaComidaN = yield (0, settingsMail_1.FormatearFecha2)(fec_comida, 'ddd');
+                var horaInicioN = yield (0, settingsMail_1.FormatearHora)(hora_inicio);
+                var horaFinN = yield (0, settingsMail_1.FormatearHora)(hora_fin);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ma_solicitud_comida',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(objetoAlimento),
+                    datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}, observacion: ${observacion}, extra: ${extra}, verificar: ${verificar}} `,
                     ip,
                     observacion: null
                 });
@@ -352,13 +362,21 @@ class PlanComidasControlador {
         WHERE id = $9 RETURNING *
         `, [id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id]);
                 const [objetoAlimento] = response.rows;
+                var fechaN = yield (0, settingsMail_1.FormatearFecha2)(fecha, 'ddd');
+                var fechaComidaN = yield (0, settingsMail_1.FormatearFecha2)(fec_comida, 'ddd');
+                var horaInicioN = yield (0, settingsMail_1.FormatearHora)(hora_inicio);
+                var horaFinN = yield (0, settingsMail_1.FormatearHora)(hora_fin);
+                var fechaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
+                var fechaComidaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_comida, 'ddd');
+                var horaInicioO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_inicio);
+                var horaFinO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_fin);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ma_solicitud_comida',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: JSON.stringify(objetoAlimento),
+                    datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_detalle_comida: ${datosOriginales.id_detalle_comida}, fecha: ${fechaO}, fecha_comida: ${fechaComidaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${datosOriginales.observacion}, extra: ${datosOriginales.extra}, verificar: ${datosOriginales.verificar}} `,
+                    datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}, observacion: ${observacion}, extra: ${extra}}} `,
                     ip,
                     observacion: null
                 });
@@ -405,12 +423,16 @@ class PlanComidasControlador {
         DELETE FROM ma_solicitud_comida WHERE id = $1 RETURNING *
         `, [id]);
                 const [alimentacion] = response.rows;
+                var fechaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
+                var fechaComidaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_comida, 'ddd');
+                var horaInicioO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_inicio);
+                var horaFinO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_fin);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ma_solicitud_comida',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_detalle_comida: ${datosOriginales.id_detalle_comida}, fecha: ${fechaO}, fecha_comida: ${fechaComidaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${datosOriginales.observacion}, extra: ${datosOriginales.extra}, verificar: ${datosOriginales.verificar}} `,
                     datosNuevos: '',
                     ip,
                     observacion: null
@@ -493,18 +515,21 @@ class PlanComidasControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-        INSERT INTO ma_empleado_plan_comida_general (codigo, id_empleado, id_sol_comida, fecha,
+        INSERT INTO ma_empleado_plan_comida_general (codigo, id_empleado, id_solicitud_comida, fecha,
           hora_inicio, hora_fin, consumido) 
         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
         `, [codigo, id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido]);
                 const [objetoAlimento] = response.rows;
+                var fechaN = yield (0, settingsMail_1.FormatearFecha2)(fecha, 'ddd');
+                var horaInicio = yield (0, settingsMail_1.FormatearHora)(hora_inicio);
+                var horaFin = yield (0, settingsMail_1.FormatearHora)(hora_fin);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ma_empleado_plan_comida_general',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(objetoAlimento),
+                    datosNuevos: `{codigo: ${codigo}, id_empleado: ${id_empleado}, id_detalle_plan: null, id_solicitud_comida: ${id_sol_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
                     ip,
                     observacion: null
                 });
@@ -559,12 +584,15 @@ class PlanComidasControlador {
         RETURNING *
         `, [id, fecha, id_empleado]);
                 const [objetoAlimento] = response.rows;
+                var fechaN = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
+                var horaInicio = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_inicio);
+                var horaFin = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_fin);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ma_empleado_plan_comida_general',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado: ${datosOriginales.id_empleado}, id_detalle_plan: ${datosOriginales.id_detalle_plan}, id_solicitud_comida: ${datosOriginales.id_solicitud_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: ${datosOriginales.ticket}, consumido: ${datosOriginales.consumido}}`,
                     datosNuevos: '',
                     ip,
                     observacion: null
@@ -665,12 +693,15 @@ class PlanComidasControlador {
                 yield database_1.default.query(`
         DELETE FROM ma_empleado_plan_comida_general WHERE id_detalle_plan = $1 AND id_empleado = $2
         `, [id, id_empleado]);
+                var fechaN = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
+                var horaInicio = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_inicio);
+                var horaFin = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_fin);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ma_empleado_plan_comida_general',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado: ${datosOriginales.id_empleado}, id_detalle_plan: ${datosOriginales.id_detalle_plan}, id_solicitud_comida: ${datosOriginales.id_solicitud_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: ${datosOriginales.ticket}, consumido: ${datosOriginales.consumido}}`,
                     datosNuevos: '',
                     ip,
                     observacion: null
@@ -720,13 +751,16 @@ class PlanComidasControlador {
         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
         `, [codigo, id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido]);
                 const [planAlimentacion] = response.rows;
+                var fechaN = yield (0, settingsMail_1.FormatearFecha2)(fecha, 'ddd');
+                var horaInicio = yield (0, settingsMail_1.FormatearHora)(hora_inicio);
+                var horaFin = yield (0, settingsMail_1.FormatearHora)(hora_fin);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ma_empleado_plan_comida_general',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(planAlimentacion),
+                    datosNuevos: `{codigo: ${codigo}, id_empleado: ${id_empleado}, id_detalle_plan: ${id_plan_comida}, id_solicitud_comida: null, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
                     ip,
                     observacion: null
                 });
@@ -787,13 +821,15 @@ class PlanComidasControlador {
         RETURNING *
         `, [create_at, id_empl_envia, id_empl_recive, notifica, tipo]);
                 const [notificiacion] = response.rows;
+                const fechaHoraN = yield (0, settingsMail_1.FormatearHora)(create_at.toLocaleString().split(' ')[1]);
+                const fechaN = yield (0, settingsMail_1.FormatearFecha2)(create_at.toLocaleString(), 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ecm_realtime_timbres',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(notificiacion),
+                    datosNuevos: `id_empleado_envia: ${id_empl_envia}, id_empleado_recibe: ${id_empl_recive}, fecha_hora: ${fechaN + ' ' + fechaHoraN}, descripcion: ${notifica}, id_timbre: null, visto: null, tipo: ${tipo}`,
                     ip,
                     observacion: null
                 });
@@ -856,7 +892,7 @@ class PlanComidasControlador {
                     html: `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -892,7 +928,7 @@ class PlanComidasControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
           `,
                     attachments: [
@@ -963,7 +999,7 @@ class PlanComidasControlador {
                     html: `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -998,7 +1034,7 @@ class PlanComidasControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
           `,
                     attachments: [
@@ -1072,7 +1108,7 @@ class PlanComidasControlador {
                     html: `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -1118,7 +1154,7 @@ class PlanComidasControlador {
                 <b>Gracias por la atención</b><br>
                 <b>Saludos cordiales,</b> <br><br>
               </p>
-              <img src="cid:pief" width="50%" height="50%"/>
+              <img src="cid:pief" width="100%" height="100%"/>
           </body>
           `,
                     attachments: [

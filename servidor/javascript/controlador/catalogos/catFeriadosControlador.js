@@ -19,6 +19,7 @@ const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const settingsMail_1 = require("../../libs/settingsMail");
 class FeriadosControlador {
     // CONSULTA DE LISTA DE FERIADOS ORDENADOS POR SU DESCRIPCION
     ListarFeriados(req, res) {
@@ -47,12 +48,18 @@ class FeriadosControlador {
                 SELECT * FROM ef_cat_feriados WHERE id = $1
                 `, [id]);
                 const [feriado] = datosOriginales.rows;
+                var fecha_formatoO = yield (0, settingsMail_1.FormatearFechaBase)(feriado.fecha, 'ddd');
+                console.log("ver fecha formateada", fecha_formatoO);
+                var fec_recuperacion_formatoO = '';
+                if (feriado.fec_recuperacion) {
+                    var fec_recuperacion_formatoO = yield (0, settingsMail_1.FormatearFechaBase)(feriado.fecha_recuperacion, 'ddd');
+                }
                 if (!feriado) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'ef_cat_feriados',
                         usuario: user_name,
                         accion: 'D',
-                        datosOriginales: '',
+                        datosOriginales: JSON.stringify(feriado),
                         datosNuevos: '',
                         ip,
                         observacion: `Error al eliminar feriado con id ${id}. Registro no encontrado.`
@@ -69,7 +76,8 @@ class FeriadosControlador {
                     tabla: 'ef_cat_feriados',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: JSON.stringify(feriado),
+                    datosOriginales: `{fecha: ${fecha_formatoO}, 
+                            descripcion: ${feriado.descripcion}, fecha_recuperacion: ${fec_recuperacion_formatoO}} `,
                     datosNuevos: '',
                     ip,
                     observacion: null
@@ -80,6 +88,7 @@ class FeriadosControlador {
             }
             catch (error) {
                 // REVERTIR TRANSACCION
+                console.log("error: ", error);
                 yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });
             }
@@ -92,6 +101,7 @@ class FeriadosControlador {
                 const { fecha, descripcion, fec_recuperacion, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
+                // Buscar si ya existe un feriado con la misma descripción
                 const busqueda = yield database_1.default.query(`
                 SELECT * FROM ef_cat_feriados WHERE UPPER(descripcion) = $1 OR fecha = $2 OR fecha_recuperacion = $3
                 `, [descripcion.toUpperCase(), fecha, fec_recuperacion]);
@@ -100,18 +110,25 @@ class FeriadosControlador {
                     return res.jsonp({ message: 'existe', status: '300' });
                 }
                 else {
+                    // Obtener los datos originales (en este caso, no hay datos originales porque es una inserción nueva)
                     const response = yield database_1.default.query(`
                     INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
                     VALUES ($1, $2, $3) RETURNING *
                     `, [fecha, descripcion, fec_recuperacion]);
                     const [feriado] = response.rows;
+                    var fecha_formato = yield (0, settingsMail_1.FormatearFecha2)(fecha.toLocaleString(), 'ddd');
+                    var fec_recuperacion_formato = '';
+                    if (fec_recuperacion) {
+                        var fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha2)(fec_recuperacion, 'ddd');
+                    }
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'ef_cat_feriados',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: JSON.stringify(feriado),
+                        datosNuevos: `{fecha: ${fecha_formato}, 
+                            descripcion: ${descripcion}, fecha_recuperacion: ${fec_recuperacion_formato} `,
                         ip,
                         observacion: null
                     });
@@ -187,14 +204,26 @@ class FeriadosControlador {
                 UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
                 WHERE id = $4
                 `, [fecha, descripcion, fec_recuperacion, id]);
+                    var fecha_formato = yield (0, settingsMail_1.FormatearFecha2)(fecha.toLocaleString(), 'ddd');
+                    var fec_recuperacion_formato = '';
+                    if (fec_recuperacion) {
+                        var fec_recuperacion_formato = yield (0, settingsMail_1.FormatearFecha2)(fec_recuperacion, 'ddd');
+                    }
+                    var fecha_formatoO = yield (0, settingsMail_1.FormatearFecha2)(feriado.fecha, 'ddd');
+                    console.log("ver fecha formateada", fecha_formatoO);
+                    var fec_recuperacion_formatoO = '';
+                    if (feriado.fecha_recuperacion) {
+                        var fec_recuperacion_formatoO = yield (0, settingsMail_1.FormatearFechaBase)(feriado.fecha_recuperacion, 'ddd');
+                    }
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'ef_cat_feriados',
                         usuario: user_name,
                         accion: 'U',
-                        datosOriginales: JSON.stringify(feriado),
-                        datosNuevos: JSON.stringify({ fecha, descripcion, fec_recuperacion }),
-                        ip,
+                        datosOriginales: `{fecha: ${fecha_formatoO}, 
+                            descripcion: ${feriado.descripcion}, fecha_recuperacion: ${fec_recuperacion_formatoO}} `,
+                        datosNuevos: `{fecha: ${fecha_formato}, 
+                            descripcion: ${descripcion}, fecha_recuperacion: ${fec_recuperacion_formato}} `, ip,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
@@ -205,6 +234,7 @@ class FeriadosControlador {
             catch (error) {
                 console.log('error ', error);
                 // REVERTIR TRANSACCION
+                console.log(error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }

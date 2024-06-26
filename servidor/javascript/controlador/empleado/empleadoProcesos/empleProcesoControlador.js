@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPLEADO_PROCESO_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../../database"));
+const settingsMail_1 = require("../../../libs/settingsMail");
 class EmpleadoProcesoControlador {
     CrearEmpleProcesos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -26,13 +27,16 @@ class EmpleadoProcesoControlador {
         INSERT INTO map_empleado_procesos (id_proceso, id_empleado, id_empleado_cargo, fecha_inicio, fecha_final) 
         VALUES ($1, $2, $3, $4, $5)
         `, [id, id_empleado, id_empl_cargo, fec_inicio, fec_final]);
+                var fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
+                var fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
+                ;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_empleado_procesos',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{id: ${id}, id_empleado: ${id_empleado}, id_empleado_cargo: ${id_empl_cargo}, fecha_inicio: ${fec_inicio}, fecha_final: ${fec_final}}`,
+                    datosNuevos: `{id: ${id}, id_empleado: ${id_empleado}, id_empleado_cargo: ${id_empl_cargo}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}}`,
                     ip,
                     observacion: null
                 });
@@ -74,13 +78,17 @@ class EmpleadoProcesoControlador {
         UPDATE map_empleado_procesos SET id = $1, id_empleado_cargo = $2, fecha_inicio = $3, fecha_final = $4 
         WHERE id = $5
         `, [id, id_empl_cargo, fec_inicio, fec_final, id_p]);
+                var fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
+                var fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
+                var fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
+                var fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_empleado_procesos',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{id: ${id}, id_empleado_cargo: ${id_empl_cargo}, fecha_inicio: ${fec_inicio}, fecha_final: ${fec_final}}`,
+                    datosOriginales: `{id: ${datosOriginales.id}, id_empleado_cargo: ${datosOriginales.id_empl_cargo}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}}`,
+                    datosNuevos: `{id: ${id}, id_empleado_cargo: ${id_empl_cargo}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}}`,
                     ip,
                     observacion: null
                 });
@@ -136,12 +144,14 @@ class EmpleadoProcesoControlador {
                 yield database_1.default.query(`
         DELETE FROM map_empleado_procesos WHERE id = $1
         `, [id]);
+                var fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
+                var fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_empleado_procesos',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosOriginales: `{id: ${datosOriginales.id}, id_empleado_cargo: ${datosOriginales.id_empl_cargo}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}}`,
                     datosNuevos: '',
                     ip,
                     observacion: null

@@ -6,6 +6,7 @@ import moment from 'moment';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
+import { FormatearFecha2 } from '../../../libs/settingsMail';
 
 import excel from 'xlsx';
 
@@ -57,17 +58,21 @@ class EmpleadoCargosControlador {
       delete datosNuevos.user_name;
       delete datosNuevos.ip;
 
+      var fechaIngresoN = await FormatearFecha2(fec_inicio, 'ddd');
+      var fechaSalidaN = await FormatearFecha2(fec_final, 'ddd');
+
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eu_empleado_cargos',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: JSON.stringify(datosNuevos),
+        datosNuevos: `{id_contrato: ${id_empl_contrato}, id_departamento: ${id_departamento}, id_sucursal: ${id_sucursal}, id_tipo_cargo: ${cargo}, fecha_inicio: ${fechaIngresoN}, fecha_final: ${fechaSalidaN}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}}`,
         ip,
         observacion: null
       });
-
+      
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
 
@@ -122,13 +127,18 @@ class EmpleadoCargosControlador {
         , [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo,
           id_empl_contrato, id, jefe]);
 
+          
+      var fechaIngresoO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+      var fechaSalidaO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
+      var fechaIngresoN = await FormatearFecha2(fec_inicio, 'ddd');
+      var fechaSalidaN = await FormatearFecha2(fec_final, 'ddd');
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eu_empleado_cargos',
         usuario: user_name,
         accion: 'U',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{id_departamento: ${id_departamento}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, id_sucursal: ${id_sucursal}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, cargo: ${cargo}, jefe: ${jefe}}`,
+        datosOriginales: `{id_contrato: ${datosOriginales.id_contrato}, id_departamento: ${datosOriginales.id_departamento}, id_sucursal: ${datosOriginales.id_sucursal}, id_tipo_cargo: ${datosOriginales.id_tipo_cargo}, fecha_inicio: ${fechaIngresoO}, fecha_final: ${fechaSalidaO}, sueldo: ${datosOriginales.sueldo}, hora_trabaja: ${datosOriginales.hora_trabaja}, jefe: ${datosOriginales.jefe}}`,
+        datosNuevos: `{id_contrato: ${id_empl_contrato}, id_departamento: ${id_departamento}, id_sucursal: ${id_sucursal}, id_tipo_cargo: ${cargo}, fecha_inicio: ${fechaIngresoN}, fecha_final: ${fechaSalidaN}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, jefe: ${jefe}}`,
         ip,
         observacion: null
       });
