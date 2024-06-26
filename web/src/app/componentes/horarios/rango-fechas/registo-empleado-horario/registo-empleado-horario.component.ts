@@ -764,6 +764,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         }
         // ALMACENAMIENTO DE PLANIFICACION GENERAL
         this.plan_general = this.plan_general.concat(plan);
+        console.log('plan general ', this.plan_general)
       })
     }
   }

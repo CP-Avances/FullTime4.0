@@ -17,76 +17,75 @@ const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaCo
 const database_1 = __importDefault(require("../../database"));
 const settingsMail_1 = require("../../libs/settingsMail");
 class PlanGeneralControlador {
-    // METODO PARA REGISTRAR PLAN GENERAL   --**VERIFICADO
+    // METODO PARA REGISTRAR PLAN GENERAL --**VERIFICADO
     CrearPlanificacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            var errores = 0;
+            let errores = 0;
             let ocurrioError = false;
             let mensajeError = '';
             let codigoError = 0;
-            // CONTADORES INICIAN EN CERO (0)
-            errores = 0;
             const { user_name, ip, plan_general } = req.body;
-            for (var i = 0; i < plan_general.length; i++) {
+            console.log('plan general ', plan_general);
+            for (let i = 0; i < plan_general.length; i++) {
+                console.log('i ', i, ' plan_general ', plan_general.length);
                 try {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
-                    database_1.default.query(`
-                    INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
-                        fecha_horario, id_empleado_cargo, tipo_accion, codigo, id_horario, tipo_dia, salida_otro_dia,
-                        minutos_antes, minutos_despues, estado_origen, minutos_alimentacion) 
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                    `, [plan_general[i].fec_hora_horario, plan_general[i].tolerancia, plan_general[i].estado_timbre,
+                    const result = yield database_1.default.query(`
+                INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
+                    fecha_horario, id_empleado_cargo, tipo_accion, codigo, id_horario, tipo_dia, salida_otro_dia,
+                    minutos_antes, minutos_despues, estado_origen, minutos_alimentacion) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                `, [
+                        plan_general[i].fec_hora_horario, plan_general[i].tolerancia, plan_general[i].estado_timbre,
                         plan_general[i].id_det_horario, plan_general[i].fec_horario, plan_general[i].id_empl_cargo,
                         plan_general[i].tipo_entr_salida, plan_general[i].codigo, plan_general[i].id_horario, plan_general[i].tipo_dia,
                         plan_general[i].salida_otro_dia, plan_general[i].min_antes, plan_general[i].min_despues, plan_general[i].estado_origen,
-                        plan_general[i].min_alimentacion], (error, results) => __awaiter(this, void 0, void 0, function* () {
-                        var fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(plan_general[i].fec_hora_horario.split(' ')[1]);
-                        var fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(plan_general[i].fec_hora_horario, 'ddd');
-                        var fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(plan_general[i].fec_horario, 'ddd');
-                        // AUDITORIA
-                        yield auditoriaControlador_1.default.InsertarAuditoria({
-                            tabla: 'eu_asistencia_general',
-                            usuario: user_name,
-                            accion: 'I',
-                            datosOriginales: '',
-                            datosNuevos: `{fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, 
-                            tolerancia: ${plan_general[i].tolerancia}, 
-                            estado_timbre: ${plan_general[i].estado_timbre}, 
-                            id_detalle_horario: ${plan_general[i].id_det_horario}, 
-                            fecha_horario: ${fecha_horario}, 
-                            id_empleado_cargo: ${plan_general[i].id_empl_cargo}, 
-                            tipo_accion: ${plan_general[i].tipo_entr_salida}, 
-                            codigo: ${plan_general[i].codigo}, 
-                            id_horario: ${plan_general[i].id_horario}, 
-                            tipo_dia: ${plan_general[i].tipo_dia}, 
-                            salida_otro_dia: ${plan_general[i].salida_otro_dia}, 
-                            minutos_antes: ${plan_general[i].min_antes}, 
-                            minutos_despues: ${plan_general[i].min_despues}, 
-                            estado_origen: ${plan_general[i].estado_origen}, 
-                            minutos_alimentacion: ${plan_general[i].min_alimentacion}
-                            }`,
-                            ip,
-                            observacion: null
-                        });
-                        // FINALIZAR TRANSACCION
-                        yield database_1.default.query('COMMIT');
-                        if (error) {
-                            errores = errores + 1;
-                        }
-                    }));
+                        plan_general[i].min_alimentacion
+                    ]);
+                    const fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(plan_general[i].fec_hora_horario.split(' ')[1]);
+                    const fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(plan_general[i].fec_hora_horario, 'ddd');
+                    const fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(plan_general[i].fec_horario, 'ddd');
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_asistencia_general',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, 
+                tolerancia: ${plan_general[i].tolerancia}, 
+                estado_timbre: ${plan_general[i].estado_timbre}, 
+                id_detalle_horario: ${plan_general[i].id_det_horario}, 
+                fecha_horario: ${fecha_horario}, 
+                id_empleado_cargo: ${plan_general[i].id_empl_cargo}, 
+                tipo_accion: ${plan_general[i].tipo_entr_salida}, 
+                codigo: ${plan_general[i].codigo}, 
+                id_horario: ${plan_general[i].id_horario}, 
+                tipo_dia: ${plan_general[i].tipo_dia}, 
+                salida_otro_dia: ${plan_general[i].salida_otro_dia}, 
+                minutos_antes: ${plan_general[i].min_antes}, 
+                minutos_despues: ${plan_general[i].min_despues}, 
+                estado_origen: ${plan_general[i].estado_origen}, 
+                minutos_alimentacion: ${plan_general[i].min_alimentacion}
+                }`,
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                 }
                 catch (error) {
                     // REVERTIR TRANSACCION
                     yield database_1.default.query('ROLLBACK');
                     ocurrioError = true;
-                    mensajeError = error;
+                    mensajeError = error.message;
                     codigoError = 500;
+                    errores++;
                     break;
                 }
             }
             if (ocurrioError) {
-                return res.status(500).jsonp({ message: mensajeError });
+                return res.status(codigoError).jsonp({ message: mensajeError });
             }
             else {
                 if (errores > 0) {
