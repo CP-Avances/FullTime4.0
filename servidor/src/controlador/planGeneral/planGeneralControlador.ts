@@ -5,50 +5,50 @@ import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/setti
 
 class PlanGeneralControlador {
 
-    // METODO PARA REGISTRAR PLAN GENERAL --**VERIFICADO
-    public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
-        let errores: number = 0;
-        let ocurrioError = false;
-        let mensajeError = '';
-        let codigoError = 0;
+// METODO PARA REGISTRAR PLAN GENERAL --**VERIFICADO
+public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
+    let errores: number = 0;
+    let ocurrioError = false;
+    let mensajeError = '';
+    let codigoError = 0;
 
-        const { user_name, ip, plan_general } = req.body;
-        console.log('plan general ', plan_general);
+    const { user_name, ip, plan_general } = req.body;
+    console.log('plan general ', plan_general);
 
-        for (let i = 0; i < plan_general.length; i++) {
-            console.log('i ', i, ' plan_general ', plan_general.length);
+    for (let i = 0; i < plan_general.length; i++) {
+        console.log('i ', i, ' plan_general ', plan_general.length);
 
-            try {
-                // INICIAR TRANSACCION
-                await pool.query('BEGIN');
+        try {
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
 
-                const result = await pool.query(
-                    `
+            const result = await pool.query(
+                `
                 INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
                     fecha_horario, id_empleado_cargo, tipo_accion, codigo, id_horario, tipo_dia, salida_otro_dia,
                     minutos_antes, minutos_despues, estado_origen, minutos_alimentacion) 
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
                 `,
-                    [
-                        plan_general[i].fec_hora_horario, plan_general[i].tolerancia, plan_general[i].estado_timbre,
-                        plan_general[i].id_det_horario, plan_general[i].fec_horario, plan_general[i].id_empl_cargo,
-                        plan_general[i].tipo_entr_salida, plan_general[i].codigo, plan_general[i].id_horario, plan_general[i].tipo_dia,
-                        plan_general[i].salida_otro_dia, plan_general[i].min_antes, plan_general[i].min_despues, plan_general[i].estado_origen,
-                        plan_general[i].min_alimentacion
-                    ]
-                );
+                [
+                    plan_general[i].fec_hora_horario, plan_general[i].tolerancia, plan_general[i].estado_timbre,
+                    plan_general[i].id_det_horario, plan_general[i].fec_horario, plan_general[i].id_empl_cargo,
+                    plan_general[i].tipo_entr_salida, plan_general[i].codigo, plan_general[i].id_horario, plan_general[i].tipo_dia,
+                    plan_general[i].salida_otro_dia, plan_general[i].min_antes, plan_general[i].min_despues, plan_general[i].estado_origen,
+                    plan_general[i].min_alimentacion
+                ]
+            );
 
-                const fecha_hora_horario1 = await FormatearHora(plan_general[i].fec_hora_horario.split(' ')[1]);
-                const fecha_hora_horario = await FormatearFecha2(plan_general[i].fec_hora_horario, 'ddd');
-                const fecha_horario = await FormatearFecha2(plan_general[i].fec_horario, 'ddd');
+            const fecha_hora_horario1 = await FormatearHora(plan_general[i].fec_hora_horario.split(' ')[1]);
+            const fecha_hora_horario = await FormatearFecha2(plan_general[i].fec_hora_horario, 'ddd');
+            const fecha_horario = await FormatearFecha2(plan_general[i].fec_horario, 'ddd');
 
-                // AUDITORIA
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'eu_asistencia_general',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, 
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'eu_asistencia_general',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: `{fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, 
                 tolerancia: ${plan_general[i].tolerancia}, 
                 estado_timbre: ${plan_general[i].estado_timbre}, 
                 id_detalle_horario: ${plan_general[i].id_det_horario}, 
@@ -64,33 +64,34 @@ class PlanGeneralControlador {
                 estado_origen: ${plan_general[i].estado_origen}, 
                 minutos_alimentacion: ${plan_general[i].min_alimentacion}
                 }`,
-                    ip,
-                    observacion: null
-                });
+                ip,
+                observacion: null
+            });
 
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-            } catch (error) {
-                // REVERTIR TRANSACCION
-                await pool.query('ROLLBACK');
-                ocurrioError = true;
-                mensajeError = error.message;
-                codigoError = 500;
-                errores++;
-                break;
-            }
-        }
-
-        if (ocurrioError) {
-            return res.status(codigoError).jsonp({ message: mensajeError });
-        } else {
-            if (errores > 0) {
-                return res.status(200).jsonp({ message: 'error' });
-            } else {
-                return res.status(200).jsonp({ message: 'OK' });
-            }
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            ocurrioError = true;
+            mensajeError = error.message;
+            codigoError = 500;
+            errores++;
+            break;
         }
     }
+
+    if (ocurrioError) {
+        return res.status(codigoError).jsonp({ message: mensajeError });
+    } else {
+        if (errores > 0) {
+            return res.status(200).jsonp({ message: 'error' });
+        } else {
+            return res.status(200).jsonp({ message: 'OK' });
+        }
+    }
+}
 
     // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   --**VERIFICADO
     public async BuscarFechas(req: Request, res: Response) {

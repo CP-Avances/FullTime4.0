@@ -151,14 +151,14 @@ export class CrearTimbreComponent implements OnInit {
       longitud: this.longitud,
       latitud: this.latitud,
       accion: form.accionForm,
-      tipo: 'admin',
+      tipo: 'administrar',
       user_name: this.user_name,
       ip: this.ip,
     }
-
     if (this.data.length === undefined) {
       //-console.log(' id' + this.data.id);
       timbre.id_empleado = this.data.id;
+      //console.log('timbre ', timbre)
       this.ventana.close(timbre);
     }
     else {
