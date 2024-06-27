@@ -41,10 +41,6 @@ export class TimbreWebComponent implements OnInit {
   filtroFechaTimbre = '';
   idEmpleado: number;
 
-  // VARIABLES PARA AUDITORIA
-  user_name: string | null;
-  ip: string | null;
-
   get habilitarTimbre(): boolean { return this.funciones.timbre_web; }
 
   constructor(
@@ -70,9 +66,6 @@ export class TimbreWebComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
-      this.user_name = localStorage.getItem('usuario');
-      this.ip = localStorage.getItem('ip');
-
       this.BuscarParametro();
       this.ObtenerUsuario();
     }
@@ -135,10 +128,12 @@ export class TimbreWebComponent implements OnInit {
       this.cuenta = res.cuenta;
       this.info = res.info;
       this.timbres.forEach((data: any) => {
-        data.fecha = this.validar.FormatearFecha(data.fec_hora_timbre, formato_fecha, this.validar.dia_abreviado);
-        data.hora = this.validar.FormatearHora(data.fec_hora_timbre.split(' ')[1], formato_hora);
+        //console.log('ver data ', data)
+        data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, formato_fecha, this.validar.dia_abreviado);
+        data.hora = this.validar.FormatearHora(data.fecha_hora_timbre.split(' ')[1], formato_hora);
       })
     }, err => {
+      console.log('err ', err)
       this.toastr.info(err.error.message)
     })
   }
@@ -148,11 +143,7 @@ export class TimbreWebComponent implements OnInit {
     this.ventana.open(RegistrarTimbreComponent, { width: '550px' }).afterClosed().subscribe(data => {
       if (data !== undefined) {
         if (!data.close) {
-          data.append('user_name', this.user_name as string);
-          data.append('ip', this.ip as string);
-
           this.restTimbres.RegistrarTimbreWeb(data).subscribe(res => {
-            // METODO PARA AUDITAR TIMBRES
             data.id_empleado = this.idEmpleado;
             this.BuscarParametro();
             this.toastr.success(res.message)

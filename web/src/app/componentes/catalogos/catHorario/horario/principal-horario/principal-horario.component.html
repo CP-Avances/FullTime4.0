@@ -113,8 +113,7 @@
                             <td></td>
                             <td>
                                 <mat-form-field class="input-tables codigo">
-                                    <input matInput placeholder="Buscar" [formControl]="nombreHorarioF"
-                                        [(ngModel)]="filtroNombreHorario">
+                                    <input matInput placeholder="Buscar" [formControl]="nombreHorarioF">
                                 </mat-form-field>
                             </td>
                             <td></td>
@@ -130,7 +129,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let horario of horarios | filtrosNombres: filtroNombreHorario | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let horario of horarios | filtroCodigo: nombreHorarioF.value | paginate:tamanio_pagina:numero_pagina">
 
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"

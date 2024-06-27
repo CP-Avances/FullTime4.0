@@ -100,7 +100,7 @@ export class DetalleCatHorarioComponent implements OnInit {
       else {
         this.acciones = false;
       }
-      console.log('ver acciones', this.acciones)
+      //console.log('ver acciones', this.acciones)
     });
   }
 
@@ -171,8 +171,7 @@ export class DetalleCatHorarioComponent implements OnInit {
       detalle.min_antes = parseInt(form.min_antesForm);
       detalle.min_despues = parseInt(form.min_despuesForm);
     }
-
-    console.log('ver datos de horario ', detalle)
+    //console.log('ver datos de horario ', detalle)
     this.ValidarMinEspera(form, detalle);
     if (this.datosHorario[0].minutos_comida === 0) {
       this.ValidarDetallesSinAlimentacion(detalle);

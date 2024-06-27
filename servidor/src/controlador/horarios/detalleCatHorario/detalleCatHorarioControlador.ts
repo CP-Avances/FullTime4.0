@@ -3,6 +3,7 @@ import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import pool from '../../../database';
 import excel from 'xlsx';
 import fs from 'fs';
+import { FormatearHora } from '../../../libs/settingsMail';
 
 class DetalleCatalogoHorarioControlador {
 
@@ -91,12 +92,14 @@ class DetalleCatalogoHorarioControlador {
                 `
                 , [id]);
 
+            const horadetalle = await FormatearHora(datosOriginales.hora);
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eh_detalle_horarios',
                 usuario: user_name,
                 accion: 'D',
-                datosOriginales: JSON.stringify(datosOriginales),
+                datosOriginales: `{orden: ${datosOriginales.orden}, hora: ${horadetalle}, tolerancia: ${datosOriginales.tolerancia}, id_horario: ${datosOriginales.id_horario}, tipo_accion: ${datosOriginales.tipo_accion}, segundo_dia: ${datosOriginales.segundo_dia}, tercer_dia: ${datosOriginales.tercer_dia}, min_antes: ${datosOriginales.minutos_antes}, min_despues: ${datosOriginales.minutos_despues}}`,
                 datosNuevos: '',
                 ip,
                 observacion: ''
@@ -116,7 +119,7 @@ class DetalleCatalogoHorarioControlador {
     public async CrearDetalleHorarios(req: Request, res: Response): Promise<void> {
         try {
             const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, user_name, ip } = req.body;
-            
+
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
@@ -127,14 +130,19 @@ class DetalleCatalogoHorarioControlador {
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                 `
                 , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues]);
-            
+
             // AUDITORIA
+
+
+            const horadetalle = await FormatearHora(hora);
+
+
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eh_detalle_horarios',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{orden: ${orden}, hora: ${hora}, tolerancia: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
+                datosNuevos: `{orden: ${orden}, hora: ${horadetalle}, tolerancia: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
                 ip,
                 observacion: ''
             });
@@ -185,21 +193,25 @@ class DetalleCatalogoHorarioControlador {
                 WHERE id = $10
                 `
                 , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id]);
-            
+
+            const horadetalle = await FormatearHora(hora);
+            const horadetalleO = await FormatearHora(datosOriginales.hora);
+
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eh_detalle_horarios',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: `{orden: ${orden}, hora: ${hora}, tolerancia: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
+                datosOriginales: `{orden: ${datosOriginales.orden}, hora: ${horadetalleO}, tolerancia: ${datosOriginales.tolerancia}, id_horario: ${datosOriginales.id_horario}, tipo_accion: ${datosOriginales.tipo_accion}, segundo_dia: ${datosOriginales.segundo_dia}, tercer_dia: ${datosOriginales.tercer_dia}, min_antes: ${datosOriginales.minutos_antes}, min_despues: ${datosOriginales.minutos_despues}}`,
+                datosNuevos: `{orden: ${orden}, hora: ${horadetalle}, tolerancia: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
                 ip,
                 observacion: ''
             });
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-            
+
             return res.jsonp({ message: 'Registro actualizado.' });
         } catch (error) {
             // REVERTIR TRANSACCION
@@ -222,7 +234,7 @@ class DetalleCatalogoHorarioControlador {
         }
     }
 
-   
+
 
 }
 

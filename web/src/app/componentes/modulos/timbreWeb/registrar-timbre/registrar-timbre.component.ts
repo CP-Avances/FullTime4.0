@@ -47,6 +47,10 @@ export class RegistrarTimbreComponent implements OnInit {
   // ID EMPLEADO QUE INICIO SESION
   id_empl: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restP: ParametrosService,
     public restE: EmpleadoService,
@@ -59,6 +63,8 @@ export class RegistrarTimbreComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.VerificarFunciones();
     this.BuscarParametro();
     this.Geolocalizar();
@@ -199,6 +205,8 @@ export class RegistrarTimbreComponent implements OnInit {
       id_reloj: 98,
       latitud: this.latitud,
       accion: this.accionF,
+      ip: this.ip,
+      user_name: this.user_name
     }
     console.log('ver data timbre ', dataTimbre)
     this.ventana.close(dataTimbre);

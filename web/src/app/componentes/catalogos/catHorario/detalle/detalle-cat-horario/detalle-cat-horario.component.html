@@ -32,15 +32,7 @@
                     </mat-form-field>
                     <mat-form-field>
                         <mat-label>Orden</mat-label>
-                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                            matTooltip="Indicar el orden del horario">
-                            help_outline
-                        </mat-icon>
-                        <mat-select [formControl]="ordenF" [disabled]="true" required>
-                            <mat-option *ngFor="let option of options" [value]="option.orden">
-                                {{option.orden}}
-                            </mat-option>
-                        </mat-select>
+                        <input matInput [formControl]="ordenF" readonly required>
                     </mat-form-field>
                 </div>
             </div>

@@ -40,14 +40,10 @@ import { ITableHorarios } from 'src/app/model/reportes.model';
 
 export class PrincipalHorarioComponent implements OnInit {
 
-
   // ALMACENAMIENTO DE DATOS Y BUSQUEDA
   horarios: any = [];
   ver_horarios: boolean = true;
   horariosEliminar: any = [];
-
-  // FILTROS
-  filtroNombreHorario = '';
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreHorarioF = new FormControl('', Validators.minLength(2));
@@ -234,8 +230,12 @@ export class PrincipalHorarioComponent implements OnInit {
     this.tamanio_paginaH = 5;
     this.tamanio_paginaD = 5;
     this.paginator.firstPage();
-    this.paginatorH.firstPage();
-    this.paginatorD.firstPage();
+    if (this.paginatorH) {
+      this.paginatorH.firstPage();
+    }
+    if (this.paginatorD) {
+      this.paginatorD.firstPage();
+    }
     this.mostrarbtnsubir = false;
     this.formulario.setValue({
       nombreHorarioForm: '',

@@ -91,33 +91,27 @@
             </div>
             <div class="col-md">
                 <div class="d-flex flex-wrap justify-content-start">
-                    <mat-checkbox id="check" [formControl]="tipoF" [(ngModel)]="nocturno" matSuffix
-                        matTooltipPosition="right" matTooltip="Marcar si el horario es Nocturno.">
+                    <mat-checkbox id="check" [formControl]="tipoF" matSuffix matTooltipPosition="right"
+                        matTooltip="Marcar si el horario es Nocturno.">
                         <label id="textoradiobtn">Horario nocturno</label>
                     </mat-checkbox>
-
                     <mat-checkbox id="checks" (change)="VerificarArchivo($event)">
                         <label id="textoradiobtn">Control de archivos</label>
                     </mat-checkbox>
-
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="d-flex flex-wrap justify-content-start">
                     <section class="d-flex flex-column bd-highlight" *ngIf="isChecked">
-                        <mat-radio-group aria-label="Select an option" [formControl]="seleccion">
-                            <div class="bd-highlight">
-                                <div class="contenedor d-flex flex-wrap justify-content-start">
-                                    <mat-radio-group aria-labelledby="example-radio-group-label" class="contenedor">
-                                        <mat-radio-button class="radio-button" value=1 (click)="QuitarArchivo()">
-                                            Retirar archivo
-                                        </mat-radio-button>
-                                        <mat-radio-button class="radio-button" value=2 (click)="ActivarArchivo()">
-                                            Actualizar archivo
-                                        </mat-radio-button>
-                                    </mat-radio-group>
-                                </div>
-                            </div>
+                        <mat-radio-group aria-label="Select an option" [formControl]="seleccion" class="contenedor">
+                            <mat-radio-button class="radio-button" value=1 (click)="QuitarArchivo()">
+                                Retirar archivo
+                            </mat-radio-button>
+                            <mat-radio-button class="radio-button" value=2 (click)="ActivarArchivo()">
+                                Actualizar archivo
+                            </mat-radio-button>
                         </mat-radio-group>
                     </section>
-                </div>
-                <div class="d-flex flex-wrap justify-content-start">
                     <section class="d-flex flex-column bd-highlight" *ngIf="activar">
                         <div class="separar">
                             <form method="post" enctype="multipart/form-data">

@@ -3,6 +3,7 @@ import AUDITORIA_CONTROLADOR from "../../auditoria/auditoriaControlador";
 import pool from "../../../database";
 import excel from "xlsx";
 import fs from "fs";
+import { FormatearFecha2 } from "../../../libs/settingsMail";
 
 class PeriodoVacacionControlador {
   // METODO PARA BUSCAR ID DE PERIODO DE VACACIONES
@@ -44,6 +45,9 @@ class PeriodoVacacionControlador {
           fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones,
           codigo,]
       );
+      const fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd')
+      const fechaFinalN = await FormatearFecha2(fec_final, 'ddd')
+
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -51,7 +55,7 @@ class PeriodoVacacionControlador {
         usuario: user_name,
         accion: "I",
         datosOriginales: "",
-        datosNuevos: `{id_empleado_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, estado: ${estado}, fecha_inicio: ${fec_inicio}, fecha_final: ${fec_final}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, minutos_vacaciones: ${min_vacaciones}, codigo: ${codigo}}`,
+        datosNuevos: `{codigo: ${codigo}, id_empleado_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, minutos_vacaciones: ${min_vacaciones}, estado: ${estado}}`,
         ip,
         observacion: null,
       });
@@ -123,14 +127,18 @@ class PeriodoVacacionControlador {
         [ id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
           fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id, ]
       );
+      const fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd')
+      const fechaFinalN = await FormatearFecha2(fec_final, 'ddd')
+      const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd')
+      const fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd')
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: "mv_periodo_vacacion",
         usuario: user_name,
         accion: "U",
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{id_empleado_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, estado: ${estado}, fecha_inicio: ${fec_inicio}, fecha_final: ${fec_final}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, minutos_vacaciones: ${min_vacaciones}}`,
+        datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, descripcion: ${datosOriginales.descripcion}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, dia_vacacion: ${datosOriginales.dia_vacacion}, dia_antiguedad: ${datosOriginales.dia_antiguedad}, dia_perdido: ${datosOriginales.dia_perdido}, horas_vacaciones: ${datosOriginales.horas_vacaciones}, minutos_vacaciones: ${datosOriginales.minutos_vacaciones}, estado: ${datosOriginales.estado}}`,
+        datosNuevos: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, minutos_vacaciones: ${min_vacaciones}, estado: ${estado}}`,
         ip,
         observacion: null,
       });

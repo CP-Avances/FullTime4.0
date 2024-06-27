@@ -171,13 +171,18 @@ class PermisosControlador {
                     id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
                     estado, id_empl_cargo, hora_salida, hora_ingreso, codigo]);
                 const [objetoPermiso] = response.rows;
+                var fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(fec_creacion, 'ddd');
+                var fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
+                var fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
+                const horaSalidaN = yield (0, settingsMail_1.FormatearHora)(hora_salida);
+                const horaIngresoN = yield (0, settingsMail_1.FormatearHora)(hora_ingreso);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mp_solicitud_permiso',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(objetoPermiso),
+                    datosNuevos: `{codigo: ${codigo}, id_empleado_contrato: ${id_empl_contrato}, id_empleado_cargo: ${id_empl_cargo}, id_periodo_vacacion: ${id_peri_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: null, numero_permiso: ${num_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dia}, dia_libre: ${dia_libre}, horas_permiso: ${hora_numero}, documento: null, legalizado: ${legalizado}, estado: ${estado}}`,
                     ip, observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -251,13 +256,24 @@ class PermisosControlador {
                 `, [descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso,
                     hora_salida, hora_ingreso, id_peri_vacacion, fec_edicion, id]);
                 const [objetoPermiso] = response.rows;
+                var fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
+                var fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
+                var fechaEdicionN = yield (0, settingsMail_1.FormatearFecha2)(fec_edicion, 'ddd');
+                const horaSalidaN = yield (0, settingsMail_1.FormatearHora)(hora_salida);
+                const horaIngresoN = yield (0, settingsMail_1.FormatearHora)(hora_ingreso);
+                var fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_creacion, 'ddd');
+                var fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
+                var fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
+                var fechaEdicionO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_edicion, 'ddd');
+                const horaSalidaO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_salida);
+                const horaIngresoO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_ingreso);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mp_solicitud_permiso',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: JSON.stringify(objetoPermiso),
+                    datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                    datosNuevos: `{codigo: , id_empleado_contrato: , id_empleado_cargo: , id_periodo_vacacion: ${id_peri_vacacion}, fecha_creacion: , fecha_edicion: ${fechaEdicionN}, numero_permiso: ${num_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dia}, dia_libre: ${dia_libre}, horas_permiso: ${hora_numero}, documento: null, legalizado: , estado: }`,
                     ip, observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -340,13 +356,19 @@ class PermisosControlador {
                 yield database_1.default.query(`
                 UPDATE mp_solicitud_permiso SET documento = $2 WHERE id = $1
                 `, [id, documento]);
+                var fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_creacion, 'ddd');
+                var fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
+                var fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
+                var fechaEdicionO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_edicion, 'ddd');
+                const horaSalidaO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_salida);
+                const horaIngresoO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_ingreso);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mp_solicitud_permiso',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"documento": "${documento}"}`,
+                    datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                    datosNuevos: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
                     ip,
                     observacion: null
                 });
@@ -405,12 +427,19 @@ class PermisosControlador {
                 UPDATE mp_solicitud_permiso SET documento = null WHERE id = $1
                 `, [id]);
                 // AUDITORIA
+                var fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_creacion, 'ddd');
+                var fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
+                var fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
+                var fechaEdicionO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_edicion, 'ddd');
+                const horaSalidaO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_salida);
+                const horaIngresoO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_ingreso);
+                // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mp_solicitud_permiso',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: '{"documento": null}',
+                    datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                    datosNuevos: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: null, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
                     ip,
                     observacion: null
                 });
@@ -570,12 +599,18 @@ class PermisosControlador {
                 const response = yield database_1.default.query(`
                 DELETE FROM mp_solicitud_permiso WHERE id = $1 RETURNING *
                 `, [id_permiso]);
+                var fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(datosOriginalesPermisos.fecha_creacion, 'ddd');
+                var fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginalesPermisos.fecha_inicio, 'ddd');
+                var fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginalesPermisos.fecha_final, 'ddd');
+                var fechaEdicionO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginalesPermisos.fecha_edicion, 'ddd');
+                const horaSalidaO = yield (0, settingsMail_1.FormatearHora)(datosOriginalesPermisos.hora_salida);
+                const horaIngresoO = yield (0, settingsMail_1.FormatearHora)(datosOriginalesPermisos.hora_ingreso);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mp_solicitud_permiso',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginalesPermisos),
+                    datosOriginales: `{codigo: ${datosOriginalesPermisos.codigo}, id_empleado_contrato: ${datosOriginalesPermisos.id_empleado_contrato}, id_empleado_cargo: ${datosOriginalesPermisos.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginalesPermisos.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginalesPermisos.numero_permiso}, descripcion: ${datosOriginalesPermisos.descripcion}, id_tipo_permiso: ${datosOriginalesPermisos.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginalesPermisos.dias_permiso}, dia_libre: ${datosOriginalesPermisos.dia_libre}, horas_permiso: ${datosOriginalesPermisos.horas_permiso}, documento: ${datosOriginalesPermisos.documento}, legalizado: ${datosOriginalesPermisos.legalizado}, estado: ${datosOriginalesPermisos.estado}}`,
                     datosNuevos: '',
                     ip,
                     observacion: null
@@ -659,7 +694,7 @@ class PermisosControlador {
                     html: `
                     <body>
                         <div style="text-align: center;">
-                            <img width="25%" height="25%" src="cid:cabeceraf"/>
+                            <img width="100%" height="100%" src="cid:cabeceraf"/>
                         </div>
                         <br>
                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -694,7 +729,7 @@ class PermisosControlador {
                             <b>Gracias por la atención</b><br>
                             <b>Saludos cordiales,</b> <br><br>
                         </p>
-                        <img src="cid:pief" width="50%" height="50%"/>
+                        <img src="cid:pief" width="100%" height="100%"/>
                     </body>
                     `,
                     attachments: [
@@ -758,7 +793,7 @@ class PermisosControlador {
                     html: `
                     <body>
                          <div style="text-align: center;">
-                            <img width="25%" height="25%" src="cid:cabeceraf"/>
+                            <img width="100%" height="100%" src="cid:cabeceraf"/>
                         </div>
                         <br>
                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -863,7 +898,7 @@ class PermisosControlador {
                             <b>Gracias por la atención</b><br>
                             <b>Saludos cordiales,</b> <br><br>
                         </p>
-                        <img src="cid:pief" width="50%" height="50%"/>
+                        <img src="cid:pief" width="100%" height="100%"/>
                     </body>
                     `,
                     attachments: [
@@ -934,7 +969,7 @@ class PermisosControlador {
                     html: `
                     <body>
                         <div style="text-align: center;">
-                             <img width="25%" height="25%" src="cid:cabeceraf"/>
+                             <img width="100%" height="100%" src="cid:cabeceraf"/>
                         </div>
                         <br>
                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -970,7 +1005,7 @@ class PermisosControlador {
                             <b>Gracias por la atención</b><br>
                             <b>Saludos cordiales,</b> <br><br>
                         </p>
-                        <img src="cid:pief" width="50%" height="50%"/>
+                        <img src="cid:pief" width="100%" height="100%"/>
                     </body>
                     `,
                     attachments: [
@@ -1221,7 +1256,7 @@ class PermisosControlador {
                     html: `
                     <body>
                         <div style="text-align: center;">
-                            <img width="25%" height="25%" src="cid:cabeceraf"/>
+                            <img width="100%" height="100%" src="cid:cabeceraf"/>
                         </div>
                         <br>
                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -1255,7 +1290,7 @@ class PermisosControlador {
                             <b>Gracias por la atención</b><br>
                             <b>Saludos cordiales,</b> <br><br>
                         </p>
-                        <img src="cid:pief" width="50%" height="50%"/>
+                        <img src="cid:pief" width="100%" height="100%"/>
                     </body>
                     `,
                     attachments: [
@@ -1318,7 +1353,7 @@ class PermisosControlador {
                     html: `
                      <body>
                         <div style="text-align: center;">
-                            <img width="25%" height="25%" src="cid:cabeceraf"/>
+                            <img width="100%" height="100%" src="cid:cabeceraf"/>
                         </div>
                         <br>
                         <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -1422,7 +1457,7 @@ class PermisosControlador {
                             b>Gracias por la atención</b><br>
                             <b>Saludos cordiales,</b> <br><br>
                         </p>
-                        <img src="cid:pief" width="50%" height="50%"/>
+                        <img src="cid:pief" width="100%" height="100%"/>
                     </body>
                     `,
                     attachments: [

@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DETALLE_CATALOGO_HORARIO_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../../database"));
+const settingsMail_1 = require("../../../libs/settingsMail");
 class DetalleCatalogoHorarioControlador {
     // METODO PARA BUSCAR DETALLE DE UN HORARIO   --**VERIFICADO
     ListarUnDetalleHorario(req, res) {
@@ -91,12 +92,13 @@ class DetalleCatalogoHorarioControlador {
                 yield database_1.default.query(`
                 DELETE FROM eh_detalle_horarios WHERE id = $1
                 `, [id]);
+                const horadetalle = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eh_detalle_horarios',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosOriginales: `{orden: ${datosOriginales.orden}, hora: ${horadetalle}, tolerancia: ${datosOriginales.tolerancia}, id_horario: ${datosOriginales.id_horario}, tipo_accion: ${datosOriginales.tipo_accion}, segundo_dia: ${datosOriginales.segundo_dia}, tercer_dia: ${datosOriginales.tercer_dia}, min_antes: ${datosOriginales.minutos_antes}, min_despues: ${datosOriginales.minutos_despues}}`,
                     datosNuevos: '',
                     ip,
                     observacion: ''
@@ -125,12 +127,13 @@ class DetalleCatalogoHorarioControlador {
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                 `, [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues]);
                 // AUDITORIA
+                const horadetalle = yield (0, settingsMail_1.FormatearHora)(hora);
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eh_detalle_horarios',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{orden: ${orden}, hora: ${hora}, tolerancia: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
+                    datosNuevos: `{orden: ${orden}, hora: ${horadetalle}, tolerancia: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
                     ip,
                     observacion: ''
                 });
@@ -174,13 +177,15 @@ class DetalleCatalogoHorarioControlador {
                     tipo_accion = $5, segundo_dia = $6, tercer_dia = $7, minutos_antes = $8, minutos_despues= $9 
                 WHERE id = $10
                 `, [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id]);
+                const horadetalle = yield (0, settingsMail_1.FormatearHora)(hora);
+                const horadetalleO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eh_detalle_horarios',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{orden: ${orden}, hora: ${hora}, tolerancia: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
+                    datosOriginales: `{orden: ${datosOriginales.orden}, hora: ${horadetalleO}, tolerancia: ${datosOriginales.tolerancia}, id_horario: ${datosOriginales.id_horario}, tipo_accion: ${datosOriginales.tipo_accion}, segundo_dia: ${datosOriginales.segundo_dia}, tercer_dia: ${datosOriginales.tercer_dia}, min_antes: ${datosOriginales.minutos_antes}, min_despues: ${datosOriginales.minutos_despues}}`,
+                    datosNuevos: `{orden: ${orden}, hora: ${horadetalle}, tolerancia: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
                     ip,
                     observacion: ''
                 });

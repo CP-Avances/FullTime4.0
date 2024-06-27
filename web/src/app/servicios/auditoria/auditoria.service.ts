@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders , HttpResponse   } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { catchError } from 'rxjs';
-import { Observable } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
 
 @Injectable({
@@ -14,25 +14,16 @@ export class AuditoriaService {
     private http: HttpClient,
   ) { }
 
-  // catalogo de departamentos
-
-  ConsultarAuditoriaOriginal(data: any) {
-    return this.http.post(`${environment.url}/reportes-auditoria/auditar`, data, );
+  ConsultarAuditoriaPorTabla(data: any) {
+    return this.http.post(`${environment.url}/reportes-auditoria/auditarportabla`, data,);
   }
   
-
-  ConsultarAuditoria1(data: any) {
-    const headers = new HttpHeaders({
-      'Accept-Encoding': 'gzip, deflate',
-      'Content-Type': 'application/json'
-    });
-
-    return this.http.post(`${environment.url}/reportes-auditoria/auditar`, data, {
-      headers: headers,
-      responseType: 'arraybuffer' // Esto indica que esperamos una respuesta binaria
+  ConsultarAuditoriaPorTablaEmpaquetados(data: any){
+    return this.http.post(`${environment.url}/reportes-auditoria/auditarportablaempaquetados`, data, {
+      observe: 'response',
+      responseType: 'blob' // Indicar que esperamos una respuesta de tipo Blob (para la transmisión)
     });
   }
-
 
   ConsultarAuditoria(data: any): Observable<HttpResponse<Blob>> {
     return this.http.post(`${environment.url}/reportes-auditoria/auditar`, data, {

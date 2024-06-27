@@ -1,26 +1,22 @@
 // IMPORTAR LIBRERIAS
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { IReporteFaltas, ITableEmpleados } from 'src/app/model/reportes.model';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { HttpResponse } from '@angular/common/http';
-
-
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
-import * as xlsx from 'xlsx';
-import pako from 'pako';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { ThemePalette } from '@angular/material/core';
+
 
 // IMPORTAR SERVICIOS
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { AuditoriaService } from 'src/app/servicios/auditoria/auditoria.service';
 
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
@@ -37,8 +33,6 @@ interface TablasD {
     modulo: string;
 }
 
-
-
 @Component({
     selector: 'app-reporte-auditoria',
     templateUrl: './reporte-auditoria.component.html',
@@ -47,11 +41,35 @@ interface TablasD {
 
 export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
+
+    // VARIABLES PROGRESS SPINNER
+    habilitarprogress: boolean = false;
+    mode: ProgressSpinnerMode = 'indeterminate';
+    color: ThemePalette = 'primary';
+    value = 10;
+
+    // FORMATO FECHA HORA   
+    formato_fecha: string = 'DD/MM/YYYY';
+    formato_hora: string = 'HH:mm:ss';
+
+    // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+    BuscarParametro() {
+        // id_tipo_parametro Formato fecha = 25
+        this.parametro.ListarDetalleParametros(25).subscribe(
+            res => {
+                this.formato_fecha = res[0].descripcion;
+            });
+    }
+
+    BuscarHora() {
+        // id_tipo_parametro Formato hora = 26
+        this.parametro.ListarDetalleParametros(26).subscribe(
+            res => {
+                this.formato_hora = res[0].descripcion;
+            });
+    }
+
     verDetalle: boolean = false;
-
-
-    data_pdf: any = [];
-
     accionesSeleccionadas = [];
 
 
@@ -91,10 +109,10 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
     // Inicialización directa de la lista de objetos Tablas
     tablas: Tablas[] = [
-        { nombre: "e_empresa ", modulo: "", disponibilidad: true },
+        { nombre: "e_empresa", modulo: "", disponibilidad: true },
         { nombre: "e_provincias", modulo: "", disponibilidad: true },
         { nombre: "e_ciudades", modulo: "", disponibilidad: true },
-        { nombre: "e_sucursales ", modulo: "", disponibilidad: true },
+        { nombre: "e_sucursales", modulo: "", disponibilidad: true },
         //e_cat_tipo_cargo
         { nombre: "e_cat_tipo_cargo", modulo: "", disponibilidad: true },
         { nombre: "e_cat_modalidad_trabajo", modulo: "", disponibilidad: true },
@@ -133,12 +151,13 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         { nombre: "eu_asistencia_general", modulo: "", disponibilidad: true },
         { nombre: "eu_timbres", modulo: "", disponibilidad: true },
         { nombre: "eu_usuario_sucursal", modulo: "", disponibilidad: true },
-        { nombre: "eu_empleado_justifica_atraso", modulo: "", disponibilidad: true },
+        { nombre: "eu_empleado_justificacion_atraso", modulo: "", disponibilidad: true },
         { nombre: "ed_autoriza_departamento", modulo: "", disponibilidad: true },
         { nombre: "ecm_autorizaciones", modulo: "", disponibilidad: true },
         { nombre: "ecm_realtime_notificacion", modulo: "", disponibilidad: true },
         { nombre: "ecm_realtime_timbres", modulo: "", disponibilidad: true },
-        { nombre: "ma_cg_comidas", modulo: "alimentacion", disponibilidad: this.alimentacion },
+        //ma_cg_comidas
+        { nombre: "ma_cat_comidas", modulo: "alimentacion", disponibilidad: this.alimentacion },
         { nombre: "ma_detalle_comida", modulo: "alimentacion", disponibilidad: this.alimentacion },
         { nombre: "ma_detalle_plan_comida", modulo: "alimentacion", disponibilidad: this.alimentacion },
         { nombre: "ma_empleado_plan_comida_general", modulo: "alimentacion", disponibilidad: this.alimentacion },
@@ -176,7 +195,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
 
 
 
-        tabla.map((x: any)  => {
+        tabla.map((x: any) => {
 
             if (x.disponibilidad == true) {
                 this.tablasD.push({
@@ -196,6 +215,8 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         private toastr: ToastrService,
         private restAuditoria: AuditoriaService,
         private restEmpre: EmpresaService,
+        public validar: ValidacionesService, // SERVICIO CONTROL DE VALIDACONES
+        public parametro: ParametrosService,
 
 
     ) {
@@ -203,13 +224,65 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         this.ObtenerLogo();
         this.ObtenerColores();
 
+
     }
 
 
     // VALIDACIONES DE OPCIONES DE REPORTE
     ValidarReporte(action: any) {
+
         if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '' || this.accionesSeleccionadas.length == 0) return this.toastr.error('Primero valide fechas de búsqueda y acciones.');
-        this.ModelarTablasAuditoria(action);
+        this.ModelarTablasAuditoriaPorTablasEmpaquetados(action);
+
+    }
+
+    blobToArraynoString(blob: Blob): Promise<any[]> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = () => {
+                try {
+                    const result = reader.result;
+                    if (result instanceof ArrayBuffer) {
+                        const dataArray = new Uint8Array(result);
+
+                        const decoder = new TextDecoder('utf-8');
+                        let jsonString = '';
+                        const objects: any[] = []; // Define the type of objects array
+                        let lastIndex = 0;
+
+                        for (let i = 0; i < dataArray.length; i++) {
+                            if (dataArray[i] === 125) { // Character code for "}"
+                                let segment = decoder.decode(dataArray.slice(lastIndex, i + 1));
+                                lastIndex = i + 1;
+                                jsonString += segment;
+
+                                try {
+                                    const jsonObject = JSON.parse(jsonString);
+                                    objects.push(jsonObject);
+                                    jsonString = '';
+                                } catch (e) {
+                                    // If JSON.parse fails, the segment isn't complete yet
+                                    continue;
+                                }
+                            }
+                        }
+
+                        resolve(objects);
+                    } else {
+                        reject(new Error("Expected an ArrayBuffer but got a different type"));
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            };
+
+            reader.onerror = () => {
+                reject(reader.error);
+            };
+
+            reader.readAsArrayBuffer(blob);
+        });
     }
 
     blobToArray(blob: Blob): Promise<any[]> {
@@ -219,12 +292,20 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
                 try {
                     const arrayBuffer = reader.result as ArrayBuffer;
                     const dataArray = new Uint8Array(arrayBuffer);
-                    const jsonString = new TextDecoder('utf-8').decode(dataArray);
-                    //console.log('Contenido del Blob:', jsonString);
-                    // Convertir la cadena JSON en un array de objetos
-                    const data = jsonString.trim().split('\n').map(objStr => JSON.parse(objStr));
-                    console.log('Contenido del Blob a json:', data);
+                    console.log("para ver como es este array", dataArray)
+                    let jsonString = new TextDecoder('utf-8').decode(dataArray);
 
+                    // console.log('Contenido original del Blob:', jsonString); // Imprimir el contenido original del Blob
+
+                    // Añadir las comas antes de {"plataforma": excepto la primera vez
+                    jsonString = jsonString.replace(/(\{"plataforma":)/g, (match, p1, offset) => offset === 0 ? p1 : `,${p1}`);
+
+                    // Añadir los corchetes al principio y al final
+                    jsonString = `[${jsonString}]`;
+
+                    console.log('Contenido modificado del Blob:', jsonString); // Imprimir el contenido modificado del Blob
+
+                    const data = JSON.parse(jsonString);
                     resolve(data);
                 } catch (error) {
                     reject(error);
@@ -236,6 +317,7 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
             reader.readAsArrayBuffer(blob);
         });
     }
+
     //BUSCAR REGISTROS AUDITORIA
 
     ModelarTablasAuditoria(accion: any) {
@@ -243,8 +325,8 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
         this.data_pdf = [];
         var tablas = '';
         var acciones = '';
-        tablas = this.tablasSolicitadas.map((x: any)  => x.nombre).join(',');
-        acciones = this.accionesSeleccionadas.map((x: any)  => x).join(',');
+        tablas = this.tablasSolicitadas.map((x: any) => x.nombre).join(',');
+        acciones = this.accionesSeleccionadas.map((x: any) => x).join(',');
 
         const buscarTabla = {
             tabla: tablas,
@@ -253,12 +335,16 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
             action: acciones,
         };
 
+
         this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
             (response: HttpResponse<Blob>) => {
                 if (response.body !== null) {
                     //const data_pdf: Blob = response.body;
-                    this.blobToArray(response.body).then((data_pdf: any[]) => {
-                        console.log(data_pdf); // Aquí puedes manejar los datos recibidos, como guardarlos o procesarlos
+                    //console.log("para ver", response.body);
+                    this.blobToArraynoString(response.body).then((data_pdf: any[]) => {
+                        //console.log(data_pdf); // Aquí puedes manejar los datos recibidos, como guardarlos o procesarlos
+                        this.data_pdf = data_pdf;
+
                         switch (accion) {
                             // Agrega aquí tu lógica para manejar las diferentes acciones
                             // case 'excel': this.ExportarExcelCargoRegimen(); break;
@@ -280,116 +366,154 @@ export class ReporteAuditoriaComponent implements OnInit, OnDestroy {
                     console.error('Error en la consulta:', error);
                 }
             }
-        );
+        )
+    }
 
-        /*
-                this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
-                    res => {
-                        this.data_pdf = res;
-                        //this.GenerarPDF(this.data_pdf);
-                        console.log(this.data_pdf)
-                        console.log(this.accionesSeleccionadas)
-        
-        
-                        switch (accion) {
-                            case 'ver': this.VerDatos(); break;
-                            default: this.GenerarPDF(this.data_pdf, accion); break;
-                        }
-                    }
-                    , error => {
-                        if (error.status == '404') {
-                            this.toastr.error('No existen registros con las tablas y acciones seleccionadas', 'Ups!!! algo salio mal..', {
-                                timeOut: 6000,
-                            })
-                        }
-                    }
-        
-                )
-        */
+    datosbusqueda: any = [];
+    data_pdf: any = [];
 
 
 
-        /*pruebas para descomprimir
-this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
-    (res: any) => {
-        console.log("a ver si imprime: ", res);
-        const compressedData = res[0];
+    dataSource: any;
+    async ModelarTablasAuditoriaPorTablas(accion: any) {
+        this.data_pdf = [];
+        this.datosbusqueda = [];
+        var acciones = '';
+        acciones = this.accionesSeleccionadas.map(x => x).join(',');
 
-        console.log("a ver si imprime 2: ", compressedData);
-        const uncompressedData = pako.inflate(compressedData, { to: 'string' });
+        const consultas: Promise<any>[] = [];
 
- 
-        // Convertir los datos JSON descomprimidos en un objeto
-        this.data_pdf = JSON.parse(uncompressedData);
- 
-        // Realizar la acción correspondiente según el valor de 'accion'
-        switch (accion) {
-            case 'ver':
-                this.VerDatos();
-                break;
-            default:
-                this.GenerarPDF(this.data_pdf, accion);
-                break;
+        for (let i = 0; i < this.tablasSolicitadas.length; i++) {
+            const tabla = this.tablasSolicitadas[i];
+            const buscarTabla = {
+                tabla: tabla.nombre,
+                desde: this.rangoFechas.fec_inico,
+                hasta: this.rangoFechas.fec_final,
+                action: acciones,
+            };
+
+            const consulta = this.restAuditoria.ConsultarAuditoriaPorTabla(buscarTabla).toPromise();
+            consultas.push(consulta);
         }
-    },
-    error => {
-        if (error.status == '404') {
-            this.toastr.error('No existen registros con las tablas y acciones seleccionadas', 'Ups!!! algo salió mal..', {
-                timeOut: 6000,
-            });
+
+        try {
+            // Esperar a que todas las consultas se completen
+            const resultados = await Promise.allSettled(consultas);
+
+            // Filtrar y extraer sólo los resultados exitosos
+            this.datosbusqueda = resultados
+                .filter(result => result.status === 'fulfilled')
+                .map(result => (result as PromiseFulfilledResult<any>).value);
+
+            console.log("a ver si carga datos pdf", this.datosbusqueda);
+
+            this.data_pdf = this.datosbusqueda.flat();
+
+            console.log("datos oficiales", this.data_pdf);
+
+            switch (accion) {
+                case 'ver':
+                    this.VerDatos();
+                    break;
+                default:
+                    this.GenerarPDF(this.data_pdf, accion);
+                    break;
+            }
+        } catch (error) {
+            console.error("Error al consultar auditorías por tabla:", error);
         }
     }
-);
+
+    datosPdF: any = []
 
 
-*/
+    async ModelarTablasAuditoriaPorTablasEmpaquetados(accion: any) {
+        this.habilitarprogress = true;
 
-        /* prueba de descomprimir parte
-                this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
-                    (res: any) => {
-                        console.log("a ver si imprime: ", res);
-                
-                        // Verificar si el cliente admite la transferencia de fragmentos
-                        const contentEncoding = res.headers.get('Content-Encoding');
-                        const isCompressed = contentEncoding && contentEncoding.includes('gzip');
-                
-                        // Descomprimir los datos antes de asignarlos
-                        const uncompressedData = isCompressed ? pako.inflate(res, { to: 'string' }) : res;
-                        
-                        // Convertir los datos JSON descomprimidos en un objeto
-                        this.data_pdf = JSON.parse(uncompressedData);
-                        
-                        // Realizar la acción correspondiente según el valor de 'accion'
-                        switch (accion) {
-                            case 'ver':
-                                this.VerDatos();
-                                break;
-                            default:
-                                this.GenerarPDF(this.data_pdf, accion);
-                                break;
+        this.data_pdf = [];
+        var acciones = this.accionesSeleccionadas.map(x => x).join(',');
+
+        // Array para almacenar todas las promesas de consulta
+        const consultasPromesas: Promise<any>[] = [];
+
+        for (let i = 0; i < this.tablasSolicitadas.length; i++) {
+
+            const tabla = this.tablasSolicitadas[i];
+            const buscarTabla = {
+                tabla: tabla.nombre,
+                desde: this.rangoFechas.fec_inico,
+                hasta: this.rangoFechas.fec_final,
+                action: acciones,
+            };
+
+            // Crear una promesa para cada consulta
+            const consultaPromise = new Promise((resolve, reject) => {
+                this.restAuditoria.ConsultarAuditoriaPorTablaEmpaquetados(buscarTabla).subscribe(
+                    (response: any) => {
+                        if (response !== null && response.body instanceof Blob) {
+                            this.blobToArraynoString(response.body).then((data_pdf: any[]) => {
+                                resolve(data_pdf); // Resolver la promesa con los datos convertidos
+                            }).catch(error => {
+                                reject(`Error al convertir Blob a array de objetos: ${error}`);
+                            });
+                        } else {
+                            reject('Respuesta vacía o no es un Blob.');
                         }
                     },
                     error => {
-                        if (error.status == '404') {
-                            this.toastr.error('No existen registros con las tablas y acciones seleccionadas', 'Ups!!! algo salió mal..', {
-                                timeOut: 6000,
-                            });
+                        if (error.status === 404) {
+                            reject('No existen registros con las tablas y acciones seleccionadas');
+                        } else {
+                            reject(`Error en la consulta: ${error}`);
                         }
                     }
-                );*/
+                );
+            });
 
 
+            consultasPromesas.push(consultaPromise); // Agregar la promesa al array
+        }
+
+
+        try {
+            // Esperar a que todas las promesas se resuelvan
+            const resultados = await Promise.allSettled(consultasPromesas);
+
+            this.datosbusqueda = resultados
+                .filter(result => result.status === 'fulfilled')
+                .map(result => (result as PromiseFulfilledResult<any>).value);
+
+            // resultados ahora contiene todos los arrays de datos obtenidos
+            this.data_pdf = this.datosbusqueda.flat(); // Aplanar el array de arrays
+
+            console.log("quiero ver los datos", this.data_pdf);
+            this.datosPdF = this.data_pdf;
+
+            // Realizar la acción correspondiente
+            switch (accion) {
+                case 'ver':
+                    this.VerDatos();
+                    break;
+                default:
+                    this.GenerarPDF(this.datosPdF, accion);
+                    break;
+            }
+        } finally {
+            this.habilitarprogress = false;
+
+        }
     }
-
-
 
 
     ngOnDestroy(): void {
         //this.ModelarTablasAuditoria();
     }
     ngOnInit(): void {
+        //this.obtenerDatosPdf();
 
         this.ContruirTablaDefinitiva(this.tablas);
+        this.BuscarParametro();
+        this.BuscarHora();
     }
     // METODO PARA MOSTRAR FILAS DETERMINADAS DE DATOS EN LA TABLA
     ManejarPagina(e: PageEvent) {
@@ -441,14 +565,15 @@ this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
         }
         this.tablasSolicitadas = this.selectionAuditoria.selected;
 
-        //console.log(this.selectionPaginas.selected)
+
+        // console.log(this.selectionAuditoria.selected)
         return `${this.selectionAuditoria.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
 
     }
 
     /** ****************************************************************************************** **
-   **                              COLORES Y LOGO PARA EL REPORTE                                **
-   ** ****************************************************************************************** **/
+    **                              COLORES Y LOGO PARA EL REPORTE                                **
+    ** ****************************************************************************************** **/
 
     logo: any = String;
     ObtenerLogo() {
@@ -473,8 +598,8 @@ this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
 
 
     /** ****************************************************************************************** **
- **                                              PDF                                           **
- ** ****************************************************************************************** **/
+    **                                              PDF                                           **
+    ** ****************************************************************************************** **/
 
     GenerarPDF(data: any, action: any) {
         let documentDefinition: any;
@@ -610,8 +735,8 @@ this.restAuditoria.ConsultarAuditoria(buscarTabla).subscribe(
                             { style: 'itemsTableCentrado', text: audi.ip_address },
                             { style: 'itemsTableCentrado', text: audi.table_name },
                             { style: 'itemsTableCentrado', text: this.transformAction(audi.action) },
-                            { style: 'itemsTable', text: this.getDateFromISO(audi.fecha_hora) },
-                            { style: 'itemsTable', text: this.getTimeFromISO(audi.fecha_hora) },
+                            { style: 'itemsTable', text: this.validar.FormatearFecha(audi.fecha_hora, this.formato_fecha, this.validar.dia_abreviado) },
+                            { style: 'itemsTable', text: this.validar.FormatearHora(audi.fecha_hora.split(' ')[1], this.formato_hora) },
                             { style: 'itemsTable', text: audi.original_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [4, 0, 9, 0] },
                             { style: 'itemsTable', text: audi.new_data, fontSize: 6, noWrap: false, overflow: 'hidden', margin: [4, 0, 9, 0] },
                         ]

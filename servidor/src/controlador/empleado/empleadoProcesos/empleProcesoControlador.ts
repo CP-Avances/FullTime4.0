@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import pool from '../../../database';
+import { FormatearFecha2 } from '../../../libs/settingsMail';
 
 class EmpleadoProcesoControlador {
 
@@ -16,7 +17,12 @@ class EmpleadoProcesoControlador {
         INSERT INTO map_empleado_procesos (id_proceso, id_empleado, id_empleado_cargo, fecha_inicio, fecha_final) 
         VALUES ($1, $2, $3, $4, $5)
         `
-        , [id, id_empleado, id_empl_cargo, fec_inicio, fec_final]);
+        , [id, id_empleado, id_empl_cargo, fec_inicio, fec_final])
+
+
+      var fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');
+      var fechaFinalN = await FormatearFecha2(fec_final, 'ddd');;
+
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -24,8 +30,8 @@ class EmpleadoProcesoControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos:`{id: ${id}, id_empleado: ${id_empleado}, id_empleado_cargo: ${id_empl_cargo}, fecha_inicio: ${fec_inicio}, fecha_final: ${fec_final}}`,
-        ip, 
+        datosNuevos: `{id: ${id}, id_empleado: ${id_empleado}, id_empleado_cargo: ${id_empl_cargo}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}}`,
+        ip,
         observacion: null
       });
 
@@ -56,8 +62,8 @@ class EmpleadoProcesoControlador {
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
-          datosNuevos:'',
-          ip, 
+          datosNuevos: '',
+          ip,
           observacion: `Error al actualizar proceso con id_p: ${id_p}`
         });
 
@@ -73,14 +79,22 @@ class EmpleadoProcesoControlador {
         `
         , [id, id_empl_cargo, fec_inicio, fec_final, id_p]);
 
+      var fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');
+      var fechaFinalN = await FormatearFecha2(fec_final, 'ddd');
+
+      var fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+      var fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
+
+
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'map_empleado_procesos',
         usuario: user_name,
         accion: 'U',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{id: ${id}, id_empleado_cargo: ${id_empl_cargo}, fecha_inicio: ${fec_inicio}, fecha_final: ${fec_final}}`,
-        ip, 
+        datosOriginales: `{id: ${datosOriginales.id}, id_empleado_cargo: ${datosOriginales.id_empl_cargo}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}}`,
+        datosNuevos: `{id: ${id}, id_empleado_cargo: ${id_empl_cargo}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}}`,
+        ip,
         observacion: null
       });
 
@@ -109,7 +123,7 @@ class EmpleadoProcesoControlador {
     res.status(404).jsonp({ text: 'Registro no encontrado.' });
   }
 
- 
+
 
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
@@ -129,8 +143,8 @@ class EmpleadoProcesoControlador {
           usuario: user_name,
           accion: 'D',
           datosOriginales: '',
-          datosNuevos:'',
-          ip, 
+          datosNuevos: '',
+          ip,
           observacion: `Error al eliminar proceso con id: ${id}`
         });
 
@@ -143,15 +157,16 @@ class EmpleadoProcesoControlador {
         `
         DELETE FROM map_empleado_procesos WHERE id = $1
         `, [id]);
-
+      var fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+      var fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'map_empleado_procesos',
         usuario: user_name,
         accion: 'D',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos:'',
-        ip, 
+        datosOriginales: `{id: ${datosOriginales.id}, id_empleado_cargo: ${datosOriginales.id_empl_cargo}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}}`,
+        datosNuevos: '',
+        ip,
         observacion: null
       });
 

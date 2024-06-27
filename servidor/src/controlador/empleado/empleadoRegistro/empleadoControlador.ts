@@ -11,6 +11,7 @@ import excel from 'xlsx';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
+import { FormatearFecha2 } from '../../../libs/settingsMail';
 
 const sharp = require('sharp');
 
@@ -236,13 +237,19 @@ class EmpleadoControlador {
 
       const [empleado] = response.rows;
 
+
+      const fechaNacimiento = await FormatearFecha2(fec_nacimiento, 'ddd')
+
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eu_empleados',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: JSON.stringify(empleado),
+
+        datosNuevos: `{cedula:${cedula}, apellido:${apellido}, nombre:${nombre}, estado_civil:${esta_civil}, genero: ${genero}, correo: ${correo}, 
+          fecha_nacimiento:${fechaNacimiento}, estado:${estado}, domicilio:${domicilio}, telefono:${telefono}, id_nacionalidad:${id_nacionalidad}, codigo:${codigo}`,
         ip,
         observacion: null
       });
@@ -259,6 +266,7 @@ class EmpleadoControlador {
     }
     catch (error) {
       // REVERTIR TRANSACCION
+      console.log(error)
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
     }
@@ -311,13 +319,18 @@ class EmpleadoControlador {
         , [id, cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
           domicilio, telefono, id_nacionalidad, codigo]);
 
+
+      const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd')
+      const fechaNacimientoN = await FormatearFecha2(fec_nacimiento.toLocaleString(), 'ddd')
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eu_empleados',
         usuario: user_name,
         accion: 'U',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{cedula: ${cedula}, apellido: ${apellido}, nombre: ${nombre}, estado_civil: ${esta_civil}, genero: ${genero}, correo: ${correo}, fecha_nacimiento: ${fec_nacimiento}, estado: ${estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad}, codigo: ${codigo}}`,
+        datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
+
+        datosNuevos: `{id:${datosOriginales.id}, cedula: ${cedula}, apellido: ${apellido}, nombre: ${nombre}, estado_civil: ${esta_civil}, genero: ${genero}, correo: ${correo}, fecha_nacimiento: ${fechaNacimientoN}, estado: ${estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad}, codigo: ${codigo}, imagen: ${datosOriginales.imagen},  mail_alternativo: ${datosOriginales.mail_alternativo}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
         ip,
         observacion: null
       });
@@ -558,13 +571,16 @@ class EmpleadoControlador {
             , [obj])
             .then((result: any) => { });
 
+          const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd')
+
+
           // AUDITORIA
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
             tabla: 'eu_empleados',
             usuario: user_name,
             accion: 'U',
-            datosOriginales: JSON.stringify(datosOriginales),
-            datosNuevos: `{estado: 2}`,
+            datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
+            datosNuevos: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: 2, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
             ip,
             observacion: null
           });
@@ -662,13 +678,16 @@ class EmpleadoControlador {
             , [obj])
             .then((result: any) => { });
 
+          const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd')
+
+
           // AUDITORIA
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
             tabla: 'eu_empleados',
             usuario: user_name,
             accion: 'U',
-            datosOriginales: JSON.stringify(datosOriginales),
-            datosNuevos: `{estado: 1}`,
+            datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
+            datosNuevos: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: 1, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
             ip,
             observacion: null
           });
@@ -915,13 +934,16 @@ class EmpleadoControlador {
             `
             , [id, imagen]);
 
+          const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd')
+
+
           // AUDITORIA
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
             tabla: 'eu_empleados',
             usuario: user_name,
             accion: 'U',
-            datosOriginales: JSON.stringify(datosOriginales),
-            datosNuevos: `{imagen: ${imagen}}`,
+            datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
+            datosNuevos: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
             ip,
             observacion: null
           });
@@ -984,13 +1006,18 @@ class EmpleadoControlador {
         , [lat, lng, id])
         .then((result: any) => { });
 
+
+      const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd')
+
+
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'empleados',
         usuario: user_name,
         accion: 'U',
-        datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{latitud: ${lat}, longitud: ${lng}}`,
+        datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
+        datosNuevos: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${lng}, latitud: ${lat}, web_access: ${datosOriginales.web_access}}`,
         ip,
         observacion: null
       });
@@ -1301,7 +1328,7 @@ class EmpleadoControlador {
     const { empleados, user_name, ip } = req.body;
     let empleadosRegistrados: boolean = false;
     let errorEliminar: boolean = false;
-    
+
     for (const e of empleados) {
       try {
         // INICIAR TRANSACCION
@@ -1313,7 +1340,7 @@ class EmpleadoControlador {
 
         const empleado = await pool.query('SELECT * FROM eu_empleados WHERE id = $1', [e.id]);
         const [datosOriginalesEmpleado] = empleado.rows;
-  
+
         if (!datosOriginalesUsuarios || !datosOriginalesEmpleado) {
           await AUDITORIA_CONTROLADOR.InsertarAuditoria({
             tabla: 'eu_usuarios',
@@ -1337,7 +1364,7 @@ class EmpleadoControlador {
 
           errorEliminar = true;
           await pool.query('COMMIT');
-          continue; 
+          continue;
         }
 
         const datosActuales = await pool.query('SELECT * FROM datos_actuales_empleado WHERE id = $1', [e.id]);
@@ -1348,7 +1375,7 @@ class EmpleadoControlador {
 
         if (datosActualesEmpleado || datosContratos) {
           empleadosRegistrados = true;
-          continue; 
+          continue;
         }
 
         // ELIMINAR USUARIO
@@ -1364,24 +1391,26 @@ class EmpleadoControlador {
           ip,
           observacion: `Usuario con id_empleado: ${e.id} eliminado correctamente.`
         });
-  
+
         // ELIMINAR EMPLEADO
         await pool.query('DELETE FROM eu_empleados WHERE id = $1', [e.id]);
-  
+
+        const fechaNacimientoO = await FormatearFecha2(datosOriginalesEmpleado.fecha_nacimiento, 'ddd')
+
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
           tabla: 'eu_empleados',
           usuario: user_name,
           accion: 'D',
-          datosOriginales: JSON.stringify(datosOriginalesEmpleado),
+          datosOriginales: `{id: ${datosOriginalesEmpleado.id}, cedula: ${datosOriginalesEmpleado.cedula}, codigo: ${datosOriginalesEmpleado.codigo}, apellido: ${datosOriginalesEmpleado.apellido}, nombre: ${datosOriginalesEmpleado.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginalesEmpleado.estado_civil}, genero: ${datosOriginalesEmpleado.genero}, correo: ${datosOriginalesEmpleado.correo}, mail_alternativo: ${datosOriginalesEmpleado.mail_alternativo}, estado: ${datosOriginalesEmpleado.estado}, domicilio: ${datosOriginalesEmpleado.domicilio}, telefono: ${datosOriginalesEmpleado.telefono}, id_nacionalidad: ${datosOriginalesEmpleado.id_nacionalidad}, imagen: ${datosOriginalesEmpleado.imagen}, longitud: ${datosOriginalesEmpleado.longitud}, latitud: ${datosOriginalesEmpleado.latitud}, web_access: ${datosOriginalesEmpleado.web_access}}`,
           datosNuevos: '',
           ip,
-          observacion: `Empleado con id: ${e.id} eliminado correctamente.`
+          observacion: null
         });
 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
-        
+
       } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
@@ -1511,9 +1540,9 @@ class EmpleadoControlador {
 
                                 if (!regexLatitud.test(data.latitud) && !regexLongitud.test(data.longitud)) {
                                   data.observacion = '3';
-                                }else if(!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)){
+                                } else if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                                   data.observacion = 'Verificar ubicacion';
-                                }else{
+                                } else {
                                   if (duplicados.find((p: any) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
                                     data.observacion = 'ok';
                                     duplicados.push(dato);
@@ -1637,57 +1666,57 @@ class EmpleadoControlador {
                 if (data.cedula.toString().length != 10) {
                   data.observacion = 'La cédula ingresada no es válida';
                 } else {
-                  if(data.apellido != 'No registrado' &&  data.nombre != 'No registrado'){
+                  if (data.apellido != 'No registrado' && data.nombre != 'No registrado') {
                     if (data.contrasena != 'No registrado') {
-                    if (!valiContra.test(data.contrasena.toString())) {
-                      if (data.contrasena.toString().length <= 10) {
-                        if(data.estado_civil != 'No registrado'){
-                          if (estadoCivilArray.includes(data.estado_civil)) {
-                            if(data.genero != 'No registrado'){
-                              if (tipogenero.includes(data.genero.toLowerCase())) {
-                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                                if (data.fec_nacimiento != 'No registrado') {
-                                  if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
-                                    // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
-                                    if (TELEFONO != undefined) {
-    
-                                      //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
-                                      if (regex.test(data.telefono.toString())) {
-                                        if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                          //console.log('ent: ', data.telefono);
-                                          data.observacion = 'El teléfono ingresado no es válido';
-                                        } else {
-                                          if (!regexLatitud.test(data.latitud) && !regexLongitud.test(data.longitud)) {
-                                            data.observacion = '3';
-                                          }else if(!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)){
-                                            data.observacion = 'Verificar ubicación';
+                      if (!valiContra.test(data.contrasena.toString())) {
+                        if (data.contrasena.toString().length <= 10) {
+                          if (data.estado_civil != 'No registrado') {
+                            if (estadoCivilArray.includes(data.estado_civil)) {
+                              if (data.genero != 'No registrado') {
+                                if (tipogenero.includes(data.genero.toLowerCase())) {
+                                  // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
+                                  if (data.fec_nacimiento != 'No registrado') {
+                                    if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                                      // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
+                                      if (TELEFONO != undefined) {
+
+                                        //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
+                                        if (regex.test(data.telefono.toString())) {
+                                          if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                                            //console.log('ent: ', data.telefono);
+                                            data.observacion = 'El teléfono ingresado no es válido';
+                                          } else {
+                                            if (!regexLatitud.test(data.latitud) && !regexLongitud.test(data.longitud)) {
+                                              data.observacion = '3';
+                                            } else if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                              data.observacion = 'Verificar ubicación';
+                                            }
                                           }
+                                          //console.log(data.telefono);
+                                        } else {
+                                          data.observacion = 'El teléfono ingresado no es válido';
                                         }
-                                        //console.log(data.telefono);
-                                      } else {
-                                        data.observacion = 'El teléfono ingresado no es válido';
                                       }
+                                    } else {
+                                      data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                                     }
-                                  } else {
-                                    data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                                   }
+
+                                } else {
+                                  data.observacion = 'Género no es válido';
                                 }
-    
-                              } else {
-                                data.observacion = 'Género no es válido';
                               }
+
+                            } else {
+                              data.observacion = 'Estado civil no es válido';
                             }
-                            
-                          } else {
-                            data.observacion = 'Estado civil no es válido';
                           }
+                        } else {
+                          data.observacion = 'La contraseña debe tener máximo 10 caracteres';
                         }
                       } else {
-                        data.observacion = 'La contraseña debe tener máximo 10 caracteres';
+                        data.observacion = 'La contraseña ingresada no es válida';
                       }
-                    } else {
-                      data.observacion = 'La contraseña ingresada no es válida';
-                    }
                     }
                   }
                 }
@@ -1793,7 +1822,7 @@ class EmpleadoControlador {
               item.observacion = 'Registro duplicado (cédula)';
             } else if (item.observacion == '2') {
               item.observacion = 'Registro duplicado (usuario)';
-            }else if (item.observacion == '3'){
+            } else if (item.observacion == '3') {
               item.observacion = 'no registrado';
             }
 
@@ -2172,7 +2201,7 @@ class EmpleadoControlador {
                                   } else {
                                     if (!regexLatitud.test(data.latitud) && !regexLongitud.test(data.longitud)) {
                                       data.observacion = '3';
-                                    }else if(!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)){
+                                    } else if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                                       data.observacion = 'Verificar ubicación';
                                     } else {
                                       if (duplicados.find((p: any) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
@@ -2304,55 +2333,55 @@ class EmpleadoControlador {
                 if (data.codigo.toString().length > 10) {
                   data.observacion = 'El código debe tener máximo 10 caracteres';
                 } else {
-                  if(data.apellido != 'No registrado' &&  data.nombre != 'No registrado'){
+                  if (data.apellido != 'No registrado' && data.nombre != 'No registrado') {
                     if (CONTRASENA != undefined) {
-                    //console.log('data: ', data.contrasena);
-                    if (!valiContra.test(data.contrasena.toString())) {
-                      //console.log(data.contrasena, ' entro ', data.contrasena.toString().length);
-                      if (data.contrasena.toString().length > 10) {
-                        data.observacion = 'La contraseña debe tener máximo 10 caracteres';
-                      } else {
-                        if(data.estado_civil != 'No registrado'){
-                          if (estadoCivilArray.includes(data.estado_civil)) {
-                            if(data.genero != 'No registrado'){
-                              if (tipogenero.includes(data.genero.toLowerCase())) {
-                                // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
-                                if (data.fec_nacimiento != 'No registrado') {
-                                  if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
-                                    // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
-                                    if (TELEFONO != undefined) {
-                                      const regex = /^[0-9]+$/;
-                                      if (regex.test(data.telefono)) {
-                                        if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
-                                          data.observacion = 'El teléfono ingresado no es válido';
-                                        } else {
-                                          if (!regexLatitud.test(data.latitud) && !regexLongitud.test(data.longitud)) {
-                                            data.observacion = '4';
-                                          }else if(!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)){
-                                            data.observacion = 'Verificar ubicación';
+                      //console.log('data: ', data.contrasena);
+                      if (!valiContra.test(data.contrasena.toString())) {
+                        //console.log(data.contrasena, ' entro ', data.contrasena.toString().length);
+                        if (data.contrasena.toString().length > 10) {
+                          data.observacion = 'La contraseña debe tener máximo 10 caracteres';
+                        } else {
+                          if (data.estado_civil != 'No registrado') {
+                            if (estadoCivilArray.includes(data.estado_civil)) {
+                              if (data.genero != 'No registrado') {
+                                if (tipogenero.includes(data.genero.toLowerCase())) {
+                                  // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
+                                  if (data.fec_nacimiento != 'No registrado') {
+                                    if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                                      // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
+                                      if (TELEFONO != undefined) {
+                                        const regex = /^[0-9]+$/;
+                                        if (regex.test(data.telefono)) {
+                                          if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
+                                            data.observacion = 'El teléfono ingresado no es válido';
+                                          } else {
+                                            if (!regexLatitud.test(data.latitud) && !regexLongitud.test(data.longitud)) {
+                                              data.observacion = '4';
+                                            } else if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                              data.observacion = 'Verificar ubicación';
+                                            }
                                           }
+                                        } else {
+                                          data.observacion = 'El teléfono ingresado no es válido';
                                         }
-                                      } else {
-                                        data.observacion = 'El teléfono ingresado no es válido';
                                       }
+                                    } else {
+                                      data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                                     }
-                                  } else {
-                                    data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                                   }
+                                } else {
+                                  data.observacion = 'Género no es válido';
                                 }
-                              } else {
-                                data.observacion = 'Género no es válido';
                               }
+
+                            } else {
+                              data.observacion = 'Estado civil no es válido';
                             }
-                            
-                          } else {
-                            data.observacion = 'Estado civil no es válido';
                           }
                         }
+                      } else {
+                        data.observacion = 'La contraseña ingresada no es válida';
                       }
-                    } else {
-                      data.observacion = 'La contraseña ingresada no es válida';
-                    }
                     }
                   }
                 }
@@ -2489,7 +2518,7 @@ class EmpleadoControlador {
               item.observacion = 'Registro duplicado (usuario)';
             } else if (item.observacion == '3') {
               item.observacion = 'Registro duplicado (código)';
-            }else if (item.observacion == '4') {
+            } else if (item.observacion == '4') {
               item.observacion = 'no registrado';
             }
 

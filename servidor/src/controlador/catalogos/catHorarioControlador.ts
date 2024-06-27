@@ -1,7 +1,7 @@
 import { ObtenerIndicePlantilla, ObtenerRutaHorarios, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import fs from 'fs';
 import path from 'path';
 import pool from '../../database';
@@ -9,7 +9,6 @@ import excel from 'xlsx';
 import moment from 'moment';
 
 class HorarioControlador {
-
 
   // REGISTRAR HORARIO
   public async CrearHorario(req: Request, res: Response): Promise<Response> {
@@ -27,13 +26,15 @@ class HorarioControlador {
 
       const [horario] = response.rows;
 
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eh_cat_horarios',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: JSON.stringify(horario),
+        datosNuevos: `{codigo=${codigo}, nombre=${nombre}, minutos_comida=${min_almuerzo}, hora_trabajo=${hora_trabajo}, nocturno=${nocturno}, documento=${''}, default_=${default_} } `,
+
         ip,
         observacion: null
       })
@@ -210,7 +211,7 @@ class HorarioControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{nombre: ${nombre}, minutos_comida: ${min_almuerzo}, hora_trabajo: ${hora_trabajo}, nocturno: ${nocturno}, codigo: ${codigo}, default_: ${default_}}`,
+        datosNuevos: `{nombre: ${nombre}, minutos_comida: ${min_almuerzo}, hora_trabajo: ${hora_trabajo}, nocturno: ${nocturno}, codigo: ${codigo}, documento: ${datosOriginales.documento}, default_: ${default_}}`,
         ip,
         observacion: null
       });
@@ -479,7 +480,7 @@ class HorarioControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{hora_trabajo: ${hora_trabajo}}`,
+        datosNuevos: `{codigo=${datosOriginales.codigo}, nombre=${datosOriginales.nombre}, minutos_comida=${datosOriginales.nombre}, hora_trabajo=${hora_trabajo}, nocturno=${datosOriginales.nocturno}, documento=${datosOriginales.documento}, default_=${datosOriginales.default_} } `,
         ip,
         observacion: null
       });
@@ -593,6 +594,7 @@ class HorarioControlador {
             const idHorario = correcto.id;
             const codigoHorario = correcto.codigo;
             codigosHorariosCargados.push({ codigoHorario, idHorario });
+
           } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -702,7 +704,8 @@ class HorarioControlador {
         return res.status(500).jsonp({ message: 'error' })
       }
     } catch (error) {
-      return res.status(500).jsonp({ message: error });
+      console.log('error ', error)
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -887,7 +890,6 @@ class HorarioControlador {
 
       const horariosOk = plantillaHorarios.filter((horario: any) => horario.OBSERVACION === 'Ok');
 
-
       // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
       fs.access(ruta, fs.constants.F_OK, (err) => {
         if (err) {
@@ -896,9 +898,7 @@ class HorarioControlador {
           fs.unlinkSync(ruta);
         }
       });
-
       const mensaje = horariosOk.length > 0 ? 'correcto' : 'error';
-
       res.json({ plantillaHorarios, plantillaDetalles, mensaje });
     }
   }

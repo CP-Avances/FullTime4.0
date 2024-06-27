@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import {
   enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
-  FormatearFecha, FormatearHora, dia_completo
+  FormatearFecha, FormatearHora, dia_completo, FormatearFecha2
 }
   from '../../libs/settingsMail';
 
@@ -136,8 +136,8 @@ class PlanHoraExtraControlador {
         UPDATE mhe_empleado_plan_hora_extra SET tiempo_autorizado = $2 WHERE id = $1
         `
         , [id, hora]).then((result: any) => {
-        return { message: 'Tiempo de hora autorizada confirmada' }
-      });
+          return { message: 'Tiempo de hora autorizada confirmada' }
+        });
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -160,7 +160,7 @@ class PlanHoraExtraControlador {
     }
   }
 
- 
+
 
   public async ActualizarEstado(req: Request, res: Response): Promise<Response> {
     try {
@@ -242,13 +242,21 @@ class PlanHoraExtraControlador {
 
       const [planHoraExtra] = response.rows;
 
+      var fecha_DesdeN = await FormatearFecha2(fecha_desde, 'ddd');
+      var fecha_HastaN = await FormatearFecha2(fecha_hasta, 'ddd');
+
+      const horaInicio = await FormatearHora(hora_inicio)
+      const horaFin = await FormatearHora(hora_fin)
+
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'mhe_detalle_plan_hora_extra',
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: JSON.stringify(planHoraExtra),
+        datosNuevos: `{ id_empleado_planifica: ${id_empl_planifica}, fecha_desde: ${fecha_DesdeN}, fecha_hasta: ${fecha_HastaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, 
+          descripcion: ${descripcion}, horas_totales: ${horas_totales}}`,
         ip,
         observacion: null
       });
@@ -389,13 +397,20 @@ class PlanHoraExtraControlador {
         DELETE FROM mhe_detalle_plan_hora_extra WHERE id = $1
         `
         , [id]);
+        var fecha_DesdeO = await FormatearFecha2(datosOriginales.fecha_desde, 'ddd');
+        var fecha_HastaO = await FormatearFecha2(datosOriginales.fecha_hasta, 'ddd');
+  
+        const horaInicioO = await FormatearHora(datosOriginales.hora_inicio)
+        const horaFinO = await FormatearHora(datosOriginales.hora_fin)
+  
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'mhe_detalle_plan_hora_extra',
         usuario: user_name,
         accion: 'D',
-        datosOriginales: JSON.stringify(datosOriginales),
+        datosOriginales: `{ id_empleado_planifica: ${datosOriginales.id_empleado_planifica}, fecha_desde: ${fecha_DesdeO}, fecha_hasta: ${fecha_HastaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, 
+          descripcion: ${datosOriginales.descripcion}, horas_totales: ${datosOriginales.horas_totales}}`,
         datosNuevos: '',
         ip,
         observacion: null
@@ -460,7 +475,7 @@ class PlanHoraExtraControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-  
+
       return res.jsonp({ message: 'Registro eliminado.' });
     } catch (error) {
       // REVERTIR TRANSACCION
@@ -528,7 +543,7 @@ class PlanHoraExtraControlador {
           `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -569,7 +584,7 @@ class PlanHoraExtraControlador {
               <b>Gracias por la atención</b> <br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>                 
+            <img src="cid:pief" width="100%" height="100%"/>                 
           </body>
           `
         ,

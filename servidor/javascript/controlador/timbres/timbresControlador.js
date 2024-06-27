@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.timbresControlador = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
+const settingsMail_1 = require("../../libs/settingsMail");
 class TimbresControlador {
     // ELIMINAR NOTIFICACIONES TABLA DE AVISOS --**VERIFICADO
     EliminarMultiplesAvisos(req, res) {
@@ -143,7 +144,7 @@ class TimbresControlador {
                     `, [id]).then((result) => { return result.rows[0].count; }),
                         timbres_AES: yield database_1.default.query(`
                     SELECT count(*) 
-                    FROM eu_empleados AS e, eu_:timbres AS t 
+                    FROM eu_empleados AS e, eu_timbres AS t 
                     WHERE e.id = $1 AND e.codigo = t.codigo 
                     AND t.accion in (\'AES\', \'E/A\', \'S/A\')
                     `, [id]).then((result) => { return result.rows[0].count; }),
@@ -262,13 +263,6 @@ class TimbresControlador {
     CrearTimbreWeb(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // OBTENCION DE DIRECCION IP
-                var ip_cliente = '';
-                var requestIp = require('request-ip');
-                var clientIp = requestIp.getClientIp(req);
-                if (clientIp != null && clientIp != '' && clientIp != undefined) {
-                    ip_cliente = clientIp.split(':')[3];
-                }
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion, user_name, ip } = req.body;
                 //console.log('ingresa informacion ', req.body)
                 let f = new Date();
@@ -279,35 +273,30 @@ class TimbresControlador {
                 if (code.length === 0)
                     return { mensaje: 'El usuario no tiene un código asignado.' };
                 var codigo = parseInt(code[0].codigo);
+                console.log('codigo ', codigo);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                const [timbre] = yield database_1.default.query(`
+                database_1.default.query(`
                 INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, 
                     codigo, fecha_hora_timbre_servidor, id_reloj, ubicacion, dispositivo_timbre)
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id
                 `, [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
-                    f.toLocaleString(), id_reloj, ubicacion, ip_cliente])
-                    .then((result) => __awaiter(this, void 0, void 0, function* () {
-                    // AUDITORIA
+                    f.toLocaleString(), id_reloj, ubicacion, 'APP_WEB'], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                    const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.split('T')[1]);
+                    const fechaTimbre = yield (0, settingsMail_1.FormatearFecha)(fec_hora_timbre.toLocaleString(), 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_timbres',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fec_hora_timbre}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${f.toLocaleString()}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: ${ip_cliente}}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${f.toLocaleString()}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: 'APP_WEB'}`,
                         ip,
                         observacion: null
                     });
                     //FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    return result.rows;
-                })).catch((err) => {
-                    return err;
-                });
-                if (timbre) {
-                    return res.status(200).jsonp({ message: 'Registro guardado.' });
-                }
-                return res.status(500).jsonp({ message: 'Ups!!! algo ha salido mal.' });
+                    res.status(200).jsonp({ message: 'Registro guardado.' });
+                }));
             }
             catch (error) {
                 // REVERTIR TRANSACCION
@@ -320,14 +309,7 @@ class TimbresControlador {
     CrearTimbreWebAdmin(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                // OBTENCION DE DIRECCION IP
-                var ip_cliente = '';
-                var requestIp = require('request-ip');
-                var clientIp = requestIp.getClientIp(req);
-                if (clientIp != null && clientIp != '' && clientIp != undefined) {
-                    ip_cliente = clientIp.split(':')[3];
-                }
-                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj, tipo } = req.body;
+                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj, tipo, ip, user_name } = req.body;
                 let f = new Date();
                 let servidor;
                 if (tipo === 'administrar') {
@@ -350,19 +332,19 @@ class TimbresControlador {
                     longitud, codigo, id_reloj, dispositivo_timbre, fecha_hora_timbre_servidor) 
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 `, [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
-                    id_reloj, ip_cliente, servidor])
-                    .then((result) => __awaiter(this, void 0, void 0, function* () {
-                    // AUDITORIA
+                    id_reloj, 'APP_WEB', servidor], (error, results) => __awaiter(this, void 0, void 0, function* () {
+                    console.log("ver fecha", fec_hora_timbre);
+                    const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.split('T')[1]);
+                    const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre, 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_timbres',
-                        usuario: 'admin',
+                        usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fec_hora_timbre}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: ${ip_cliente}, fecha_hora_timbre_servidor: ${servidor}}`,
-                        ip: ip_cliente,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}}`,
+                        ip,
                         observacion: null
                     });
-                    // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     res.status(200).jsonp({ message: 'Registro guardado.' });
                 }));

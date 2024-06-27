@@ -6,7 +6,7 @@ import moment from 'moment';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
-
+import { FormatearFecha2 } from '../../../libs/settingsMail';
 class VacunasControlador {
 
     // LISTAR REGISTROS DE VACUNACIÓN DEL EMPLEADO POR SU ID
@@ -101,13 +101,15 @@ class VacunasControlador {
 
                 const [vacuna] = response.rows;
 
+                var fechaN = await FormatearFecha2(fecha, 'ddd');
+
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{id_empleado: ${id_empleado}, descripcion: ${descripcion}, fecha: ${fecha}, id_tipo_vacuna: ${id_tipo_vacuna}}`,
+                    datosNuevos: `{id_empleado: ${id_empleado}, id_vacuna: ${id_tipo_vacuna}, fecha: ${fechaN}, carnet: null , descripcion: ${descripcion}}`,
                     ip,
                     observacion: null
                 });
@@ -190,14 +192,16 @@ class VacunasControlador {
                     UPDATE eu_empleado_vacunas SET carnet = $2 WHERE id = $1
                     `
                 , [id, documento]);
+            var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_empleado_vacunas',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: '',
-                datosNuevos: `{carnet: ${documento}}`,
+                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
+                datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${documento} , descripcion: ${datosOriginales.descripcion}}`,
                 ip,
                 observacion: null
             });
@@ -282,13 +286,16 @@ class VacunasControlador {
                     `
                     , [id_empleado, descripcion, fecha, id_tipo_vacuna, id]);
 
+                var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+
+                var fechaN = await FormatearFecha2(fecha, 'ddd');
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{id_empleado: ${id_empleado}, descripcion: ${descripcion}, fecha: ${fecha}, id_vacuna: ${id_tipo_vacuna}}`,
+                    datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
+                    datosNuevos: `{id_empleado: ${id_empleado}, id_vacuna: ${id_tipo_vacuna}, fecha: ${fechaN}, carnet: ${datosOriginales.carnet} , descripcion: ${descripcion}}`,
                     ip,
                     observacion: null
                 });
@@ -365,13 +372,16 @@ class VacunasControlador {
 
             const [vacuna] = response.rows;
 
+            var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_empleado_vacunas',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: `{carnet: null}`,
+                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
+                datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: null, descripcion: ${datosOriginales.descripcion}}`,
                 ip,
                 observacion: null
             });
@@ -438,12 +448,15 @@ class VacunasControlador {
 
             const [vacuna] = response.rows;
 
+
+            var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_empleado_vacunas',
                 usuario: user_name,
                 accion: 'D',
-                datosOriginales: JSON.stringify(datosOriginales),
+                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
                 datosNuevos: '',
                 ip,
                 observacion: null

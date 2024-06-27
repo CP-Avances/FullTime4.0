@@ -19,6 +19,7 @@ const moment_1 = __importDefault(require("moment"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const settingsMail_1 = require("../../../libs/settingsMail");
 const xlsx_1 = __importDefault(require("xlsx"));
 class EmpleadoCargosControlador {
     // METODO BUSQUEDA DATOS DEL CARGO DE UN USUARIO
@@ -58,13 +59,15 @@ class EmpleadoCargosControlador {
         `, [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe]);
                 delete datosNuevos.user_name;
                 delete datosNuevos.ip;
+                var fechaIngresoN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
+                var fechaSalidaN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_cargos',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(datosNuevos),
+                    datosNuevos: `{id_contrato: ${id_empl_contrato}, id_departamento: ${id_departamento}, id_sucursal: ${id_sucursal}, id_tipo_cargo: ${cargo}, fecha_inicio: ${fechaIngresoN}, fecha_final: ${fechaSalidaN}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}}`,
                     ip,
                     observacion: null
                 });
@@ -113,13 +116,17 @@ class EmpleadoCargosControlador {
         WHERE id_contrato = $8 AND id = $9
         `, [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo,
                     id_empl_contrato, id, jefe]);
+                var fechaIngresoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
+                var fechaSalidaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
+                var fechaIngresoN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
+                var fechaSalidaN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_cargos',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{id_departamento: ${id_departamento}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, id_sucursal: ${id_sucursal}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, cargo: ${cargo}, jefe: ${jefe}}`,
+                    datosOriginales: `{id_contrato: ${datosOriginales.id_contrato}, id_departamento: ${datosOriginales.id_departamento}, id_sucursal: ${datosOriginales.id_sucursal}, id_tipo_cargo: ${datosOriginales.id_tipo_cargo}, fecha_inicio: ${fechaIngresoO}, fecha_final: ${fechaSalidaO}, sueldo: ${datosOriginales.sueldo}, hora_trabaja: ${datosOriginales.hora_trabaja}, jefe: ${datosOriginales.jefe}}`,
+                    datosNuevos: `{id_contrato: ${id_empl_contrato}, id_departamento: ${id_departamento}, id_sucursal: ${id_sucursal}, id_tipo_cargo: ${cargo}, fecha_inicio: ${fechaIngresoN}, fecha_final: ${fechaSalidaN}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, jefe: ${jefe}}`,
                     ip,
                     observacion: null
                 });

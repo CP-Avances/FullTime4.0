@@ -39,7 +39,7 @@ class HorarioControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(horario),
+                    datosNuevos: `{codigo=${codigo}, nombre=${nombre}, minutos_comida=${min_almuerzo}, hora_trabajo=${hora_trabajo}, nocturno=${nocturno}, documento=${''}, default_=${default_} } `,
                     ip,
                     observacion: null
                 });
@@ -192,7 +192,7 @@ class HorarioControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{nombre: ${nombre}, minutos_comida: ${min_almuerzo}, hora_trabajo: ${hora_trabajo}, nocturno: ${nocturno}, codigo: ${codigo}, default_: ${default_}}`,
+                    datosNuevos: `{nombre: ${nombre}, minutos_comida: ${min_almuerzo}, hora_trabajo: ${hora_trabajo}, nocturno: ${nocturno}, codigo: ${codigo}, documento: ${datosOriginales.documento}, default_: ${default_}}`,
                     ip,
                     observacion: null
                 });
@@ -431,7 +431,7 @@ class HorarioControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{hora_trabajo: ${hora_trabajo}}`,
+                    datosNuevos: `{codigo=${datosOriginales.codigo}, nombre=${datosOriginales.nombre}, minutos_comida=${datosOriginales.nombre}, hora_trabajo=${hora_trabajo}, nocturno=${datosOriginales.nocturno}, documento=${datosOriginales.documento}, default_=${datosOriginales.default_} } `,
                     ip,
                     observacion: null
                 });
@@ -633,7 +633,8 @@ class HorarioControlador {
                 }
             }
             catch (error) {
-                return res.status(500).jsonp({ message: error });
+                console.log('error ', error);
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }

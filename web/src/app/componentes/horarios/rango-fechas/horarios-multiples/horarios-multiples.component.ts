@@ -39,15 +39,6 @@ export class HorariosMultiplesComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
-  // OPCIONES DE DIAS LIBRERIAS EN HORARIOS
-  miercoles = false;
-  domingo = false;
-  viernes = false;
-  martes = false;
-  jueves = false;
-  sabado = false;
-  lunes = false;
-
   // VARIABLE DE ALMACENAMIENTO DE DATOS
   horarios: any = [];
   feriados: any = [];
@@ -305,6 +296,28 @@ export class HorariosMultiplesComponent implements OnInit {
     this.validar = validar;
     this.cancelar = cancelar;
     this.registrar = formulario;
+    if (this.registrar === true) {
+      this.lunesF.disable();
+      this.martesF.disable();
+      this.miercolesF.disable();
+      this.juevesF.disable();
+      this.viernesF.disable();
+      this.sabadoF.disable();
+      this.domingoF.disable();
+      this.fechaInicioF.disable();
+      this.fechaFinalF.disable();
+    }
+    else {
+      this.lunesF.enable();
+      this.martesF.enable();
+      this.miercolesF.enable();
+      this.juevesF.enable();
+      this.viernesF.enable();
+      this.sabadoF.enable();
+      this.domingoF.enable();
+      this.fechaInicioF.enable();
+      this.fechaFinalF.enable();
+    }
     this.btn_eliminar_todo = eliminar_todo;
     this.btn_eliminar = eliminar;
   }
@@ -382,8 +395,8 @@ export class HorariosMultiplesComponent implements OnInit {
         this.cont2 = this.cont2 + 1;
 
         // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS
-        if ((Date.parse(response[0].fecha_ingreso.split('T')[0]) <= Date.parse(form.fechaInicioForm)) &&
-          (Date.parse(response[0].fecha_salida.split('T')[0]) >= Date.parse(form.fechaFinalForm))) {
+        if ((Date.parse(response[0].fecha_ingreso.split('T')[0]) <= Date.parse(moment(form.fechaInicioForm).format('YYYY-MM-DD'))) &&
+          (Date.parse(response[0].fecha_salida.split('T')[0]) >= Date.parse(moment(form.fechaFinalForm).format('YYYY-MM-DD')))) {
 
           dh.observacion = 'OK';
           contrato = contrato.concat(dh);
@@ -646,27 +659,16 @@ export class HorariosMultiplesComponent implements OnInit {
       sumam = 0;
       sumah = sumah + 1;
     }
+
     let h = '00';
     let m = '00';
     let s = '00';
-    if (sumah < 10) {
-      h = '0' + sumah;
-    }
-    else {
-      h = String(sumah)
-    }
-    if (sumam < 10) {
-      m = '0' + sumam;
-    }
-    else {
-      m = String(sumam)
-    }
-    if (sumas < 10) {
-      s = '0' + sumas;
-    }
-    else {
-      s = String(sumas)
-    }
+
+    // CCONVERTIR A DOS DIGITOS
+    h = sumah < 10 ? '0' + sumah : String(sumah);
+    m = sumam < 10 ? '0' + sumam : String(sumam);
+    s = sumas < 10 ? '0' + sumas : String(sumas);
+
     return h + ':' + m + ':' + s;
   }
 
@@ -978,7 +980,7 @@ export class HorariosMultiplesComponent implements OnInit {
         // ALMACENAMIENTO DE PLANIFICACION GENERAL
         this.plan_general = this.plan_general.concat(plan);
       })
-      //console.log('ver datos de plan_general ', this.plan_general)
+      console.log('ver datos de plan_general ', this.plan_general)
     }
   }
 
@@ -1154,6 +1156,7 @@ export class HorariosMultiplesComponent implements OnInit {
       lunesForm: false,
     });
     this.usuarios_validos = [];
+
   }
 
   // METODO PARA CERRAR VENTANA

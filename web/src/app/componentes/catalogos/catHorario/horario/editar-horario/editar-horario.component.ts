@@ -22,9 +22,6 @@ import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.
 
 export class EditarHorarioComponent implements OnInit {
 
-  // OPCIONES DE REGISTRO DE HORARIO
-  nocturno = false;
-
   // VALIDACIONES PARA EL FORMULARIO
   horaTrabajo = new FormControl('', [Validators.required, Validators.pattern("^[0-9]*(:[0-9][0-9])?$")]);
   archivoForm = new FormControl('');
@@ -117,13 +114,6 @@ export class EditarHorarioComponent implements OnInit {
       tipoForm: this.data.horario.nocturno,
       tipoHForm: tipo,
     });
-
-    if (this.data.horario.nocturno === true) {
-      this.nocturno = true;
-    }
-    else {
-      this.nocturno = false;
-    }
   }
 
   // METODO PARA REGISTRAR DATOS DE HORARIO

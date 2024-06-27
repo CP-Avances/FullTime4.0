@@ -644,7 +644,6 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
       useClass: SpinnerInterceptor,
       multi: true
     },
-
     {
       provide: LOCALE_ID, useValue: 'es-EC'
     },
