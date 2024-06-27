@@ -9,6 +9,7 @@ import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/em
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import moment from 'moment';
 
 @Component({
   selector: 'app-registrar-timbre',
@@ -196,8 +197,12 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA TOMAR DATOS DE MARCACION
   RegistrarDatosTimbre(form: any, ubicacion: any) {
+    // OBTENER LA FECHA Y HORA ACTUAL
+    var now = moment();
+    // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
+    var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
     let dataTimbre = {
-      fec_hora_timbre: this.f.toLocaleString(),
+      fec_hora_timbre: fecha_hora,
       tecl_funcion: this.teclaFuncionF,
       observacion: form.observacionForm,
       ubicacion: ubicacion,

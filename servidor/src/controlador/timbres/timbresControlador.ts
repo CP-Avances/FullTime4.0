@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
+import moment from 'moment';
 
 
 class TimbresControlador {
@@ -267,8 +268,12 @@ class TimbresControlador {
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
                 ubicacion, user_name, ip } = req.body;
 
-            //console.log('ingresa informacion ', req.body)
-            let f = new Date();
+            // Obtener la fecha y hora actual
+            var now = moment();
+
+            // Formatear la fecha y hora actual en el formato deseado
+            var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
+
             const id_empleado = req.userIdEmpleado;
 
             let code = await pool.query(
@@ -292,7 +297,7 @@ class TimbresControlador {
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id
                 `,
                 [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
-                    f.toLocaleString(), id_reloj, ubicacion, 'APP_WEB'],
+                    fecha_hora, id_reloj, ubicacion, 'APP_WEB'],
 
                 async (error, results) => {
                     const fechaHora = await FormatearHora(fec_hora_timbre.split('T')[1]);
@@ -303,7 +308,7 @@ class TimbresControlador {
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${f.toLocaleString()}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: 'APP_WEB'}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fecha_hora}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: 'APP_WEB'}`,
                         ip,
                         observacion: null
                     });
@@ -329,14 +334,18 @@ class TimbresControlador {
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud,
                 id_empleado, id_reloj, tipo, ip, user_name } = req.body
 
-            let f = new Date();
+            // Obtener la fecha y hora actual
+            var now = moment();
+
+            // Formatear la fecha y hora actual en el formato deseado
+            var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
             let servidor: any;
 
             if (tipo === 'administrar') {
                 servidor = fec_hora_timbre;
             }
             else {
-                servidor = f.toLocaleString();
+                servidor = fecha_hora;
             }
 
             let code = await pool.query(

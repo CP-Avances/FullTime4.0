@@ -28,18 +28,9 @@ export class TimbreAdminComponent implements OnInit {
   idUsuariosAcceso: Set<any> = new Set();
 
   // DATOS DEL FORMULARIO DE BUSQUEDA
-  departamentoF = new FormControl('', Validators.minLength(2));
   cedula = new FormControl('', Validators.minLength(2));
   nombre = new FormControl('', Validators.minLength(2));
-  cargoF = new FormControl('', Validators.minLength(2));
   codigo = new FormControl('');
-
-  // DATOS DE FILTROS DE BUSQUEDA
-  filtroDepartamento: '';
-  filtroEmpleado = '';
-  filtroCodigo: number;
-  filtroCedula: '';
-  filtroCargo: '';
 
   // ITEMS DE PAGINACION DE LA TABLA DE LISTA DE EMPLEADOS
   numero_pagina_e: number = 1;
@@ -172,12 +163,9 @@ export class TimbreAdminComponent implements OnInit {
 
   // METODO PARA LIMPIAR CAMPOS DE FORMULARIO
   LimpiarCampos() {
-    this.departamentoF.reset();
-    this.filtroEmpleado = '';
     this.codigo.reset();
     this.cedula.reset();
     this.nombre.reset();
-    this.cargoF.reset();
   }
 
   // METODO PARA CERRAR TABLA
