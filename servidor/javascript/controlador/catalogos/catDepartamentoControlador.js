@@ -829,11 +829,11 @@ class DepartamentoControlador {
                                                     }
                                                 }
                                                 else {
-                                                    item.observacion = 'Sucursal superior no existe en la base';
+                                                    item.observacion = 'Sucursal superior no existe en el sistema';
                                                 }
                                             }
                                             else {
-                                                item.observacion = 'Departamento superior no existe en la base';
+                                                item.observacion = 'Departamento superior no existe en el sistema';
                                             }
                                         }
                                         else {
@@ -853,11 +853,11 @@ class DepartamentoControlador {
                             }
                         }
                         else {
-                            item.observacion = 'Departamento no existe en la base';
+                            item.observacion = 'Departamento no existe en el sistema';
                         }
                     }
                     else {
-                        item.observacion = 'Sucursal no existe en la base';
+                        item.observacion = 'Sucursal no existe en el sistema';
                     }
                 }));
                 var tiempo = 1500;

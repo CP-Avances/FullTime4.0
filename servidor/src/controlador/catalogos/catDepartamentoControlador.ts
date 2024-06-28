@@ -951,11 +951,11 @@ class DepartamentoControlador {
                                   item.observacion = 'Departamento no pertenece a la sucursal';
                                 }
                               }else{
-                                item.observacion = 'Sucursal superior no existe en la base';
+                                item.observacion = 'Sucursal superior no existe en el sistema';
                               }
 
                             }else{
-                              item.observacion = 'Departamento superior no existe en la base';
+                              item.observacion = 'Departamento superior no existe en el sistema';
                             }
                         }else{
                           item.observacion = 'El nivel no puede ser mayor a 5';
@@ -970,10 +970,10 @@ class DepartamentoControlador {
                   item.observacion = 'Departamento no pertenece al establecimiento';
                 }
               } else {
-                item.observacion = 'Departamento no existe en la base';
+                item.observacion = 'Departamento no existe en el sistema';
               }
             } else {
-              item.observacion = 'Sucursal no existe en la base';
+              item.observacion = 'Sucursal no existe en el sistema';
             }
         });
 

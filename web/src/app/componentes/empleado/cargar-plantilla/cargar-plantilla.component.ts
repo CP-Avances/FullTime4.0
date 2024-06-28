@@ -312,10 +312,10 @@ export class CargarPlantillaComponent {
       return 'rgb(159, 221, 154)';
     } else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
-    } else if (observacion == 'Sucursal no existe en la base' || 
-      observacion == 'Departamento no existe en la base' ||
-      observacion == 'Departamento superior no existe en la base' ||
-      observacion == 'Sucursal superior no existe en la base' 
+    } else if (observacion == 'Sucursal no existe en el sistema' || 
+      observacion == 'Departamento no existe en el sistema' ||
+      observacion == 'Departamento superior no existe en el sistema' ||
+      observacion == 'Sucursal superior no existe en el sistema' 
     ) {
       return 'rgb(255, 192, 203)';
     } else if (observacion == 'Departamento no pertenece al establecimiento' || 

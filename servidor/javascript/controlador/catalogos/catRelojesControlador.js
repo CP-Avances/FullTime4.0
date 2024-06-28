@@ -94,11 +94,21 @@ class RelojesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { nombre, ip, puerto, contrasenia, marca, modelo, serie, id_fabricacion, fabricante, mac, tien_funciones, id_sucursal, id_departamento, codigo, numero_accion, user_name, user_ip } = req.body;
+                console.log('ver req.body ', req.body);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                var VERIFICAR_CODIGO = yield database_1.default.query(`
-                SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1
-                `, [codigo.toUpperCase()]);
+                var VERIFICAR_CODIGO;
+                if (serie === '') {
+                    VERIFICAR_CODIGO = yield database_1.default.query(`
+                    SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1
+                    `, [codigo.toUpperCase()]);
+                }
+                else {
+                    VERIFICAR_CODIGO = yield database_1.default.query(`
+                    SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1 OR UPPER(serie) = $2
+                    `, [codigo.toUpperCase(), serie.toUpperCase()]);
+                }
+                console.log('ver rows ', VERIFICAR_CODIGO.rows);
                 if (VERIFICAR_CODIGO.rows[0] == undefined || VERIFICAR_CODIGO.rows[0] == '') {
                     const response = yield database_1.default.query(`
                     INSERT INTO ed_relojes (nombre, ip, puerto, contrasenia, marca, modelo, serie, 
@@ -127,11 +137,15 @@ class RelojesControlador {
                         return res.status(404).jsonp({ message: 'mal_registro' });
                     }
                 }
+                else {
+                    return res.jsonp({ message: 'existe' });
+                }
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: error });
+                return res.jsonp({ message: 'error' });
             }
         });
     }
@@ -158,7 +172,9 @@ class RelojesControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const reloj = yield database_1.default.query('SELECT * FROM ed_relojes WHERE codigo = $1', [codigo]);
+                const reloj = yield database_1.default.query(`
+                SELECT * FROM ed_relojes WHERE id = $1
+                `, [id_real]);
                 const [datosOriginales] = reloj.rows;
                 if (!datosOriginales) {
                     // AUDITORIA
@@ -175,10 +191,18 @@ class RelojesControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'error' });
                 }
-                var VERIFICAR_DISCAPACIDAD = yield database_1.default.query(`
-                SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1 AND NOT id = $2
-                `, [codigo.toUpperCase(), id_real]);
-                if (VERIFICAR_DISCAPACIDAD.rows[0] == undefined || VERIFICAR_DISCAPACIDAD.rows[0] == '') {
+                var VERIFICA_CODIGO;
+                if (serie === '') {
+                    VERIFICA_CODIGO = yield database_1.default.query(`
+                    SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1 AND NOT id = $3
+                    `, [codigo.toUpperCase(), id_real]);
+                }
+                else {
+                    VERIFICA_CODIGO = yield database_1.default.query(`
+                    SELECT * FROM ed_relojes WHERE (UPPER(codigo) = $1 OR UPPER(serie) = $2) AND NOT id = $3
+                    `, [codigo.toUpperCase(), serie.toUpperCase(), id_real]);
+                }
+                if (VERIFICA_CODIGO.rows[0] == undefined || VERIFICA_CODIGO.rows[0] == '') {
                     yield database_1.default.query(`
                     UPDATE ed_relojes SET nombre = $1, ip = $2, puerto = $3, contrasenia = $4, marca = $5, 
                         modelo = $6, serie = $7, id_fabricacion = $8, fabricante = $9, mac = $10, 
@@ -193,7 +217,7 @@ class RelojesControlador {
                         usuario: user_name,
                         accion: 'U',
                         datosOriginales: JSON.stringify(datosOriginales),
-                        datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tien_funciones": "${tien_funciones}", "id_sucursal": "${id_sucursal}", "id_departamento": "${id_departamento}", "codigo": "${codigo}", "numero_accion": "${numero_accion}"}`,
+                        datosNuevos: `{"nombre": "${nombre}", "ip": "${ip}", "puerto": "${puerto}", "contrasenia": "${contrasenia}", "marca": "${marca}", "modelo": "${modelo}", "serie": "${serie}", "id_fabricacion": "${id_fabricacion}", "fabricante": "${fabricante}", "mac": "${mac}", "tiene_funciones": "${tien_funciones}", "id_sucursal": "${id_sucursal}", "id_departamento": "${id_departamento}", "codigo": "${codigo}", "numero_accion": "${numero_accion}"}`,
                         ip: user_ip,
                         observacion: null
                     });
@@ -208,7 +232,7 @@ class RelojesControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
+                return res.jsonp({ message: 'error' });
             }
         });
     }
@@ -510,7 +534,7 @@ class RelojesControlador {
                                                 if (validDireccIP.rows[0] == undefined || validDireccIP.rows[0] == '')
                                                     if (regex.test(item.puerto)) {
                                                         if (item.puerto.length > 6) {
-                                                            item.observacion = 'El puerto debe ser de 6 digitos';
+                                                            item.observacion = 'El puerto debe ser de 6 dígitos';
                                                         }
                                                         else {
                                                             if (item.acciones.toString().toLowerCase() == 'si' || item.acciones.toString().toLowerCase() == 'no') {
@@ -567,11 +591,11 @@ class RelojesControlador {
                                     }
                                 }
                                 else {
-                                    item.observacion = 'Departamento no existe en la base';
+                                    item.observacion = 'Departamento no existe en el sistema';
                                 }
                             }
                             else {
-                                item.observacion = 'Establecimiento no existe en la base';
+                                item.observacion = 'Establecimiento no existe en el sistema';
                             }
                         }
                     }));
@@ -599,7 +623,7 @@ class RelojesControlador {
                                     if (direccMac.test(item.direccion_mac.toString())) {
                                     }
                                     else {
-                                        item.observacion = 'Formato de direccion mac incorrecta (numeración hexadecimal)';
+                                        item.observacion = 'Formato de dirección MAC incorrecta (numeración hexadecimal)';
                                     }
                                 }
                             }

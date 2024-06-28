@@ -15,7 +15,7 @@
             </span>
         </div>
         <div class="d-flex flex-wrap justify-content-between">
-            <mat-form-field>
+            <mat-form-field style="width: 200px;">
                 <mat-label>Fecha timbre</mat-label>
                 <input id="i-cursor" matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa" [formControl]="FechaF"
                     required>
@@ -24,7 +24,7 @@
                 </mat-datepicker-toggle>
                 <mat-datepicker touchUi #picker></mat-datepicker>
             </mat-form-field>
-            <mat-form-field>
+            <mat-form-field style="width: 175px;">
                 <mat-label>Hora timbre</mat-label>
                 <input id="i-cursor" matInput type="time" [formControl]="HoraF">
             </mat-form-field>
@@ -38,6 +38,16 @@
                         {{a.name}}
                     </mat-option>
                 </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Observación</mat-label>
+                <textarea matInput #message maxlength="100" placeholder="Ingresar una descripción."
+                    [formControl]="observacionF">
+                        </textarea>
+                <mat-hint align="start" id="letras">
+                    <strong>Ingresar hasta 100 caracteres</strong>
+                </mat-hint>
+                <mat-hint align="end" id="letras">{{message.value.length}} / 100</mat-hint>
             </mat-form-field>
         </div>
     </div>

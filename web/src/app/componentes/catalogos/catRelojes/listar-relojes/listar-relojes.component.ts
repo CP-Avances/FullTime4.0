@@ -38,12 +38,7 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 export class ListarRelojesComponent implements OnInit {
 
-  // ALMACENAMIENTO DE DATOS Y BUSQUEDA
-  filtroDepartamentoReloj = '';
-  filtroSucursalReloj = '';
-  filtroEmpresaReloj = '';
-  filtroNombreReloj = '';
-  filtroIpReloj = '';
+  // ALMACENAMIENTO DE DATOS
   relojes: any = [];
 
   empleado: any = [];
@@ -301,7 +296,7 @@ export class ListarRelojesComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }
       else if (this.messajeExcel == 'no_existe') {
-        this.toastr.error('No se ha encontrado pestaña TIPO_DISCAPACIDAD en la plantilla.', 'Plantilla no aceptada.', {
+        this.toastr.error('No se ha encontrado pestaña BIOMETRICOS en la plantilla.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
@@ -335,21 +330,21 @@ export class ListarRelojesComponent implements OnInit {
       return 'rgb(159, 221, 154)';
     } else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
-    } else if (observacion == 'Establecimiento no existe en la base' ||
-        observacion == 'Departamento no existe en la base') {
+    } else if (observacion == 'Establecimiento no existe en el sistema' ||
+      observacion == 'Departamento no existe en el sistema') {
       return 'rgb(255, 192, 203)';
     } else if (observacion == 'Departamento no pertenece al establecimiento' ||
-        observacion == 'El puerto debe ser de 6 digitos'
+      observacion == 'El puerto debe ser de 6 dígitos'
     ) {
       return 'rgb(238, 34, 207)';
-    }else if (observacion == 'Dirección IP incorrecta' ||
-        observacion == 'Puerto incorrecto (solo números)' ||
-        observacion == 'Acción incorrecta ingrese (SI / NO)' ||
-        observacion == 'Número de acciones incorrecta ingrese (solo números)' ||
-        observacion == 'Formato de direccion mac incorrecta (numeración hexadecimal)'
+    } else if (observacion == 'Dirección IP incorrecta' ||
+      observacion == 'Puerto incorrecto (solo números)' ||
+      observacion == 'Acción incorrecta ingrese (SI / NO)' ||
+      observacion == 'Número de acciones incorrecta ingrese (solo números)' ||
+      observacion == 'Formato de dirección MAC incorrecta (numeración hexadecimal)'
     ) {
       return 'rgb(222, 162, 73)';
-    }else{
+    } else {
       return 'rgb(242, 21, 21)';
     }
   }
@@ -375,7 +370,7 @@ export class ListarRelojesComponent implements OnInit {
       });
   }
 
-  registrarDispositivos(){
+  registrarDispositivos() {
     if (this.listaDispositivosCorrectos.length > 0) {
       const data = {
         plantilla: this.listaDispositivosCorrectos,
