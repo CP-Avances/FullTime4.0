@@ -760,6 +760,8 @@ export class ListarFeriadosComponent implements OnInit {
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
+        this.feriados = [];
+        this.ObtenerFeriados(this.formato_fecha);
       }
     });
   }
@@ -775,7 +777,6 @@ export class ListarFeriadosComponent implements OnInit {
           this.plan_multiple_ = false;
           this.feriadosEliminar = [];
           this.selectionFeriados.clear();
-          this.BuscarParametro();
         }
       });
 
@@ -807,6 +808,8 @@ export class ListarFeriadosComponent implements OnInit {
               timeOut: 6000,
             });
             this.ingresar = true;
+            this.feriados = [];
+            this.ObtenerFeriados(this.formato_fecha);
           }
         }
       });
@@ -826,8 +829,6 @@ export class ListarFeriadosComponent implements OnInit {
             this.plan_multiple_ = false;
             this.feriadosEliminar = [];
             this.selectionFeriados.clear();
-            this.BuscarParametro();
-
           } else {
             this.toastr.warning('No ha seleccionado FERIADOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
