@@ -1899,6 +1899,7 @@ class EmpleadoControlador {
           let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
           nombreE = name1
         }
+        
 
         var apellidoE: any;
         let apellidos = data.apellido.split(' ');
