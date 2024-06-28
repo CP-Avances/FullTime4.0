@@ -92,12 +92,21 @@ class VacunasControlador {
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
 
+                const usuario = await pool.query(
+                    `
+                    SELECT id FROM eu_usuarios WHERE id_empleado = $1
+                    `
+                    , [id_empleado]);
+            
+                  const id_usuario = usuario.rows[0].id;
+                  
+
                 const response: QueryResult = await pool.query(
                     `
-                    INSERT INTO eu_empleado_vacunas (id_empleado, descripcion, fecha, id_vacuna) 
-                    VALUES ($1, $2, $3, $4) RETURNING *
+                    INSERT INTO eu_empleado_vacunas (id_empleado, descripcion, fecha, id_vacuna, id_usuario) 
+                    VALUES ($1, $2, $3, $4, $5) RETURNING *
                     `
-                    , [id_empleado, descripcion, fecha, id_tipo_vacuna]);
+                    , [id_empleado, descripcion, fecha, id_tipo_vacuna, id_usuario]);
 
                 const [vacuna] = response.rows;
 
@@ -109,7 +118,7 @@ class VacunasControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{id_empleado: ${id_empleado}, id_vacuna: ${id_tipo_vacuna}, fecha: ${fechaN}, carnet: null , descripcion: ${descripcion}}`,
+                    datosNuevos: `{id_empleado: ${id_empleado}, id_vacuna: ${id_tipo_vacuna}, fecha: ${fechaN}, carnet: null , descripcion: ${descripcion}, id_usuario: ${id_usuario}`,
                     ip,
                     observacion: null
                 });

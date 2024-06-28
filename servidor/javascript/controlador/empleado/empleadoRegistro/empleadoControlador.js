@@ -926,16 +926,20 @@ class EmpleadoControlador {
                 const { observacion, id_empleado, id_titulo, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
+                const usuario = yield database_1.default.query(`
+        SELECT id FROM eu_usuarios WHERE id_empleado = $1
+        `, [id_empleado]);
+                const id_usuario = usuario.rows[0].id;
                 yield database_1.default.query(`
-        INSERT INTO eu_empleado_titulos (observacion, id_empleado, id_titulo) VALUES ($1, $2, $3)
-        `, [observacion, id_empleado, id_titulo]);
+        INSERT INTO eu_empleado_titulos (observacion, id_empleado, id_titulo, id_usuario) VALUES ($1, $2, $3, $4)
+        `, [observacion, id_empleado, id_titulo, id_usuario]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_titulos',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{observacion: ${observacion}, id_empleado: ${id_empleado}, id_titulo: ${id_titulo}}`,
+                    datosNuevos: `{observacion: ${observacion}, id_empleado: ${id_empleado}, id_titulo: ${id_titulo}, id_usuario: ${id_usuario}`,
                     ip,
                     observacion: null
                 });
@@ -1224,6 +1228,7 @@ class EmpleadoControlador {
                 catch (error) {
                     // REVERTIR TRANSACCION
                     yield database_1.default.query('ROLLBACK');
+                    console.log('error ', error);
                     errorEliminar = true;
                 }
             }
