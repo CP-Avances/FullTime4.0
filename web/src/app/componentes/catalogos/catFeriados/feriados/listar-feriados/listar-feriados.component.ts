@@ -194,8 +194,8 @@ export class ListarFeriadosComponent implements OnInit {
 
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
-    this.DataFeriados = [];
-    this.DataFerieados_ciudades= [];
+    this.DataFeriados = null;
+    this.DataFerieados_ciudades= null;
     this.messajeExcel2 = '';
     this.archivoSubido = [];
     this.nameFile = '';
@@ -388,13 +388,20 @@ export class ListarFeriadosComponent implements OnInit {
         this.toastr.success('Operación exitosa.', 'Plantilla de Discapacidad importada.', {
           timeOut: 5000,
         });
-      },() => {
+
         if(this.listaFerediadCiudadCorrectos?.length > 0){
           setTimeout(() => {
             this.Crear_feriado_ciudad();
           }, 500);
         }
+        console.log('prueba entro')
         this.LimpiarCampos();
+
+      },(error) => {
+        this.toastr.error(error, 'Plantilla procesada.', {
+          timeOut: 4000,
+        });
+        this.archivoForm.reset();
       });
       
     } else {
@@ -479,7 +486,11 @@ export class ListarFeriadosComponent implements OnInit {
       || arrayObservacion[0] == 'Feriado'
     ) {
       return 'rgb(242, 21, 21)';
-    } else if (observacion == 'Feriado no válido') {
+    }else if(observacion == 'La ciudad no existe en el sistema' ||
+      observacion == 'La provincia ingresada no existe en el sistema' 
+    ){
+      return 'rgb(255, 192, 203';
+    } else if (observacion == 'Feriado no válido(Debe existir previamente)') {
       return 'rgb(238, 34, 207)';
     } else {
       return 'white'

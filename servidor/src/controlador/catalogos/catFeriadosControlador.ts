@@ -749,7 +749,10 @@ class FeriadosControlador {
                     if (valor.observacion == '1') {
                         valor.observacion = 'Registro duplicado'
                     } else if (valor.observacion == 'registrado') {
-                        valor.observacion = 'Feriado no válido'
+                        valor.observacion = 'Feriado no válido(Debe existir previamente)'
+                        if(valor.feriado == 'No registrado'){
+                            valor.observacion = 'Feriado no registrado';
+                        }
                     }
                 })
 
