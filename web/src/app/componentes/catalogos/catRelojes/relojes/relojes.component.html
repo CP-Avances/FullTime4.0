@@ -114,7 +114,9 @@
                                 <mat-form-field *ngIf=(activarCampo)>
                                     <mat-label>Número de acciones</mat-label>
                                     <input matInput placeholder="Acciones del dispositivo." [formControl]="numeroF"
-                                        required (keypress)="IngresarSoloNumeros($event)">
+                                        required (keypress)="IngresarSoloNumeros($event)" placeholder="1-8"
+                                        maxlength="1"
+                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar el número de acciones que tiene el dispositivo.">
                                         help_outline

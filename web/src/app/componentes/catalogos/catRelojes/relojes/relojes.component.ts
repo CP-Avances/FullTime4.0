@@ -44,7 +44,7 @@ export class RelojesComponent implements OnInit {
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
 
   // PRIMER FORMULARIO
-  ipF = new FormControl('', [Validators.required, Validators.pattern("[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}")]);
+  ipF = new FormControl('', [Validators.required, Validators.pattern(/^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/)]);
   nombreF = new FormControl('', [Validators.required, Validators.minLength(4)]);
   puertoF = new FormControl('', [Validators.required]);
   codigoF = new FormControl('', Validators.required);
@@ -147,10 +147,13 @@ export class RelojesComponent implements OnInit {
     return data.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
   }
 
+
   // METODO PARA REGISTRAR DISPOSITIVO
   InsertarReloj(form1: any, form2: any) {
-    let reloj = {
+    // VALIDAR DIRECCION MAC
+    const direccMac = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$|^[0-9A-Fa-f]{12}$/;
 
+    let reloj = {
       // PRIMER FORMULARIO
       ip: form1.ipForm,
       codigo: form1.codigoForm,
@@ -172,8 +175,29 @@ export class RelojesComponent implements OnInit {
       user_name: this.user_name,
       user_ip: this.ip,
     };
+    // VALIDAR DIRECCION MAC
+    console.log('mac ', reloj.mac)
+    if (reloj.mac != '') {
+      if (direccMac.test(reloj.mac.toString())) {
+        console.log('ingresa aqui mac')
+        this.GuardarSistema(reloj);
+      } else {
+        this.toastr.warning('MAC ingresada no es válida.',
+          'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        })
+      }
+    }
+    else {
+      console.log('ingresa aqui')
+      this.GuardarSistema(reloj);
+    }
+  }
+
+  // METODO PARA ALMACENAR LOS DATOS EN LA BASE
+  GuardarSistema(reloj: any) {
     this.rest.CrearNuevoReloj(reloj).subscribe(response => {
-      //--console.log('ver response', response)
+      console.log('ver response', response)
       if (response.message === 'guardado') {
         this.LimpiarCampos();
         this.VerDatosReloj(response.reloj.id);
@@ -182,7 +206,7 @@ export class RelojesComponent implements OnInit {
         })
       }
       else if (response.message === 'existe') {
-        this.toastr.warning('Código ingresado ya existe en el sistema.',
+        this.toastr.warning('Código o serie del equipo ya existe en el sistema.',
           'Ups!!! algo salio mal.', {
           timeOut: 6000,
         })

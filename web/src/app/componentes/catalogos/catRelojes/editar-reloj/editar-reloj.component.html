@@ -66,7 +66,7 @@
                                 <mat-form-field>
                                     <mat-label id="selec">Código</mat-label>
                                     <input matInput placeholder="Código del dispositivo." [formControl]="codigoF"
-                                        required (keypress)="IngresarSoloNumeros($event)">
+                                        required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar el código que tiene el dispositivo">help_outline</mat-icon>
                                 </mat-form-field>
@@ -101,21 +101,20 @@
                                         <span style="margin-left: 10px;">Tiene acciones *</span>
                                     </label>
                                     <div class="d-flex justify-content-around">
-                                        <mat-radio-button [(ngModel)]="selec1" [checked]="selec1"
-                                            [ngModelOptions]="{standalone: true}" value="true" (click)="ActivarVista()">
-                                            Si
+                                        <mat-radio-button [value]="true" (click)="ActivarVista()">
+                                            <label id="textoradiobtn">Si</label>
                                         </mat-radio-button>
-                                        <mat-radio-button ngDefaultControl [(ngModel)]="selec2" [checked]="selec2"
-                                            [ngModelOptions]="{standalone: true}" value="false"
-                                            (click)="DesactivarVista()">
-                                            No
+                                        <mat-radio-button [value]="false" (click)="DesactivarVista()">
+                                            <label id="textoradiobtn">No</label>
                                         </mat-radio-button>
                                     </div>
                                 </mat-radio-group>
                                 <mat-form-field *ngIf=(activarCampo)>
                                     <mat-label>Número de acciones</mat-label>
                                     <input matInput placeholder="Acciones del dispositivo." [formControl]="numeroF"
-                                        required (keypress)="IngresarSoloNumeros($event)">
+                                        required (keypress)="IngresarSoloNumeros($event)" placeholder="1-8"
+                                        maxlength="1"
+                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar el número de acciones que tiene el dispositivo.">
                                         help_outline
@@ -202,14 +201,15 @@
                                     <input matInput placeholder="Ingresar dirección MAC" [formControl]="macF">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="left"
                                         matTooltip="Ingresar dirección física (MAC) del dispositivo ">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
                                     <mat-error *ngIf="macF.invalid">Ingresar una dirección MAC válida</mat-error>
                                 </mat-form-field>
                                 <mat-form-field>
                                     <mat-label>Contraseña</mat-label>
                                     <input matInput placeholder="Ingresar contraseña" [formControl]="contraseniaF">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar contraseña del dispositivo.">vpn_key
+                                        matTooltip="Ingresar contraseña del dispositivo.">
                                     </mat-icon>
                                     <mat-error *ngIf="contraseniaF.invalid">Ingresar una contraseña válida.</mat-error>
                                 </mat-form-field>

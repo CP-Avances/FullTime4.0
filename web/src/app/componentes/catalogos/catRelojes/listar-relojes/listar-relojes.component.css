@@ -18,7 +18,7 @@ td {
 
 #letras {
     text-align: center;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .btn {
@@ -101,4 +101,14 @@ td {
     height: 12px;
     border-radius: 50px;
     float: left;
+}
+
+#t-inputs {
+    background: transparent;
+    font-size: 12px;
+    text-align: center;
+    outline: none;
+    fill: none;
+    width: 130px;
+    height: 65px;
 }

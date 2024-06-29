@@ -648,7 +648,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
       provide: LOCALE_ID, useValue: 'es-EC'
     },
     { provide: MatPaginatorIntl, useClass: MatPaginatorIntl },
-    //LoginService,
+    LoginService,
     RolesService,
     TituloService,
     EmpleadoService,

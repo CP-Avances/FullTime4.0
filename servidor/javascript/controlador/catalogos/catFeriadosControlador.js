@@ -563,7 +563,7 @@ class FeriadosControlador {
                             }
                         }
                         else {
-                            value.observacion = 'La provincia ingresada no existe en la base';
+                            value.observacion = 'La provincia ingresada no existe en el sistema';
                         }
                     }
                     // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.

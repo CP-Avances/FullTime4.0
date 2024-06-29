@@ -18,6 +18,7 @@ export class CrearTimbreComponent implements OnInit {
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   teclaFuncionF = new FormControl('');
+  observacionF = new FormControl('');
   accionF = new FormControl('', Validators.required);
   FechaF = new FormControl('', Validators.required);
   HoraF = new FormControl('', Validators.required);
@@ -50,6 +51,7 @@ export class CrearTimbreComponent implements OnInit {
     fechaForm: this.FechaF,
     accionForm: this.accionF,
     teclaFuncionForm: this.teclaFuncionF,
+    observacionForm: this.observacionF,
   });
 
   // METODO DE CONTROL DE MEMORIA
@@ -145,7 +147,7 @@ export class CrearTimbreComponent implements OnInit {
     let timbre = {
       fec_hora_timbre: form.fechaForm.toJSON().split('T')[0] + 'T' + form.horaForm + ':00',
       tecl_funcion: this.TeclaFuncion(form.accionForm),
-      observacion: 'Timbre creado por ' + this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido,
+      observacion: 'Timbre creado por ' + this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido + ', ' + form.observacionForm,
       id_empleado: '',
       id_reloj: 98,
       longitud: this.longitud,
