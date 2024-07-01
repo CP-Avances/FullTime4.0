@@ -65,9 +65,9 @@ class CiudadControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            await pool.query(
+            const datosNuevos = await pool.query(
                 `
-                INSERT INTO e_ciudades (id_provincia, descripcion) VALUES ($1, $2)
+                INSERT INTO e_ciudades (id_provincia, descripcion) VALUES ($1, $2) RETURNING *
                 `
                 , [id_provincia, descripcion]);
             
@@ -77,7 +77,7 @@ class CiudadControlador {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{id_provincia: ${id_provincia}, descripcion: ${descripcion}}`,
+                datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                 ip,
                 observacion: null
             });
