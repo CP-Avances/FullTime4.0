@@ -18,14 +18,13 @@
                             <label id="textoradiobtn">{{c.valor}}</label></mat-radio-button>
                     </mat-radio-group>
                 </form>
-                <!-- FORM PARA SUCURSALES -->
+                <!--  **************************  FORM PARA SUCURSALES  ******************************  -->
                 <form *ngIf="_booleanOptions.bool_suc">
                     <div class="d-flex flex-wrap justify-content-center">
                         <mat-form-field>
                             <mat-label>Sucursal</mat-label>
-                            <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc_"
-                                (input)="Filtrar(filtroNombreSuc_, 6)" [formControl]="nombre_suc" type="text"
-                                (keypress)="IngresarSoloLetras($event)">
+                            <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 6)"
+                                [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                             <mat-icon matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda de sucursales por nombre.">
                                 help_outline
@@ -33,16 +32,15 @@
                         </mat-form-field>
                     </div>
                 </form>
-                <!-- FORM PARA REGIMEN -->
+                <!--  ***************************  FORM PARA REGIMEN  ***************************  -->
                 <form *ngIf="_booleanOptions.bool_reg">
                     <div class="row">
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Sucursal</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc_"
-                                        (input)="Filtrar(filtroNombreSuc_, 6)" [formControl]="nombre_suc" type="text"
-                                        (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 6)"
+                                        [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
                                         help_outline
@@ -54,9 +52,8 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Régimen laboral</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreReg_"
-                                        (input)="Filtrar(filtroNombreReg_, 13)" [formControl]="nombre_reg" type="text"
-                                        (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_reg.value, 13)"
+                                        [formControl]="nombre_reg" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de régim laboral por nombre.">
                                         help_outline
@@ -66,16 +63,15 @@
                         </div>
                     </div>
                 </form>
-                <!-- FORM PARA CARGOS -->
+                <!--  *********************************  FORM PARA CARGOS  ****************************  -->
                 <form *ngIf="_booleanOptions.bool_cargo">
                     <div class="row">
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Sucursal</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc_"
-                                        (input)="Filtrar(filtroNombreSuc_, 6)" [formControl]="nombre_suc" type="text"
-                                        (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 6)"
+                                        [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
                                         help_outline
@@ -87,9 +83,8 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Cargo</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreCarg_"
-                                        (input)="Filtrar(filtroNombreCarg_, 7)" [formControl]="nombre_carg" type="text"
-                                        (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_carg.value, 7)"
+                                        [formControl]="nombre_carg" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de cargos por su descripción.">
                                         help_outline
@@ -99,16 +94,15 @@
                         </div>
                     </div>
                 </form>
-                <!-- FORM PARA DEPARTAMENTOS -->
+                <!--  *************************  FORM PARA DEPARTAMENTOS  **************************  -->
                 <form *ngIf="_booleanOptions.bool_dep">
                     <div class="row">
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Sucursal</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc_"
-                                        (input)="Filtrar(filtroNombreSuc_, 6)" [formControl]="nombre_suc" type="text"
-                                        (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 6)"
+                                        [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
                                         help_outline
@@ -120,9 +114,8 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Departamento</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreDep_"
-                                        (input)="Filtrar(filtroNombreDep_, 8)" [formControl]="nombre_dep" type="text"
-                                        (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_dep.value, 8)"
+                                        [formControl]="nombre_dep" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de departamentos por nombre.">
                                         help_outline
@@ -132,16 +125,15 @@
                         </div>
                     </div>
                 </form>
-                <!-- FORM PARA EMPLEADOS -->
+                <!--  **************************  FORM PARA EMPLEADOS  ***************************  -->
                 <form *ngIf="_booleanOptions.bool_emp">
                     <div class="row">
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Sucursal</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc_"
-                                        (input)="Filtrar(filtroNombreSuc_, 6)" [formControl]="nombre_suc" type="text"
-                                        (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 6)"
+                                        [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
                                         help_outline
@@ -151,9 +143,8 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Nombres</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreEmp_"
-                                        (input)="Filtrar(filtroNombreEmp_, 10)" [formControl]="nombre_emp" type="text"
-                                        (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 10)"
+                                        [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
                                     <mat-error *ngIf="nombre_emp.invalid">
                                         Indispensable ingresar dos letras
                                     </mat-error>
@@ -168,9 +159,8 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Código</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo_"
-                                        (input)="Filtrar(filtroCodigo_, 8)" [formControl]="codigo"
-                                        (keypress)="IngresarSoloNumeros($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 8)"
+                                        [formControl]="codigo" (keypress)="IngresarSoloNumeros($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de datos de empleado por código.">
                                         help_outline
@@ -180,8 +170,8 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Cédula</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula_" maxlength="10"
-                                        (input)="Filtrar(filtroCedula_, 9)"
+                                    <input matInput placeholder="Buscar" maxlength="10"
+                                        (input)="Filtrar(cedula.value, 9)"
                                         oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                         [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
                                     <mat-error *ngIf="cedula.invalid">
@@ -205,7 +195,7 @@
                 </div>
 
                 <hr>
-                <!-- TABLA PARA SUCURSALES -->
+                <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
                 <div *ngIf="_booleanOptions.bool_suc" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados">
                         <span class="w-100 bd-highlight">
@@ -262,7 +252,7 @@
                     </mat-paginator>
                     <br>
                 </div>
-                <!-- TABLA PARA REGIMEN -->
+                <!--  ****************************  TABLA PARA REGIMEN  ****************************  -->
                 <div *ngIf="_booleanOptions.bool_reg" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados">
                         <span class="w-100 bd-highlight">
@@ -323,7 +313,7 @@
                     </mat-paginator>
                     <br>
                 </div>
-                <!-- TABLA PARA CARGOS -->
+                <!--  ***************************  TABLA PARA CARGOS  ***************************  -->
                 <div *ngIf="_booleanOptions.bool_cargo" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados">
                         <span class="w-100 bd-highlight">
@@ -383,7 +373,7 @@
                     <br>
                 </div>
 
-                <!-- TABLA PARA DEPARTAMENTOS -->
+                <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
                 <div *ngIf="_booleanOptions.bool_dep" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados">
                         <span class="w-100 bd-highlight">
@@ -443,7 +433,7 @@
                     <br>
                 </div>
 
-                <!-- TABLA PARA EMPLEADOS -->
+                <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
                 <div *ngIf="_booleanOptions.bool_emp" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados">
                         <span class="w-100 bd-highlight">
@@ -528,14 +518,13 @@
                         </mat-radio-button>
                     </mat-radio-group>
                 </form>
-                <!-- FORM PARA SUCURSALES -->
+                <!--  **************************  FORM PARA SUCURSALES  ******************************  -->
                 <form *ngIf="_booleanOptions_dh.bool_suc">
                     <div class="d-flex flex-wrap justify-content-center">
                         <mat-form-field>
                             <mat-label>Sucursal</mat-label>
-                            <input matInput placeholder="Buscar" [(ngModel)]="dh_filtroNombreSuc_"
-                                (input)="Filtrar_DH(dh_filtroNombreSuc_, 1)" [formControl]="nombre_suc_dh" type="text"
-                                (keypress)="IngresarSoloLetras($event)">
+                            <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_suc_dh.value, 1)"
+                                [formControl]="nombre_suc_dh" type="text" (keypress)="IngresarSoloLetras($event)">
                             <mat-error *ngIf="nombre_suc_dh.invalid">
                                 Indispensable ingresar dos letras
                             </mat-error>
@@ -546,16 +535,16 @@
                         </mat-form-field>
                     </div>
                 </form>
-                <!-- FORM PARA REGIMEN -->
+                <!--  ***************************  FORM PARA REGIMEN  ***************************  -->
                 <form *ngIf="_booleanOptions_dh.bool_reg">
                     <div class="row">
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Sucursal</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="dh_filtroNombreSuc_"
-                                        (input)="Filtrar_DH(dh_filtroNombreSuc_, 1)" [formControl]="nombre_suc_dh"
-                                        type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_suc_dh.value, 1)"
+                                        [formControl]="nombre_suc_dh" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
                                     <mat-error *ngIf="nombre_suc_dh.invalid">
                                         Indispensable ingresar dos letras
                                     </mat-error>
@@ -570,9 +559,9 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Régimen laboral</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="dh_filtroNombreReg_"
-                                        (input)="Filtrar_DH(dh_filtroNombreReg_, 12)" [formControl]="nombre_reg_dh"
-                                        type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_reg_dh.value, 12)"
+                                        [formControl]="nombre_reg_dh" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
                                     <mat-error *ngIf="nombre_suc_dh.invalid">
                                         Indispensable ingresar dos letras
                                     </mat-error>
@@ -585,16 +574,16 @@
                         </div>
                     </div>
                 </form>
-                <!-- FORM PARA CARGOS -->
+                <!--  *********************************  FORM PARA CARGOS  ****************************  -->
                 <form *ngIf="_booleanOptions_dh.bool_cargo">
                     <div class="row">
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Sucursal</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="dh_filtroNombreSuc_"
-                                        (input)="Filtrar_DH(dh_filtroNombreSuc_, 1)" [formControl]="nombre_suc_dh"
-                                        type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_suc_dh.value, 1)"
+                                        [formControl]="nombre_suc_dh" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
                                     <mat-error *ngIf="nombre_suc_dh.invalid">
                                         Indispensable ingresar dos letras
                                     </mat-error>
@@ -609,9 +598,9 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Cargo</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="dh_filtroNombreCarg_"
-                                        (input)="Filtrar(dh_filtroNombreCarg_, 2)" [formControl]="nombre_carg_dh"
-                                        type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_carg_dh.value, 2)"
+                                        [formControl]="nombre_carg_dh" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de cargos por su descripción.">
                                         help_outline
@@ -621,16 +610,16 @@
                         </div>
                     </div>
                 </form>
-                <!-- FORM PARA DEPARTAMENTOS -->
+                <!--  *************************  FORM PARA DEPARTAMENTOS  **************************  -->
                 <form *ngIf="_booleanOptions_dh.bool_dep">
                     <div class="row">
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Sucursal</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="dh_filtroNombreSuc_"
-                                        (input)="Filtrar(dh_filtroNombreSuc_, 1)" [formControl]="nombre_suc_dh"
-                                        type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc_dh.value, 1)"
+                                        [formControl]="nombre_suc_dh" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de sucursales por nombre.">
                                         help_outline
@@ -642,9 +631,9 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Departamento</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="dh_filtroNombreDep_"
-                                        (input)="Filtrar(dh_filtroNombreDep_, 3)" [formControl]="nombre_dep_dh"
-                                        type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_dep_dh.value, 3)"
+                                        [formControl]="nombre_dep_dh" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de departamentos por nombre.">
                                         help_outline
@@ -654,16 +643,16 @@
                         </div>
                     </div>
                 </form>
-                <!-- FORM PARA EMPLEADOS -->
+                <!--  **************************  FORM PARA EMPLEADOS  ***************************  -->
                 <form *ngIf="_booleanOptions_dh.bool_emp">
                     <div class="row">
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Sucursal</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="dh_filtroNombreSuc_"
-                                        (input)="Filtrar_DH(dh_filtroNombreSuc_, 1)" [formControl]="nombre_suc_dh"
-                                        type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_suc_dh.value, 1)"
+                                        [formControl]="nombre_suc_dh" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
                                     <mat-error *ngIf="nombre_suc_dh.invalid">
                                         Indispensable ingresar dos letras
                                     </mat-error>
@@ -676,9 +665,9 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Nombres</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="dh_filtroNombreEmp_"
-                                        (input)="Filtrar_DH(dh_filtroNombreEmp_, 5)" [formControl]="nombre_emp_dh"
-                                        type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_emp_dh.value, 5)"
+                                        [formControl]="nombre_emp_dh" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
                                     <mat-error *ngIf="nombre_emp_dh.invalid">
                                         Indispensable ingresar dos letras
                                     </mat-error>
@@ -693,9 +682,8 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Código</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="dh_filtroCodigo_"
-                                        (input)="Filtrar_DH(dh_filtroCodigo_, 3)" [formControl]="codigo_dh"
-                                        (keypress)="IngresarSoloNumeros($event)">
+                                    <input matInput placeholder="Buscar" (input)="Filtrar_DH(codigo_dh.value, 3)"
+                                        [formControl]="codigo_dh" (keypress)="IngresarSoloNumeros($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de datos de empleado por código.">
                                         help_outline
@@ -705,8 +693,8 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Cédula</mat-label>
-                                    <input matInput placeholder="Buscar" [(ngModel)]="dh_filtroCedula_" maxlength="10"
-                                        (input)="Filtrar_DH(dh_filtroCedula_, 4)"
+                                    <input matInput placeholder="Buscar" maxlength="10"
+                                        (input)="Filtrar_DH(cedula_dh.value, 4)"
                                         oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                         [formControl]="cedula_dh" type="text" (keypress)="IngresarSoloNumeros($event)">
                                     <mat-error *ngIf="cedula_dh.invalid">
@@ -731,7 +719,7 @@
                 </div>
 
                 <hr>
-                <!-- TABLA PARA SUCURSALES -->
+                <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
                 <div *ngIf="_booleanOptions_dh.bool_suc" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados_dh">
                         <span class="w-100 bd-highlight">
@@ -793,7 +781,7 @@
                     </mat-paginator>
                     <br>
                 </div>
-                <!-- TABLA PARA REGIMEN -->
+                <!--  ****************************  TABLA PARA REGIMEN  ****************************  -->
                 <div *ngIf="_booleanOptions_dh.bool_reg" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados_dh">
                         <span class="w-100 bd-highlight">
@@ -830,7 +818,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let rdh of regimen_dh | sucNombre: dh_filtroNombreSuc_ | emplNombre: dh_filtroNombreReg | paginate:tamanio_pagina_reg_dh:numero_pagina_reg_dh">
+                                    *ngFor="let rdh of regimen_dh | sucNombre: dh_filtroNombreSuc | emplNombre: dh_filtroNombreReg | paginate:tamanio_pagina_reg_dh:numero_pagina_reg_dh">
                                     <td>
                                         <mat-checkbox *ngIf="multiple_dh_" (click)="$event.stopPropagation()"
                                             (change)="$event ? selectionReg_dh.toggle(rdh) : null"
@@ -857,7 +845,7 @@
                     </mat-paginator>
                     <br>
                 </div>
-                <!-- TABLA PARA CARGOS -->
+                <!--  ***************************  TABLA PARA CARGOS  ***************************  -->
                 <div *ngIf="_booleanOptions_dh.bool_cargo" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados_dh">
                         <span class="w-100 bd-highlight">
@@ -891,7 +879,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let c of cargos_dh | sucNombre: dh_filtroNombreSuc_ | emplNombre: dh_filtroNombreCarg | paginate:tamanio_pagina_car_dh:numero_pagina_car_dh">
+                                    *ngFor="let c of cargos_dh | sucNombre: dh_filtroNombreSuc | emplNombre: dh_filtroNombreCarg | paginate:tamanio_pagina_car_dh:numero_pagina_car_dh">
                                     <td>
                                         <mat-checkbox *ngIf="multiple_dh_" (click)="$event.stopPropagation()"
                                             (change)="$event ? selectionCarg_dh.toggle(c) : null"
@@ -918,7 +906,7 @@
                     </mat-paginator>
                     <br>
                 </div>
-                <!-- TABLA PARA DEPARTAMENTOS -->
+                <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
                 <div *ngIf="_booleanOptions_dh.bool_dep" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados_dh">
                         <span class="w-100 bd-highlight">
@@ -980,7 +968,7 @@
                     <br>
                 </div>
 
-                <!-- TABLA PARA EMPLEADOS -->
+                <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
                 <div *ngIf="_booleanOptions_dh.bool_emp" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados_dh">
                         <span class="w-100 bd-highlight">
@@ -1016,7 +1004,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let e of empleados_dh | sucNombre: dh_filtroNombreSuc_ | emplCodigo: dh_filtroCodigo | emplCedula: dh_filtroCedula | emplNombre: dh_filtroNombreEmp | paginate:tamanio_pagina_emp_dh:numero_pagina_emp_dh">
+                                    *ngFor="let e of empleados_dh | sucNombre: dh_filtroNombreSuc | emplCodigo: dh_filtroCodigo | emplCedula: dh_filtroCedula | emplNombre: dh_filtroNombreEmp | paginate:tamanio_pagina_emp_dh:numero_pagina_emp_dh">
                                     <td>
                                         <mat-checkbox *ngIf="multiple_dh_" (click)="$event.stopPropagation()"
                                             (change)="$event ? selectionEmp_dh.toggle(e) : null"

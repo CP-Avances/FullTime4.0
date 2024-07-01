@@ -5,8 +5,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class SucNomEmpleadoPipe implements PipeTransform {
 
-  transform(value: any[], arg: string): any[] {
-    if (arg === '' || arg.length < 2) return value;
+  transform(value: any[], arg: any): any[] {
+    if (arg === undefined || arg === null || arg.length < 2) return value;
     const RESULTADO_BUSQUEDAS: any[] = [];
     for (const resultados of value) {
       let nombreCompleto = resultados.apellido + ' ' + resultados.nombre;

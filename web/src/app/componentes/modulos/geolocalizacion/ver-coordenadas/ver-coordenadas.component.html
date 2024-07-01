@@ -50,7 +50,7 @@
                     </mat-radio-group>
                 </form>
 
-                <!-- Form para SUCURSALES -->
+                 <!--  **************************  FORM PARA SUCURSALES  ******************************  -->
                 <form *ngIf="_booleanOptions.bool_suc">
                     <div class="d-flex flex-wrap justify-content-center">
                         <mat-form-field>
@@ -66,7 +66,7 @@
                     </div>
                 </form>
 
-                <!-- Form para REGIMEN -->
+                <!--  ***************************  FORM PARA REGIMEN  ***************************  -->
                 <form *ngIf="_booleanOptions.bool_reg">
                     <div class="d-flex flex-wrap justify-content-center">
                         <mat-form-field>
@@ -82,7 +82,7 @@
                     </div>
                 </form>
 
-                <!-- FORM PARA CARGOS -->
+                 <!--  *********************************  FORM PARA CARGOS  ****************************  -->
                 <form *ngIf="_booleanOptions.bool_cargo">
                     <div class="d-flex flex-wrap justify-content-center">
                         <mat-form-field>
@@ -97,7 +97,7 @@
                         </mat-form-field>
                     </div>
                 </form>
-                <!-- FORM PARA DEPARTAMENTOS -->
+                <!--  *************************  FORM PARA DEPARTAMENTOS  **************************  -->
                 <form *ngIf="_booleanOptions.bool_dep">
                     <div class="row">
                         <div class="col-md">
@@ -130,7 +130,7 @@
                         </div>
                     </div>
                 </form>
-                <!-- Form para EMPLEADOS -->
+                <!--  **************************  FORM PARA EMPLEADOS  ***************************  -->
                 <form *ngIf="_booleanOptions.bool_emp">
                     <div class="d-flex flex-wrap justify-content-center">
                         <mat-form-field>
@@ -173,7 +173,7 @@
                 </div>
 
                 <hr>
-                <!-- TABLA PARA SUCURSALES -->
+                <!--  ************************  TABLA PARA SUCURSALES  *************************  -->
                 <div *ngIf="_booleanOptions.bool_suc" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados">
                         <span class="w-100 bd-highlight">
@@ -224,7 +224,7 @@
                     </mat-paginator>
                     <br>
                 </div>
-                <!-- TABLA PARA REGIMEN -->
+                <!--  ****************************  TABLA PARA REGIMEN  ****************************  -->
                 <div *ngIf="_booleanOptions.bool_reg" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados">
                         <span class="w-100 bd-highlight">
@@ -275,7 +275,7 @@
                     </mat-paginator>
                     <br>
                 </div>
-                <!-- TABLA PARA CARGOS -->
+                <!--  ***************************  TABLA PARA CARGOS  ***************************  -->
                 <div *ngIf="_booleanOptions.bool_cargo" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados">
                         <span class="w-100 bd-highlight">
@@ -326,7 +326,7 @@
                     </mat-paginator>
                     <br>
                 </div>
-                <!-- TABLA PARA DEPARTAMENTOS -->
+                 <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
                 <div *ngIf="_booleanOptions.bool_dep" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados">
                         <span class="w-100 bd-highlight">
@@ -379,7 +379,7 @@
                     </mat-paginator>
                     <br>
                 </div>
-                <!-- TABLA PARA EMPLEADOS -->
+                <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
                 <div *ngIf="_booleanOptions.bool_emp" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados">
                         <span class="w-100 bd-highlight">

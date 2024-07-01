@@ -237,9 +237,7 @@ class EmpleadoControlador {
 
       const [empleado] = response.rows;
 
-
       const fechaNacimiento = await FormatearFecha2(fec_nacimiento, 'ddd')
-
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({

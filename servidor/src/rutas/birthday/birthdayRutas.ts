@@ -18,7 +18,6 @@ const storage = multer.diskStorage({
         var mes = fecha.format('MM');
         var dia = fecha.format('DD');
         let documento = anio + '_' + mes + '_' + dia + '_' + file.originalname;
-
         cb(null, documento);
     }
 })
@@ -39,7 +38,7 @@ class BirthdayRutas {
         // METODO PARA REGISTRAR MENSAJE DE CUMPLEAÑOS
         this.router.post('/', TokenValidation, BIRTHDAY_CONTROLADOR.CrearMensajeBirthday);
         // METODO PARA SUBIR IMAGEN DE CUMPLEAÑOS   --**VERIFICADO
-        this.router.put('/:id_empresa/uploadImage', [TokenValidation, upload.single('uploads')], BIRTHDAY_CONTROLADOR.CrearImagenEmpleado);
+        this.router.put('/:id_empresa/uploadImage', [TokenValidation, upload.single('uploads')], BIRTHDAY_CONTROLADOR.CrearImagenCumpleanios);
         // METODO PARA DESCARGAR IMAGEN DE CUMPLEAÑOS
         this.router.get('/img/:imagen', BIRTHDAY_CONTROLADOR.getImagen);
         // METODO PARA ACTUALIZAR MENSAJE DE CUMPLEAÑOS

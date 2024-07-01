@@ -1,6 +1,7 @@
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { ObtenerRutaBirthday } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
+import { QueryResult } from 'pg';
 import moment from 'moment';
 import pool from '../../database';
 import path from 'path';
@@ -32,14 +33,16 @@ class BirthdayControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            await pool.query(
+            const response: QueryResult = await pool.query(
                 `
-                INSERT INTO e_message_birthday (id_empresa, asunto, mensaje, link) VALUES ($1, $2, $3, $4)
+                INSERT INTO e_message_birthday (id_empresa, asunto, mensaje, link) VALUES ($1, $2, $3, $4) RETURNING *
                 `
                 , [id_empresa, titulo, mensaje, link]);
 
+            const [cumpleanios] = response.rows;
+
             // AUDITORIA
-            AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'e_message_birthday',
                 usuario: user_name,
                 accion: 'I',
@@ -52,14 +55,11 @@ class BirthdayControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
 
-            const oneMessage = await pool.query(
-                `
-                SELECT id FROM e_message_birthday WHERE id_empresa = $1
-                `
-                , [id_empresa]);
-            const idMessageGuardado = oneMessage.rows[0].id;
-            return res.jsonp([{ message: 'Registro guardado.', id: idMessageGuardado }]);
+            return res.jsonp([{ message: 'Registro guardado.', id: cumpleanios.id }]);
+
         } catch (error) {
+
+            console.log('error ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ text: 'Error al guardar el registro.' });
@@ -67,7 +67,7 @@ class BirthdayControlador {
     }
 
     // METODO PARA CARGAR MENSAJE DE CUMPLEANIOS    --**VERIFICADO
-    public async CrearImagenEmpleado(req: Request, res: Response): Promise<Response> {
+    public async CrearImagenCumpleanios(req: Request, res: Response): Promise<Response> {
         try {
             // FECHA DEL SISTEMA
             var fecha = moment();
@@ -81,79 +81,62 @@ class BirthdayControlador {
 
             const { user_name, ip } = req.body;
 
-            const unEmpleado = await pool.query(
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            const cumpleanios = await pool.query(
                 `
                 SELECT * FROM e_message_birthday WHERE id = $1
                 `
                 , [id]);
-            if (unEmpleado.rowCount != 0) {
-                unEmpleado.rows.map(async (obj: any) => {
-                    if (obj.img != null) {
-                        let ruta = ObtenerRutaBirthday() + separador + obj.img;
 
-                        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                        fs.access(ruta, fs.constants.F_OK, (err) => {
-                            if (!err) {
-                                // ELIMINAR DEL SERVIDOR
-                                fs.unlinkSync(ruta);
-                            }
-                        });
-                    }
+            console.log('verificar cumpleanios ', cumpleanios.rows[0])
 
-                    try {
-                        // INICIAR TRANSACCION
-                        await pool.query('BEGIN');
+            if (cumpleanios.rowCount != 0) {
 
+                if (cumpleanios.rows[0].imagen != null) {
 
-                        await pool.query(
-                            `
-                            UPDATE e_message_birthday SET imagen = $2 WHERE id = $1
-                            `
-                            , [id, imagen]);
+                    let ruta = ObtenerRutaBirthday() + separador + cumpleanios.rows[0].imagen;
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs.access(ruta, fs.constants.F_OK, (err) => {
+                        if (!err) {
+                            // ELIMINAR DEL SERVIDOR
+                            fs.unlinkSync(ruta);
+                        }
+                    });
+                }
 
-                        // AUDITORIA
-                        AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                            tabla: 'e_message_birthday',
-                            usuario: user_name,
-                            accion: 'U',
-                            datosOriginales: JSON.stringify(obj),
-                            datosNuevos: `{id: ${id}, img: ${imagen}}`,
-                            ip,
-                            observacion: null
-                        });
+                await pool.query(
+                    `
+                    UPDATE e_message_birthday SET imagen = $2 WHERE id = $1
+                    `
+                    , [id, imagen]);
 
-                        // FINALIZAR TRANSACCION
-                        await pool.query('COMMIT');
-                    } catch (error) {
-                        // REVERTIR TRANSACCION
-                        console.log(error)
-
-                        await pool.query('ROLLBACK');
-                        throw error;
-
-                    }
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_message_birthday',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(cumpleanios.rows[0]),
+                    datosNuevos: `{id: ${id}, img: ${imagen}}`,
+                    ip,
+                    observacion: null
                 });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
                 return res.jsonp({ message: 'Imagen actualizada.' });
             }
-
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'e_message_birthday',
-                usuario: user_name,
-                accion: 'U',
-                datosOriginales: '',
-                datosNuevos: '',
-                ip,
-                observacion: 'Error al actualizar la imagen, no se encuentra el registro.'
-            });
-
-            return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+            else {
+                return res.jsonp({ message: 'No se encuentran resultados.' });
+            }
 
         } catch (error) {
+            // REVERTIR TRANSACCION
             console.log(error)
+            await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'Error al actualizar la imagen.' });
-
         }
-
     }
 
 
@@ -170,75 +153,75 @@ class BirthdayControlador {
         });
     }
 
-/*
-    public async EditarMensajeBirthday(req: Request, res: Response): Promise<Response> {
-        try {
-            const { titulo, mensaje, link, user_name, ip } = req.body;
-            const { id } = req.params;
-
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
-
-            const response = await pool.query(`SELECT * FROM e_message_birthday WHERE id = $1`
-                , [id]);
-            const [datos] = response.rows;
-
-            if (!datos) {
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+    /*
+        public async EditarMensajeBirthday(req: Request, res: Response): Promise<Response> {
+            try {
+                const { titulo, mensaje, link, user_name, ip } = req.body;
+                const { id } = req.params;
+    
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+    
+                const response = await pool.query(`SELECT * FROM e_message_birthday WHERE id = $1`
+                    , [id]);
+                const [datos] = response.rows;
+    
+                if (!datos) {
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'e_message_birthday',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el mensaje de cumpleaños, no se encuentra el registro con id: ${id}`
+                    });
+                    // FINALIZAR TRANSACCION
+                    //await pool.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+                }
+    
+                await pool.query(
+                    `
+                    UPDATE e_message_birthday SET asunto = $1, mensaje = $2, link = $3 WHERE id = $4
+                    `
+                    , [titulo, mensaje, link, id]);
+    
+                // AUDITORIA
+                AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'e_message_birthday',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: '',
-                    datosNuevos: '',
+                    datosOriginales: JSON.stringify(datos),
+                    datosNuevos: `{titulo: ${titulo}, mensaje: ${mensaje}, url: ${link}}`,
                     ip,
-                    observacion: `Error al actualizar el mensaje de cumpleaños, no se encuentra el registro con id: ${id}`
+                    observacion: null
                 });
-                // FINALIZAR TRANSACCION
-                //await pool.query('COMMIT');
-                return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+    
+                // FINALIZAR TRANSACCION|
+                await pool.query('COMMIT');
+                return res.jsonp({ message: 'Mensaje de cumpleaños actualizado.' });
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                console.log(error);
+                await pool.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar el mensaje de cumpleaños.' });
             }
-
-            await pool.query(
-                `
-                UPDATE e_message_birthday SET asunto = $1, mensaje = $2, link = $3 WHERE id = $4
-                `
-                , [titulo, mensaje, link, id]);
-
-            // AUDITORIA
-            AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'e_message_birthday',
-                usuario: user_name,
-                accion: 'U',
-                datosOriginales: JSON.stringify(datos),
-                datosNuevos: `{titulo: ${titulo}, mensaje: ${mensaje}, url: ${link}}`,
-                ip,
-                observacion: null
-            });
-
-            // FINALIZAR TRANSACCION|
-            await pool.query('COMMIT');
-            return res.jsonp({ message: 'Mensaje de cumpleaños actualizado.' });
-        } catch (error) {
-            // REVERTIR TRANSACCION
-            console.log(error);
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'Error al actualizar el mensaje de cumpleaños.' });
         }
-    }
-    */
+        */
     public async EditarMensajeBirthday(req: Request, res: Response): Promise<Response> {
         try {
             const { titulo, mensaje, link, user_name, ip } = req.body;
             const { id } = req.params;
-    
+
             console.log(`Iniciando transacción para actualizar mensaje de cumpleaños con id: ${id}`);
-    
+
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
-    
+
             const response = await pool.query('SELECT * FROM e_message_birthday WHERE id = $1', [id]);
             const [datos] = response.rows;
-    
+
             if (!datos) {
                 console.log(`Registro con id ${id} no encontrado, insertando auditoría de error.`);
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -254,13 +237,13 @@ class BirthdayControlador {
                 await pool.query('COMMIT');
                 return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
             }
-    
+
             console.log(`Actualizando registro con id: ${id}`);
             await pool.query(
                 'UPDATE e_message_birthday SET asunto = $1, mensaje = $2, link = $3 WHERE id = $4',
                 [titulo, mensaje, link, id]
             );
-    
+
             // AUDITORIA
             console.log(`Insertando auditoría para la actualización del registro con id: ${id}`);
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -272,7 +255,7 @@ class BirthdayControlador {
                 ip,
                 observacion: null
             });
-    
+
             // FINALIZAR TRANSACCION
             console.log(`Finalizando transacción para el registro con id: ${id}`);
             await pool.query('COMMIT');
@@ -284,7 +267,7 @@ class BirthdayControlador {
             return res.status(500).jsonp({ message: 'Error al actualizar el mensaje de cumpleaños.' });
         }
     }
-    
+
 }
 
 export const BIRTHDAY_CONTROLADOR = new BirthdayControlador();

@@ -35,7 +35,7 @@ class BirthdayRutas {
         // METODO PARA REGISTRAR MENSAJE DE CUMPLEAÑOS
         this.router.post('/', verificarToken_1.TokenValidation, birthdayControlador_1.default.CrearMensajeBirthday);
         // METODO PARA SUBIR IMAGEN DE CUMPLEAÑOS   --**VERIFICADO
-        this.router.put('/:id_empresa/uploadImage', [verificarToken_1.TokenValidation, upload.single('uploads')], birthdayControlador_1.default.CrearImagenEmpleado);
+        this.router.put('/:id_empresa/uploadImage', [verificarToken_1.TokenValidation, upload.single('uploads')], birthdayControlador_1.default.CrearImagenCumpleanios);
         // METODO PARA DESCARGAR IMAGEN DE CUMPLEAÑOS
         this.router.get('/img/:imagen', birthdayControlador_1.default.getImagen);
         // METODO PARA ACTUALIZAR MENSAJE DE CUMPLEAÑOS
