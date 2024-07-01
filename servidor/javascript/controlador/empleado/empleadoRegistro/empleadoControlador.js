@@ -139,7 +139,6 @@ class EmpleadoControlador {
                 return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
-                console.log('error ---- ', error);
                 //REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'Error al actualizar código.' });
@@ -236,7 +235,6 @@ class EmpleadoControlador {
             }
             catch (error) {
                 // REVERTIR TRANSACCION
-                console.log(error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }
@@ -819,7 +817,6 @@ class EmpleadoControlador {
                 }
             }
             catch (error) {
-                console.log('error ---- ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 res.status(500).jsonp({ message: 'Error al actualizar imagen del usuario.' });
@@ -1193,7 +1190,13 @@ class EmpleadoControlador {
                     const [datosActualesEmpleado] = datosActuales.rows;
                     const contratos = yield database_1.default.query('SELECT * FROM eu_empleado_contratos WHERE id_empleado = $1', [e.id]);
                     const [datosContratos] = contratos.rows;
-                    if (datosActualesEmpleado || datosContratos) {
+                    const titulos = yield database_1.default.query('SELECT * FROM eu_empleado_titulos WHERE id_empleado = $1', [e.id]);
+                    const [datosTitulos] = titulos.rows;
+                    const discapacidad = yield database_1.default.query('SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1', [e.id]);
+                    const [datosDiscapacidad] = discapacidad.rows;
+                    const vacunas = yield database_1.default.query('SELECT * FROM eu_empleado_vacunas WHERE id_empleado = $1', [e.id]);
+                    const [datosVacunas] = vacunas.rows;
+                    if (datosActualesEmpleado || datosContratos || datosTitulos || datosDiscapacidad || datosVacunas) {
                         empleadosRegistrados = true;
                         continue;
                     }
@@ -1228,8 +1231,12 @@ class EmpleadoControlador {
                 catch (error) {
                     // REVERTIR TRANSACCION
                     yield database_1.default.query('ROLLBACK');
-                    console.log('error ', error);
-                    errorEliminar = true;
+                    if (error.code === '23503') {
+                        empleadosRegistrados = true;
+                    }
+                    else {
+                        errorEliminar = true;
+                    }
                 }
             }
             if (errorEliminar) {

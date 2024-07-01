@@ -146,7 +146,6 @@ class EmpleadoControlador {
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
     } catch (error) {
-      console.log('error ---- ', error)
       //REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'Error al actualizar código.' });
@@ -266,7 +265,6 @@ class EmpleadoControlador {
     }
     catch (error) {
       // REVERTIR TRANSACCION
-      console.log(error)
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
     }
@@ -958,7 +956,6 @@ class EmpleadoControlador {
       }
 
     } catch (error) {
-      console.log('error ---- ', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       res.status(500).jsonp({ message: 'Error al actualizar imagen del usuario.' });
@@ -1382,7 +1379,16 @@ class EmpleadoControlador {
         const contratos = await pool.query('SELECT * FROM eu_empleado_contratos WHERE id_empleado = $1', [e.id]);
         const [datosContratos] = contratos.rows;
 
-        if (datosActualesEmpleado || datosContratos) {
+        const titulos = await pool.query('SELECT * FROM eu_empleado_titulos WHERE id_empleado = $1', [e.id]);
+        const [datosTitulos] = titulos.rows;
+
+        const discapacidad = await pool.query('SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1', [e.id]);
+        const [datosDiscapacidad] = discapacidad.rows;
+
+        const vacunas = await pool.query('SELECT * FROM eu_empleado_vacunas WHERE id_empleado = $1', [e.id]);
+        const [datosVacunas] = vacunas.rows;
+
+        if (datosActualesEmpleado || datosContratos || datosTitulos || datosDiscapacidad || datosVacunas) {
           empleadosRegistrados = true;
           continue;
         }
@@ -1423,8 +1429,11 @@ class EmpleadoControlador {
       } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
-        console.log('error ', error);
-        errorEliminar = true;
+        if (error.code === '23503') {
+          empleadosRegistrados = true;
+        } else {
+          errorEliminar = true;
+        }
       }
     }
 
