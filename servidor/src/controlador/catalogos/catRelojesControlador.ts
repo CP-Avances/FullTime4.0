@@ -421,7 +421,6 @@ class RelojesControlador {
             } else {
                 const sheet_name_list = workbook.SheetNames;
                 const plantilla_dispositivos = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
-                console.log('plantilla_dispositivos: ', plantilla_dispositivos);
 
                 let data: any = {
                     fila: '',
@@ -446,6 +445,9 @@ class RelojesControlador {
 
                 var listDispositivos: any = [];
                 var duplicados: any = [];
+                var duplicados1: any = [];
+                var duplicados2: any = [];
+                var duplicados3: any = [];
                 var mensaje: string = 'correcto';
 
                 //Exprecion regular para validar el formato de una IPv4.
@@ -489,6 +491,31 @@ class RelojesControlador {
                         data.direccion_mac = DIRECCION_MAC;
                         data.contrasena = CONTRASENA;
                         data.observacion = 'no registrado';
+
+                        // DISCRIMINACION DE ELEMENTOS IGUALES CODIGO
+                        if (duplicados.find((p: any) => p.codigo === data.codigo) == undefined) {
+                            // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION IP
+                            if (duplicados1.find((a: any) => a.direccion_ip === data.direccion_ip) == undefined) {
+                                // DISCRIMINACIÓN DE ELEMENTOS IGUALES NUMERO DE SERIE
+                                if(duplicados2.find((b: any) => b.numero_serie === data.numero_serie) == undefined){
+                                    // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION MAC
+                                    if(duplicados3.find((c: any) => c.direccion_mac === data.direccion_mac) == undefined){
+                                        duplicados3.push(data);
+                                    }else{
+                                        data.observacion = '4';
+                                    }
+                                    duplicados2.push(data);
+                                }else{
+                                    data.observacion = '3';
+                                }
+                                duplicados1.push(data);
+                            } else {
+                                data.observacion = '2';
+                            }
+                            duplicados.push(data);
+                        }else {
+                            data.observacion = '1';
+                        }                                                                
 
                         listDispositivos.push(data);
 
@@ -568,6 +595,39 @@ class RelojesControlador {
                             data.contrasena = ' - ';
                         }
 
+                        if(data.codigo != 'No registrado' && data.direccion_ip != 'No registrado'){
+                            // DISCRIMINACION DE ELEMENTOS IGUALES CODIGO
+                            if (duplicados.find((p: any) => p.codigo === data.codigo) == undefined) {
+                            // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION IP
+                            if (duplicados1.find((a: any) => a.direccion_ip === data.direccion_ip) == undefined) {
+
+                                if(data.numero_serie != ' - '){
+                                    // DISCRIMINACIÓN DE ELEMENTOS IGUALES NUMERO DE SERIE
+                                    if(duplicados2.find((b: any) => b.numero_serie === data.numero_serie) == undefined){
+                                        duplicados2.push(data);
+                                    }else{
+                                        data.observacion = '3';
+                                    }
+                                }
+
+                                if(data.direccion_mac != ' - '){
+                                    // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION MAC
+                                    if(duplicados3.find((c: any) => c.direccion_mac === data.direccion_mac) == undefined){
+                                        duplicados3.push(data);
+                                    }else{
+                                        data.observacion = '4';
+                                    }
+                                }
+                                
+                                duplicados1.push(data);
+                            } else {
+                                data.observacion = '2';
+                            }
+                            duplicados.push(data);
+                            }else {
+                                data.observacion = '1';
+                            }   
+                        }
 
                         listDispositivos.push(data);
 
@@ -587,7 +647,9 @@ class RelojesControlador {
                 });
 
                 listDispositivos.forEach(async (item: any) => {
-                    if (item.observacion == 'no registrado') {
+                    if (item.observacion == 'no registrado' || item.observacion == '1' ||
+                        item.observacion == '2' || item.observacion == '3' || item.observacion == '4') 
+                        {
                         var validEstablecimiento = await pool.query(
                             `SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`
                             , [item.establecimiento.toUpperCase()])
@@ -605,37 +667,44 @@ class RelojesControlador {
                                             var validDireccIP = await pool.query(
                                                 `SELECT * FROM ed_relojes WHERE ip = $1`
                                                 , [item.direccion_ip])
-                                            if (validDireccIP.rows[0] == undefined || validDireccIP.rows[0] == '')
+                                            if (validDireccIP.rows[0] == undefined || validDireccIP.rows[0] == ''){
                                                 if (regex.test(item.puerto)) {
-                                                    if (item.puerto.length > 6) {
+                                                    if (item.puerto.toString().length > 6) {
                                                         item.observacion = 'El puerto debe ser de 6 dígitos';
                                                     } else {
                                                         if (item.acciones.toString().toLowerCase() == 'si' || item.acciones.toString().toLowerCase() == 'no') {
-                                                            if (item.numero_acciones != ' - ') {
-                                                                if (regex.test(item.numero_acciones)) {
-
-                                                                    // Discriminación de elementos iguales
-                                                                    if (duplicados.find((p: any) => parseInt(p.codigo) === parseInt(item.codigo) ||
-                                                                        p.direccion_ip === item.direccion_ip) == undefined) {
-                                                                        item.observacion = 'ok';
-                                                                        duplicados.push(item);
-                                                                    } else {
-                                                                        item.observacion = '1';
+                                                            if (item.acciones.toString().toLowerCase() == 'si') {
+                                                                if(item.numero_acciones != ' - '){
+                                                                    if (!regex.test(item.numero_acciones)) {
+                                                                        item.observacion = 'Número de acciones incorrecta ingrese (solo números)';
+                                                                    } else{
+                                                                        if (item.numero_acciones < 1 || item.numero_acciones > 8 ) {
+                                                                            item.observacion = 'El número de acciones no debe ser mayor 8 ni 0';
+                                                                        }
                                                                     }
+                                                                }else{
+                                                                    item.observacion = 'Debe ingresar acciones';
+                                                                } 
+                                                            }
 
-                                                                } else {
-                                                                    item.observacion = 'Número de acciones incorrecta ingrese (solo números)';
-                                                                }
-                                                            } else {
-                                                                // Discriminación de elementos iguales
-                                                                if (duplicados.find((p: any) => parseInt(p.codigo) === parseInt(item.codigo) ||
-                                                                    p.direccion_ip === item.direccion_ip) == undefined) {
-                                                                    item.observacion = 'ok';
-                                                                    duplicados.push(item);
-                                                                } else {
-                                                                    item.observacion = '1';
+                                                            if(item.numero_serie != ' - '){
+                                                                var VERIFICAR_SERIE = await pool.query(
+                                                                    `SELECT id FROM ed_relojes WHERE serie = $1`
+                                                                    , [item.numero_serie])
+                                                                if (VERIFICAR_SERIE.rows[0] != undefined && VERIFICAR_SERIE.rows[0] != ''){
+                                                                    item.observacion = 'Número de serie ya existe en la base';
                                                                 }
                                                             }
+
+                                                            if(item.direccion_mac != ' - '){
+                                                                var VERIFICAR_MAC = await pool.query(
+                                                                    `SELECT id FROM ed_relojes WHERE mac = $1`
+                                                                    , [item.direccion_mac])
+                                                                if (VERIFICAR_MAC.rows[0] != undefined && VERIFICAR_MAC.rows[0] != ''){
+                                                                    item.observacion = 'Dirección MAC ya existe en la base';
+                                                                }
+                                                            }
+
                                                         } else {
                                                             item.observacion = 'Acción incorrecta ingrese (SI / NO)';
                                                         }
@@ -643,7 +712,7 @@ class RelojesControlador {
                                                 } else {
                                                     item.observacion = 'Puerto incorrecto (solo números)';
                                                 }
-                                            else {
+                                            }else {
                                                 item.observacion = 'Ya existe en el sistema';
                                             }
                                         } else {
@@ -666,6 +735,13 @@ class RelojesControlador {
 
                 });
 
+                var tiempo = 2000;
+                if (listDispositivos.length > 500 && listDispositivos.length <= 1000) {
+                  tiempo = 4000;
+                } else if (listDispositivos.length > 1000) {
+                  tiempo = 7000;
+                }
+
                 setTimeout(() => {
                     listDispositivos.sort((a: any, b: any) => {
                         // COMPARA LOS NUMEROS DE LOS OBJETOS
@@ -681,23 +757,32 @@ class RelojesControlador {
                     var filaDuplicada: number = 0;
 
                     //VALIDACIONES DE LOS DATOS
-                    listDispositivos.forEach(async (item: any) => {
-                        if (item.observacion == '1') {
-                            item.observacion = 'Registro duplicado'
-                        } else {
-                            if (item.direccion_mac != ' - ') {
-                                console.log('mac: ', item.direccion_mac.toString());
-                                console.log('mac: ', direccMac.test(item.direccion_mac));
-                                if (direccMac.test(item.direccion_mac.toString())) {
+                    listDispositivos.forEach((item: any) => {
 
-                                } else {
-                                    item.observacion = 'Formato de dirección MAC incorrecta (numeración hexadecimal)'
-                                }
+                        if (item.direccion_mac != ' - ') {
+                            if (direccMac.test(item.direccion_mac.toString())) {
+                            } else {
+                                item.observacion = 'Formato de dirección MAC incorrecta (numeración hexadecimal)'
                             }
-
                         }
 
 
+                        if (item.observacion != undefined) {
+                            let arrayObservacion = item.observacion.split(" ");
+                            if (arrayObservacion[0] == 'no' || item.observacion == " ") {
+                              item.observacion = 'ok'
+                            }
+
+                            if (item.observacion == '1') {
+                                item.observacion = 'Registro duplicado (código)'
+                            }else if (item.observacion == '2') {
+                                item.observacion = 'Registro duplicado (dirección IP)'
+                            }else if (item.observacion == '3') {
+                                item.observacion = 'Registro duplicado (numero de serie)'
+                            }else if (item.observacion == '4') {
+                                item.observacion = 'Registro duplicado (dirección mac)'
+                            } 
+                        }
 
                         // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
                         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
@@ -720,7 +805,7 @@ class RelojesControlador {
 
                     return res.jsonp({ message: mensaje, data: listDispositivos });
 
-                }, 1000)
+                }, tiempo)
 
             }
 

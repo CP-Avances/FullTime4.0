@@ -148,7 +148,7 @@ export class ListarRelojesComponent implements OnInit {
     this.relojes = [];
     this.rest.ConsultarRelojes().subscribe(datos => {
       this.relojes = this.FiltrarRelojesAsignados(datos);
-      console.log('probando relojes', this.relojes);
+      
     })
   }
 
@@ -324,11 +324,18 @@ export class ListarRelojesComponent implements OnInit {
   colorCelda: string = ''
   stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
-    if (observacion == 'Registro duplicado') {
+    if (observacion == 'Registro duplicado (código)' ||
+      observacion == 'Registro duplicado (dirección IP)' ||
+      observacion == 'Registro duplicado (numero de serie)' ||
+      observacion == 'Registro duplicado (dirección mac)'
+    ) {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Ya existe en el sistema') {
+    } else if (observacion == 'Ya existe en el sistema' || 
+      observacion == 'Número de serie ya existe en la base' ||
+      observacion == 'Dirección MAC ya existe en la base'
+    ) {
       return 'rgb(239, 203, 106)';
     } else if (observacion == 'Establecimiento no existe en el sistema' ||
       observacion == 'Departamento no existe en el sistema') {

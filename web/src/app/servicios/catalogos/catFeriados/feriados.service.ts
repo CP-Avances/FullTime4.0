@@ -61,12 +61,15 @@ export class FeriadosService {
   }
 
   RevisarFormato(formData) {
-    console.log('formDataferiados: ',formData);
     return this.http.post<any>(environment.url + '/feriados/upload/revision', formData);
   }
 
-  Crear_feriados_ciudad(form){
+  Crear_feriados(form){
     console.log('form: ',form);
+    return this.http.post<any>(environment.url + '/feriados/upload/crearFeriado', form);
+  }
+
+  Crear_feriados_ciudad(form){
     return this.http.post<any>(environment.url + '/feriados/upload/crearFeriadoCiudad', form);
   }
 

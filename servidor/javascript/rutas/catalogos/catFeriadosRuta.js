@@ -61,6 +61,7 @@ class FeriadosRuta {
         // METODO PARA BUSCAR FECHASDE RECUPERACION DE FERIADOS POR CIUDAD Y RANGO DE FECHAS  --**VERIFICADO
         this.router.post('/listar-feriados-recuperar/ciudad', verificarToken_1.TokenValidation, catFeriadosControlador_1.default.FeriadosRecuperacionCiudad);
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catFeriadosControlador_1.default.RevisarDatos);
+        this.router.post('/upload/crearFeriado', [verificarToken_1.TokenValidation, upload1.single('uploads')], catFeriadosControlador_1.default.RegistrarFeriado);
         this.router.post('/upload/crearFeriadoCiudad', [verificarToken_1.TokenValidation, upload1.single('uploads')], catFeriadosControlador_1.default.RegistrarFeriado_Ciudad);
     }
 }
