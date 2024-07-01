@@ -1402,7 +1402,7 @@ class EmpleadoControlador {
           datosOriginales: JSON.stringify(datosOriginalesUsuarios),
           datosNuevos: '',
           ip,
-          observacion: `Usuario con id_empleado: ${e.id} eliminado correctamente.`
+          observacion: null
         });
 
         // ELIMINAR EMPLEADO
