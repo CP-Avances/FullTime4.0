@@ -40,17 +40,21 @@ class DiscapacidadControlador {
                 const { id_empleado, carn_conadis, porcentaje, tipo, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
+                const usuario = yield database_1.default.query(`
+        SELECT id FROM eu_usuarios WHERE id_empleado = $1
+        `, [id_empleado]);
+                const id_usuario = usuario.rows[0].id;
                 yield database_1.default.query(`
-        INSERT INTO eu_empleado_discapacidad (id_empleado, carnet_conadis, porcentaje, id_discapacidad) 
-        VALUES ($1, $2, $3, $4)
-        `, [id_empleado, carn_conadis, porcentaje, tipo]);
+        INSERT INTO eu_empleado_discapacidad (id_empleado, carnet_conadis, porcentaje, id_discapacidad, id_usuario) 
+        VALUES ($1, $2, $3, $4, $5)
+        `, [id_empleado, carn_conadis, porcentaje, tipo, id_usuario]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_discapacidad',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{id_empleado: ${id_empleado}, carn_conadis: ${carn_conadis}, porcentaje: ${porcentaje}, tipo: ${tipo}}`,
+                    datosNuevos: `{id_empleado: ${id_empleado}, carn_conadis: ${carn_conadis}, porcentaje: ${porcentaje}, tipo: ${tipo}, id_usuario: ${id_usuario}`,
                     ip, observacion: null
                 });
                 // FINALIZAR TRANSACCION

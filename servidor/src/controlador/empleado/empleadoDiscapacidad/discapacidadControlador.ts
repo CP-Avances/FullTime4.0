@@ -31,12 +31,20 @@ class DiscapacidadControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
+      const usuario = await pool.query(
+        `
+        SELECT id FROM eu_usuarios WHERE id_empleado = $1
+        `
+        , [id_empleado]);
+
+      const id_usuario = usuario.rows[0].id;
+
       await pool.query(
         `
-        INSERT INTO eu_empleado_discapacidad (id_empleado, carnet_conadis, porcentaje, id_discapacidad) 
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO eu_empleado_discapacidad (id_empleado, carnet_conadis, porcentaje, id_discapacidad, id_usuario) 
+        VALUES ($1, $2, $3, $4, $5)
         `
-        , [id_empleado, carn_conadis, porcentaje, tipo]);
+        , [id_empleado, carn_conadis, porcentaje, tipo, id_usuario]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -44,7 +52,7 @@ class DiscapacidadControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos:`{id_empleado: ${id_empleado}, carn_conadis: ${carn_conadis}, porcentaje: ${porcentaje}, tipo: ${tipo}}`,
+        datosNuevos:`{id_empleado: ${id_empleado}, carn_conadis: ${carn_conadis}, porcentaje: ${porcentaje}, tipo: ${tipo}, id_usuario: ${id_usuario}`,
         ip, observacion: null
       });
 
