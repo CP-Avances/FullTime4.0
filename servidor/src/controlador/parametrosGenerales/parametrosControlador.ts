@@ -212,7 +212,7 @@ class ParametrosControlador {
             await pool.query('BEGIN');
 
             // OBTENER DATOSORIGINALES
-            const consulta = await pool.query(`SELECT descripcion FROM ep_detalle_parametro WHERE id = $1`, [id]);
+            const consulta = await pool.query(`SELECT * FROM ep_detalle_parametro WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
 
             if (!datosOriginales) {
@@ -231,9 +231,9 @@ class ParametrosControlador {
                 return res.status(404).jsonp({ message: 'Registro no encontrado.' });
             }
 
-            await pool.query(
+            const datosNuevos = await pool.query(
                 `
-                UPDATE ep_detalle_parametro SET descripcion = $1 WHERE id = $2
+                UPDATE ep_detalle_parametro SET descripcion = $1 WHERE id = $2 RETURNING *
                 `
                 , [descripcion, id]);
 
@@ -243,7 +243,7 @@ class ParametrosControlador {
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: `{"descripcion": "${descripcion}"}`,
+                datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                 ip,
                 observacion: null
             });

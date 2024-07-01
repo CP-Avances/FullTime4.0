@@ -112,14 +112,14 @@ class RegimenControlador {
                     yield database_1.default.query("COMMIT");
                     return res.status(404).jsonp({ message: "Registro no encontrado" });
                 }
-                yield database_1.default.query(`
+                const datosNuevos = yield database_1.default.query(`
       UPDATE ere_cat_regimenes SET id_pais = $1, descripcion = $2, mes_periodo = $3, dias_mes = $4, trabajo_minimo_mes = $5, 
         trabajo_minimo_horas = $6, continuidad_laboral = $7, vacacion_dias_laboral = $8, vacacion_dias_libre = $9, 
         vacacion_dias_calendario = $10, acumular = $11, dias_maximo_acumulacion = $12, 
         vacacion_divisible = $13, antiguedad = $14, antiguedad_fija = $15, anio_antiguedad = $16, dias_antiguedad = $17, 
         antiguedad_variable = $18, vacacion_dias_calendario_mes = $19, vacacion_dias_laboral_mes = $20, calendario_dias = $21,
         laboral_dias = $22, meses_calculo = $23 
-      WHERE id = $24
+      WHERE id = $24 RETURNING *
       `, [
                     id_pais,
                     descripcion,
@@ -146,38 +146,13 @@ class RegimenControlador {
                     meses_calculo,
                     id,
                 ]);
-                const datosNuevos = {
-                    "id_pais": id_pais,
-                    "descripcion": descripcion,
-                    "mes_periodo": mes_periodo,
-                    "dias_mes": dias_mes,
-                    "trabajo_minimo_mes": trabajo_minimo_mes,
-                    "trabajo_minimo_horas": trabajo_minimo_horas,
-                    "continuidad_laboral": continuidad_laboral,
-                    "vacacion_dias_laboral": vacacion_dias_laboral,
-                    "vacacion_dias_libre": vacacion_dias_libre,
-                    "vacacion_dias_calendario": vacacion_dias_calendario,
-                    "acumular": acumular,
-                    "dias_max_acumulacion": dias_max_acumulacion,
-                    "vacacion_divisible": vacacion_divisible,
-                    "antiguedad": antiguedad,
-                    "antiguedad_fija": antiguedad_fija,
-                    "anio_antiguedad": anio_antiguedad,
-                    "dias_antiguedad": dias_antiguedad,
-                    "antiguedad_variable": antiguedad_variable,
-                    "vacacion_dias_calendario_mes": vacacion_dias_calendario_mes,
-                    "vacacion_dias_laboral_mes": vacacion_dias_laboral_mes,
-                    "calendario_dias": calendario_dias,
-                    "laboral_dias": laboral_dias,
-                    "meses_calculo": meses_calculo
-                };
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: "ere_cat_regimenes",
                     usuario: user_name,
                     accion: "U",
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: JSON.stringify(datosNuevos),
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip: ip,
                     observacion: null,
                 });

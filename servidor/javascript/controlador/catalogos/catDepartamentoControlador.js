@@ -76,9 +76,9 @@ class DepartamentoControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'error' });
                 }
-                yield database_1.default.query(`
+                const datosNuevos = yield database_1.default.query(`
         UPDATE ed_departamentos set nombre = $1, id_sucursal = $2 
-        WHERE id = $3
+        WHERE id = $3 RETURNING *
         `, [nombre, id_sucursal, id]);
                 // INSERTAR AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -86,7 +86,7 @@ class DepartamentoControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datos),
-                    datosNuevos: `{Nombre: ${nombre}, Sucursal: ${id_sucursal}}`,
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip: ip,
                     observacion: null
                 });

@@ -77,10 +77,10 @@ class DepartamentoControlador {
         return res.status(404).jsonp({ message: 'error' });
       }
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
         UPDATE ed_departamentos set nombre = $1, id_sucursal = $2 
-        WHERE id = $3
+        WHERE id = $3 RETURNING *
         `
         , [nombre, id_sucursal, id]);
 
@@ -90,7 +90,7 @@ class DepartamentoControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datos),
-        datosNuevos: `{Nombre: ${nombre}, Sucursal: ${id_sucursal}}`,
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip: ip,
         observacion: null
       });
