@@ -6,7 +6,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class EmplNombrePipe implements PipeTransform {
 
   transform(value: any, arg: any): any {
-
     if (arg === undefined || arg === null || arg.length < 2) return value;
 
     const RESULTADO_BUSQUEDAS: any = [];
@@ -24,7 +23,6 @@ export class EmplNombrePipe implements PipeTransform {
           RESULTADO_BUSQUEDAS.push(resultados);
         }
       }
-
     };
     return RESULTADO_BUSQUEDAS;
 

@@ -634,6 +634,7 @@ export class ListaWebComponent implements OnInit {
 
   // METODO PARA FILTRAR DATOS DE BUSQUEDA
   Filtrar_DH(e: any, orden: number) {
+    //console.log('ver ingreso dh', e, ' orden ', orden)
     this.ControlarFiltrado_DH(e);
     switch (orden) {
       case 1: this.restR.setFiltroNombreSuc(e); break;
@@ -879,6 +880,7 @@ export class ListaWebComponent implements OnInit {
 
   // METODO PARA FILTRAR DATOS DE BUSQUEDA
   Filtrar(e: any, orden: number) {
+    //console.log('ver ingreso ', e, ' orden ', orden)
     this.ControlarFiltrado(e);
     switch (orden) {
       case 6: this.restR.setFiltroNombreSuc(e); break;
