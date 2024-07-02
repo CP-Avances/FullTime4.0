@@ -498,9 +498,19 @@ export class ListaSucursalesComponent implements OnInit {
         //Separa llas filas que estan con la observacion OK para luego registrar en la base.
         this.Datasucursales.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
-            this.listSucursalesCorrectas.push(item);
+
+            const nombre = item.nom_sucursal.charAt(0).toUpperCase() + item.nom_sucursal.slice(1);
+            const ciudad = this.datosCiudades.find((ciudad: any) => ciudad.nombre.toLowerCase() === item.ciudad.toLowerCase());
+
+            const sucursal = {
+              nombre: nombre,
+              id_ciudad: ciudad.id,
+              id_empresa: '1',
+            }
+            this.listSucursalesCorrectas.push(sucursal);
           }
         });
+
         if (this.listSucursalesCorrectas.length > 0) {
           this.btn_registrar = false;
         }
@@ -546,43 +556,26 @@ export class ListaSucursalesComponent implements OnInit {
   listSucursalesCorrectas: any = [];
   btn_registrar: boolean = true;
   registrarSucursales() {
-    var data = {
-      nombre: '',
-      id_ciudad: '',
-      id_empresa: '',
-      user_name: this.user_name,
-      ip: this.ip,
-    }
-
     if (this.listSucursalesCorrectas.length > 0) {
-      console.log('lista sucursales correctas: ', this.listSucursalesCorrectas.length);
-      var cont = 0;
-      this.listSucursalesCorrectas.forEach((item: any) => {
-        this.datosCiudades.forEach(valor => {
-          if (item.ciudad.toLowerCase() == valor.nombre.toLowerCase()) {
-            data.nombre = item.nom_sucursal;
-            data.id_ciudad = valor.id;
-            data.id_empresa = '1';
+      let data = {
+        sucursales: this.listSucursalesCorrectas,
+        user_name: this.user_name,
+        ip: this.ip,
+      }
+      console.log("sucursales correctas", this.listSucursalesCorrectas)
+      this.rest.RegistrarSucursales(data).subscribe({
+        next: (res: any) => {
+          this.toastr.success('Plantilla de Sucursales importada.','Operación exitosa.', {
+            timeOut: 10000,
+          });
+          this.LimpiarCampoBuscar();
 
-            // CAPITALIZAR LA PRIMERA LETRA DE LA PRIMERA PALABRA
-            const textonombre = data.nombre.charAt(0).toUpperCase();
-            const restoDelTexto = data.nombre.slice(1);
-
-            data.nombre = textonombre + restoDelTexto
-
-            this.rest.RegistrarSucursal(data).subscribe(res => {
-              cont = cont + 1;
-              if (this.listSucursalesCorrectas.length == cont) {
-                this.toastr.success('Operación exitosa.', 'Plantilla de Sucursales importada.', {
-                  timeOut: 10000,
-                });
-                this.LimpiarCampoBuscar();
-              }
-            })
-          }
-        })
-
-      })
+      }, error: (error: any) => {
+        this.toastr.error('Error al registrar los datos.', 'Operación fallida.', {
+          timeOut: 6000,
+        });
+      }
+    });
     } else {
       this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
         timeOut: 4000,

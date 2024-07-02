@@ -402,6 +402,57 @@ class SucursalControlador {
       }, 1500)
     }
   }
+
+  // METODO PARA CARGAR PLANTILLA DE SUCURSALES
+  public async RegistrarSucursales(req: Request, res: Response): Promise<Response> {
+    const { sucursales, user_name, ip } = req.body;
+    let error: boolean = false;
+    console.log(sucursales);
+
+    for (const sucursal of sucursales) {
+      const { nombre, id_ciudad, id_empresa } = sucursal;
+      try {
+
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+
+        const response: QueryResult = await pool.query(
+          `
+          INSERT INTO e_sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
+          `
+          , [nombre, id_ciudad, id_empresa]);
+        
+        const [sucursal] = response.rows;
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'e_sucursales',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: JSON.stringify(sucursal),
+          ip,
+          observacion: null
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+      
+      } catch (error) {
+        // REVERTIR TRANSACCION
+        await pool.query('ROLLBACK');
+        error = true;
+      }
+
+    }
+
+    if (error) {
+      return res.status(500).jsonp({ message: 'error' });
+    }
+
+    return res.status(200).jsonp({ message: 'ok' })
+  }
+
 }
 
 export const SUCURSAL_CONTROLADOR = new SucursalControlador();

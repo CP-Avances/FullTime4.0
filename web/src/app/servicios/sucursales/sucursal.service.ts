@@ -56,5 +56,9 @@ export class SucursalService {
     return this.http.post<any>(environment.url + '/sucursales/upload/revision', formData);
   }
 
+  RegistrarSucursales(data: any) {
+    return this.http.post<any>(environment.url + '/sucursales/registraSucursales', data);
+  }
+
 
 }
