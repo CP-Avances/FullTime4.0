@@ -1,18 +1,15 @@
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { environment } from '../../../../environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-
-import { ToastrService } from 'ngx-toastr';
-
-import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { SubirDocumentoComponent } from '../subir-documento/subir-documento.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 import { DocumentosService } from 'src/app/servicios/documentos/documentos.service';
-
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableArchivos } from 'src/app/model/reportes.model';
@@ -25,17 +22,14 @@ import { ITableArchivos } from 'src/app/model/reportes.model';
 
 export class ListaArchivosComponent implements OnInit {
 
-
-  archivosEliminar: any = [];
-
   hipervinculo: string = environment.url;
+  archivosEliminar: any = [];
+  archivosFiltro: any;
   archivos: any = [];
   Dirname: string;
   subir: boolean = false;
   listad: boolean = true;
   listap: boolean = false;
-
-  filtroDescripcion = '';
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -49,21 +43,17 @@ export class ListaArchivosComponent implements OnInit {
     nombreForm: this.nombreF,
   });
 
-
-  archivosFiltro: any;
   constructor(
     private toastr: ToastrService,
     private router: Router,
-
-    private rest: DocumentosService,
     private route: ActivatedRoute,
+    private rest: DocumentosService,
     public ventana: MatDialog,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
     this.MostrarArchivos();
   }
 
@@ -71,10 +61,9 @@ export class ListaArchivosComponent implements OnInit {
   MostrarArchivos() {
     this.route.params.subscribe((obj: any) => {
       this.Dirname = obj.filename
-      console.log('ver carpetas ', obj.filename)
+      //console.log('ver carpetas ', obj.filename)
       this.ObtenerArchivos(obj.filename)
     })
-
     if (this.Dirname === 'documentacion') {
       this.subir = true;
     } else {
@@ -144,7 +133,7 @@ export class ListaArchivosComponent implements OnInit {
         this.rest.ListarDocumentacion('documentacion').subscribe(res => {
           this.archivos = res
           this.archivosFiltro = [...this.archivos];
-          console.log('archivosFiltro: ', this.archivosFiltro);
+          //console.log('archivosFiltro: ', this.archivosFiltro);
         })
       });
     this.MostrarArchivos();
@@ -153,8 +142,6 @@ export class ListaArchivosComponent implements OnInit {
     this.plan_multiple_ = false;
     this.selectionArchivos.clear();
     this.archivosEliminar = [];
-
-
   }
 
   // METODO PARA VER LISTA DE ARCHIVOS DE PERMISOS
@@ -166,36 +153,33 @@ export class ListaArchivosComponent implements OnInit {
     this.rest.ListarArchivosIndividuales(nombre_carpeta, tipo).subscribe(res => {
       this.archivos = res
       this.archivosFiltro = [...this.archivos];
-      console.log('archivosFiltro: ', this.archivosFiltro);
+      //console.log('archivosFiltro: ', this.archivosFiltro);
     })
   }
 
+  // METODO PARA VER LISTA DE INDIVIDUALES
   VerListaIndividuales() {
     this.listap = false;
     this.listad = true;
     this.ObtenerArchivos(this.Dirname);
   }
 
-
+  // METODO PARA FILTRAR CARPETAS
   Filtrar(e: any, tipo: string) {
-    console.log('e: ', e.target.value);
+    //console.log('e: ', e.target.value);
     const query: string = e.target.value;
     const filtro = this.archivos.filter((o: any) => {
-      console.log('o: ', o);
+      //console.log('o: ', o);
       if (tipo == 'carpeta') {
         return (o.indexOf(query) > -1);
       } else {
         return (o.nombre.indexOf(query) > -1);
       }
-
     })
     this.archivosFiltro = filtro;
   }
 
-
-
   // METODOS PARA LA SELECCION MULTIPLE
-
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
 
@@ -212,14 +196,11 @@ export class ListaArchivosComponent implements OnInit {
 
   selectionArchivos = new SelectionModel<ITableArchivos>(true, []);
 
-
-
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
     const numSelected = this.selectionArchivos.selected.length;
     return numSelected === this.archivosFiltro.length
   }
-
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
@@ -228,21 +209,14 @@ export class ListaArchivosComponent implements OnInit {
       this.archivosFiltro.forEach((row: any) => this.selectionArchivos.select(row));
   }
 
-
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelPag(row?: ITableArchivos): string {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.archivosEliminar = this.selectionArchivos.selected;
-
-
-
     return `${this.selectionArchivos.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
-
   }
-
-
 
   // METODO PARA ELIMINAR ARCHIVOS
   EliminarArchivo(filename: string, id: number) {
@@ -251,8 +225,6 @@ export class ListaArchivosComponent implements OnInit {
       ip: this.ip
     };
     this.rest.EliminarRegistro(id, filename, data).subscribe((res: any) => {
-
-
       if (res.message === 'error') {
         this.toastr.error('No se puede eliminar.', '', {
           timeOut: 6000,
@@ -261,16 +233,10 @@ export class ListaArchivosComponent implements OnInit {
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
-
-
         this.MostrarArchivos();
-
       }
     })
-
   }
-
-
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
@@ -279,56 +245,38 @@ export class ListaArchivosComponent implements OnInit {
         if (confirmado) {
           this.EliminarArchivo(datos.filename, datos.id);
           this.activar_seleccion = true;
-
           this.plan_multiple = false;
           this.plan_multiple_ = false;
           this.archivosEliminar = [];
           this.selectionArchivos.clear();
-
-
           this.MostrarArchivos();
-
         } else {
           this.router.navigate(['/archivos/documentacion']);
         }
       });
-
-
   }
 
-
-
+  // METODO DE ELIMINACION MULTIPLE
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
-
     const data = {
       user_name: this.user_name,
       ip: this.ip
     };
-
     this.ingresar = false;
     this.contador = 0;
-
     this.archivosEliminar = this.selectionArchivos.selected;
     this.archivosEliminar.forEach((datos: any) => {
-
       this.archivosFiltro = this.archivosFiltro.filter(item => item.id !== datos.id);
-
       this.contador = this.contador + 1;
-
       this.rest.EliminarRegistro(datos.id, datos.filename, data).subscribe((res: any) => {
-
-
         if (res.message === 'error') {
           this.toastr.error('No se puede eliminar.', '', {
             timeOut: 6000,
           });
-
           this.contador = this.contador - 1;
-
         } else {
-
           if (!this.ingresar) {
             this.toastr.error('Se ha eliminado ' + this.contador + ' registros.', '', {
               timeOut: 6000,
@@ -336,19 +284,17 @@ export class ListaArchivosComponent implements OnInit {
             this.ingresar = true;
           }
           this.MostrarArchivos();
-
         }
       })
     }
     )
   }
 
-
+  // METODO DE CONFIRMACION MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-
           if (this.archivosEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
@@ -356,27 +302,16 @@ export class ListaArchivosComponent implements OnInit {
             this.plan_multiple_ = false;
             this.archivosEliminar = [];
             this.selectionArchivos.clear();
-
             this.MostrarArchivos();
-
           } else {
             this.toastr.warning('No ha seleccionado ARCHIVOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
-
           this.selectionArchivos.clear();
-
         } else {
           this.router.navigate(['/archivos/documentacion']);
         }
-
-
       });
-
-
   }
-
-
 }

@@ -42,11 +42,12 @@ class BirthdayControlador {
                 const { id_empresa, titulo, link, mensaje, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
-                INSERT INTO e_message_birthday (id_empresa, asunto, mensaje, link) VALUES ($1, $2, $3, $4)
+                const response = yield database_1.default.query(`
+                INSERT INTO e_message_birthday (id_empresa, asunto, mensaje, link) VALUES ($1, $2, $3, $4) RETURNING *
                 `, [id_empresa, titulo, mensaje, link]);
+                const [cumpleanios] = response.rows;
                 // AUDITORIA
-                auditoriaControlador_1.default.InsertarAuditoria({
+                yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'e_message_birthday',
                     usuario: user_name,
                     accion: 'I',
@@ -57,13 +58,10 @@ class BirthdayControlador {
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                const oneMessage = yield database_1.default.query(`
-                SELECT id FROM e_message_birthday WHERE id_empresa = $1
-                `, [id_empresa]);
-                const idMessageGuardado = oneMessage.rows[0].id;
-                return res.jsonp([{ message: 'Registro guardado.', id: idMessageGuardado }]);
+                return res.jsonp([{ message: 'Registro guardado.', id: cumpleanios.id }]);
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ text: 'Error al guardar el registro.' });
@@ -71,7 +69,7 @@ class BirthdayControlador {
         });
     }
     // METODO PARA CARGAR MENSAJE DE CUMPLEANIOS    --**VERIFICADO
-    CrearImagenEmpleado(req, res) {
+    CrearImagenCumpleanios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
@@ -84,62 +82,48 @@ class BirthdayControlador {
                 let id = req.params.id_empresa;
                 let separador = path_1.default.sep;
                 const { user_name, ip } = req.body;
-                const unEmpleado = yield database_1.default.query(`
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const cumpleanios = yield database_1.default.query(`
                 SELECT * FROM e_message_birthday WHERE id = $1
                 `, [id]);
-                if (unEmpleado.rowCount != 0) {
-                    unEmpleado.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                        if (obj.img != null) {
-                            let ruta = (0, accesoCarpetas_1.ObtenerRutaBirthday)() + separador + obj.img;
-                            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                                if (!err) {
-                                    // ELIMINAR DEL SERVIDOR
-                                    fs_1.default.unlinkSync(ruta);
-                                }
-                            });
-                        }
-                        try {
-                            // INICIAR TRANSACCION
-                            yield database_1.default.query('BEGIN');
-                            yield database_1.default.query(`
-                            UPDATE e_message_birthday SET imagen = $2 WHERE id = $1
-                            `, [id, imagen]);
-                            // AUDITORIA
-                            auditoriaControlador_1.default.InsertarAuditoria({
-                                tabla: 'e_message_birthday',
-                                usuario: user_name,
-                                accion: 'U',
-                                datosOriginales: JSON.stringify(obj),
-                                datosNuevos: `{id: ${id}, img: ${imagen}}`,
-                                ip,
-                                observacion: null
-                            });
-                            // FINALIZAR TRANSACCION
-                            yield database_1.default.query('COMMIT');
-                        }
-                        catch (error) {
-                            // REVERTIR TRANSACCION
-                            console.log(error);
-                            yield database_1.default.query('ROLLBACK');
-                            throw error;
-                        }
-                    }));
+                console.log('verificar cumpleanios ', cumpleanios.rows[0]);
+                if (cumpleanios.rowCount != 0) {
+                    if (cumpleanios.rows[0].imagen != null) {
+                        let ruta = (0, accesoCarpetas_1.ObtenerRutaBirthday)() + separador + cumpleanios.rows[0].imagen;
+                        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                        fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                            if (!err) {
+                                // ELIMINAR DEL SERVIDOR
+                                fs_1.default.unlinkSync(ruta);
+                            }
+                        });
+                    }
+                    yield database_1.default.query(`
+                    UPDATE e_message_birthday SET imagen = $2 WHERE id = $1
+                    `, [id, imagen]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'e_message_birthday',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: JSON.stringify(cumpleanios.rows[0]),
+                        datosNuevos: `{id: ${id}, img: ${imagen}}`,
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                     return res.jsonp({ message: 'Imagen actualizada.' });
                 }
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'e_message_birthday',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: '',
-                    datosNuevos: '',
-                    ip,
-                    observacion: 'Error al actualizar la imagen, no se encuentra el registro.'
-                });
-                return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+                else {
+                    return res.jsonp({ message: 'No se encuentran resultados.' });
+                }
             }
             catch (error) {
+                // REVERTIR TRANSACCION
                 console.log(error);
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'Error al actualizar la imagen.' });
             }
         });

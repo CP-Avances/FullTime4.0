@@ -91,27 +91,20 @@ export class ComunicadosComponent implements OnInit {
   numero_pagina_car: number = 1;
 
   // FILTROS SUCURSALES
-  filtroNombreSuc_: string = '';
   get filtroNombreSuc() { return this.restR.filtroNombreSuc }
 
-  // FILTROS DEPARTAMENTOS
-  filtroNombreDep_: string = '';
+  // FILTROS DEPARTAMENTOS;
   get filtroNombreDep() { return this.restR.filtroNombreDep }
 
   // FILTROS EMPLEADO
-  filtroCodigo_: any;
-  filtroCedula_: string = '';
-  filtroNombreEmp_: string = '';
   get filtroNombreEmp() { return this.restR.filtroNombreEmp };
   get filtroCodigo() { return this.restR.filtroCodigo };
   get filtroCedula() { return this.restR.filtroCedula };
 
   // FILTRO CARGO
-  filtroNombreCarg_: string = '';
   get filtroNombreCarg() { return this.restR.filtroNombreCarg };
 
   // FILTRO REGIMEN
-  filtroNombreReg_: string = '';
   get filtroNombreReg() { return this.restR.filtroNombreReg };
 
   // MODELO DE SELECCION DE DATOS
@@ -821,7 +814,6 @@ export class ComunicadosComponent implements OnInit {
   MostrarLista() {
     if (this.opcion === 's') {
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
@@ -830,9 +822,7 @@ export class ComunicadosComponent implements OnInit {
     }
     else if (this.opcion === 'r') {
       this.nombre_reg.reset();
-      this.filtroNombreReg_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
@@ -842,9 +832,7 @@ export class ComunicadosComponent implements OnInit {
     }
     else if (this.opcion === 'c') {
       this.nombre_carg.reset();
-      this.filtroNombreCarg_ = '';
-      this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
+      this.nombre_suc.reset();;
       this.selectionEmp.clear();
       this.selectionDep.clear();
       this.selectionSuc.clear();
@@ -854,9 +842,7 @@ export class ComunicadosComponent implements OnInit {
     }
     else if (this.opcion === 'd') {
       this.nombre_dep.reset();
-      this.filtroNombreDep_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionEmp.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
@@ -868,11 +854,7 @@ export class ComunicadosComponent implements OnInit {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
-      this.filtroCodigo_ = '';
-      this.filtroCedula_ = '';
-      this.filtroNombreEmp_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();

@@ -54,8 +54,9 @@ export class RegistrarBirthdayComponent implements OnInit {
       ip: this.ip
     }
     this.restB.CrearMensajeCumpleanios(dataMensaje).subscribe(res => {
-      this.ventana.close(true);
+      //console.log('ver res ', res)
       this.SubirRespaldo(res[0].id)
+      this.ventana.close(true);
     })
   }
 
@@ -86,8 +87,8 @@ export class RegistrarBirthdayComponent implements OnInit {
       let arrayItems = name.split(".");
       let itemExtencion = arrayItems[arrayItems.length - 1];
       if (this.archivoSubido[0].size <= 2e+6) {
-        if (itemExtencion == 'png' || itemExtencion == 'jpg' ||
-          itemExtencion == 'jpeg' || itemExtencion == 'gif') {
+        if (itemExtencion === 'png' || itemExtencion === 'jpg' ||
+          itemExtencion === 'jpeg' || itemExtencion === 'gif') {
           this.formulario.patchValue({ imagenForm: name });
         }
         else {
@@ -114,7 +115,6 @@ export class RegistrarBirthdayComponent implements OnInit {
     }
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
-
     this.restB.SubirImagenBirthday(formData, id).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Imagen subida con éxito.', {
         timeOut: 6000,

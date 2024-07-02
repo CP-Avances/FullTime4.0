@@ -146,7 +146,6 @@ class EmpleadoControlador {
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
     } catch (error) {
-      console.log('error ---- ', error)
       //REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'Error al actualizar código.' });
@@ -237,9 +236,7 @@ class EmpleadoControlador {
 
       const [empleado] = response.rows;
 
-
       const fechaNacimiento = await FormatearFecha2(fec_nacimiento, 'ddd')
-
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -266,7 +263,6 @@ class EmpleadoControlador {
     }
     catch (error) {
       // REVERTIR TRANSACCION
-      console.log(error)
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
     }
@@ -958,7 +954,6 @@ class EmpleadoControlador {
       }
 
     } catch (error) {
-      console.log('error ---- ', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       res.status(500).jsonp({ message: 'Error al actualizar imagen del usuario.' });
@@ -1082,11 +1077,20 @@ class EmpleadoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
+      const usuario = await pool.query(
+        `
+        SELECT id FROM eu_usuarios WHERE id_empleado = $1
+        `
+        , [id_empleado]);
+
+      const id_usuario = usuario.rows[0].id;
+      
+
       await pool.query(
         `
-        INSERT INTO eu_empleado_titulos (observacion, id_empleado, id_titulo) VALUES ($1, $2, $3)
+        INSERT INTO eu_empleado_titulos (observacion, id_empleado, id_titulo, id_usuario) VALUES ($1, $2, $3, $4)
         `
-        , [observacion, id_empleado, id_titulo]);
+        , [observacion, id_empleado, id_titulo, id_usuario]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -1094,7 +1098,7 @@ class EmpleadoControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{observacion: ${observacion}, id_empleado: ${id_empleado}, id_titulo: ${id_titulo}}`,
+        datosNuevos: `{observacion: ${observacion}, id_empleado: ${id_empleado}, id_titulo: ${id_titulo}, id_usuario: ${id_usuario}`,
         ip,
         observacion: null
       });
@@ -1373,7 +1377,16 @@ class EmpleadoControlador {
         const contratos = await pool.query('SELECT * FROM eu_empleado_contratos WHERE id_empleado = $1', [e.id]);
         const [datosContratos] = contratos.rows;
 
-        if (datosActualesEmpleado || datosContratos) {
+        const titulos = await pool.query('SELECT * FROM eu_empleado_titulos WHERE id_empleado = $1', [e.id]);
+        const [datosTitulos] = titulos.rows;
+
+        const discapacidad = await pool.query('SELECT * FROM eu_empleado_discapacidad WHERE id_empleado = $1', [e.id]);
+        const [datosDiscapacidad] = discapacidad.rows;
+
+        const vacunas = await pool.query('SELECT * FROM eu_empleado_vacunas WHERE id_empleado = $1', [e.id]);
+        const [datosVacunas] = vacunas.rows;
+
+        if (datosActualesEmpleado || datosContratos || datosTitulos || datosDiscapacidad || datosVacunas) {
           empleadosRegistrados = true;
           continue;
         }
@@ -1414,7 +1427,11 @@ class EmpleadoControlador {
       } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
-        errorEliminar = true;
+        if (error.code === '23503') {
+          empleadosRegistrados = true;
+        } else {
+          errorEliminar = true;
+        }
       }
     }
 

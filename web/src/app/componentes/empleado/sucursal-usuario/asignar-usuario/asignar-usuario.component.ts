@@ -2,21 +2,20 @@ import { Observable, map, startWith } from 'rxjs';
 import { Component, OnInit, Input } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { SelectionModel } from '@angular/cdk/collections';
+import { firstValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { PrincipalSucursalUsuarioComponent } from '../principal-sucursal-usuario/principal-sucursal-usuario.component';
-import { firstValueFrom } from 'rxjs';
 import { VisualizarAsignacionesComponent } from '../visualizar-asignaciones/visualizar-asignaciones.component';
 
 @Component({
@@ -47,10 +46,6 @@ export class AsignarUsuarioComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
-  filtroRol = '';
-  filtroNombre = '';
-  filtroDepartamento = '';
-
   rol = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
   departamento = new FormControl('', [Validators.minLength(2)]);
@@ -70,9 +65,9 @@ export class AsignarUsuarioComponent implements OnInit {
 
 
   constructor(
+    public departamentoService: DepartamentosService,
     public ventanasu: PrincipalSucursalUsuarioComponent,
     public sucursal: SucursalService,
-    public departamentoService: DepartamentosService,
     public ventana: MatDialog,
     public general: DatosGeneralesService,
     public toastr: ToastrService,
@@ -119,10 +114,9 @@ export class AsignarUsuarioComponent implements OnInit {
   ver_asignados: boolean = false;
   BuscarUsuariosSucursal() {
     let data = {
-      sucursal:  this.data.id,
+      sucursal: this.data.id,
       estado: 1
     }
-
     this.usuarios = [];
     this.asignados = [];
     this.general.ObtenerUsuariosSucursal(data).subscribe(res => {
@@ -137,9 +131,7 @@ export class AsignarUsuarioComponent implements OnInit {
           });
         });
       }
-
       this.ver_principal = true;
-
     });
   }
 
@@ -164,7 +156,6 @@ export class AsignarUsuarioComponent implements OnInit {
   ObtenerSucursales() {
     this.sucursal.BuscarSucursal().subscribe(res => {
       this.sucursales = res;
-
       this.filteredOptions = this.sucursalForm.valueChanges
         .pipe(
           startWith(''),
@@ -181,30 +172,25 @@ export class AsignarUsuarioComponent implements OnInit {
     this.isChecked = false;
     this.isPersonal = false;
     this.deshabilitarTodos = false;
-
     const [elemento] = this.sucursales.filter((o: any) => {
       return o.nombre === this.sucursalForm.value
     });
-
     this.departamentos = [];
     const id_sucursal = elemento.id;
     this.departamentoService.BuscarDepartamentoSucursal(id_sucursal).subscribe(datos => {
       this.departamentos = datos;
       this.ver_departamentos = true;
     });
-
     // GREGAR PROPIEDAD SELECCIONADO A TODOS LOS DEPARTAMENTOS
     this.departamentos.forEach((obj: any) => {
       obj.seleccionado = false;
     });
-
     if (elemento.nombre.toLowerCase() === this.name_sucursal.toLowerCase()) {
       this.ver_personal = true;
     }
     else {
       this.ver_personal = false;
     }
-
   }
 
   // VARIABLES DE ACTIVACION DE FUNCIONES
@@ -239,7 +225,7 @@ export class AsignarUsuarioComponent implements OnInit {
     this.limpiarData = this.departamentos;
     for (var i = 0; i <= this.limpiarData.length - 1; i++) {
       (<HTMLInputElement>document.getElementById('departamentosSeleccionados' + i)).checked = false;
-      this.departamentosSeleccionados = this.departamentosSeleccionados.filter((d:any) => d !== this.departamentos[i]);
+      this.departamentosSeleccionados = this.departamentosSeleccionados.filter((d: any) => d !== this.departamentos[i]);
     }
   }
 
@@ -255,7 +241,6 @@ export class AsignarUsuarioComponent implements OnInit {
       this.QuitarTodos();
       this.ver_guardar = false;
     }
-
   }
 
   // METODO PARA VERIFICAR SELECCION DE CIUDADES
@@ -276,22 +261,18 @@ export class AsignarUsuarioComponent implements OnInit {
 
   // METODO PARA DESHABILITAR OPCIONES DEPARTAMENTOS
   ModificarPersonal(event: any) {
-
     const target = event.target as HTMLInputElement;
     this.isPersonal = target.checked;
-
     if (this.isPersonal === true || this.departamentosSeleccionados.length != 0) {
       this.ver_guardar = true;
     } else {
       this.ver_guardar = false;
     }
-
   }
 
   // METODO PARA RETIRAR DE LISTA DE SELECCIONADOS
   RetirarLista(seleccionado: any) {
     this.departamentosSeleccionados = this.departamentosSeleccionados.filter(elemento => elemento.id !== seleccionado);
-
     const departamento = this.departamentos.find((departamento: any) => departamento.id === seleccionado);
     if (departamento) {
       departamento.seleccionado = false;
@@ -314,7 +295,6 @@ export class AsignarUsuarioComponent implements OnInit {
     const requests: Promise<any>[] = [];
 
     for (const objeto of this.usuariosSeleccionados.selected) {
-
       let datos: Datos = {
         id: '',
         id_empleado: objeto.id,
@@ -328,24 +308,18 @@ export class AsignarUsuarioComponent implements OnInit {
 
       if (this.isPersonal) {
         datos.id_departamento = objeto.id_departamento;
-
         const verificacion = await this.VerificarAsignaciones(datos, true);
-
-        if (verificacion === 2 ) {
+        if (verificacion === 2) {
           requests.push(firstValueFrom(this.usuario.ActualizarUsuarioDepartamento(datos)));
         }
-
       }
 
       for (const departamento of this.departamentosSeleccionados) {
-
         datos.id_departamento = departamento.id;
         datos.administra = true;
         datos.principal = false;
         datos.personal = false;
-
         const verificacion = await this.VerificarAsignaciones(datos, false);
-
         if (verificacion === 1 || verificacion === 2) {
           const accion = verificacion === 1 ? this.usuario.RegistrarUsuarioDepartamento.bind(this.usuario) : this.usuario.ActualizarUsuarioDepartamento.bind(this.usuario);
           requests.push(firstValueFrom(accion(datos)));
@@ -376,7 +350,7 @@ export class AsignarUsuarioComponent implements OnInit {
     2: EXISTE LA ASIGNACION Y ES PRINCIPAL => SE ACTUALIZA LA ASIGNACION (PRINCIPAL)
     3: EXISTE LA ASIGNACION Y NO ES PRINCIPAL => NO SE EJECUTA NINGUNA ACCION
   */
-  async VerificarAsignaciones(datos: Datos, personal: boolean): Promise<number>  {
+  async VerificarAsignaciones(datos: Datos, personal: boolean): Promise<number> {
 
     const usuario = this.usuarios.find((u: any) => u.id === datos.id_empleado);
 

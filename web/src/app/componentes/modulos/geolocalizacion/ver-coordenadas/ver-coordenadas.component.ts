@@ -103,27 +103,20 @@ export class VerCoordenadasComponent implements OnInit {
   numero_pagina_emp: number = 1;
 
   // FILTROS SUCURSALES
-  filtroNombreSuc_: string = '';
   get filtroNombreSuc() { return this.filtros.filtroNombreSuc }
 
   // FILTROS DEPARTAMENTOS
-  filtroNombreDep_: string = '';
   get filtroNombreDep() { return this.filtros.filtroNombreDep }
 
   // FILTROS EMPLEADO
-  filtroCodigo_: any;
-  filtroCedula_: string = '';
-  filtroNombreEmp_: string = '';
   get filtroNombreEmp() { return this.filtros.filtroNombreEmp };
   get filtroCodigo() { return this.filtros.filtroCodigo };
   get filtroCedula() { return this.filtros.filtroCedula };
 
   // FILTRO CARGOS
-  filtroNombreCarg_: string = '';
   get filtroNombreCarg() { return this.filtros.filtroNombreCarg };
 
   // FILTRO REGIMEN
-  filtroNombreReg_: string = '';
   get filtroNombreReg() { return this.filtros.filtroNombreReg };
 
   coordenadas: any = [];
@@ -516,7 +509,6 @@ export class VerCoordenadasComponent implements OnInit {
   MostrarLista() {
     if (this.opcion === 's') {
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
@@ -525,7 +517,6 @@ export class VerCoordenadasComponent implements OnInit {
     }
     else if (this.opcion === 'r') {
       this.nombre_reg.reset();
-      this.filtroNombreReg_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
@@ -534,7 +525,6 @@ export class VerCoordenadasComponent implements OnInit {
     }
     else if (this.opcion === 'c') {
       this.nombre_carg.reset();
-      this.filtroNombreCarg_ = '';
       this.selectionEmp.clear();
       this.selectionDep.clear();
       this.selectionSuc.clear();
@@ -543,9 +533,7 @@ export class VerCoordenadasComponent implements OnInit {
     }
     else if (this.opcion === 'd') {
       this.nombre_dep.reset();
-      this.filtroNombreDep_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionEmp.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
@@ -557,9 +545,6 @@ export class VerCoordenadasComponent implements OnInit {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
-      this.filtroCodigo_ = '';
-      this.filtroCedula_ = '';
-      this.filtroNombreEmp_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();

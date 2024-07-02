@@ -85,27 +85,20 @@ export class ListaAppComponent implements OnInit {
   numero_pagina_emp: number = 1;
 
   // FILTROS SUCURSALES
-  filtroNombreSuc_: string = '';
   get filtroNombreSuc() { return this.restR.filtroNombreSuc }
 
   // FILTROS DEPARTAMENTOS
-  filtroNombreDep_: string = '';
   get filtroNombreDep() { return this.restR.filtroNombreDep }
 
   // FILTROS EMPLEADO
-  filtroCodigo_: any;
-  filtroCedula_: string = '';
-  filtroNombreEmp_: string = '';
   get filtroNombreEmp() { return this.restR.filtroNombreEmp };
   get filtroCodigo() { return this.restR.filtroCodigo };
   get filtroCedula() { return this.restR.filtroCedula };
 
   // FILTRO CARGOS
-  filtroNombreCarg_: string = '';
   get filtroNombreCarg() { return this.restR.filtroNombreCarg };
 
   // FILTRO REGIMEN
-  filtroNombreReg_: string = '';
   get filtroNombreReg() { return this.restR.filtroNombreReg };
 
 
@@ -172,27 +165,20 @@ export class ListaAppComponent implements OnInit {
   numero_pagina_emp_dh: number = 1;
 
   // FILTROS SUCURSALES
-  dh_filtroNombreSuc_: string = '';
   get dh_filtroNombreSuc() { return this.restR.filtroNombreSuc }
 
   // FILTROS DEPARTAMENTOS
-  dh_filtroNombreDep_: string = '';
   get dh_filtroNombreDep() { return this.restR.filtroNombreDep }
 
   // FILTROS EMPLEADO
-  dh_filtroCodigo_: any;
-  dh_filtroCedula_: string = '';
-  dh_filtroNombreEmp_: string = '';
   get dh_filtroNombreEmp() { return this.restR.filtroNombreEmp };
   get dh_filtroCodigo() { return this.restR.filtroCodigo };
   get dh_filtroCedula() { return this.restR.filtroCedula };
 
   // FILTROS CARGOS
-  dh_filtroNombreCarg_: string = '';
   get dh_filtroNombreCarg() { return this.restR.filtroNombreCarg };
 
   // FILTRO REGIMEN
-  dh_filtroNombreReg_: string = '';
   get dh_filtroNombreReg() { return this.restR.filtroNombreReg };
 
   // HABILITAR O DESHABILITAR EL ICONO DE PROCESO INDIVIDUAL
@@ -439,11 +425,11 @@ export class ListaAppComponent implements OnInit {
 
     this.OmitirDuplicados(departamentos_, cargos_, estado);
 
-    console.log('ver sucursales ', sucursales_)
+    /*console.log('ver sucursales ', sucursales_)
     console.log('ver regimenes ', regimenes_)
     console.log('ver departamentos ', departamentos_)
     console.log('ver cargos ', cargos_)
-    console.log('ver empleados ', empleados_)
+    console.log('ver empleados ', empleados_)*/
   }
 
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
@@ -595,7 +581,6 @@ export class ListaAppComponent implements OnInit {
   MostrarLista_DH() {
     if (this.opcion_dh === 's') {
       this.nombre_suc_dh.reset();
-      this.dh_filtroNombreSuc_ = '';
       this.selectionEmp_dh.clear();
       this.selectionCarg_dh.clear();
       this.selectionSuc_dh.clear();
@@ -604,9 +589,7 @@ export class ListaAppComponent implements OnInit {
     }
     else if (this.opcion_dh === 'r') {
       this.nombre_reg_dh.reset();
-      this.dh_filtroNombreReg_ = '';
       this.nombre_suc_dh.reset();
-      this.dh_filtroNombreSuc_ = '';
       this.selectionDep_dh.clear();
       this.selectionCarg_dh.clear();
       this.selectionEmp_dh.clear();
@@ -615,10 +598,8 @@ export class ListaAppComponent implements OnInit {
       this.Filtrar_DH('', 12)
     }
     else if (this.opcion_dh === 'c') {
-      this.nombre_carg_dh.reset();
-      this.dh_filtroNombreCarg_ = '';
+      this.nombre_carg_dh.reset();;
       this.nombre_suc_dh.reset();
-      this.dh_filtroNombreSuc_ = '';
       this.selectionEmp_dh.clear();
       this.selectionDep_dh.clear();
       this.selectionSuc_dh.clear();
@@ -628,9 +609,7 @@ export class ListaAppComponent implements OnInit {
     }
     else if (this.opcion_dh === 'd') {
       this.nombre_dep_dh.reset();
-      this.dh_filtroNombreDep_ = '';
       this.nombre_suc_dh.reset();
-      this.dh_filtroNombreSuc_ = '';
       this.selectionEmp_dh.clear();
       this.selectionCarg_dh.clear();
       this.selectionSuc_dh.clear();
@@ -642,11 +621,7 @@ export class ListaAppComponent implements OnInit {
       this.codigo_dh.reset();
       this.cedula_dh.reset();
       this.nombre_emp_dh.reset();
-      this.dh_filtroCodigo_ = '';
-      this.dh_filtroCedula_ = '';
-      this.dh_filtroNombreEmp_ = '';
       this.nombre_suc_dh.reset();
-      this.dh_filtroNombreSuc_ = '';
       this.selectionDep_dh.clear();
       this.selectionCarg_dh.clear();
       this.selectionSuc_dh.clear();
@@ -1344,7 +1319,6 @@ export class ListaAppComponent implements OnInit {
   MostrarLista() {
     if (this.opcion === 's') {
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
@@ -1353,9 +1327,7 @@ export class ListaAppComponent implements OnInit {
     }
     else if (this.opcion === 'r') {
       this.nombre_reg.reset();
-      this.filtroNombreReg_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
@@ -1365,9 +1337,7 @@ export class ListaAppComponent implements OnInit {
     }
     else if (this.opcion === 'c') {
       this.nombre_carg.reset();
-      this.filtroNombreCarg_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionEmp.clear();
       this.selectionDep.clear();
       this.selectionSuc.clear();
@@ -1377,9 +1347,7 @@ export class ListaAppComponent implements OnInit {
     }
     else if (this.opcion === 'd') {
       this.nombre_dep.reset();
-      this.filtroNombreDep_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionEmp.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
@@ -1391,11 +1359,7 @@ export class ListaAppComponent implements OnInit {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
-      this.filtroCodigo_ = '';
-      this.filtroCedula_ = '';
-      this.filtroNombreEmp_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();

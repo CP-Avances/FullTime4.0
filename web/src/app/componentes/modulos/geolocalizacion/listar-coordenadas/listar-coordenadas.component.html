@@ -38,12 +38,11 @@
                         <tr>
                             <td>
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" minlength="2" [formControl]="descripcionF"
-                                        [(ngModel)]="filtroDescripcion">
+                                    <input matInput placeholder="Buscar" minlength="2" [formControl]="descripcionF">
                                 </mat-form-field>
                         </tr>
                         <tr
-                            *ngFor="let tp of coordenadas | filtroNombre: filtroDescripcion | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let tp of coordenadas | filtroNombre: descripcionF.value | paginate:tamanio_pagina:numero_pagina">
                             <td style="padding-top: 10px;text-align: center;">{{tp.descripcion}}</td>
                             <td style="padding-top: 10px;text-align: center;">{{tp.latitud}}</td>
                             <td style="padding-top: 10px;text-align: center;">{{tp.longitud}}</td>
@@ -70,27 +69,31 @@
             <mat-paginator id="pagina" [length]="coordenadas.length" [pageSize]="tamanio_pagina"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
-            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-                <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
-                    matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato PDF.">
-                    <p>PDF</p>
-                </i>
-                <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar Lista de Tipo de Permisos en formato EXCEL.">
-                    <p>XLSL</p>
-                </i>
-                <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar Lista de Tipo de Permisos en formato CSV.">
-                    <p>CSV</p>
-                </i>
-                <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar Lista de Tipo de Permisos en formato XML.">
-                    <p>XML</p>
-                </i>
-            </div>
-            <div class="d-flex justify-content-end"
-                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-                <p> Reporte de coordenadas geográficas. </p>
+
+            <!--  ***********************  DESCARGAR REPORTES  ******************************  -->
+            <div>
+                <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                    <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                        matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato PDF.">
+                        <p>PDF</p>
+                    </i>
+                    <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix
+                        matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato EXCEL.">
+                        <p>XLSL</p>
+                    </i>
+                    <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                        matTooltip="Descargar Lista de Tipo de Permisos en formato CSV.">
+                        <p>CSV</p>
+                    </i>
+                    <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                        matTooltip="Descargar Lista de Tipo de Permisos en formato XML.">
+                        <p>XML</p>
+                    </i>
+                </div>
+                <div class="d-flex justify-content-end"
+                    style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                    <p> Reporte de coordenadas geográficas. </p>
+                </div>
             </div>
         </div>
     </div>
