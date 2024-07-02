@@ -222,7 +222,6 @@ export class ListarNivelTitulosComponent implements OnInit {
   registrarNiveles() {
     if (this.listNivelesCorrectos.length > 0) {
 
-      console.log('listNivelesCorrectos: ', this.listNivelesCorrectos);
       const data = {
         niveles: this.listNivelesCorrectos,
         user_name: this.user_name,
