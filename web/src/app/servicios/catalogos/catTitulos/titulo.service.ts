@@ -47,5 +47,10 @@ export class TituloService {
     return this.http.post<any>(environment.url + '/titulo/upload/revision', formData);
   }
 
+  // METODO PARA REGISTRAR TITULOS DE LA PLANTILLA
+  RegistrarTitulosPlantilla(data: any) {
+    return this.http.post(`${environment.url}/titulo/registrarTitulos`, data);
+  }
+
 
 }

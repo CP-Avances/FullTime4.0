@@ -39,6 +39,8 @@ class TituloRutas {
         this.router.post('/', TokenValidation, TITULO_CONTROLADOR.create);
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], TITULO_CONTROLADOR.RevisarDatos);
 
+        // METODO PARA REGISTRAR TITULOS DE LA PLANTILLA
+        this.router.post('/registrarTitulos', TokenValidation, TITULO_CONTROLADOR.RegistrarTitulosPlantilla);
     }
 }
 

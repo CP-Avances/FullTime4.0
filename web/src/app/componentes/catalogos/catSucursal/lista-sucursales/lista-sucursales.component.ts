@@ -570,7 +570,7 @@ export class ListaSucursalesComponent implements OnInit {
           this.LimpiarCampoBuscar();
 
       }, error: (error: any) => {
-        this.toastr.error('Error al registrar los datos.', 'Operación fallida.', {
+        this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
           timeOut: 6000,
         });
       }

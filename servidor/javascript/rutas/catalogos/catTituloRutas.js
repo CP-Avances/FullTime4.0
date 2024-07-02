@@ -34,6 +34,8 @@ class TituloRutas {
         this.router.put('/', verificarToken_1.TokenValidation, catTituloControlador_1.default.ActualizarTitulo);
         this.router.post('/', verificarToken_1.TokenValidation, catTituloControlador_1.default.create);
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catTituloControlador_1.default.RevisarDatos);
+        // METODO PARA REGISTRAR TITULOS DE LA PLANTILLA
+        this.router.post('/registrarTitulos', verificarToken_1.TokenValidation, catTituloControlador_1.default.RegistrarTitulosPlantilla);
     }
 }
 const TITULO_RUTAS = new TituloRutas();
