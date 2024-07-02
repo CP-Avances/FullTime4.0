@@ -332,15 +332,25 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   registrarDepartamentos() {
     if (this.listDepartamentosCorrectos.length > 0) {
-      this.rest.subirArchivoExcel(this.listDepartamentosCorrectos).subscribe(response => {
-        console.log('respuesta: ', response);
-        this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
-          timeOut: 3000,
-        });
-        //window.location.reload();
-        this.LimpiarCampos();
-        this.archivoForm.reset();
-        this.nameFile = '';
+      const data = {
+        plantilla: this.listDepartamentosCorrectos,
+        user_name: this.user_name,
+        ip: this.ip
+      }
+      this.rest.subirArchivoExcel(data).subscribe({
+        next: (response) => {
+          this.toastr.success('Plantilla de Contratos importada.', 'Operación exitosa.', {
+            timeOut: 3000,
+          });
+          this.LimpiarCampos();
+          this.archivoForm.reset();
+          this.nameFile = '';
+        },
+        error: (error) => {;
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal',  {
+            timeOut: 4000,
+          });
+        }
       });
     } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {

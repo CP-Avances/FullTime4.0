@@ -635,38 +635,40 @@ class DepartamentoControlador {
     // METODO PARA REGISTRAR DATOS DE DEPARTAMENTOS
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const plantilla = req.body;
-                //console.log('datos departamento: ', plantilla);
-                var contador = 1;
-                var respuesta;
-                plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                    console.log('data: ', data);
-                    // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
-                    const { nombre, sucursal } = data;
-                    const ID_SUCURSAL = yield database_1.default.query(`
-          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
-          `, [sucursal.toUpperCase()]);
-                    var id_sucursal = ID_SUCURSAL.rows[0].id;
-                    // REGISTRO DE LOS DATOS DE CONTRATOS
-                    const response = yield database_1.default.query(`
-          INSERT INTO ed_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING *
-          `, [nombre.toUpperCase(), id_sucursal]);
+            const { plantilla, user_name, ip } = req.body;
+            let error = false;
+            for (const data of plantilla) {
+                const { nombre, sucursal } = data;
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const id_sucursal = yield database_1.default.query(` SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`, [sucursal.toUpperCase()]);
+                    const id = id_sucursal.rows[0].id;
+                    const response = yield database_1.default.query(`INSERT INTO ed_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING *`, [nombre.toUpperCase(), id]);
                     const [departamento] = response.rows;
-                    if (contador === plantilla.length) {
-                        if (departamento) {
-                            return respuesta = res.status(200).jsonp({ message: 'ok' });
-                        }
-                        else {
-                            return respuesta = res.status(404).jsonp({ message: 'error' });
-                        }
-                    }
-                    contador = contador + 1;
-                }));
+                    // INSERTAR AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ed_departamentos',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(departamento),
+                        ip: ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    error = true;
+                }
             }
-            catch (error) {
-                return res.status(500).jsonp({ message: error });
+            if (error) {
+                return res.status(500).jsonp({ message: 'error' });
             }
+            return res.status(200).jsonp({ message: 'ok' });
         });
     }
     BuscarDepartamentoPorCargo(req, res) {
