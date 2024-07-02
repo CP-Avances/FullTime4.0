@@ -191,7 +191,9 @@ export class ListarNivelTitulosComponent implements OnInit {
       else {
         this.DataNivelesProfesionales.forEach((item: any) => {
           if (item.observacion.toLowerCase() === 'ok') {
-            this.listNivelesCorrectos.push(item);
+            const nombre = item.nombre.charAt(0).toUpperCase() + item.nombre.slice(1);
+            const nivel = { nombre: nombre };
+            this.listNivelesCorrectos.push(nivel);
           }
         });
       }
@@ -218,35 +220,36 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   btn_registrar: boolean = true;
   registrarNiveles() {
-    var data = {
-      nombre: '',
-      user_name: this.user_name,
-      ip: this.ip,
-    }
     if (this.listNivelesCorrectos.length > 0) {
-      var cont = 0;
-      this.listNivelesCorrectos.forEach((item: any) => {
-        data.nombre = item.nombre;
-        // CAPITALIZAR LA PRIMERA LETRA DE LA PRIMERA PALABRA
-        const textoNivel = item.nombre.charAt(0).toUpperCase();
-        const restoDelTexto = item.nombre.slice(1);
-        data.nombre = textoNivel + restoDelTexto;
-        this.nivel.RegistrarNivel(data).subscribe(res => {
-          cont = cont + 1;
-          if (this.listNivelesCorrectos.length == cont) {
-            this.toastr.success('Operación exitosa.', 'Plantilla de Niveles profesionales importada.', {
-              timeOut: 1500,
-            });
-            this.LimpiarCampos();
-          }
-        })
-      })
+
+      console.log('listNivelesCorrectos: ', this.listNivelesCorrectos);
+      const data = {
+        niveles: this.listNivelesCorrectos,
+        user_name: this.user_name,
+        ip: this.ip,
+      }
+
+      this.nivel.RegistrarNivelesPlantilla(data).subscribe({
+        next: (res) => {
+          this.toastr.success('Plantilla de Niveles profesionales importada.', 'Operación exitosa.',  {
+            timeOut: 1500,
+          });
+          this.LimpiarCampos();
+        },
+        error: (error) => {
+          this.toastr.error('No se pudo imnportar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+        }
+      });
+
     } else {
       this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
         timeOut: 4000,
       });
       this.archivoForm.reset();
     }
+
     this.btn_registrar = true;
     this.archivoSubido = [];
     this.nameFile = '';

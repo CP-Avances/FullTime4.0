@@ -774,7 +774,7 @@ class DepartamentoControlador {
         return res.status(500).jsonp({ message: 'error' });
       }
 
-      return res.status(200).jsonp({ message: 'ok' })
+      return res.status(200).jsonp({ message: 'ok' });
 
   }
 
