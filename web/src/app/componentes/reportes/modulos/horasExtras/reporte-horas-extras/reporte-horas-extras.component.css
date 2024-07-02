@@ -1,7 +1,19 @@
-.btn { margin-left: 15px; background-color: rgb(80,87,97); color: white; } 
+.btn {
+    margin-left: 15px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
 
-td { padding-top: 10px; text-align: center; }
+td {
+    padding-top: 10px;
+    text-align: center;
+}
 
-table { width: 100%; font-size: 14px;}
+table {
+    width: 100%;
+    font-size: 12px;
+}
 
-p { font-size: x-small; }
+p {
+    font-size: x-small;
+}

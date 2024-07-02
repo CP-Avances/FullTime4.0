@@ -26,14 +26,13 @@
                         <label id="textoradiobtn">{{c.valor}}</label></mat-radio-button>
                 </mat-radio-group>
             </form>
-             <!--  **************************  FORM PARA SUCURSALES  ******************************  -->
+            <!--  **************************  FORM PARA SUCURSALES  ******************************  -->
             <form *ngIf="_booleanOptions.bool_suc">
                 <div class="d-flex flex-wrap justify-content-center">
                     <mat-form-field>
                         <mat-label>Sucursal</mat-label>
-                        <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc_"
-                            (input)="Filtrar(filtroNombreSuc_, 1)" [formControl]="nombre_suc" type="text"
-                            (keypress)="IngresarSoloLetras($event)">
+                        <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 1)"
+                            [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                         <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de sucursales por nombre.">
                             help_outline
                         </mat-icon>
@@ -47,9 +46,8 @@
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Sucursal</mat-label>
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc_"
-                                    (input)="Filtrar(filtroNombreSuc_, 1)" [formControl]="nombre_suc" type="text"
-                                    (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 1)"
+                                    [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
                                     help_outline
@@ -61,9 +59,8 @@
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Regimen laboral</mat-label>
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreReg_"
-                                    (input)="Filtrar(filtroNombreReg_, 7)" [formControl]="nombre_reg" type="text"
-                                    (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_reg.value, 7)"
+                                    [formControl]="nombre_reg" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de regimen por nombre.">
                                     help_outline
@@ -73,16 +70,15 @@
                     </div>
                 </div>
             </form>
-             <!--  *********************************  FORM PARA CARGOS  ****************************  -->
+            <!--  *********************************  FORM PARA CARGOS  ****************************  -->
             <form *ngIf="_booleanOptions.bool_cargo">
                 <div class="row">
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Sucursal</mat-label>
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc_"
-                                    (input)="Filtrar(filtroNombreSuc_, 1)" [formControl]="nombre_suc" type="text"
-                                    (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 1)"
+                                    [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
                                     help_outline
@@ -94,9 +90,8 @@
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Cargo</mat-label>
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreCarg_"
-                                    (input)="Filtrar(filtroNombreCarg_, 2)" [formControl]="nombre_carg" type="text"
-                                    (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_carg.value, 2)"
+                                    [formControl]="nombre_carg" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de cargos por su descripción.">
                                     help_outline
@@ -113,9 +108,8 @@
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Sucursal</mat-label>
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc_"
-                                    (input)="Filtrar(filtroNombreSuc_, 1)" [formControl]="nombre_suc" type="text"
-                                    (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 1)"
+                                    [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
                                     help_outline
@@ -127,9 +121,8 @@
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Departamento</mat-label>
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreDep_"
-                                    (input)="Filtrar(filtroNombreDep_, 3)" [formControl]="nombre_dep" type="text"
-                                    (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_dep.value, 3)"
+                                    [formControl]="nombre_dep" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de departamentos por nombre.">
                                     help_outline
@@ -146,9 +139,8 @@
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Sucursal</mat-label>
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc_"
-                                    (input)="Filtrar(filtroNombreSuc_, 1)" [formControl]="nombre_suc" type="text"
-                                    (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc.value, 1)"
+                                    [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de sucursales por nombre.">
                                     help_outline
@@ -158,9 +150,8 @@
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Nombres</mat-label>
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreEmp_"
-                                    (input)="Filtrar(filtroNombreEmp_, 5)" [formControl]="nombre_emp" type="text"
-                                    (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" (input)="Filtrar(nombre_emp.value, 6)"
+                                    [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de datos de empleado por nombre.">
                                     help_outline
@@ -172,9 +163,8 @@
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Código</mat-label>
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo_"
-                                    (input)="Filtrar(filtroCodigo_, 3)" [formControl]="codigo"
-                                    (keypress)="IngresarSoloNumeros($event)">
+                                <input matInput placeholder="Buscar" (input)="Filtrar(codigo.value, 4)"
+                                    [formControl]="codigo" (keypress)="IngresarSoloNumeros($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de datos de empleado por código.">
                                     help_outline
@@ -184,8 +174,7 @@
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
                                 <mat-label>Cédula</mat-label>
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula_" maxlength="10"
-                                    (input)="Filtrar(filtroCedula_, 4)"
+                                <input matInput placeholder="Buscar" maxlength="10" (input)="Filtrar(cedula.value, 5)"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
@@ -327,7 +316,8 @@
             </div>
 
             <!--  ***************************  TABLA PARA CARGOS  ***************************  -->
-            <div *ngIf="_booleanOptions.bool_cargo && mostrarTablas" class="mat-elevation-z8" style="background: white;">
+            <div *ngIf="_booleanOptions.bool_cargo && mostrarTablas" class="mat-elevation-z8"
+                style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
                         RESULTADO CARGOS
@@ -386,7 +376,7 @@
                 <br>
             </div>
 
-             <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
+            <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
             <div *ngIf="_booleanOptions.bool_dep && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">

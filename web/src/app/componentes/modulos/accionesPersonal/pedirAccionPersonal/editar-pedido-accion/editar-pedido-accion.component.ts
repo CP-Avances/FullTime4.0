@@ -48,14 +48,9 @@ export class EditarPedidoAccionComponent implements OnInit {
   filtroNombreG: Observable<any[]>;
   filtroNombreR: Observable<any[]>;
   filtroNombre: Observable<any[]>;
-  seleccionarEmpResponsable: any;
-  seleccionarEmpleados: any;
-  seleccionEmpleadoH: any;
-  seleccionEmpleadoG: any;
 
   //FILTRO CIUDAD
   filtroCiudad: Observable<any[]>;
-  seleccionarCiudad: any;
 
   // EVENTOS RELACIONADOS A SELECCION E INGRESO DE ACUERDOS - DECRETOS - RESOLUCIONES
   ingresoAcuerdo: boolean = false;
@@ -189,28 +184,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     // DATOS VACIOS INDICAR LA OPCION OTRO
     this.decretos[this.decretos.length] = { descripcion: "OTRO" };
     this.cargos[this.cargos.length] = { descripcion: "OTRO" };
-
-    // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
-    this.filtroNombre = this.idEmpleadoF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleado(value))
-    );
-    this.filtroNombreH = this.idEmpleadoHF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleado(value))
-    );
-    this.filtroNombreG = this.idEmpleadoGF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleado(value))
-    );
-    this.filtroNombreR = this.idEmpleadoRF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleado(value))
-    );
-    this.filtroCiudad = this.idCiudad.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarCiudad(value))
-    );
   }
 
   // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
@@ -406,10 +379,24 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.empleados = [];
     this.restE.BuscarListaEmpleados().subscribe((data) => {
       this.empleados = data;
-      this.seleccionarEmpleados = "";
-      this.seleccionEmpleadoH = "";
-      this.seleccionEmpleadoG = "";
-      console.log("empleados", this.empleados);
+      //console.log("empleados", this.empleados);
+      // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
+      this.filtroNombre = this.idEmpleadoF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
+      this.filtroNombreH = this.idEmpleadoHF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
+      this.filtroNombreG = this.idEmpleadoGF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
+      this.filtroNombreR = this.idEmpleadoRF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
     });
   }
 
@@ -418,8 +405,11 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.ciudades = [];
     this.restC.ConsultarCiudades().subscribe((data) => {
       this.ciudades = data;
-      this.seleccionarCiudad = "";
-      console.log("ciudades", this.ciudades);
+      //console.log("ciudades", this.ciudades);
+      this.filtroCiudad = this.idCiudad.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarCiudad(value))
+      );
     });
   }
 

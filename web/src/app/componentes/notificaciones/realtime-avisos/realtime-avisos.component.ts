@@ -29,10 +29,6 @@ export class RealtimeAvisosComponent implements OnInit {
   id_empleado_logueado: number;
   timbres_noti: any = [];
 
-  filtroTimbreEmpl: '';
-  filtroTimbreDesc: '';
-  filtroTimbreFech: '';
-
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 10;
   numero_pagina: number = 1;

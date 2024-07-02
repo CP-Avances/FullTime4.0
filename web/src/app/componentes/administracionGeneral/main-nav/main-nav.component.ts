@@ -545,18 +545,6 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Auditoría',
-            accion: true,
-            estado: true,
-            subtitulo: true,
-            icono: 'check_circle_outline',
-            color: true,
-            children: [
-              { name: 'Auditoría', url: '/reporte-auditoria', color: true, ver: true },
-
-            ]
-          },
-          {
             name: 'Timbres',
             accion: true,
             estado: true,
@@ -681,17 +669,18 @@ export class MainNavComponent implements OnInit {
                ]
              },
              */
-             {
-               name: 'Auditoría',
-               accion: true,
-               estado: true,
-               subtitulo: true,
-               icono: 'gavel',
-               color: true,
-               children: [
-                 { name: 'Auditoria', url: '/auditoria', color: true, ver: true },
-               ]
-             },
+          {
+            name: 'Auditoría',
+            accion: true,
+            estado: true,
+            subtitulo: true,
+            icono: 'gavel',
+            color: true,
+            children: [
+              { name: 'Auditoría', url: '/reporte-auditoria', color: true, ver: true },
+
+            ]
+          },
         ]
       },
     ];

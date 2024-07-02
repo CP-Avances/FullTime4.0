@@ -36,10 +36,6 @@ export class PrincipalProcesoComponent implements OnInit {
   buscarNivel = new FormControl('');
   buscarPadre = new FormControl('', [Validators.minLength(2)]);
 
-  filtroNombre = '';
-  filtroNivel: number;
-  filtroProPadre = '';
-
   procesos: any = [];
   empleado: any = [];
   idEmpleado: number;

@@ -39,12 +39,6 @@ export class ListarPedidoAccionComponent implements OnInit {
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
-  // DATOS FILTROS DE BUSQUEDA
-  filtroCodigo: number;
-  filtroCedula: "";
-  filtroNombre: "";
-  filtroApellido: "";
-
   // DATOS DEL FORMULARIO DE BUSQUEDA
   codigo = new FormControl("");
   cedula = new FormControl("", [Validators.minLength(2)]);

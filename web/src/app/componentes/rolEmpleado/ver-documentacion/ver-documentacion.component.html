@@ -9,17 +9,18 @@
             <li class="breadcrumb-item active" aria-current="page">{{Dirname}}</li>
         </ol>
     </nav>
-    <div style="width: 100%;"  *ngIf="subir">
+    <div style="width: 100%;" *ngIf="subir">
 
         <div style="float: left;" *ngIf="Dirname != 'permisos' && Dirname != 'contratos'">
             <mat-form-field id="t-inputs">
-              <mat-icon matPrefix>search</mat-icon>
-              <input matInput placeholder="Buscar archivo" minlength="2" [formControl]="nombreF"
-              [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'archivo')">
+                <mat-icon matPrefix>search</mat-icon>
+                <input matInput placeholder="Buscar archivo" minlength="2" [formControl]="nombreF"
+                    (input)="Filtrar($event, 'archivo')">
             </mat-form-field>
-          </div>
+        </div>
 
-        <button type="submit" style="float: right; margin-right: 10px;" class="btn btn-sm btn-primary" (click)="AbrirVentanaRegistrar()">
+        <button type="submit" style="float: right; margin-right: 10px;" class="btn btn-sm btn-primary"
+            (click)="AbrirVentanaRegistrar()">
             Subir documento
         </button>
     </div>

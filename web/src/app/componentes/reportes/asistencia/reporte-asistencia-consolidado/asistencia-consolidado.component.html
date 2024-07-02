@@ -67,25 +67,25 @@
                     <tr>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo" [formControl]="codigo"
+                                <input matInput placeholder="Buscar" [formControl]="codigo"
                                     (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroEmpleado" [formControl]="nombre"
-                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroEmpleado" [formControl]="nombre"
-                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula" maxlength="10"
+                                <input matInput placeholder="Buscar" maxlength="10"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
@@ -101,7 +101,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let e of empleados | emplCodigo: filtroCodigo | emplCedula: filtroCedula | nombreApellido: filtroEmpleado | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let e of empleados | emplCodigo: codigo.value | emplCedula: cedula.value | nombreApellido: nombre.value | paginate:tamanio_pagina:numero_pagina">
                         <th scope="row">{{e.codigo}}</th>
                         <td>{{e.nombre}}</td>
                         <td>{{e.apellido}}</td>
@@ -128,8 +128,8 @@
                 </tbody>
             </table>
         </div>
-        <mat-paginator id="pagina" [length]="empleados.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
-            id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        <mat-paginator id="pagina" [length]="empleados.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
         <br>
     </div>

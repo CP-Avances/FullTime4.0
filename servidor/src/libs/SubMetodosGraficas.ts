@@ -134,7 +134,7 @@ async function HorasExtrasSolicitadasGrafica(fec_desde: Date, fec_hasta: Date) {
             h.tiempo_autorizado, h.codigo, h.id_empleado_cargo 
         FROM mhe_solicitud_hora_extra AS h 
         WHERE h.fecha_inicio BETWEEN $1 and $2 AND h.estado = 3   
-            AND h.fecha_final BETWEEN $1 and $2 ORDER BY h.fehac_inicio
+            AND h.fecha_final BETWEEN $1 and $2 ORDER BY h.fecha_inicio
         `
         , [fec_desde, fec_hasta])
         .then(result => {
@@ -161,7 +161,7 @@ async function PlanificacionHorasExtrasSolicitadasGrafica(fec_desde: Date, fec_h
         //estado = 3 para horas extras autorizadas
         `
         SELECT CAST(h.fecha_desde AS VARCHAR), CAST(h.hora_inicio AS VARCHAR), h.fecha_hasta, h.hora_fin, h.descripcion,
-            h.horas_totales, ph.tiempo_autorizado, ph.codigo, ph.id_empleado_cargo '
+            h.horas_totales, ph.tiempo_autorizado, ph.codigo, ph.id_empleado_cargo 
         FROM mhe_empleado_plan_hora_extra AS ph, mhe_detalle_plan_hora_extra AS h 
         WHERE ph.id_detalle_plan = h.id AND ph.estado = 3 
             AND h.fecha_desde BETWEEN $1 and $2 AND h.fecha_hasta BETWEEN $1 and $2 

@@ -13,7 +13,7 @@ import { ThemePalette } from '@angular/material/core';
 
 
 // IMPORTAR SERVICIOS
-import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
+import { ValidacionesService } from '../../../servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';

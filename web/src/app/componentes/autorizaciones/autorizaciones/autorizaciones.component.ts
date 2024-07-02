@@ -722,9 +722,9 @@ export class AutorizacionesComponent implements OnInit {
     this.componente.multiple = false;
     this.componente.lista_permisos = true;
     this.componente.lista_autorizados = false;
-    this.componente.filtroDepa = undefined;
-    this.componente.filtroUsuario = undefined;
-    this.componente.filtroEstado = undefined;
+    this.componente.Depata.reset();
+    this.componente.Usuario.reset();
+    this.componente.Estado.reset();
     this.componente.BuscarHora(this.formato_fecha);
   }
 

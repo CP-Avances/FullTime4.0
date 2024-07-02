@@ -16,7 +16,7 @@
                 <span class="w-100 bd-highlight">
                     LISTA DE VACACIONES SOLICITADAS POR USUARIO
                 </span>
-                <button *ngIf="filtroDepa || filtroUsuario || filtroEstado" class="btn btn-primary"
+                <button *ngIf="Depata.value || Usuario.value || Estado.value" class="btn btn-primary"
                     (click)="limpiarFiltro()" style="float: right; margin-right: 10px;">
                     Limpiar
                 </button>
@@ -46,20 +46,20 @@
                             <td></td>
                             <td>
                                 <mat-form-field class="input-tables departamento">
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroDepa" [formControl]="Depata"
-                                        type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" [formControl]="Depata" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
                                 </mat-form-field>
                             </td>
                             <td>
                                 <mat-form-field class="input-tables departamento">
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroUsuario"
-                                        [formControl]="Usuario" type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" [formControl]="Usuario" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
                                 </mat-form-field>
                             </td>
                             <td>
                                 <mat-form-field class="input-tables departamento">
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroEstado"
-                                        [formControl]="Estado" type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" [formControl]="Estado" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
                                 </mat-form-field>
                             </td>
                             <td></td>
@@ -73,7 +73,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let v of listaVacacionDeparta | empleDepa: filtroDepa | emplUsuario: filtroUsuario | emplEstado: filtroEstado | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let v of listaVacacionDeparta | empleDepa: Depata.value | emplUsuario: Usuario.value | emplEstado: Estado.value | paginate:tamanio_pagina:numero_pagina">
                             <td>
                                 <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionUno.toggle(v) : null"
@@ -107,27 +107,34 @@
             <mat-paginator id="pagina" [length]="listaVacacionDeparta.length" [pageSize]="tamanio_pagina"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
-            <div class="d-flex justify-content-end" style="margin-right: 2%;">
-                <i (click)="generarPdf('download','Vacaciones solicitadas')" id="pdf" class="fas fa-file-pdf" matSuffix
-                    matTooltipPosition="right" matTooltip="Descargar Lista de vacaciones solicitadas en formato PDF.">
-                    <p>PDF</p>
-                </i>
-                <i (click)="exportToExcel('Vacaciones solicitadas')" id="excel" class="fas fa-file-excel" matSuffix
-                    matTooltipPosition="right" matTooltip="Descargar Lista de vacaciones solicitadas en formato EXCEL.">
-                    <p>XLSL</p>
-                </i>
-                <i (click)="exportToCVS('Vacaciones solicitadas')" id="csv" class="fas fa-file-csv" matSuffix
-                    matTooltipPosition="right" matTooltip="Descargar Lista de vacaciones solicitadas en formato CSV.">
-                    <p>CSV</p>
-                </i>
-                <i (click)="exportToXML('Vacaciones solicitadas')" id="xml" class="fas fa-file-code" matSuffix
-                    matTooltipPosition="right" matTooltip="Descargar Lista de vacaciones solicitadas en formato XML.">
-                    <p>XML</p>
-                </i>
-            </div>
-            <div class="d-flex justify-content-end"
-                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-                <p> Reporte de vacaciones solicitadas. </p>
+            <!--  ***************************  DESCARGAR REPORTES  ***********************************  -->
+            <div>
+                <div class="d-flex justify-content-end" style="margin-right: 2%;">
+                    <i (click)="generarPdf('download','Vacaciones solicitadas')" id="pdf" class="fas fa-file-pdf"
+                        matSuffix matTooltipPosition="right"
+                        matTooltip="Descargar Lista de vacaciones solicitadas en formato PDF.">
+                        <p>PDF</p>
+                    </i>
+                    <i (click)="exportToExcel('Vacaciones solicitadas')" id="excel" class="fas fa-file-excel" matSuffix
+                        matTooltipPosition="right"
+                        matTooltip="Descargar Lista de vacaciones solicitadas en formato EXCEL.">
+                        <p>XLSL</p>
+                    </i>
+                    <i (click)="exportToCVS('Vacaciones solicitadas')" id="csv" class="fas fa-file-csv" matSuffix
+                        matTooltipPosition="right"
+                        matTooltip="Descargar Lista de vacaciones solicitadas en formato CSV.">
+                        <p>CSV</p>
+                    </i>
+                    <i (click)="exportToXML('Vacaciones solicitadas')" id="xml" class="fas fa-file-code" matSuffix
+                        matTooltipPosition="right"
+                        matTooltip="Descargar Lista de vacaciones solicitadas en formato XML.">
+                        <p>XML</p>
+                    </i>
+                </div>
+                <div class="d-flex justify-content-end"
+                    style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                    <p> Reporte de vacaciones solicitadas. </p>
+                </div>
             </div>
         </div>
     </div>
@@ -137,7 +144,7 @@
                 <span class="w-100 bd-highlight">
                     LISTA DE VACACIONES AUTORIZADAS
                 </span>
-                <button *ngIf="AutorifiltroDepa || AutorifiltroUsuario || AutorifiltroEstado" class="btn btn-primary"
+                <button *ngIf="AutoriDepata.value || AutoriUsuario.value || AutoriEstado.value" class="btn btn-primary"
                     (click)="limpiarFiltroAutorizados()" style="float: right; margin-right: 10px;">Limpiar</button>
             </div>
             <div class="table-responsive">
@@ -157,21 +164,20 @@
                         <tr>
                             <td>
                                 <mat-form-field class="input-tables departamento">
-                                    <input matInput placeholder="Buscar" [(ngModel)]="AutorifiltroDepa"
-                                        [formControl]="AutoriDepata" type="text"
+                                    <input matInput placeholder="Buscar" [formControl]="AutoriDepata" type="text"
                                         (keypress)="IngresarSoloLetras($event)">
                                 </mat-form-field>
                             </td>
                             <td>
                                 <mat-form-field class="input-tables departamento">
-                                    <input matInput placeholder="Buscar" [(ngModel)]="AutorifiltroUsuario"
+                                    <input matInput placeholder="Buscar" 
                                         [formControl]="AutoriUsuario" type="text"
                                         (keypress)="IngresarSoloLetras($event)">
                                 </mat-form-field>
                             </td>
                             <td>
                                 <mat-form-field class="input-tables departamento">
-                                    <input matInput placeholder="Buscar" [(ngModel)]="AutorifiltroEstado"
+                                    <input matInput placeholder="Buscar" 
                                         [formControl]="AutoriEstado" type="text"
                                         (keypress)="IngresarSoloLetras($event)">
                                 </mat-form-field>
@@ -187,7 +193,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let v of listaVacacionesFiltradaAutorizada | empleDepa: AutorifiltroDepa | emplUsuario: AutorifiltroUsuario | emplEstado: AutorifiltroEstado | paginate:tamanio_pagina_auto:numero_pagina_auto">
+                            *ngFor="let v of listaVacacionesFiltradaAutorizada | empleDepa: AutoriDepata.value | emplUsuario: AutoriUsuario.value | emplEstado: AutoriEstado.value | paginate:tamanio_pagina_auto:numero_pagina_auto">
                             <td>{{v.depa_nombre}}</td>
                             <td>{{v.fullname}}</td>
                             <td>{{v.estado}}</td>
@@ -195,7 +201,8 @@
                             <td>{{v.fec_final_}}</td>
                             <td>{{v.fec_ingreso_}}</td>
                             <td class="justify-content-center">
-                                <a class="fas fa-file-alt" style="color:rgb(197, 95, 11); margin-left: 15px; text-decoration: none;" matSuffix
+                                <a class="fas fa-file-alt"
+                                    style="color:rgb(197, 95, 11); margin-left: 15px; text-decoration: none;" matSuffix
                                     matTooltipPosition="right"
                                     matTooltip="Cambiar el estado del documento de autorización"
                                     [routerLink]="['/ver-vacacion',v.id]">

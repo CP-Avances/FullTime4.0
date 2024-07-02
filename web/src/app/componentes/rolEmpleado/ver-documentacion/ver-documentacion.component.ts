@@ -80,7 +80,7 @@ export class VerDocumentacionComponent implements OnInit {
         this.MostrarArchivos();
       });
   }
-  filtroDescripcion = '';
+
   archivosFiltro: any;
   Filtrar(e: any, tipo: string){
     console.log('e: ',e.target.value);

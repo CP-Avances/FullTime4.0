@@ -37,7 +37,7 @@
                             <td>
                                 <mat-form-field id="t-inputs">
                                     <input matInput name="filtroNombre" placeholder="Buscar" minlength="2"
-                                        [formControl]="nombreF" [(ngModel)]="filtroNombre">
+                                        [formControl]="nombreF">
                                 </mat-form-field>
                             </td>
                             <td>
@@ -48,7 +48,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let ta of tipo_acciones | nombre:filtroNombre | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let ta of tipo_acciones | nombre:nombreF.value | paginate:tamanio_pagina:numero_pagina">
                             <td id="centrar">{{ta.nombre}}</td>
                             <td id="centrar" class="justify-content-center">
                                 <i matSuffix matTooltipPosition="right"

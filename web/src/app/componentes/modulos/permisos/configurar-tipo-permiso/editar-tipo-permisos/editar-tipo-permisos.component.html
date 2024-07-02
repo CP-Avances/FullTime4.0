@@ -193,15 +193,13 @@
                                     <span style="font-size: 12px;">Restrición por fecha*</span>
                                 </label>
                                 <div class="d-flex justify-content-start">
-                                    <mat-radio-button (click)="VerCalendario()" ngDefaultControl [(ngModel)]="selec1"
-                                        [checked]="selec1" [ngModelOptions]="{standalone: true}" value="true" matSuffix
+                                    <mat-radio-button (click)="VerCalendario()" [value]="true" matSuffix
                                         matTooltipPosition="right"
                                         matTooltip="El usuario no podrá solicitar el permiso en una fecha determinada.">
                                         <label id="textoradiobtn">Si</label>
                                     </mat-radio-button>
-                                    <mat-radio-button (click)="OcultarCalendario()" ngDefaultControl
-                                        [(ngModel)]="selec2" [checked]="selec2" [ngModelOptions]="{standalone: true}"
-                                        value="false" matSuffix matTooltipPosition="right"
+                                    <mat-radio-button (click)="OcultarCalendario()" [value]="false" matSuffix
+                                        matTooltipPosition="right"
                                         matTooltip="El usuario podrá solicitar el permiso sin restricciones de fechas.">
                                         <label id="textoradiobtn">No</label>
                                     </mat-radio-button>

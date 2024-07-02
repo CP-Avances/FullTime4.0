@@ -12,8 +12,8 @@
             <form [formGroup]="fechasConsultaForm" class="d-flex flex-wrap justify-content-center">
                 <mat-form-field>
                     <mat-label>Desde</mat-label>
-                    <input matInput [matDatepicker]="pickerYearI" placeholder="dd/mm/aaaa" [disabled]="habilitar"
-                        [formControl]="anio_inicio" required>
+                    <input matInput [matDatepicker]="pickerYearI" placeholder="dd/mm/aaaa" [formControl]="anio_inicio"
+                        required>
                     <mat-datepicker-toggle matSuffix [for]="pickerYearI" matTooltipPosition="right" id="ayuda_fec"
                         matTooltip="Ingresar fecha inicial en la que desea consultar gráfica estadística. Ejm: 01/08/2020.">
                     </mat-datepicker-toggle>
@@ -21,8 +21,8 @@
                 </mat-form-field>
                 <mat-form-field>
                     <mat-label>Hasta</mat-label>
-                    <input matInput [matDatepicker]="pickerYearF" placeholder="dd/mm/aaaa" [disabled]="habilitar"
-                        [formControl]="anio_final" required>
+                    <input matInput [matDatepicker]="pickerYearF" placeholder="dd/mm/aaaa" [formControl]="anio_final"
+                        required>
                     <mat-datepicker-toggle matSuffix [for]="pickerYearF" matTooltipPosition="right" id="ayuda_fec"
                         matTooltip="Ingresar fecha final en la que desea consultar gráfica estadística. Ejm: 31/08/2020.">
                     </mat-datepicker-toggle>
@@ -30,10 +30,9 @@
                 </mat-form-field>
             </form>
             <div class="d-flex flex-wrap justify-content-around" style="margin: 10px 10px 0px 10px;">
-                <button id="btn-raised"  class="btn btn-sm" [disabled]="fechasConsultaForm.invalid"
+                <button id="btn-raised" class="btn btn-sm" [disabled]="fechasConsultaForm.invalid"
                     (click)="ValidarRangofechas(fechasConsultaForm.value)">Aceptar</button>
-                <button id="btn-raised"  class="btn btn-sm"
-                    (click)="limpiarCamposRango()">Cancelar</button>
+                <button id="btn-raised" class="btn btn-sm" (click)="limpiarCamposRango()">Cancelar</button>
             </div>
         </div>
     </mat-card>

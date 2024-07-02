@@ -149,8 +149,6 @@ export class EditarTipoPermisosComponent implements OnInit {
   }
 
   // METODO PARA IMPRIMIR DATOS EN FORMULARIO
-  selec1: boolean = false;
-  selec2: boolean = false;
   ImprimirDatos() {
     // TIPO PERMISO HORAS - DIAS
     this.ActivarDiasHorasSet();
@@ -199,16 +197,12 @@ export class EditarTipoPermisosComponent implements OnInit {
     if (this.tipoPermiso.fecha_inicio != '' && this.tipoPermiso.fecha_inicio != null &&
       this.tipoPermiso.fecha_fin != '' && this.tipoPermiso.fecha_fin != null) {
       this.calendario = true;
-      this.selec1 = true;
-      this.selec2 = false;
       this.rango.patchValue({
         start: moment(this.tipoPermiso.fecha_inicio, "YYYY/MM/DD").format("YYYY-MM-DD"),
         end: moment(this.tipoPermiso.fecha_fin, "YYYY/MM/DD").format("YYYY-MM-DD")
       });
     } else {
       this.calendario = false;
-      this.selec2 = true;
-      this.selec1 = false;
     }
   }
 

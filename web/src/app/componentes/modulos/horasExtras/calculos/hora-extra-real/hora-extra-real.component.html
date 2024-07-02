@@ -20,7 +20,7 @@
                         <div class="d-flex flex-wrap justify-content-around">
                             <mat-form-field>
                                 <mat-label>Ingresar Código</mat-label>
-                                <input matInput placeholder="Ej: " [(ngModel)]="filtroCodigo" [formControl]="codigo"
+                                <input matInput placeholder="Ej: "  [formControl]="codigo"
                                     (keypress)="IngresarSoloNumeros($event)">
                                 <mat-icon id="iemple" matSuffix matTooltipPosition="right"
                                      matTooltip="Búsqueda de datos de empleado por código.">
@@ -28,7 +28,7 @@
                             </mat-form-field>
                             <mat-form-field>
                                 <mat-label>Ingresar Cédula</mat-label>
-                                <input matInput placeholder="Ej: " [(ngModel)]="filtroCedula" maxlength="10"
+                                <input matInput placeholder="Ej: "  maxlength="10"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
                                 <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores
@@ -40,7 +40,7 @@
                             </mat-form-field>
                             <mat-form-field>
                                 <mat-label>Ingresar Nombres</mat-label>
-                                <input matInput placeholder="Ej: " [(ngModel)]="filtroNombre" [formControl]="nombre"
+                                <input matInput placeholder="Ej: " [formControl]="nombre"
                                     type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-error *ngIf="nombre.invalid">Indispensable ingresar dos letras
                                 </mat-error>
@@ -50,7 +50,7 @@
                             </mat-form-field>
                             <mat-form-field>
                                 <mat-label>Ingresar Apellidos</mat-label>
-                                <input matInput placeholder="Ej: " [(ngModel)]="filtroApellido" [formControl]="apellido"
+                                <input matInput placeholder="Ej: " [formControl]="apellido"
                                     type="text" (keypress)="IngresarSoloLetras($event)">
                                 <mat-error *ngIf="apellido.invalid">Indispensable ingresar dos letras
                                 </mat-error>
@@ -68,78 +68,6 @@
             </mat-accordion>
         </div>
     </div>
-    <!--
-    <br>
-    <div class="row">
-        <div class="col-md">
-            <mat-accordion>
-                <mat-expansion-panel hideToggle>
-                    <mat-expansion-panel-header class="d-flex bd-highlight">
-                        <mat-panel-title class="w-100 bd-highlight">
-                            Críterios de Búsqueda
-                        </mat-panel-title>
-                        <mat-icon id="i-cursor" class="flex-shrink-1 bd-highlight" matTooltipPosition="right"
-                            matTooltip="Dar clic para desplegar y contraer todos los campos de búsqueda.">
-                            search</mat-icon>
-                    </mat-expansion-panel-header>
-                    <form [formGroup]="busquedasForm">
-                        <div class="d-flex flex-wrap justify-content-around">
-                            <mat-form-field>
-                                <mat-label id="selec">1.Establecimientos</mat-label>
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Muestra todos los empleados que pertenecen al establecimiento.">
-                                    help_outline</mat-icon>
-                                <mat-select [formControl]="sucursalF">
-                                    <mat-option *ngFor="let s of sucursales" [value]="s.id"
-                                        (click)="FiltrarSucursal(busquedasForm.value)">{{s.nombre}}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-form-field>
-                                <mat-label id="selec">2.Regimen Laboral</mat-label>
-                                <mat-icon id="i-cursor" matSuffix 
-                                    matTooltipPosition="right"
-                                    matTooltip="Indicar cuál es la cucursal en la que se encuntra el dispositivo">
-                                    help_outline</mat-icon>
-                                <mat-select [formControl]="laboralF">
-                                    <mat-option *ngFor="let r of regimen" [value]="r.id"
-                                        (click)="FiltrarRegimen(busquedasForm.value)">{{r.descripcion}}</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-form-field>
-                                <mat-label id="selec">3.Departamentos</mat-label>
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Indicar cuál es la cucursal en la que se encuntra el dispositivo">
-                                    help_outline</mat-icon>
-                                <mat-select [formControl]="depaF">
-                                    <mat-option *ngFor="let d of departamentos" [value]="d.id"
-                                        (click)="FiltrarDepartamento(busquedasForm.value)">{{d.nombre}}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-form-field>
-                                <mat-label id="selec">4.Cargos</mat-label>
-                                <mat-icon id="i-cursor" matSuffix 
-                                    matTooltipPosition="right"
-                                    matTooltip="Indicar cuál es la cucursal en la que se encuntra el dispositivo">
-                                    help_outline</mat-icon>
-                                <mat-select [formControl]="cargosF">
-                                    <mat-option *ngFor="let c of cargos" [value]="c.id">{{c.cargo}}</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-                    </form>
-                    <div class="d-flex justify-content-around">
-                        <button mat-button type="submit" class="btn btn-sm" id="boton"
-                            (click)="VerificarBusquedas(busquedasForm.value)">Buscar</button>
-                        <button mat-button type="submit" class="btn btn-sm" id="boton"
-                            (click)="LimpiarBusquedas()">Cancelar</button>
-                    </div>
-                </mat-expansion-panel>
-            </mat-accordion>
-        </div>
-    </div>
-    -->
     <br>
     <div class="row">
         <div class="col-md">
@@ -209,7 +137,7 @@
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let d of datosTotales | emplCargo: filtroCargo | regimen: filtroRegimen | departamento: filtroDepartamento | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombre | emplApellido: filtroApellido  | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let d of datosTotales | emplCodigo: codigo.value | emplCedula: cedula.value | emplNombre: nombre.value | emplApellido: apellido.value  | paginate:tamanio_pagina:numero_pagina">
                         <th scope="row">{{d.codigo}}</th>
                         <td>{{d.cedula}}</td>
                         <td>{{d.apellido}}</td>
@@ -231,23 +159,5 @@
         <mat-paginator id="pagina" [length]="datosTotales.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
             id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <!--   <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-            <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
-                 matTooltip="Descargar Lista de Empleados en formato PDF">
-                <p>PDF</p>
-            </i>
-            <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                 matTooltip="Descargar Lista de Empleados en formato EXCEL">
-                <p>XLSL</p>
-            </i>
-            <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                 matTooltip="Descargar Lista de Empleados en formato CSV">
-                <p>CSV</p>
-            </i>
-            <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                 matTooltip="Descargar Lista de Empleados en formato XML">
-                <p>XML</p>
-            </i>
-        </div> -->
     </div>
 </div>
