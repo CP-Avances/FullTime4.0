@@ -339,6 +339,7 @@ class FeriadosControlador {
                 //Proceso de hoja de feriados de la plantilla feriados.xlxs
                 var listFeriados = [];
                 var duplicados = [];
+                var duplicados1 = [];
                 var fecha_igual = [];
                 var mensaje = 'correcto';
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
@@ -423,11 +424,11 @@ class FeriadosControlador {
                         }
                         if (CIUDAD == undefined) {
                             data_fC.ciudad = 'No registrado';
-                            data_fC.observacion = 'Ciudad no' + data_fC.observacion;
+                            data_fC.observacion = 'Ciudad no ' + data_fC.observacion;
                         }
                         if (FERIADO == undefined) {
                             data_fC.feriado = 'No registrado';
-                            data_fC.observacion = 'Feriado no' + data_fC.observacion;
+                            data_fC.observacion = 'Feriado no ' + data_fC.observacion;
                         }
                         listFeriados_ciudades.push(data_fC);
                     }
@@ -460,7 +461,7 @@ class FeriadosControlador {
                                     if (item.fec_recuperacion == '-' || item.fec_recuperacion == undefined) {
                                         fec_recuperacion_correcta = true;
                                         // Discriminación de elementos iguales
-                                        if (duplicados.find((p) => p.descripcion == item.descripcion || p.fecha === item.fecha) == undefined) {
+                                        if (duplicados.find((p) => p.descripcion.toLowerCase() == item.descripcion.toLowerCase() || p.fecha === item.fecha) == undefined) {
                                             duplicados.push(item);
                                         }
                                         else {
@@ -475,8 +476,9 @@ class FeriadosControlador {
                                                  `, [item.fec_recuperacion]);
                                             if (VERIFICAR_FECHA_RECUPE.rowCount === 0) {
                                                 // Discriminación de elementos iguales
-                                                if (duplicados.find((p) => p.descripcion == item.descripcion || p.fecha === item.fecha || p.fec_recuperacion === item.fec_recuperacion) == undefined) {
-                                                    duplicados.push(item);
+                                                if (duplicados1.find((p) => p.descripcion.toLowerCase() == item.descripcion.toLowerCase() ||
+                                                    p.fecha === item.fecha || p.fec_recuperacion === item.fec_recuperacion) == undefined) {
+                                                    duplicados1.push(item);
                                                 }
                                                 else {
                                                     item.observacion = '1';
@@ -488,7 +490,7 @@ class FeriadosControlador {
                                         }
                                         else {
                                             fec_recuperacion_correcta = false;
-                                            item.observacion = 'Formato de fec_recuperacion incorrecto (YYYY-MM-DD)';
+                                            item.observacion = 'Formato de fecha recuperación incorrecto (YYYY-MM-DD)';
                                         }
                                     }
                                 }
@@ -612,17 +614,17 @@ class FeriadosControlador {
                         if (item.fec_recuperacion != '-') {
                             fecha_igual.forEach((valor) => {
                                 if (valor.fecha == item.fec_recuperacion) {
-                                    item.observacion = 'Fecha registrada como valor de otra columna';
+                                    item.observacion = 'Fecha como valor de otra columna';
                                 }
                             });
-                        }
-                        if (item.observacion == '1') {
-                            item.observacion = 'Registro duplicado';
                         }
                         if (item.observacion != undefined) {
                             let arrayObservacion = item.observacion.split(" ");
                             if (arrayObservacion[0] == 'no' || item.observacion == " ") {
                                 item.observacion = 'ok';
+                            }
+                            if (item.observacion == '1') {
+                                item.observacion = 'Registro duplicado';
                             }
                         }
                     });
@@ -652,7 +654,7 @@ class FeriadosControlador {
                             valor.observacion = 'Registro duplicado';
                         }
                         else if (valor.observacion == 'registrado') {
-                            valor.observacion = 'Feriado no válido(Debe existir previamente)';
+                            valor.observacion = 'Feriado no válido (Debe existir previamente)';
                             if (valor.feriado == 'No registrado') {
                                 valor.observacion = 'Feriado no registrado';
                             }

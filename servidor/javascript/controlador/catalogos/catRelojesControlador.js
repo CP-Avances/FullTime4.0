@@ -606,11 +606,11 @@ class RelojesControlador {
                                                                 if (item.acciones.toString().toLowerCase() == 'si') {
                                                                     if (item.numero_acciones != ' - ') {
                                                                         if (!regex.test(item.numero_acciones)) {
-                                                                            item.observacion = 'Número de acciones incorrecta ingrese (solo números)';
+                                                                            item.observacion = 'Número de acciones incorrecta (solo números)';
                                                                         }
                                                                         else {
                                                                             if (item.numero_acciones < 1 || item.numero_acciones > 8) {
-                                                                                item.observacion = 'El número de acciones no debe ser mayor 8 ni 0';
+                                                                                item.observacion = 'El número de acciones debe ser mayor a 0 y menor a 8';
                                                                             }
                                                                         }
                                                                     }
