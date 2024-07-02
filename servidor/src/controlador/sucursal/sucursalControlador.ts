@@ -407,7 +407,6 @@ class SucursalControlador {
   public async RegistrarSucursales(req: Request, res: Response): Promise<Response> {
     const { sucursales, user_name, ip } = req.body;
     let error: boolean = false;
-    console.log(sucursales);
 
     for (const sucursal of sucursales) {
       const { nombre, id_ciudad, id_empresa } = sucursal;

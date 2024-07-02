@@ -562,7 +562,6 @@ export class ListaSucursalesComponent implements OnInit {
         user_name: this.user_name,
         ip: this.ip,
       }
-      console.log("sucursales correctas", this.listSucursalesCorrectas)
       this.rest.RegistrarSucursales(data).subscribe({
         next: (res: any) => {
           this.toastr.success('Plantilla de Sucursales importada.','Operación exitosa.', {

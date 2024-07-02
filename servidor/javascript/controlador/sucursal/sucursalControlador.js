@@ -367,7 +367,6 @@ class SucursalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { sucursales, user_name, ip } = req.body;
             let error = false;
-            console.log(sucursales);
             for (const sucursal of sucursales) {
                 const { nombre, id_ciudad, id_empresa } = sucursal;
                 try {
