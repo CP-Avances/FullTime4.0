@@ -51,7 +51,7 @@ class EmpleadoControlador {
                 const { id, valor, automatico, manual, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
+                const datos = yield database_1.default.query(`
         INSERT INTO e_codigo (id, valor, automatico, manual) VALUES ($1, $2, $3, $4)
         `, [id, valor, automatico, manual]);
                 // AUDITORIA
@@ -60,7 +60,7 @@ class EmpleadoControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{id: ${id}, valor: ${valor}, automatico: ${automatico}, manual: ${manual}}`,
+                    datosNuevos: JSON.stringify(datos.rows[0]),
                     ip,
                     observacion: null
                 });
@@ -121,8 +121,8 @@ class EmpleadoControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Error al actualizar código' });
                 }
-                yield database_1.default.query(`
-        UPDATE e_codigo SET valor = $1, automatico = $2, manual = $3 , cedula = $4 WHERE id = $5
+                const datosNuevos = yield database_1.default.query(`
+        UPDATE e_codigo SET valor = $1, automatico = $2, manual = $3 , cedula = $4 WHERE id = $5 RETURNING *
         `, [valor, automatico, manual, cedula, id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -130,7 +130,7 @@ class EmpleadoControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{valor: ${valor}, automatico: ${automatico}, manual: ${manual}, cedula: ${cedula}}`,
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip,
                     observacion: null
                 });
@@ -171,8 +171,8 @@ class EmpleadoControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Error al actualizar código' });
                 }
-                yield database_1.default.query(`
-        UPDATE e_codigo SET valor = $1 WHERE id = $2
+                const datosNuevos = yield database_1.default.query(`
+        UPDATE e_codigo SET valor = $1 WHERE id = $2 RETURNING *
         `, [valor, id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -180,7 +180,7 @@ class EmpleadoControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{valor: ${valor}}`,
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip,
                     observacion: null
                 });

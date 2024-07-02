@@ -44,7 +44,7 @@ class EmpleadoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      await pool.query(
+      const datos = await pool.query(
         `
         INSERT INTO e_codigo (id, valor, automatico, manual) VALUES ($1, $2, $3, $4)
         `
@@ -56,7 +56,7 @@ class EmpleadoControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{id: ${id}, valor: ${valor}, automatico: ${automatico}, manual: ${manual}}`,
+        datosNuevos: JSON.stringify(datos.rows[0]),
         ip,
         observacion: null
       });
@@ -125,9 +125,9 @@ class EmpleadoControlador {
         return res.status(404).jsonp({ message: 'Error al actualizar código' });
       }
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
-        UPDATE e_codigo SET valor = $1, automatico = $2, manual = $3 , cedula = $4 WHERE id = $5
+        UPDATE e_codigo SET valor = $1, automatico = $2, manual = $3 , cedula = $4 WHERE id = $5 RETURNING *
         `
         , [valor, automatico, manual, cedula, id]);
 
@@ -137,7 +137,7 @@ class EmpleadoControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{valor: ${valor}, automatico: ${automatico}, manual: ${manual}, cedula: ${cedula}}`,
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip,
         observacion: null
       });
@@ -184,9 +184,9 @@ class EmpleadoControlador {
         return res.status(404).jsonp({ message: 'Error al actualizar código' });
       }
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
-        UPDATE e_codigo SET valor = $1 WHERE id = $2
+        UPDATE e_codigo SET valor = $1 WHERE id = $2 RETURNING *
         `
         , [valor, id]);
 
@@ -196,7 +196,7 @@ class EmpleadoControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{valor: ${valor}}`,
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip,
         observacion: null
       });
