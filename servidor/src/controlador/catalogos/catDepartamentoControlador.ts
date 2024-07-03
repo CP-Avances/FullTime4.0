@@ -731,8 +731,8 @@ class DepartamentoControlador {
       let error: boolean = false;
 
       for (const data of plantilla) {
-        const { nombre, sucursal } = data;
         try {
+          const { nombre, sucursal } = data;
 
           // INICIAR TRANSACCION
           await pool.query('BEGIN');

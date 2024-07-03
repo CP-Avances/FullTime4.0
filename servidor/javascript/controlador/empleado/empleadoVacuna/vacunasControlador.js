@@ -68,6 +68,7 @@ class VacunasControlador {
             }
         });
     }
+    // TODO REVISAR
     // CREAR REGISTRO DE VACUNACION
     CrearRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -139,6 +140,7 @@ class VacunasControlador {
             }
         });
     }
+    //TODO REVISAR
     // REGISTRO DE CERTIFICADO O CARNET DE VACUNACION
     GuardarDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -205,6 +207,7 @@ class VacunasControlador {
             }
         });
     }
+    //TODO REVISAR
     // ACTUALIZAR REGISTRO DE VACUNACION
     ActualizarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -307,6 +310,7 @@ class VacunasControlador {
             res.jsonp({ message: 'Documento actualizado.' });
         });
     }
+    //TODO: REVISAR
     // ELIMINAR DOCUMENTO CARNET DE VACUNACION
     EliminarDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -370,6 +374,7 @@ class VacunasControlador {
             }
         });
     }
+    // TODO : REVISAR
     // ELIMINAR REGISTRO DE VACUNACION
     EliminarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -437,46 +442,48 @@ class VacunasControlador {
     // CREAR REGISTRO DE TIPO DE VACUNA
     CrearTipoVacuna(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { vacuna, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const VERIFICAR_VACUNA = yield database_1.default.query(`
-                SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
-                `, [vacuna.toUpperCase()]);
-                if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
-                    const response = yield database_1.default.query(`
-                    INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
-                    `, [vacuna]);
-                    // AUDITORIA
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'e_cat_vacuna',
-                        usuario: user_name,
-                        accion: 'I',
-                        datosOriginales: '',
-                        datosNuevos: `{nombre: ${vacuna}}`,
-                        ip,
-                        observacion: null
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    const [vacunaInsertada] = response.rows;
-                    if (vacunaInsertada) {
-                        return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' });
-                    }
-                    else {
-                        return res.status(404).jsonp({ message: 'Ups!!! algo slaio mal.', status: '400' });
-                    }
-                }
-                else {
-                    return res.jsonp({ message: 'Registro de tipo de vacuna ya existe en el sistema.', status: '300' });
-                }
-            }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error al guardar registro.' });
-            }
+            console.log("Metodod de crear tipo vacuna por eliminar");
+            // try {
+            //     const { vacuna, user_name, ip } = req.body;
+            //     // INICIAR TRANSACCION
+            //     await pool.query('BEGIN');
+            //     const VERIFICAR_VACUNA: QueryResult = await pool.query(
+            //         `
+            //         SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
+            //         `
+            //         , [vacuna.toUpperCase()])
+            //     if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
+            //         const response: QueryResult = await pool.query(
+            //             `
+            //             INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
+            //             `
+            //             , [vacuna]);
+            //         const [vacunaInsertada] = response.rows;
+            //         // AUDITORIA
+            //         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            //             tabla: 'e_cat_vacuna',
+            //             usuario: user_name,
+            //             accion: 'I',
+            //             datosOriginales: '',
+            //             datosNuevos: JSON.stringify(vacunaInsertada),
+            //             ip,
+            //             observacion: null
+            //         });
+            //         // FINALIZAR TRANSACCION
+            //         await pool.query('COMMIT');
+            //         if (vacunaInsertada) {
+            //             return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' })
+            //         } else {
+            //             return res.status(404).jsonp({ message: 'Ups!!! algo salio mal.', status: '400' })
+            //         }
+            //     } else {
+            //         return res.jsonp({ message: 'Registro de tipo de vacuna ya existe en el sistema.', status: '300' })
+            //     }
+            // } catch (error) {
+            //     // REVERTIR TRANSACCION
+            //     await pool.query('ROLLBACK');
+            //     return res.status(500).jsonp({ message: 'Error al guardar registro.' });
+            // }
         });
     }
     // OBTENER CERTIFICADO DE VACUNACION

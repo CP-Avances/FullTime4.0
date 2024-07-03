@@ -93,44 +93,44 @@ class VacunaControlador {
                 var VERIFICAR_VACUNA = yield database_1.default.query(`
                 SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1 AND NOT id = $2
                 `, [nombre.toUpperCase(), id]);
-                const consulta = yield database_1.default.query('SELECT * FROM e_cat_vacuna WHERE id = $1', [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'e_cat_vacuna',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip: ip,
-                        observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-                }
                 if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
                     const vacunaEditar = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
+                    const consulta = yield database_1.default.query('SELECT * FROM e_cat_vacuna WHERE id = $1', [id]);
+                    const [datosOriginales] = consulta.rows;
+                    if (!datosOriginales) {
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'e_cat_vacuna',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip: ip,
+                            observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                    }
                     const response = yield database_1.default.query(`
                 UPDATE e_cat_vacuna SET nombre = $2
                 WHERE id = $1 RETURNING *
                 `, [id, vacunaEditar]);
-                    const [vacunaInsertada] = response.rows;
+                    const [vacunaActualizada] = response.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'e_cat_vacuna',
                         usuario: req.body.user_name,
                         accion: 'U',
                         datosOriginales: JSON.stringify(datosOriginales),
-                        datosNuevos: JSON.stringify(vacunaInsertada),
+                        datosNuevos: JSON.stringify(vacunaActualizada),
                         ip,
                         observacion: null
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    if (vacunaInsertada) {
+                    if (vacunaActualizada) {
                         return res.status(200).jsonp({ message: 'Registro editado.', status: '200' });
                     }
                     else {
@@ -143,7 +143,6 @@ class VacunaControlador {
             }
             catch (error) {
                 // ROLLBACK
-                console.log(error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error', status: '500' });
             }
@@ -324,11 +323,10 @@ class VacunaControlador {
     // REGISTRAR PLANTILLA TIPO VACUNA
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { plantilla, user_name, ip } = req.body;
-                var contador = 1;
-                var respuesta;
-                plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
+            const { plantilla, user_name, ip } = req.body;
+            let error = false;
+            for (const data of plantilla) {
+                try {
                     // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                     const { vacuna } = data;
                     const vacu = vacuna.charAt(0).toUpperCase() + vacuna.slice(1).toLowerCase();
@@ -351,22 +349,17 @@ class VacunaControlador {
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    if (contador === plantilla.length) {
-                        if (vacuna_emp) {
-                            return respuesta = res.status(200).jsonp({ message: 'ok', status: '200' });
-                        }
-                        else {
-                            return respuesta = res.status(404).jsonp({ message: 'error', status: '400' });
-                        }
-                    }
-                    contador = contador + 1;
-                }));
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    error = true;
+                }
             }
-            catch (error) {
-                // ROLLBACK
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error con el servidor metodo CargarPlantilla.', status: '500' });
+            if (error) {
+                return res.status(500).jsonp({ message: 'error' });
             }
+            return res.status(200).jsonp({ message: 'ok' });
         });
     }
 }

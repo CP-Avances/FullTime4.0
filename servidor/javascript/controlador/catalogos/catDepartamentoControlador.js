@@ -638,8 +638,8 @@ class DepartamentoControlador {
             const { plantilla, user_name, ip } = req.body;
             let error = false;
             for (const data of plantilla) {
-                const { nombre, sucursal } = data;
                 try {
+                    const { nombre, sucursal } = data;
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     const id_sucursal = yield database_1.default.query(` SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`, [sucursal.toUpperCase()]);
