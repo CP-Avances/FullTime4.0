@@ -212,15 +212,13 @@ class EmpleadoControlador {
         `, [cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio,
                     telefono, id_nacionalidad, codigo]);
                 const [empleado] = response.rows;
-                const fechaNacimiento = yield (0, settingsMail_1.FormatearFecha2)(fec_nacimiento, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleados',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{cedula:${cedula}, apellido:${apellido}, nombre:${nombre}, estado_civil:${esta_civil}, genero: ${genero}, correo: ${correo}, 
-          fecha_nacimiento:${fechaNacimiento}, estado:${estado}, domicilio:${domicilio}, telefono:${telefono}, id_nacionalidad:${id_nacionalidad}, codigo:${codigo}`,
+                    datosNuevos: JSON.stringify(empleado),
                     ip,
                     observacion: null
                 });
@@ -269,22 +267,20 @@ class EmpleadoControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Error al actualizar empleado' });
                 }
-                yield database_1.default.query(`
+                const datosNuevos = yield database_1.default.query(`
         UPDATE eu_empleados SET cedula = $2, apellido = $3, nombre = $4, estado_civil = $5, 
           genero = $6, correo = $7, fecha_nacimiento = $8, estado = $9, domicilio = $10, 
           telefono = $11, id_nacionalidad = $12, codigo = $13 
-        WHERE id = $1 
+        WHERE id = $1 RETURNING *
         `, [id, cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
                     domicilio, telefono, id_nacionalidad, codigo]);
-                const fechaNacimientoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_nacimiento, 'ddd');
-                const fechaNacimientoN = yield (0, settingsMail_1.FormatearFecha2)(fec_nacimiento.toLocaleString(), 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleados',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
-                    datosNuevos: `{id:${datosOriginales.id}, cedula: ${cedula}, apellido: ${apellido}, nombre: ${nombre}, estado_civil: ${esta_civil}, genero: ${genero}, correo: ${correo}, fecha_nacimiento: ${fechaNacimientoN}, estado: ${estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad}, codigo: ${codigo}, imagen: ${datosOriginales.imagen},  mail_alternativo: ${datosOriginales.mail_alternativo}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip,
                     observacion: null
                 });
@@ -1220,7 +1216,7 @@ class EmpleadoControlador {
                         tabla: 'eu_empleados',
                         usuario: user_name,
                         accion: 'D',
-                        datosOriginales: `{id: ${datosOriginalesEmpleado.id}, cedula: ${datosOriginalesEmpleado.cedula}, codigo: ${datosOriginalesEmpleado.codigo}, apellido: ${datosOriginalesEmpleado.apellido}, nombre: ${datosOriginalesEmpleado.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginalesEmpleado.estado_civil}, genero: ${datosOriginalesEmpleado.genero}, correo: ${datosOriginalesEmpleado.correo}, mail_alternativo: ${datosOriginalesEmpleado.mail_alternativo}, estado: ${datosOriginalesEmpleado.estado}, domicilio: ${datosOriginalesEmpleado.domicilio}, telefono: ${datosOriginalesEmpleado.telefono}, id_nacionalidad: ${datosOriginalesEmpleado.id_nacionalidad}, imagen: ${datosOriginalesEmpleado.imagen}, longitud: ${datosOriginalesEmpleado.longitud}, latitud: ${datosOriginalesEmpleado.latitud}, web_access: ${datosOriginalesEmpleado.web_access}}`,
+                        datosOriginales: JSON.stringify(datosOriginalesEmpleado),
                         datosNuevos: '',
                         ip,
                         observacion: null
