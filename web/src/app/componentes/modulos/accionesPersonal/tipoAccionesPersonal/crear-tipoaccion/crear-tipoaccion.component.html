@@ -45,18 +45,15 @@
                     </label>
                     <section>
                         <mat-radio-group aria-label="Select an option" formControlName="tipoForm">
-                            <mat-radio-button ngDefaultControl [(ngModel)]="selec1" [checked]="selec1"
-                                [ngModelOptions]="{standalone: true}" (click)="CambiarEstadosPermisos()" value="true">
+                            <mat-radio-button (click)="CambiarEstadosPermisos()" value="permiso">
                                 <label id="textoradiobtn">Permiso</label>
                             </mat-radio-button>
                             <br>
-                            <mat-radio-button ngDefaultControl [(ngModel)]="selec2" [checked]="selec2"
-                                [ngModelOptions]="{standalone: true}" (click)="CambiarEstadosVacaciones()" value="true">
+                            <mat-radio-button (click)="CambiarEstadosVacaciones()" value="vacacion">
                                 <label id="textoradiobtn">Vacación</label>
                             </mat-radio-button>
                             <br>
-                            <mat-radio-button ngDefaultControl [(ngModel)]="selec3" [checked]="selec3"
-                                [ngModelOptions]="{standalone: true}" (click)="CambiarEstadosSituacion()" value="true">
+                            <mat-radio-button (click)="CambiarEstadosSituacion()" value="propuesta">
                                 <label id="textoradiobtn">Situación propuesta</label>
                             </mat-radio-button>
                         </mat-radio-group>

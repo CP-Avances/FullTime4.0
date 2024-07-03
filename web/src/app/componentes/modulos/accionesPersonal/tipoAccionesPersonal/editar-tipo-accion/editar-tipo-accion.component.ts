@@ -67,20 +67,20 @@ export class EditarTipoAccionComponent implements OnInit {
     this.selec2 = false;
     this.selec3 = false;
     this.formulario.patchValue({
-      tipoAccionForm: this.data.id_tipo_accion_personal ,
+      tipoAccionForm: this.data.id_tipo_accion_personal,
       descripcionForm: this.data.descripcion,
       baseLegalForm: this.data.base_legal,
     })
     if (this.data.tipo_permiso === true) {
-      this.selec1 = true;
+      this.tipoF.setValue('permiso');
       this.CambiarEstadosPermisos();
     }
     if (this.data.tipo_vacacion === true) {
-      this.selec2 = true;
+      this.tipoF.setValue('vacacion');
       this.CambiarEstadosVacaciones();
     }
     if (this.data.tipo_situacion_propuesta === true) {
-      this.selec3 = true;
+      this.tipoF.setValue('propuesta');
       this.CambiarEstadosSituacion();
     }
   }
@@ -140,7 +140,7 @@ export class EditarTipoAccionComponent implements OnInit {
   tipos_acciones: any = [];
   ObtenerTiposAccionPersonal() {
     this.tipos_acciones = [];
-    this.rest.BuscarDatosTipoEdicion(this.data.id_tipo_accion_personal ).subscribe(datos => {
+    this.rest.BuscarDatosTipoEdicion(this.data.id_tipo_accion_personal).subscribe(datos => {
       this.tipos_acciones = datos;
     })
   }

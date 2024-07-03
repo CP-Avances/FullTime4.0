@@ -16,23 +16,24 @@ exports.PROCESOS_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class ProcesoControlador {
-    list(req, res) {
+    // METODO PARA BUSCAR LISTA DE PROCESOS
+    ListarProcesos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const Sin_proc_padre = yield database_1.default.query(`
-      SELECT p.id, p.nombre, p.nivel FROM map_cat_procesos AS p 
+            const SIN_PROCESO_SUPERIOR = yield database_1.default.query(`
+      SELECT p.id, p.nombre, p.nivel, p.proceso_padre AS proc_padre FROM map_cat_procesos AS p 
       WHERE p.proceso_padre IS NULL 
       ORDER BY p.nombre ASC
       `);
-            const Con_proc_padre = yield database_1.default.query(`
+            const CON_PROCESO_SUPERIOR = yield database_1.default.query(`
       SELECT p.id, p.nombre, p.nivel, nom_p.nombre AS proc_padre 
       FROM map_cat_procesos AS p, nombreprocesos AS nom_p 
       WHERE p.proceso_padre = nom_p.id 
       ORDER BY p.nombre ASC
       `);
-            Sin_proc_padre.rows.forEach((obj) => {
-                Con_proc_padre.rows.push(obj);
+            SIN_PROCESO_SUPERIOR.rows.forEach((obj) => {
+                CON_PROCESO_SUPERIOR.rows.push(obj);
             });
-            res.jsonp(Con_proc_padre.rows);
+            res.jsonp(CON_PROCESO_SUPERIOR.rows);
         });
     }
     getOne(req, res) {
@@ -137,6 +138,7 @@ class ProcesoControlador {
             }
         });
     }
+    // METODO PARA ELIMINA PROCESOS
     EliminarProceso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -145,7 +147,9 @@ class ProcesoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const proceso = yield database_1.default.query('SELECT * FROM map_cat_procesos WHERE id = $1', [id]);
+                const proceso = yield database_1.default.query(`
+        SELECT * FROM map_cat_procesos WHERE id = $1
+        `, [id]);
                 const [datosOriginales] = proceso.rows;
                 if (!datosOriginales) {
                     // AUDITORIA
@@ -180,9 +184,10 @@ class ProcesoControlador {
                 return res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: error });
+                return res.jsonp({ message: 'error' });
             }
             ;
         });

@@ -14,8 +14,9 @@
             <span class="w-100 bd-highlight">
                 LISTA DE SOLICITUDES DE HORAS EXTRAS
             </span>
-            <button class="btn btn-sm" style="float: right; margin-right: 6px;" ngDefaultControl
-                [(ngModel)]="totalHorasExtras" [ngModelOptions]="{standalone: true}">
+            <!--ngDefaultControl
+                [(ngModel)]="totalHorasExtras" [ngModelOptions]="{standalone: true}"-->
+            <button class="btn btn-sm" style="float: right; margin-right: 6px;">
                 Horas Totales {{totalHorasExtras}}
             </button>
         </div>
@@ -101,8 +102,9 @@
         </div>
         <br>
         <div class="float-right">
-            <button mat-raised-button id="btn-raised" class="btn_horas" type="submit" ngDefaultControl
-                [(ngModel)]="horasSumadas" style="margin-right: 10px;" [ngModelOptions]="{standalone: true}">
+            <!--ngDefaultControl
+                [(ngModel)]="horasSumadas" [ngModelOptions]="{standalone: true}"-->
+            <button mat-raised-button id="btn-raised" class="btn_horas" type="submit" style="margin-right: 10px;">
                 Sub-total Horas {{horasSumadas}}
             </button>
         </div>
@@ -161,8 +163,9 @@
             <span class="w-100 bd-highlight">
                 LISTA DE SOLICITUDES DE HORAS EXTRAS CON OBSERVACIONES
             </span>
-            <button class="btn btn-sm" style="float: right; margin-right: 10px;" ngDefaultControl
-                [(ngModel)]="total_horas_observacion" [ngModelOptions]="{standalone: true}">
+            <!--ngDefaultControl
+                [(ngModel)]="total_horas_observacion" [ngModelOptions]="{standalone: true}"-->
+            <button class="btn btn-sm" style="float: right; margin-right: 10px;">
                 Horas Totales {{total_horas_observacion}}
             </button>
         </div>
@@ -216,9 +219,8 @@
         </div>
         <br>
         <div class="float-right">
-            <button mat-raised-button id="btn-raised" class="btn_horas" type="submit" ngDefaultControl
-                [(ngModel)]="horasSumadas_observacion" style="margin-right: 10px;"
-                [ngModelOptions]="{standalone: true}">
+            <!--ngDefaultControl [(ngModel)]="horasSumadas_observacion" [ngModelOptions]="{standalone: true}"-->
+            <button mat-raised-button id="btn-raised" style="margin-right: 10px;" class="btn_horas" type="submit">
                 Sub-total Horas {{horasSumadas_observacion}}
             </button>
         </div>
@@ -267,8 +269,9 @@
             <span class="w-100 bd-highlight">
                 LISTA DE HORAS EXTRAS SOLICITADAS AUTORIZADAS O NEGADAS
             </span>
-            <button class="btn btn-sm" style="float: right; margin-right: 10px;" ngDefaultControl
-                [(ngModel)]="total_horas_autorizadas" [ngModelOptions]="{standalone: true}">
+            <!--ngDefaultControl
+                [(ngModel)]="total_horas_autorizadas" [ngModelOptions]="{standalone: true}"-->
+            <button class="btn btn-sm" style="float: right; margin-right: 10px;">
                 Horas Totales Autorizadas {{total_horas_autorizadas}}
             </button>
         </div>

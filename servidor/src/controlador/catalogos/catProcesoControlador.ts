@@ -5,15 +5,18 @@ import pool from '../../database';
 
 class ProcesoControlador {
 
-  public async list(req: Request, res: Response) {
-    const Sin_proc_padre = await pool.query(
+  // METODO PARA BUSCAR LISTA DE PROCESOS
+  public async ListarProcesos(req: Request, res: Response) {
+
+    const SIN_PROCESO_SUPERIOR = await pool.query(
       `
-      SELECT p.id, p.nombre, p.nivel FROM map_cat_procesos AS p 
+      SELECT p.id, p.nombre, p.nivel, p.proceso_padre AS proc_padre FROM map_cat_procesos AS p 
       WHERE p.proceso_padre IS NULL 
       ORDER BY p.nombre ASC
       `
     );
-    const Con_proc_padre = await pool.query(
+
+    const CON_PROCESO_SUPERIOR = await pool.query(
       `
       SELECT p.id, p.nombre, p.nivel, nom_p.nombre AS proc_padre 
       FROM map_cat_procesos AS p, nombreprocesos AS nom_p 
@@ -21,11 +24,14 @@ class ProcesoControlador {
       ORDER BY p.nombre ASC
       `
     );
-    Sin_proc_padre.rows.forEach((obj: any) => {
-      Con_proc_padre.rows.push(obj);
+
+    SIN_PROCESO_SUPERIOR.rows.forEach((obj: any) => {
+      CON_PROCESO_SUPERIOR.rows.push(obj);
     })
-    res.jsonp(Con_proc_padre.rows);
+
+    res.jsonp(CON_PROCESO_SUPERIOR.rows);
   }
+
 
   public async getOne(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
@@ -120,7 +126,7 @@ class ProcesoControlador {
         UPDATE map_cat_procesos SET nombre = $1, nivel = $2, proceso_padre = $3 WHERE id = $4
         `
         , [nombre, nivel, proc_padre, id]);
-      
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'map_cat_procesos',
@@ -142,6 +148,7 @@ class ProcesoControlador {
     }
   }
 
+  // METODO PARA ELIMINA PROCESOS
   public async EliminarProceso(req: Request, res: Response): Promise<Response> {
     try {
       const id = req.params.id;
@@ -151,7 +158,11 @@ class ProcesoControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const proceso = await pool.query('SELECT * FROM map_cat_procesos WHERE id = $1', [id]);
+      const proceso = await pool.query(
+        `
+        SELECT * FROM map_cat_procesos WHERE id = $1
+        `
+        , [id]);
       const [datosOriginales] = proceso.rows;
 
       if (!datosOriginales) {
@@ -190,11 +201,14 @@ class ProcesoControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
+
       return res.jsonp({ message: 'Registro eliminado.' })
+
     } catch (error) {
+      console.log('error ', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(500).jsonp({ message: error });
+      return res.jsonp({ message: 'error' });
     };
   }
 

@@ -59,7 +59,7 @@
                                     matTooltip="Seleccionar si el permiso será por días o por horas y minutos.">
                                     help_outline
                                 </mat-icon>
-                                <mat-select formControlName="diasHorasForm" [(ngModel)]="selectDiasHoras" required>
+                                <mat-select formControlName="diasHorasForm" required>
                                     <mat-option *ngFor="let dh of diasHoras" [value]="dh.valor"
                                         (click)="ActivarDiasHoras(primeroFormGroup.value)">
                                         {{dh.nombre}}
@@ -94,7 +94,7 @@
                                     matTooltip="Seleccionar si el usuario puede solicitar este tipo de permiso.">
                                     help_outline
                                 </mat-icon>
-                                <mat-select formControlName="acceEmpleadoForm" [(ngModel)]="selectAccess" required>
+                                <mat-select formControlName="acceEmpleadoForm" required>
                                     <mat-option *ngFor="let sol of solicitudes" [value]="sol.valor">
                                         {{sol.nombre}}
                                     </mat-option>

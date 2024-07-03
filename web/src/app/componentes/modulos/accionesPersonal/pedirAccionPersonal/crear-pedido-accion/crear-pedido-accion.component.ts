@@ -243,7 +243,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   procesos: any = [];
   ObtenerProcesos() {
     this.procesos = [];
-    this.restProcesos.getProcesosRest().subscribe((datos) => {
+    this.restProcesos.ConsultarProcesos().subscribe((datos) => {
       this.procesos = datos;
     });
   }

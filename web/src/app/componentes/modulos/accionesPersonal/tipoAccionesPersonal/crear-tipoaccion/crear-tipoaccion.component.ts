@@ -109,6 +109,7 @@ export class CrearTipoaccionComponent implements OnInit {
 
   // METODO PARA CAMBIAR ESTADO PERMISO
   CambiarEstadosPermisos() {
+    this.selec1 = true;
     this.selec2 = false;
     this.selec3 = false;
   }
@@ -116,12 +117,14 @@ export class CrearTipoaccionComponent implements OnInit {
 
   // METODO PARA CAMBIAR ESTADO VACACIONES
   CambiarEstadosVacaciones() {
+    this.selec2 = true;
     this.selec1 = false;
     this.selec3 = false;
   }
 
   // METODO PARA CAMBIAR ESTADO SITUACION PROPUESTA
   CambiarEstadosSituacion() {
+    this.selec3 = true;
     this.selec1 = false;
     this.selec2 = false;
   }
