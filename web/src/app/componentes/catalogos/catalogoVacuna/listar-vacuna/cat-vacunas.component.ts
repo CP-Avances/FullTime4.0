@@ -315,15 +315,22 @@ export class CatVacunasComponent implements OnInit {
         user_name: this.user_name,
         ip: this.ip,
       }
-      this.rest.SubirArchivoExcel(data).subscribe(response => {
-        console.log('respuesta: ', response);
-        this.toastr.success('Operación exitosa.', 'Plantilla de vacunas importada.', {
-          timeOut: 3000,
-        });
-        //window.location.reload();
-        this.LimpiarCampos();
-        this.archivoForm.reset();
-        this.nameFile = '';
+      this.rest.SubirArchivoExcel(data).subscribe({
+        next: (response) => {
+          console.log('respuesta: ', response);
+          this.toastr.success('Plantilla de vacunas importada.', 'Operación exitosa.',  {
+            timeOut: 3000,
+          });
+          //window.location.reload();
+          this.LimpiarCampos();
+          this.archivoForm.reset();
+          this.nameFile = '';
+        },
+        error: (error) => {;
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal',  {
+            timeOut: 4000,
+          });
+        }
       });
     } else {
       console.log('entro en salir')

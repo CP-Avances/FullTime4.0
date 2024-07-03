@@ -127,9 +127,9 @@ class TituloControlador {
         return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
       }
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
-        UPDATE et_titulos SET nombre = $1, id_nivel = $2 WHERE id = $3
+        UPDATE et_titulos SET nombre = $1, id_nivel = $2 WHERE id = $3 RETURNING *
         `
         , [nombre, id_nivel, id]);
 
@@ -139,7 +139,7 @@ class TituloControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{nombre: ${nombre}, id_nivel: ${id_nivel}}`,
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip,
         observacion: null
       });
@@ -161,9 +161,9 @@ class TituloControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
-        INSERT INTO et_titulos (nombre, id_nivel) VALUES ($1, $2)
+        INSERT INTO et_titulos (nombre, id_nivel) VALUES ($1, $2) RETURNING *
         `
         , [nombre, id_nivel]);
 
@@ -173,7 +173,7 @@ class TituloControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{nombre: ${nombre}, id_nivel: ${id_nivel}}`,
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip,
         observacion: null
       });
@@ -343,6 +343,51 @@ class TituloControlador {
       }, 1500)
     }
 
+  }
+
+  // METODO PARA REGISTRAR LOS TITULOS DE LA PLANTILLA
+  public async RegistrarTitulosPlantilla(req: Request, res: Response): Promise<any> {
+    const { titulos, user_name, ip } = req.body;
+    let error: boolean = false;
+    
+    for (const titulo of titulos) {
+      const { nombre, id_nivel } = titulo;
+      try {
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+
+        const datosNuevos = await pool.query(
+          `
+          INSERT INTO et_titulos (nombre, id_nivel) VALUES ($1, $2) RETURNING *
+          `
+          , [nombre, id_nivel]);
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'et_titulos',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: JSON.stringify(datosNuevos.rows[0]),
+          ip,
+          observacion: null
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        
+      } catch (error) {
+        // REVERTIR TRANSACCION
+        await pool.query('ROLLBACK');
+        error = true;
+      }
+    }
+
+    if (error) {
+      return res.status(500).jsonp({ message: 'error' });
+    }
+
+    return res.status(200).jsonp({ message: 'ok' });
   }
 
 }

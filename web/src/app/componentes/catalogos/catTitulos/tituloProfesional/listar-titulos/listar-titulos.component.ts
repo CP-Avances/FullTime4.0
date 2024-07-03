@@ -253,11 +253,19 @@ export class ListarTitulosComponent implements OnInit {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } 
+      }
       else {
         this.DataTitulosProfesionales.forEach((item: any) => {
           if (item.observacion.toLowerCase() === 'ok') {
-            this.listTitulosCorrectos.push(item);
+            const nombre = item.titulo;
+            const nivel = this.nivelTitulos.find((valor: any) => valor.nombre.toLowerCase() === item.nivel.toLowerCase());
+
+            const titulo = {
+              nombre: nombre,
+              id_nivel: nivel.id
+            }
+
+            this.listTitulosCorrectos.push(titulo);
           }
         });
       }
@@ -313,32 +321,27 @@ export class ListarTitulosComponent implements OnInit {
   }
 
   registrarTitulos() {
-    var data: any = {
-      nombre: '',
-      id_nivel: '',
-      user_name: this.user_name,
-      ip: this.ip
-    }
     if (this.listTitulosCorrectos.length > 0) {
-      var cont = 0;
-      this.listTitulosCorrectos.forEach((item: any) => {
-        this.nivelTitulos.forEach(valor => {
-          if (item.nivel.toLowerCase() == valor.nombre.toLowerCase()) {
-            data.nombre = item.titulo;
-            data.id_nivel = valor.id;
-            this.rest.RegistrarTitulo(data).subscribe(res => {
-              cont = cont + 1;
-              if (this.listTitulosCorrectos.length == cont) {
-                this.toastr.success('Operación exitosa.', 'Plantilla de Titulos profesionales importada.', {
-                  timeOut: 1500,
-                });
-                this.LimpiarCampos();
-              }
-            })
-            data = {}
-          }
-        })
-      })
+      const data = {
+        titulos: this.listTitulosCorrectos,
+        user_name: this.user_name,
+        ip: this.ip
+      };
+
+      this.rest.RegistrarTitulosPlantilla(data).subscribe({
+        next: (res: any) => {
+          this.toastr.success('Plantilla de Titulos profesionales importada.', 'Operación exitosa.', {
+            timeOut: 1500,
+          });
+          this.LimpiarCampos();
+        },
+        error: (error: any) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+          this.archivoForm.reset();
+        }
+      });
     } else {
       this.toastr.error('No exiten datos para registrar ingrese otra', 'Plantilla no aceptada', {
         timeOut: 4000,

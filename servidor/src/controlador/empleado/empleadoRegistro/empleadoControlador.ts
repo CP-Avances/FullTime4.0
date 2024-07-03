@@ -44,7 +44,7 @@ class EmpleadoControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      await pool.query(
+      const datos = await pool.query(
         `
         INSERT INTO e_codigo (id, valor, automatico, manual) VALUES ($1, $2, $3, $4)
         `
@@ -56,7 +56,7 @@ class EmpleadoControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{id: ${id}, valor: ${valor}, automatico: ${automatico}, manual: ${manual}}`,
+        datosNuevos: JSON.stringify(datos.rows[0]),
         ip,
         observacion: null
       });
@@ -125,9 +125,9 @@ class EmpleadoControlador {
         return res.status(404).jsonp({ message: 'Error al actualizar código' });
       }
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
-        UPDATE e_codigo SET valor = $1, automatico = $2, manual = $3 , cedula = $4 WHERE id = $5
+        UPDATE e_codigo SET valor = $1, automatico = $2, manual = $3 , cedula = $4 WHERE id = $5 RETURNING *
         `
         , [valor, automatico, manual, cedula, id]);
 
@@ -137,7 +137,7 @@ class EmpleadoControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{valor: ${valor}, automatico: ${automatico}, manual: ${manual}, cedula: ${cedula}}`,
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip,
         observacion: null
       });
@@ -184,9 +184,9 @@ class EmpleadoControlador {
         return res.status(404).jsonp({ message: 'Error al actualizar código' });
       }
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
-        UPDATE e_codigo SET valor = $1 WHERE id = $2
+        UPDATE e_codigo SET valor = $1 WHERE id = $2 RETURNING *
         `
         , [valor, id]);
 
@@ -196,7 +196,7 @@ class EmpleadoControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{valor: ${valor}}`,
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip,
         observacion: null
       });
@@ -236,7 +236,9 @@ class EmpleadoControlador {
 
       const [empleado] = response.rows;
 
-      const fechaNacimiento = await FormatearFecha2(fec_nacimiento, 'ddd')
+      const fechaNacimiento = await FormatearFecha2(fec_nacimiento, 'ddd');
+
+      empleado.fecha_nacimiento = fechaNacimiento;
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -244,9 +246,7 @@ class EmpleadoControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-
-        datosNuevos: `{cedula:${cedula}, apellido:${apellido}, nombre:${nombre}, estado_civil:${esta_civil}, genero: ${genero}, correo: ${correo}, 
-          fecha_nacimiento:${fechaNacimiento}, estado:${estado}, domicilio:${domicilio}, telefono:${telefono}, id_nacionalidad:${id_nacionalidad}, codigo:${codigo}`,
+        datosNuevos: JSON.stringify(empleado),
         ip,
         observacion: null
       });
@@ -305,28 +305,30 @@ class EmpleadoControlador {
         return res.status(404).jsonp({ message: 'Error al actualizar empleado' });
       }
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
         UPDATE eu_empleados SET cedula = $2, apellido = $3, nombre = $4, estado_civil = $5, 
           genero = $6, correo = $7, fecha_nacimiento = $8, estado = $9, domicilio = $10, 
           telefono = $11, id_nacionalidad = $12, codigo = $13 
-        WHERE id = $1 
+        WHERE id = $1 RETURNING *
         `
         , [id, cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
           domicilio, telefono, id_nacionalidad, codigo]);
 
+      const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd');
+      const fechaNacimientoN = await FormatearFecha2(fec_nacimiento.toLocaleString(), 'ddd');
 
-      const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd')
-      const fechaNacimientoN = await FormatearFecha2(fec_nacimiento.toLocaleString(), 'ddd')
+      datosOriginales.fecha_nacimiento = fechaNacimientoO;
+      datosNuevos.rows[0].fecha_nacimiento = fechaNacimientoN;
+
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eu_empleados',
         usuario: user_name,
         accion: 'U',
-        datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
-
-        datosNuevos: `{id:${datosOriginales.id}, cedula: ${cedula}, apellido: ${apellido}, nombre: ${nombre}, estado_civil: ${esta_civil}, genero: ${genero}, correo: ${correo}, fecha_nacimiento: ${fechaNacimientoN}, estado: ${estado}, domicilio: ${domicilio}, telefono: ${telefono}, id_nacionalidad: ${id_nacionalidad}, codigo: ${codigo}, imagen: ${datosOriginales.imagen},  mail_alternativo: ${datosOriginales.mail_alternativo}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip,
         observacion: null
       });
@@ -980,7 +982,7 @@ class EmpleadoControlador {
 
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-          tabla: 'empleados',
+          tabla: 'eu_empleados',
           usuario: user_name,
           accion: 'U',
           datosOriginales: '',
@@ -994,25 +996,19 @@ class EmpleadoControlador {
         return res.status(404).jsonp({ message: 'Error al actualizar geolocalización de empleado.' });
       }
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
-        UPDATE eu_empleados SET latitud = $1, longitud = $2 WHERE id = $3
+        UPDATE eu_empleados SET latitud = $1, longitud = $2 WHERE id = $3 RETURNING *
         `
-        , [lat, lng, id])
-        .then((result: any) => { });
-
-
-      const fechaNacimientoO = await FormatearFecha2(datosOriginales.fecha_nacimiento, 'ddd')
-
-
+        , [lat, lng, id]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        tabla: 'empleados',
+        tabla: 'eu_empleados',
         usuario: user_name,
         accion: 'U',
-        datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
-        datosNuevos: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${lng}, latitud: ${lat}, web_access: ${datosOriginales.web_access}}`,
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip,
         observacion: null
       });
@@ -1086,9 +1082,9 @@ class EmpleadoControlador {
       const id_usuario = usuario.rows[0].id;
       
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
-        INSERT INTO eu_empleado_titulos (observacion, id_empleado, id_titulo, id_usuario) VALUES ($1, $2, $3, $4)
+        INSERT INTO eu_empleado_titulos (observacion, id_empleado, id_titulo, id_usuario) VALUES ($1, $2, $3, $4) RETURNING *
         `
         , [observacion, id_empleado, id_titulo, id_usuario]);
 
@@ -1098,7 +1094,7 @@ class EmpleadoControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{observacion: ${observacion}, id_empleado: ${id_empleado}, id_titulo: ${id_titulo}, id_usuario: ${id_usuario}`,
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip,
         observacion: null
       });
@@ -1142,9 +1138,9 @@ class EmpleadoControlador {
         return res.status(404).jsonp({ message: 'Error al actualizar titulo del empleado.' });
       }
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
-        UPDATE eu_empleado_titulos SET observacion = $1, id_titulo = $2 WHERE id = $3
+        UPDATE eu_empleado_titulos SET observacion = $1, id_titulo = $2 WHERE id = $3 RETURNING *
         `
         , [observacion, id_titulo, id]);
 
@@ -1154,7 +1150,7 @@ class EmpleadoControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{observacion: ${observacion}, id_titulo: ${id_titulo}}`,
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip,
         observacion: null
       });
@@ -1402,20 +1398,21 @@ class EmpleadoControlador {
           datosOriginales: JSON.stringify(datosOriginalesUsuarios),
           datosNuevos: '',
           ip,
-          observacion: `Usuario con id_empleado: ${e.id} eliminado correctamente.`
+          observacion: null
         });
 
         // ELIMINAR EMPLEADO
         await pool.query('DELETE FROM eu_empleados WHERE id = $1', [e.id]);
 
         const fechaNacimientoO = await FormatearFecha2(datosOriginalesEmpleado.fecha_nacimiento, 'ddd')
+        datosOriginalesEmpleado.fecha_nacimiento = fechaNacimientoO;
 
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
           tabla: 'eu_empleados',
           usuario: user_name,
           accion: 'D',
-          datosOriginales: `{id: ${datosOriginalesEmpleado.id}, cedula: ${datosOriginalesEmpleado.cedula}, codigo: ${datosOriginalesEmpleado.codigo}, apellido: ${datosOriginalesEmpleado.apellido}, nombre: ${datosOriginalesEmpleado.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginalesEmpleado.estado_civil}, genero: ${datosOriginalesEmpleado.genero}, correo: ${datosOriginalesEmpleado.correo}, mail_alternativo: ${datosOriginalesEmpleado.mail_alternativo}, estado: ${datosOriginalesEmpleado.estado}, domicilio: ${datosOriginalesEmpleado.domicilio}, telefono: ${datosOriginalesEmpleado.telefono}, id_nacionalidad: ${datosOriginalesEmpleado.id_nacionalidad}, imagen: ${datosOriginalesEmpleado.imagen}, longitud: ${datosOriginalesEmpleado.longitud}, latitud: ${datosOriginalesEmpleado.latitud}, web_access: ${datosOriginalesEmpleado.web_access}}`,
+          datosOriginales: JSON.stringify(datosOriginalesEmpleado),
           datosNuevos: '',
           ip,
           observacion: null

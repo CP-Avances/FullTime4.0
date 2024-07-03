@@ -319,13 +319,20 @@ export class CatDiscapacidadComponent implements OnInit {
         user_name: this.user_name,
         ip: this.ip,
       }
-      this.rest.subirArchivoExcel(data).subscribe(response => {
-        this.toastr.success('Operación exitosa.', 'Plantilla de Discapacidad importada.', {
-          timeOut: 3000,
-        });
-        this.LimpiarCampos();
-        this.archivoForm.reset();
-        this.nameFile = '';
+      this.rest.subirArchivoExcel(data).subscribe({
+        next: (response) => {
+          this.toastr.success('Operación exitosa.', 'Plantilla de Discapacidad importada.', {
+            timeOut: 3000,
+          });
+          this.LimpiarCampos();
+          this.archivoForm.reset();
+          this.nameFile = '';
+        },
+        error: (error) => {;
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal',  {
+            timeOut: 4000,
+          });
+        }
       });
     } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {

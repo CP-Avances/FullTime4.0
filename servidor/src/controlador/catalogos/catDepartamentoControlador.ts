@@ -77,10 +77,10 @@ class DepartamentoControlador {
         return res.status(404).jsonp({ message: 'error' });
       }
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
         UPDATE ed_departamentos set nombre = $1, id_sucursal = $2 
-        WHERE id = $3
+        WHERE id = $3 RETURNING *
         `
         , [nombre, id_sucursal, id]);
 
@@ -90,7 +90,7 @@ class DepartamentoControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datos),
-        datosNuevos: `{Nombre: ${nombre}, Sucursal: ${id_sucursal}}`,
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip: ip,
         observacion: null
       });
@@ -727,46 +727,54 @@ class DepartamentoControlador {
 
   // METODO PARA REGISTRAR DATOS DE DEPARTAMENTOS
   public async CargarPlantilla(req: Request, res: Response) {
-    try {
-      const plantilla = req.body;
-      //console.log('datos departamento: ', plantilla);
-      var contador = 1;
-      var respuesta: any
+      const {plantilla, user_name, ip} = req.body;
+      let error: boolean = false;
 
-      plantilla.forEach(async (data: any) => {
-        console.log('data: ', data);
-        // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
-        const { nombre, sucursal } = data;
-        const ID_SUCURSAL: any = await pool.query(
-          `
-          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
-          `
-          , [sucursal.toUpperCase()]);
+      for (const data of plantilla) {
+        try {
+          const { nombre, sucursal } = data;
 
-        var id_sucursal = ID_SUCURSAL.rows[0].id;
+          // INICIAR TRANSACCION
+          await pool.query('BEGIN');
 
-        // REGISTRO DE LOS DATOS DE CONTRATOS
-        const response: QueryResult = await pool.query(
-          `
-          INSERT INTO ed_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING *
-          `
-          , [nombre.toUpperCase(), id_sucursal]);
+          const id_sucursal: any = await pool.query(
+            ` SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`
+            , [sucursal.toUpperCase()]);
 
-        const [departamento] = response.rows;
+          const id = id_sucursal.rows[0].id;
 
-        if (contador === plantilla.length) {
-          if (departamento) {
-            return respuesta = res.status(200).jsonp({ message: 'ok' })
-          } else {
-            return respuesta = res.status(404).jsonp({ message: 'error' })
-          }
+          const response: QueryResult = await pool.query(
+            `INSERT INTO ed_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING *`
+            , [nombre.toUpperCase(), id]);
+
+          const [departamento] = response.rows;
+
+          // INSERTAR AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'ed_departamentos',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: JSON.stringify(departamento),
+            ip: ip,
+            observacion: null
+          });
+
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+
+        } catch (error) {
+          // REVERTIR TRANSACCION
+          await pool.query('ROLLBACK');
+          error = true;
         }
-        contador = contador + 1;
-      });
+      }
 
-    } catch (error) {
-      return res.status(500).jsonp({ message: error });
-    }
+      if (error) {
+        return res.status(500).jsonp({ message: 'error' });
+      }
+
+      return res.status(200).jsonp({ message: 'ok' });
 
   }
 

@@ -134,8 +134,8 @@ class ProvinciaControlador {
                 const { nombre, id_pais, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
-        INSERT INTO e_provincias (nombre, id_pais) VALUES ($1, $2)
+                const datosNuevos = yield database_1.default.query(`
+        INSERT INTO e_provincias (nombre, id_pais) VALUES ($1, $2) RETURNING *
         `, [nombre, id_pais]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -143,7 +143,7 @@ class ProvinciaControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{"nombre": "${nombre}", "id_pais": "${id_pais}"}`,
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip: ip,
                     observacion: null
                 });

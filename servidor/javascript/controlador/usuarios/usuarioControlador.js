@@ -26,9 +26,9 @@ class UsuarioControlador {
                 const { usuario, contrasena, estado, id_rol, id_empleado, user_name, ip } = req.body;
                 // INCIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
+                const response = yield database_1.default.query(`
         INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado) 
-          VALUES ($1, $2, $3, $4, $5)
+          VALUES ($1, $2, $3, $4, $5) RETURNING *
         `, [usuario, contrasena, estado, id_rol, id_empleado]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -36,7 +36,7 @@ class UsuarioControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{usuario: ${usuario}, contrasena: ${contrasena}, estado: ${estado}, id_rol: ${id_rol}, id_empleado: ${id_empleado}}`,
+                    datosNuevos: JSON.stringify(response.rows[0]),
                     ip,
                     observacion: null
                 });
@@ -123,8 +123,8 @@ class UsuarioControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
-                yield database_1.default.query(`
-        UPDATE eu_usuarios SET usuario = $1, contrasena = $2, id_rol = $3 WHERE id_empleado = $4
+                const datosNuevos = yield database_1.default.query(`
+        UPDATE eu_usuarios SET usuario = $1, contrasena = $2, id_rol = $3 WHERE id_empleado = $4 RETURNING *
         `, [usuario, contrasena, id_rol, id_empleado]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -132,7 +132,7 @@ class UsuarioControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{usuario: ${usuario}, contrasena: ${contrasena}, id_rol: ${id_rol}}`,
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip,
                     observacion: null
                 });

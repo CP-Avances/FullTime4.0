@@ -323,14 +323,12 @@ class DiscapacidadControlador {
     // REGISTRAR PLANTILLA MODALIDAD_CARGO 
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { plantilla, user_name, ip } = req.body;
-                var contador = 1;
-                var respuesta;
-                plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                    // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
-                    const { item, discapacidad, observacion } = data;
-                    const disca = discapacidad.charAt(0).toUpperCase() + discapacidad.slice(1).toLowerCase();
+            const { plantilla, user_name, ip } = req.body;
+            let error = false;
+            for (const data of plantilla) {
+                const { item, discapacidad, observacion } = data;
+                const disca = discapacidad.charAt(0).toUpperCase() + discapacidad.slice(1).toLowerCase();
+                try {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
@@ -350,22 +348,17 @@ class DiscapacidadControlador {
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    if (contador === plantilla.length) {
-                        if (discapacidad_emp) {
-                            return respuesta = res.status(200).jsonp({ message: 'ok', status: '200' });
-                        }
-                        else {
-                            return respuesta = res.status(404).jsonp({ message: 'error', status: '400' });
-                        }
-                    }
-                    contador = contador + 1;
-                }));
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    error = true;
+                }
             }
-            catch (error) {
-                // ROLLBACK
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'Error con el servidor método CargarPlantilla.', status: '500' });
+            if (error) {
+                return res.status(500).jsonp({ message: 'error' });
             }
+            return res.status(200).jsonp({ message: 'ok' });
         });
     }
 }

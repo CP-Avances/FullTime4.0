@@ -135,9 +135,9 @@ class ProvinciaControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
-        INSERT INTO e_provincias (nombre, id_pais) VALUES ($1, $2)
+        INSERT INTO e_provincias (nombre, id_pais) VALUES ($1, $2) RETURNING *
         `
         , [nombre, id_pais]);
       
@@ -147,7 +147,7 @@ class ProvinciaControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{"nombre": "${nombre}", "id_pais": "${id_pais}"}`,
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip: ip,
         observacion: null
       });

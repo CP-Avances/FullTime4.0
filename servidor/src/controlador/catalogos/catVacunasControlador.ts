@@ -92,29 +92,31 @@ class VacunaControlador {
                 `
                 , [nombre.toUpperCase(), id]);
 
-            const consulta = await pool.query('SELECT * FROM e_cat_vacuna WHERE id = $1', [id]);
-            const [datosOriginales] = consulta.rows;
-            if (!datosOriginales) {
-                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                    tabla: 'e_cat_vacuna',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: '',
-                    datosNuevos: '',
-                    ip: ip,
-                    observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
-                });
-
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
-            }
 
             if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
                 const vacunaEditar = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
+
+                const consulta = await pool.query('SELECT * FROM e_cat_vacuna WHERE id = $1', [id]);
+                const [datosOriginales] = consulta.rows;
+                
+                if (!datosOriginales) {
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'e_cat_vacuna',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip: ip,
+                        observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
+                    });
+    
+                    // FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
 
                 const response: QueryResult = await pool.query(
                     `
@@ -123,7 +125,7 @@ class VacunaControlador {
                 `
                     , [id, vacunaEditar]);
 
-                const [vacunaInsertada] = response.rows;
+                const [vacunaActualizada] = response.rows;
 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -131,7 +133,7 @@ class VacunaControlador {
                     usuario: req.body.user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: JSON.stringify(vacunaInsertada),
+                    datosNuevos: JSON.stringify(vacunaActualizada),
                     ip,
                     observacion: null
                 });
@@ -139,7 +141,7 @@ class VacunaControlador {
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
 
-                if (vacunaInsertada) {
+                if (vacunaActualizada) {
                     return res.status(200).jsonp({ message: 'Registro editado.', status: '200' })
                 } else {
                     return res.status(404).jsonp({ message: 'Ups!!! algo salio mal.', status: '400' })
@@ -151,7 +153,6 @@ class VacunaControlador {
         }
         catch (error) {
             // ROLLBACK
-            console.log(error);
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error', status: '500' });
         }
@@ -358,12 +359,11 @@ class VacunaControlador {
 
     // REGISTRAR PLANTILLA TIPO VACUNA
     public async CargarPlantilla(req: Request, res: Response) {
-        try {
-            const { plantilla, user_name, ip } = req.body;
-            var contador = 1;
-            var respuesta: any
+        const { plantilla, user_name, ip } = req.body;
+        let error: boolean = false;
 
-            plantilla.forEach(async (data: any) => {
+        for (const data of plantilla) {
+            try {
                 // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                 const { vacuna } = data;
                 const vacu = vacuna.charAt(0).toUpperCase() + vacuna.slice(1).toLowerCase();
@@ -393,21 +393,20 @@ class VacunaControlador {
 
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
+                
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                error = true;
+                
+            }
 
-                if (contador === plantilla.length) {
-                    if (vacuna_emp) {
-                        return respuesta = res.status(200).jsonp({ message: 'ok', status: '200' })
-                    } else {
-                        return respuesta = res.status(404).jsonp({ message: 'error', status: '400' })
-                    }
-                }
-                contador = contador + 1;
-            });
-        } catch (error) {
-            // ROLLBACK
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'Error con el servidor metodo CargarPlantilla.', status: '500' });
         }
+        if (error) {
+            return res.status(500).jsonp({ message: 'error' });
+        }
+    
+        return res.status(200).jsonp({ message: 'ok' });
     }
 
 }

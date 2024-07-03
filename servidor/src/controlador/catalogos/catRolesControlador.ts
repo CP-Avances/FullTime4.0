@@ -85,9 +85,9 @@ class RolesControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
-        INSERT INTO ero_cat_roles (nombre) VALUES ($1)
+        INSERT INTO ero_cat_roles (nombre) VALUES ($1)  RETURNING *
          `
         , [nombre]);
       
@@ -97,7 +97,7 @@ class RolesControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{nombre: ${nombre}}`,
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip,
         observacion: null
       });
@@ -171,7 +171,8 @@ class RolesControlador {
         return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
       }
 
-      await pool.query('UPDATE ero_cat_roles SET nombre = $1 WHERE id = $2', [nombre, id]);
+      const datosNuevos = await pool.query('UPDATE ero_cat_roles SET nombre = $1 WHERE id = $2 RETURNING *'
+        , [nombre, id]);
       
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -179,7 +180,7 @@ class RolesControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{nombre: ${nombre}}`,
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip,
         observacion: null
       });

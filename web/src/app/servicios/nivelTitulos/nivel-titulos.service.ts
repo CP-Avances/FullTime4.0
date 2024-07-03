@@ -41,8 +41,13 @@ export class NivelTitulosService {
   }
 
 
-  RevisarFormato(formData) {
+  RevisarFormato(formData: any) {
     return this.http.post<any>(environment.url + '/nivel-titulo/upload/revision', formData);
+  }
+
+  // METODO PARA REGISTAR LOS NIVELES DE TITULO DE LA PLANTILLA
+  RegistrarNivelesPlantilla(data: any) {
+    return this.http.post<any>(environment.url + '/nivel-titulo/registrarNiveles', data);
   }
 
 }

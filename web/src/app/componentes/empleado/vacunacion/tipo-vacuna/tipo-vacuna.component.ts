@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 
 // IMPORTAR SERVICIOS
 import { VacunacionService } from 'src/app/servicios/empleado/empleadoVacunas/vacunacion.service';
+import { CatVacunasService } from 'src/app/servicios/catalogos/catVacunas/cat-vacunas.service';
 
 @Component({
   selector: 'app-tipo-vacuna',
@@ -28,6 +29,7 @@ export class TipoVacunaComponent {
 
   constructor(
     public restVacuna: VacunacionService, // VARIABLE DE CONSULTA DE DATOS DE VACUNAS
+    private rest: CatVacunasService, // VARIABLE DE CONSULTA DE DATOS DE TIPOS VACUNAS
     public ventana: MatDialogRef<TipoVacunaComponent>, // VARIABLE DE MANEJO DE VENTANAS
     public toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES,
   ) { }
@@ -48,7 +50,7 @@ export class TipoVacunaComponent {
       user_name: this.user_name,
       ip: this.ip,
     }
-    this.restVacuna.CrearTipoVacuna(vacuna).subscribe(response => {
+    this.rest.CrearVacuna(vacuna).subscribe(response => {
       //---console.log('response: ', response);
       if (response.status == '200') {
         this.toastr.success(response.message, 'Operación exitosa.', {

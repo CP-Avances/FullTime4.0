@@ -101,7 +101,7 @@ class NivelTituloControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{nombre: ${nombre}}`,
+                    datosNuevos: JSON.stringify(nivel),
                     ip: ip,
                     observacion: null
                 });
@@ -146,8 +146,8 @@ class NivelTituloControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
-                yield database_1.default.query(`
-        UPDATE et_cat_nivel_titulo SET nombre = $1 WHERE id = $2 
+                const datosNuevos = yield database_1.default.query(`
+        UPDATE et_cat_nivel_titulo SET nombre = $1 WHERE id = $2 RETURNING *
         `, [nombre, id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -155,9 +155,9 @@ class NivelTituloControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"nombre": "${nombre}"}`,
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip,
-                    observacion: ''
+                    observacion: null
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
@@ -290,6 +290,45 @@ class NivelTituloControlador {
                     return res.jsonp({ message: mensaje, data: listNivelesProfesionales });
                 }, 1500);
             }
+        });
+    }
+    // METODO PARA REGISTRAR DATOS DE LA PLANTILLA DE NIVELES DE TITULO
+    RegistrarNivelesPlantilla(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { niveles, user_name, ip } = req.body;
+            let error = false;
+            for (const nivel of niveles) {
+                const { nombre } = nivel;
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const response = yield database_1.default.query(`
+          INSERT INTO et_cat_nivel_titulo (nombre) VALUES ($1) RETURNING *
+          `, [nombre]);
+                    const [nivel] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'et_cat_nivel_titulo',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(nivel),
+                        ip: ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    error = true;
+                }
+            }
+            if (error) {
+                return res.status(500).jsonp({ message: 'error' });
+            }
+            return res.status(200).jsonp({ message: 'ok' });
         });
     }
 }

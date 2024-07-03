@@ -18,7 +18,7 @@ export class CatVacunasService {
     return this.http.get<any>(environment.url + '/vacunasTipos');
   }
   CrearVacuna(Vacuna: any){
-    return this.http.post(`${environment.url}/vacunasTipos/crearVacunas`, Vacuna).pipe(
+    return this.http.post(`${environment.url}/vacunasTipos/crearVacuna`, Vacuna).pipe(
       catchError(Vacuna)
     );
   }

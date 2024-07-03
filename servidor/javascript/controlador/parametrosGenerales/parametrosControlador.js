@@ -200,7 +200,7 @@ class ParametrosControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // OBTENER DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT descripcion FROM ep_detalle_parametro WHERE id = $1`, [id]);
+                const consulta = yield database_1.default.query(`SELECT * FROM ep_detalle_parametro WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -216,8 +216,8 @@ class ParametrosControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
-                yield database_1.default.query(`
-                UPDATE ep_detalle_parametro SET descripcion = $1 WHERE id = $2
+                const datosNuevos = yield database_1.default.query(`
+                UPDATE ep_detalle_parametro SET descripcion = $1 WHERE id = $2 RETURNING *
                 `, [descripcion, id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -225,7 +225,7 @@ class ParametrosControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"descripcion": "${descripcion}"}`,
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip,
                     observacion: null
                 });

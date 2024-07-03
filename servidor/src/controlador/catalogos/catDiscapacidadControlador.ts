@@ -353,17 +353,15 @@ class DiscapacidadControlador {
 
     // REGISTRAR PLANTILLA MODALIDAD_CARGO 
     public async CargarPlantilla(req: Request, res: Response) {
-        try {
-            const { plantilla, user_name, ip } = req.body;
-            var contador = 1;
-            var respuesta: any
 
-            plantilla.forEach(async (data: any) => {
-                // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
-                const { item, discapacidad, observacion } = data;
-                const disca = discapacidad.charAt(0).toUpperCase() + discapacidad.slice(1).toLowerCase();
+        const { plantilla, user_name, ip } = req.body;
+        let error: boolean = false;
 
-                // INICIAR TRANSACCION
+        for (const data of plantilla) {
+            const { item, discapacidad, observacion } = data;
+            const disca = discapacidad.charAt(0).toUpperCase() + discapacidad.slice(1).toLowerCase();
+            try {
+                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
 
                 // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
@@ -375,7 +373,7 @@ class DiscapacidadControlador {
 
                 const [discapacidad_emp] = response.rows;
 
-                // AUDITORIA
+                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'e_cat_discapacidad',
                     usuario: user_name,
@@ -389,20 +387,18 @@ class DiscapacidadControlador {
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
 
-                if (contador === plantilla.length) {
-                    if (discapacidad_emp) {
-                        return respuesta = res.status(200).jsonp({ message: 'ok', status: '200' })
-                    } else {
-                        return respuesta = res.status(404).jsonp({ message: 'error', status: '400' })
-                    }
-                }
-                contador = contador + 1;
-            });
-        } catch (error) {
-            // ROLLBACK
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'Error con el servidor método CargarPlantilla.', status: '500' });
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                error = true;  
+            }
         }
+            
+        if (error) {
+          return res.status(500).jsonp({ message: 'error' });
+        }
+
+        return res.status(200).jsonp({ message: 'ok' });
     }
 
 }

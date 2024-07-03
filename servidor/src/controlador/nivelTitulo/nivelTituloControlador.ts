@@ -7,7 +7,7 @@ import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 import excel from 'xlsx';
 import path from 'path';
-import fs from 'fs';
+import fs from 'fs'; 
 
 class NivelTituloControlador {
 
@@ -105,7 +105,7 @@ class NivelTituloControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{nombre: ${nombre}}`,
+        datosNuevos: JSON.stringify(nivel),
         ip: ip,
         observacion: null
       });
@@ -155,9 +155,9 @@ class NivelTituloControlador {
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
-        UPDATE et_cat_nivel_titulo SET nombre = $1 WHERE id = $2 
+        UPDATE et_cat_nivel_titulo SET nombre = $1 WHERE id = $2 RETURNING *
         `
         , [nombre, id]);
 
@@ -167,9 +167,9 @@ class NivelTituloControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{"nombre": "${nombre}"}`,
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip,
-        observacion: ''
+        observacion: null
       });
 
       // FINALIZAR TRANSACCION
@@ -314,6 +314,54 @@ class NivelTituloControlador {
     }
   }
 
+  // METODO PARA REGISTRAR DATOS DE LA PLANTILLA DE NIVELES DE TITULO
+  public async RegistrarNivelesPlantilla(req: Request, res: Response): Promise<any> {
+    const { niveles, user_name, ip } = req.body;
+    let error: boolean = false;
+
+    for (const nivel of niveles) {
+      const { nombre } = nivel;
+
+      try {
+
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+
+        const response: QueryResult = await pool.query(
+          `
+          INSERT INTO et_cat_nivel_titulo (nombre) VALUES ($1) RETURNING *
+          `
+          , [nombre]);
+
+        const [nivel] = response.rows;
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'et_cat_nivel_titulo',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: JSON.stringify(nivel),
+          ip: ip,
+          observacion: null
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+      } catch (error) {
+        // REVERTIR TRANSACCION
+        await pool.query('ROLLBACK');
+        error = true;
+      }
+    }
+
+    if (error) {
+      return res.status(500).jsonp({ message: 'error' });
+    }
+
+    return res.status(200).jsonp({ message: 'ok' });
+
+  }
 }
 
 export const NIVEL_TITULO_CONTROLADOR = new NivelTituloControlador();

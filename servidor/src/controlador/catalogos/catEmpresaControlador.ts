@@ -202,11 +202,11 @@ class EmpresaControlador {
                 return res.status(404).jsonp({ message: 'error' });
             }
 
-            await pool.query(
+            const datosNuevos = await pool.query(
                 `
                 UPDATE e_empresa SET nombre = $1, ruc = $2, direccion = $3, telefono = $4, correo_empresa = $5,
                 tipo_empresa = $6, representante = $7, establecimiento = $8, dias_cambio = $9, cambios = $10, 
-                numero_partida = $11 WHERE id = $12
+                numero_partida = $11 WHERE id = $12 RETURNING *
                 `
                 , [nombre, ruc, direccion, telefono, correo_empresa, tipo_empresa, representante, establecimiento,
                     dias_cambio, cambios, num_partida, id]);
@@ -217,7 +217,7 @@ class EmpresaControlador {
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales.rows[0]),
-                datosNuevos: `{"nombre": "${nombre}", "ruc": "${ruc}", "direccion": "${direccion}", "telefono": "${telefono}", correo_empresa: "${correo_empresa}", "tipo_empresa": "${tipo_empresa}", "representante": "${representante}", "establecimiento": "${establecimiento}", "dias_cambio": "${dias_cambio}", "cambios": "${cambios}", "num_partida": "${num_partida}"}`,
+                datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                 ip,
                 observacion: null
             });
