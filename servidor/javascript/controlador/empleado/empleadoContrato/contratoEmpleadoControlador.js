@@ -61,15 +61,17 @@ class ContratoEmpleadoControlador {
                         id_tipo_contrato]);
                     const [contrato] = response.rows;
                     // AUDITORIA
-                    var fechaIngresoN = yield (0, settingsMail_1.FormatearFecha2)(fec_ingreso, 'ddd');
-                    var fechaSalidaN = yield (0, settingsMail_1.FormatearFecha2)(fec_salida, 'ddd');
+                    const fechaIngresoN = yield (0, settingsMail_1.FormatearFecha2)(fec_ingreso, 'ddd');
+                    const fechaSalidaN = yield (0, settingsMail_1.FormatearFecha2)(fec_salida, 'ddd');
+                    contrato.fecha_ingreso = fechaIngresoN;
+                    contrato.fecha_salida = fechaSalidaN;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleado_contratos',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{id_empleado: ${id_empleado}, fec_ingreso: ${fechaIngresoN}, fec_salida: ${fechaSalidaN}, vaca_controla: ${vaca_controla}, asis_controla: ${asis_controla}, id_regimen: ${id_regimen}, id_tipo_contrato: ${id_tipo_contrato}}`,
+                        datosNuevos: JSON.stringify(contrato),
                         ip,
                         observacion: null
                     });
@@ -128,7 +130,7 @@ class ContratoEmpleadoControlador {
                     return res.status(404).jsonp({ message: 'Error al guardar el documento.' });
                 }
                 yield database_1.default.query(`
-                UPDATE eu_empleado_contratos SET documento = $2 WHERE id = $1
+                UPDATE eu_empleado_contratos SET documento = $2 WHERE id = $1 RETURNING *
                 `, [id, documento]);
                 var fechaIngresoO = yield (0, settingsMail_1.FormatearFecha2)(empleado.fecha_ingreso, 'ddd');
                 var fechaSalidaO = yield (0, settingsMail_1.FormatearFecha2)(empleado.fecha_salida, 'ddd');

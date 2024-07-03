@@ -19,7 +19,6 @@ const moment_1 = __importDefault(require("moment"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const settingsMail_1 = require("../../../libs/settingsMail");
 class VacunasControlador {
     // LISTAR REGISTROS DE VACUNACIÓN DEL EMPLEADO POR SU ID
     ListarUnRegistro(req, res) {
@@ -68,7 +67,6 @@ class VacunasControlador {
             }
         });
     }
-    // TODO REVISAR
     // CREAR REGISTRO DE VACUNACION
     CrearRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -109,14 +107,14 @@ class VacunasControlador {
                     VALUES ($1, $2, $3, $4, $5) RETURNING *
                     `, [id_empleado, descripcion, fecha, id_tipo_vacuna, id_usuario]);
                     const [vacuna] = response.rows;
-                    var fechaN = yield (0, settingsMail_1.FormatearFecha2)(fecha, 'ddd');
+                    console.log('vacuna ', vacuna);
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleado_vacunas',
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{id_empleado: ${id_empleado}, id_vacuna: ${id_tipo_vacuna}, fecha: ${fechaN}, carnet: null , descripcion: ${descripcion}, id_usuario: ${id_usuario}`,
+                        datosNuevos: JSON.stringify(vacuna),
                         ip,
                         observacion: null
                     });
@@ -140,7 +138,6 @@ class VacunasControlador {
             }
         });
     }
-    //TODO REVISAR
     // REGISTRO DE CERTIFICADO O CARNET DE VACUNACION
     GuardarDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -181,17 +178,16 @@ class VacunasControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
-                yield database_1.default.query(`
-                    UPDATE eu_empleado_vacunas SET carnet = $2 WHERE id = $1
+                const datosNuevos = yield database_1.default.query(`
+                    UPDATE eu_empleado_vacunas SET carnet = $2 WHERE id = $1 RETURNING *
                     `, [id, documento]);
-                var fechaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
-                    datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${documento} , descripcion: ${datosOriginales.descripcion}}`,
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip,
                     observacion: null
                 });
@@ -207,7 +203,6 @@ class VacunasControlador {
             }
         });
     }
-    //TODO REVISAR
     // ACTUALIZAR REGISTRO DE VACUNACION
     ActualizarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -259,19 +254,17 @@ class VacunasControlador {
                         yield database_1.default.query('COMMIT');
                         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                     }
-                    yield database_1.default.query(`
+                    const datosNuevos = yield database_1.default.query(`
                     UPDATE eu_empleado_vacunas SET id_empleado = $1, descripcion = $2, fecha = $3, id_vacuna = $4 
-                    WHERE id = $5
+                    WHERE id = $5 RETURNING *
                     `, [id_empleado, descripcion, fecha, id_tipo_vacuna, id]);
-                    var fechaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
-                    var fechaN = yield (0, settingsMail_1.FormatearFecha2)(fecha, 'ddd');
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleado_vacunas',
                         usuario: user_name,
                         accion: 'U',
-                        datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
-                        datosNuevos: `{id_empleado: ${id_empleado}, id_vacuna: ${id_tipo_vacuna}, fecha: ${fechaN}, carnet: ${datosOriginales.carnet} , descripcion: ${descripcion}}`,
+                        datosOriginales: JSON.stringify(datosOriginales),
+                        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                         ip,
                         observacion: null
                     });
@@ -310,7 +303,6 @@ class VacunasControlador {
             res.jsonp({ message: 'Documento actualizado.' });
         });
     }
-    //TODO: REVISAR
     // ELIMINAR DOCUMENTO CARNET DE VACUNACION
     EliminarDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -340,14 +332,13 @@ class VacunasControlador {
                 UPDATE eu_empleado_vacunas SET carnet = null WHERE id = $1 RETURNING *
                 `, [id]);
                 const [vacuna] = response.rows;
-                var fechaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
-                    datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: null, descripcion: ${datosOriginales.descripcion}}`,
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(vacuna),
                     ip,
                     observacion: null
                 });
@@ -374,7 +365,6 @@ class VacunasControlador {
             }
         });
     }
-    // TODO : REVISAR
     // ELIMINAR REGISTRO DE VACUNACION
     EliminarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -395,7 +385,7 @@ class VacunasControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al eliminar vacuna con id: ${id}`
+                        observacion: `Error al eliminar vacuna con id: ${id}. No se encontro registro.`
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
@@ -405,13 +395,12 @@ class VacunasControlador {
                 DELETE FROM eu_empleado_vacunas WHERE id = $1 RETURNING *
                 `, [id]);
                 const [vacuna] = response.rows;
-                var fechaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha, 'ddd');
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
+                    datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
                     ip,
                     observacion: null
@@ -437,53 +426,6 @@ class VacunasControlador {
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
             }
-        });
-    }
-    // CREAR REGISTRO DE TIPO DE VACUNA
-    CrearTipoVacuna(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log("Metodod de crear tipo vacuna por eliminar");
-            // try {
-            //     const { vacuna, user_name, ip } = req.body;
-            //     // INICIAR TRANSACCION
-            //     await pool.query('BEGIN');
-            //     const VERIFICAR_VACUNA: QueryResult = await pool.query(
-            //         `
-            //         SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
-            //         `
-            //         , [vacuna.toUpperCase()])
-            //     if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
-            //         const response: QueryResult = await pool.query(
-            //             `
-            //             INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
-            //             `
-            //             , [vacuna]);
-            //         const [vacunaInsertada] = response.rows;
-            //         // AUDITORIA
-            //         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-            //             tabla: 'e_cat_vacuna',
-            //             usuario: user_name,
-            //             accion: 'I',
-            //             datosOriginales: '',
-            //             datosNuevos: JSON.stringify(vacunaInsertada),
-            //             ip,
-            //             observacion: null
-            //         });
-            //         // FINALIZAR TRANSACCION
-            //         await pool.query('COMMIT');
-            //         if (vacunaInsertada) {
-            //             return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' })
-            //         } else {
-            //             return res.status(404).jsonp({ message: 'Ups!!! algo salio mal.', status: '400' })
-            //         }
-            //     } else {
-            //         return res.jsonp({ message: 'Registro de tipo de vacuna ya existe en el sistema.', status: '300' })
-            //     }
-            // } catch (error) {
-            //     // REVERTIR TRANSACCION
-            //     await pool.query('ROLLBACK');
-            //     return res.status(500).jsonp({ message: 'Error al guardar registro.' });
-            // }
         });
     }
     // OBTENER CERTIFICADO DE VACUNACION

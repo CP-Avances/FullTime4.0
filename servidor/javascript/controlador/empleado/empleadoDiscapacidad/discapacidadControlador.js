@@ -44,9 +44,9 @@ class DiscapacidadControlador {
         SELECT id FROM eu_usuarios WHERE id_empleado = $1
         `, [id_empleado]);
                 const id_usuario = usuario.rows[0].id;
-                yield database_1.default.query(`
+                const datosNuevos = yield database_1.default.query(`
         INSERT INTO eu_empleado_discapacidad (id_empleado, carnet_conadis, porcentaje, id_discapacidad, id_usuario) 
-        VALUES ($1, $2, $3, $4, $5)
+        VALUES ($1, $2, $3, $4, $5) RETURNING *
         `, [id_empleado, carn_conadis, porcentaje, tipo, id_usuario]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -54,7 +54,7 @@ class DiscapacidadControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{id_empleado: ${id_empleado}, carn_conadis: ${carn_conadis}, porcentaje: ${porcentaje}, tipo: ${tipo}, id_usuario: ${id_usuario}`,
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip, observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -90,9 +90,9 @@ class DiscapacidadControlador {
                         observacion: `Error al actualizar discapacidad con id_empleado: ${id_empleado}`
                     });
                 }
-                yield database_1.default.query(`
+                const datosNuevos = yield database_1.default.query(`
         UPDATE eu_empleado_discapacidad SET carnet_conadis = $1, porcentaje = $2, id_discapacidad = $3 
-        WHERE id_empleado = $4
+        WHERE id_empleado = $4 RETURNING *
         `, [carn_conadis, porcentaje, tipo, id_empleado]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -100,7 +100,7 @@ class DiscapacidadControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{carnet_conadis: ${carn_conadis}, porcentaje: ${porcentaje}, tipo: ${tipo}}`,
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip,
                     observacion: null
                 });

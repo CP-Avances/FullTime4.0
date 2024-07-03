@@ -60,7 +60,6 @@ class VacunasControlador {
         }
     }
 
-    // TODO REVISAR
     // CREAR REGISTRO DE VACUNACION
     public async CrearRegistro(req: Request, res: Response): Promise<Response> {
         const { id_empleado, descripcion, fecha, id_tipo_vacuna, user_name, ip, subir_documento } = req.body;
@@ -110,8 +109,8 @@ class VacunasControlador {
                     , [id_empleado, descripcion, fecha, id_tipo_vacuna, id_usuario]);
 
                 const [vacuna] = response.rows;
+                console.log('vacuna ', vacuna)
 
-                var fechaN = await FormatearFecha2(fecha, 'ddd');
 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -119,7 +118,7 @@ class VacunasControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{id_empleado: ${id_empleado}, id_vacuna: ${id_tipo_vacuna}, fecha: ${fechaN}, carnet: null , descripcion: ${descripcion}, id_usuario: ${id_usuario}`,
+                    datosNuevos: JSON.stringify(vacuna),
                     ip,
                     observacion: null
                 });
@@ -146,7 +145,6 @@ class VacunasControlador {
 
     }
 
-    //TODO REVISAR
     // REGISTRO DE CERTIFICADO O CARNET DE VACUNACION
     public async GuardarDocumento(req: Request, res: Response): Promise<Response> {
         //console.log('ingresa aqui')
@@ -198,12 +196,11 @@ class VacunasControlador {
                 return res.status(404).jsonp({ message: 'Registro no encontrado.' });
             }
 
-            await pool.query(
+            const datosNuevos = await pool.query(
                 `
-                    UPDATE eu_empleado_vacunas SET carnet = $2 WHERE id = $1
+                    UPDATE eu_empleado_vacunas SET carnet = $2 WHERE id = $1 RETURNING *
                     `
                 , [id, documento]);
-            var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
 
 
             // AUDITORIA
@@ -211,8 +208,8 @@ class VacunasControlador {
                 tabla: 'eu_empleado_vacunas',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
-                datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${documento} , descripcion: ${datosOriginales.descripcion}}`,
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                 ip,
                 observacion: null
             });
@@ -231,7 +228,6 @@ class VacunasControlador {
         }
     }
 
-    //TODO REVISAR
     // ACTUALIZAR REGISTRO DE VACUNACION
     public async ActualizarRegistro(req: Request, res: Response): Promise<Response> {
 
@@ -291,23 +287,20 @@ class VacunasControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
 
-                await pool.query(
+                const datosNuevos = await pool.query(
                     `
                     UPDATE eu_empleado_vacunas SET id_empleado = $1, descripcion = $2, fecha = $3, id_vacuna = $4 
-                    WHERE id = $5
+                    WHERE id = $5 RETURNING *
                     `
                     , [id_empleado, descripcion, fecha, id_tipo_vacuna, id]);
 
-                var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
-
-                var fechaN = await FormatearFecha2(fecha, 'ddd');
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'eu_empleado_vacunas',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
-                    datosNuevos: `{id_empleado: ${id_empleado}, id_vacuna: ${id_tipo_vacuna}, fecha: ${fechaN}, carnet: ${datosOriginales.carnet} , descripcion: ${descripcion}}`,
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip,
                     observacion: null
                 });
@@ -347,7 +340,6 @@ class VacunasControlador {
         res.jsonp({ message: 'Documento actualizado.' });
     }
 
-    //TODO: REVISAR
     // ELIMINAR DOCUMENTO CARNET DE VACUNACION
     public async EliminarDocumento(req: Request, res: Response): Promise<Response> {
         try {
@@ -385,16 +377,13 @@ class VacunasControlador {
 
             const [vacuna] = response.rows;
 
-            var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
-
-
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_empleado_vacunas',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
-                datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: null, descripcion: ${datosOriginales.descripcion}}`,
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: JSON.stringify(vacuna),
                 ip,
                 observacion: null
             });
@@ -422,7 +411,6 @@ class VacunasControlador {
         }
     }
 
-    // TODO : REVISAR
     // ELIMINAR REGISTRO DE VACUNACION
     public async EliminarRegistro(req: Request, res: Response): Promise<Response> {
         try {
@@ -446,7 +434,7 @@ class VacunasControlador {
                     datosOriginales: '',
                     datosNuevos: '',
                     ip,
-                    observacion: `Error al eliminar vacuna con id: ${id}`
+                    observacion: `Error al eliminar vacuna con id: ${id}. No se encontro registro.`
                 });
 
                 // FINALIZAR TRANSACCION
@@ -462,15 +450,12 @@ class VacunasControlador {
 
             const [vacuna] = response.rows;
 
-
-            var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
-
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'eu_empleado_vacunas',
                 usuario: user_name,
                 accion: 'D',
-                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_vacuna: ${datosOriginales.id_vacuna}, fecha: ${fechaO}, carnet: ${datosOriginales.carnet} , descripcion: ${datosOriginales.descripcion}}`,
+                datosOriginales: JSON.stringify(datosOriginales),
                 datosNuevos: '',
                 ip,
                 observacion: null
@@ -496,63 +481,6 @@ class VacunasControlador {
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
         }
-    }
-
-    // CREAR REGISTRO DE TIPO DE VACUNA
-    public async CrearTipoVacuna(req: Request, res: Response) {
-        console.log("Metodod de crear tipo vacuna por eliminar");
-        
-        // try {
-        //     const { vacuna, user_name, ip } = req.body;
-
-        //     // INICIAR TRANSACCION
-        //     await pool.query('BEGIN');
-
-        //     const VERIFICAR_VACUNA: QueryResult = await pool.query(
-        //         `
-        //         SELECT * FROM e_cat_vacuna WHERE UPPER(nombre) = $1
-        //         `
-        //         , [vacuna.toUpperCase()])
-
-        //     if (VERIFICAR_VACUNA.rows[0] == undefined || VERIFICAR_VACUNA.rows[0] == '') {
-        //         const response: QueryResult = await pool.query(
-        //             `
-        //             INSERT INTO e_cat_vacuna (nombre) VALUES ($1) RETURNING *
-        //             `
-        //             , [vacuna]);
-
-        //         const [vacunaInsertada] = response.rows;
-
-        //         // AUDITORIA
-        //         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-        //             tabla: 'e_cat_vacuna',
-        //             usuario: user_name,
-        //             accion: 'I',
-        //             datosOriginales: '',
-        //             datosNuevos: JSON.stringify(vacunaInsertada),
-        //             ip,
-        //             observacion: null
-        //         });
-
-        //         // FINALIZAR TRANSACCION
-        //         await pool.query('COMMIT');
-
-
-        //         if (vacunaInsertada) {
-        //             return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' })
-        //         } else {
-        //             return res.status(404).jsonp({ message: 'Ups!!! algo salio mal.', status: '400' })
-        //         }
-
-        //     } else {
-        //         return res.jsonp({ message: 'Registro de tipo de vacuna ya existe en el sistema.', status: '300' })
-        //     }
-
-        // } catch (error) {
-        //     // REVERTIR TRANSACCION
-        //     await pool.query('ROLLBACK');
-        //     return res.status(500).jsonp({ message: 'Error al guardar registro.' });
-        // }
     }
 
     // OBTENER CERTIFICADO DE VACUNACION

@@ -212,6 +212,8 @@ class EmpleadoControlador {
         `, [cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, domicilio,
                     telefono, id_nacionalidad, codigo]);
                 const [empleado] = response.rows;
+                const fechaNacimiento = yield (0, settingsMail_1.FormatearFecha2)(fec_nacimiento, 'ddd');
+                empleado.fecha_nacimiento = fechaNacimiento;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleados',
@@ -274,6 +276,10 @@ class EmpleadoControlador {
         WHERE id = $1 RETURNING *
         `, [id, cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
                     domicilio, telefono, id_nacionalidad, codigo]);
+                const fechaNacimientoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_nacimiento, 'ddd');
+                const fechaNacimientoN = yield (0, settingsMail_1.FormatearFecha2)(fec_nacimiento.toLocaleString(), 'ddd');
+                datosOriginales.fecha_nacimiento = fechaNacimientoO;
+                datosNuevos.rows[0].fecha_nacimiento = fechaNacimientoN;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_empleados',
@@ -835,7 +841,7 @@ class EmpleadoControlador {
                 const [datosOriginales] = empleado.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'empleados',
+                        tabla: 'eu_empleados',
                         usuario: user_name,
                         accion: 'U',
                         datosOriginales: '',
@@ -847,18 +853,16 @@ class EmpleadoControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Error al actualizar geolocalización de empleado.' });
                 }
-                yield database_1.default.query(`
-        UPDATE eu_empleados SET latitud = $1, longitud = $2 WHERE id = $3
-        `, [lat, lng, id])
-                    .then((result) => { });
-                const fechaNacimientoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_nacimiento, 'ddd');
+                const datosNuevos = yield database_1.default.query(`
+        UPDATE eu_empleados SET latitud = $1, longitud = $2 WHERE id = $3 RETURNING *
+        `, [lat, lng, id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'empleados',
+                    tabla: 'eu_empleados',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${datosOriginales.longitud}, latitud: ${datosOriginales.latitud}, web_access: ${datosOriginales.web_access}}`,
-                    datosNuevos: `{id: ${datosOriginales.id}, cedula: ${datosOriginales.cedula}, codigo: ${datosOriginales.codigo}, apellido: ${datosOriginales.apellido}, nombre: ${datosOriginales.nombre}, fecha_nacimiento: ${fechaNacimientoO}, estado_civil: ${datosOriginales.estado_civil}, genero: ${datosOriginales.genero}, correo: ${datosOriginales.correo}, mail_alternativo: ${datosOriginales.mail_alternativo}, estado: ${datosOriginales.estado}, domicilio: ${datosOriginales.domicilio}, telefono: ${datosOriginales.telefono}, id_nacionalidad: ${datosOriginales.id_nacionalidad}, imagen: ${datosOriginales.imagen}, longitud: ${lng}, latitud: ${lat}, web_access: ${datosOriginales.web_access}}`,
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip,
                     observacion: null
                 });
@@ -923,8 +927,8 @@ class EmpleadoControlador {
         SELECT id FROM eu_usuarios WHERE id_empleado = $1
         `, [id_empleado]);
                 const id_usuario = usuario.rows[0].id;
-                yield database_1.default.query(`
-        INSERT INTO eu_empleado_titulos (observacion, id_empleado, id_titulo, id_usuario) VALUES ($1, $2, $3, $4)
+                const datosNuevos = yield database_1.default.query(`
+        INSERT INTO eu_empleado_titulos (observacion, id_empleado, id_titulo, id_usuario) VALUES ($1, $2, $3, $4) RETURNING *
         `, [observacion, id_empleado, id_titulo, id_usuario]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -932,7 +936,7 @@ class EmpleadoControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{observacion: ${observacion}, id_empleado: ${id_empleado}, id_titulo: ${id_titulo}, id_usuario: ${id_usuario}`,
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip,
                     observacion: null
                 });
@@ -972,8 +976,8 @@ class EmpleadoControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Error al actualizar titulo del empleado.' });
                 }
-                yield database_1.default.query(`
-        UPDATE eu_empleado_titulos SET observacion = $1, id_titulo = $2 WHERE id = $3
+                const datosNuevos = yield database_1.default.query(`
+        UPDATE eu_empleado_titulos SET observacion = $1, id_titulo = $2 WHERE id = $3 RETURNING *
         `, [observacion, id_titulo, id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -981,7 +985,7 @@ class EmpleadoControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{observacion: ${observacion}, id_titulo: ${id_titulo}}`,
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip,
                     observacion: null
                 });
@@ -1211,6 +1215,7 @@ class EmpleadoControlador {
                     // ELIMINAR EMPLEADO
                     yield database_1.default.query('DELETE FROM eu_empleados WHERE id = $1', [e.id]);
                     const fechaNacimientoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginalesEmpleado.fecha_nacimiento, 'ddd');
+                    datosOriginalesEmpleado.fecha_nacimiento = fechaNacimientoO;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleados',
