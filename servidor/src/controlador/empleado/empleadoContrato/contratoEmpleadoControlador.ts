@@ -851,6 +851,7 @@ class ContratoEmpleadoControlador {
 
     }
 
+    // TODO: revisar
     public async CargarPlantilla_contrato(req: Request, res: Response): Promise<void> {
         const plantilla = req.body;
         console.log('datos contrato: ', plantilla);

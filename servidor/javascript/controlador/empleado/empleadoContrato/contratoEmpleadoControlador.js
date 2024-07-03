@@ -784,6 +784,7 @@ class ContratoEmpleadoControlador {
             }
         });
     }
+    // TODO: revisar
     CargarPlantilla_contrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const plantilla = req.body;
