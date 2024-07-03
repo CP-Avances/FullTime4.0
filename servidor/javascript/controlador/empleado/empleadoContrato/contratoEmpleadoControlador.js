@@ -287,7 +287,6 @@ class ContratoEmpleadoControlador {
                 // CONSULTAR DATOS ORIGINALES
                 const contratoConsulta = yield database_1.default.query('SELECT * FROM eu_empleado_contratos WHERE id = $1', [id]);
                 const [datosOriginales] = contratoConsulta.rows;
-                console.log("ver datos buscados", datosOriginales);
                 if (!datosOriginales) {
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -454,7 +453,7 @@ class ContratoEmpleadoControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{descripcion: ${descripcion}}`,
+                    datosNuevos: JSON.stringify(contrato),
                     ip,
                     observacion: null
                 });
