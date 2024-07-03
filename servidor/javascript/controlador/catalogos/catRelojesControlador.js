@@ -592,7 +592,7 @@ class RelojesControlador {
                                 var validDeparta = yield database_1.default.query(`SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1`, [item.departamento.toUpperCase()]);
                                 if (validDeparta.rows[0] != undefined && validDeparta.rows[0] != '') {
                                     if (validEstablecimiento.rows[0].id == validDeparta.rows[0].id_sucursal) {
-                                        var validCodigo = yield database_1.default.query(`SELECT * FROM ed_relojes WHERE codigo = $1`, [item.codigo]);
+                                        var validCodigo = yield database_1.default.query(`SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1`, [item.codigo.toUpperCase()]);
                                         if (validCodigo.rows[0] == undefined || validCodigo.rows[0] == '') {
                                             if (ipv4Regex.test(item.direccion_ip.toString())) {
                                                 var validDireccIP = yield database_1.default.query(`SELECT * FROM ed_relojes WHERE ip = $1`, [item.direccion_ip]);
@@ -606,11 +606,11 @@ class RelojesControlador {
                                                                 if (item.acciones.toString().toLowerCase() == 'si') {
                                                                     if (item.numero_acciones != ' - ') {
                                                                         if (!regex.test(item.numero_acciones)) {
-                                                                            item.observacion = 'Número de acciones incorrecta ingrese (solo números)';
+                                                                            item.observacion = 'Número de acciones incorrecta (solo números)';
                                                                         }
                                                                         else {
                                                                             if (item.numero_acciones < 1 || item.numero_acciones > 8) {
-                                                                                item.observacion = 'El número de acciones no debe ser mayor 8 ni 0';
+                                                                                item.observacion = 'El número de acciones debe ser mayor a 0 y menor a 8';
                                                                             }
                                                                         }
                                                                     }

@@ -473,13 +473,12 @@ export class ListarFeriadosComponent implements OnInit {
       observacion == 'Feriando ya asignado a una ciudad'
     ) {
       return 'rgb(239, 203, 106)';
-    } else if (observacion == 'Fecha registrada como valor de otra columna') {
+    } else if (observacion == 'Fecha como valor de otra columna') {
       return 'rgb(170, 129, 236)';
     } else if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
-    } else if (observacion == 'Formato de fecha_recuperacion incorrecto (YYYY-MM-DD)') {
-      return 'rgb(156, 214, 255)';
-    } else if (observacion == 'Formato de fecha incorrecto (YYYY-MM-DD)') {
+    } else if (observacion == 'Formato de fecha incorrecto (YYYY-MM-DD)' || 
+      observacion == 'Formato de fecha recuperación incorrecto (YYYY-MM-DD)') {
       return 'rgb(230, 176, 96)';
     } else if (arrayObservacion[0] == 'Fecha' || arrayObservacion[0] == 'Descripción'
       || arrayObservacion[0] == 'Provincia' || arrayObservacion[0] == 'Ciudad'
@@ -487,10 +486,10 @@ export class ListarFeriadosComponent implements OnInit {
     ) {
       return 'rgb(242, 21, 21)';
     }else if(observacion == 'La ciudad no existe en el sistema' ||
-      observacion == 'La provincia ingresada no existe en el sistema' 
+      observacion == 'La provincia no existe en el sistema' 
     ){
       return 'rgb(255, 192, 203';
-    } else if (observacion == 'Feriado no válido(Debe existir previamente)') {
+    } else if (observacion == 'Feriado no válido (Debe existir previamente)') {
       return 'rgb(238, 34, 207)';
     } else {
       return 'white'
