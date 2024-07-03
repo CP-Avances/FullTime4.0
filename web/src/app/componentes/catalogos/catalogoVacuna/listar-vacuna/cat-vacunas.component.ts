@@ -23,7 +23,7 @@ import { CatVacunasService } from 'src/app/servicios/catalogos/catVacunas/cat-va
 import { PlantillaReportesService } from '../../../reportes/plantilla-reportes.service';
 
 import { EditarVacunasComponent } from '../editar-vacuna/editar-vacuna.component';
-import { TipoVacunaComponent } from '../../../empleado/vacunacion/tipo-vacuna/tipo-vacuna.component';
+import { TipoVacunaComponent } from '../tipo-vacuna/tipo-vacuna.component';
 import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/metodos.component';
 
 @Component({

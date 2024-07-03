@@ -118,12 +118,12 @@ export class CatDiscapacidadComponent implements OnInit {
     this.rest.ListarDiscapacidad().subscribe(res => {
       this.discapacidades = res
     }, error => {
-      if(error.status == 400 || error.status == 404){
-        this.toastr.info('Registro vacio', 'Discapacidad', {
+      if (error.status == 400 || error.status == 404) {
+        this.toastr.info('No se han encontrado registros.', '', {
           timeOut: 3500,
         });
-      }else{
-        this.toastr.error('Error al cargar los datos', 'Discapacidad', {
+      } else {
+        this.toastr.error('Error al cargar los datos.', 'Discapacidad', {
           timeOut: 3500,
         });
       }
@@ -328,8 +328,9 @@ export class CatDiscapacidadComponent implements OnInit {
           this.archivoForm.reset();
           this.nameFile = '';
         },
-        error: (error) => {;
-          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal',  {
+        error: (error) => {
+          ;
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
             timeOut: 4000,
           });
         }

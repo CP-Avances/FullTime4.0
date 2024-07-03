@@ -3,6 +3,7 @@
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
         TIPO DE VACUNA
     </span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
 </div>
 <form [formGroup]="formulario">
     <div class="container">
@@ -25,5 +26,4 @@
 <div class="d-flex flex-wrap justify-content-center">
     <input type="submit" class="btn btn-sm" [disabled]="!formulario.valid" (click)="GuardarTipoVacuna(formulario.value)"
         value="Guardar">
-    <input type="submit" class="btn btn-sm" (click)="CerrarVentana()" value="Salir">
 </div>

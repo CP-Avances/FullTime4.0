@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class ModalidadLaboralPipe implements PipeTransform {
 
   transform(value: any, arg: any): any {
-   
+ 
     if (arg === undefined || arg === null || arg.length < 2) return value;
 
     const resultadoModalidad: any = [];

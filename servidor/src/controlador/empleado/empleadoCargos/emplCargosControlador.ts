@@ -78,6 +78,7 @@ class EmpleadoCargosControlador {
 
       res.jsonp({ message: 'Registro guardado.' });
     } catch (error) {
+      console.log('error ', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       res.status(500).jsonp({ message: 'Error al guardar el registro.' });

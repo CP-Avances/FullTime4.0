@@ -213,7 +213,7 @@ import { CambiarFraseComponent } from './componentes/administracionGeneral/frase
 import { RecuperarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/recuperar-frase/recuperar-frase.component';
 
 import { OlvidarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/olvidar-frase/olvidar-frase.component';
-import { TipoVacunaComponent } from './componentes/empleado/vacunacion/tipo-vacuna/tipo-vacuna.component';
+import { TipoVacunaComponent } from './componentes/catalogos/catalogoVacuna/tipo-vacuna/tipo-vacuna.component';
 import { ListarParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/listar-parametro/listar-parametro.component';
 import { EditarParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/editar-parametro/editar-parametro.component';
 import { VerParametroComponent } from './componentes/administracionGeneral/parametrizacion/detalle-parametros/ver-parametro/ver-parametro.component';

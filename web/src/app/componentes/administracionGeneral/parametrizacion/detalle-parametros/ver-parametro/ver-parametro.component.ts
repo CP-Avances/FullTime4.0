@@ -140,7 +140,7 @@ export class VerParametroComponent implements OnInit {
     this.datosDetalle = [];
     this.parametro.ListarDetalleParametros(id).subscribe(datos => {
       this.datosDetalle = datos;
-      console.log('ver detalles ', this.datosDetalle)
+      //console.log('ver detalles ', this.datosDetalle)
       if (this.ingreso === 0) {
         this.seleccion = this.datosDetalle[0].descripcion;
         this.opcion_kardex = this.datosDetalle[0].descripcion;
