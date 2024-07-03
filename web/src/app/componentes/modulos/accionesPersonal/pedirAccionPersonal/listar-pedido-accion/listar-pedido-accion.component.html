@@ -43,14 +43,14 @@
                         <tr>
                             <td>
                                 <mat-form-field id="t-inputs" style="width: 125px;">
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroApellido"
-                                        [formControl]="apellido" type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" [formControl]="apellido" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
                                 </mat-form-field>
                             </td>
                             <td>
                                 <mat-form-field id="t-inputs" style="width: 125px;">
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroNombre"
-                                        [formControl]="nombre" type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
                                 </mat-form-field>
                             </td>
                             <td></td>
@@ -65,7 +65,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let a of listaPedidos  | emplNombre: filtroNombre | emplApellido: filtroApellido  | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let a of listaPedidos  | emplNombre: nombre.value | emplApellido: apellido.value  | paginate:tamanio_pagina:numero_pagina">
                             <td>{{a.apellido}}</td>
                             <td>{{a.nombre}}</td>
                             <td>{{a.fecCreacion_}}</td>

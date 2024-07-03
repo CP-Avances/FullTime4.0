@@ -29,16 +29,15 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
   templateUrl: './listar-coordenadas.component.html',
   styleUrls: ['./listar-coordenadas.component.css']
 })
-export class ListarCoordenadasComponent implements OnInit {
 
-  tipoPermiso: any = [];
-  filtroDescripcion = '';
+export class ListarCoordenadasComponent implements OnInit {
 
   // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
-
+  
+  tipoPermiso: any = [];
   empleado: any = [];
   idEmpleado: number;
 

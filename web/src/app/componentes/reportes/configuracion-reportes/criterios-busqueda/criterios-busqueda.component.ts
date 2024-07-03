@@ -1,7 +1,8 @@
-import { Component, Input, OnInit, OnDestroy, SimpleChanges } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatRadioChange } from '@angular/material/radio';
 import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
+import { MatRadioChange } from '@angular/material/radio';
+
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
 
@@ -10,9 +11,8 @@ import { ValidacionesService } from '../../../../servicios/validaciones/validaci
   templateUrl: './criterios-busqueda.component.html',
   styleUrls: ['./criterios-busqueda.component.css']
 })
-export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
 
-  buscador !: FormGroup;
+export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
 
   codigo = new FormControl('');
   cedula = new FormControl('', [Validators.minLength(2)]);
@@ -22,23 +22,6 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
   nombre_reg = new FormControl('', [Validators.minLength(2)]);
   nombre_cargo = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
-
-  filtroNombreSuc: string = '';
-  filtroNombreCargo: string = '';
-  filtroNombreReg: string = '';
-  filtroNombreDep: string = '';
-
-  filtroCodigo: number;
-  filtroCedula: string = '';
-  filtroNombreEmp: string = '';
-
-  filtroCodigo_tab: number;
-  filtroCedula_tab: string = '';
-  filtroNombreTab: string = '';
-
-  filtroCodigo_inc: number;
-  filtroCedula_inc: string = '';
-  filtroNombreInc: string = '';
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_cargo: false,
@@ -61,35 +44,32 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    console.log('atributo', this.num_option);
+    //console.log('atributo', this.num_option);
     this.check = this.reporteService.checkOptionsN(this.num_option);
-    console.log('CHECK ', this.check);
-
+    //console.log('CHECK ', this.check);
   }
 
   ngOnDestroy() {
-
     this.reporteService.GuardarCheckOpcion('');
     this.reporteService.DefaultFormCriterios();
     this.reporteService.DefaultValoresFiltros();
-    console.log('Componenete destruido');
-
+    //console.log('Componenete destruido');
   }
 
   ngOnChanges() {
-    if (this.limpiar !=0) {
+    if (this.limpiar != 0) {
       this.limpiarCampos();
       this.seleccion.patchValue(null);
       this.reporteService.GuardarCheckOpcion('');
       this.reporteService.DefaultFormCriterios();
       this.reporteService.DefaultValoresFiltros();
-    }  }
+    }
+  }
 
-
-
+  // METODO PARA BUSCAR TIPO DE OPCION
   opcion: string;
   BuscarPorTipo(e: MatRadioChange) {
-    console.log('CHECK ', e.value);
+    //console.log('CHECK ', e.value);
     this.opcion = e.value;
     switch (this.opcion) {
       case 's':
@@ -167,10 +147,10 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
     }
     this.reporteService.GuardarFormCriteriosBusqueda(this._booleanOptions);
     this.reporteService.GuardarCheckOpcion(this.opcion)
-
   }
 
-  Filtrar(e, orden: number) {
+  // METODO PARA FILTRAR DATOS DE BUSQUEDA
+  Filtrar(e: any, orden: number) {
     switch (orden) {
       case 1: this.reporteService.setFiltroNombreSuc(e); break;
       case 2: this.reporteService.setFiltroNombreReg(e); break;
@@ -190,14 +170,17 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
     }
   }
 
-  IngresarSoloLetras(e) {
+  // METODO DE INGRESO DE LETRAS
+  IngresarSoloLetras(e: any) {
     return this.validacionService.IngresarSoloLetras(e);
   }
 
-  IngresarSoloNumeros(evt) {
+  // METODO DE INGRESO DE NUMEROS
+  IngresarSoloNumeros(evt: any) {
     return this.validacionService.IngresarSoloNumeros(evt);
   }
 
+  // METODO PARA LIMPIAR CAMPOS DE BUSQUEDA
   limpiarCampos() {
     if (this._booleanOptions.bool_emp === true || this._booleanOptions.bool_tab === true || this._booleanOptions.bool_inc === true) {
       this.codigo.reset();

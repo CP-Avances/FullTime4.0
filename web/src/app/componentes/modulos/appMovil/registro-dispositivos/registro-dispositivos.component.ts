@@ -40,11 +40,6 @@ export class RegistroDispositivosComponent implements OnInit {
   dispositivosRegistrados: any = [];
   dispositivo: any = [];
 
-  // FILTROS DE BUSQUEDA
-  filtroCodigo: number;
-  filtroCedula: '';
-  filtroNombre: '';
-
   // DATOS DE EMPLEADO
   empleado: any = [];
   idEmpleado: number;
@@ -138,24 +133,24 @@ export class RegistroDispositivosComponent implements OnInit {
     if (this.habilitar === false) {
       this.habilitar = true;
 
-      if (this.filtroNombre != undefined) {
-        if (this.filtroNombre.length > 1) {
+      if (this.nombre.value != undefined) {
+        if ((this.nombre.value).length > 1) {
           this.ocultar = true;
         } else {
           this.ocultar = false;
         }
       }
 
-      if (this.filtroCodigo != undefined) {
-        if (this.filtroCodigo > 0) {
+      if (this.codigo.value != undefined) {
+        if ((this.codigo.value).length > 0) {
           this.ocultar = true;
         } else {
           this.ocultar = false;
         }
       }
 
-      if (this.filtroCedula != undefined) {
-        if (this.filtroCedula.length > 1) {
+      if (this.cedula.value != undefined) {
+        if ((this.cedula.value).length > 1) {
           this.ocultar = true;
         } else {
           this.ocultar = false;

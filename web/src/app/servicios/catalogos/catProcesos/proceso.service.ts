@@ -14,7 +14,7 @@ export class ProcesoService {
 
   // catalogo de Procesos
 
-  getProcesosRest() {
+  ConsultarProcesos() {
     return this.http.get(`${environment.url}/proceso`);
   }
 
@@ -26,7 +26,7 @@ export class ProcesoService {
     return this.http.post(`${environment.url}/proceso`, data);
   }
 
-  deleteProcesoRest(id: number, data: any){
+  EliminarProceso(id: number, data: any){
     const url= `${environment.url}/proceso/eliminar/${id}`;
     const httpOtions = {
       body: data

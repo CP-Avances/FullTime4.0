@@ -64,18 +64,18 @@ class AutorizaDepartamentoControlador {
 
             await pool.query(
                 `
-                INSERT INTO ed_autoriza_departamento (id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar)
+                INSERT INTO ed_autoriza_departamento (id_departamento, id_empleado_cargo, estado, id_empleado, autorizar, preautorizar)
                 VALUES ($1, $2, $3, $4, $5, $6)
                 `
                 , [id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar]);
-            
+
             // INSERTAR REGISTRO DE AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'ed_autoriza_departamento',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{id_departamento: ${id_departamento}, id_empl_cargo: ${id_empl_cargo}, estado: ${estado}, id_empleado: ${id_empleado}, autorizar: ${autorizar}, preautorizar: ${preautorizar}}`,
+                datosNuevos: `{id_departamento: ${id_departamento}, id_empleado_cargo: ${id_empl_cargo}, estado: ${estado}, id_empleado: ${id_empleado}, autorizar: ${autorizar}, preautorizar: ${preautorizar}}`,
                 ip,
                 observacion: null
             });
@@ -83,10 +83,12 @@ class AutorizaDepartamentoControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Registro guardado.' });
+
         } catch (error) {
+            console.log('error ', error)
             // CANCELAR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'Error al guardar registro.' }); 
+            return res.status(500).jsonp({ message: 'Error al guardar registro.' });
         }
     }
 
@@ -182,7 +184,7 @@ class AutorizaDepartamentoControlador {
                 DELETE FROM ed_autoriza_departamento WHERE id = $1
                 `
                 , [id]);
-            
+
             // INSERTAR REGISTRO DE AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'ed_autoriza_departamento',

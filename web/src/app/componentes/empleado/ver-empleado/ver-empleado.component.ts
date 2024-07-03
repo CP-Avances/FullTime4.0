@@ -2107,6 +2107,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   // VENTANA PARA INGRESAR PERÍODO DE VACACIONES
+  registrar_periodo: boolean = false;
+  data_registrar_periodo: any = [];
+  pagina_registrar_periodo: string = '';
+  ver_periodo: boolean = true;
   AbrirVentanaPerVacaciones(): void {
     if (this.datoActual.id_contrato != undefined) {
       this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
@@ -2116,16 +2120,13 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
           timeOut: 6000,
         })
       }, error => {
-        this.ventana.open(RegistrarPeriodoVComponent,
-          {
-            width: '900px', data: {
-              idEmpleado: this.idEmpleado,
-              idContrato: this.datoActual.id_contrato
-            }
-          })
-          .afterClosed().subscribe(item => {
-            this.ObtenerPeriodoVacaciones(this.formato_fecha);
-          });
+        this.ver_periodo = false;
+        this.registrar_periodo = true;
+        this.pagina_registrar_periodo = 'ver-empleado';
+        this.data_registrar_periodo = {
+          idEmpleado: this.idEmpleado,
+          idContrato: this.datoActual.id_contrato
+        };
       });
     }
     else {
@@ -2136,12 +2137,14 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   // VENTANA PARA PERIODO DE VACACIONES
+  editar_periodo: boolean = false;
+  data_periodo: any = [];
+  pagina_periodo: string = '';
   AbrirEditarPeriodoVacaciones(datoSeleccionado: any): void {
-    this.ventana.open(EditarPeriodoVacacionesComponent,
-      { width: '900px', data: { idEmpleado: this.idEmpleado, datosPeriodo: datoSeleccionado } })
-      .afterClosed().subscribe(item => {
-        this.ObtenerPeriodoVacaciones(this.formato_fecha);
-      });
+    this.data_periodo = { idEmpleado: this.idEmpleado, datosPeriodo: datoSeleccionado };
+    this.ver_periodo = false;
+    this.editar_periodo = true;
+    this.pagina_periodo = 'ver-empleado';
   }
 
 

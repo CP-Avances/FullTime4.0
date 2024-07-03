@@ -275,4 +275,9 @@ mat-progress-spinner {
     z-index: 100;
 }
 
+/* ESTILLO PARA CENTRAR LOS TITULOS DE LAS TABLAS DE FORMA VERTICAL */
+#cabecera {
+    vertical-align: middle;
+}
+
 @import "~leaflet/dist/leaflet.css";

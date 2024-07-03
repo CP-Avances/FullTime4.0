@@ -32,10 +32,6 @@ export interface NotiRealtime {
 
 export class RealtimeNotificacionComponent implements OnInit {
 
-  filtroTimbreEmpl: '';
-  filtroTimbreEsta: '';
-  filtroTimbreFech: '';
-
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 10;
   numero_pagina: number = 1;

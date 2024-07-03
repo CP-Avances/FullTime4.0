@@ -50,10 +50,7 @@ export class ListarTipoComidasComponent implements OnInit {
   // ALMACENAMIENTO DE DATOS CONSULTADOS
   tipoComidas: any = [];
   empleado: any = [];
-
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESIÓN
-  filtroNombre = ''; // VARIABLE DE BUSQUEDA FILTRO DE DATOS
-  filtroTipo = ''; // VARIABLE DE BUSQUEDA DE FILTRO DE DATOS TIPO SERVICIO
 
   // ITEMS DE PAGINACION DE LA TABLA
   pageSizeOptions = [5, 10, 20, 50];

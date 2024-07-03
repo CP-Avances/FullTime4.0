@@ -45,6 +45,7 @@ class EmpleadoProcesoControlador {
                 res.jsonp({ message: 'Procesos del empleado guardados con éxito' });
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 res.status(500).jsonp({ message: 'Error al guardar procesos del empleado.' });

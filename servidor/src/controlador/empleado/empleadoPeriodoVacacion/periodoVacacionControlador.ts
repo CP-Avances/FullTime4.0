@@ -11,16 +11,16 @@ class PeriodoVacacionControlador {
 
     const { id_empleado } = req.params;
     const VACACIONES = await pool.query(
-        `
+      `
         SELECT pv.id, pv.id_empleado_contrato
         FROM mv_periodo_vacacion AS pv
         WHERE pv.id = (SELECT MAX(pv.id) AS id 
                        FROM mv_periodo_vacacion AS pv, eu_empleados AS e 
                        WHERE pv.codigo = e.codigo AND e.id = $1 )
         `
-        , [id_empleado]);
+      , [id_empleado]);
     if (VACACIONES.rowCount != 0) {
-        return res.jsonp(VACACIONES.rows)
+      return res.jsonp(VACACIONES.rows)
     }
     res.status(404).jsonp({ text: 'Registro no encontrado' });
   }
@@ -41,7 +41,7 @@ class PeriodoVacacionControlador {
               dia_antiguedad, estado, fecha_inicio, fecha_final, dia_perdido, horas_vacaciones, minutos_vacaciones, codigo)
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         `,
-        [ id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
+        [id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
           fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones,
           codigo,]
       );
@@ -73,17 +73,17 @@ class PeriodoVacacionControlador {
   public async EncontrarPerVacaciones(req: Request, res: Response): Promise<any> {
     const { codigo } = req.params;
     const PERIODO_VACACIONES = await pool.query(
-        `
+      `
         SELECT * FROM mv_periodo_vacacion AS p WHERE p.codigo = $1
         `
-        , [codigo]);
+      , [codigo]);
     if (PERIODO_VACACIONES.rowCount != 0) {
-        return res.jsonp(PERIODO_VACACIONES.rows)
+      return res.jsonp(PERIODO_VACACIONES.rows)
     }
     res.status(404).jsonp({ text: 'Registro no encontrado.' });
   }
 
-  public async ActualizarPeriodo(req: Request,res: Response): Promise<Response> {
+  public async ActualizarPeriodo(req: Request, res: Response): Promise<Response> {
     try {
       const {
         id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio,
@@ -124,8 +124,8 @@ class PeriodoVacacionControlador {
         WHERE id = $11
         `
         ,
-        [ id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
-          fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id, ]
+        [id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
+          fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id]
       );
       const fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd')
       const fechaFinalN = await FormatearFecha2(fec_final, 'ddd')
@@ -148,14 +148,15 @@ class PeriodoVacacionControlador {
       return res.jsonp({ message: "Registro Actualizado exitosamente" });
     } catch (error) {
       // REVERTIR TRANSACCION
+      console.log('error ', error)
       await pool.query("ROLLBACK");
       return res.status(500).jsonp({ message: "Error al actualizar período de vacaciones." });
     }
   }
 
 
- 
- 
+
+
 }
 
 const PERIODO_VACACION_CONTROLADOR = new PeriodoVacacionControlador();

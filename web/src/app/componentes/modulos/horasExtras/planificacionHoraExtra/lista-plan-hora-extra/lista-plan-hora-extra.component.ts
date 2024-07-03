@@ -51,9 +51,6 @@ export class ListaPlanHoraExtraComponent implements OnInit {
   // BUSQUEDA
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
-  filtroCedula: '';
-  filtroCedulaO: '';
-  filtroEmpleado = '';
 
   // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
   auto_individual: boolean = true;
@@ -430,7 +427,6 @@ export class ListaPlanHoraExtraComponent implements OnInit {
   limpiarCampos() {
     this.cedula.reset();
     this.nombre.reset();
-    this.filtroEmpleado = '';
   }
 
   // METODO PARA INGRESAR SOLO NUMEROS

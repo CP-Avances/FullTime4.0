@@ -117,7 +117,7 @@ export class RegistroProcesoComponent implements OnInit {
   // METODO PARA BUSCAR PROCESOS
   Obtenerprocesos() {
     this.procesos = [];
-    this.rest.getProcesosRest().subscribe(data => {
+    this.rest.ConsultarProcesos().subscribe(data => {
       this.procesos = data
     })
   }

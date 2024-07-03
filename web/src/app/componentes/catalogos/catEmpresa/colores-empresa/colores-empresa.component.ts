@@ -34,22 +34,12 @@ export class ColoresEmpresaComponent implements OnInit {
     nuevaForm: this.nuevaF
   });
 
-  // DATOS DE FORMULARIO DE COLORES
-  principal = new FormControl('');
-  secundario = new FormControl('');
-
-  public coloresForm = new FormGroup({
-    color_p: this.principal,
-    color_s: this.secundario
-  });
-
   idEmpleado: number;
   empleado: any = [];
   p_color: any;
   s_color: any;
   frase: any;
 
-  verColores: boolean = false;
   verFrase: boolean = false;
 
   /**
@@ -79,7 +69,6 @@ export class ColoresEmpresaComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerLogo();
     this.VerFormularios();
@@ -88,12 +77,8 @@ export class ColoresEmpresaComponent implements OnInit {
 
   // METODO PARA MOSTRAR VENTANA DE COLORES O MARCA DE AGUA
   VerFormularios() {
-    if (this.data.ventana === 'colores') {
-      this.verColores = true;
-    } else {
-      this.verFrase = true;
-      this.ImprimirFrase();
-    }
+    this.verFrase = true;
+    this.ImprimirFrase();
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -112,26 +97,6 @@ export class ColoresEmpresaComponent implements OnInit {
     });
   }
 
-  // METODO DE REGISTRO DE COLORES
-  CambiarColores() {
-    this.habilitarprogress = true;
-    let datos = {
-      color_p: this.p_color,
-      color_s: this.s_color,
-      id: this.data.datos.id,
-      user_name: this.user_name,
-      ip: this.ip
-    }
-    this.rest.ActualizarColores(datos).subscribe(data => {
-      this.toastr.success('Colores de encabezados de reportes registrados.', '', {
-        timeOut: 6000,
-      });
-      this.obtenerColores();
-      this.ventana.close({ actualizar: true });
-      this.habilitarprogress = false;
-    })
-  }
-
   // METODO PARA OBTENER DATOS DE EMPRESA COLORES - MARCA DE AGUA
   empresas: any = [];
   obtenerColores() {
@@ -147,10 +112,10 @@ export class ColoresEmpresaComponent implements OnInit {
   // METODO PARA MOSTRAR INFORMACION DE MARCA DE AGUA
   ImprimirFrase() {
     if (this.data.datos.marca_agua === 'FullTime' || this.data.datos.marca_agua === 'Confidencial') {
-      this.fraseReporte.setValue(this.data.datos.marca_agua)
+      this.fraseReporte.setValue(this.data.datos.marca_agua);
     }
     else if (this.data.datos.marca_agua === '' || this.data.datos.marca_agua === null) {
-      this.fraseReporte.setValue('')
+      this.fraseReporte.setValue('');
     }
     else {
       this.fraseReporte.setValue('Otro');
@@ -230,7 +195,7 @@ export class ColoresEmpresaComponent implements OnInit {
    ** **                                 METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************** **/
 
-   // GENERACION DE REPORTE DE PDF
+  // GENERACION DE REPORTE DE PDF
   GenerarPdf(action = 'open') {
     const documentDefinition = this.getDocumentDefinicion();
 

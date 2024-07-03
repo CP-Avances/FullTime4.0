@@ -425,11 +425,11 @@ export class ListaAppComponent implements OnInit {
 
     this.OmitirDuplicados(departamentos_, cargos_, estado);
 
-    console.log('ver sucursales ', sucursales_)
+    /*console.log('ver sucursales ', sucursales_)
     console.log('ver regimenes ', regimenes_)
     console.log('ver departamentos ', departamentos_)
     console.log('ver cargos ', cargos_)
-    console.log('ver empleados ', empleados_)
+    console.log('ver empleados ', empleados_)*/
   }
 
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS

@@ -110,7 +110,7 @@ class PeriodoVacacionControlador {
             horas_vacaciones = $9, minutos_vacaciones = $10 
         WHERE id = $11
         `, [id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
-                    fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id,]);
+                    fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id]);
                 const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
                 const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
                 const fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
@@ -131,6 +131,7 @@ class PeriodoVacacionControlador {
             }
             catch (error) {
                 // REVERTIR TRANSACCION
+                console.log('error ', error);
                 yield database_1.default.query("ROLLBACK");
                 return res.status(500).jsonp({ message: "Error al actualizar período de vacaciones." });
             }

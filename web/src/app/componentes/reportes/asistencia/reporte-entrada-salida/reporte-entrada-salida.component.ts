@@ -3,8 +3,6 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
-// import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
-// import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import * as moment from 'moment';
 moment.locale('es');
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
@@ -28,12 +26,6 @@ import { ValidacionesService } from '../../../../servicios/validaciones/validaci
   selector: 'app-reporte-entrada-salida',
   templateUrl: './reporte-entrada-salida.component.html',
   styleUrls: ['./reporte-entrada-salida.component.css'],
-  // providers: [
-  //   { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-  //   { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-  //   { provide: MAT_DATE_LOCALE, useValue: 'es' },
-  //   { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-  // ]
 })
 
 export class ReporteEntradaSalidaComponent implements OnInit {
@@ -48,9 +40,6 @@ export class ReporteEntradaSalidaComponent implements OnInit {
   codigo = new FormControl('');
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
-  departamentoF = new FormControl('', [Validators.minLength(2)]);
-  regimenF = new FormControl('', [Validators.minLength(2)]);
-  cargoF = new FormControl('', [Validators.minLength(2)]);
 
   // Datos del Formulario de Periodo
   fechaInicialF = new FormControl('', [Validators.required]);
@@ -61,14 +50,6 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     inicioForm: this.fechaInicialF,
     finalForm: this.fechaFinalF,
   });
-
-  // Datos de filtros de BUSQUEDA
-  filtroCodigo: number;
-  filtroCedula: '';
-  filtroEmpleado = '';
-  filtroDepartamento: '';
-  filtroRegimen: '';
-  filtroCargo: '';
 
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
@@ -364,10 +345,6 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     this.codigo.reset();
     this.cedula.reset();
     this.nombre.reset();
-    this.departamentoF.reset();
-    this.regimenF.reset();
-    this.cargoF.reset();
-    this.filtroEmpleado = '';
   }
 
   // METODO para limpiar campos de fecha

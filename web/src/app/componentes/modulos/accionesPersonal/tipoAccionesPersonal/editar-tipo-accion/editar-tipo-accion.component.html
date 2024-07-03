@@ -1,6 +1,5 @@
 <div id="titulo">
-    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
-    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+    <span>
         MODIFICAR TIPO DE ACCIONES DE PERSONAL
     </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1, '')">highlight_off</mat-icon>
@@ -49,21 +48,15 @@
                     </label>
                     <section>
                         <mat-radio-group aria-label="Select an option" formControlName="tipoForm">
-                            <mat-radio-button ngDefaultControl [(ngModel)]="selec1" [checked]="selec1"
-                                [ngModelOptions]="{standalone: true}" (click)="CambiarEstadosPermisos()"
-                                [value]="selec1">
+                            <mat-radio-button (click)="CambiarEstadosPermisos()" value="permiso">
                                 <label id="textoradiobtn">Permiso</label>
                             </mat-radio-button>
                             <br>
-                            <mat-radio-button ngDefaultControl [(ngModel)]="selec2" [checked]="selec2"
-                                [ngModelOptions]="{standalone: true}" (click)="CambiarEstadosVacaciones()"
-                                [value]="selec2">
+                            <mat-radio-button (click)="CambiarEstadosVacaciones()" value="vacacion">
                                 <label id="textoradiobtn">Vacación</label>
                             </mat-radio-button>
                             <br>
-                            <mat-radio-button ngDefaultControl [(ngModel)]="selec3" [checked]="selec3"
-                                [ngModelOptions]="{standalone: true}" (click)="CambiarEstadosSituacion()"
-                                [value]="selec3">
+                            <mat-radio-button (click)="CambiarEstadosSituacion()" value="propuesta">
                                 <label id="textoradiobtn">Situación propuesta</label>
                             </mat-radio-button>
                         </mat-radio-group>

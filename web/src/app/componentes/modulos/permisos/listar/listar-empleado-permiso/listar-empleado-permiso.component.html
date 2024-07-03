@@ -1,6 +1,6 @@
 <!-- *** VENTANA DE REGISTRO DE APROBACION DE PERMISOS MULTIPLES *** -->
 <div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 15px;" *ngIf="multiple">
-    <app-autorizaciones [data]="datos" [filtroDepa]="filtroDepa"></app-autorizaciones>
+    <app-autorizaciones [data]="datos" [filtroDepa]="Depata.value"></app-autorizaciones>
 </div>
 
 <div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 15px;" *ngIf="lista_permisos">
@@ -18,7 +18,7 @@
             <span class="w-100 bd-highlight">
                 LISTA DE PERMISOS SOLICITADOS POR USUARIO
             </span>
-            <button *ngIf="filtroDepa || filtroUsuario || filtroEstado" class="btn btn-primary"
+            <button *ngIf="Depata.value || Usuario.value || Estado.value" class="btn btn-primary"
                 (click)="limpiarFiltro()" style="float: right; margin-right: 10px;">
                 Limpiar
             </button>
@@ -48,20 +48,20 @@
                         <td></td>
                         <td>
                             <mat-form-field class="input-tables departamento">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroDepa" [formControl]="Depata"
-                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" [formControl]="Depata" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field class="input-tables departamento">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroUsuario" [formControl]="Usuario"
-                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" [formControl]="Usuario" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field class="input-tables departamento">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroEstado" [formControl]="Estado"
-                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" [formControl]="Estado" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td></td>
@@ -75,7 +75,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let e of listaPermisosDeparta | empleDepa: filtroDepa | emplUsuario: filtroUsuario | emplEstado: filtroEstado | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let e of listaPermisosDeparta | empleDepa: Depata.value | emplUsuario: Usuario.value | emplEstado: Estado.value | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionUno.toggle(e) : null" [checked]="selectionUno.isSelected(e)"
@@ -108,26 +108,30 @@
         <mat-paginator id="pagina" [length]="listaPermisosDeparta.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-            <i (click)="generarPdf('download','Permisos solicitados')" id="pdf" class="fas fa-file-pdf" matSuffix
-                matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato PDF.">
-                <p>PDF</p>
-            </i>
-            <i (click)="exportToExcel('Permisos solicitados')" id="excel" class="fas fa-file-excel" matSuffix
-                matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato EXCEL.">
-                <p>XLSL</p>
-            </i>
-            <i (click)="exportToCVS('Permisos solicitados')" id="csv" class="fas fa-file-csv" matSuffix
-                matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato CSV.">
-                <p>CSV</p>
-            </i>
-            <i (click)="exportToXML('Permisos solicitados')" id="xml" class="fas fa-file-code" matSuffix
-                matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato XML.">
-                <p>XML</p>
-            </i>
-        </div>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-            <p> Reporte de permisos solicitados. </p>
+        <!--  ***********************  DESCARGAR REPORTES  ******************************  -->
+        <div>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                <i (click)="generarPdf('download','Permisos solicitados')" id="pdf" class="fas fa-file-pdf" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato PDF.">
+                    <p>PDF</p>
+                </i>
+                <i (click)="exportToExcel('Permisos solicitados')" id="excel" class="fas fa-file-excel" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato EXCEL.">
+                    <p>XLSL</p>
+                </i>
+                <i (click)="exportToCVS('Permisos solicitados')" id="csv" class="fas fa-file-csv" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato CSV.">
+                    <p>CSV</p>
+                </i>
+                <i (click)="exportToXML('Permisos solicitados')" id="xml" class="fas fa-file-code" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato XML.">
+                    <p>XML</p>
+                </i>
+            </div>
+            <div class="d-flex justify-content-end"
+                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                <p> Reporte de permisos solicitados. </p>
+            </div>
         </div>
     </div>
 </div>
@@ -138,7 +142,7 @@
             <span class="w-100 bd-highlight">
                 LISTA DE PERMISOS AUTORIZADOS O NEGADOS
             </span>
-            <button *ngIf="AutorifiltroDepa || AutorifiltroUsuario || AutorifiltroEstado" class="btn btn-primary"
+            <button *ngIf="AutoriDepata.value || AutoriUsuario.value || AutoriEstado.value" class="btn btn-primary"
                 (click)="limpiarFiltroAutorizados()" style="float: right; margin-right: 10px;">
                 Limpiar
             </button>
@@ -160,19 +164,19 @@
                     <tr>
                         <td>
                             <mat-form-field class="input-tables departamento">
-                                <input matInput placeholder="Buscar" [(ngModel)]="AutorifiltroDepa"
+                                <input matInput placeholder="Buscar" 
                                     [formControl]="AutoriDepata" type="text" (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field class="input-tables departamento">
-                                <input matInput placeholder="Buscar" [(ngModel)]="AutorifiltroUsuario"
+                                <input matInput placeholder="Buscar" 
                                     [formControl]="AutoriUsuario" type="text" (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field class="input-tables departamento">
-                                <input matInput placeholder="Buscar" [(ngModel)]="AutorifiltroEstado"
+                                <input matInput placeholder="Buscar" 
                                     [formControl]="AutoriEstado" type="text" (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
@@ -187,7 +191,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let e of listaPermisosAutorizadosFiltrados | empleDepa: AutorifiltroDepa | emplUsuario: AutorifiltroUsuario | emplEstado: AutorifiltroEstado | paginate:tamanio_pagina_autorizado:numero_pagina_autorizado">
+                        *ngFor="let e of listaPermisosAutorizadosFiltrados | empleDepa: AutoriDepata.value | emplUsuario: AutoriUsuario.value | emplEstado: AutoriEstado.value | paginate:tamanio_pagina_autorizado:numero_pagina_autorizado">
                         <td>{{e.depa_nombre}}</td>
                         <td>{{e.fullname}}</td>
                         <td>{{e.estado}}</td>

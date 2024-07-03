@@ -30,8 +30,6 @@ import { MainNavService } from 'src/app/componentes/administracionGeneral/main-n
 
 export class ListarTipoAccionComponent implements OnInit {
 
-  filtroNombre = '';
-
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;

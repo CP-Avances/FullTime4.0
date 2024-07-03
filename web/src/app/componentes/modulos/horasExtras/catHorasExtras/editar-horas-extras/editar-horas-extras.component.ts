@@ -72,8 +72,6 @@ export class EditarHorasExtrasComponent implements OnInit {
   ];
 
   datosHoraExtra: any = [];
-  selec1: boolean = false;
-  selec2: boolean = false;
 
   isLinear = true;
   primeroFormGroup: FormGroup;
@@ -177,13 +175,6 @@ export class EditarHorasExtrasComponent implements OnInit {
         inclAlmuerzoForm: this.datosHoraExtra[0].minutos_comida,
         tipoFuncionForm: this.datosHoraExtra[0].tipo_funcion
       })
-
-      if (this.datosHoraExtra[0].minutos_comida === true) {
-        this.selec1 = true;
-      }
-      else {
-        this.selec2 = true;
-      }
     }, err => {
       const { access, message } = err.error.message;
       if (access === false) {

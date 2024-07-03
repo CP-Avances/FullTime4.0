@@ -1,13 +1,14 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import * as moment from 'moment';
 
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
+import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 
 @Component({
@@ -21,13 +22,15 @@ import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/pe
     { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
   ]
 })
+
 export class EditarPeriodoVacacionesComponent implements OnInit {
+
+  @Input() data: any;
+  @Input() pagina: any;
 
   // Datos del empleado
   empleados: any = [];
   periodoDatos: any = [];
-  selec1 = false;
-  selec2 = false;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -63,14 +66,14 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     private rest: EmpleadoService,
     private restV: PeriodoVacacionesService,
     private toastr: ToastrService,
-    public dialogRef: MatDialogRef<EditarPeriodoVacacionesComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    public componentev: VerEmpleadoComponent,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
+    //console.log('ver data ', this.data)
     this.ObtenerEmpleados(this.data.idEmpleado);
     this.ImprimirDatos();
   }
@@ -100,12 +103,6 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
       minVacacionForm: this.data.datosPeriodo.minutos_vacaciones,
     });
     console.log("estado", this.data.datosPeriodo.estado)
-    if (this.data.datosPeriodo.estado === 1) {
-      this.selec1 = true;
-    }
-    else {
-      this.selec2 = true;
-    }
   }
 
   ValidarDatosPerVacacion(form: any) {
@@ -127,7 +124,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
   ActualizarPerVacacion(form: any) {
     let datosPerVacaciones = {
       id: this.data.datosPeriodo.id,
-      id_empl_contrato: this.data.datosPeriodo.id_empl_contrato,
+      id_empl_contrato: this.data.datosPeriodo.id_empleado_contrato,
       descripcion: form.descripcionForm,
       dia_vacacion: form.diaVacacionForm,
       dia_antiguedad: form.diaAntiguedadForm,
@@ -140,11 +137,12 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     };
+    console.log('ver dara ', datosPerVacaciones)
     this.restV.ActualizarPeriodoV(datosPerVacaciones).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Período de Vacaciones actualizado', {
         timeOut: 6000,
       })
-      this.CerrarVentanaRegistroPerVacaciones();
+      this.CerrarVentana();
     }, error => {
       this.toastr.error('Ups!!! algo salio mal.', 'Período de Vacaciones no fue actualizado', {
         timeOut: 6000,
@@ -156,10 +154,13 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     this.PerVacacionesForm.reset();
   }
 
-  CerrarVentanaRegistroPerVacaciones() {
+  CerrarVentana() {
     this.LimpiarCampos();
-    this.dialogRef.close();
-    //window.location.reload();
+    if (this.pagina === 'ver-empleado') {
+      this.componentev.ObtenerPeriodoVacaciones(this.componentev.formato_fecha);
+      this.componentev.editar_periodo = false;
+      this.componentev.ver_periodo = true;
+    }
   }
 
   ObtenerMensajeErrorNombre() {
@@ -168,23 +169,9 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     }
   }
 
-  IngresarSoloNumeros(evt) {
-    if (window.event) {
-      var keynum = evt.keyCode;
-    }
-    else {
-      keynum = evt.which;
-    }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
-    if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
-      return true;
-    }
-    else {
-      this.toastr.info('No se admite el ingreso de letras', 'Usar solo números', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+  // METODO PARA INGRESAR SOLO NUMEROS
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
   dInicio: any;
@@ -196,7 +183,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     var fecha = new Date(String(moment(this.dInicio)));
     var ingreso = String(moment(fecha, "YYYY/MM/DD").format("YYYY-MM-DD"));
     this.rest.BuscarDatosContrato(this.data.datosPeriodo.id_empl_contrato).subscribe(data => {
-      if (Date.parse(data[0].fec_ingreso.split('T')[0]) <= Date.parse(ingreso)) {
+      if (Date.parse(data[0].fecha_ingreso.split('T')[0]) <= Date.parse(ingreso)) {
         fecha.setMonth(fecha.getMonth() + parseInt(data[0].meses_periodo));
         this.PerVacacionesForm.patchValue({ fechaFinForm: fecha });
       }

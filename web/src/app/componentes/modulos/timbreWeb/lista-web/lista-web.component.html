@@ -578,7 +578,7 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Cargo</mat-label>
-                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_carg_dh.value, 2)"
+                                    <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_carg_dh.value, 2)"
                                         [formControl]="nombre_carg_dh" type="text"
                                         (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
@@ -598,7 +598,7 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Sucursal</mat-label>
-                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_suc_dh.value, 1)"
+                                    <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_suc_dh.value, 1)"
                                         [formControl]="nombre_suc_dh" type="text"
                                         (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
@@ -612,7 +612,7 @@
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
                                     <mat-label>Departamento</mat-label>
-                                    <input matInput placeholder="Buscar" (input)="Filtrar(nombre_dep_dh.value, 3)"
+                                    <input matInput placeholder="Buscar" (input)="Filtrar_DH(nombre_dep_dh.value, 3)"
                                         [formControl]="nombre_dep_dh" type="text"
                                         (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"

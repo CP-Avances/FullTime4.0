@@ -35,14 +35,12 @@ export class ListaHorasExtrasComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
-  horasExtras: any = [];
-  filtroDescripcion = '';
-
   // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
-
+  
+  horasExtras: any = [];
   empleado: any = [];
   idEmpleado: number;
 

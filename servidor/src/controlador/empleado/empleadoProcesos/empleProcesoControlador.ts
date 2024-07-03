@@ -38,7 +38,9 @@ class EmpleadoProcesoControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       res.jsonp({ message: 'Procesos del empleado guardados con éxito' });
+
     } catch (error) {
+      console.log('error ', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       res.status(500).jsonp({ message: 'Error al guardar procesos del empleado.' });

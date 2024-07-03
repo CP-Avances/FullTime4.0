@@ -36,10 +36,6 @@ export class PrincipalProcesoComponent implements OnInit {
   buscarNivel = new FormControl('');
   buscarPadre = new FormControl('', [Validators.minLength(2)]);
 
-  filtroNombre = '';
-  filtroNivel: number;
-  filtroProPadre = '';
-
   procesos: any = [];
   empleado: any = [];
   idEmpleado: number;
@@ -134,8 +130,9 @@ export class PrincipalProcesoComponent implements OnInit {
   // METODO PARA LISTAR PROCESOS
   ObtenerProcesos() {
     this.procesos = [];
-    this.rest.getProcesosRest().subscribe(data => {
+    this.rest.ConsultarProcesos().subscribe(data => {
       this.procesos = data;
+      //console.log('ver datos de procesos ', this.procesos)
     });
   }
 
@@ -149,11 +146,10 @@ export class PrincipalProcesoComponent implements OnInit {
 
   // METODO PARA ABRIR VENTANA EDITAR PROCESO
   AbrirVentanaEditar(datosSeleccionados: any): void {
-    console.log(datosSeleccionados);
+    //console.log(datosSeleccionados);
     this.ventana.open(EditarCatProcesosComponent,
       {
         width: '450px', data: { datosP: datosSeleccionados, lista: true }
-
       }).afterClosed().subscribe(items => {
         this.ObtenerProcesos();
       });
@@ -165,10 +161,7 @@ export class PrincipalProcesoComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip
     };
-
-
-    this.rest.deleteProcesoRest(id_proceso, datos).subscribe((res: any) => {
-
+    this.rest.EliminarProceso(id_proceso, datos).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
@@ -184,7 +177,7 @@ export class PrincipalProcesoComponent implements OnInit {
 
   // FUNCION PARA CONFIRMAR ELIMINAR REGISTROS
   ConfirmarDelete(datos: any) {
-    console.log(datos);
+    //console.log(datos);
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

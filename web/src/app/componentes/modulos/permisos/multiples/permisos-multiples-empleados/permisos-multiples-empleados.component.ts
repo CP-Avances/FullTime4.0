@@ -2,7 +2,6 @@ import { Validators, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
-import { firstValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 
@@ -12,11 +11,11 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 @Component({
   selector: 'app-permisos-multiples-empleados',
@@ -25,8 +24,6 @@ import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones
 })
 
 export class PermisosMultiplesEmpleadosComponent implements OnInit {
-
-  idEmpleadoLogueado: any;
 
   idCargosAcceso: Set<any> = new Set();
   idUsuariosAcceso: Set<any> = new Set();
@@ -44,24 +41,17 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
   seleccion = new FormControl('');
 
   // VARIABLES DE FILTROS DE BUSQUEDA
-  filtroNombreSuc_: string = '';
   get filtroNombreSuc() { return this.restR.filtroNombreSuc }
 
-  filtroNombreCarg_: string = '';
   get filtroNombreCarg() { return this.restR.filtroNombreCarg };
 
-  filtroNombreDep_: string = '';
   get filtroNombreDep() { return this.restR.filtroNombreDep }
 
-  filtroCodigo_: any;
-  filtroCedula_: string = '';
-  filtroNombreEmp_: string = '';
   get filtroNombreEmp() { return this.restR.filtroNombreEmp };
   get filtroCodigo() { return this.restR.filtroCodigo };
   get filtroCedula() { return this.restR.filtroCedula };
 
   // FILTRO REGIMEN
-  filtroNombreReg_: string = '';
   get filtroNombreReg() { return this.restR.filtroNombreReg };
 
   public _booleanOptions: FormCriteriosBusqueda = {
@@ -77,6 +67,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
   public check: checkOptions[];
   habilitado: any;
 
+  idEmpleadoLogueado: any;
   // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
   departamentos: any = [];
   sucursales: any = [];
@@ -154,7 +145,6 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
       this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
       this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
       this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
-
       this.PresentarInformacion();
     }
   }
@@ -840,7 +830,6 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
   MostrarLista() {
     if (this.opcion === 's') {
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
@@ -849,9 +838,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     }
     else if (this.opcion === 'r') {
       this.nombre_reg.reset();
-      this.filtroNombreReg_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
@@ -861,9 +848,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     }
     else if (this.opcion === 'c') {
       this.nombre_carg.reset();
-      this.filtroNombreCarg_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionEmp.clear();
       this.selectionDep.clear();
       this.selectionSuc.clear();
@@ -873,9 +858,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     }
     else if (this.opcion === 'd') {
       this.nombre_dep.reset();
-      this.filtroNombreDep_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionEmp.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
@@ -887,11 +870,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
-      this.filtroCodigo_ = '';
-      this.filtroCedula_ = '';
-      this.filtroNombreEmp_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();

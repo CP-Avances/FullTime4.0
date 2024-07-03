@@ -78,7 +78,6 @@ export class TipoPermisosComponent implements OnInit {
     { valor: 'Sufragio', nombre: 'Sufragio' },
     { valor: 'OTRO', nombre: 'OTRO' },
   ];
-  seleccionarPermiso: string = this.permisos[0].valor;
 
   // FORMULARIOS
   isLinear = true;
@@ -113,7 +112,7 @@ export class TipoPermisosComponent implements OnInit {
     this.primeroFormGroup = this._formBuilder.group({
       nombreForm: [''],
       diasHorasForm: ['', Validators.required],
-      descripcionForm: ['', Validators.required],
+      descripcionForm: ['Seleccionar', Validators.required],
       acceEmpleadoForm: ['', Validators.required],
       numDiaMaximoForm: [''],
       numHoraMaximoForm: [''],

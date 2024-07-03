@@ -38,8 +38,7 @@
                                 <mat-form-field>
                                     <mat-label>Fecha Realización</mat-label>
                                     <input matInput [matDatepicker]="pickerF" placeholder="dd/mm/aaaa"
-                                        [formControl]="fechaF" min="1950-01-31" max="2050-01-31" required
-                                        [disabled]="true">
+                                        [formControl]="fechaF" min="1950-01-31" max="2050-01-31" required>
                                     <mat-datepicker-toggle matSuffix [for]="pickerF" id="i-cursor"
                                         matTooltipPosition="right"
                                         matTooltip="Fecha en la que se realiza el registro de ingreso de acción de personal">
@@ -139,8 +138,7 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field class="contenedor-completo">
                                     <input type="text" placeholder="Empleado" aria-label="Number" matInput
-                                        [formControl]="idEmpleadoF" [matAutocomplete]="auto1"
-                                        [(ngModel)]="seleccionarEmpleados" required>
+                                        [formControl]="idEmpleadoF" [matAutocomplete]="auto1" required>
                                     <mat-autocomplete #auto1="matAutocomplete">
                                         <mat-option *ngFor="let option of filtroNombre | async"
                                             [value]="option.empleado">
@@ -197,7 +195,7 @@
                                 <mat-form-field class="contenedor-completo">
                                     <mat-label class="letra">Ciudad</mat-label>
                                     <input type="text" aria-label="Number" matInput [formControl]="idCiudad"
-                                        [matAutocomplete]="auto4" [(ngModel)]="seleccionarCiudad" required>
+                                        [matAutocomplete]="auto4" required>
                                     <mat-autocomplete #auto4="matAutocomplete">
                                         <mat-option *ngFor="let option of filtroCiudad | async"
                                             [value]="option.descripcion">
@@ -274,10 +272,10 @@
                                 <mat-form-field class="contenedor-completo">
                                     <mat-label class="letra">Número Partida Presupuestaria</mat-label>
                                     <input class="numero" matInput placeholder="13369689656312"
-                                        formControlName="numPartidaForm" required [disabled]="true"
+                                        formControlName="numPartidaForm" required readonly
                                         (keypress)="IngresarSoloNumeros($event)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar número de partida presupuestaria">
+                                        matTooltip="Número de partida presupuestaria empresarial">
                                         help_outline
                                     </mat-icon>
                                 </mat-form-field>
@@ -348,8 +346,7 @@
                                     </mat-form-field>
                                     <mat-form-field class="nombre">
                                         <input type="text" placeholder="Firma Talento Humano" aria-label="Number"
-                                            matInput [formControl]="idEmpleadoHF" [matAutocomplete]="auto2"
-                                            [(ngModel)]="seleccionEmpleadoH" required>
+                                            matInput [formControl]="idEmpleadoHF" [matAutocomplete]="auto2" required>
                                         <mat-autocomplete #auto2="matAutocomplete">
                                             <mat-option *ngFor="let th of filtroNombreH | async" [value]="th.empleado">
                                                 {{th.empleado.toUpperCase()}}
@@ -369,8 +366,7 @@
                                     </mat-form-field>
                                     <mat-form-field class="nombre">
                                         <input type="text" placeholder="Firma Gerente" aria-label="Number" matInput
-                                            [formControl]="idEmpleadoGF" [matAutocomplete]="auto3"
-                                            [(ngModel)]="seleccionEmpleadoG" required>
+                                            [formControl]="idEmpleadoGF" [matAutocomplete]="auto3" required>
                                         <mat-autocomplete #auto3="matAutocomplete">
                                             <mat-option *ngFor="let g of filtroNombreG | async" [value]="g.empleado">
                                                 {{g.empleado.toUpperCase()}}
@@ -391,8 +387,7 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field>
                                     <input type="text" placeholder="Responsable del registro" aria-label="Number"
-                                        matInput [formControl]="idEmpleadoRF" [matAutocomplete]="auto5"
-                                        [(ngModel)]="seleccionarEmpResponsable" required>
+                                        matInput [formControl]="idEmpleadoRF" [matAutocomplete]="auto5" required>
                                     <mat-autocomplete #auto5="matAutocomplete">
                                         <mat-option *ngFor="let option of filtroNombreR | async"
                                             [value]="option.empleado">

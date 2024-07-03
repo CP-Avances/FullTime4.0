@@ -49,9 +49,6 @@ export class HoraExtraRealComponent implements OnInit {
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
   apellido = new FormControl('', [Validators.minLength(2)]);
-  departamentoF = new FormControl('', [Validators.minLength(2)]);
-  regimenF = new FormControl('', [Validators.minLength(2)]);
-  cargoF = new FormControl('', [Validators.minLength(2)]);
 
   fechaInicialF = new FormControl('', [Validators.required]);
   fechaFinalF = new FormControl('', [Validators.required]);
@@ -60,15 +57,6 @@ export class HoraExtraRealComponent implements OnInit {
     inicioForm: this.fechaInicialF,
     finalForm: this.fechaFinalF,
   });
-
-
-  filtroCodigo: number;
-  filtroCedula: '';
-  filtroNombre: '';
-  filtroApellido: '';
-  filtroDepartamento: '';
-  filtroRegimen: '';
-  filtroCargo: '';
 
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
@@ -320,9 +308,6 @@ export class HoraExtraRealComponent implements OnInit {
     this.cedula.reset();
     this.nombre.reset();
     this.apellido.reset();
-    this.departamentoF.reset();
-    this.regimenF.reset();
-    this.cargoF.reset();
   }
 
   LimpiarFechas() {

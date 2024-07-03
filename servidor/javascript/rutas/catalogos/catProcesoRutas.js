@@ -12,7 +12,8 @@ class ProcesoRutas {
         this.configuracion();
     }
     configuracion() {
-        this.router.get('/', verificarToken_1.TokenValidation, catProcesoControlador_1.default.list);
+        // METODO PARA CONSULTAR PROCESOS
+        this.router.get('/', verificarToken_1.TokenValidation, catProcesoControlador_1.default.ListarProcesos);
         this.router.get('/busqueda/:nombre', verificarToken_1.TokenValidation, catProcesoControlador_1.default.getIdByNombre);
         this.router.get('/:id', verificarToken_1.TokenValidation, catProcesoControlador_1.default.getOne);
         this.router.post('/', verificarToken_1.TokenValidation, catProcesoControlador_1.default.create);

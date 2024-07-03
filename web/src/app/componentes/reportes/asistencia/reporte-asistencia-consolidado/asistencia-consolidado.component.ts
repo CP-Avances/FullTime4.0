@@ -39,10 +39,6 @@ export class AsistenciaConsolidadoComponent implements OnInit {
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
 
-  filtroCodigo: number;
-  filtroCedula: '';
-  filtroEmpleado = '';
-
   // ITEMS DE PAGINACION DE LA TABLA
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
@@ -1172,7 +1168,6 @@ export class AsistenciaConsolidadoComponent implements OnInit {
     this.codigo.reset();
     this.cedula.reset();
     this.nombre.reset();
-    this.filtroEmpleado = '';
   }
 
   limpiarCamposRango() {

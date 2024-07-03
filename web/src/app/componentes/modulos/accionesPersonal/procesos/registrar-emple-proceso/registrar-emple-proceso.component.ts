@@ -72,7 +72,7 @@ export class RegistrarEmpleProcesoComponent implements OnInit {
 
   ObtenerProcesos() {
     this.procesos = [];
-    this.restPro.getProcesosRest().subscribe(data => {
+    this.restPro.ConsultarProcesos().subscribe(data => {
       this.procesos = data;
     });
   }

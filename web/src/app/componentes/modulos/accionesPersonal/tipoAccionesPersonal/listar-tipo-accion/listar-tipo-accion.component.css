@@ -1,15 +1,32 @@
-.btn { background-color: rgb(80,87,97); color: white; margin: 5px 10px 5px 10px;} 
+.btn {
+    background-color: rgb(80, 87, 97);
+    color: white;
+    margin: 5px 10px 5px 10px;
+}
 
-mat-form-field {width: 250px; padding: 10px 10px 0px 10px;}
+mat-form-field {
+    width: 250px;
+    padding: 10px 10px 0px 10px;
+}
 
-p { font-size: x-small; }
+p {
+    font-size: x-small;
+}
 
-mat-form-field { padding: 10px 15px 0px 15px;}
+mat-form-field {
+    padding: 10px 15px 0px 15px;
+}
 
-table { width: 100%; font-size: 14px;}
+table {
+    width: 100%;
+    font-size: 12px;
+}
 
-#centrar { padding-top: 10px; text-align: center }
+#centrar {
+    padding-top: 10px;
+    text-align: center
+}
 
-td{
+td {
     vertical-align: middle;
 }

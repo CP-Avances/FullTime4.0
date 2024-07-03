@@ -42,14 +42,9 @@ export class CrearPedidoAccionComponent implements OnInit {
   filtroNombreG: Observable<any[]>;
   filtroNombreR: Observable<any[]>;
   filtroNombre: Observable<any[]>;
-  seleccionarEmpResponsable: any;
-  seleccionarEmpleados: any;
-  seleccionEmpleadoH: any;
-  seleccionEmpleadoG: any;
 
   //FILTRO CIUDAD
   filtroCiudad: Observable<any[]>;
-  seleccionarCiudad: any;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -158,17 +153,16 @@ export class CrearPedidoAccionComponent implements OnInit {
   }
 
   constructor(
-    public restAccion: AccionPersonalService,
+    private asignaciones: AsignacionesService,
     public restProcesos: ProcesoService,
     public restEmpresa: EmpresaService,
-    private restUsuario: UsuarioService,
+    public restAccion: AccionPersonalService,
+    private funciones: MainNavService,
+    private validar: ValidacionesService,
     private toastr: ToastrService,
     public restE: EmpleadoService,
     public restC: CiudadService,
     public router: Router,
-    private funciones: MainNavService,
-    private validar: ValidacionesService,
-    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem("empleado") as string);
     this.departamento = parseInt(localStorage.getItem("departamento") as string);
@@ -208,28 +202,6 @@ export class CrearPedidoAccionComponent implements OnInit {
       // DATOS VACIOS INDICAR LA OPCION OTRO
       this.decretos[this.decretos.length] = { descripcion: "OTRO" };
       this.cargos[this.cargos.length] = { descripcion: "OTRO" };
-
-      // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
-      this.filtroNombre = this.idEmpleadoF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleado(value))
-      );
-      this.filtroNombreH = this.idEmpleadoHF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleado(value))
-      );
-      this.filtroNombreG = this.idEmpleadoGF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleado(value))
-      );
-      this.filtroNombreR = this.idEmpleadoRF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleado(value))
-      );
-      this.filtroCiudad = this.idCiudad.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarCiudad(value))
-      );
     }
   }
 
@@ -237,7 +209,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   private _filtrarEmpleado(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase();
-      return this.empleados.filter((info) =>
+      return this.empleados.filter((info: any) =>
         info.empleado.toUpperCase().includes(filterValue)
       );
     }
@@ -247,7 +219,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   private _filtrarCiudad(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase();
-      return this.ciudades.filter((info) =>
+      return this.ciudades.filter((info: any) =>
         info.descripcion.toUpperCase().includes(filterValue)
       );
     }
@@ -271,7 +243,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   procesos: any = [];
   ObtenerProcesos() {
     this.procesos = [];
-    this.restProcesos.getProcesosRest().subscribe((datos) => {
+    this.restProcesos.ConsultarProcesos().subscribe((datos) => {
       this.procesos = datos;
     });
   }
@@ -366,10 +338,28 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.empleados = [];
     this.restE.BuscarListaEmpleados().subscribe((data) => {
       this.empleados = this.FiltrarEmpleadosAsignados(data);
-      this.seleccionarEmpleados = "";
-      this.seleccionEmpleadoH = "";
-      this.seleccionEmpleadoG = "";
-      this.seleccionarEmpResponsable = "";
+
+      // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
+
+      this.filtroNombre = this.idEmpleadoF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
+
+      this.filtroNombreH = this.idEmpleadoHF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
+
+      this.filtroNombreG = this.idEmpleadoGF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
+
+      this.filtroNombreR = this.idEmpleadoRF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
     });
   }
 
@@ -383,8 +373,11 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.ciudades = [];
     this.restC.ConsultarCiudades().subscribe((data) => {
       this.ciudades = data;
-      this.seleccionarCiudad = "";
-      console.log("ciudades", this.ciudades);
+      //console.log("ciudades", this.ciudades);
+      this.filtroCiudad = this.idCiudad.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarCiudad(value))
+      );
     });
   }
 

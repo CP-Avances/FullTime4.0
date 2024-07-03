@@ -38,7 +38,6 @@ export class JornadaVsHoraExtraMacroComponent implements OnInit {
     fec_final: this.anio_final
   });
 
-  habilitar: boolean = false;
   f_inicio_req: string = '';
   f_final_req: string = '';
 
@@ -120,7 +119,6 @@ export class JornadaVsHoraExtraMacroComponent implements OnInit {
 
         this.f_inicio_req = f_i.toJSON().split('T')[0];
         this.f_final_req = f_f.toJSON().split('T')[0];
-        this.habilitar = true
 
         this.restGraficas.MetricaJornadaHoraExtraMacro(this.f_inicio_req, this.f_final_req).subscribe(res => {
           console.log('#################### Jornada hora extra Macro #######################');
@@ -267,7 +265,6 @@ export class JornadaVsHoraExtraMacroComponent implements OnInit {
 
   limpiarCamposRango() {
     this.fechasConsultaForm.reset();
-    this.habilitar = false;
     this.llamarGraficaOriginal();
   }
 
