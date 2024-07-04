@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 // IMPORTAR SERVICIOS
 import { VacunacionService } from 'src/app/servicios/empleado/empleadoVacunas/vacunacion.service';
 
-import { TipoVacunaComponent } from '../tipo-vacuna/tipo-vacuna.component';
+import { TipoVacunaComponent } from '../../../catalogos/catalogoVacuna/tipo-vacuna/tipo-vacuna.component';
 
 @Component({
   selector: 'app-crear-vacuna',

@@ -32,38 +32,40 @@ export class AsignacionesService {
     const res: any = await firstValueFrom(this.restUsuario.BuscarUsuarioDepartamento(dataEmpleado));
     this.asignacionesAcceso = res;
 
-    const promises = this.asignacionesAcceso.map((asignacion: any) => {
-      if (asignacion.principal) {
-        if (!asignacion.administra && !asignacion.personal) {
-          noPersonal = true;
-          return Promise.resolve(null);
-        } else if (asignacion.administra && !asignacion.personal) {
-          noPersonal = true;
-        } else if (asignacion.personal && !asignacion.administra) {
-          this.idUsuariosAcceso.add(idEmpleado);
-          return Promise.resolve(null);
+    if (this.asignacionesAcceso) {
+      const promises = this.asignacionesAcceso.map((asignacion: any) => {
+        if (asignacion.principal) {
+          if (!asignacion.administra && !asignacion.personal) {
+            noPersonal = true;
+            return Promise.resolve(null);
+          } else if (asignacion.administra && !asignacion.personal) {
+            noPersonal = true;
+          } else if (asignacion.personal && !asignacion.administra) {
+            this.idUsuariosAcceso.add(idEmpleado);
+            return Promise.resolve(null);
+          }
         }
+
+        this.idDepartamentosAcceso.add(asignacion.id_departamento);
+        this.idSucursalesAcceso.add(asignacion.id_sucursal);
+
+        const data = {
+          id_departamento: asignacion.id_departamento
+        }
+        return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
+      });
+
+      const results = await Promise.all(promises);
+
+      const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
+      ids.forEach(id => this.idUsuariosAcceso.add(id));
+
+      if (noPersonal) {
+        this.idUsuariosAcceso.delete(idEmpleado);
       }
 
-      this.idDepartamentosAcceso.add(asignacion.id_departamento);
-      this.idSucursalesAcceso.add(asignacion.id_sucursal);
-
-      const data = {
-        id_departamento: asignacion.id_departamento
-      }
-      return firstValueFrom(this.restUsuario.ObtenerIdUsuariosDepartamento(data));
-    });
-
-    const results = await Promise.all(promises);
-
-    const ids = results.flat().map((res: any) => res?.id).filter(Boolean);
-    ids.forEach(id => this.idUsuariosAcceso.add(id));
-
-    if (noPersonal) {
-      this.idUsuariosAcceso.delete(idEmpleado);
+      this.GuardarEstado();
     }
-
-    this.GuardarEstado();
 
   }
 

@@ -526,7 +526,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   // METODO PARA VER UBICACION EN EL MAPA
   MARKER: any;
   MAP: any;
-  MapGeolocalizar(latitud: number, longitud: number, empleado: string) {
+  MapGeolocalizar(latitud: any, longitud: any, empleado: any) {
     let zoom = 19;
     if (latitud === null || longitud === null) {
       latitud = -0.1918213;
@@ -548,13 +548,13 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.MAP.setView([latitud, longitud], zoom);
     }
 
+    // LIMPIAR MARCADORES EXISTENTES
     if (this.MARKER) {
-      // SI EL MARCADOR YA EXISTE, ACTUALIZA SU POSICION
-      this.MARKER.setLatLng([latitud, longitud]);
-    } else {
-      // CREAR UN NUEVO MARCADOR SI NO EXISTE
-      this.MARKER = L.marker([latitud, longitud]).addTo(this.MAP);
+      this.MAP.removeLayer(this.MARKER);
     }
+
+    // CREAR UN NUEVO MARCADOR Y AGREGARLO AL MAPA
+    this.MARKER = L.marker([latitud, longitud]).addTo(this.MAP);
 
     // ACTUALIZAR EL POPUP DEL MARCADOR
     this.MARKER.bindPopup(empleado).openPopup();
@@ -564,6 +564,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   AbrirUbicacion(nombre: string, apellido: string) {
     this.ventana.open(EmplLeafletComponent, { width: '500px', height: '500px' })
       .afterClosed().subscribe((res: any) => {
+        //console.log('res ', res)
         if (res.message === true) {
           if (res.latlng != undefined) {
             const datos = {
@@ -574,7 +575,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
             }
             this.restEmpleado.ActualizarDomicilio(parseInt(this.idEmpleado), datos).subscribe(respuesta => {
               this.toastr.success(respuesta.message);
-              this.MAP.off();
+              // LIMPIAR MARCADORES EXISTENTES
+              if (this.MARKER) {
+                this.MAP.removeLayer(this.MARKER);
+              }
               this.MapGeolocalizar(res.latlng.lat, res.latlng.lng, nombre + ' ' + apellido);
             }, err => {
               this.toastr.error(err);

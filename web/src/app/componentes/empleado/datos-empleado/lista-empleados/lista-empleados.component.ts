@@ -49,7 +49,7 @@ export class ListaEmpleadosComponent implements OnInit {
   nacionalidades: any = [];
   empleadoD: any = [];
   empleado: any = [];
-  idUsuariosAcceso:   Set<any> = new Set();// VARIABLE DE ALMACENAMIENTO DE IDs DE USUARIOS A LOS QUE TIENE ACCESO EL USURIO QUE INICIO SESION
+  idUsuariosAcceso: Set<any> = new Set();// VARIABLE DE ALMACENAMIENTO DE IDs DE USUARIOS A LOS QUE TIENE ACCESO EL USURIO QUE INICIO SESION
 
   mostarTabla: boolean = false;
   mostrarCrearCarpeta: boolean = false;
@@ -275,7 +275,9 @@ export class ListaEmpleadosComponent implements OnInit {
         data: { opcion: opcion, lista: EmpleadosSeleccionados }
       })
         .afterClosed().subscribe(item => {
+          //console.log('ver item ', item)
           if (item === true) {
+            this.empleado = [];
             this.GetEmpleados();
           };
           this.btnCheckHabilitar = false;
@@ -624,7 +626,7 @@ export class ListaEmpleadosComponent implements OnInit {
       (observacion == 'El teléfono ingresado no es válido') ||
       (observacion == 'La cédula ingresada no es válida') ||
       (observacion == 'Género no es válido') ||
-      (observacion == 'Estado civil no es válido') || 
+      (observacion == 'Estado civil no es válido') ||
       (observacion == 'Verificar ubicación')) {
       return 'rgb(222, 162, 73)';
     }
@@ -956,9 +958,9 @@ export class ListaEmpleadosComponent implements OnInit {
   ConfirmarDeleteMultiple(opcion: number) {
     let seleccion = opcion === 1 ? this.selectionUno.selected : (opcion === 2 || opcion === 3) ? this.selectionDos.selected : [];
     let empleadosSeleccionados = seleccion.filter((obj: any) => obj.id !== this.idEmpleado)
-    .map((obj: any) => ({
-      id: obj.id,
-    }));
+      .map((obj: any) => ({
+        id: obj.id,
+      }));
 
     const datos = {
       empleados: empleadosSeleccionados,
@@ -968,28 +970,28 @@ export class ListaEmpleadosComponent implements OnInit {
 
     // VERIFICAR QUE EXISTAN USUARIOS SELECCIONADOS
     empleadosSeleccionados.length > 0 ? this.ventana.open(MetodosComponent, { width: '450px' })
-    .afterClosed().subscribe((confirmado: Boolean) => {
-      if (confirmado) {
+      .afterClosed().subscribe((confirmado: Boolean) => {
+        if (confirmado) {
 
-        this.rest.EliminarEmpleados(datos).subscribe((res: any) => {
-          if (res.error) {
-            const metodo = res.status === 500 ? 'error' : 'warning';
-            const titulo = res.status === 500 ? 'Ups!!! algo salio mal.' : '';
-            this.toastr[metodo](res.message, titulo, { timeOut: 6000 });
-          } else {
-            this.toastr.success(res.message, '', { timeOut: 6000 });
-          }
-          empleadosSeleccionados = [];
-          this.btnCheckHabilitar = false;
-          this.btnCheckDeshabilitado = false;
-          this.selectionUno.clear();
-          this.selectionDos.clear();
-          this.GetEmpleados();
-        });
-      };
-    }) : this.toastr.info('No ha seleccionado usuarios.', '', {
-      timeOut: 6000,
-    });
+          this.rest.EliminarEmpleados(datos).subscribe((res: any) => {
+            if (res.error) {
+              const metodo = res.status === 500 ? 'error' : 'warning';
+              const titulo = res.status === 500 ? 'Ups!!! algo salio mal.' : '';
+              this.toastr[metodo](res.message, titulo, { timeOut: 6000 });
+            } else {
+              this.toastr.success(res.message, '', { timeOut: 6000 });
+            }
+            empleadosSeleccionados = [];
+            this.btnCheckHabilitar = false;
+            this.btnCheckDeshabilitado = false;
+            this.selectionUno.clear();
+            this.selectionDos.clear();
+            this.GetEmpleados();
+          });
+        };
+      }) : this.toastr.info('No ha seleccionado usuarios.', '', {
+        timeOut: 6000,
+      });
   }
 
 }

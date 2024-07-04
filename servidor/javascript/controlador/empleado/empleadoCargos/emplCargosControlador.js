@@ -76,6 +76,7 @@ class EmpleadoCargosControlador {
                 res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 res.status(500).jsonp({ message: 'Error al guardar el registro.' });

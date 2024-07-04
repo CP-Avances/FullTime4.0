@@ -113,7 +113,7 @@ export class VerEmpresaComponent implements OnInit {
       this.datosEmpresa = datos;
       this.p_color = this.datosEmpresa[0].color_principal;
       this.s_color = this.datosEmpresa[0].color_secundario;
-      console.log('ver datos de colores ', this.p_color, ' - ', this.s_color)
+      //console.log('ver datos de colores ', this.p_color, ' - ', this.s_color)
       this.principal.patchValue(this.p_color);
       this.secundario.patchValue(this.s_color);
       if (this.datosEmpresa[0].establecimiento === null || this.datosEmpresa[0].establecimiento === '' || this.datosEmpresa[0].establecimiento === undefined) {
@@ -304,10 +304,7 @@ export class VerEmpresaComponent implements OnInit {
   // DEFINICION DE PDF CABECERA - PIE DE PAGINA - ESTRUCTURA DE REPORTE
   getDocumentDefinicion() {
     sessionStorage.setItem('Empresas', this.empresas);
-
-    console.log("Empleado Nombre: ", this.empleado[0].nombre);
     return {
-
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
