@@ -25,9 +25,7 @@ class PlanGeneralControlador {
             let mensajeError = '';
             let codigoError = 0;
             const { user_name, ip, plan_general } = req.body;
-            console.log('plan general ', plan_general);
             for (let i = 0; i < plan_general.length; i++) {
-                console.log('i ', i, ' plan_general ', plan_general.length);
                 try {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
@@ -132,13 +130,9 @@ class PlanGeneralControlador {
                         yield database_1.default.query('COMMIT');
                         return res.status(404).jsonp({ message: 'error' });
                     }
-                    database_1.default.query(`
+                    yield database_1.default.query(`
                     DELETE FROM eu_asistencia_general WHERE id = $1
-                    `, [plan.id], (error) => __awaiter(this, void 0, void 0, function* () {
-                        if (error) {
-                            errores = errores + 1;
-                        }
-                    }));
+                    `, [plan.id]);
                     const fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(datosOriginales.fecha_hora_horario.toLocaleString().split(' ')[1]);
                     const fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_hora_horario, 'ddd');
                     const fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_horario, 'ddd');
@@ -161,6 +155,7 @@ class PlanGeneralControlador {
                     // REVERTIR TRANSACCION
                     console.log(error);
                     yield database_1.default.query('ROLLBACK');
+                    errores++;
                     ocurrioError = true;
                     mensajeError = error;
                     codigoError = 500;

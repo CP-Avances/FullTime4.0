@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import e, { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
@@ -137,16 +137,11 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
                     return res.status(404).jsonp({ message: 'error' });
                 }
 
-                pool.query(
+                await pool.query(
                     `
                     DELETE FROM eu_asistencia_general WHERE id = $1
                     `,
-                    [plan.id]
-                    , async (error) => {
-                        if (error) {
-                            errores = errores + 1;
-                        }
-                    });
+                    [plan.id]);
 
                 const fecha_hora_horario1 = await FormatearHora(datosOriginales.fecha_hora_horario.toLocaleString().split(' ')[1]);
                 const fecha_hora_horario = await FormatearFecha2(datosOriginales.fecha_hora_horario, 'ddd');
@@ -174,6 +169,7 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
                 // REVERTIR TRANSACCION
                 console.log(error)
                 await pool.query('ROLLBACK');
+                errores++;
                 ocurrioError = true;
                 mensajeError = error;
                 codigoError = 500;
