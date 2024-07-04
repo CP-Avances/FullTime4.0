@@ -313,8 +313,10 @@ export class RegistrarVacacionesComponent implements OnInit {
     };
     console.log(datosVacaciones);
     this.restV.RegistrarVacaciones(datosVacaciones).subscribe(vacacion => {
-      vacacion.EmpleadosSendNotiEmail.push(this.solInfo);
-      //TODO respuesta vacacion es solo un texto
+      const notificacion: any = [];
+      notificacion.push(this.solInfo);
+      vacacion.EmpleadosSendNotiEmail = notificacion;
+
       this.IngresarAutorizacion(vacacion);
       this.EnviarNotificacion(vacacion);
       this.EnviarCorreoEmpleados(vacacion);

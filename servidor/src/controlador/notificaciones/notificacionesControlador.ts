@@ -134,7 +134,7 @@ class NotificacionTiempoRealControlador {
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'ecm_realtime_notificacion',
         usuario: user_name,
-        accion: 'C',
+        accion: 'I',
         datosOriginales: '',
         datosNuevos: JSON.stringify(notificiacion),
         ip,
@@ -626,13 +626,12 @@ class NotificacionTiempoRealControlador {
         `,
         [create_at, id_empl_envia, id_empl_recive, mensaje, tipo]);
 
-
-      console.log("par visualizar la fecha", create_at);
-
       const [notificiacion] = response.rows;
 
       const fechaHoraN = await FormatearHora(create_at.split(' ')[1])
       const fechaN = await FormatearFecha2(create_at, 'ddd')
+
+      notificiacion.fecha_hora = `${fechaN} ${fechaHoraN}`;
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -640,7 +639,7 @@ class NotificacionTiempoRealControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `id_empleado_envia: ${id_empl_envia}, id_empleado_recibe: ${id_empl_recive}, fecha_hora: ${fechaN + ' ' + fechaHoraN}, descripcion: ${mensaje}, id_timbre: null, visto: null, tipo: ${tipo}`,
+        datosNuevos: JSON.stringify(notificiacion),
         ip,
         observacion: null
       });
@@ -663,7 +662,6 @@ class NotificacionTiempoRealControlador {
         .jsonp({ message: 'Comunicado enviado exitosamente.', respuesta: notificiacion });
     } catch (error) {
       // REVERTIR TRANSACCION
-      console.log(error)
       await pool.query('ROLLBACK');
       return res.status(500)
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
