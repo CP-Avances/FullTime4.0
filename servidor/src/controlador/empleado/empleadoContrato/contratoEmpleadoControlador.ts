@@ -186,15 +186,34 @@ class ContratoEmpleadoControlador {
     // METODO PARA LISTAR CONTRATOS POR ID DE EMPLEADO
     public async BuscarContratoEmpleado(req: Request, res: Response): Promise<any> {
         const { id_empleado } = req.params;
-        const CONTRATO_EMPLEADO_REGIMEN = await pool.query(
+        const CONTRATO_EMPLEADO = await pool.query(
             `
             SELECT ec.id, ec.fecha_ingreso, ec.fecha_salida 
             FROM eu_empleado_contratos AS ec
             WHERE ec.id_empleado = $1 ORDER BY ec.id ASC
             `
             , [id_empleado]);
-        if (CONTRATO_EMPLEADO_REGIMEN.rowCount != 0) {
-            return res.jsonp(CONTRATO_EMPLEADO_REGIMEN.rows)
+        if (CONTRATO_EMPLEADO.rowCount != 0) {
+            return res.jsonp(CONTRATO_EMPLEADO.rows)
+        }
+        else {
+            return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+        }
+    }
+
+    // METODO PARA CONSULTAR CONTRATOS A EXCEPCION DEL QUE SE ESTA EDITANDO
+    public async BuscarContratoEmpleadoEditar(req: Request, res: Response): Promise<any> {
+        const { id_empleado, id_contrato } = req.body;
+        const CONTRATO_EMPLEADO = await pool.query(
+            `
+                SELECT ec.id, ec.fecha_ingreso, ec.fecha_salida 
+                FROM eu_empleado_contratos AS ec
+                WHERE ec.id_empleado = $1 AND NOT ec.id = $2 
+                ORDER BY ec.id ASC
+                `
+            , [id_empleado, id_contrato]);
+        if (CONTRATO_EMPLEADO.rowCount != 0) {
+            return res.jsonp(CONTRATO_EMPLEADO.rows)
         }
         else {
             return res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -613,11 +632,11 @@ class ContratoEmpleadoControlador {
                                 if (moment(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) { } else {
                                     data.observacion = 'Formato de fecha hasta incorrecta (YYYY-MM-DD)';
                                 }
-                             } else {
+                            } else {
                                 data.observacion = 'Formato de fecha desde incorrecta (YYYY-MM-DD)';
                             }
 
-                            
+
                         }
                     } else {
                         data.observacion = 'La cédula ingresada no es válida';
@@ -648,7 +667,7 @@ class ContratoEmpleadoControlador {
                     }
                     if (MODALIDAD_LABORAL == undefined) {
                         data.modalida_la = 'No registrado';
-                        data.observacion = 'Modalida laboral ' + data.observacion;
+                        data.observacion = 'Modalidad laboral ' + data.observacion;
                     }
                     if (FECHA_DESDE == undefined) {
                         data.fecha_desde = 'No registrado';
@@ -679,17 +698,17 @@ class ContratoEmpleadoControlador {
                             } else {
                                 // Verificar si la variable tiene el formato de fecha correcto con moment
                                 if (data.fecha_desde != 'No registrado') {
-                                    if (moment(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) { 
+                                    if (moment(FECHA_DESDE, 'YYYY-MM-DD', true).isValid()) {
                                         // Verificar si la variable tiene el formato de fecha correcto con moment
-                                        if(data.fecha_hasta != 'No registrado') {
-                                            if (moment(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) { 
+                                        if (data.fecha_hasta != 'No registrado') {
+                                            if (moment(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
                                                 if (data.control_vaca != 'No registrado') {
                                                     if (data.control_vaca.toUpperCase() != 'NO' && data.control_vaca.toUpperCase() != 'SI') {
-                                                        data.observacion = 'El control de vacaiones es incorrecto'
-                                                    }else{
+                                                        data.observacion = 'Control de vacaciones es incorrecto'
+                                                    } else {
                                                         if (data.control_asis != 'No registrado') {
                                                             if (data.control_asis.toUpperCase() != 'NO' && data.control_asis.toUpperCase() != 'SI') {
-                                                                data.observacion = 'El control de asistencias es incorrecto'
+                                                                data.observacion = 'Control de asistencia es incorrecto'
                                                             }
                                                         }
                                                     }
@@ -699,9 +718,9 @@ class ContratoEmpleadoControlador {
                                             }
                                         }
                                     } else {
-                                            data.observacion = 'Formato de fecha desde incorrecta (YYYY-MM-DD)';
+                                        data.observacion = 'Formato de fecha desde incorrecta (YYYY-MM-DD)';
                                     }
-                                } 
+                                }
                             }
                         } else {
                             data.observacion = 'La cédula ingresada no es válida';
@@ -808,9 +827,9 @@ class ContratoEmpleadoControlador {
 
             var tiempo = 2000;
             if (listContratos.length > 500 && listContratos.length <= 1000) {
-              tiempo = 4000;
+                tiempo = 4000;
             } else if (listContratos.length > 1000) {
-              tiempo = 7000;
+                tiempo = 7000;
             }
 
             setTimeout(() => {

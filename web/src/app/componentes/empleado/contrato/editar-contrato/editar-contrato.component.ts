@@ -285,7 +285,11 @@ export class EditarContratoComponent implements OnInit {
     this.revisarFecha = [];
     this.duplicado = 0;
     // BUSQUEDA DE CONTRATOS QUE TIENE EL USUARIO
-    this.rest.BuscarContratosEmpleado(this.contrato.id_empleado).subscribe(data => {
+    let editar = {
+      id_empleado: this.contrato.id_empleado,
+      id_contrato: this.contrato.id
+    }
+    this.rest.BuscarContratosEmpleadoEditar(editar).subscribe(data => {
       this.revisarFecha = data;
       var ingreso = String(moment(datos.fec_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
       // COMPARACION DE CADA REGISTRO

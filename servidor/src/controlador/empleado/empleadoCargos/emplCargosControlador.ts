@@ -447,11 +447,11 @@ class EmpleadoCargosControlador {
                   }
 
                 } else {
-                  data.observacion = 'Formato de fecha final incorrecto (YYYY-MM-DD)';
+                  data.observacion = 'Formato de fecha hasta incorrecto (YYYY-MM-DD)';
                 }
 
               } else {
-                data.observacion = 'Formato de fecha inicio incorrecto (YYYY-MM-DD)';
+                data.observacion = 'Formato de fecha desde incorrecto (YYYY-MM-DD)';
               }
               
             }
@@ -481,11 +481,11 @@ class EmpleadoCargosControlador {
           }
           if (FECHA_DESDE == undefined) {
             data.fecha_desde = 'No registrado';
-            data.observacion = 'Fecha inicio ' + data.observacion;
+            data.observacion = 'Fecha desde ' + data.observacion;
           }
           if (FECHA_HASTA == undefined) {
             data.fecha_hasta = 'No registrado';
-            data.observacion = 'Fecha final ' + data.observacion;
+            data.observacion = 'Fecha hasta ' + data.observacion;
           }
           if (SUCURSAL == undefined) {
             data.sucursal = 'No registrado';

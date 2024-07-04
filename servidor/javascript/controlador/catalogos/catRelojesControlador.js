@@ -621,13 +621,13 @@ class RelojesControlador {
                                                                 if (item.numero_serie != ' - ') {
                                                                     var VERIFICAR_SERIE = yield database_1.default.query(`SELECT id FROM ed_relojes WHERE serie = $1`, [item.numero_serie]);
                                                                     if (VERIFICAR_SERIE.rows[0] != undefined && VERIFICAR_SERIE.rows[0] != '') {
-                                                                        item.observacion = 'Número de serie ya existe en la base';
+                                                                        item.observacion = 'Número de serie ya existe en el sistema';
                                                                     }
                                                                 }
                                                                 if (item.direccion_mac != ' - ') {
                                                                     var VERIFICAR_MAC = yield database_1.default.query(`SELECT id FROM ed_relojes WHERE mac = $1`, [item.direccion_mac]);
                                                                     if (VERIFICAR_MAC.rows[0] != undefined && VERIFICAR_MAC.rows[0] != '') {
-                                                                        item.observacion = 'Dirección MAC ya existe en la base';
+                                                                        item.observacion = 'Dirección MAC ya existe en el sistema';
                                                                     }
                                                                 }
                                                             }
