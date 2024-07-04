@@ -39,22 +39,25 @@ class PeriodoVacacionControlador {
                 const { id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, codigo, user_name, ip, } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
-                yield database_1.default.query(`
+                const datosNuevos = yield database_1.default.query(`
           INSERT INTO mv_periodo_vacacion (id_empleado_contrato, descripcion, dia_vacacion,
               dia_antiguedad, estado, fecha_inicio, fecha_final, dia_perdido, horas_vacaciones, minutos_vacaciones, codigo)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *
         `, [id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
                     fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones,
                     codigo,]);
+                const [periodo] = datosNuevos.rows;
                 const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
                 const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
+                periodo.fecha_inicio = fechaInicioN;
+                periodo.fecha_final = fechaFinalN;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: "mv_periodo_vacacion",
                     usuario: user_name,
                     accion: "I",
                     datosOriginales: "",
-                    datosNuevos: `{codigo: ${codigo}, id_empleado_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, minutos_vacaciones: ${min_vacaciones}, estado: ${estado}}`,
+                    datosNuevos: JSON.stringify(periodo),
                     ip,
                     observacion: null,
                 });
@@ -104,24 +107,29 @@ class PeriodoVacacionControlador {
                     yield database_1.default.query("COMMIT");
                     return res.status(404).jsonp({ message: "Error al actualizar período de vacaciones." });
                 }
-                yield database_1.default.query(`
+                const periodoNuevo = yield database_1.default.query(`
         UPDATE mv_periodo_vacacion SET id_empleado_contrato = $1, descripcion = $2, dia_vacacion = $3 ,
             dia_antiguedad = $4, estado = $5, fecha_inicio = $6, fecha_final = $7, dia_perdido = $8, 
             horas_vacaciones = $9, minutos_vacaciones = $10 
-        WHERE id = $11
+        WHERE id = $11 RETURNING *
         `, [id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
                     fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id]);
+                const [datosNuevos] = periodoNuevo.rows;
                 const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
                 const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
                 const fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
                 const fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
+                datosOriginales.fecha_inicio = fechaInicioO;
+                datosOriginales.fecha_final = fechaFinalO;
+                datosNuevos.fecha_inicio = fechaInicioN;
+                datosNuevos.fecha_final = fechaFinalN;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: "mv_periodo_vacacion",
                     usuario: user_name,
                     accion: "U",
-                    datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, descripcion: ${datosOriginales.descripcion}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, dia_vacacion: ${datosOriginales.dia_vacacion}, dia_antiguedad: ${datosOriginales.dia_antiguedad}, dia_perdido: ${datosOriginales.dia_perdido}, horas_vacaciones: ${datosOriginales.horas_vacaciones}, minutos_vacaciones: ${datosOriginales.minutos_vacaciones}, estado: ${datosOriginales.estado}}`,
-                    datosNuevos: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, minutos_vacaciones: ${min_vacaciones}, estado: ${estado}}`,
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(datosNuevos),
                     ip,
                     observacion: null,
                 });
