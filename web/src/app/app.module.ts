@@ -686,6 +686,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     ListaSucursalesComponent,
     VerEmpresaComponent,
     HorariosEmpleadoComponent,
+    ListarVacacionesComponent,
   ],
   exports: [CommonModule, TimbreMultipleComponent],
 

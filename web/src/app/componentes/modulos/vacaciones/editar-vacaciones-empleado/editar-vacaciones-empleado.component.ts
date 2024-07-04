@@ -1,7 +1,7 @@
 import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Inject, Optional } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import * as moment from 'moment';
 
@@ -12,6 +12,7 @@ import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.servi
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 
 import { ListarVacacionesComponent } from 'src/app/componentes/modulos/vacaciones/listar-vacaciones/listar-vacaciones.component';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-editar-vacaciones-empleado',
@@ -70,6 +71,7 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
     public parametro: ParametrosService,
     public validar: ValidacionesService,
     public componentel: ListarVacacionesComponent,
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     var id = localStorage.getItem('empleado') as string
     if (id) {
@@ -80,12 +82,15 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    if (this.data) {
+      this.dato = this.data || this.dato; // Usa `info` o un nombre de propiedad adecuado
+    }
 
     this.formulario.patchValue({
-      fechaIngresoForm: this.dato.info.fec_ingreso,
+      fechaIngresoForm: this.dato.info.fecha_ingreso,
       dialaborableForm: this.dato.info.dia_laborable,
-      fecInicioForm: this.dato.info.fec_inicio,
-      fecFinalForm: this.dato.info.fec_final,
+      fecInicioForm: this.dato.info.fecha_inicio,
+      fecFinalForm: this.dato.info.fecha_final,
       diaLibreForm: this.dato.info.dia_libre,
       calcularForm: true
     });
@@ -298,12 +303,13 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     };
-    console.log(datosVacaciones);
     this.restV.EditarVacacion(this.dato.info.id, datosVacaciones).subscribe(vacaciones => {
       this.toastr.success('Operación exitosa.', 'Vacaciones del Empleado registradas', {
         timeOut: 6000,
       })
-      vacaciones.EmpleadosSendNotiEmail.push(this.solInfo);
+      const notificacion: any = [];
+      notificacion.push(this.solInfo);
+      vacaciones.EmpleadosSendNotiEmail = notificacion;
       this.EnviarCorreoEmpleados(vacaciones);
       this.EnviarNotificacion(vacaciones);
       this.CerrarVentana(2);
@@ -406,8 +412,8 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
   EnviarNotificacion(vacaciones: any) {
 
     // METODO PARA OBTENER NOMBRE DEL DIA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACION
-    let desde = this.validar.FormatearFecha(vacaciones.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(vacaciones.fec_final, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(vacaciones.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(vacaciones.fecha_final, this.formato_fecha, this.validar.dia_completo);
 
     let notificacion = {
       id_send_empl: this.idEmpleadoIngresa,

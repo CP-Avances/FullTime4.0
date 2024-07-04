@@ -2165,9 +2165,9 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         this.vacaciones = res;
         this.vacaciones.forEach((v: any) => {
           // TRATAMIENTO DE FECHAS Y HORAS
-          v.fec_ingreso_ = this.validar.FormatearFecha(v.fec_ingreso, formato_fecha, this.validar.dia_completo);
-          v.fec_inicio_ = this.validar.FormatearFecha(v.fec_inicio, formato_fecha, this.validar.dia_completo);
-          v.fec_final_ = this.validar.FormatearFecha(v.fec_final, formato_fecha, this.validar.dia_completo);
+          v.fecha_ingreso_ = this.validar.FormatearFecha(v.fecha_ingreso, formato_fecha, this.validar.dia_completo);
+          v.fecha_inicio_ = this.validar.FormatearFecha(v.fecha_inicio, formato_fecha, this.validar.dia_completo);
+          v.fecha_final_ = this.validar.FormatearFecha(v.fecha_final, formato_fecha, this.validar.dia_completo);
         })
       });
     });
@@ -2209,9 +2209,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
         width: '900px',
         data: {
           info: v, id_empleado: parseInt(this.idEmpleado),
-          id_contrato: this.datoActual.id_contrato
+          id_contrato: this.datoActual.id_contrato,
         }
       }).afterClosed().subscribe(items => {
+
         this.ObtenerVacaciones(this.formato_fecha);
       });
   }
