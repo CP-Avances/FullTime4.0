@@ -326,8 +326,8 @@ export class ListarRelojesComponent implements OnInit {
     let arrayObservacion = observacion.split(" ");
     if (observacion == 'Registro duplicado (código)' ||
       observacion == 'Registro duplicado (dirección IP)' ||
-      observacion == 'Registro duplicado (numero de serie)' ||
-      observacion == 'Registro duplicado (dirección mac)'
+      observacion == 'Registro duplicado (número de serie)' ||
+      observacion == 'Registro duplicado (dirección MAC)'
     ) {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {

@@ -778,9 +778,9 @@ class RelojesControlador {
                             }else if (item.observacion == '2') {
                                 item.observacion = 'Registro duplicado (dirección IP)'
                             }else if (item.observacion == '3') {
-                                item.observacion = 'Registro duplicado (numero de serie)'
+                                item.observacion = 'Registro duplicado (número de serie)'
                             }else if (item.observacion == '4') {
-                                item.observacion = 'Registro duplicado (dirección mac)'
+                                item.observacion = 'Registro duplicado (dirección MAC)'
                             } 
                         }
 
