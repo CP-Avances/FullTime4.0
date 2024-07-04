@@ -111,12 +111,12 @@ class PlanGeneralControlador {
             // CONTADORES INICIAN EN CERO (0)
             errores = 0;
             const { user_name, ip, id_plan } = req.body;
-            for (var i = 0; i < id_plan.length; i++) {
+            for (const plan of id_plan) {
                 try {
                     // INICIAR TRANSACCION
                     yield database_1.default.query('BEGIN');
                     // CONSULTAR DATOSORIGINALES
-                    const consulta = yield database_1.default.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [id_plan[i].id]);
+                    const consulta = yield database_1.default.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [plan.id]);
                     const [datosOriginales] = consulta.rows;
                     if (!datosOriginales) {
                         yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -126,7 +126,7 @@ class PlanGeneralControlador {
                             datosOriginales: '',
                             datosNuevos: '',
                             ip,
-                            observacion: `Error al eliminar el registro con id ${id_plan[i].id}. Registro no encontrado.`
+                            observacion: `Error al eliminar el registro con id ${plan.id}. Registro no encontrado.`
                         });
                         // FINALIZAR TRANSACCION
                         yield database_1.default.query('COMMIT');
@@ -134,21 +134,22 @@ class PlanGeneralControlador {
                     }
                     database_1.default.query(`
                     DELETE FROM eu_asistencia_general WHERE id = $1
-                    `, [id_plan[i].id], (error) => __awaiter(this, void 0, void 0, function* () {
+                    `, [plan.id], (error) => __awaiter(this, void 0, void 0, function* () {
                         if (error) {
                             errores = errores + 1;
                         }
                     }));
-                    var fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(datosOriginales.fecha_hora_horario.toLocaleString().split(' ')[1]);
-                    var fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_hora_horario, 'ddd');
-                    var fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_horario, 'ddd');
+                    const fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(datosOriginales.fecha_hora_horario.toLocaleString().split(' ')[1]);
+                    const fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_hora_horario, 'ddd');
+                    const fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_horario, 'ddd');
+                    datosOriginales.fecha_horario = fecha_horario;
+                    datosOriginales.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_asistencia_general',
                         usuario: user_name,
                         accion: 'D',
-                        datosOriginales: `id: ${datosOriginales.id}
-                        , codigo: ${datosOriginales.codigo}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${datosOriginales.fecha_hora_timbre}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`,
+                        datosOriginales: JSON.stringify(datosOriginales),
                         datosNuevos: '',
                         ip,
                         observacion: null
