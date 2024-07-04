@@ -111,7 +111,7 @@ export class TimbreAdminComponent implements OnInit {
   // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
   FiltrarEmpleadosAsignados(data: any) {
     return data.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
-}
+  }
 
   // EVENTO PARA MANEJAR LA PAGINACION DE TABLA DE TIMBRES
   ManejarPagina(e: PageEvent) {
@@ -125,11 +125,36 @@ export class TimbreAdminComponent implements OnInit {
     this.restTimbres.ObtenerTimbresEmpleado(id).subscribe(res => {
       this.dataSource = new MatTableDataSource(res.timbres);
       this.timbres = this.dataSource.data;
+      console.log('ver timbres ', this.timbres)
       this.lista = true;
       this.selec_nombre = nombre + ' ' + apellido;
       this.timbres.forEach((data: any) => {
         data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_abreviado);
         data.hora = this.validar.FormatearHora(data.fecha_hora_timbre.split(' ')[1], this.formato_hora);
+        if (data.tecla_funcion === '0') {
+          data.tecla_funcion_ = 'Entrada';
+        }
+        else if (data.tecla_funcion === '1') {
+          data.tecla_funcion_ = 'Salida';
+        }
+        else if (data.tecla_funcion === '2') {
+          data.tecla_funcion_ = 'Inicio alimentación';
+        }
+        else if (data.tecla_funcion === '3') {
+          data.tecla_funcion_ = 'Fin alimentación';
+        }
+        else if (data.tecla_funcion === '4') {
+          data.tecla_funcion_ = 'Inicio permiso';
+        }
+        else if (data.tecla_funcion === '5') {
+          data.tecla_funcion_ = 'Fin permiso';
+        }
+        if (data.tecla_funcion === '7') {
+          data.tecla_funcion_ = 'Timbre libre';
+        }
+        else if (data.tecla_funcion === '99') {
+          data.tecla_funcion_ = 'Desconocido';
+        }
       })
     }, err => {
       this.toastr.info(err.error.message)

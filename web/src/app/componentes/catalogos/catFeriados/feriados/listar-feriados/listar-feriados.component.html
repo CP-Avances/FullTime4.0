@@ -31,14 +31,14 @@
                                 <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                 <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
-                                    style="height: 65px;  padding-top: 25px;"
-                                    matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                    style="height: 65px; padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
                                     Subir plantilla
                                 </label>
                                 <label for="file" matSuffix matTooltipPosition="right"
                                     *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
                                     style="height: 65px;  padding-top: 25px;"
-                                    matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
                                     Subir nueva plantilla
                                 </label>
                             </form>
