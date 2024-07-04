@@ -13,10 +13,8 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
     let codigoError = 0;
 
     const { user_name, ip, plan_general } = req.body;
-    console.log('plan general ', plan_general);
 
     for (let i = 0; i < plan_general.length; i++) {
-        console.log('i ', i, ' plan_general ', plan_general.length);
 
         try {
             // INICIAR TRANSACCION
