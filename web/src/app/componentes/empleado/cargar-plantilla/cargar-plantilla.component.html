@@ -206,8 +206,8 @@
                                     <td [style.color]="stiloTextoCelda(contrato.pais)" style="font-size: 12px;">{{contrato.pais}}</td>
                                     <td [style.color]="stiloTextoCelda(contrato.regimen_la)" style="font-size: 12px;">{{contrato.regimen_la}}</td>
                                     <td [style.color]="stiloTextoCelda(contrato.modalida_la)" style="font-size: 12px;">{{contrato.modalida_la}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.fecha_ingreso)" style="font-size: 12px;">{{contrato.fecha_inicio}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.fecha_salida)" style="font-size: 12px;">{{contrato.fecha_final}}</td>
+                                    <td [style.color]="stiloTextoCelda(contrato.fecha_desde)" style="font-size: 12px;">{{contrato.fecha_desde}}</td>
+                                    <td [style.color]="stiloTextoCelda(contrato.fecha_hasta)" style="font-size: 12px;">{{contrato.fecha_hasta}}</td>
                                     <td [style.color]="stiloTextoCelda(contrato.control_asis)" id="letras" style="font-size: 12px;">{{contrato.control_asis}}</td>
                                     <td [style.color]="stiloTextoCelda(contrato.control_vaca)" id="letras" style="font-size: 12px;">{{contrato.control_vaca}}</td>
                                     
@@ -301,6 +301,7 @@
                                     <th scope="col">Fecha hasta</th>
                                     <th scope="col">Sueldo</th>
                                     <th scope="col">Hora de trabajo</th>
+                                    <th scope="col">Jefe</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -318,10 +319,11 @@
                                     <td [style.color]="stiloTextoCelda(cargo.sucursal)" style="font-size: 12px;">{{cargo.sucursal}}</td>
                                     <td [style.color]="stiloTextoCelda(cargo.departamento)" style="font-size: 12px;">{{cargo.departamento}}</td>
                                     <td [style.color]="stiloTextoCelda(cargo.cargo)" id="letras" style="font-size: 12px;">{{cargo.cargo}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.fecha_inicio)" style="font-size: 12px;">{{cargo.fecha_inicio}}</td>
-                                    <td [style.color]="stiloTextoCelda(cargo.fecha_final)" style="font-size: 12px;">{{cargo.fecha_final}}</td>
+                                    <td [style.color]="stiloTextoCelda(cargo.fecha_desde)" style="font-size: 12px;">{{cargo.fecha_desde}}</td>
+                                    <td [style.color]="stiloTextoCelda(cargo.fecha_hasta)" style="font-size: 12px;">{{cargo.fecha_hasta}}</td>
                                     <td [style.color]="stiloTextoCelda(cargo.sueldo)" style="font-size: 12px;">{{cargo.sueldo}}</td>
                                     <td [style.color]="stiloTextoCelda(cargo.hora_trabaja)" id="letras" style="font-size: 12px;">{{cargo.hora_trabaja}}</td>
+                                    <td [style.color]="stiloTextoCelda(cargo.admini_depa)" id="letras" style="font-size: 12px;">{{cargo.admini_depa}}</td>
                                 </tr>
                             </tbody>
                         </table>

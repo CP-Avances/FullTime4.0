@@ -661,7 +661,7 @@ class RelojesControlador {
                                 if (validEstablecimiento.rows[0].id == validDeparta.rows[0].id_sucursal) {
                                     var validCodigo = await pool.query(
                                         `SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1`
-                                        , [item.codigo.toUpperCase()])
+                                        , [item.codigo.toString().toUpperCase()])
                                     if (validCodigo.rows[0] == undefined || validCodigo.rows[0] == '') {
                                         if (ipv4Regex.test(item.direccion_ip.toString())) {
                                             var validDireccIP = await pool.query(

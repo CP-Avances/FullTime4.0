@@ -346,8 +346,8 @@ export class CargarPlantillaComponent {
     } else if (observacion == 'Registro duplicado (cédula)') {
       return 'rgb(156, 214, 255)';
     } else if (arrayObservacion[0] == 'Formato') {
-      return 'rgb(230, 176, 96)';
-    } else if (observacion == 'Pais ingresado no se encuentra registrado' ||
+      return 'rgb(222, 162, 73)';
+    } else if (observacion == 'País no existe en el sistema' ||
       observacion == 'Régimen Laboral no existe en el sistema' ||
       observacion == 'Modalidad Laboral no existe en el sistema'
     ) {
@@ -356,8 +356,7 @@ export class CargarPlantillaComponent {
       observacion == 'Existe un contrato vigente en esas fechas') {
       return 'rgb(239, 203, 106)';
     } else if (observacion == 'País no corresponde con el Régimen Laboral' ||
-      observacion == 'La fecha de ingreso no puede ser mayor o igual a la fecha salida' ||
-      observacion == 'La fecha de inicio no puede ser mayor o igual a la fecha salida'
+      observacion == 'La fecha de desde no puede ser mayor o igual a la fecha hasta' 
     ) {
       return 'rgb(238, 34, 207)';
     } else if (arrayObservacion[1] + ' ' + arrayObservacion[2] == 'no registrado') {
@@ -366,6 +365,10 @@ export class CargarPlantillaComponent {
       observacion == 'Modalidad laboral no registrado'
     ) {
       return 'rgb(242, 21, 21)';
+    }else if(observacion == 'El control de asistencias es incorrecto' ||
+      'El control de vacaiones es incorrecto'
+    ){
+      return 'rgb(222, 162, 73)';
     } else {
       return 'rgb(242, 21, 21)';
     }

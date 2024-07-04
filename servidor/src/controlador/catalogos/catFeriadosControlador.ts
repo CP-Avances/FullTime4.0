@@ -650,7 +650,7 @@ class FeriadosControlador {
                         }
 
                     } else {
-                        value.observacion = 'La provincia ingresada no existe en el sistema'
+                        value.observacion = 'La provincia no existe en el sistema'
                     }
                 }
 
