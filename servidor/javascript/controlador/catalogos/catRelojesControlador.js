@@ -592,7 +592,7 @@ class RelojesControlador {
                                 var validDeparta = yield database_1.default.query(`SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1`, [item.departamento.toUpperCase()]);
                                 if (validDeparta.rows[0] != undefined && validDeparta.rows[0] != '') {
                                     if (validEstablecimiento.rows[0].id == validDeparta.rows[0].id_sucursal) {
-                                        var validCodigo = yield database_1.default.query(`SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1`, [item.codigo.toUpperCase()]);
+                                        var validCodigo = yield database_1.default.query(`SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1`, [item.codigo.toString().toUpperCase()]);
                                         if (validCodigo.rows[0] == undefined || validCodigo.rows[0] == '') {
                                             if (ipv4Regex.test(item.direccion_ip.toString())) {
                                                 var validDireccIP = yield database_1.default.query(`SELECT * FROM ed_relojes WHERE ip = $1`, [item.direccion_ip]);

@@ -385,7 +385,7 @@ export class ListarFeriadosComponent implements OnInit {
     console.log('lista sucursales correctas: ', this.listFeriadosCorrectos);
     if (this.listFeriadosCorrectos?.length > 0) {
       this.rest.Crear_feriados(this.listFeriadosCorrectos).subscribe(response => {
-        this.toastr.success('Operación exitosa.', 'Plantilla de Discapacidad importada.', {
+        this.toastr.success('Operación exitosa.', 'Plantilla de Feriados importada.', {
           timeOut: 5000,
         });
 
