@@ -38,9 +38,14 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
                 ]
             );
 
+            const [plan] = result.rows;
+
             const fecha_hora_horario1 = await FormatearHora(plan_general[i].fec_hora_horario.split(' ')[1]);
             const fecha_hora_horario = await FormatearFecha2(plan_general[i].fec_hora_horario, 'ddd');
             const fecha_horario = await FormatearFecha2(plan_general[i].fec_horario, 'ddd');
+
+            plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
+            plan.fecha_horario = fecha_horario;
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -48,22 +53,7 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, 
-                tolerancia: ${plan_general[i].tolerancia}, 
-                estado_timbre: ${plan_general[i].estado_timbre}, 
-                id_detalle_horario: ${plan_general[i].id_det_horario}, 
-                fecha_horario: ${fecha_horario}, 
-                id_empleado_cargo: ${plan_general[i].id_empl_cargo}, 
-                tipo_accion: ${plan_general[i].tipo_entr_salida}, 
-                codigo: ${plan_general[i].codigo}, 
-                id_horario: ${plan_general[i].id_horario}, 
-                tipo_dia: ${plan_general[i].tipo_dia}, 
-                salida_otro_dia: ${plan_general[i].salida_otro_dia}, 
-                minutos_antes: ${plan_general[i].min_antes}, 
-                minutos_despues: ${plan_general[i].min_despues}, 
-                estado_origen: ${plan_general[i].estado_origen}, 
-                minutos_alimentacion: ${plan_general[i].min_alimentacion}
-                }`,
+                datosNuevos: JSON.stringify(plan),
                 ip,
                 observacion: null
             });
