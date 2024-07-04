@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import e, { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
@@ -13,10 +13,8 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
     let codigoError = 0;
 
     const { user_name, ip, plan_general } = req.body;
-    console.log('plan general ', plan_general);
 
     for (let i = 0; i < plan_general.length; i++) {
-        console.log('i ', i, ' plan_general ', plan_general.length);
 
         try {
             // INICIAR TRANSACCION
@@ -38,9 +36,14 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
                 ]
             );
 
+            const [plan] = result.rows;
+
             const fecha_hora_horario1 = await FormatearHora(plan_general[i].fec_hora_horario.split(' ')[1]);
             const fecha_hora_horario = await FormatearFecha2(plan_general[i].fec_hora_horario, 'ddd');
             const fecha_horario = await FormatearFecha2(plan_general[i].fec_horario, 'ddd');
+
+            plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
+            plan.fecha_horario = fecha_horario;
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -48,22 +51,7 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, 
-                tolerancia: ${plan_general[i].tolerancia}, 
-                estado_timbre: ${plan_general[i].estado_timbre}, 
-                id_detalle_horario: ${plan_general[i].id_det_horario}, 
-                fecha_horario: ${fecha_horario}, 
-                id_empleado_cargo: ${plan_general[i].id_empl_cargo}, 
-                tipo_accion: ${plan_general[i].tipo_entr_salida}, 
-                codigo: ${plan_general[i].codigo}, 
-                id_horario: ${plan_general[i].id_horario}, 
-                tipo_dia: ${plan_general[i].tipo_dia}, 
-                salida_otro_dia: ${plan_general[i].salida_otro_dia}, 
-                minutos_antes: ${plan_general[i].min_antes}, 
-                minutos_despues: ${plan_general[i].min_despues}, 
-                estado_origen: ${plan_general[i].estado_origen}, 
-                minutos_alimentacion: ${plan_general[i].min_alimentacion}
-                }`,
+                datosNuevos: JSON.stringify(plan),
                 ip,
                 observacion: null
             });
@@ -123,14 +111,14 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
 
         const { user_name, ip, id_plan } = req.body;
 
-        for (var i = 0; i < id_plan.length; i++) {
+        for (const plan of id_plan) {
 
             try {
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
 
                 // CONSULTAR DATOSORIGINALES
-                const consulta = await pool.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [id_plan[i].id]);
+                const consulta = await pool.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [plan.id]);
                 const [datosOriginales] = consulta.rows;
 
                 if (!datosOriginales) {
@@ -141,7 +129,7 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al eliminar el registro con id ${id_plan[i].id}. Registro no encontrado.`
+                        observacion: `Error al eliminar el registro con id ${plan.id}. Registro no encontrado.`
                     });
 
                     // FINALIZAR TRANSACCION
@@ -149,32 +137,25 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
                     return res.status(404).jsonp({ message: 'error' });
                 }
 
-                pool.query(
+                await pool.query(
                     `
                     DELETE FROM eu_asistencia_general WHERE id = $1
                     `,
-                    [id_plan[i].id]
-                    , async (error) => {
+                    [plan.id]);
 
+                const fecha_hora_horario1 = await FormatearHora(datosOriginales.fecha_hora_horario.toLocaleString().split(' ')[1]);
+                const fecha_hora_horario = await FormatearFecha2(datosOriginales.fecha_hora_horario, 'ddd');
+                const fecha_horario = await FormatearFecha2(datosOriginales.fecha_horario, 'ddd');
 
-
-
-                        if (error) {
-                            errores = errores + 1;
-                        }
-                    });
-
-                var fecha_hora_horario1 = await FormatearHora(datosOriginales.fecha_hora_horario.toLocaleString().split(' ')[1])
-                var fecha_hora_horario = await FormatearFecha2(datosOriginales.fecha_hora_horario, 'ddd')
-                var fecha_horario = await FormatearFecha2(datosOriginales.fecha_horario, 'ddd')
+                datosOriginales.fecha_horario = fecha_horario;
+                datosOriginales.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
 
                 // AUDITORIA
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                     tabla: 'eu_asistencia_general',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: `id: ${datosOriginales.id}
-                        , codigo: ${datosOriginales.codigo}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${datosOriginales.fecha_hora_timbre}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`,
+                    datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
                     ip,
                     observacion: null
@@ -184,15 +165,11 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
 
-
-
-
-
-
             } catch (error) {
                 // REVERTIR TRANSACCION
                 console.log(error)
                 await pool.query('ROLLBACK');
+                errores++;
                 ocurrioError = true;
                 mensajeError = error;
                 codigoError = 500;

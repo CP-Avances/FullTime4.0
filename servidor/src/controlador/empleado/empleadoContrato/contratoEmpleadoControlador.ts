@@ -302,7 +302,6 @@ class ContratoEmpleadoControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: `{id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, id_regimen: ${datosOriginales.id_regimen}, id_modalidad_laboral: ${datosOriginales.id_modalidad_laboral}, fecha_ingreso: ${fechaIngresoO}, fecha_salida: ${fechaSalidaO}, controlar_vacacion: ${datosOriginales.controlar_vacacion}, controlar_asistencia: ${datosOriginales.controlar_asistencia}, documento: ${datosOriginales.documento}}`,
-
                     datosNuevos: `{id: ${datosOriginales.id}, id_empleado: ${datosOriginales.id_empleado}, id_regimen: ${id_regimen}, id_modalidad_laboral: ${id_tipo_contrato}, fecha_ingreso: ${fechaIngresoN}, fecha_salida: ${fechaSalidaN}, controlar_vacacion: ${vaca_controla}, controlar_asistencia: ${asis_controla}, documento: ${datosOriginales.documento}}`,
                     ip,
                     observacion: null
@@ -335,7 +334,6 @@ class ContratoEmpleadoControlador {
             // CONSULTAR DATOS ORIGINALES
             const contratoConsulta = await pool.query('SELECT * FROM eu_empleado_contratos WHERE id = $1', [id]);
             const [datosOriginales] = contratoConsulta.rows;
-            console.log("ver datos buscados", datosOriginales);
 
             if (!datosOriginales) {
                 // AUDITORIA
@@ -519,7 +517,7 @@ class ContratoEmpleadoControlador {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{descripcion: ${descripcion}}`,
+                datosNuevos: JSON.stringify(contrato),
                 ip,
                 observacion: null
             });
@@ -886,6 +884,7 @@ class ContratoEmpleadoControlador {
 
     }
 
+    // TODO: revisar
     public async CargarPlantilla_contrato(req: Request, res: Response): Promise<void> {
         const plantilla = req.body;
         console.log('datos contrato: ', plantilla);

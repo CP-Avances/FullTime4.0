@@ -374,8 +374,8 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   // METODO PARA ENVIAR NOTIFICACIONES
   EnviarNotificacion(vacaciones: any, estado_v: string) {
     vacaciones.EmpleadosSendNotiEmail.push(this.solInfo);
-    let desde = moment.weekdays(moment(vacaciones.fec_inicio).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacaciones.fec_inicio).day()).slice(1);
-    let hasta = moment.weekdays(moment(vacaciones.fec_final).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacaciones.fec_final).day()).slice(1);
+    let desde = moment.weekdays(moment(vacaciones.fecha_inicio).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacaciones.fec_inicio).day()).slice(1);
+    let hasta = moment.weekdays(moment(vacaciones.fecha_final).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacaciones.fec_final).day()).slice(1);
 
     let notificacion = {
       id_receives_empl: '',

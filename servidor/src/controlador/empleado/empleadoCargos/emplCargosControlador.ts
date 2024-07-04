@@ -42,24 +42,25 @@ class EmpleadoCargosControlador {
       const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo,
         user_name, ip, jefe } = req.body;
 
-      const datosNuevos = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
         INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal,
            sueldo, hora_trabaja, id_tipo_cargo, jefe) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
         `
         , [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe]);
 
-      delete datosNuevos.user_name;
-      delete datosNuevos.ip;
+      const [empleadoCargo] = datosNuevos.rows;
 
-      var fechaIngresoN = await FormatearFecha2(fec_inicio, 'ddd');
-      var fechaSalidaN = await FormatearFecha2(fec_final, 'ddd');
+      const fechaIngresoN = await FormatearFecha2(fec_inicio, 'ddd');
+      const fechaSalidaN = await FormatearFecha2(fec_final, 'ddd');
+
+      empleadoCargo.fecha_inicio = fechaIngresoN;
+      empleadoCargo.fecha_final = fechaSalidaN;
 
 
       // AUDITORIA
@@ -68,7 +69,7 @@ class EmpleadoCargosControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{id_contrato: ${id_empl_contrato}, id_departamento: ${id_departamento}, id_sucursal: ${id_sucursal}, id_tipo_cargo: ${cargo}, fecha_inicio: ${fechaIngresoN}, fecha_final: ${fechaSalidaN}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}}`,
+        datosNuevos: JSON.stringify(empleadoCargo),
         ip,
         observacion: null
       });
@@ -119,27 +120,36 @@ class EmpleadoCargosControlador {
         return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
       }
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
         UPDATE eu_empleado_cargos SET id_departamento = $1, fecha_inicio = $2, fecha_final = $3, id_sucursal = $4, 
           sueldo = $5, hora_trabaja = $6, id_tipo_cargo = $7, jefe = $10  
-        WHERE id_contrato = $8 AND id = $9
+        WHERE id_contrato = $8 AND id = $9 RETURNING *
         `
         , [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo,
           id_empl_contrato, id, jefe]);
+        
+      const [empleadoCargo] = datosNuevos.rows;
 
           
-      var fechaIngresoO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
-      var fechaSalidaO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
-      var fechaIngresoN = await FormatearFecha2(fec_inicio, 'ddd');
-      var fechaSalidaN = await FormatearFecha2(fec_final, 'ddd');
+      const fechaIngresoO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+      const fechaSalidaO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
+      const fechaIngresoN = await FormatearFecha2(fec_inicio, 'ddd');
+      const fechaSalidaN = await FormatearFecha2(fec_final, 'ddd');
+
+      datosOriginales.fecha_inicio = fechaIngresoO;
+      datosOriginales.fecha_final = fechaSalidaO;
+      empleadoCargo.fecha_inicio = fechaIngresoN;
+      empleadoCargo.fecha_final = fechaSalidaN;
+
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eu_empleado_cargos',
         usuario: user_name,
         accion: 'U',
-        datosOriginales: `{id_contrato: ${datosOriginales.id_contrato}, id_departamento: ${datosOriginales.id_departamento}, id_sucursal: ${datosOriginales.id_sucursal}, id_tipo_cargo: ${datosOriginales.id_tipo_cargo}, fecha_inicio: ${fechaIngresoO}, fecha_final: ${fechaSalidaO}, sueldo: ${datosOriginales.sueldo}, hora_trabaja: ${datosOriginales.hora_trabaja}, jefe: ${datosOriginales.jefe}}`,
-        datosNuevos: `{id_contrato: ${id_empl_contrato}, id_departamento: ${id_departamento}, id_sucursal: ${id_sucursal}, id_tipo_cargo: ${cargo}, fecha_inicio: ${fechaIngresoN}, fecha_final: ${fechaSalidaN}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, jefe: ${jefe}}`,
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: JSON.stringify(empleadoCargo),
         ip,
         observacion: null
       });
@@ -351,7 +361,7 @@ class EmpleadoCargosControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{cargo: ${cargo}}`,
+        datosNuevos: JSON.stringify(tipo_cargo),
         ip,
         observacion: null
       });

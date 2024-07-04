@@ -35,18 +35,23 @@ class PeriodoVacacionControlador {
       // INICIAR TRANSACCION
       await pool.query("BEGIN");
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
           INSERT INTO mv_periodo_vacacion (id_empleado_contrato, descripcion, dia_vacacion,
               dia_antiguedad, estado, fecha_inicio, fecha_final, dia_perdido, horas_vacaciones, minutos_vacaciones, codigo)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *
         `,
         [id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
           fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones,
           codigo,]
       );
-      const fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd')
-      const fechaFinalN = await FormatearFecha2(fec_final, 'ddd')
+
+      const [periodo] = datosNuevos.rows;
+      const fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');
+      const fechaFinalN = await FormatearFecha2(fec_final, 'ddd');
+
+      periodo.fecha_inicio = fechaInicioN;
+      periodo.fecha_final = fechaFinalN;
 
 
       // AUDITORIA
@@ -55,7 +60,7 @@ class PeriodoVacacionControlador {
         usuario: user_name,
         accion: "I",
         datosOriginales: "",
-        datosNuevos: `{codigo: ${codigo}, id_empleado_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, minutos_vacaciones: ${min_vacaciones}, estado: ${estado}}`,
+        datosNuevos: JSON.stringify(periodo),
         ip,
         observacion: null,
       });
@@ -116,29 +121,37 @@ class PeriodoVacacionControlador {
         return res.status(404).jsonp({ message: "Error al actualizar período de vacaciones." });
       }
 
-      await pool.query(
+      const periodoNuevo = await pool.query(
         `
         UPDATE mv_periodo_vacacion SET id_empleado_contrato = $1, descripcion = $2, dia_vacacion = $3 ,
             dia_antiguedad = $4, estado = $5, fecha_inicio = $6, fecha_final = $7, dia_perdido = $8, 
             horas_vacaciones = $9, minutos_vacaciones = $10 
-        WHERE id = $11
+        WHERE id = $11 RETURNING *
         `
         ,
         [id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
           fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id]
-      );
-      const fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd')
-      const fechaFinalN = await FormatearFecha2(fec_final, 'ddd')
-      const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd')
-      const fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd')
+        );
+
+      const [datosNuevos] = periodoNuevo.rows;
+      const fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');
+      const fechaFinalN = await FormatearFecha2(fec_final, 'ddd');
+      const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+      const fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
+
+      datosOriginales.fecha_inicio = fechaInicioO;
+      datosOriginales.fecha_final = fechaFinalO;
+      datosNuevos.fecha_inicio = fechaInicioN;
+      datosNuevos.fecha_final = fechaFinalN;
+
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: "mv_periodo_vacacion",
         usuario: user_name,
         accion: "U",
-        datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, descripcion: ${datosOriginales.descripcion}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, dia_vacacion: ${datosOriginales.dia_vacacion}, dia_antiguedad: ${datosOriginales.dia_antiguedad}, dia_perdido: ${datosOriginales.dia_perdido}, horas_vacaciones: ${datosOriginales.horas_vacaciones}, minutos_vacaciones: ${datosOriginales.minutos_vacaciones}, estado: ${datosOriginales.estado}}`,
-        datosNuevos: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${id_empl_contrato}, descripcion: ${descripcion}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, dia_vacacion: ${dia_vacacion}, dia_antiguedad: ${dia_antiguedad}, dia_perdido: ${dia_perdido}, horas_vacaciones: ${horas_vacaciones}, minutos_vacaciones: ${min_vacaciones}, estado: ${estado}}`,
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: JSON.stringify(datosNuevos),
         ip,
         observacion: null,
       });
@@ -153,9 +166,6 @@ class PeriodoVacacionControlador {
       return res.status(500).jsonp({ message: "Error al actualizar período de vacaciones." });
     }
   }
-
-
-
 
 }
 

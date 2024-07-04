@@ -119,7 +119,7 @@ class NotificacionTiempoRealControlador {
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ecm_realtime_notificacion',
                     usuario: user_name,
-                    accion: 'C',
+                    accion: 'I',
                     datosOriginales: '',
                     datosNuevos: JSON.stringify(notificiacion),
                     ip,
@@ -544,17 +544,17 @@ class NotificacionTiempoRealControlador {
         INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
         VALUES($1, $2, $3, $4, $5) RETURNING *
         `, [create_at, id_empl_envia, id_empl_recive, mensaje, tipo]);
-                console.log("par visualizar la fecha", create_at);
                 const [notificiacion] = response.rows;
                 const fechaHoraN = yield (0, settingsMail_1.FormatearHora)(create_at.split(' ')[1]);
                 const fechaN = yield (0, settingsMail_1.FormatearFecha2)(create_at, 'ddd');
+                notificiacion.fecha_hora = `${fechaN} ${fechaHoraN}`;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ecm_realtime_timbres',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `id_empleado_envia: ${id_empl_envia}, id_empleado_recibe: ${id_empl_recive}, fecha_hora: ${fechaN + ' ' + fechaHoraN}, descripcion: ${mensaje}, id_timbre: null, visto: null, tipo: ${tipo}`,
+                    datosNuevos: JSON.stringify(notificiacion),
                     ip,
                     observacion: null
                 });
@@ -572,7 +572,6 @@ class NotificacionTiempoRealControlador {
             }
             catch (error) {
                 // REVERTIR TRANSACCION
-                console.log(error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500)
                     .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
