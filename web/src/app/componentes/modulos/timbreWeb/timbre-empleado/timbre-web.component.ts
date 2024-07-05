@@ -131,6 +131,30 @@ export class TimbreWebComponent implements OnInit {
         //console.log('ver data ', data)
         data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, formato_fecha, this.validar.dia_abreviado);
         data.hora = this.validar.FormatearHora(data.fecha_hora_timbre.split(' ')[1], formato_hora);
+        if (data.tecla_funcion === '0') {
+          data.tecla_funcion_ = 'Entrada';
+        }
+        else if (data.tecla_funcion === '1') {
+          data.tecla_funcion_ = 'Salida';
+        }
+        else if (data.tecla_funcion === '2') {
+          data.tecla_funcion_ = 'Inicio alimentación';
+        }
+        else if (data.tecla_funcion === '3') {
+          data.tecla_funcion_ = 'Fin alimentación';
+        }
+        else if (data.tecla_funcion === '4') {
+          data.tecla_funcion_ = 'Inicio permiso';
+        }
+        else if (data.tecla_funcion === '5') {
+          data.tecla_funcion_ = 'Fin permiso';
+        }
+        if (data.tecla_funcion === '7') {
+          data.tecla_funcion_ = 'Timbre libre';
+        }
+        else if (data.tecla_funcion === '99') {
+          data.tecla_funcion_ = 'Desconocido';
+        }
       })
     }, err => {
       console.log('err ', err)
