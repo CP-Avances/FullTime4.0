@@ -7,6 +7,7 @@ moment.locale('es');
 
 import { LoginService } from '../../../servicios/login/login.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 @Component({
   selector: 'app-login',
@@ -45,7 +46,9 @@ export class LoginComponent implements OnInit {
     public restU: UsuarioService,
     private router: Router,
     private route: ActivatedRoute,
-    private toastr: ToastrService) {
+    private toastr: ToastrService,
+    private asignacionesService: AsignacionesService,
+  ) {
     this.formulario.setValue({
       usuarioF: '',
       passwordF: '',
@@ -220,7 +223,6 @@ export class LoginComponent implements OnInit {
             timeOut: 6000,
           })
         }
-        this.IngresoSistema(form.usuarioF, 'Fallido', datos.text);
       }
       
       else if (datos.message === 'error_') {
@@ -267,6 +269,8 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('bool_timbres', datos.acciones_timbres);
         localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
 
+        this.asignacionesService.ObtenerAsignacionesUsuario(datos.empleado);
+
         this.toastr.success('Ingreso Existoso! ' + datos.usuario + ' ' + datos.ip_adress, 'Usuario y contraseña válidos', {
           timeOut: 6000,
         });
@@ -278,44 +282,7 @@ export class LoginComponent implements OnInit {
           localStorage.removeItem("redireccionar");
         } else {
           this.router.navigate(['/home']);
-          /*
-          //inicio recarga pagina al inicio, recarga valores iniciales por defecto
-          const paginaRecargada = sessionStorage.getItem('paginaRecargada');
-          if (!paginaRecargada) {
-            sessionStorage.setItem('paginaRecargada', 'true');
-            location.reload();
-          }
-          //fin recarga pagina al inicio, recarga valores iniciales por defecto
-          */
         };
-        //REDIRECCIONAMIENTO A /home Y RECARGA TRAS LOGIN
-        /*
-        if (datos.rol === 1) { // ADMIN
-          console.log('ver redireccionar ', localStorage.getItem("redireccionar"));
-          if (!!localStorage.getItem("redireccionar")) {
-            let redi = localStorage.getItem("redireccionar");
-            this.router.navigate([redi], { relativeTo: this.route, skipLocationChange: false });
-            localStorage.removeItem("redireccionar");
-          } else {
-            this.router.navigate(['/home'])
-          };
-        }else{
-          // EMPLEADO
-          this.router.navigate(['/home']);
-          //this.router.navigate(['/estadisticas']);
-        }
-        */
-        //this.IngresoSistema(form.usuarioF, 'Exitoso', datos.ip_adress);
-
-        /*
-        //inicio recarga pagina al inicio, recarga valores iniciales por defecto
-        const paginaRecargada = sessionStorage.getItem('paginaRecargada');
-        if (!paginaRecargada) {
-          sessionStorage.setItem('paginaRecargada', 'true');
-          location.reload();
-        }
-        //fin recarga pagina al inicio, recarga valores iniciales por defecto
-        */
       }
     }, err => {
       if (err.error.message === 'sin_permiso_acceso') {
@@ -326,23 +293,6 @@ export class LoginComponent implements OnInit {
         this.toastr.error(err.error.message);
       }
     })
-  }
-
-  // METODO PARA AUDITAR INICIOS DE SESION
-  IngresoSistema(user: any, acceso: string, dir_ip: any) {
-    var f = moment();
-    var fecha = f.format('YYYY-MM-DD');
-    var time = f.format('HH:mm:ss');
-    let dataAcceso = {
-      ip_address: dir_ip,
-      user_name: user,
-      modulo: 'login',
-      acceso: acceso,
-      fecha: fecha,
-      hora: time,
-    }
-    //TODO YA NO FORMA PARTE DEL SISTEMA
-    //this.restU.CrearAccesosSistema(dataAcceso).subscribe(datos => { })
   }
 
 }

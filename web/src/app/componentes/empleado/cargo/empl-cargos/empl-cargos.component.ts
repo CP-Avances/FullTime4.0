@@ -5,12 +5,13 @@ import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
+import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
 
 @Component({
   selector: 'app-empl-cargos',
@@ -22,13 +23,20 @@ export class EmplCargosComponent implements OnInit {
 
   habilitarCargo: boolean = false;
   idEmpleado: string;
-  ver_jefe: boolean = false;
+
+  idSucursalesAcceso: any = [];
+  idDepartamentosAcceso: any = [];
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS
   departamento: any = [];
   sucursales: any = [];
   tipoCargo: any = [];
   empresas: any = [];
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+  rol: string;
 
   // VARIABLES DE FORMULARIO
   idEmpleContrato = new FormControl('', [Validators.required]);
@@ -41,6 +49,8 @@ export class EmplCargosComponent implements OnInit {
   cargoF = new FormControl('', [Validators.minLength(3)]);
   tipoF = new FormControl('');
   jefeF = new FormControl(false);
+  administraF = new FormControl(false);
+  personalF = new FormControl(false);
 
   // AGREGAR CAMPOS DE FORMULARIO
   public formulario = new FormGroup({
@@ -53,16 +63,20 @@ export class EmplCargosComponent implements OnInit {
     cargoForm: this.cargoF,
     tipoForm: this.tipoF,
     jefeForm: this.jefeF,
+
+    administraForm: this.administraF,
+    personalForm: this.personalF,
   });
 
   constructor(
     private restCatDepartamento: DepartamentosService,
+    private asignaciones: AsignacionesService,
     private restSucursales: SucursalService,
     private restEmpleado: EmpleadoService,
     private cargos: EmplCargosService,
+    private usuario: UsuarioService,
     private toastr: ToastrService,
     public router: Router,
-    public usuario: UsuarioService,
     public ventana: MatDialogRef<EmplCargosComponent>,
     public validar: ValidacionesService,
     public tipocargo: CatTipoCargosService,
@@ -72,9 +86,13 @@ export class EmplCargosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.datoEmpleado.idRol != 2) {
-      this.ver_jefe = true;
-    }
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+    this.rol = localStorage.getItem('rol') as string;
+
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
+
     this.FiltrarSucursales();
     this.BuscarTiposCargos();
     this.tipoCargo[this.tipoCargo.length] = { cargo: "OTRO" };
@@ -90,11 +108,11 @@ export class EmplCargosComponent implements OnInit {
   }
 
   // METODO DE BUSQUEDA DE ESTABLECIMIENTOS
-  FiltrarSucursales() {
+  async FiltrarSucursales() {
     let idEmpre = parseInt(localStorage.getItem('empresa') as string);
     this.sucursales = [];
     this.restSucursales.BuscarSucursalEmpresa(idEmpre).subscribe(datos => {
-      this.sucursales = datos;
+      this.sucursales = this.rol === '1' ? datos : this.FiltrarSucursalesAsignadas(datos);
     }, error => {
       this.toastr.info('No se han encontrado registros de Sucursales.', '', {
         timeOut: 6000,
@@ -102,17 +120,27 @@ export class EmplCargosComponent implements OnInit {
     })
   }
 
+  // METODO PARA FILTRAR SUCURSALES ASIGNADAS
+  FiltrarSucursalesAsignadas(data: any) {
+    return data.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
+  }
+
   // METODO PARA LISTAR DEPARTAMENTOS
   ObtenerDepartamentos(form: any) {
     this.departamento = [];
     let idSucursal = form.idSucursalForm;
     this.restCatDepartamento.BuscarDepartamentoSucursal(idSucursal).subscribe(datos => {
-      this.departamento = datos;
+      this.departamento = this.rol === '1' ? datos : this.FiltrarDepartamentosAsignados(datos);
     }, error => {
       this.toastr.info('Sucursal no cuenta con departamentos registrados.', '', {
         timeOut: 6000,
       })
     });
+  }
+
+  // METODO PARA FILTRAR DEPARTAMENTOS ASIGNADOS
+  FiltrarDepartamentosAsignados(data: any) {
+    return data.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
   }
 
   // METODO PARA ACTIVAR INGRESO DE CARGO
@@ -177,6 +205,8 @@ export class EmplCargosComponent implements OnInit {
       sueldo: form.sueldoForm,
       cargo: form.tipoForm,
       jefe: form.jefeForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     // FORMATEAR HORAS
     if (cargo.hora_trabaja.split(':').length === 1) {
@@ -224,7 +254,7 @@ export class EmplCargosComponent implements OnInit {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
-      this.BuscarUsuarioSucursal(form);
+      this.BuscarUsuarioDepartamento(form);
       this.CerrarVentana();
     });
   }
@@ -233,7 +263,9 @@ export class EmplCargosComponent implements OnInit {
   IngresarTipoCargo(form: any, datos: any) {
     if (form.cargoForm != '') {
       let tipo_cargo = {
-        cargo: form.cargoForm
+        cargo: form.cargoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.cargos.CrearTipoCargo(tipo_cargo).subscribe(res => {
         datos.cargo = res.id;
@@ -306,43 +338,52 @@ export class EmplCargosComponent implements OnInit {
 
 
   /** *************************************************************************************************** **
-   **                              METODOS TABLA USUARIO - SUCURSAL                                    ** **
+   **                              METODOS TABLA USUARIO - DEPARTAMENTO                                ** **
    ** *************************************************************************************************** **/
 
-  // METODO PARA REGISTRAR TIPO CARGO
-  IngresarUsuarioSucursal(form: any) {
+  // METODO PARA BUSCAR USUARIO - DEPARTAMENTO
+  BuscarUsuarioDepartamento(form: any) {
     let datos = {
       id_empleado: this.idEmpleado,
-      id_sucursal: form.idSucursalForm,
-      principal: true
     }
-    this.usuario.RegistrarUsuarioSucursal(datos).subscribe(res => {
+    this.usuario.BuscarAsignacionUsuarioDepartamento(datos).subscribe(res => {
+      if (res != null) {
+        const id = res[0].id;
+        this.ActualizarUsuarioDepartamento(form, id);
+      }
+      else {
+        this.IngresarUsuarioDepartamento(form);
+      }
     });
   }
 
-  // METODO PARA BUSCAR USUARIO - SUCURSAL
-  BuscarUsuarioSucursal(form: any) {
-    if (this.datoEmpleado.idRol != 2) {
-      let datos = {
-        id_empleado: this.idEmpleado,
-      }
-      this.usuario.BuscarUsuarioSucursalPrincipal(datos).subscribe(res => {
-        if (res[0].id_sucursal != form.idSucursalForm) {
-          this.ActualizarUsuarioSucursal(form);
-        }
-      }, vacio => {
-        this.IngresarUsuarioSucursal(form);
-      });
+  // METODO PARA REGISTRAR USUARIO - DEPARTAMENTO
+  IngresarUsuarioDepartamento(form: any) {
+    let datos = {
+      id_empleado: this.idEmpleado,
+      id_departamento: form.idDeparForm,
+      principal: true,
+      personal: form.personalForm,
+      administra: form.administraForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
+    this.usuario.RegistrarUsuarioDepartamento(datos).subscribe(res => {
+    });
   }
 
-  // METODO PARA ACTUALIZAR USUARIO - SUCURSAL
-  ActualizarUsuarioSucursal(form: any) {
+  // METODO PARA ACTUALIZAR USUARIO - DEPARTAMENTO
+  ActualizarUsuarioDepartamento(form: any, id: number) {
     let datos = {
-      id_sucursal: form.idSucursalForm,
-      id_empleado: this.idEmpleado,
+      id: id,
+      id_departamento: form.idDeparForm,
+      principal: true,
+      personal: form.personalForm,
+      administra: form.administraForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
-    this.usuario.ActualizarUsuarioSucursalPrincipal(datos).subscribe(res => {
+    this.usuario.ActualizarUsuarioDepartamento(datos).subscribe(res => {
     });
   }
 

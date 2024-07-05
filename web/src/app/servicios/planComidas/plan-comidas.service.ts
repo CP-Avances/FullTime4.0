@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -28,15 +27,6 @@ export class PlanComidasService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas/infoComida/estado/expirada`)
   }
 
-  /** BUSCAR JEFES */
-  obtenerJefes(id_departamento: number) {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas/enviar/notificacion/${id_departamento}`)
-  }
-
-  ObtenerUltimaPlanificacion() {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas/fin_registro`)
-  }
-
   ObtenerPlanComidaPorIdEmpleado(id_empleado: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas/infoComida/plan/${id_empleado}`)
   }
@@ -44,13 +34,6 @@ export class PlanComidasService {
   ObtenerPlanComidaPorIdPlan(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas/comida-empleado/plan/${id}`)
   }
-
-
-  ActualizarDatos(datos: any) {
-    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/planComidas`, datos);
-  }
-
-
 
   EncontrarPlanComidaEmpleadoConsumido(datos: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/planComidas/empleado/plan/consumido`, datos);
@@ -74,7 +57,7 @@ export class PlanComidasService {
 
 
 
-  // SERVICIO PARA OBTENER DATOS DE LA TABLA TIPO_COMIDA 
+  // SERVICIO PARA OBTENER DATOS DE LA TABLA TIPO_COMIDA
   CrearTipoComidas(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas/tipo_comida`, datos);
   }
@@ -83,17 +66,10 @@ export class PlanComidasService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas/tipo_comida`)
   }
 
-  ObtenerUltimoTipoComidas() {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas/tipo_comida/ultimo`)
-  }
-
-
-
+  
   ObtenerPlanComidas() {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/planComidas`)
   }
-
-
 
   /** ********************************************************************************************* **
    ** **              METODOS DE MANEJO DE SOLICTUDES DE SERVICIO DE ALIMENTACION                ** **
@@ -112,13 +88,17 @@ export class PlanComidasService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/planComidas/solicitud-comida/estado`, datos);
   }
   // ELIMINAR REGISTRO DE SOLICITUD DE SERVICIO DE ALIMENTACION
-  EliminarSolicitud(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/planComidas/eliminar/sol-comida/${id}`);
+  EliminarSolicitud(id: number, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/planComidas/eliminar/sol-comida/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
 
   /** ********************************************************************************************** **
-   ** **               METODO DE MANEJO DE PLANIFICACIONES DE ALIMENTACION                        ** ** 
+   ** **               METODO DE MANEJO DE PLANIFICACIONES DE ALIMENTACION                        ** **
    ** ********************************************************************************************** **/
 
   // CREAR PLANIIFCACIÓN DE SERVICIO DE ALIMENTACION
@@ -130,16 +110,32 @@ export class PlanComidasService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/planComidas/empleado/solicitud`, datos);
   }
   // ELIMINAR PLANIFICACION DE ALIMENTACION
-  EliminarComidaAprobada(id: number, fecha: any, id_empleado: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/planComidas/eliminar/plan-solicitud/${id}/${fecha}/${id_empleado}`);
+  EliminarComidaAprobada(id: number, fecha: any, id_empleado: number, datos: any) {
+    const {user_name, ip} = datos;
+
+    const data = { user_name, ip,};
+
+    const url = `${(localStorage.getItem('empresaURL') as string)}/planComidas/eliminar/plan-comida/${id}/${fecha}/${id_empleado}`;
+    const httpOtions = {
+      body: data
+    };
+    return this.http.request('delete', url, httpOtions);
   }
   // ELIMINAR REGISTRO DE PLANIFICACION
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/planComidas/eliminar/${id}`);
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/planComidas/eliminar/registro/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
   // ELIMINAR PLANIFICACIÓN DE ALIMENTACIÓN DE UN USUARIO
-  EliminarPlanComida(id: number, id_empleado: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/planComidas/eliminar/plan-comida/${id}/${id_empleado}`);
+  EliminarPlanComida(id: number, id_empleado: number, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/planComidas/eliminar/plan-comida/${id}/${id_empleado}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
   // CREAR PLANIFICACION DE SERVICIO DE ALIMENTACION PARA EMPLEADO
   CrearPlanComidasEmpleado(datos: any) {

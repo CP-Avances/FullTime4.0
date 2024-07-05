@@ -8,7 +8,6 @@ import { ListaEmpleadosComponent } from './componentes/empleado/datos-empleado/l
 import { LoginComponent } from './componentes/iniciarSesion/login/login.component';
 import { HomeComponent } from './componentes/home/home.component';
 import { VerEmpleadoComponent } from './componentes/empleado/ver-empleado/ver-empleado.component';
-import { SeleccionarRolPermisoComponent } from './componentes/catalogos/catRoles/seleccionar-rol-permiso/seleccionar-rol-permiso.component'
 import { ListarRegimenComponent } from './componentes/catalogos/catRegimen/listar-regimen/listar-regimen.component';
 import { RelojesComponent } from './componentes/catalogos/catRelojes/relojes/relojes.component'
 import { PrincipalProcesoComponent } from './componentes/modulos/accionesPersonal/catProcesos/principal-proceso/principal-proceso.component';
@@ -66,6 +65,8 @@ import { ReporteHorasExtrasComponent } from './componentes/reportes/modulos/hora
 import { AlimentosGeneralComponent } from './componentes/reportes/modulos/alimentacion/alimentos-general/alimentos-general.component';
 import { ReporteAtrasosMultiplesComponent } from './componentes/reportes/asistencia/reporte-atrasos-multiples/reporte-atrasos-multiples.component';
 import { ReporteFaltasComponent } from './componentes/reportes/asistencia/reporte-faltas/reporte-faltas.component';
+import { ReporteAuditoriaComponent } from './componentes/reportes/reporte-auditoria/reporte-auditoria.component';
+
 import { ReporteHorasTrabajadasComponent } from './componentes/reportes/asistencia/reporte-horas-trabajadas/reporte-horas-trabajadas.component';
 import { ReporteResumenAsistenciaComponent } from './componentes/reportes/asistencia/reporte-resumen-asistencia/reporte-resumen-asistencia.component';
 import { ReporteTimbresMultiplesComponent } from './componentes/reportes/timbres/reporte-timbres-multiples/reporte-timbres-multiples.component';
@@ -88,7 +89,6 @@ import { VacunaMultipleComponent } from './componentes/reportes/generales/vacuna
 import { AlimentosInvitadosComponent } from './componentes/reportes/modulos/alimentacion/alimentos-invitados/alimentos-invitados.component';
 import { TimbreIncompletoComponent } from './componentes/reportes/timbres/timbre-incompleto/timbre-incompleto.component';
 import { SalidasAntesComponent } from './componentes/reportes/asistencia/salidas-antes/salidas-antes.component';
-import { AuditoriaComponent } from './componentes/reportes/auditoria/auditoria.component';
 import { SolicitudVacacionComponent } from './componentes/reportes/modulos/vacaciones/solicitud-vacacion/solicitud-vacacion.component';
 import { TimbreSistemaComponent } from './componentes/reportes/timbres/timbre-sistema/timbre-sistema.component';
 import { TimbreVirtualComponent } from './componentes/reportes/timbres/timbre-virtual/timbre-virtual.component';
@@ -144,6 +144,9 @@ import { CatModalidaLaboralComponent } from './componentes/catalogos/catalogoMod
 import { CatDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/listar-discapacidad/cat-discapacidad.component';
 import { CatTipoCargosComponent } from './componentes/catalogos/catalogoTipoCargo/listar-tipo-cargo/cat-tipo-cargos.component';
 import { CatVacunasComponent } from './componentes/catalogos/catalogoVacuna/listar-vacuna/cat-vacunas.component';
+import { CommonModule } from '@angular/common';
+
+
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -161,7 +164,7 @@ const routes: Routes = [
   { path: 'calcularHoraExtra', component: CalculoHoraExtraComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
 
   // VISTA DE SUPER ADMINSITRADOR
-  { path: 'administrarSucursales', component: PrincipalSucursalUsuarioComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
+  { path: 'administrarInformacion', component: PrincipalSucursalUsuarioComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
 
 
   { path: 'verEmpleado/:id', component: VerEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
@@ -185,6 +188,7 @@ const routes: Routes = [
   { path: 'horas/extras', component: ReporteHorasPedidasComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
   { path: 'reporte-atrasos-multiples', component: ReporteAtrasosMultiplesComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
   { path: 'reporte-faltas', component: ReporteFaltasComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
+  { path: 'reporte-auditoria', component: ReporteAuditoriaComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
   { path: 'reporte-horas-trabajadas', component: ReporteHorasTrabajadasComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
   { path: 'reporte-resumen-asistencia', component: ReporteResumenAsistenciaComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
   { path: 'reporte-puntualidad', component: ReportePuntualidadComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
@@ -195,8 +199,7 @@ const routes: Routes = [
   { path: 'reporte-planificacion-horaria', component: ReportePlanificacionHorariaComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
   { path: 'salidas-anticipadas', component: SalidasAntesComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
   { path: 'tiempo-alimentacion', component: ReporteTiempoAlimentacionComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
-  { path: 'auditoria', component: AuditoriaComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
-  { path: 'solicitud-vacacion', component: SolicitudVacacionComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
+{ path: 'solicitud-vacacion', component: SolicitudVacacionComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
   { path: 'reporte-timbre-sistema', component: TimbreSistemaComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
   { path: 'reporte-timbre-reloj-virtual', component: TimbreVirtualComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
   { path: 'analisisDatos', component: AnalisisDatosComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
@@ -371,7 +374,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  imports: [RouterModule.forRoot(routes), CommonModule],
+  exports: [RouterModule, CommonModule]
 })
 export class AppRoutingModule { }

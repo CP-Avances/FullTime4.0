@@ -32,20 +32,9 @@ export class ReporteHorasPedidasComponent implements OnInit {
   datosEmpleado: any = [];
 
   // DATOS DEL FÓRMULARIO DE BUSQUEDA
-  departamentoF = new FormControl('', [Validators.minLength(2)]);
-  regimenF = new FormControl('', [Validators.minLength(2)]);
   codigo = new FormControl('');
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
-  cargoF = new FormControl('', [Validators.minLength(2)]);
-
-  // DATOS DE FILTROS DE BUSQUEDA
-  filtroDepartamento: '';
-  filtroEmpleado = '';
-  filtroRegimen: '';
-  filtroCodigo: number;
-  filtroCedula: '';
-  filtroCargo: '';
 
   // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
@@ -130,20 +119,16 @@ export class ReporteHorasPedidasComponent implements OnInit {
     this.codigo.reset();
     this.cedula.reset();
     this.nombre.reset();
-    this.departamentoF.reset();
-    this.regimenF.reset();
-    this.cargoF.reset();
-    this.filtroEmpleado = '';
   }
 
   // METODO PARA INGRESAR SOLO LETRAS
-  IngresarSoloLetras(e) {
-    this.validar.IngresarSoloLetras(e);
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
   }
 
   // METODO PARA INGRESAR SOLO NUMEROS
-  IngresarSoloNumeros(evt) {
-    this.validar.IngresarSoloNumeros(evt);
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
   // METODO PARA OBTENER SOLICITUDES DE HORAS EXTRAS
@@ -343,7 +328,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
             { text: 'APELLIDO', style: 'tableHeader' },
             '', '', '', ''
           ],
-          ...solicitudHoras.map(obj => {
+          ...solicitudHoras.map((obj: any) => {
             this.contarRegistros = this.contarRegistros + 1;
             return [
               { text: this.contarRegistros, style: 'itemsTableD' },
@@ -384,7 +369,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
 
   ExportarExcelSolicitudes(datos) {
     this.contarRegistros = 0;
-    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos.map(obj => {
+    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos.map((obj: any) => {
       this.contarRegistros = this.contarRegistros + 1;
       return {
         N_REGISTROS: this.contarRegistros,
@@ -399,7 +384,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
       }
     }));
     const header = Object.keys(datos[0]); // NOMBRE DE LAS COLUMNAS
-    var wscols : any = [];
+    var wscols: any = [];
     for (var i = 0; i < header.length; i++) {  // NÚMERO DE COLUMNAS AÑADIDAS
       wscols.push({ wpx: 80 })
     }
@@ -488,7 +473,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
             { text: 'APELLIDO', style: 'tableHeader' },
             '', '', '', '', ''
           ],
-          ...horasAutorizadas.map(obj => {
+          ...horasAutorizadas.map((obj: any) => {
             if (obj.estado === 3) {
               obj.estado = 'Autorizado'
             }
@@ -524,7 +509,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
 
   ExportarExcelSolicitudesAutorizadas(datos) {
     this.contarRegistros = 0;
-    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos.map(obj => {
+    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos.map((obj: any) => {
       if (obj.estado === 3) {
         obj.estado = 'Autorizado'
       }
@@ -543,7 +528,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
       }
     }));
     const header = Object.keys(datos[0]); // nombres de las columnas
-    var wscols : any = [];
+    var wscols: any = [];
     for (var i = 0; i < header.length; i++) {  // contar columnas
       wscols.push({ wpx: 80 })
     }
@@ -610,7 +595,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
       // TÍTULOS DEL ARCHIVO PDF Y CONTENIDO GENERAL
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        ...this.datosEmpleado.map(obj => {
+        ...this.datosEmpleado.map((obj: any) => {
           if (obj.id === id_seleccionado) {
             return [
               { text: obj.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, -30, 0, 5] },
@@ -711,7 +696,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
             { text: 'HORA FINAL', style: 'tableHeader' },
             { text: 'HORAS SOLICITADAS', style: 'tableHeader' },
           ],
-          ...this.solicitudes_empleado.map(obj => {
+          ...this.solicitudes_empleado.map((obj: any) => {
             this.contarRegistros = this.contarRegistros + 1;
             return [
               { text: this.contarRegistros, style: 'itemsTableD' },
@@ -771,13 +756,13 @@ export class ReporteHorasPedidasComponent implements OnInit {
 
     const headerE = Object.keys(datosGenerales[0]); // NOMBRE DE LAS COLUMNAS
 
-    var wscolsE : any = [];
+    var wscolsE: any = [];
     for (var i = 0; i < headerE.length; i++) {  // NÚMERO DE COLUMNAS AÑADIDAS
       wscolsE.push({ wpx: 80 })
     }
     wse["!cols"] = wscolsE;
 
-    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.solicitudes_empleado.map(obj => {
+    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.solicitudes_empleado.map((obj: any) => {
       this.contarRegistros = this.contarRegistros + 1;
       return {
         N_REGISTROS: this.contarRegistros,
@@ -790,7 +775,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
       }
     }));
     const header = Object.keys(this.solicitudes_empleado[0]); // NOMBRE DE LAS COLUMNAS
-    var wscols : any = [];
+    var wscols: any = [];
     for (var i = 0; i < header.length; i++) {  // NÚMERO DE COLUMNAS AÑADIDAS
       wscols.push({ wpx: 80 })
     }
@@ -841,7 +826,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
       // TÍTULOS DEL ARCHIVO PDF Y CONTENIDO GENERAL
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        ...this.datosEmpleado.map(obj => {
+        ...this.datosEmpleado.map((obj: any) => {
           if (obj.id === id_seleccionado) {
             return [
               { text: obj.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, -30, 0, 5] },
@@ -943,7 +928,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
             { text: 'ESTADO', style: 'tableHeader' },
             { text: 'HORAS AUTORIZADAS', style: 'tableHeader' },
           ],
-          ...this.solicitudes_empleado.map(obj => {
+          ...this.solicitudes_empleado.map((obj: any) => {
             if (obj.estado === 3) {
               obj.estado = 'Autorizado'
             }
@@ -998,13 +983,13 @@ export class ReporteHorasPedidasComponent implements OnInit {
 
     const headerE = Object.keys(datosGenerales[0]); // columns name
 
-    var wscolsE : any = [];
+    var wscolsE: any = [];
     for (var i = 0; i < headerE.length; i++) {  // columns length added
       wscolsE.push({ wpx: 80 })
     }
     wse["!cols"] = wscolsE;
 
-    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.solicitudes_empleado.map(obj => {
+    const wsa: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.solicitudes_empleado.map((obj: any) => {
       if (obj.estado === 3) {
         obj.estado = 'Autorizado'
       }
@@ -1021,7 +1006,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
       }
     }));
     const header = Object.keys(this.solicitudes_empleado[0]); // NOMBRE DE LAS COLUMNAS
-    var wscols : any = [];
+    var wscols: any = [];
     for (var i = 0; i < header.length; i++) {  // NÚMERO DE COLUMNAS AÑADIDAS
       wscols.push({ wpx: 80 })
     }

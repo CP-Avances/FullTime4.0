@@ -84,30 +84,22 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   Depata: any = new FormControl('');
   Usuario: any = new FormControl('');
   Estado: any = new FormControl('');
-  filtroDepa: any;
-  filtroUsuario: any;
-  filtroEstado: any;
 
   //VARIABLES DE FILTRO DE LA TABLA DE AUTORIZADOS O NEGADOS
   AutoriDepata: any = new FormControl('');
   AutoriUsuario: any = new FormControl('');
   AutoriEstado: any = new FormControl('');
-  AutorifiltroDepa: any;
-  AutorifiltroUsuario: any;
-  AutorifiltroEstado: any;
-
-
 
   idEmpleado: number;
   empleado: any = []; // VARIABLE DE ALMACENAMIENTO DE DATOS DE EMPLEADO
 
-  get habilitarPermiso(): boolean {return this.funciones.permisos;}
+  get habilitarPermiso(): boolean { return this.funciones.permisos; }
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
-  get s_color(): string {return this.plantilla.color_Secundary;}
-  get p_color(): string {return this.plantilla.color_Primary;}
-  get logoE(): string {return this.plantilla.logoBase64;}
-  get frase(): string {return this.plantilla.marca_Agua;}
+  get s_color(): string { return this.plantilla.color_Secundary; }
+  get p_color(): string { return this.plantilla.color_Primary; }
+  get logoE(): string { return this.plantilla.logoBase64; }
+  get frase(): string { return this.plantilla.marca_Agua; }
 
   autorizacion: boolean = false;
   preautorizacion: boolean = false;
@@ -214,7 +206,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     this.restP.obtenerAllPermisos().subscribe(
       (res) => {
         this.permisos = res;
-      
+
         //Filtra la lista de Permisos para descartar las solicitudes del mismo usuario y almacena en una nueva lista
         this.permisos.filter((o) => {
           if (this.idEmpleado !== o.id_emple_solicita) {
@@ -247,64 +239,63 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
           }
 
         });
-     
+
         let i = 0;
         this.listaPermisosFiltradas.filter(item => {
           this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
             (usuaDep) => {
-              i = i+1;
+              i = i + 1;
               this.ArrayAutorizacionTipos.filter(x => {
-                if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
+                if ((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)) {
                   this.gerencia = true;
-                  
-                  if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
+
+                  if (item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)) {
                     this.permilista.push(item);
-                  }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
+                  } else if (item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)) {
                     this.permilista.push(item);
                   }
-                }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
-                  if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true){
+                } else if ((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)) {
+                  if ((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true) {
                     this.permilista.push(item);
-                  }else if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true){
+                  } else if ((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true) {
                     this.permilista.push(item);
                   }
                 }
-                
+
               })
 
               //Filtra la lista de autorizacion para almacenar en un array
-              if(this.listaPermisosFiltradas.length === i){
+              if (this.listaPermisosFiltradas.length === i) {
 
                 //Listado para eliminar el usuario duplicado
                 var ListaSinDuplicadosPendie: any = [];
                 var cont = 0;
-                this.permilista.forEach(function(elemento, indice, array) {
+                this.permilista.forEach(function (elemento, indice, array) {
                   cont = cont + 1;
-                  if(ListaSinDuplicadosPendie.find(p=>p.id == elemento.id) == undefined)
-                  {
+                  if (ListaSinDuplicadosPendie.find(p => p.id == elemento.id) == undefined) {
                     ListaSinDuplicadosPendie.push(elemento);
                   }
                 });
 
-                if(this.permilista.length == cont){
+                if (this.permilista.length == cont) {
                   this.listaPermisosDeparta = [];
                   ListaSinDuplicadosPendie.sort((a, b) => b.id - a.id);
                   this.listaPermisosDeparta = ListaSinDuplicadosPendie;
 
-                  console.log('listaPermisosDeparta: ',this.listaPermisosDeparta)
+                  console.log('listaPermisosDeparta: ', this.listaPermisosDeparta)
 
-                  if(Object.keys(this.listaPermisosDeparta).length == 0) {
+                  if (Object.keys(this.listaPermisosDeparta).length == 0) {
                     this.validarMensaje1 = true;
                   }
-        
-                  if(this.listaPermisosDeparta.length != 0) {
+
+                  if (this.listaPermisosDeparta.length != 0) {
                     this.lista_permisos = true;
                   }
 
 
                 }
               }
-              
+
             }
           );
 
@@ -321,7 +312,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
 
   permisosTotales: any;
   EditarPermiso(id, id_empl) {
-    console.log('id: ',id,' - id_empl: ',id_empl)
+    console.log('id: ', id, ' - id_empl: ', id_empl)
     // METODO PARA IMPRIMIR DATOS DEL PERMISO
     this.permisosTotales = [];
     this.restP.ObtenerUnPermisoEditar(id).subscribe(
@@ -360,30 +351,30 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     this.listafiltro = [];
     this.listafiltro = this.listaPermisosDeparta;
 
-    if(this.filtroDepa != undefined && this.filtroDepa != null && this.filtroDepa != ''){
-      this.listafiltro = new EmplDepaPipe().transform(this.listafiltro, this.filtroDepa);
+    if (this.Depata.value != undefined && this.Depata.value != null && this.Depata.value != '') {
+      this.listafiltro = new EmplDepaPipe().transform(this.listafiltro, this.Depata.value);
     }
-    if(this.filtroUsuario != undefined && this.filtroUsuario != null && this.filtroUsuario != ''){
-      this.listafiltro = new EmplUsuarioPipe().transform(this.listafiltro, this.filtroUsuario);
+    if (this.Usuario.value != undefined && this.Usuario.value != null && this.Usuario.value != '') {
+      this.listafiltro = new EmplUsuarioPipe().transform(this.listafiltro, this.Usuario.value);
     }
-    if(this.filtroEstado != undefined && this.filtroEstado != null && this.filtroEstado != ''){
-      this.listafiltro = new EmplEstadoPipe().transform(this.listafiltro, this.filtroEstado);
+    if (this.Estado.value != undefined && this.Estado.value != null && this.Estado.value != '') {
+      this.listafiltro = new EmplEstadoPipe().transform(this.listafiltro, this.Estado.value);
     }
-    
+
     this.isAllSelected()
       ? this.selectionUno.clear()
       : this.filtrar(this.listafiltro);
   }
 
-  filtrar(listafiltro: any){
+  filtrar(listafiltro: any) {
     this.listaPermisosDeparta = listafiltro;
     this.listaPermisosDeparta.forEach((row: any) => this.selectionUno.select(row));
   }
 
-  limpiarFiltro(){
-    this.filtroDepa = undefined;
-    this.filtroUsuario = undefined;
-    this.filtroEstado = undefined;
+  limpiarFiltro() {
+    this.Depata.reset();
+    this.Usuario.reset()
+    this.Estado.reset();
     this.obtenerPermisos(this.formato_fecha, this.formato_hora);
   }
 
@@ -392,9 +383,8 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     if (!row) {
       return `${this.isAllSelected() ? "select" : "deselect"} all`;
     }
-    return `${this.selectionUno.isSelected(row) ? "deselect" : "select"} row ${
-      row.id + 1
-    }`;
+    return `${this.selectionUno.isSelected(row) ? "deselect" : "select"} row ${row.id + 1
+      }`;
   }
 
   btnCheckHabilitar: boolean = false;
@@ -424,7 +414,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         fecha_inicio: moment(obj.fec_inicio).format('YYYY-MM-DD'),
         fecha_final: moment(obj.fec_final).format('YYYY-MM-DD'),
         codigo: obj.codigo,
-        observacion:'',
+        observacion: '',
         aprobar: '',
       };
     });
@@ -434,7 +424,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   lis: any = [];
   // AUTORIZACIÓN DE PERMISOS
   AbrirAutorizaciones(datos_permiso, forma: string) {
-    if(datos_permiso.length != 0){
+    if (datos_permiso.length != 0) {
       this.multiple = true;
       this.lista_permisos = false;
       this.lista_autorizados = false;
@@ -443,7 +433,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
       var datosPermiso = { datosPermiso: datos_permiso, carga: forma }
       this.datos = datosPermiso;
       this.selectionUno.clear();
-    }else{
+    } else {
       this.toastr.error("No ha seleccionado solicitudes para aprobar");
     }
   }
@@ -469,11 +459,11 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         this.permisosAutorizados = res;
 
         //Filtra la lista de Horas Extras para descartar las solicitudes del mismo usuario y almacena en una nueva lista
-          this.permisosAutorizados.filter((o) => {
-            if (this.idEmpleado !== o.id_emple_solicita) {
-              return this.listaPermisosAutorizadosFiltrados.push(o);
-            }
-          });
+        this.permisosAutorizados.filter((o) => {
+          if (this.idEmpleado !== o.id_emple_solicita) {
+            return this.listaPermisosAutorizadosFiltrados.push(o);
+          }
+        });
 
         this.listaPermisosAutorizadosFiltrados.forEach((p) => {
           // TRATAMIENTO DE FECHAS Y HORAS EN FORMATO DD/MM/YYYYY
@@ -516,10 +506,10 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     );
   }
 
-  limpiarFiltroAutorizados(){
-    this.AutorifiltroDepa = undefined;
-    this.AutorifiltroUsuario = undefined;
-    this.AutorifiltroEstado = undefined;
+  limpiarFiltroAutorizados() {
+    this.AutoriDepata.reset();
+    this.AutoriUsuario.reset();
+    this.AutoriEstado.reset();
     this.ObtenerPermisosAutorizados(this.formato_fecha, this.formato_hora);
   }
 
@@ -666,29 +656,29 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
 
   //Metodo seleccionar que lista de permisos mostrar (solicitados o autorizados)
   mostrarDatosPermisos(opcion: string) {
-      return (opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map((obj) => {
-        return [
-          { text: obj.id, style: "itemsTable" },
-          { text: obj.depa_nombre, style: "itemsTable" },
-          { text: obj.nombre +' '+ obj.apellido, style: "itemsTable" },
-          { text: obj.estado, style: "itemsTable" },
-          { text: obj.nom_permiso, style: "itemsTable" },
-          { text: obj.fec_inicio_, style: "itemsTable" },
-          { text: obj.fec_final_, style: "itemsTable" },
-        ];
-      });
+    return (opcion == "Permisos solicitados" ? this.listaPermisosDeparta : this.listaPermisosAutorizadosFiltrados).map((obj) => {
+      return [
+        { text: obj.id, style: "itemsTable" },
+        { text: obj.depa_nombre, style: "itemsTable" },
+        { text: obj.nombre + ' ' + obj.apellido, style: "itemsTable" },
+        { text: obj.estado, style: "itemsTable" },
+        { text: obj.nom_permiso, style: "itemsTable" },
+        { text: obj.fec_inicio_, style: "itemsTable" },
+        { text: obj.fec_final_, style: "itemsTable" },
+      ];
+    });
   }
 
-   /** ************************************************************************************************* **
-   ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
-   ** ************************************************************************************************* **/
+  /** ************************************************************************************************* **
+  ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
+  ** ************************************************************************************************* **/
 
-   exportToExcel(opcion: string) {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map(obj => {
+  exportToExcel(opcion: string) {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados" ? this.listaPermisosDeparta : this.listaPermisosAutorizadosFiltrados).map((obj: any) => {
       return {
         Permiso: obj.id,
         Departamento: obj.depa_nombre,
-        Nombre: obj.nombre +' '+ obj.apellido,
+        Nombre: obj.nombre + ' ' + obj.apellido,
         Estado: obj.estado,
         Tipo_Permiso: obj.nom_permiso,
         Fecha_Inicial: obj.fec_inicio_,
@@ -708,16 +698,16 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     xlsx.writeFile(wb, `${opcion}EXCEL` + new Date().getTime() + '.xlsx');
   }
 
-   /** ************************************************************************************************** ** 
-   ** **                                     METODO PARA EXPORTAR A CSV                               ** **
-   ** ************************************************************************************************** **/
+  /** ************************************************************************************************** ** 
+  ** **                                     METODO PARA EXPORTAR A CSV                               ** **
+  ** ************************************************************************************************** **/
 
-   exportToCVS(opcion: string) {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map(obj => {
+  exportToCVS(opcion: string) {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados" ? this.listaPermisosDeparta : this.listaPermisosAutorizadosFiltrados).map((obj: any) => {
       return {
         Permiso: obj.id,
         Departamento: obj.depa_nombre,
-        Nombre: obj.nombre +' '+ obj.apellido,
+        Nombre: obj.nombre + ' ' + obj.apellido,
         Estado: obj.estado,
         Tipo_Permiso: obj.nom_permiso,
         Fecha_Inicial: obj.fec_inicio_,
@@ -739,16 +729,16 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   exportToXML(opcion: String) {
     var objeto: any;
     var arregloPermisos: any = [];
-    (opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).forEach((obj: any) => {
+    (opcion == "Permisos solicitados" ? this.listaPermisosDeparta : this.listaPermisosAutorizadosFiltrados).forEach((obj: any) => {
       objeto = {
         "lista_permisos": {
-        "@id": obj.id,
-        "Departamento": obj.depa_nombre,
-        "nombre": obj.nombre +' '+ obj.apellido,
-        "estado": obj.estado,
-        "tipo_permiso": obj.nom_permiso,
-        "fecha_inicial": obj.fec_inicio_,
-        "fecha_final": obj.fec_final_,
+          "@id": obj.id,
+          "Departamento": obj.depa_nombre,
+          "nombre": obj.nombre + ' ' + obj.apellido,
+          "estado": obj.estado,
+          "tipo_permiso": obj.nom_permiso,
+          "fecha_inicial": obj.fec_inicio_,
+          "fecha_final": obj.fec_final_,
         }
       }
       arregloPermisos.push(objeto)

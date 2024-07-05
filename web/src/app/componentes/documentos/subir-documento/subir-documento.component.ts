@@ -24,6 +24,10 @@ export class SubirDocumentoComponent implements OnInit {
   nameFile: string;
   archivoSubido: Array<File>;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private toastr: ToastrService,
     private rest: DocumentosService,
@@ -31,6 +35,9 @@ export class SubirDocumentoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.nameFile = '';
   }
 
@@ -50,7 +57,7 @@ export class SubirDocumentoComponent implements OnInit {
 
 
   /** *********************************************************************************** **
-   ** **                               MANEJO DE ARCHIVOS                              ** ** 
+   ** **                               MANEJO DE ARCHIVOS                              ** **
    ** *********************************************************************************** **/
 
   // SELECCIONAR UN ARCHIVO
@@ -76,6 +83,9 @@ export class SubirDocumentoComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.rest.CrearArchivo(formData, form.documentoForm).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,

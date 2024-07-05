@@ -30,6 +30,7 @@ import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.ser
 import { ITableProvincias } from 'src/app/model/reportes.model';
 import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-listar-titulos',
@@ -44,10 +45,6 @@ export class ListarTitulosComponent implements OnInit {
   verTitulos: any = [];
   empleado: any = [];
   idEmpleado: number; // VARIABLE QUE ALMACENA ID DE EMPLEADO QUE INICIO SESION
-
-  // VARIABLES USADAS PARA FILTROS DE BUSQUEDA
-  filtradoNombre = '';
-  filtradoNivel = '';
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
@@ -75,11 +72,12 @@ export class ListarTitulosComponent implements OnInit {
   get frase(): string { return this.plantillaPDF.marca_Agua }
   get logo(): string { return this.plantillaPDF.logoBase64 }
 
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
+  // VARIABLE PARA TOMAR RUTA DEL SISTEMA
+  hipervinculo: string = environment.url;
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   constructor(
     public ventana: MatDialog, // VARIABLE QUE MANEJA EVENTOS CON VENTANAS
@@ -94,6 +92,9 @@ export class ListarTitulosComponent implements OnInit {
 
   ngOnInit(): void {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerTitulos();
     this.ObtenerNiveles();
@@ -111,7 +112,7 @@ export class ListarTitulosComponent implements OnInit {
     this.numero_paginaMul = e.pageIndex + 1
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -136,7 +137,7 @@ export class ListarTitulosComponent implements OnInit {
     });
   }
 
-  // ORDENAR LOS DATOS SEGUN EL ID 
+  // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
       if (a.id < b.id) {
@@ -201,14 +202,14 @@ export class ListarTitulosComponent implements OnInit {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 25);
+    let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'titulos_profesionales') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre Titulos_profesionales', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
 
@@ -235,7 +236,8 @@ export class ListarTitulosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.progreso = true;
+
+
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataTitulosProfesionales = res.data;
@@ -245,21 +247,39 @@ export class ListarTitulosComponent implements OnInit {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
-        this.DataTitulosProfesionales.forEach(item => {
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña TITULOS en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.DataTitulosProfesionales.forEach((item: any) => {
           if (item.observacion.toLowerCase() === 'ok') {
-            this.listTitulosCorrectos.push(item);
+            const nombre = item.titulo;
+            const nivel = this.nivelTitulos.find((valor: any) => valor.nombre.toLowerCase() === item.nivel.toLowerCase());
+
+            const titulo = {
+              nombre: nombre,
+              id_nivel: nivel.id
+            }
+
+            this.listTitulosCorrectos.push(titulo);
           }
         });
       }
+
     }, error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
-      this.progreso = false;
+
     }, () => {
-      this.progreso = false;
+
     });
+
   }
 
   // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
@@ -267,7 +287,7 @@ export class ListarTitulosComponent implements OnInit {
   stiloCelda(observacion: string): string {
     if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Ya esta registrado en base') {
+    } else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
     } else if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
@@ -284,8 +304,9 @@ export class ListarTitulosComponent implements OnInit {
     if (arrayObservacion[0] == 'No') {
       return 'rgb(255, 80, 80)';
     } else {
-      return 'black';
+      return 'black'
     }
+
   }
 
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
@@ -300,30 +321,27 @@ export class ListarTitulosComponent implements OnInit {
   }
 
   registrarTitulos() {
-    var data: any = {
-      nombre: '',
-      id_nivel: ''
-    }
     if (this.listTitulosCorrectos.length > 0) {
-      var cont = 0;
-      this.listTitulosCorrectos.forEach(item => {
-        this.nivelTitulos.forEach(valor => {
-          if (item.nivel.toLowerCase() == valor.nombre.toLowerCase()) {
-            data.nombre = item.titulo;
-            data.id_nivel = valor.id;
-            this.rest.RegistrarTitulo(data).subscribe(res => {
-              cont = cont + 1;
-              if (this.listTitulosCorrectos.length == cont) {
-                this.toastr.success('Operación exitosa.', 'Plantilla de Titulos profesionales importada.', {
-                  timeOut: 1500,
-                });
-                this.LimpiarCampos();
-              }
-            })
-            data = {}
-          }
-        })
-      })
+      const data = {
+        titulos: this.listTitulosCorrectos,
+        user_name: this.user_name,
+        ip: this.ip
+      };
+
+      this.rest.RegistrarTitulosPlantilla(data).subscribe({
+        next: (res: any) => {
+          this.toastr.success('Plantilla de Titulos profesionales importada.', 'Operación exitosa.', {
+            timeOut: 1500,
+          });
+          this.LimpiarCampos();
+        },
+        error: (error: any) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+          this.archivoForm.reset();
+        }
+      });
     } else {
       this.toastr.error('No exiten datos para registrar ingrese otra', 'Plantilla no aceptada', {
         timeOut: 4000,
@@ -405,7 +423,7 @@ export class ListarTitulosComponent implements OnInit {
                 { text: 'Nombre', style: 'tableHeader' },
                 { text: 'Nivel', style: 'tableHeader' },
               ],
-              ...this.verTitulos.map(obj => {
+              ...this.verTitulos.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableD' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -432,7 +450,7 @@ export class ListarTitulosComponent implements OnInit {
 
   ExportToExcel() {
     this.OrdenarDatos(this.verTitulos);
-    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.verTitulos.map(obj => {
+    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.verTitulos.map((obj: any) => {
       return {
         CODIGO: obj.id,
         TITULO: obj.nombre,
@@ -501,7 +519,7 @@ export class ListarTitulosComponent implements OnInit {
     this.ObtenerTitulos();
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
 
@@ -609,7 +627,11 @@ export class ListarTitulosComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
   Eliminar(id_titulo: number) {
-    this.rest.EliminarRegistro(id_titulo).subscribe(res => {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistro(id_titulo, data).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('No se puede eliminar.', '', {
           timeOut: 6000,
@@ -623,7 +645,7 @@ export class ListarTitulosComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -645,13 +667,17 @@ export class ListarTitulosComponent implements OnInit {
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ingresar = false;
     this.contador = 0;
     this.titulosEliminar = this.selectionTitulos.selected;
     this.titulosEliminar.forEach((datos: any) => {
       this.verTitulos = this.verTitulos.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+      this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,

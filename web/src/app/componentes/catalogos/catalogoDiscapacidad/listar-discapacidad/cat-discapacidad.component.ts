@@ -48,7 +48,6 @@ export class CatDiscapacidadComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
-  filtradoNombre = ''; // VARIABLE DE BUSQUEDA DE DATOS
   archivoForm = new FormControl('', Validators.required);
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
@@ -74,6 +73,10 @@ export class CatDiscapacidadComponent implements OnInit {
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
   empleado: any = [];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
   get p_color(): string { return this.plantillaPDF.color_Primary }
@@ -92,6 +95,9 @@ export class CatDiscapacidadComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.discapacidades = [];
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerDiscapacidad();
@@ -112,22 +118,28 @@ export class CatDiscapacidadComponent implements OnInit {
     this.rest.ListarDiscapacidad().subscribe(res => {
       this.discapacidades = res
     }, error => {
-      this.toastr.error('Error al cargar los datos.', '', {
-        timeOut: 4000,
-      });
+      if (error.status == 400 || error.status == 404) {
+        this.toastr.info('No se han encontrado registros.', '', {
+          timeOut: 3500,
+        });
+      } else {
+        this.toastr.error('Error al cargar los datos.', 'Discapacidad', {
+          timeOut: 3500,
+        });
+      }
     });
   }
 
   // METODO PARA LIMPIAR FOMULARIO
   LimpiarCampos() {
-    this.Datos_modalidad_laboral = null;
+    this.Datos_discapacidad = null;
     this.archivoSubido = [];
     this.nameFile = '';
-
     this.formulario.setValue({
       nombreForm: '',
     });
-    this.ObtenerDiscapacidad();
+    this.ngOnInit();
+    this.messajeExcel = '';
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
   }
@@ -165,13 +177,6 @@ export class CatDiscapacidadComponent implements OnInit {
     this.numero_paginaMul = e.pageIndex + 1
   }
 
-  // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
-  nameFile: string;
-  archivoSubido: Array<File>;
-  mostrarbtnsubir: boolean = false;
-
-  Datos_modalidad_laboral: any
-
   // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
@@ -185,6 +190,160 @@ export class CatDiscapacidadComponent implements OnInit {
     }
     array.sort(compare);
   }
+
+  // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
+  nameFile: string;
+  archivoSubido: Array<File>;
+  mostrarbtnsubir: boolean = false;
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS
+  FileChange(element: any) {
+    this.archivoSubido = [];
+    this.nameFile = '';
+    this.archivoSubido = element.target.files;
+    this.nameFile = this.archivoSubido[0].name;
+    let arrayItems = this.nameFile.split(".");
+    let itemExtencion = arrayItems[arrayItems.length - 1];
+    let itemName = arrayItems[0];
+    console.log('itemName: ', itemName);
+    if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
+        this.numero_paginaMul = 1;
+        this.tamanio_paginaMul = 5;
+        this.Revisarplantilla();
+      } else {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta.', {
+          timeOut: 6000,
+        });
+
+        this.nameFile = '';
+      }
+    } else {
+      this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
+        timeOut: 6000,
+      });
+
+      this.nameFile = '';
+    }
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = true;
+  }
+
+  Datos_discapacidad: any
+  listaDiscapacidadCorrectas: any = [];
+  messajeExcel: string = '';
+  Revisarplantilla() {
+    this.listaDiscapacidadCorrectas = [];
+    let formData = new FormData();
+    for (var i = 0; i < this.archivoSubido.length; i++) {
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+    }
+
+    this.progreso = true;
+
+    // VERIFICACION DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    this.rest.RevisarFormato(formData).subscribe(res => {
+      this.Datos_discapacidad = res.data;
+      this.messajeExcel = res.message;
+      //console.log('probando plantilla discapacidad', this.Datos_discapacidad);
+      if (this.messajeExcel == 'error') {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña TIPO_DISCAPACIDAD en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.Datos_discapacidad.forEach((item: any) => {
+          if (item.observacion.toLowerCase() == 'ok') {
+            this.listaDiscapacidadCorrectas.push(item);
+          }
+        });
+      }
+    }, error => {
+      //console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+      this.progreso = false;
+    }, () => {
+      this.progreso = false;
+    });
+  }
+
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
+  colorCelda: string = ''
+  stiloCelda(observacion: string): string {
+    let arrayObservacion = observacion.split(" ");
+    if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya existe en el sistema') {
+      return 'rgb(239, 203, 106)';
+    } else if (arrayObservacion[0] == 'Discapacidad ') {
+      return 'rgb(242, 21, 21)';
+    } else {
+      return 'rgb(242, 21, 21)';
+    }
+  }
+  colorTexto: string = '';
+  stiloTextoCelda(texto: string): string {
+    let arrayObservacion = texto.split(" ");
+    if (arrayObservacion[0] == 'No') {
+      return 'rgb(255, 80, 80)';
+    } else {
+      return 'black'
+    }
+  }
+
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.subirDatosPlantilla();
+        }
+      });
+  }
+
+  subirDatosPlantilla() {
+    if (this.listaDiscapacidadCorrectas.length > 0) {
+      const data = {
+        plantilla: this.listaDiscapacidadCorrectas,
+        user_name: this.user_name,
+        ip: this.ip,
+      }
+      this.rest.subirArchivoExcel(data).subscribe({
+        next: (response) => {
+          this.toastr.success('Operación exitosa.', 'Plantilla de Discapacidad importada.', {
+            timeOut: 3000,
+          });
+          this.LimpiarCampos();
+          this.archivoForm.reset();
+          this.nameFile = '';
+        },
+        error: (error) => {
+          ;
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+        }
+      });
+    } else {
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+      this.nameFile = '';
+    }
+  }
+
 
   /** ************************************************************************************************* **
    ** **                           PARA LA EXPORTACION DE ARCHIVOS PDF                               ** **
@@ -255,7 +414,7 @@ export class CatDiscapacidadComponent implements OnInit {
                 { text: 'Nombre', style: 'tableHeader' },
 
               ],
-              ...this.discapacidades.map(obj => {
+              ...this.discapacidades.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableD' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -282,7 +441,7 @@ export class CatDiscapacidadComponent implements OnInit {
 
   ExportToExcel() {
     this.OrdenarDatos(this.discapacidades);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidades.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidades.map((obj: any) => {
       return {
         CODIGO: obj.id,
         NOMBRE: obj.nombre,
@@ -405,10 +564,14 @@ export class CatDiscapacidadComponent implements OnInit {
   // METODO PARA CONFIRMAR ELIMINACION
   ConfirmarDelete(discapacidad: any) {
     const mensaje = 'eliminar';
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.rest.Eliminar(discapacidad.id).subscribe(res => {
+          this.rest.Eliminar(discapacidad.id, data).subscribe((res: any) => {
             if (res.message === 'error') {
               this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
                 timeOut: 6000,
@@ -434,13 +597,17 @@ export class CatDiscapacidadComponent implements OnInit {
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     this.ingresar = false;
     this.contador = 0;
     this.discapacidadesEliminar = this.selectionDiscapacidad.selected;
     this.discapacidadesEliminar.forEach((datos: any) => {
       this.discapacidades = this.discapacidades.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.rest.Eliminar(datos.id).subscribe(res => {
+      this.rest.Eliminar(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,

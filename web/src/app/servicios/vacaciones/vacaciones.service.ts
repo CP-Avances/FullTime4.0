@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Socket } from 'ngx-socket-io';
-import { environment } from '../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -30,12 +29,6 @@ export class VacacionesService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/estado-solicitud`);
   }
 
-
-
-
-
-
-
   ObtenerVacacionesPorIdPeriodo(id_peri_perido: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/${id_peri_perido}`)
   }
@@ -52,13 +45,13 @@ export class VacacionesService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/datosAutorizacion/${id_vacaciones}`);
   }
 
-  EliminarVacacion(id_vacacion: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/eliminar/${id_vacacion}`);
+  EliminarVacacion(id_vacacion: number, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/vacaciones/eliminar/${id_vacacion}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
   }
-
-
-
-
 
   // REPORTE DE VACACIONES DE FORMA MÚLTIPLE
   BuscarSolicitudVacacion(datos: any, desde: string, hasta: string) {
@@ -69,7 +62,6 @@ export class VacacionesService {
   ListarUnaVacacion(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/listar/vacacion/${id}`);
   }
-
 
   // BUSQUEDA DE VACACIONES POR ID DE VACACIONES
   ObtenerUnaVacacion(id: number) {
@@ -91,7 +83,7 @@ export class VacacionesService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/mail-noti`, datos);
   }
 
-   // METODO PARA CREAR ARCHIVO XML
+  // METODO PARA CREAR ARCHIVO XML
   CrearXML(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/xmlDownload`, data);
   }

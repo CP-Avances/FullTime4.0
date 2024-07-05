@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
-import { environment } from '../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -29,15 +28,15 @@ export class UsuarioService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios/dato/${id}`);
   }
 
+  // METODO PARA OBTENER IDS USUARIOS DEPARTAMENTO
+  ObtenerIdUsuariosDepartamento(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-ids-usuarios-departamento`, data);
+  }
+
   // METODO PARA ACTUALIZAR REGISTRO DE USUARIO
   ActualizarDatos(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/usuarios/actualizarDatos`, data).pipe(
       catchError(data));
-  }
-
-  // METODO PARA REGISTRAR ACCESOS AL SISTEMA
-  CrearAccesosSistema(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/acceso`, data);
   }
 
   // METODO PARA CAMBIAR PASSWORD
@@ -60,10 +59,6 @@ export class UsuarioService {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-web/`, data);
   }
 
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
-  UsuariosTimbreMovilCargos(estado: any, habilitado: boolean) {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-app-movil-cargos/${estado}/activo/${habilitado}`);
-  }
 
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
   ActualizarEstadoTimbreMovil(data: any) {
@@ -76,8 +71,12 @@ export class UsuarioService {
   }
 
   // METODO PARA ELIMINAR REGISTROS DISPOSITIVOS
-  EliminarDispositivoMovil(data: any) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/usuarios/delete-registro-dispositivos/${data}`);
+  EliminarDispositivoMovil(data: any, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/usuarios/delete-registro-dispositivos/${data}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
   }
 
   // METODO PARA ENVIAR CORREO CAMBIAR FRASE SEGURIDAD
@@ -92,7 +91,7 @@ export class UsuarioService {
 
 
   /** *********************************************************************************************** **
-   ** **                       SERVICIOS USUARIOS QUE USAN TIMBRE WEB                              ** **           
+   ** **                       SERVICIOS USUARIOS QUE USAN TIMBRE WEB                              ** **
    ** *********************************************************************************************** */
 
   // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB SUPERADMINISTRADOR
@@ -129,7 +128,7 @@ export class UsuarioService {
 
 
   /** *********************************************************************************************** **
-   ** **                       SERVICIOS DE TABLA USUARIO - SUCURSAL                               ** **           
+   ** **                     SERVICIOS DE USUARIO - SUCURSAL - DEPARTAMENTO                        ** **
    ** *********************************************************************************************** */
 
   // METODO DE BUSQUEDA DE DATOS DE USUARIO
@@ -137,63 +136,37 @@ export class UsuarioService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-usuario-sucursal`, id_empleado);
   }
 
-  // REGISTRAR USUARIO
-  RegistrarUsuarioSucursal(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/usuario-sucursal`, data)
+  //REGISTRAR USUARIO - DEPARTAMENTO
+  RegistrarUsuarioDepartamento(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/usuario-departamento`, data)
       .pipe(
         catchError(data)
       );
   }
 
-  // METODO DE BUSQUEDA DE DATOS DE USUARIO - SUCURSAL
-  BuscarUsuarioSucursalPrincipal(id_empleado: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/principal-usuario-sucursal`, id_empleado);
+  // METODO DE BUSQUEDA DE DATOS DE USUARIO - DEPARTAMENTOS
+  BuscarUsuarioDepartamento(id_empleado: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-usuario-departamento`, id_empleado);
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO DE USUARIO - SUCURSAL
-  ActualizarUsuarioSucursalPrincipal(data: any) {
-    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/usuarios/actualizar-usuario-sucursal`, data).pipe(
+  // METODO PARA BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO
+  BuscarAsignacionUsuarioDepartamento(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-asignacion-usuario-departamento`, data);
+  }
+
+  // METODO PARA ACTUALIZAR REGISTRO DE USUARIO - DEPARTAMENTOS
+  ActualizarUsuarioDepartamento(data: any) {
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/usuarios/actualizar-usuario-departamento`, data).pipe(
       catchError(data));
   }
 
-  // METODO PARA ELIMINAR REGISTROS DE USUARIO - SUCURSAL
-  EliminarUsuarioSucursal(id_usucursal: any) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/usuarios/eliminar-usuario-sucursal/${id_usucursal}`);
-  }
-
-
-
-
-
-
-
-
-
-
-  // catalogo de usuarios
-
-  getUsuariosRest() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios`);
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-  BuscarUsersNoEnrolados() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios/noEnrolados`);
-  }
-
-  getIdByUsuarioRest(usuario: string) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios/busqueda/${usuario}`);
+  // METODO PARA ELIMINAR REGISTROS DE USUARIO - DEPARTAMENTO
+  EliminarUsuarioDepartamento(datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/usuarios/eliminar-usuario-departamento`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
   }
 
   //OBTENER TEXTO ENCRIPTADO

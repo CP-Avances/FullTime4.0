@@ -40,11 +40,6 @@ export class RegistroDispositivosComponent implements OnInit {
   dispositivosRegistrados: any = [];
   dispositivo: any = [];
 
-  // FILTROS DE BUSQUEDA
-  filtroCodigo: number;
-  filtroCedula: '';
-  filtroNombre: '';
-
   // DATOS DE EMPLEADO
   empleado: any = [];
   idEmpleado: number;
@@ -78,6 +73,11 @@ export class RegistroDispositivosComponent implements OnInit {
   individual: boolean = true;
   multiple: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
+
   constructor(
     private usuariosService: UsuarioService,
     private funciones: MainNavService,
@@ -100,6 +100,8 @@ export class RegistroDispositivosComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
       this.ObtenerLogo();
       this.ObtenerColores();
       this.ObtenerEmpleados(this.idEmpleado);
@@ -107,7 +109,7 @@ export class RegistroDispositivosComponent implements OnInit {
     }
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -131,24 +133,24 @@ export class RegistroDispositivosComponent implements OnInit {
     if (this.habilitar === false) {
       this.habilitar = true;
 
-      if (this.filtroNombre != undefined) {
-        if (this.filtroNombre.length > 1) {
+      if (this.nombre.value != undefined) {
+        if ((this.nombre.value).length > 1) {
           this.ocultar = true;
         } else {
           this.ocultar = false;
         }
       }
 
-      if (this.filtroCodigo != undefined) {
-        if (this.filtroCodigo > 0) {
+      if (this.codigo.value != undefined) {
+        if ((this.codigo.value).length > 0) {
           this.ocultar = true;
         } else {
           this.ocultar = false;
         }
       }
 
-      if (this.filtroCedula != undefined) {
-        if (this.filtroCedula.length > 1) {
+      if (this.cedula.value != undefined) {
+        if ((this.cedula.value).length > 1) {
           this.ocultar = true;
         } else {
           this.ocultar = false;
@@ -188,6 +190,12 @@ export class RegistroDispositivosComponent implements OnInit {
     this.habilitar = false;
     this.multiple = false;
     this.individual = true;
+
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
     // VALIDAR SELECCION DE REGISTROS
     if (array.length === 0) return this.toastr.
       warning('Debe seleccionar al menos un usuario para modificar su acceso al reloj virtual.');
@@ -195,10 +203,10 @@ export class RegistroDispositivosComponent implements OnInit {
     this.ventana.open(DeleteRegistroDispositivoComponent,
       { width: '400px', data: array }).afterClosed().subscribe(result => {
         if (result) {
-          result.forEach(item => {
+          result.forEach((item: any) => {
             this.dispositivo.push(item.id_dispositivo);
           });
-          this.usuariosService.EliminarDispositivoMovil(this.dispositivo).subscribe(res => {
+          this.usuariosService.EliminarDispositivoMovil(this.dispositivo, datos).subscribe(res => {
             this.toastr.success('Registro eliminado exitosamnete.');
             this.ObtenerDispositivosRegistrados();
             this.selectionEmp.clear();
@@ -216,20 +224,20 @@ export class RegistroDispositivosComponent implements OnInit {
       })
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedEmp() {
     const numSelected = this.selectionEmp.selected.length;
     return numSelected === this.dispositivosRegistrados.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
       this.dispositivosRegistrados.forEach((row: any) => this.selectionEmp.select(row));
   }
 
-  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA 
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelEmp(row?: ItableDispositivos): string {
     if (!row) {
       return `${this.isAllSelectedEmp() ? 'select' : 'deselect'} all`;
@@ -263,7 +271,7 @@ export class RegistroDispositivosComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -351,7 +359,7 @@ export class RegistroDispositivosComponent implements OnInit {
                 { text: 'Id dispositivo', style: 'tableHeader' },
                 { text: 'Modelo dispositivo', style: 'tableHeader' },
               ],
-              ...this.dispositivosRegistrados.map(obj => {
+              ...this.dispositivosRegistrados.map((obj: any) => {
                 return [
                   { text: count++, style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -400,7 +408,7 @@ export class RegistroDispositivosComponent implements OnInit {
     xlsx.writeFile(wb, "DispositivosEXCEL" + new Date().getTime() + '.xlsx');
   }
 
-  /** ********************************************************************************************** ** 
+  /** ********************************************************************************************** **
    ** **                              METODO PARA EXPORTAR A CSV                                  ** **
    ** ********************************************************************************************** **/
 

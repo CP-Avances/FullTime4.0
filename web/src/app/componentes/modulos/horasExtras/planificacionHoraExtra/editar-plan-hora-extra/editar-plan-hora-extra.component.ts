@@ -28,6 +28,10 @@ import { ListaPlanificacionesComponent } from '../lista-planificaciones/lista-pl
 
 export class EditarPlanHoraExtraComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   @Input() data: any;
   @Input() pagina: string = '';
 
@@ -68,7 +72,9 @@ export class EditarPlanHoraExtraComponent implements OnInit {
 
   ngOnInit(): void {
 
-    console.log('ver data ... ', this.data, this.data.planifica, this.data.planifica.length)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
 
@@ -81,7 +87,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -155,8 +161,12 @@ export class EditarPlanHoraExtraComponent implements OnInit {
 
   // METODO PARA ACTUALIZAR UNA PLANIFICACIÓN, ELIMINAR LA ANTERIOR Y CREAR UNA NUEVA
   InsertarPlanificacion(form: any) {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     // METODO PARA ELIMINAR PLANIFICACIÓN ANTERIOR
-    this.restPE.EliminarPlanEmpleado(this.leer_datos.id_plan, this.leer_datos.id_empleado)
+    this.restPE.EliminarPlanEmpleado(this.leer_datos.id_plan, this.leer_datos.id_empleado, datos)
       .subscribe(eliminar => {
         // CREACIÓN DE LA PLANIFICACIÓN PARA UN EMPLEADO
         let planificacion = {
@@ -167,6 +177,8 @@ export class EditarPlanHoraExtraComponent implements OnInit {
           hora_inicio: form.horaInicioForm,
           descripcion: form.descripcionForm,
           hora_fin: form.horaFinForm,
+          user_name: this.user_name,
+          ip: this.ip,
         }
         // INSERCIÓN DE PLANIFICACIÓN
         this.restPE.CrearPlanificacionHoraExtra(planificacion).subscribe(res => {
@@ -194,7 +206,9 @@ export class EditarPlanHoraExtraComponent implements OnInit {
               id_plan_hora: plan.id,
               id_empl_cargo: this.leer_datos.id_cargo,
               id_empl_realiza: this.leer_datos.id_empleado,
-              id_empl_contrato: this.leer_datos.id_contrato
+              id_empl_contrato: this.leer_datos.id_contrato,
+              user_name: this.user_name,
+              ip: this.ip,
             }
 
             // VALIDAR SI LA PLANIFICACIÓN ES DE VARIOS USUARIOS
@@ -220,7 +234,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
     var usuario = '';
     var cont = 0;
     var contPlan = 0;
-    this.data.planifica.map(obj => {
+    this.data.planifica.map((obj: any) => {
 
       // LECTURA DE NOMBRES DE USUARIOS
       usuario = usuario + '<tr><th>' + obj.nombre + '</th><th>' + obj.cedula + '</th></tr>';
@@ -336,6 +350,8 @@ export class EditarPlanHoraExtraComponent implements OnInit {
       mensaje: 'Planificación de horas extras actualizada desde ' +
         desde + ' hasta ' + hasta +
         ' horario de ' + h_inicio + ' a ' + h_fin,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restPE.EnviarNotiPlanificacion(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);

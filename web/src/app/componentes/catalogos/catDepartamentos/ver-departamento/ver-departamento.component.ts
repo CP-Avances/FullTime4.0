@@ -80,6 +80,10 @@ export class VerDepartamentoComponent implements OnInit {
   nombre_sucursal: string = '';
   mostrar: boolean = true;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public componented: PrincipalDepartamentoComponent,
     public componentes: VerSucursalComponent,
@@ -91,6 +95,9 @@ export class VerDepartamentoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     if (this.id_departamento) {
       this.rest.BuscarDepartamento(this.id_departamento).subscribe(dato => {
         this.info = dato[0];
@@ -128,7 +135,11 @@ export class VerDepartamentoComponent implements OnInit {
 
   // METODO PARA ACTUALIZAR NIVELES DE APROBACION
   ActualizarRegistros(datos: any) {
-    var data = { nivel: 0 };
+    var data = {
+      nivel: 0,
+      user_name: this.user_name,
+      ip: this.ip
+    };
     var arreglo: any = [];
     var contador = 0;
     var actualiza = 0;
@@ -166,7 +177,7 @@ export class VerDepartamentoComponent implements OnInit {
   }
 
 
-  // ORDENAR LOS DATOS SEGUN EL ID 
+  // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
       if (a.id < b.id) {
@@ -280,7 +291,11 @@ export class VerDepartamentoComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_dep: number, datos: any) {
-    this.rest.EliminarRegistroNivelDepa(id_dep).subscribe(res => {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistroNivelDepa(id_dep, data).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
@@ -294,7 +309,7 @@ export class VerDepartamentoComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -309,13 +324,17 @@ export class VerDepartamentoComponent implements OnInit {
   }
 
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ingresar = false;
     this.contador = 0;
     this.nivelesEliminar = this.selectionNivel.selected;
     this.nivelesEliminar.forEach((datos: any) => {
       this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.rest.EliminarRegistroNivelDepa(datos.id).subscribe(res => {
+      this.rest.EliminarRegistroNivelDepa(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.nivel + '.', 'No fue posible eliminar.', {
             timeOut: 6000,

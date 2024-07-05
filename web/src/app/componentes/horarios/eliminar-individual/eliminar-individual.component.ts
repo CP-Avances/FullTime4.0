@@ -39,6 +39,10 @@ export class EliminarIndividualComponent implements OnInit {
   cerrar_ventana: boolean = true;
   btn_eliminar: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // INICIALIZACION DE CAMPOS DE FORMULARIOS
   fechaInicioF = new FormControl('', Validators.required);
   fechaFinalF = new FormControl('', [Validators.required]);
@@ -63,7 +67,8 @@ export class EliminarIndividualComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('ver datos eliminar ', this.datosEliminar)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip')
   }
 
   // METODO PARA VERIFICAR QUE CAMPOS DE FECHAS NO SE ENCUENTREN VACIOS
@@ -198,6 +203,12 @@ export class EliminarIndividualComponent implements OnInit {
     let contador = 0;
     this.progreso = true;
 
+    let datos = {
+      id_plan: [],
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
     this.horariosSeleccionados.forEach((obj: any) => {
       this.datosEliminar.usuario.forEach((usu: any) => {
         let plan_fecha = {
@@ -210,12 +221,14 @@ export class EliminarIndividualComponent implements OnInit {
           contador = contador + 1;
           this.lista_eliminar = this.lista_eliminar.concat(res);
           if (contador === total) {
-            this.EliminarDatos(this.lista_eliminar);
+            datos.id_plan = this.lista_eliminar;
+            this.EliminarDatos(datos);
           }
         }, error => {
           contador = contador + 1;
           if (contador === total) {
-            this.EliminarDatos(this.lista_eliminar);
+            datos.id_plan = this.lista_eliminar;
+            this.EliminarDatos(datos);
           }
         })
       })
@@ -276,6 +289,7 @@ export class EliminarIndividualComponent implements OnInit {
     if (this.datosEliminar.pagina === 'ver_empleado') {
       this.ventana.eliminar_plan = false;
       this.ventana.ver_tabla_horarios = true;
+      this.ventana.BuscarHorarioPeriodo();
     }
     else if (this.datosEliminar.pagina === 'planificar') {
       this.componentem.eliminar_plan = false;

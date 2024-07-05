@@ -14,29 +14,65 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NOTIFICACION_TIEMPO_REAL_CONTROLADOR = void 0;
 const settingsMail_1 = require("../../libs/settingsMail");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 class NotificacionTiempoRealControlador {
     // METODO PARA ELIMINAR NOTIFICACIONES DE PERMISOS - VACACIONES - HORAS EXTRAS  --**VERIFICACION
     EliminarMultiplesNotificaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const arregloNotificaciones = req.body;
+            const { arregloNotificaciones, user_name, ip } = req.body;
             let contador = 0;
-            console.log('VER IDS', arregloNotificaciones);
             if (arregloNotificaciones.length > 0) {
                 contador = 0;
                 arregloNotificaciones.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
-                    yield database_1.default.query(`
-          DELETE FROM ecm_realtime_notificacion WHERE id = $1
-          `, [obj])
-                        .then((result) => {
-                        contador = contador + 1;
-                        if (contador === arregloNotificaciones.length) {
-                            return res.jsonp({ message: 'OK' });
+                    try {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // OBTENER DATOSORIGINALES
+                        const consulta = yield database_1.default.query('SELECT * FROM ecm_realtime_notificacion WHERE id = $1', [obj]);
+                        const [datosOriginales] = consulta.rows;
+                        if (!datosOriginales) {
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'ecm_realtime_notificacion',
+                                usuario: user_name,
+                                accion: 'D',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al eliminar el registro con id ${obj}. No existe el registro en la base de datos.`
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                         }
-                        console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
-                    });
+                        yield database_1.default.query(`
+            DELETE FROM ecm_realtime_notificacion WHERE id = $1
+            `, [obj])
+                            .then((result) => {
+                            contador = contador + 1;
+                            console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
+                        });
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'ecm_realtime_notificacion',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: JSON.stringify(datosOriginales),
+                            datosNuevos: '',
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                    }
+                    catch (error) {
+                        // ROEVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
+                        return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+                    }
                 }));
+                return res.jsonp({ message: 'OK' });
             }
             else {
                 return res.jsonp({ message: 'error' });
@@ -68,8 +104,10 @@ class NotificacionTiempoRealControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 var tiempo = (0, settingsMail_1.fechaHora)();
-                const { id_send_empl, id_receives_empl, id_receives_depa, estado, id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo } = req.body;
+                const { id_send_empl, id_receives_empl, id_receives_depa, estado, id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo, user_name, ip } = req.body;
                 let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
         INSERT INTO ecm_realtime_notificacion (id_empleado_envia, id_empleado_recibe, id_departamento_recibe, estado, 
           fecha_hora, id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo) 
@@ -77,6 +115,18 @@ class NotificacionTiempoRealControlador {
         `, [id_send_empl, id_receives_empl, id_receives_depa, estado, create_at, id_permiso, id_vacaciones,
                     id_hora_extra, mensaje, tipo]);
                 const [notificiacion] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ecm_realtime_notificacion',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(notificiacion),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 if (!notificiacion)
                     return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
                 const USUARIO = yield database_1.default.query(`
@@ -88,43 +138,10 @@ class NotificacionTiempoRealControlador {
                     .jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
             }
             catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.status(500)
                     .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
-            }
-        });
-    }
-    ListarNotificacion(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const REAL_TIME_NOTIFICACION = yield database_1.default.query(`
-      SELECT * FROM ecm_realtime_notificacion ORDER BY id DESC
-      `);
-            if (REAL_TIME_NOTIFICACION.rowCount != 0) {
-                return res.jsonp(REAL_TIME_NOTIFICACION.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-            }
-        });
-    }
-    ListaPorEmpleado(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id_send;
-            const REAL_TIME_NOTIFICACION = yield database_1.default.query(`
-      SELECT * FROM ecm_realtime_notificacion 
-      WHERE id_empleado_envia = $1 ' +
-      ORDER BY id DESC
-      `, [id]).
-                then((result) => {
-                return result.rows.map((obj) => {
-                    obj;
-                    return obj;
-                });
-            });
-            if (REAL_TIME_NOTIFICACION.length > 0) {
-                return res.jsonp(REAL_TIME_NOTIFICACION);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
@@ -167,44 +184,142 @@ class NotificacionTiempoRealControlador {
     }
     ActualizarVista(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const { visto } = req.body;
-            yield database_1.default.query(`
-      UPDATE ecm_realtime_notificacion SET visto = $1 WHERE id = $2
-      `, [visto, id]);
-            res.jsonp({ message: 'Vista modificado.' });
+            try {
+                const id = req.params.id;
+                const { visto, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOSORIGINALES
+                const consulta = yield database_1.default.query('SELECT * FROM ecm_realtime_notificacion WHERE id = $1', [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ecm_realtime_notificacion',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al modificar el registro con id ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        UPDATE ecm_realtime_notificacion SET visto = $1 WHERE id = $2
+        `, [visto, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ecm_realtime_notificacion',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{"visto": "${visto}"}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Vista modificado' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al modificar el registro.' });
+            }
         });
     }
     /** *********************************************************************************************** **
-     **                         METODOS PARA LA TABLA DE CONFIG_NOTI                                    **
+     **                         METODOS PARA LA TABLA DE CONFIGURAR_ALERTAS                                    **
      ** *********************************************************************************************** **/
     // METODO PARA REGISTRAR CONFIGURACIÓN DE RECEPCIÓN DE NOTIFICACIONES
     CrearConfiguracion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti } = req.body;
-            yield database_1.default.query(`
-      INSERT INTO eu_configurar_alertas (id_empleado, vacacion_mail, vacacion_notificacion, permiso_mail,
-        permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail, comida_notificacion, comunicado_mail,
-      comunicado_notificacion)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-      `, [id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail,
-                comida_noti, comunicado_mail, comunicado_noti]);
-            res.jsonp({ message: 'REgistro guardado.' });
+            try {
+                const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                yield database_1.default.query(`
+        INSERT INTO eu_configurar_alertas (id_empleado, vacacion_mail, vacacion_notificacion, permiso_mail,
+          permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail, comida_notificacion, comunicado_mail,
+        comunicado_notificacion)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        `, [id_empleado, vaca_mail, vaca_noti,
+                    permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti,
+                    comunicado_mail, comunicado_noti]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_configurar_alertas',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{"id_empleado": "${id_empleado}", "vacacion_mail": "${vaca_mail}", "vacacion_notificacion": "${vaca_noti}", permiso_mail: "${permiso_mail}", permiso_notificacion: "${permiso_noti}", hora_extra_mail: "${hora_extra_mail}", hora_extra_notificacion: "${hora_extra_noti}", comida_mail: "${comida_mail}", comida_notificacion: "${comida_noti}", comunicado_mail: "${comunicado_mail}", comunicado_notificacion: "${comunicado_noti}"}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Configuracion guardada' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'Error al guardar la configuración.' });
+            }
         });
     }
     // METODO PARA ACTUALIZAR CONFIGURACIÓN DE RECEPCIÓN DE NOTIFICACIONES
     ActualizarConfigEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti } = req.body;
-            const id_empleado = req.params.id;
-            yield database_1.default.query(`
-      UPDATE eu_configurar_alertas SET vacacion_mail = $1, vacacion_notificacion = $2, permiso_mail = $3,
-        permiso_notificacion = $4, hora_extra_mail = $5, hora_extra_notificacion = $6, comida_mail = $7, 
-        comida_notificacion = $8, comunicado_mail = $9, comunicado_notificacion = $10 
-      WHERE id_empleado = $11
-      `, [vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti,
-                comunicado_mail, comunicado_noti, id_empleado]);
-            res.jsonp({ message: 'Registro guardado.' });
+            try {
+                const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+                const id_empleado = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // OBTENER DATOSORIGINALES
+                const consulta = yield database_1.default.query('SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1', [id_empleado]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_configurar_alertas',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al modificar el registro con id ${id_empleado}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        UPDATE eu_configurar_alertas SET vacacion_mail = $1, vacacion_notificacion = $2, permiso_mail = $3,
+          permiso_notificacion = $4, hora_extra_mail = $5, hora_extra_notificacion = $6, comida_mail = $7, 
+          comida_notificacion = $8, comunicado_mail = $9, comunicado_notificacion = $10 
+        WHERE id_empleado = $11
+        `, [vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti,
+                    comida_mail, comida_noti, comunicado_mail, comunicado_noti, id_empleado]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_configurar_alertas',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{"vacacion_mail": "${vaca_mail}", "vacacion_notificacion": "${vaca_noti}", permiso_mail: "${permiso_mail}", permiso_notificacion: "${permiso_noti}", hora_extra_mail: "${hora_extra_mail}", hora_extra_notificacion: "${hora_extra_noti}", comida_mail: "${comida_mail}", comida_notificacion: "${comida_noti}", comunicado_mail: "${comunicado_mail}", comunicado_notificacion: "${comunicado_noti}"}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Configuración actualizada.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al modificar el registro.' });
+            }
         });
     }
     /** ******************************************************************************************** **
@@ -279,7 +394,7 @@ class NotificacionTiempoRealControlador {
                     html: `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -300,7 +415,7 @@ class NotificacionTiempoRealControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
         `,
                     attachments: [
@@ -361,7 +476,7 @@ class NotificacionTiempoRealControlador {
                     html: `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -382,7 +497,7 @@ class NotificacionTiempoRealControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
           `,
                     attachments: [
@@ -419,23 +534,48 @@ class NotificacionTiempoRealControlador {
     // NOTIFICACIONES GENERALES
     EnviarNotificacionGeneral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let { id_empl_envia, id_empl_recive, mensaje, tipo } = req.body;
-            var tiempo = (0, settingsMail_1.fechaHora)();
-            let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
-            const response = yield database_1.default.query(`
-      INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
-      VALUES($1, $2, $3, $4, $5) RETURNING *
-      `, [create_at, id_empl_envia, id_empl_recive, mensaje, tipo]);
-            const [notificiacion] = response.rows;
-            if (!notificiacion)
-                return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
-            const USUARIO = yield database_1.default.query(`
-      SELECT (nombre || ' ' || apellido) AS usuario
-      FROM eu_empleados WHERE id = $1
-      `, [id_empl_envia]);
-            notificiacion.usuario = USUARIO.rows[0].usuario;
-            return res.status(200)
-                .jsonp({ message: 'Comunicado enviado exitosamente.', respuesta: notificiacion });
+            try {
+                let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip } = req.body;
+                var tiempo = (0, settingsMail_1.fechaHora)();
+                let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query(`
+        INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
+        VALUES($1, $2, $3, $4, $5) RETURNING *
+        `, [create_at, id_empl_envia, id_empl_recive, mensaje, tipo]);
+                const [notificiacion] = response.rows;
+                const fechaHoraN = yield (0, settingsMail_1.FormatearHora)(create_at.split(' ')[1]);
+                const fechaN = yield (0, settingsMail_1.FormatearFecha2)(create_at, 'ddd');
+                notificiacion.fecha_hora = `${fechaN} ${fechaHoraN}`;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'ecm_realtime_timbres',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(notificiacion),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                if (!notificiacion)
+                    return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
+                const USUARIO = yield database_1.default.query(`
+        SELECT (nombre || ' ' || apellido) AS usuario
+        FROM eu_empleados WHERE id = $1
+        `, [id_empl_envia]);
+                notificiacion.usuario = USUARIO.rows[0].usuario;
+                return res.status(200)
+                    .jsonp({ message: 'Comunicado enviado exitosamente.', respuesta: notificiacion });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500)
+                    .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+            }
         });
     }
     /** ***************************************************************************************** **
@@ -477,7 +617,7 @@ class NotificacionTiempoRealControlador {
                     html: `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -503,7 +643,7 @@ class NotificacionTiempoRealControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
           `,
                     attachments: [

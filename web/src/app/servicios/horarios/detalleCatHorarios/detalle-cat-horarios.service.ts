@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -16,9 +15,13 @@ export class DetalleCatHorariosService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/detalleHorario/${id}`);
   }
 
-  // METODO PARA ELIMINAR REGISTRO  
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/detalleHorario/eliminar/${id}`);
+  // METODO PARA ELIMINAR REGISTRO
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/detalleHorario/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA REGISTRAR DETALLE DE HORARIO
@@ -31,17 +34,4 @@ export class DetalleCatHorariosService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/detalleHorario`, data);
   }
 
-
-
-
-
-
-  // VERIFICAR DATOS DE LA PLANTILLA DE DETALLES DE HORRAIO Y CARGARLOS AL SISTEMA
-  CargarPlantillaDetalles(formData) {
-    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/detalleHorario/upload', formData)
-  }
-
-  VerificarDatosDetalles(formData) {
-    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/detalleHorario/verificarDatos/upload', formData)
-  }
 }

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -30,9 +29,6 @@ export class PedHoraExtraService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/horas-extras-pedidas/observaciones`);
   }
 
-
-
-
   GuardarHoraExtra(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/horas-extras-pedidas`, datos);
   }
@@ -49,8 +45,12 @@ export class PedHoraExtraService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/horas-extras-pedidas/datosAutorizacion/${id_hora}`);
   }
 
-  EliminarHoraExtra(id_hora_extra: number, documento: string) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/horas-extras-pedidas/eliminar/${id_hora_extra}/${documento}`);
+  EliminarHoraExtra(id_hora_extra: number, documento: string, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/horas-extras-pedidas/eliminar/${id_hora_extra}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
   }
 
   HorarioEmpleadoSemanal(id_cargo: number) {

@@ -11,6 +11,10 @@ import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/
 })
 export class EditarTipoCargoComponent implements OnInit{
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   cargo = new FormControl('', Validators.required)
 
   public formulario = new FormGroup({
@@ -25,6 +29,8 @@ export class EditarTipoCargoComponent implements OnInit{
   ){}
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.ImprimirDatos();
   }
 
@@ -45,6 +51,8 @@ export class EditarTipoCargoComponent implements OnInit{
     let tipoCargo = {
       id: this.data.id,
       cargo: form.cargo,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.cargos_.ActualizarCargo(tipoCargo).subscribe(response => {
       console.log('response: ',response);
@@ -62,7 +70,7 @@ export class EditarTipoCargoComponent implements OnInit{
           timeOut: 4000,
         });
       }
-      
+
     }, error => {
       this.toastr.info(error, 'Error', {
         timeOut: 4000,

@@ -43,18 +43,10 @@ class DepartamentoRutas {
         this.router.get('/sucursal-departamento-edicion/:id_sucursal/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.ObtenerDepartamentosSucursal_);
         // ACTUALIZAR DEPARTAMENTO  --**VERIFICADO
         this.router.put('/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.ActualizarDepartamento);
-
-
-
-
         // LISTAR DEPARTAMENTOS    --**VERIFICADO
         this.router.get('/', TokenValidation, DEPARTAMENTO_CONTROLADOR.ListarDepartamentos);
        // LISTAR DEPARTAMENTOS
         this.router.get('/listarDepartamentos', TokenValidation, DEPARTAMENTO_CONTROLADOR.ListarDepartamentos);
-
-
-
-        
         // METODO PARA LISTAR INFORMACION DE DEPARTAMENTOS POR ID DE SUCURSAL
         this.router.get('/buscar/datosDepartamento/:id_sucursal', TokenValidation, DEPARTAMENTO_CONTROLADOR.ListarDepartamentosSucursal);
         // METODO PARA ELIMINAR REGISTRO
@@ -69,25 +61,14 @@ class DepartamentoRutas {
         this.router.put('/nivelactualizar/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.ActualizarNivelDepa);
         // ACTUALIZAR NOMBRE DE DEPARTAMENTOS EN NIVELES DE APROBACION   --**VERIFICADO
         this.router.post('/actualizarNombrenivel', TokenValidation, DEPARTAMENTO_CONTROLADOR.ActualizarNombreNivel);
-
-
-
-
-
-
-        this.router.get('/nombreDepartamento', TokenValidation, DEPARTAMENTO_CONTROLADOR.ListarNombreDepartamentos);
-        this.router.get('/idDepartamento/:nombre', TokenValidation, DEPARTAMENTO_CONTROLADOR.ListarIdDepartamentoNombre);
-        this.router.get('/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.ObtenerUnDepartamento);
-        this.router.get('/busqueda/:nombre', TokenValidation, DEPARTAMENTO_CONTROLADOR.ObtenerIdDepartamento);
         this.router.get('/busqueda-cargo/:id_cargo', TokenValidation, DEPARTAMENTO_CONTROLADOR.BuscarDepartamentoPorCargo);
-
-
-
         this.router.get('/buscar/regimen-departamento/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.ListarDepartamentosRegimen);
-
-
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], DEPARTAMENTO_CONTROLADOR.RevisarDatos);
         this.router.post('/cargar_plantilla/', TokenValidation, DEPARTAMENTO_CONTROLADOR.CargarPlantilla);
+
+        this.router.post('/upload/revisionNivel', [TokenValidation, upload.single('uploads')], DEPARTAMENTO_CONTROLADOR.RevisarDatosNivel);
+        this.router.post('/cargar_plantillaNivel/', TokenValidation, DEPARTAMENTO_CONTROLADOR.CargarPlantillaNivelesDep);
+
     }
 }
 

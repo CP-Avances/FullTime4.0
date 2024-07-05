@@ -94,7 +94,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
       sessionStorage.setItem('reporte_vacunas_multiples', JSON.stringify(res))
 
       // BUSQUEDA DE SUCURSALES
-      this.sucursales = res.map(obj => {
+      this.sucursales = res.map((obj: any) => {
         return {
           id: obj.id_suc,
           nombre: obj.name_suc
@@ -213,7 +213,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
   ModelarEmpleados(accion) {
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_vacunas_multiples') as any)
     respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach(element => {
+      obj.departamentos.forEach((element: any) => {
         element.empleado = element.empleado.filter((o: any) => {
           var bool = this.selectionEmp.selected.find(obj1 => {
             return obj1.id === o.id
@@ -319,7 +319,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: (localStorage.getItem('name_empresa') as string).toLocaleUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
         { text: 'Reporte - Solicitud Vacaciones', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 5] },
-        ...this.impresionDatosPDF(this.data_pdf).map(obj => {
+        ...this.impresionDatosPDF(this.data_pdf).map((obj: any) => {
           return obj
         })
       ],
@@ -366,7 +366,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
         })
       }
 
-      obj.departamentos.forEach(obj1 => {
+      obj.departamentos.forEach((obj1: any) => {
 
         // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
         if (this.bool.bool_dep === true) {
@@ -488,7 +488,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
   MapingDataPdfDefault(array: Array<any>) {
     let nuevo: Array<any> = [];
     array.forEach((obj1: ReporteHoraExtra) => {
-      obj1.departamentos.forEach(obj2 => {
+      obj1.departamentos.forEach((obj2: any) => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.horaE.forEach((obj4: hora) => {
             /* let ele = {

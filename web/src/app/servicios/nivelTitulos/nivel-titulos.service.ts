@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
 import { catchError } from 'rxjs';
 
 @Injectable({
@@ -18,15 +17,13 @@ export class NivelTitulosService {
   }
 
   // ELIMIAR REGISTRO
-  EliminarNivel(id: any) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/nivel-titulo/eliminar/${id}`).pipe(catchError(id));
+  EliminarNivel(id: any, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/nivel-titulo/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
-
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/nivel-titulo/xmlDownload`, data);
-  }
-
   // METODO PARA REGISTRAR NIVEL DE TITULO
   RegistrarNivel(data: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/nivel-titulo`, data);
@@ -43,26 +40,13 @@ export class NivelTitulosService {
   }
 
 
-  RevisarFormato(formData) {
+  RevisarFormato(formData: any) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/nivel-titulo/upload/revision', formData);
   }
 
-
-
-
-
-
-  // Niveles de titulos
-  getOneNivelTituloRest(id: number) {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/nivel-titulo/${id}`);
+  // METODO PARA REGISTAR LOS NIVELES DE TITULO DE LA PLANTILLA
+  RegistrarNivelesPlantilla(data: any) {
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/nivel-titulo/registrarNiveles', data);
   }
-
-
-
-
-
-
-
-
 
 }

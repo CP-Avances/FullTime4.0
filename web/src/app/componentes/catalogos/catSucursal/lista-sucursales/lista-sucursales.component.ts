@@ -23,11 +23,14 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
-import { ThemePalette } from '@angular/material/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
+
+import { environment } from 'src/environments/environment';
+
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableSucursales } from 'src/app/model/reportes.model';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-lista-sucursales',
@@ -42,9 +45,6 @@ export class ListaSucursalesComponent implements OnInit {
   buscarNombre = new FormControl('', [Validators.minLength(2)]);
   buscarCiudad = new FormControl('', [Validators.minLength(2)]);
   buscarEmpresa = new FormControl('', [Validators.minLength(2)]);
-  filtroNombreSuc = '';
-  filtroCiudadSuc = '';
-  filtroEmpresaSuc = '';
 
   public formulario = new FormGroup({
     buscarNombreForm: this.buscarNombre,
@@ -67,13 +67,24 @@ export class ListaSucursalesComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
+  idSucursalesAcceso: Set<any> = new Set();
+  idDepartamentosAcceso: Set<any> = new Set();
+
   expansion: boolean = false;
 
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
+  // VARIABLE PARA TOMAR RUTA DEL SISTEMA
+  hipervinculo: string = environment.url
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
+
+  // // VARIABLES PROGRESS SPINNER
+  // progreso: boolean = false;
+  // color: ThemePalette = 'primary';
+  // mode: ProgressSpinnerMode = 'indeterminate';
+  // value = 10;
 
   constructor(
     private rest: SucursalService,
@@ -84,11 +95,17 @@ export class ListaSucursalesComponent implements OnInit {
     public ventana: MatDialog,
     public validar: ValidacionesService,
     public restE: EmpleadoService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerSucursal();
     this.ObtenerColores();
@@ -100,7 +117,7 @@ export class ListaSucursalesComponent implements OnInit {
     });
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -116,7 +133,7 @@ export class ListaSucursalesComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -144,8 +161,13 @@ export class ListaSucursalesComponent implements OnInit {
 
     this.sucursales = [];
     this.rest.BuscarSucursal().subscribe(data => {
-      this.sucursales = data;
+      this.sucursales = this.FiltrarSucursalesAsignadas(data);
     });
+  }
+
+  // METODO PARA FILTRAR SUCURSALES ASIGNADAS
+  FiltrarSucursalesAsignadas(data: any) {
+    return data.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
   }
 
   // METODO PARA REGISTRAR SUCURSAL
@@ -214,7 +236,7 @@ export class ListaSucursalesComponent implements OnInit {
     this.ver_departamentos = true;
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                      METODO PARA EXPORTAR A PDF                              ** **
    ** ************************************************************************************************** **/
   generarPdf(action = 'open') {
@@ -277,18 +299,16 @@ export class ListaSucursalesComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto'],
             body: [
               [
                 { text: 'Código', style: 'tableHeader' },
-                { text: 'Empresa', style: 'tableHeader' },
                 { text: 'Establecimiento', style: 'tableHeader' },
                 { text: 'Ciudad', style: 'tableHeader' }
               ],
-              ...this.sucursales.map(obj => {
+              ...this.sucursales.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
-                  { text: obj.nomempresa, style: 'itemsTable' },
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTable' }
                 ];
@@ -307,21 +327,52 @@ export class ListaSucursalesComponent implements OnInit {
     };
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                      METODO PARA EXPORTAR A EXCEL                            ** **
    ** ************************************************************************************************** **/
   exportToExcel() {
+    var listExcelSucursales: any = [];
+    this.sucursales.forEach((item: any) => {
+      var data: any = {
+        id: '',
+        nombre: '',
+        descripcion: ''
+      }
+
+      data.id = item.id;
+      data.nombre = item.nombre;
+      data.descripcion = item.descripcion;
+
+      listExcelSucursales.push(data);
+    })
+
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.sucursales);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Establecimientos');
     xlsx.writeFile(wb, "Establecimientos" + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                      METODO PARA EXPORTAR A CSV                              ** **
    ** ************************************************************************************************** **/
 
   exportToCVS() {
+
+    var listExcelSucursales: any = [];
+    this.sucursales.forEach((item: any) => {
+      var data: any = {
+        id: '',
+        nombre: '',
+        descripcion: ''
+      }
+
+      data.id = item.id;
+      data.nombre = item.nombre;
+      data.descripcion = item.descripcion;
+
+      listExcelSucursales.push(data);
+    })
+
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.sucursales);
     const csvDataH = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
@@ -341,7 +392,6 @@ export class ListaSucursalesComponent implements OnInit {
       objeto = {
         "establecimiento": {
           "$": { "id": obj.id },
-          "empresa": obj.nomempresa,
           "establecimiento": obj.nombre,
           "ciudad": obj.descripcion,
         }
@@ -391,14 +441,14 @@ export class ListaSucursalesComponent implements OnInit {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 10);
+    let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'sucursales') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre Sucursales.', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
 
@@ -425,7 +475,7 @@ export class ListaSucursalesComponent implements OnInit {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
-    this.progreso = true;
+    // this.progreso = true;
 
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
@@ -437,13 +487,30 @@ export class ListaSucursalesComponent implements OnInit {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña SUCURSALES en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
         //Separa llas filas que estan con la observacion OK para luego registrar en la base.
-        this.Datasucursales.forEach(item => {
+        this.Datasucursales.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
-            this.listSucursalesCorrectas.push(item);
+
+            const nombre = item.nom_sucursal.charAt(0).toUpperCase() + item.nom_sucursal.slice(1);
+            const ciudad = this.datosCiudades.find((ciudad: any) => ciudad.nombre.toLowerCase() === item.ciudad.toLowerCase());
+
+            const sucursal = {
+              nombre: nombre,
+              id_ciudad: ciudad.id,
+              id_empresa: '1',
+            }
+            this.listSucursalesCorrectas.push(sucursal);
           }
         });
+
         if (this.listSucursalesCorrectas.length > 0) {
           this.btn_registrar = false;
         }
@@ -453,10 +520,10 @@ export class ListaSucursalesComponent implements OnInit {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
-      this.progreso = false;
+      // this.progreso = false;
       this.messajeExcel = 'error';
     }, () => {
-      this.progreso = false;
+      // this.progreso = false;
     });
 
   }
@@ -489,41 +556,25 @@ export class ListaSucursalesComponent implements OnInit {
   listSucursalesCorrectas: any = [];
   btn_registrar: boolean = true;
   registrarSucursales() {
-    var data = {
-      nombre: '',
-      id_ciudad: '',
-      id_empresa: ''
-    }
-
     if (this.listSucursalesCorrectas.length > 0) {
-      console.log('lista sucursales correctas: ', this.listSucursalesCorrectas.length);
-      var cont = 0;
-      this.listSucursalesCorrectas.forEach(item => {
-        this.datosCiudades.forEach(valor => {
-          if (item.ciudad.toLowerCase() == valor.nombre.toLowerCase()) {
-            data.nombre = item.nom_sucursal;
-            data.id_ciudad = valor.id;
-            data.id_empresa = '1';
+      let data = {
+        sucursales: this.listSucursalesCorrectas,
+        user_name: this.user_name,
+        ip: this.ip,
+      }
+      this.rest.RegistrarSucursales(data).subscribe({
+        next: (res: any) => {
+          this.toastr.success('Plantilla de Sucursales importada.','Operación exitosa.', {
+            timeOut: 10000,
+          });
+          this.LimpiarCampoBuscar();
 
-            // CAPITALIZAR LA PRIMERA LETRA DE LA PRIMERA PALABRA
-            const textonombre = data.nombre.charAt(0).toUpperCase();
-            const restoDelTexto = data.nombre.slice(1);
-
-            data.nombre = textonombre + restoDelTexto
-
-            this.rest.RegistrarSucursal(data).subscribe(res => {
-              cont = cont + 1;
-              if (this.listSucursalesCorrectas.length == cont) {
-                this.toastr.success('Operación exitosa.', 'Plantilla de Sucursales importada.', {
-                  timeOut: 10000,
-                });
-                this.LimpiarCampoBuscar();
-              }
-            })
-          }
-        })
-
-      })
+      }, error: (error: any) => {
+        this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+          timeOut: 6000,
+        });
+      }
+    });
     } else {
       this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
         timeOut: 4000,
@@ -690,9 +741,13 @@ export class ListaSucursalesComponent implements OnInit {
 
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_sucursal: number) {
-    this.rest.EliminarRegistro(id_sucursal).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistro(id_sucursal, datos).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
@@ -727,13 +782,17 @@ export class ListaSucursalesComponent implements OnInit {
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ingresar = false;
     this.contador = 0;
     this.sucursalesEliminar = this.selectionSucursales.selected;
     this.sucursalesEliminar.forEach((datos: any) => {
       this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+      this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,

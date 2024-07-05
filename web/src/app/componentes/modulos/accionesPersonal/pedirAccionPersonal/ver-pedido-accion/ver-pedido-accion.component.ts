@@ -82,11 +82,11 @@ export class VerPedidoAccionComponent implements OnInit {
   CargarInformacion(formato_fecha: string) {
     this.restAccion.BuscarDatosPedidoId(this.idPedido).subscribe(data => {
       this.datosPedido = data;
-      this.datosPedido[0].fec_creacion_ = this.validar.FormatearFecha(this.datosPedido[0].fec_creacion, formato_fecha, this.validar.dia_completo);
-      this.datosPedido[0].fec_rige_desde_ = this.validar.FormatearFecha(this.datosPedido[0].fec_rige_desde, formato_fecha, this.validar.dia_completo);
-      this.datosPedido[0].fec_rige_hasta_ = this.validar.FormatearFecha(this.datosPedido[0].fec_rige_hasta, formato_fecha, this.validar.dia_completo);
-      this.datosPedido[0].primera_fecha_reemp_ = this.validar.FormatearFecha(this.datosPedido[0].primera_fecha_reemp, formato_fecha, this.validar.dia_completo);
-      this.datosPedido[0].fec_act_final_concurso_ = this.validar.FormatearFecha(this.datosPedido[0].fec_act_final_concurso, formato_fecha, this.validar.dia_completo);
+      this.datosPedido[0].fec_creacion_ = this.validar.FormatearFecha(this.datosPedido[0].fecha_creacion, formato_fecha, this.validar.dia_completo);
+      this.datosPedido[0].fec_rige_desde_ = this.validar.FormatearFecha(this.datosPedido[0].fecha_rige_desde, formato_fecha, this.validar.dia_completo);
+      this.datosPedido[0].fec_rige_hasta_ = this.validar.FormatearFecha(this.datosPedido[0].fecha_rige_hasta, formato_fecha, this.validar.dia_completo);
+      this.datosPedido[0].primera_fecha_reemp_ = this.validar.FormatearFecha(this.datosPedido[0].primera_fecha_reemplazo, formato_fecha, this.validar.dia_completo);
+      this.datosPedido[0].fec_act_final_concurso_ = this.validar.FormatearFecha(this.datosPedido[0].fecha_acta_final_concurso, formato_fecha, this.validar.dia_completo);
       console.log('datos', this.datosPedido);
       this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empleado).subscribe(data1 => {
         console.log('empleado', data1)
@@ -95,28 +95,29 @@ export class VerPedidoAccionComponent implements OnInit {
         this.cargo = data1[0].cargo;
         this.departamentoE = data1[0].departamento;
         this.cedula = data1[0].cedula;
-        this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empl_uno).subscribe(data2 => {
+        this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empleado_uno).subscribe(data2 => {
           this.datoEmpleadoH = data2[0].apellido + ' ' + data2[0].nombre;
           this.cargoH = data2[0].cargo;
-          this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empl_dos).subscribe(data3 => {
+          this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empleado_dos).subscribe(data3 => {
             this.datoEmpleadoG = data3[0].apellido + ' ' + data3[0].nombre;
             this.cargoG = data3[0].cargo;
-            this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empl_responsable).subscribe(data4 => {
+            this.restAccion.ConsultarUnDecreto(this.datosPedido[0].id_contexto_legal).subscribe(data8 => {
+              this.decreto = data8[0].descripcion;
+            });
+            this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empleado_responsable).subscribe(data4 => {
               this.datoEmpleadoR = data4[0].apellido + ' ' + data4[0].nombre;
               this.cargoR = data4[0].cargo;
             });
             this.restAccion.BuscarDatosPedidoCiudades(this.datosPedido[0].id_ciudad).subscribe(data5 => {
               this.ciudad = data5[0].descripcion;
             });
-            this.restProcesos.getOneProcesoRest(this.datosPedido[0].proceso_propuesto).subscribe(data6 => {
+            this.restProcesos.getOneProcesoRest(this.datosPedido[0].id_proceso_propuesto).subscribe(data6 => {
               this.proceso = data6[0].nombre;
             });
-            this.restAccion.ConsultarUnCargoPropuesto(this.datosPedido[0].cargo_propuesto).subscribe(data7 => {
+            this.restAccion.ConsultarUnCargoPropuesto(this.datosPedido[0].id_cargo_propuesto).subscribe(data7 => {
               this.cargop = data7[0].descripcion;
             });
-            this.restAccion.ConsultarUnDecreto(this.datosPedido[0].decre_acue_resol).subscribe(data8 => {
-              this.decreto = data8[0].descripcion;
-            });
+          
           });
         });
       });

@@ -9,6 +9,7 @@ import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/em
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import moment from 'moment';
 
 @Component({
   selector: 'app-registrar-timbre',
@@ -47,6 +48,10 @@ export class RegistrarTimbreComponent implements OnInit {
   // ID EMPLEADO QUE INICIO SESION
   id_empl: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restP: ParametrosService,
     public restE: EmpleadoService,
@@ -59,6 +64,8 @@ export class RegistrarTimbreComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.VerificarFunciones();
     this.BuscarParametro();
     this.Geolocalizar();
@@ -194,8 +201,12 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA TOMAR DATOS DE MARCACION
   RegistrarDatosTimbre(form: any, ubicacion: any) {
+    // OBTENER LA FECHA Y HORA ACTUAL
+    var now = moment();
+    // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
+    var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
     let dataTimbre = {
-      fec_hora_timbre: this.f.toLocaleString(),
+      fec_hora_timbre: fecha_hora,
       tecl_funcion: this.teclaFuncionF,
       observacion: form.observacionForm,
       ubicacion: ubicacion,
@@ -203,6 +214,8 @@ export class RegistrarTimbreComponent implements OnInit {
       id_reloj: 98,
       latitud: this.latitud,
       accion: this.accionF,
+      ip: this.ip,
+      user_name: this.user_name
     }
     console.log('ver data timbre ', dataTimbre)
     this.ventana.close(dataTimbre);

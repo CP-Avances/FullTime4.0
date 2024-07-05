@@ -17,6 +17,10 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 
 export class EditarCoordenadasComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   latitud = new FormControl('', Validators.required);
   longitud = new FormControl('', Validators.required);
@@ -39,6 +43,9 @@ export class EditarCoordenadasComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.MostrarDatos();
     this.ConsultarCoordenadas();
     this.BuscarParametro();
@@ -85,7 +92,9 @@ export class EditarCoordenadasComponent implements OnInit {
         latitud: form.latitudForm,
         longitud: form.longitudForm,
         descripcion: form.descripcionForm,
-        id: this.data.ubicacion.id
+        id: this.data.ubicacion.id,
+        user_name: this.user_name,
+        ip: this.ip
       }
       this.rest.ActualizarCoordenadas(datos).subscribe(response => {
         this.toastr.success('Ubicación registrada exitosamente.',

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Socket } from 'ngx-socket-io';
-import { environment } from '../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +22,7 @@ export class PermisosService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoPermiso/numPermiso/${id}`);
   }
 
-  // METODO PARA BUSCAR PERMISOS SOLICITADOS 
+  // METODO PARA BUSCAR PERMISOS SOLICITADOS
   BuscarPermisosSolicitadosTotales(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoPermiso/permisos-solicitados-totales`, datos);
   }
@@ -87,8 +86,14 @@ export class PermisosService {
   }
 
   // METODO PARA ELIMINAR PERMISOS
-  EliminarPermiso(id_permiso: number, doc: string, codigo: number) {
-    return this.http.delete<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoPermiso/eliminar/${id_permiso}/${doc}/verificar/${codigo}`);
+  EliminarPermiso(datos: any) {
+    const { id_permiso, doc, codigo, user_name, ip } = datos;
+    const data = { user_name, ip };
+    const url = `${(localStorage.getItem('empresaURL') as string)}/empleadoPermiso/eliminar/${id_permiso}/${doc}/verificar/${codigo}`;
+    const httpOtions = {
+      body: data
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA CREAR ARCHIVO XML
@@ -111,17 +116,7 @@ export class PermisosService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoPermiso/mail-noti/solicitud-multiple`, datos);
   }
 
-
-
-
-
-
-
-
-
-
   // Permisos Empleado
-
   obtenerAllPermisos() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoPermiso/lista`);
   }
@@ -138,22 +133,8 @@ export class PermisosService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/empleadoPermiso/${id}/estado`, datos);
   }
 
-  ConsultarEmpleadoPermisos() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoPermiso`);
-  }
-
-
-  ObtenerUnPermiso(id: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoPermiso/${id}`)
-  }
-
   ObtenerUnPermisoEditar(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoPermiso/permiso/editar/${id}`)
-  }
-
-
-  BuscarPermisoContrato(id: any) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoPermiso/permisoContrato/${id}`);
   }
 
   BuscarDatosSolicitud(id_emple_permiso: number) {
@@ -163,24 +144,5 @@ export class PermisosService {
   BuscarDatosAutorizacion(id_permiso: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoPermiso/datosAutorizacion/${id_permiso}`);
   }
-
-
-
-  BuscarFechasPermiso(datos: any, codigo: number) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoPermiso/fechas_permiso/${codigo}`, datos);
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

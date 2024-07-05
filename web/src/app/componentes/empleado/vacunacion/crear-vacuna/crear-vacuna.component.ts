@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 // IMPORTAR SERVICIOS
 import { VacunacionService } from 'src/app/servicios/empleado/empleadoVacunas/vacunacion.service';
 
-import { TipoVacunaComponent } from '../tipo-vacuna/tipo-vacuna.component';
+import { TipoVacunaComponent } from '../../../catalogos/catalogoVacuna/tipo-vacuna/tipo-vacuna.component';
 
 @Component({
   selector: 'app-crear-vacuna',
@@ -19,6 +19,11 @@ export class CrearVacunaComponent implements OnInit {
 
   idEmploy: any;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
+
   constructor(
     public restVacuna: VacunacionService, // CONSULTA DE SERVICIOS DATOS DE VACUNACIÓN
     public toastr: ToastrService, // VARIABLE USADA PARA MENSAJES DE NOTIFICACIONES
@@ -28,6 +33,9 @@ export class CrearVacunaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.idEmploy = this.datos.idEmpleado;
     this.ObtenerTipoVacunas();
     this.tipoVacuna[this.tipoVacuna.length] = { nombre: "OTRO" };
@@ -115,13 +123,16 @@ export class CrearVacunaComponent implements OnInit {
       });
   }
 
-  // METODO PARA GUARDAR DATOS DE REGISTRO DE VACUNACION 
+  // METODO PARA GUARDAR DATOS DE REGISTRO DE VACUNACIÓN
   GuardarDatosCarnet(form: any) {
     let dataCarnet = {
+      subir_documento: false,
       id_tipo_vacuna: form.vacunaForm,
       descripcion: form.nombreForm,
       id_empleado: parseInt(this.idEmploy),
       fecha: form.fechaForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     // VERIIFCAR EXISTENCIA DEL REGISTRO DE VACUNA
     let vacuna = {
@@ -160,6 +171,7 @@ export class CrearVacunaComponent implements OnInit {
   // METODO PARA GUARDAR DATOS DE REGISTROS SI EL ARCHIVO CUMPLE CON LOS REQUISITOS
   VerificarArchivo(datos: any) {
     if (this.archivoSubido[0].size <= 2e+6) {
+      datos.subir_documento = true;
       this.CargarDocumento(datos);
       this.CerrarRegistro();
     }
@@ -177,13 +189,33 @@ export class CrearVacunaComponent implements OnInit {
       for (var i = 0; i < this.archivoSubido.length; i++) {
         formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
       }
+      formData.append('user_name', this.user_name as string);
+      formData.append('ip', this.ip as string);
       this.restVacuna.SubirDocumento(formData, vacuna.id, this.idEmploy).subscribe(res => {
+        //console.log('res documento ', res)
         this.archivoF.reset();
         this.nameFile = '';
-        this.toastr.success('', 'Registro guardado.', {
+        if (res.message === 'error') {
+          this.toastr.warning('Intente nuevamente.', 'Ups!!! algo salio mal.', {
+            timeOut: 6000,
+          });
+        }
+        else if (res.message === 'error_carpeta') {
+          this.toastr.warning('No fue posible encontrar almacenamiento de archivos.', 'Intente nuevamente.', {
+            timeOut: 6000,
+          });
+        }
+        else {
+          this.toastr.success('', 'Registro guardado.', {
+            timeOut: 6000,
+          });
+        }
+      }, error => {
+        this.toastr.warning('Intente nuevamente.', 'Ups!!! algo salio mal.', {
           timeOut: 6000,
         });
-      });
+      }
+      );
     });
   }
 

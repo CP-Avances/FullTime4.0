@@ -10,22 +10,11 @@ export class FuncionesService {
   constructor(
     private http: HttpClient,
   ) { }
-
   
   // METODO PARA LISTAR FUNCIONES ACTIVAS DEL SISTEMA
   ListarFunciones(data: any) {
-    //return this.http.post<any>(`${environment.url}/fulltime`, data);
-    //return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/administracion/funcionalidad`)
     return this.http.post<any>(`${environment.url}/administracion/funcionalidad`, data)
   }
-
-
-
-
-
-
-  
-
 
   CrearFunciones(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/administracion`, data);
@@ -34,6 +23,5 @@ export class FuncionesService {
   EditarFunciones(id: number, data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/administracion/funcion/${id}`, data);
   }
-
 
 }

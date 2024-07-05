@@ -80,6 +80,8 @@ class DepartamentoRutas {
         this.router.get('/documentos/:docs/contrato/:id', contratoEmpleadoControlador_1.default.ObtenerDocumento);
         // METODO PARA BUSCAR CONTRATOS POR ID DE EMPLEADO
         this.router.get('/contrato-empleado/:id_empleado', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.BuscarContratoEmpleado);
+        // METODO PARA BUSCAR CONTRATOS POR ID DE EMPLEADO EXCLUYENDO CONTRATO A EDITAR
+        this.router.post('/contrato-empleado-editar', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.BuscarContratoEmpleadoEditar);
         // EDITAR DATOS DE CONTRATO
         this.router.put('/:id/actualizar', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EditarContrato);
         // ELIMINAR DOCUMENTO DE CONTRATO BASE DE DATOS - SERVIDOR
@@ -93,7 +95,7 @@ class DepartamentoRutas {
         // METODO PARA BUSCAR FECHAS DE CONTRATOS    --**VERIFICADO
         this.router.post('/buscarFecha', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EncontrarFechaContrato);
         /** ********************************************************************************************* **
-         ** **            METODOS PARA SER USADOS EN LA TABLA MODAL_TRABAJO O TIPO DE CONTRATOS        ** **
+         ** **            METODOS PARA SER USADOS EN LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS        ** **
          ** ********************************************************************************************* **/
         // REGISTRAR MODALIDAD DE TRABAJO
         this.router.post('/modalidad/trabajo', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.CrearTipoContrato);
@@ -101,9 +103,6 @@ class DepartamentoRutas {
         this.router.get('/modalidad/trabajo', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.ListarTiposContratos);
         // BUSCAR MODALIDAD LABORAL POR SU NOMBRE
         this.router.post('/modalidad/trabajo/nombre', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.BuscarModalidadLaboralNombre);
-        this.router.get('/', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.ListarContratos);
-        this.router.get('/:id/get', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.ObtenerUnContrato);
-        this.router.get('/:id_empleado', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EncontrarIdContrato);
         this.router.post('/buscarFecha/contrato', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.EncontrarFechaContratoId);
         /** ********************************************************************************************* **
          ** **            METODO PAARA LA LECTURA DEL REGISTRO MULTIPLE DE CONTRATOS                   ** **

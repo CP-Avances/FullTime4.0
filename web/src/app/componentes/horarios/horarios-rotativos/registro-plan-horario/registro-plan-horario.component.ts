@@ -61,6 +61,10 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
   expansion: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public componentev: VerEmpleadoComponent,
     public componentem: HorarioMultipleEmpleadoComponent,
@@ -80,13 +84,15 @@ export class RegistroPlanHorarioComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    //---console.log('ver rotativo ', this.datoEmpleado)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.BuscarHorarios();
     this.BuscarHora();
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
   formato_hora: string = 'HH:mm:ss';
 
@@ -273,7 +279,8 @@ export class RegistroPlanHorarioComponent implements OnInit {
   dia_fin: any;
   hora_feriado: boolean = false;
   ListarFechas(fecha_inicio: any, fecha_final: any) {
-    this.fechas_mes = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO 
+    this.fechas_mes = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
+
     this.dia_inicio = moment(fecha_inicio, 'YYYY-MM-DD').format('YYYY-MM-DD');
     this.dia_fin = moment(fecha_final, 'YYYY-MM-DD').format('YYYY-MM-DD');
     // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIAS DEL PERIODO INDICADO
@@ -301,7 +308,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     }
     // TRATAMIENTO DE FERIADOS
     this.fechas_mes.forEach((obj: any) => {
-      // BUSCAR FERIADOS 
+      // BUSCAR FERIADOS
       if (this.feriados.length != 0) {
         //---console.log('ingresa feriados ', this.feriados)
         for (let i = 0; i < this.feriados.length; i++) {
@@ -496,6 +503,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
   IngresarHorario(index: number) {
     //---console.log('verificar existencias ', this.fechas_mes[index])
     //---console.log('tipo dia origen', this.fechas_mes[index].tipo_dia_origen)
+    this.cargar = false;
     let verificador = 0;
     let procesar = 0;
     this.ControlarBotones(true, false);
@@ -619,6 +627,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
   // METODO PARA INGRESAR HORARIO
   IngresarLibre(index: number) {
+    this.cargar = false;
     let verificador = 0;
     this.ControlarBotones(true, false);
     const [datoHorario] = this.horarios.filter((o: any) => {
@@ -842,6 +851,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
         })
       })
     }
+
     if (iterar3 === this.data_horarios.length) {
       this.data_horarios.forEach((obj: any) => {
         this.leer_horario2 = this.leer_horario2 + 1;
@@ -1111,7 +1121,13 @@ export class RegistroPlanHorarioComponent implements OnInit {
   // METODO PARA ELIMINAR PLANIFICACION GENERAL DE HORARIOS
   EliminarPlanificacion(seleccionados: any, origen: any, opcion: number) {
     let verificador = 0;
-    this.lista_eliminar.forEach((eliminar: any) => {
+
+    let datos = {
+      id_plan: [],
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+    this.lista_eliminar.forEach(eliminar => {
       let plan_fecha = {
         codigo: this.datoEmpleado.codigo,
         fec_final: eliminar.fecha,
@@ -1121,7 +1137,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
       //--console.log('ver plan ', plan_fecha)
       this.restP.BuscarFechas(plan_fecha).subscribe(res => {
         // METODO PARA ELIMINAR DE LA BASE DE DATOS
-        this.restP.EliminarRegistro(res).subscribe(datos => {
+        this.restP.EliminarRegistro(datos).subscribe(datos => {
           verificador = verificador + 1;
           //--console.log('veriifcador eliminado ', verificador, ' lengh ', this.lista_eliminar.length)
           if (verificador === this.lista_eliminar.length) {
@@ -1247,7 +1263,12 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
   // METODO PARA INGRESAR DATOS A LA BASE
   InsertarPlanificacion() {
-    this.restP.CrearPlanGeneral(this.plan_general).subscribe(res => {
+    const datos = {
+      plan_general: this.plan_general,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+    this.restP.CrearPlanGeneral(datos).subscribe(res => {
       if (res.message === 'OK') {
         this.progreso = false;
         this.toastr.success('Operación exitosa.', 'Planificación horaria registrada.', {

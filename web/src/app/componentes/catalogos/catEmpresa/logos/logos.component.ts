@@ -18,6 +18,10 @@ export class LogosComponent implements OnInit {
   logo: string;
   textoBoton: string = 'Editar';
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restE: EmpresaService,
     public ventana: MatDialogRef<LogosComponent>,
@@ -26,6 +30,9 @@ export class LogosComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.MostrarImagen();
   }
 
@@ -83,6 +90,10 @@ export class LogosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("image", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    formData.append("user_name", this.user_name as string);
+    formData.append("ip", this.ip as string);
+
     this.restE.EditarLogoEmpresa(this.data.empresa, formData).subscribe(res => {
       this.logo = 'data:image/jpeg;base64,' + res.imagen;
       if (res.imagen != 0) { this.textoBoton = 'Editar' };
@@ -117,6 +128,10 @@ export class LogosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("image", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    formData.append("user_name", this.user_name as string);
+    formData.append("ip", this.ip as string);
+
     this.restE.EditarCabeceraCorreo(this.data.empresa, formData).subscribe(res => {
       this.logo = 'data:image/jpeg;base64,' + res.imagen;
       if (res.imagen != 0) { this.textoBoton = 'Editar' };
@@ -150,6 +165,10 @@ export class LogosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("image", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    formData.append("user_name", this.user_name as string);
+    formData.append("ip", this.ip as string);
+
     this.restE.EditarPieCorreo(this.data.empresa, formData).subscribe(res => {
       this.logo = 'data:image/jpeg;base64,' + res.imagen;
       if (res.imagen != 0) { this.textoBoton = 'Editar' };

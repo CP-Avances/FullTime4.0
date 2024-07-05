@@ -47,6 +47,8 @@ class SucursalRutas {
 
     
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], SUCURSAL_CONTROLADOR.RevisarDatos);
+
+        this.router.post('/registraSucursales', TokenValidation, SUCURSAL_CONTROLADOR.RegistrarSucursales);
     }
 }
 

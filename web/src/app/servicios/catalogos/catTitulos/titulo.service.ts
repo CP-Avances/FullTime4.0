@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment'
 import { catchError } from 'rxjs';
 
 @Injectable({
@@ -20,18 +19,18 @@ export class TituloService {
 
   // METODO PARA CREAR ARCHIVO XML
   BuscarTituloNombre(data: any) {
-    return this.http.post(`${environment.url}/titulo/titulo-nombre`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/titulo/titulo-nombre`, data);
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarRegistro(id: any) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/titulo/eliminar/${id}`).pipe(catchError(id));
+  EliminarRegistro(id: any, datos:any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/titulo/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
 
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/titulo/xmlDownload`, data);
-  }
 
   // METODO PARA REGISTRAR TITULO
   RegistrarTitulo(data: any) {
@@ -47,18 +46,9 @@ export class TituloService {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/titulo/upload/revision', formData);
   }
 
-
-  // Catálogo de títulos
-
-  getOneTituloRest(id: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/titulo/${id}`);
+  // METODO PARA REGISTRAR TITULOS DE LA PLANTILLA
+  RegistrarTitulosPlantilla(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/titulo/registrarTitulos`, data);
   }
-
-
-
-
-
-
-
 
 }

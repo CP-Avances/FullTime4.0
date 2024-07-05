@@ -11,18 +11,12 @@ class CiudadRutas {
     }
 
     configuracion(): void {
-        this.router.get('/horasExtrasReales', TokenValidation, REPORTES_CONTROLADOR.ListarDatosContractoA);
-        this.router.get('/horasExtrasReales/:empleado_id', TokenValidation, REPORTES_CONTROLADOR.ListarDatosCargoA);
         this.router.post('/horasExtrasReales/entradaSalida/:id_empleado', TokenValidation, REPORTES_CONTROLADOR.ListarEntradaSalidaEmpleado);
         this.router.post('/horasExtrasReales/listaPedidos/:id_usua_solicita', TokenValidation, REPORTES_CONTROLADOR.ListarPedidosEmpleado);
         this.router.post('/horasExtrasReales/entradaSalida/total/timbres', TokenValidation, REPORTES_CONTROLADOR.ListarEntradaSalidaTodos);
         this.router.post('/horasExtrasReales/listaPedidos/total/solicitudes', TokenValidation, REPORTES_CONTROLADOR.ListarPedidosTodos);
-        this.router.post('/reporteTimbres/listaTimbres/:id_empleado', TokenValidation, REPORTES_CONTROLADOR.ListarTimbres);
         this.router.get('/reportePermisos/horarios/:codigo', TokenValidation, REPORTES_CONTROLADOR.ListarPermisoHorarioEmpleado);
-        this.router.get('/reportePermisos/autorizaciones/:id_empleado', TokenValidation, REPORTES_CONTROLADOR.ListarPermisoAutorizaEmpleado);
-        this.router.post('/reportePermisos/fechas/horarios/:codigo', TokenValidation, REPORTES_CONTROLADOR.ListarPermisoHorarioEmpleadoFechas);
 
-        this.router.post('/reporteTimbres/buscarPlan/:codigo', TokenValidation, REPORTES_CONTROLADOR.BuscarPlan);
     }
 }
 

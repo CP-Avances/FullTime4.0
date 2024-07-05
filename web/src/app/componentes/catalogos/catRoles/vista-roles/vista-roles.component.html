@@ -61,8 +61,7 @@
                             <td></td>
                             <td>
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroRoles"
-                                        [formControl]="buscarDescripcion">
+                                    <input matInput placeholder="Buscar" [formControl]="buscarDescripcion">
                                 </mat-form-field>
                             </td>
                             <td>
@@ -72,7 +71,8 @@
                                 </mat-icon>
                             </td>
                         </tr>
-                        <tr *ngFor="let rol of roles | roles:filtroRoles | paginate:tamanio_pagina:numero_pagina">
+                        <tr
+                            *ngFor="let rol of roles | roles:buscarDescripcion.value | paginate:tamanio_pagina:numero_pagina">
 
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"

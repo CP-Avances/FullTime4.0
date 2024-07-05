@@ -22,6 +22,10 @@ export class ConfirmarContraseniaComponent implements OnInit {
   mensaje: any = [];
   mensajeURL: any = [];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   public formulario = new FormGroup({
     nPass: this.NuevaContrasenia,
     cPass: this.ConfirmarContrasenia,
@@ -39,6 +43,8 @@ export class ConfirmarContraseniaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   // METODO PARA COMPARAR LAS CONTRASEÑAS

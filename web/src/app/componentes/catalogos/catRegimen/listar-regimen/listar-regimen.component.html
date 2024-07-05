@@ -68,8 +68,7 @@
                             <td></td>
                             <td>
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" [formControl]="descripcionF"
-                                        [(ngModel)]="filtroRegimenLaboral">
+                                    <input matInput placeholder="Buscar" [formControl]="descripcionF">
                                 </mat-form-field>
                             </td>
                             <td></td>
@@ -84,7 +83,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let regimenL of regimen | filtroRegion: filtroRegimenLaboral | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let regimenL of regimen | filtroRegion: descripcionF.value | paginate:tamanio_pagina:numero_pagina">
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionRegimen.toggle(regimenL) : null"

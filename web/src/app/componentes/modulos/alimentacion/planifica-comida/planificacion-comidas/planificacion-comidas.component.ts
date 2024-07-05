@@ -64,6 +64,10 @@ export class PlanificacionComidasComponent implements OnInit {
   FechaActual: any;
   idEmpleadoLogueado: any;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private toastr: ToastrService,
     private parametro: ParametrosService,
@@ -73,14 +77,16 @@ export class PlanificacionComidasComponent implements OnInit {
     public aviso: RealTimeService,
     public validar: ValidacionesService,
     public restPlan: PlanComidasService,
-    public restUsuario: UsuarioService,
+    private restUsuario: UsuarioService,
     public compenentel: PlanComidasComponent,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
-    console.log('datos', this.data+ ' ' + this.data.length)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
     this.ObtenerServicios();
@@ -91,7 +97,7 @@ export class PlanificacionComidasComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -188,6 +194,8 @@ export class PlanificacionComidasComponent implements OnInit {
       hora_fin: form.horaFinForm,
       fecha: form.fechaForm,
       extra: form.extraForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
 
     // METODO PARA VALIDAR FECHAS INGRESADAS
@@ -244,7 +252,7 @@ export class PlanificacionComidasComponent implements OnInit {
     }
     // METODO PARA BUSCAR PLANIFICACION HORARIA
     this.restH.BuscarHorarioFechas(parseInt(this.data.codigo), datosHorario).subscribe(plan => {
-      // REGISTRAR PLANIFICACIÓN 
+      // REGISTRAR PLANIFICACIÓN
       this.PlanificacionIndividual(form, datosPlanComida);
     }, error => {
       this.toastr.info(this.data.nombre + ' no tiene registro de horario laboral (planificación) en las fechas indicadas.', '', {
@@ -253,7 +261,7 @@ export class PlanificacionComidasComponent implements OnInit {
     });
   }
 
-  // METODO PARA GUARDAR DATOS DE PLANIFICACION DE ALIMENTACION 
+  // METODO PARA GUARDAR DATOS DE PLANIFICACION DE ALIMENTACION
   PlanificacionIndividual(form: any, datosPlanComida: any) {
     // CREACIÓN DE LA PLANIFICACION PARA UN EMPLEADO
     this.restPlan.CrearPlanComidas(datosPlanComida).subscribe(res => {
@@ -288,7 +296,9 @@ export class PlanificacionComidasComponent implements OnInit {
           fecha: '',
           hora_inicio: form.horaInicioForm,
           hora_fin: form.horaFinForm,
-          consumido: false
+          consumido: false,
+          user_name: this.user_name,
+          ip: this.ip,
         }
 
         // LECTURA DE DATOS DE USUARIO
@@ -304,7 +314,7 @@ export class PlanificacionComidasComponent implements OnInit {
         let h_fin = this.validar.FormatearHora(plan.hora_fin, this.formato_hora);
 
         // REGISTRAR PLANIFICACION DEL USUARIO
-        this.fechasHorario.map(obj => {
+        this.fechasHorario.map((obj: any) => {
           planEmpleado.fecha = obj;
 
           // METODO PARA PLANIFICAR ALIMENTACION DEL USUARIO
@@ -348,7 +358,7 @@ export class PlanificacionComidasComponent implements OnInit {
       fecha_fin: form.fechaFinForm
     }
     // PROCESAR TODOS LOS DATOS
-    this.data.map(obj => {
+    this.data.map((obj: any) => {
       datosDuplicados.id = obj.id;
       // METODO PARA VERIFICAR DATOS DUPLICADOS
       this.restPlan.BuscarDuplicadosFechas(datosDuplicados).subscribe(res => {
@@ -365,7 +375,7 @@ export class PlanificacionComidasComponent implements OnInit {
         contar_seleccionados = contar_seleccionados + 1;
         this.empleados_sinPlanificacion = this.empleados_sinPlanificacion.concat(obj);
         if (contar_seleccionados === this.data.length) {
-          // METODO PARA VALIDAR REGISTRO DE HORARIO 
+          // METODO PARA VALIDAR REGISTRO DE HORARIO
           this.VerificarHorariosEmpleadosMultiples(form, datosPlanComida, this.empleados_sinPlanificacion, this.empleados_conPlanificacion);
         }
 
@@ -382,7 +392,7 @@ export class PlanificacionComidasComponent implements OnInit {
       fechaInicio: form.fechaInicioForm,
       fechaFinal: form.fechaFinForm
     }
-    sin_planificacion.map(obj => {
+    sin_planificacion.map((obj: any) => {
       // METODO PARA BUSCAR EXISTENCIA DE HORARIO
       this.restH.BuscarHorarioFechas(obj.codigo, datosHorario).subscribe(res => {
         contar_horario = contar_horario + 1;
@@ -429,7 +439,7 @@ export class PlanificacionComidasComponent implements OnInit {
       else {
         // MENSAJE SI ALGUNOS USUARIOS CUENTAN CON PLANIFICACION
         var nombres_empleados = '';
-        array_datos.map(obj => {
+        array_datos.map((obj: any) => {
           nombres_empleados = nombres_empleados + ' - ' + obj.nombre
         })
         this.toastr.info('',
@@ -455,7 +465,7 @@ export class PlanificacionComidasComponent implements OnInit {
       else {
         // SI ALGUNOS USUARIOS O CUENTA CON PLANIFICACION HORARIA
         var nombres_empleados = '';
-        array_datos.map(obj => {
+        array_datos.map((obj: any) => {
           nombres_empleados = nombres_empleados + ' - ' + obj.nombre
         })
         this.toastr.info('',
@@ -509,10 +519,12 @@ export class PlanificacionComidasComponent implements OnInit {
             fecha: '',
             hora_inicio: form.horaInicioForm,
             hora_fin: form.horaFinForm,
-            consumido: false
+            consumido: false,
+            user_name: this.user_name,
+            ip: this.ip,
           }
           // LEER DATOS DE CADA USUARIOS
-          empleados_planificados.map(obj => {
+          empleados_planificados.map((obj: any) => {
             planEmpleado.codigo = obj.codigo;
             planEmpleado.id_empleado = obj.id;
 
@@ -608,6 +620,8 @@ export class PlanificacionComidasComponent implements OnInit {
       mensaje: 'Planificación servicio de alimentación desde ' +
         desde + ' hasta ' + hasta +
         ' horario de ' + h_inicio + ' a ' + h_fin + ' servicio ',
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restPlan.EnviarMensajePlanComida(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);

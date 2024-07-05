@@ -35,13 +35,13 @@ export class FecTimbrePipe implements PipeTransform {
       };
     };
 
-    const objetos = resultadoTimbres.map(obj => {
+    const objetos = resultadoTimbres.map((obj: any) => {
       return JSON.stringify(obj);
     });
 
     const unicos: any = [... new Set(objetos)];
 
-    return unicos.map(obj => {
+    return unicos.map((obj: any) => {
       return JSON.parse(obj)
     });
   }

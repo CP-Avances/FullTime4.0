@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
@@ -9,7 +9,11 @@ import { CatModalidadLaboralService } from 'src/app/servicios/catalogos/catModal
   templateUrl: './registro-modalidad.component.html',
   styleUrls: ['./registro-modalidad.component.css']
 })
-export class RegistroModalidadComponent {
+export class RegistroModalidadComponent implements OnInit{
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   modalidad = new FormControl('', Validators.required)
 
@@ -23,6 +27,11 @@ export class RegistroModalidadComponent {
     public ventana: MatDialogRef<RegistroModalidadComponent>,
   ){}
 
+  ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+  }
+
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
     this.formulario.reset();
@@ -32,6 +41,8 @@ export class RegistroModalidadComponent {
   InsertarModalidadLaboral(form: any) {
     let modalidadLaboral = {
       modalidad: form.modalidad,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.modalidad_.CrearModalidadLaboral(modalidadLaboral).subscribe(response => {
       console.log('response: ',response);
@@ -49,7 +60,7 @@ export class RegistroModalidadComponent {
           timeOut: 4000,
         });
       }
-      
+
 
     }, error => {
       this.toastr.info(error, 'Error', {

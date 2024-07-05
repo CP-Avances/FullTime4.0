@@ -1,8 +1,6 @@
 // IMPORTACION DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { ThemePalette } from '@angular/material/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
@@ -26,9 +24,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
 import { Router } from '@angular/router';
-
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableFeriados } from 'src/app/model/reportes.model';
@@ -59,10 +55,6 @@ export class ListarFeriadosComponent implements OnInit {
   feriados: any = [];
   empleado: any = [];
 
-  // VARAIBLES USADAS PARA FILTROS DE BUSQUEDA
-  filtroDescripcion = '';
-  filtradoFecha = '';
-
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
 
   // ITEMS DE PAGINACION DE LA TABLA
@@ -85,11 +77,9 @@ export class ListarFeriadosComponent implements OnInit {
 
   expansion: boolean = false;
 
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
@@ -105,7 +95,6 @@ export class ListarFeriadosComponent implements OnInit {
     public ventana: MatDialog, // VARIABLE DE USO DE VENTANAS DE DIÁLOGO
     public validar: ValidacionesService,
     public parametro: ParametrosService,
-    public spinnerService: SpinnerService,
     private router: Router,
 
   ) {
@@ -113,6 +102,9 @@ export class ListarFeriadosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.BuscarParametro();
   }
@@ -203,6 +195,8 @@ export class ListarFeriadosComponent implements OnInit {
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
     this.DataFeriados = null;
+    this.DataFerieados_ciudades = null;
+    this.messajeExcel2 = '';
     this.archivoSubido = [];
     this.nameFile = '';
     this.formulario.setValue({
@@ -271,15 +265,15 @@ export class ListarFeriadosComponent implements OnInit {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 8);
+    let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'feriados') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
         //this.Revisarplantilla_feriado_ciudad();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre Feriados', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
         this.nameFile = '';
@@ -307,14 +301,12 @@ export class ListarFeriadosComponent implements OnInit {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
-    this.progreso = true;
-
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataFeriados = res.data;
       this.DataFerieados_ciudades = res.datafc;
 
-      console.log('Feriados ciudades: ',this.DataFerieados_ciudades);
+      console.log('Feriados ciudades: ', this.DataFerieados_ciudades);
 
       this.messajeExcel = res.message;
       if (this.messajeExcel == 'error') {
@@ -322,7 +314,20 @@ export class ListarFeriadosComponent implements OnInit {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
+      }
+      else if (this.messajeExcel == 'no_existe_feriado') {
+        this.toastr.error('No se ha encontrado pestaña FERIADOS en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else if (this.messajeExcel == 'no_existe_ciudad') {
+        this.toastr.error('No se ha encontrado pestaña CIUDAD_FERIADOS en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
         this.DataFeriados.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listFeriadosCorrectos.push(item);
@@ -342,9 +347,8 @@ export class ListarFeriadosComponent implements OnInit {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
-      this.progreso = false;
     }, () => {
-      this.progreso = false;
+
     });
   }
 
@@ -373,42 +377,35 @@ export class ListarFeriadosComponent implements OnInit {
     var data = {
       fecha: '',
       descripcion: '',
-      fec_recuperacion: ''
+      fec_recuperacion: '',
+      user_name: this.user_name,
+      ip: this.ip
     }
 
-    if (this.listFeriadosCorrectos.length > 0) {
-      console.log('lista sucursales correctas: ', this.listFeriadosCorrectos);
-      var cont = 0;
-      this.Crear_feriado_ciudad();
-
-      this.listFeriadosCorrectos.forEach(datos => {
-        data.fecha = datos.fecha;
-        data.descripcion = datos.descripcion;
-        data.fec_recuperacion = datos.fecha_recuperacion;
-        this.rest.CrearNuevoFeriado(data).subscribe(response => {
-          cont = cont + 1;
-          if (response.message === 'error') { 
-            this.toastr.error('La fecha del feriado o la fecha de recuperación se encuentran dentro de otro registro.', 'Upss!!! algo salio mal.', {
-              timeOut: 5000,
-            })
-          } else {
-            if (this.listFeriadosCorrectos.length == cont) {
-              this.toastr.success('Operación exitosa.', 'Plantilla de feriados importada.', {
-                timeOut: 10000,
-              });
-              setTimeout(() => {
-                this.Crear_feriado_ciudad();
-              }, 500);
-
-            }
-          }
-          this.LimpiarCampos();
+    console.log('lista sucursales correctas: ', this.listFeriadosCorrectos);
+    if (this.listFeriadosCorrectos?.length > 0) {
+      this.rest.Crear_feriados(this.listFeriadosCorrectos).subscribe(response => {
+        this.toastr.success('Operación exitosa.', 'Plantilla de Feriados importada.', {
+          timeOut: 5000,
         });
 
-      })
+        if (this.listaFerediadCiudadCorrectos?.length > 0) {
+          setTimeout(() => {
+            this.Crear_feriado_ciudad();
+          }, 500);
+        }
+        console.log('prueba entro')
+        this.LimpiarCampos();
+
+      }, (error) => {
+        this.toastr.error(error, 'Plantilla procesada.', {
+          timeOut: 4000,
+        });
+        this.archivoForm.reset();
+      });
 
     } else {
-      this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
       });
       this.archivoForm.reset();
@@ -430,7 +427,7 @@ export class ListarFeriadosComponent implements OnInit {
 
    // RECORRER LA LISTA DE CIUDADES SELECCIONADAS
 
-   this.ciudadesSeleccionadas.map(obj => {
+   this.ciudadesSeleccionadas.map((obj: any) => {
      var buscarCiudad = {
        id_feriado: id,
        id_ciudad: obj.id
@@ -470,22 +467,29 @@ export class ListarFeriadosComponent implements OnInit {
       return 'rgb(170, 129, 236)';
     } else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Ya existe en el sistema') {
+    } else if (observacion == 'Fecha ya existe en el sistema' ||
+      observacion == 'Fecha recuperación ya existe en el sistema' ||
+      observacion == 'Descripción ya existe en el sistema' ||
+      observacion == 'Feriando ya asignado a una ciudad'
+    ) {
       return 'rgb(239, 203, 106)';
-    } else if (observacion == 'Fecha registrada como valor de otra columna') {
+    } else if (observacion == 'Fecha como valor de otra columna') {
       return 'rgb(170, 129, 236)';
     } else if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
-    } else if (observacion == 'Formato de fecha_recuperacion incorrecto (YYYY-MM-DD)') {
-      return 'rgb(156, 214, 255)';
-    } else if (observacion == 'Formato de fecha incorrecto (YYYY-MM-DD)') {
+    } else if (observacion == 'Formato de fecha incorrecto (YYYY-MM-DD)' ||
+      observacion == 'Formato de fecha recuperación incorrecto (YYYY-MM-DD)') {
       return 'rgb(230, 176, 96)';
     } else if (arrayObservacion[0] == 'Fecha' || arrayObservacion[0] == 'Descripción'
       || arrayObservacion[0] == 'Provincia' || arrayObservacion[0] == 'Ciudad'
       || arrayObservacion[0] == 'Feriado'
     ) {
       return 'rgb(242, 21, 21)';
-    } else if (observacion == 'feriado invalido') {
+    } else if (observacion == 'La ciudad no existe en el sistema' ||
+      observacion == 'La provincia no existe en el sistema'
+    ) {
+      return 'rgb(255, 192, 203';
+    } else if (observacion == 'Feriado no válido (Debe existir previamente)') {
       return 'rgb(238, 34, 207)';
     } else {
       return 'white'
@@ -600,7 +604,7 @@ export class ListarFeriadosComponent implements OnInit {
 
   ExportToExcel() {
     this.OrdenarDatos(this.feriados);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.feriados.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.feriados.map((obj: any) => {
       return {
         CODIGO: obj.id,
         FERIADO: obj.descripcion,
@@ -678,7 +682,7 @@ export class ListarFeriadosComponent implements OnInit {
 
   ExportToCVS() {
     this.OrdenarDatos(this.feriados);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.feriados.map(obj => {
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.feriados.map((obj: any) => {
       return {
         CODIGO: obj.id,
         FERIADO: obj.descripcion,
@@ -811,22 +815,24 @@ export class ListarFeriadosComponent implements OnInit {
 
   }
 
-
-
-
+  // METODO PARA ELIMINAR REGISTROS
   Eliminar(id_feriado: number) {
-    this.rest.EliminarFeriado(id_feriado).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarFeriado(id_feriado, datos).subscribe((res: any) => {
       if (res.message === 'error') {
-        this.toastr.error('No se puede eliminar.', '', {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No se puede eliminar.', {
           timeOut: 6000,
         });
       } else {
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
-        this.BuscarParametro();
+        this.feriados = [];
+        this.LimpiarCampos();
       }
-
     });
   }
 
@@ -841,24 +847,26 @@ export class ListarFeriadosComponent implements OnInit {
           this.plan_multiple_ = false;
           this.feriadosEliminar = [];
           this.selectionFeriados.clear();
-          this.BuscarParametro();
         }
       });
 
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA ELIMINAR REGISTROS MULTIPLES
   contador: number = 0;
   ingresar: boolean = false;
-
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ingresar = false;
     this.contador = 0;
     this.feriadosEliminar = this.selectionFeriados.selected;
     this.feriadosEliminar.forEach((datos: any) => {
-      this.feriados = this.feriados.filter(item => item.id !== datos.id);
+      this.feriados = this.feriados.filter((item: any) => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.rest.EliminarFeriado(datos.id).subscribe(res => {
+      this.rest.EliminarFeriado(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -870,44 +878,38 @@ export class ListarFeriadosComponent implements OnInit {
               timeOut: 6000,
             });
             this.ingresar = true;
+            this.feriados = [];
+            this.LimpiarCampos();
           }
-          this.BuscarParametro();
         }
       });
     }
     )
   }
 
-
+  // FUNCION PARA CONFIRMAR ELIMINACION DE REGISTROS MULTIPLES
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-
           if (this.feriadosEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
-
             this.plan_multiple = false;
             this.plan_multiple_ = false;
             this.feriadosEliminar = [];
             this.selectionFeriados.clear();
-
-            this.BuscarParametro();
-
           } else {
             this.toastr.warning('No ha seleccionado FERIADOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
-
         } else {
           this.router.navigate(['/listarFeriados']);
         }
       });
-
-
   }
 
+
+  
 }

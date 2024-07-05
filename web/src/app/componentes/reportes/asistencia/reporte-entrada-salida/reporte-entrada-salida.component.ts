@@ -3,8 +3,6 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
-// import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
-// import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import * as moment from 'moment';
 moment.locale('es');
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
@@ -28,12 +26,6 @@ import { ValidacionesService } from '../../../../servicios/validaciones/validaci
   selector: 'app-reporte-entrada-salida',
   templateUrl: './reporte-entrada-salida.component.html',
   styleUrls: ['./reporte-entrada-salida.component.css'],
-  // providers: [
-  //   { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-  //   { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-  //   { provide: MAT_DATE_LOCALE, useValue: 'es' },
-  //   { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-  // ]
 })
 
 export class ReporteEntradaSalidaComponent implements OnInit {
@@ -48,9 +40,6 @@ export class ReporteEntradaSalidaComponent implements OnInit {
   codigo = new FormControl('');
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
-  departamentoF = new FormControl('', [Validators.minLength(2)]);
-  regimenF = new FormControl('', [Validators.minLength(2)]);
-  cargoF = new FormControl('', [Validators.minLength(2)]);
 
   // Datos del Formulario de Periodo
   fechaInicialF = new FormControl('', [Validators.required]);
@@ -61,14 +50,6 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     inicioForm: this.fechaInicialF,
     finalForm: this.fechaFinalF,
   });
-
-  // Datos de filtros de BUSQUEDA
-  filtroCodigo: number;
-  filtroCedula: '';
-  filtroEmpleado = '';
-  filtroDepartamento: '';
-  filtroRegimen: '';
-  filtroCargo: '';
 
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
@@ -202,7 +183,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
   ValidarCiudadFeriado(id_seleccionado, datosFecha, archivo, form, fechasTotales) {
     this.feriadosTotales = [];
     this.ciudadFeriados = [];
-    this.datosEmpleado.map(obj => {
+    this.datosEmpleado.map((obj: any) => {
       if (obj.codigo === id_seleccionado) {
         this.restCF.BuscarFeriados(obj.id_ciudad).subscribe(data => {
           this.ciudadFeriados = data;
@@ -364,10 +345,6 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     this.codigo.reset();
     this.cedula.reset();
     this.nombre.reset();
-    this.departamentoF.reset();
-    this.regimenF.reset();
-    this.cargoF.reset();
-    this.filtroEmpleado = '';
   }
 
   // METODO para limpiar campos de fecha
@@ -443,7 +420,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
       // Título e imagen del archivo PDF - Contenido del archivo
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        ...this.datosEmpleado.map(obj => {
+        ...this.datosEmpleado.map((obj: any) => {
           if (obj.codigo === id_seleccionado) {
             return [
               {
@@ -675,7 +652,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
             { text: 'TIMBRE', style: 'tableHeaderESC' },
             '',
           ],
-          ...fechasTotales.map(obj => {
+          ...fechasTotales.map((obj: any) => {
             // Inicialización de variables
             var fecha_timbre, fechaFeriado, dayFecha, day;
             var entrada = '', salida = '', almuerzoS = '', almuerzoE = '', sinTimbre = '';
@@ -688,7 +665,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
             //console.log('ver fecha map ', obj + ' ' + dayFecha + ' ' + day);
 
             // BUSQUEDA de los datos
-            this.totalEntradasSalidas.forEach(element => {
+            this.totalEntradasSalidas.forEach((element: any) => {
               fecha_timbre = moment(element.fecha_hora_timbre).format('DD/MM/YYYY');
               // TIMBRE EXISTENTE - ESTADO Y HORA DEL TIMBRE
 
@@ -872,7 +849,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        ...this.datosEmpleado.map(obj => {
+        ...this.datosEmpleado.map((obj: any) => {
           if (obj.codigo === id_seleccionado) {
             return [
               { text: obj.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, -30, 0, 5] },
@@ -990,7 +967,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     }
     wse["!cols"] = wscolsE;
 
-    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(fechasTotales.map(obj => {
+    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(fechasTotales.map((obj: any) => {
       // Inicialización de variables
       var fecha_timbre, fechaFeriado, dayFecha, day;
       var entrada = '', salida = '', almuerzoS = '', almuerzoE = '', sinTimbre = '';
@@ -1000,7 +977,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
       day = obj.split(' ')[0].charAt(0).toUpperCase() + obj.split(' ')[0].slice(1);
 
       // BUSQUEDA de los datos
-      this.totalEntradasSalidas.forEach(element => {
+      this.totalEntradasSalidas.forEach((element: any) => {
         fecha_timbre = moment(element.fecha_hora_timbre).format('DD/MM/YYYY');
         // TIMBRE EXISTENTE - ESTADO Y HORA DEL TIMBRE
         if (dayFecha === fecha_timbre && element.accion === 'E') {

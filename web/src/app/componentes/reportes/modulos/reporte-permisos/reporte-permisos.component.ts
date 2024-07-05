@@ -15,17 +15,11 @@ import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as xlsx from 'xlsx';
 // IMPORTAR SERVICIOS
-import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-// SERVICIOS FILTROS DE BUSQUEDA
-import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
-import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
-import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
-import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
 
 @Component({
   selector: 'app-reporte-permisos',
@@ -48,12 +42,9 @@ export class ReportePermisosComponent implements OnInit {
   datosEmpleado: any = [];
 
   // DATOS DEL FORMULARIO DE BUSQUEDA
-  departamentoF = new FormControl('', [Validators.minLength(2)]);
-  regimenF = new FormControl('', [Validators.minLength(2)]);
   codigo = new FormControl('');
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
-  cargoF = new FormControl('', [Validators.minLength(2)]);
 
   // DATOS DEL FORMULARIO DE PERIODO
   fechaInicialF = new FormControl('', [Validators.required]);
@@ -65,14 +56,6 @@ export class ReportePermisosComponent implements OnInit {
     finalForm: this.fechaFinalF,
   });
 
-  // DATOS DE FILTROS DE BUSQUEDA
-  filtroDepartamento: '';
-  filtroEmpleado = '';
-  filtroRegimen: '';
-  filtroCodigo: number;
-  filtroCedula: '';
-  filtroCargo: '';
-
   // ITEMS DE PAGINACION DE LA TABLA
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
@@ -82,33 +65,13 @@ export class ReportePermisosComponent implements OnInit {
   empleadoLogueado: any = [];
   idEmpleado: number;
 
-  // FILTROS DE BUSQUEDA
-  sucursalF = new FormControl('');
-  laboralF = new FormControl('');
-  cargosF = new FormControl('');
-  depaF = new FormControl('');
-
-  // FORMULARIO DE BUSQUEDAS
-  public busquedasForm = new FormGroup({
-    sucursalForm: this.sucursalF,
-    laboralForm: this.laboralF,
-    cargosForm: this.cargosF,
-    depaForm: this.depaF,
-  });
-
   constructor(
     // FILTROS DE BUSQUEDA
-    public restGeneralepa: DepartamentosService,
-    public restRegimen: RegimenService,
-    public restSucur: SucursalService,
-    public restCargo: EmplCargosService,
-
     private toastr: ToastrService,
     public restGeneral: DatosGeneralesService,
     public restEmpre: EmpresaService,
     public validar: ValidacionesService,
     public router: Router,
-    public restH: HorasExtrasRealesService,
     public restR: ReportesService,
     public rest: EmpleadoService,
   ) {
@@ -170,7 +133,7 @@ export class ReportePermisosComponent implements OnInit {
   permisosHorarios: any = [];
   totalPermisos: any = [];
   permisosPlanificacion: any = [];
-  VerPermisosEmpleado(codigo, archivo, form) {
+  VerPermisosEmpleado(codigo: any, archivo: any, form: any) {
     this.permisosHorarios = [];
     this.permisosPlanificacion = [];
     this.totalPermisos = [];
@@ -183,7 +146,7 @@ export class ReportePermisosComponent implements OnInit {
   }
 
   // OBTENER DATOS DE PERMISOS DEL EMPLEADO DE ACUERDO A LA PLANIFICACIÓN
-  VerPermisosInformacion(permisos_horario: any, codigo: string | number, archivo: string, form) {
+  VerPermisosInformacion(permisos_horario: any, codigo: string | number, archivo: string, form: any) {
     if (permisos_horario.length != 0) {
       this.totalPermisos = permisos_horario;
       this.OrdenarDatos(this.totalPermisos);
@@ -201,9 +164,9 @@ export class ReportePermisosComponent implements OnInit {
     }
   }
 
-  // ORDENAR LOS DATOS SEGÚN EL NÚMERO DE PERMISO
-  OrdenarDatos(array) {
-    function compare(a, b) {
+  // ORDENAR LOS DATOS SEGUN EL NUMERO DE PERMISO
+  OrdenarDatos(array: any) {
+    function compare(a: any, b: any) {
       if (a.num_permiso < b.num_permiso) {
         return -1;
       }
@@ -218,10 +181,10 @@ export class ReportePermisosComponent implements OnInit {
   // OBTENER DATOS DE LA AUTORIZACIÓN DE LOS PERMISOS
   consultaAutoriza: any = [];
   verificar: number = 0;
-  VerDatosAutorizacion(codigo: string | number, archivo: string, form) {
+  VerDatosAutorizacion(codigo: string | number, archivo: string, form: any) {
     this.verificar = 1;
     // RECORREMOS EL ARRAY DE DATOS PARA CAMBIAR EL ESTADO
-    this.totalPermisos.map(obj => {
+    this.totalPermisos.map((obj: any) => {
       // OBTENEMOS EL ID DEL EMPLEADO QUE REALIZO EL CAMBIO DE ESTADO A LA AUTORIZACIÓN
       // BUSCAMOS LOS RESPECTIVOS DATOS DEL ID DEL EMPLEADO ENCONTRADO
       if (obj.estado != 'Pendiente') {
@@ -245,7 +208,7 @@ export class ReportePermisosComponent implements OnInit {
     })
   }
 
-  GenerarArchivo(archivo: String, id_seleccionado: any, form) {
+  GenerarArchivo(archivo: String, id_seleccionado: any, form: any) {
     if (archivo === 'pdf') {
       this.generarPdf('open', id_seleccionado);
     }
@@ -256,7 +219,7 @@ export class ReportePermisosComponent implements OnInit {
 
 
   // OBTENCIÓN DE LOS PERMISOS DE ACUERDO AL PERIODO DE FECHAS INDICADO
-  VerPermisosEmpleadoFecha(codigo, archivo, fechas, form) {
+  VerPermisosEmpleadoFecha(codigo: any, archivo: any, fechas: any, form: any) {
     this.permisosHorarios = [];
     this.totalPermisos = [];
     this.restR.ObtenerPermisosHorariosFechas(codigo, fechas).subscribe(dataH => {
@@ -287,7 +250,7 @@ export class ReportePermisosComponent implements OnInit {
   }
 
   // METODO PARA CONTROLAR INGRESO ADECUADO DE PERIODO DE FECHAS
-  VerPermisos(form, archivo, codigo) {
+  VerPermisos(form: any, archivo: any, codigo: any) {
     if (form.inicioForm === '' && form.finalForm === '' || form.inicioForm === null && form.finalForm === null) {
       this.VerPermisosEmpleado(codigo, archivo, form);
     }
@@ -316,12 +279,12 @@ export class ReportePermisosComponent implements OnInit {
   }
 
   // METODO PARA INGRESAR SOLO LETRAS
-  IngresarSoloLetras(e) {
+  IngresarSoloLetras(e: any) {
     this.validar.IngresarSoloLetras(e);
   }
 
   // METODO PARA INGRESAR SOLO NUMEROS
-  IngresarSoloNumeros(evt) {
+  IngresarSoloNumeros(evt: any) {
     this.validar.IngresarSoloNumeros(evt);
   }
 
@@ -330,10 +293,6 @@ export class ReportePermisosComponent implements OnInit {
     this.codigo.reset();
     this.cedula.reset();
     this.nombre.reset();
-    this.departamentoF.reset();
-    this.regimenF.reset();
-    this.cargoF.reset();
-    this.filtroEmpleado = '';
   }
 
   // METODO PARA LIMPIAR CAMPOS DE FECHA
@@ -414,7 +373,7 @@ export class ReportePermisosComponent implements OnInit {
       // TÍTULO DEL ARCHIVO Y SUMATORIA DE CÁLCULOS
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        ...this.datosEmpleado.map(obj => {
+        ...this.datosEmpleado.map((obj: any) => {
           if (obj.codigo === codigo) {
             return [
               { text: obj.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, -30, 0, 5] },
@@ -612,7 +571,7 @@ export class ReportePermisosComponent implements OnInit {
             { text: 'DÍAS', style: 'tableHeader' },
           ],
 
-          ...this.totalPermisos.map(obj => {
+          ...this.totalPermisos.map((obj: any) => {
             var horas_decimal, dias_decimal, horaT, trabaja;
             // FORMATO DE HORAS:MINUTOS:SEGUNDOS
             if (String(obj.hora_trabaja).length != 1) {
@@ -714,7 +673,7 @@ export class ReportePermisosComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        ...this.datosEmpleado.map(obj => {
+        ...this.datosEmpleado.map((obj: any) => {
           if (obj.codigo === codigo) {
             return [
               { text: obj.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, 50, 0, 5] },
@@ -734,7 +693,7 @@ export class ReportePermisosComponent implements OnInit {
   }
 
   // DATOS GENERALES DEL PDF Y SUMATORIA TOTAL DE CALCULOS REALIZADOS
-  presentarDatosEmpleado(codigo, form) {
+  presentarDatosEmpleado(codigo: any, form: any) {
     // INICIALIZACIÓN DE VARIBLES
     var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;
     // BUSQUEDA DE LOS DATOS DEL EMPLEADO DEL CUAL SE OBTIENE EL REPORTE
@@ -794,13 +753,13 @@ export class ReportePermisosComponent implements OnInit {
         ]
       },
       layout: {
-        hLineColor: function (i, node) {
+        hLineColor: function (i: any, node: any) {
           return (i === 0 || i === node.table.body.length) ? 'rgb(80,87,97)' : 'rgb(80,87,97)';
         },
-        paddingLeft: function (i, node) { return 30; },
-        paddingRight: function (i, node) { return 30; },
-        paddingTop: function (i, node) { return 10; },
-        paddingBottom: function (i, node) { return 10; }
+        paddingLeft: function (i: any, node: any) { return 30; },
+        paddingRight: function (i: any, node: any) { return 30; },
+        paddingTop: function (i: any, node: any) { return 10; },
+        paddingBottom: function (i: any, node: any) { return 10; }
       }
     }
   }
@@ -809,40 +768,40 @@ export class ReportePermisosComponent implements OnInit {
    *                               PARA LA EXPORTACION DE ARCHIVOS EXCEL
    * ****************************************************************************************************/
 
-  exportToExcel(id_empleado, form) {
+  exportToExcel(id_empleado: any, form: any) {
     var totalDias = 0, totalHoras = 0, formatoHoras = '0', formatoMinutos;
     var horas_decimal, dias_decimal, horas_horario, minutosHoras, tDias, horasDias, horaT, horaTDecimalH;
 
     this.totalPermisos.forEach((obj: any) => {
-          if (obj.estado === 'Autorizado') {
-            var hora1 = (obj.hora_numero).split(":");
-            var t1 = new Date();
-            t1.setHours(parseInt(hora1[0]), parseInt(hora1[1]), parseInt(hora1[2]));
-            var minTDecimal = (t1.getSeconds() * 60) + t1.getMinutes();
-            horas_decimal = (minTDecimal / 60) + t1.getHours();
-            if (String(obj.hora_trabaja).length != 1) {
-              horas_horario = obj.hora_trabaja + ':00:00'
-            }
-            else {
-              horas_horario = '0' + obj.hora_trabaja + ':00:00'
-            }
-            var hTrabajo = (horas_horario).split(":")
-            var t3 = new Date();
-            t3.setHours(parseInt(hTrabajo[0]), parseInt(hTrabajo[1]), parseInt(hTrabajo[2]));
-            var minTDecimalH = (t3.getSeconds() * 60) + t3.getMinutes();
-            horaTDecimalH = (minTDecimalH / 60) + t3.getHours();
-            horaT = horas_decimal + (horaTDecimalH * obj.dia);
-            dias_decimal = horaT / horaTDecimalH;
-            totalHoras = totalHoras + horaT;
-            totalDias = totalDias + dias_decimal;
-          }
+      if (obj.estado === 'Autorizado') {
+        var hora1 = (obj.hora_numero).split(":");
+        var t1 = new Date();
+        t1.setHours(parseInt(hora1[0]), parseInt(hora1[1]), parseInt(hora1[2]));
+        var minTDecimal = (t1.getSeconds() * 60) + t1.getMinutes();
+        horas_decimal = (minTDecimal / 60) + t1.getHours();
+        if (String(obj.hora_trabaja).length != 1) {
+          horas_horario = obj.hora_trabaja + ':00:00'
+        }
+        else {
+          horas_horario = '0' + obj.hora_trabaja + ':00:00'
+        }
+        var hTrabajo = (horas_horario).split(":")
+        var t3 = new Date();
+        t3.setHours(parseInt(hTrabajo[0]), parseInt(hTrabajo[1]), parseInt(hTrabajo[2]));
+        var minTDecimalH = (t3.getSeconds() * 60) + t3.getMinutes();
+        horaTDecimalH = (minTDecimalH / 60) + t3.getHours();
+        horaT = horas_decimal + (horaTDecimalH * obj.dia);
+        dias_decimal = horaT / horaTDecimalH;
+        totalHoras = totalHoras + horaT;
+        totalDias = totalDias + dias_decimal;
+      }
     });
-    // Realización de cálculos
+    // REALIZACION DE CALCULOS
     minutosHoras = parseFloat('0.' + String(totalHoras).split('.')[1]) * 60;
     tDias = parseFloat('0.' + String(totalDias).split('.')[1]) * horaTDecimalH;
     horasDias = parseFloat('0.' + String(tDias).split('.')[1]) * 60;
 
-    // Control de escritura de horas y minutos
+    // CONTROL DE ESCRITURA DE HORAS Y MINUTOS
     if (parseInt(String(tDias).split('.')[0]) < 10) {
       formatoHoras = '0' + parseInt(String(tDias).split('.')[0]);
     }
@@ -889,45 +848,45 @@ export class ReportePermisosComponent implements OnInit {
 
     const headerE = Object.keys(datosEmpleado[0]); // columns name
 
-    var wscolsE : any = [];
+    var wscolsE: any = [];
     for (var i = 0; i < headerE.length; i++) {  // columns length added
       wscolsE.push({ wpx: 115 })
     }
     wse["!cols"] = wscolsE;
 
-    const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.totalPermisos.map(obj => {
+    const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.totalPermisos.map((obj: any) => {
       var estado = '', horas_decimal, dias_decimal, horaT, trabaja, empleadoAutoriza = '';
-          if (obj.estado === 'Autorizado') {
-            empleadoAutoriza = obj.autorizado_por;
-            // Realización de cálculos
-            var hora1 = (obj.hora_numero).split(":");
-            var t1 = new Date();
-            t1.setHours(parseInt(hora1[0]), parseInt(hora1[1]), parseInt(hora1[2]));
-            var minTDecimal = (t1.getSeconds() * 60) + t1.getMinutes();
-            horas_decimal = (minTDecimal / 60) + t1.getHours();
+      if (obj.estado === 'Autorizado') {
+        empleadoAutoriza = obj.autorizado_por;
+        // Realización de cálculos
+        var hora1 = (obj.hora_numero).split(":");
+        var t1 = new Date();
+        t1.setHours(parseInt(hora1[0]), parseInt(hora1[1]), parseInt(hora1[2]));
+        var minTDecimal = (t1.getSeconds() * 60) + t1.getMinutes();
+        horas_decimal = (minTDecimal / 60) + t1.getHours();
 
-            // Obtención de las horas de trabajo en días
-            if (String(obj.hora_trabaja).length != 1) {
-              trabaja = obj.hora_trabaja + ':00:00'
-            }
-            else {
-              trabaja = '0' + obj.hora_trabaja + ':00:00'
-            }
-            var hTrabajo = (trabaja).split(":")
-            var t3 = new Date();
-            t3.setHours(parseInt(hTrabajo[0]), parseInt(hTrabajo[1]), parseInt(hTrabajo[2]));
-            var minTDecimalH = (t3.getSeconds() * 60) + t3.getMinutes();
-            var horaTDecimalH = (minTDecimalH / 60) + t3.getHours();
-            horaT = horas_decimal + (horaTDecimalH * obj.dia);
-            dias_decimal = horaT / horaTDecimalH;
-            horaT = horaT.toFixed(3);
-            dias_decimal = dias_decimal.toFixed(3);
-          }
-          else {
-            empleadoAutoriza = obj.autorizado_por;
-            horaT = 0.000;
-            dias_decimal = 0.000;
-          }
+        // Obtención de las horas de trabajo en días
+        if (String(obj.hora_trabaja).length != 1) {
+          trabaja = obj.hora_trabaja + ':00:00'
+        }
+        else {
+          trabaja = '0' + obj.hora_trabaja + ':00:00'
+        }
+        var hTrabajo = (trabaja).split(":")
+        var t3 = new Date();
+        t3.setHours(parseInt(hTrabajo[0]), parseInt(hTrabajo[1]), parseInt(hTrabajo[2]));
+        var minTDecimalH = (t3.getSeconds() * 60) + t3.getMinutes();
+        var horaTDecimalH = (minTDecimalH / 60) + t3.getHours();
+        horaT = horas_decimal + (horaTDecimalH * obj.dia);
+        dias_decimal = horaT / horaTDecimalH;
+        horaT = horaT.toFixed(3);
+        dias_decimal = dias_decimal.toFixed(3);
+      }
+      else {
+        empleadoAutoriza = obj.autorizado_por;
+        horaT = 0.000;
+        dias_decimal = 0.000;
+      }
       return {
         N_PERMISO: obj.num_permiso,
         FECHA_CREACION: moment(obj.fec_creacion).format("DD/MM/YYYY"),
@@ -946,7 +905,7 @@ export class ReportePermisosComponent implements OnInit {
 
     const header = Object.keys(this.totalPermisos[0]); // NOMBRE DE LAS COLUMNAS
 
-    var wscols : any = [];
+    var wscols: any = [];
     for (var i = 0; i < header.length; i++) {  // NÚMERO DE COLUMNAS AÑADIDAS
       wscols.push({ wpx: 125 })
     }
@@ -964,361 +923,13 @@ export class ReportePermisosComponent implements OnInit {
     }
   }
 
-  /*FILTROS DE BUSQUEDA*/
-  sucursales: any = [];
-  ListarSucursales() {
-    this.sucursales = [];
-    this.restSucur.BuscarSucursal().subscribe(res => {
-      this.sucursales = res;
-    });
-  }
-
-  departamentos: any = [];
-  ListarDepartamentos() {
-    this.departamentos = [];
-    this.restGeneralepa.ConsultarDepartamentos().subscribe(res => {
-      this.departamentos = res;
-    });
-  }
-
-  cargos: any = [];
-  ListarCargos() {
-    this.cargos = [];
-    this.restCargo.ObtenerTipoCargos().subscribe(res => {
-      this.cargos = res;
-    });
-  }
-
-  regimen: any = [];
-  ListarRegimen() {
-    this.regimen = [];
-    this.restRegimen.ConsultarRegimen().subscribe(res => {
-      this.regimen = res;
-    });
-  }
-
-  LimpiarBusquedas() {
-    this.busquedasForm.patchValue(
-      {
-        laboralForm: '',
-        depaForm: '',
-        cargosForm: '',
-        sucursalForm: ''
-      })
-    this.VerDatosEmpleado();
-    this.ListarSucursales();
-    this.ListarDepartamentos();
-    this.ListarCargos();
-    this.ListarRegimen();
-  }
-
-  LimpiarCampos1() {
-    this.busquedasForm.patchValue(
-      {
-        laboralForm: '',
-        depaForm: '',
-        cargosForm: ''
-      })
-  }
-
-  LimpiarCampos2() {
-    this.busquedasForm.patchValue(
-      {
-        depaForm: '',
-        cargosForm: ''
-      })
-  }
-
-  LimpiarCampos3() {
-    this.busquedasForm.patchValue(
-      { cargosForm: '' })
-  }
 
 
-  FiltrarSucursal(form: any) {
-    this.departamentos = [];
-    this.restGeneralepa.BuscarDepartamentoSucursal(form.sucursalForm).subscribe(res => {
-      this.departamentos = res;
-    });
-    this.cargos = [];
-    this.restCargo.ObtenerCargoSucursal(form.sucursalForm).subscribe(res => {
-      this.cargos = res;
-    }, error => {
-      this.toastr.info('La sucursal seleccionada no cuenta con cargos registrados.', 'Verificar la Información', {
-        timeOut: 3000,
-      })
-    });
-    this.regimen = [];
-    this.restRegimen.ConsultarRegimenSucursal(form.sucursalForm).subscribe(res => {
-      this.regimen = res;
-    });
-    this.LimpiarCampos1();
-  }
 
-  FiltrarRegimen(form: any) {
-    this.cargos = [];
-    this.restCargo.ObtenerCargoRegimen(form.laboralForm).subscribe(res => {
-      this.cargos = res;
-    }, error => {
-      this.toastr.info('El regimen seleccionado no cuenta con cargos registrados.', 'Verificar la Información', {
-        timeOut: 3000,
-      })
-    });
-    this.departamentos = [];
-    this.restGeneralepa.BuscarDepartamentoRegimen(form.laboralForm).subscribe(res => {
-      this.departamentos = res;
-    });
-    this.LimpiarCampos2();
-  }
 
-  FiltrarDepartamento(form: any) {
-    this.cargos = [];
-    this.restCargo.ObtenerCargoDepartamento(form.depaForm).subscribe(res => {
-      this.cargos = res;
-    }, error => {
-      this.toastr.info('El departamento seleccionado no cuenta con cargos registrados.', 'Verificar la Información', {
-        timeOut: 3000,
-      })
-    });
-    this.LimpiarCampos3();
-  }
 
-  /*
-  VerInformacionSucursal(form: any) {
-    this.datosEmpleado = [];
-    this.restGeneral.VerDatosSucursal(form.sucursalForm).subscribe(res => {
-      this.datosEmpleado = res;
-    }, error => {
-      this.toastr.error('Ningún dato coincide con los criterios de búsqueda indicados.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    });
-  }
 
-  VerInformacionSucuDepa(form: any) {
-    this.datosEmpleado = [];
-    this.restGeneral.VerDatosSucuDepa(form.sucursalForm, form.depaForm).subscribe(res => {
-      this.datosEmpleado = res;
-    }, error => {
-      this.toastr.error('Ningún dato coincide con los criterios de búsqueda indicados.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    });
-  }
 
-  VerInformacionSucuDepaRegimen(form: any) {
-    this.datosEmpleado = [];
-    this.restGeneral.VerDatosSucuDepaRegimen(form.sucursalForm, form.depaForm, form.laboralForm).subscribe(res => {
-      this.datosEmpleado = res;
-    }, error => {
-      this.toastr.error('Ningún dato coincide con los criterios de búsqueda indicados.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    });
-  }
-
-  VerInformacionSucuCargo(form: any) {
-    this.datosEmpleado = [];
-    this.restGeneral.VerDatosSucuCargo(form.sucursalForm, form.cargosForm).subscribe(res => {
-      this.datosEmpleado = res;
-    }, error => {
-      this.toastr.error('Ningún dato coincide con los criterios de búsqueda indicados.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    });
-  }
-
-  VerInformacionSucuRegimen(form: any) {
-    this.datosEmpleado = [];
-    this.restGeneral.VerDatosSucuRegimen(form.sucursalForm, form.laboralForm).subscribe(res => {
-      this.datosEmpleado = res;
-    }, error => {
-      this.toastr.error('Ningún dato coincide con los criterios de búsqueda indicados.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    });
-  }
-
-  VerInformacionSucuRegimenCargo(form: any) {
-    this.datosEmpleado = [];
-    this.restGeneral.VerDatosSucuRegimenCargo(form.sucursalForm, form.laboralForm, form.cargosForm).subscribe(res => {
-      this.datosEmpleado = res;
-    }, error => {
-      this.toastr.error('Ningún dato coincide con los criterios de búsqueda indicados.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    });
-  }
-
-  VerInformacionSucuDepaCargo(form: any) {
-    this.datosEmpleado = [];
-    this.restGeneral.VerDatosSucuDepaCargo(form.sucursalForm, form.depaForm, form.cargosForm).subscribe(res => {
-      this.datosEmpleado = res;
-    }, error => {
-      this.toastr.error('Ningún dato coincide con los criterios de búsqueda indicados.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    });
-  }
-
-  VerInformacionSucuDepaCargoRegimen(form: any) {
-    this.datosEmpleado = [];
-    this.restGeneral.VerDatosSucuRegimenDepartamentoCargo(form.sucursalForm, form.depaForm, form.laboralForm, form.cargosForm).subscribe(res => {
-      this.datosEmpleado = res;
-    }, error => {
-      this.toastr.error('Ningún dato coincide con los criterios de búsqueda indicados.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    });
-  }
-
-  VerInformacionDepartamento(form: any) {
-    this.datosEmpleado = [];
-    this.restGeneral.VerDatosDepartamento(form.depaForm).subscribe(res => {
-      this.datosEmpleado = res;
-    }, error => {
-      this.toastr.error('Ningún dato coincide con los criterios de búsqueda indicados.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    });
-  }
-
-  VerInformacionDepaCargo(form: any) {
-    this.datosEmpleado = [];
-    this.restGeneral.VerDatosDepaCargo(form.depaForm, form.cargosForm).subscribe(res => {
-      this.datosEmpleado = res;
-    }, error => {
-      this.toastr.error('Ningún dato coincide con los criterios de búsqueda indicados.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    });
-  }
-
-  VerInformacionDepaRegimen(form: any) {
-    this.datosEmpleado = [];
-    this.restGeneral.VerDatosDepaRegimen(form.depaForm, form.laboralForm).subscribe(res => {
-      this.datosEmpleado = res;
-    }, error => {
-      this.toastr.error('Ningún dato coincide con los criterios de búsqueda indicados.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    });
-  }
-
-  VerInformacionDepaRegimenCargo(form: any) {
-    this.datosEmpleado = [];
-    this.restGeneral.VerDatosDepaRegimenCargo(form.depaForm, form.laboralForm, form.cargosForm).subscribe(res => {
-      this.datosEmpleado = res;
-    }, error => {
-      this.toastr.error('Ningún dato coincide con los criterios de búsqueda indicados.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    });
-  }
-
-  VerInformacionRegimen(form: any) {
-    this.datosEmpleado = [];
-    this.restGeneral.VerDatosRegimen(form.laboralForm).subscribe(res => {
-      this.datosEmpleado = res;
-    }, error => {
-      this.toastr.error('Ningún dato coincide con los criterios de búsqueda indicados.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    });
-  }
-
-  VerInformacionRegimenCargo(form: any) {
-    this.datosEmpleado = [];
-    this.restGeneral.VerDatosRegimenCargo(form.laboralForm, form.cargosForm).subscribe(res => {
-      this.datosEmpleado = res;
-    }, error => {
-      this.toastr.error('Ningún dato coincide con los criterios de búsqueda indicados.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    });
-  }
-
-  VerInformacionCargo(form: any) {
-    this.datosEmpleado = [];
-    this.restGeneral.VerDatosCargo(form.cargosForm).subscribe(res => {
-      this.datosEmpleado = res;
-    }, error => {
-      this.toastr.error('Ningún dato coincide con los criterios de búsqueda indicados.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    });
-  }
-  */
-
-  VerificarBusquedas(form: any) {
-    console.log('form', form.depaForm, form.sucursalForm, form.cargosForm, form.laboralForm)
-   /* if (form.sucursalForm === '' && form.depaForm === '' &&
-      form.laboralForm === '' && form.cargosForm === '') {
-      this.toastr.info('Ingresar un criterio de búsqueda.', 'Verficar Información', {
-        timeOut: 6000,
-      })
-    }
-    else if (form.sucursalForm != '' && form.depaForm === '' &&
-      form.laboralForm === '' && form.cargosForm === '') {
-      this.VerInformacionSucursal(form);
-    }
-    else if (form.sucursalForm != '' && form.depaForm != '' &&
-      form.laboralForm === '' && form.cargosForm === '') {
-      this.VerInformacionSucuDepa(form);
-    }
-    else if (form.sucursalForm != '' && form.depaForm != '' &&
-      form.laboralForm != '' && form.cargosForm === '') {
-      this.VerInformacionSucuDepaRegimen(form);
-    }
-    else if (form.sucursalForm != '' && form.depaForm != '' &&
-      form.laboralForm === '' && form.cargosForm != '') {
-      this.VerInformacionSucuDepaCargo(form);
-    }
-    else if (form.sucursalForm != '' && form.depaForm === '' &&
-      form.laboralForm === '' && form.cargosForm != '') {
-      this.VerInformacionSucuCargo(form);
-    }
-    else if (form.sucursalForm != '' && form.depaForm === '' &&
-      form.laboralForm != '' && form.cargosForm === '') {
-      this.VerInformacionSucuRegimen(form);
-    }
-    else if (form.sucursalForm != '' && form.depaForm === '' &&
-      form.laboralForm != '' && form.cargosForm != '') {
-      this.VerInformacionSucuRegimenCargo(form);
-    }
-    else if (form.sucursalForm != '' && form.depaForm != '' &&
-      form.laboralForm != '' && form.cargosForm != '') {
-      this.VerInformacionSucuDepaCargoRegimen(form);
-    }
-    else if (form.sucursalForm === '' && form.depaForm != '' &&
-      form.laboralForm === '' && form.cargosForm === '') {
-      this.VerInformacionDepartamento(form);
-    }
-    else if (form.sucursalForm === '' && form.depaForm != '' &&
-      form.laboralForm === '' && form.cargosForm != '') {
-      this.VerInformacionDepaCargo(form);
-    }
-    else if (form.sucursalForm === '' && form.depaForm != '' &&
-      form.laboralForm != '' && form.cargosForm === '') {
-      this.VerInformacionDepaRegimen(form);
-    }
-    else if (form.sucursalForm === '' && form.depaForm != '' &&
-      form.laboralForm != '' && form.cargosForm != '') {
-      this.VerInformacionDepaRegimenCargo(form);
-    }
-    else if (form.sucursalForm === '' && form.depaForm === '' &&
-      form.laboralForm != '' && form.cargosForm === '') {
-      this.VerInformacionRegimen(form);
-    }
-    else if (form.sucursalForm === '' && form.depaForm === '' &&
-      form.laboralForm != '' && form.cargosForm != '') {
-      this.VerInformacionRegimenCargo(form);
-    }
-    else if (form.sucursalForm === '' && form.depaForm === '' &&
-      form.laboralForm === '' && form.cargosForm != '') {
-      this.VerInformacionCargo(form);
-    }*/
-  }
 
 
 }

@@ -56,6 +56,10 @@ export class VerParametroComponent implements OnInit {
 
   ingreso: number = 0;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private toastr: ToastrService,
     public ventana: MatDialog,
@@ -64,6 +68,9 @@ export class VerParametroComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.BuscarParametros(this.idParametro);
     this.ListarDetalles(this.idParametro);
     this.ActivarBoton();
@@ -133,7 +140,7 @@ export class VerParametroComponent implements OnInit {
     this.datosDetalle = [];
     this.parametro.ListarDetalleParametros(id).subscribe(datos => {
       this.datosDetalle = datos;
-      console.log('ver detalles ', this.datosDetalle)
+      //console.log('ver detalles ', this.datosDetalle)
       if (this.ingreso === 0) {
         this.seleccion = this.datosDetalle[0].descripcion;
         this.opcion_kardex = this.datosDetalle[0].descripcion;
@@ -215,7 +222,11 @@ export class VerParametroComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACION
   EliminarDetalle(id_detalle: number) {
-    this.parametro.EliminarDetalleParametro(id_detalle).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.parametro.EliminarDetalleParametro(id_detalle, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -225,7 +236,7 @@ export class VerParametroComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -243,7 +254,7 @@ export class VerParametroComponent implements OnInit {
   }
 
   /** ******************************************************************************************* **
-   ** **        REGISTRAR O EDITAR DETALLE DE PARAMETRO FORMATO DE FECHA Y HORA                ** ** 
+   ** **        REGISTRAR O EDITAR DETALLE DE PARAMETRO FORMATO DE FECHA Y HORA                ** **
    ** ******************************************************************************************* **/
 
   GuardarDatos(seleccion: number) {
@@ -268,7 +279,7 @@ export class VerParametroComponent implements OnInit {
   }
 
   /** ******************************************************************************************* **
-   ** **           REGISTRAR O EDITAR DETALLE DE PARAMETRO CARGA DE VACACIONES                 ** ** 
+   ** **           REGISTRAR O EDITAR DETALLE DE PARAMETRO CARGA DE VACACIONES                 ** **
    ** ******************************************************************************************* **/
 
   seleccion: any;
@@ -280,7 +291,7 @@ export class VerParametroComponent implements OnInit {
 
 
   /** ******************************************************************************************* **
-   ** **           REGISTRAR O EDITAR DETALLE DE PARAMETRO CARGA DE VACACIONES                 ** ** 
+   ** **           REGISTRAR O EDITAR DETALLE DE PARAMETRO CARGA DE VACACIONES                 ** **
    ** ******************************************************************************************* **/
 
   opcion_kardex: any;
@@ -291,7 +302,7 @@ export class VerParametroComponent implements OnInit {
   }
 
   /** ******************************************************************************************* **
-   ** **           REGISTRAR O EDITAR DETALLE DE PARAMETRO LABORAL - CALENDARIO                ** ** 
+   ** **           REGISTRAR O EDITAR DETALLE DE PARAMETRO LABORAL - CALENDARIO                ** **
    ** ******************************************************************************************* **/
 
   opcion_laboral: any;
@@ -303,10 +314,10 @@ export class VerParametroComponent implements OnInit {
 
 
   /** ******************************************************************************************* **
-   ** **                   ALMACENAMIENTO DE PARAMETROS EN BASE DE DATOS                       ** ** 
+   ** **                   ALMACENAMIENTO DE PARAMETROS EN BASE DE DATOS                       ** **
    ** ******************************************************************************************* **/
 
-  // METODO PARA REGISTRAR DETALLES 
+  // METODO PARA REGISTRAR DETALLES
   RegistrarValores(detalle: string) {
     this.ingreso = 1;
     this.parametro.ListarDetalleParametros(parseInt(this.idParametro)).subscribe(datos => {
@@ -320,7 +331,9 @@ export class VerParametroComponent implements OnInit {
   CrearDetalle(detalle: any) {
     let datos = {
       id_tipo: this.idParametro,
-      descripcion: detalle
+      descripcion: detalle,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.parametro.IngresarDetalleParametro(datos).subscribe(response => {
       this.toastr.success('Detalle registrado exitosamente.',
@@ -335,7 +348,9 @@ export class VerParametroComponent implements OnInit {
   ActualizarDetalle(id_detalle: number, detalle: any) {
     let datos = {
       id: id_detalle,
-      descripcion: detalle
+      descripcion: detalle,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.parametro.ActualizarDetalleParametro(datos).subscribe(response => {
       this.toastr.success('Detalle registrado exitosamente.',
@@ -361,7 +376,7 @@ export class VerParametroComponent implements OnInit {
   }
 
   /** ******************************************************************************************* **
-   ** **                        REGISTRO DE CONFIGURACION DE ATRASOS                           ** ** 
+   ** **                        REGISTRO DE CONFIGURACION DE ATRASOS                           ** **
    ** ******************************************************************************************* **/
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO

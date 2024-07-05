@@ -1,6 +1,6 @@
 <div class="container" style="padding-bottom: 15px; padding-top: 15px;">
     <div class="row">
-        <div class="col-md">
+        <div class="col-12 col-md-6">
             <div id="titulo">
                 <span>TIPO VACUNAS</span>
             </div>
@@ -21,34 +21,44 @@
         </div>
 
         <!--  *******************************  REGISTRO MULTIPLE DE TIPO VACUNAS  ****************************** -->
-        <div class="col-md">
+        <div class="col-12 col-md-6">
             <div id="titulo">
                 <span>REGISTRO MULTIPLE</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
-                <div class="row">
-                    <div class="col-md" style="padding-top: 5px; padding-bottom: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around"
-                            style="text-align: center; justify-content: center;">
-                            <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
-                                <input type="file" [formControl]="archivoForm" id="file"
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
-                                    style="height: 65px; padding-top: 25px"
-                                    matTooltip="Dar click para selecionar plantilla y cargar registros.">
-                                    Subir plantilla
-                                </label>
-                            </form>
-                        </div>
+                <div class="row m-auto">
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <form method="post" class="btn-2" enctype="multipart/form-data">
+                            <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                            <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                style="height: 65px; padding-top: 25px"
+                                matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                Subir plantilla
+                            </label>
+                            <label for="file" matSuffix matTooltipPosition="right"
+                                *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                style="height: 65px; padding-top: 25px;"
+                                matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                Subir nueva plantilla
+                            </label>
+                        </form>
                     </div>
-                    <div class="col-md" *ngIf="!Datos_vacunas" style="padding-top: 5px; padding-bottom: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around">
-                            <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
-                                style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
-                                href="{{hipervinculo}}/plantillaD/documento/Modalidad.xlsx">
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div *ngIf="!Datos_vacunas" class="d-flex flex-wrap justify-content-center m-auto w-auto">
+                            <a id="descargar" class="btn m-auto" matSuffix matTooltipPosition="right"
+                                matTooltip="Dar click para ver o descargar el documento."
+                                href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
                                 <br>
                                 Descargar plantilla usuarios
                             </a>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-center m-auto w-auto">
+                            <button *ngIf="Datos_vacunas && messajeExcel != 'error'" id="descargar" class="btn m-auto"
+                                (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
+                                matTooltip="Guardar registro multiple.">
+                                Registrar
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -97,8 +107,7 @@
                         <td></td>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [formControl]="nombreF"
-                                    [(ngModel)]="filtradoNombre">
+                                <input matInput placeholder="Buscar" [formControl]="nombreF">
                             </mat-form-field>
                         </td>
                         <td>
@@ -109,7 +118,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let v of vacunas| filtrosNombres: filtradoNombre |  paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let v of vacunas| filtrosNombres: nombreF.value |  paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionVacuna.toggle(v) : null"
@@ -159,5 +168,48 @@
                 <p> Reportes Tipo Vacunas</p>
             </div>
         </div>
+    </div>
+</div>
+
+<!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+<div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="Datos_vacunas && messajeExcel != 'error'">
+    <app-definicion-plantilla>
+    </app-definicion-plantilla>
+</div>
+
+<!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE DISCAPACIDAD ------------------------------------------------->
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;"
+    *ngIf="Datos_vacunas && messajeExcel != 'error'">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">REGISTRO MULTIPLE</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center; font-size: 13px;">
+                        <th scope="col">Item</th>
+                        <th scope="col">Observación</th>
+                        <th scope="col">vACUNAS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let va of Datos_vacunas | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                            {{va.fila}}</td>
+                        <td style="font-size: 12px;">
+                            <div style="width: 270px; margin: auto;">
+                                <div id="t-editar" class="circulo"
+                                    [style.background-color]="stiloCelda(va.observacion)"></div>
+                                {{va.observacion}}
+                            </div>
+                        </td>
+                        <td [style.color]="stiloTextoCelda(va.vacuna)" style="font-size: 12px;">
+                            {{va.vacuna}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator [length]="Datos_vacunas.length" [pageSize]="tamanio_paginaMul"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
+        </mat-paginator>
     </div>
 </div>

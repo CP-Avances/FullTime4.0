@@ -33,11 +33,15 @@ export class CorreoEmpresaComponent implements OnInit {
   btnDisableGuardar: boolean = false;
   dis_correo: boolean = false;
 
-  // VARIABLES PROGRESS SPINNER 
+  // VARIABLES PROGRESS SPINNER
   habilitarprogress: boolean = false;
   mode: ProgressSpinnerMode = 'indeterminate';
   color: ThemePalette = 'primary';
   value = 10;
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   public formulario = new FormGroup({
     email: this.emailF,
@@ -55,6 +59,9 @@ export class CorreoEmpresaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.formulario.patchValue({
       email: this.data.correo,
       puertoF: this.data.puerto,
@@ -69,7 +76,9 @@ export class CorreoEmpresaComponent implements OnInit {
       correo: form.email || this.data.correo,
       password_correo: form.passwordF || this.data.password_correo,
       servidor: form.servidorF || this.data.servidor,
-      puerto: form.puertoF || this.data.puerto
+      puerto: form.puertoF || this.data.puerto,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restE.EditarCredenciales(this.data.id, data).subscribe(res => {
       this.habilitarprogress = false;

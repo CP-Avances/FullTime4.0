@@ -1,11 +1,15 @@
-import { Validators, FormGroup, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+
+import { Validators, FormGroup, FormControl } from '@angular/forms';
+import { PageEvent } from '@angular/material/paginator';
+
 import { ToastrService } from 'ngx-toastr';
+import moment from 'moment';
+
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import moment from 'moment';
-import { PageEvent } from '@angular/material/paginator';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 @Component({
   selector: 'app-buscar-asistencia',
@@ -28,6 +32,11 @@ export class BuscarAsistenciaComponent implements OnInit {
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
+  idEmpleadoLogueado: any;
+  idUsuariosAcceso: Set<any> = new Set();
+
+  existenAsistencias: boolean = false;
+
   public formulario = new FormGroup({
     fechaInicioForm: this.fechaInicio,
     fechaFinForm: this.fechaFin,
@@ -42,15 +51,19 @@ export class BuscarAsistenciaComponent implements OnInit {
     public validar: ValidacionesService,
     public asistir: PlanGeneralService,
     public parametro: ParametrosService,
+    private asignaciones: AsignacionesService,
   ) { }
 
   ngOnInit(): void {
+    this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
     this.BuscarFecha();
     this.BuscarHora();
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -85,6 +98,7 @@ export class BuscarAsistenciaComponent implements OnInit {
   ver_asistencia: boolean = true;
   BuscarDatosAsistencia(form: any) {
     this.asistencia = [];
+    this.existenAsistencias = false;
     let datos = {
       codigo: form.codigoForm,
       cedula: form.cedulaForm,
@@ -93,11 +107,21 @@ export class BuscarAsistenciaComponent implements OnInit {
       inicio: form.fechaInicioForm,
       fin: form.fechaFinForm,
     }
-    this.asistir.ConsultarAsistencia(datos).subscribe(data => {
-      console.log('ver datos ', data)
+    this.asistir.ConsultarAsistencia(datos).subscribe(async data => {
+
       if (data.message === 'OK') {
-        console.log('ver respuesta ', data.respuesta)
-        this.asistencia = data.respuesta;
+
+        if (data.respuesta.length > 0) {
+          this.existenAsistencias = true;
+        }
+
+        this.asistencia = await this.FiltrarEmpleadosAsignados(data.respuesta);
+
+        if (this.asistencia.length === 0 && this.existenAsistencias) {
+          return this.toastr.error('No tiene acceso a los datos de este usuario.', 'Notificación', {
+            timeOut: 6000,
+          });
+        }
         this.asistencia.forEach((obj: any) => {
           //console.log('ver fecha ', moment(obj.fecha_hora_horario).format('YYYY-MM-DD'))
           //console.log('ver hora ', moment(obj.fecha_hora_horario).format('HH:mm:ss'))
@@ -143,6 +167,10 @@ export class BuscarAsistenciaComponent implements OnInit {
         timeOut: 6000,
       });
     })
+  }
+
+  async FiltrarEmpleadosAsignados(data: any) {
+    return data.filter((asistencia: any) => this.idUsuariosAcceso.has(asistencia.id_empleado));
   }
 
   // METODO PARA VER PANTALLA DETALLE DE TIMBRE

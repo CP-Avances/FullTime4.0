@@ -36,14 +36,14 @@ export class EditarRelojComponent implements OnInit {
   activarCampo: boolean = false;
   ver_editar: boolean = true;
 
-  // VARIABLES DE SELECCION DE FUNCIONES
-  selec1 = false;
-  selec2 = false;
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
 
   // PRIMER FORMULARIO
-  ipF = new FormControl('', [Validators.required, Validators.pattern("[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}")]);
+  ipF = new FormControl('', [Validators.required, Validators.pattern(/^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/)]);
   nombreF = new FormControl('', [Validators.required, Validators.minLength(4)]);
   codigoF = new FormControl('', Validators.required);
   numeroF = new FormControl('', [Validators.required]);
@@ -75,6 +75,9 @@ export class EditarRelojComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.FiltrarSucursales();
     this.ValidarFormulario();
     this.ObtenerDatos();
@@ -110,14 +113,12 @@ export class EditarRelojComponent implements OnInit {
       this.datosReloj = datos[0];
       this.BuscarDatos(this.datosReloj.id_sucursal);
       if (this.datosReloj.tiene_funciones === true) {
-        this.selec1 = true;
         this.activarCampo = true;
         this.primerFormulario.patchValue({
           numeroForm: this.datosReloj.numero_accion
         })
       }
       else {
-        this.selec2 = true;
         this.activarCampo = false;
         this.primerFormulario.patchValue({
           numeroForm: 0
@@ -180,6 +181,9 @@ export class EditarRelojComponent implements OnInit {
 
   // METODO PARA REGISTRAR DATOS
   InsertarReloj(form1: any, form2: any) {
+    // VALIDAR DIRECCION MAC
+    const direccMac = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$|^[0-9A-Fa-f]{12}$/;
+
     let datosReloj = {
       // PRIMER FORMULARIO
       codigo: form1.codigoForm,
@@ -200,9 +204,30 @@ export class EditarRelojComponent implements OnInit {
       fabricante: form2.fabricanteForm,
       contrasenia: form2.contraseniaForm,
       id_fabricacion: form2.idFabricacionForm,
+      user_name: this.user_name,
+      user_ip: this.ip,
     };
 
+    // VERIFICAR DIRECCION MAC
+    if (datosReloj.mac != '') {
+      if (direccMac.test(datosReloj.mac.toString())) {
+        this.GuardarSistema(datosReloj);
+      } else {
+        this.toastr.warning('MAC ingresada no es válida.',
+          'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        })
+      }
+    }
+    else {
+      this.GuardarSistema(datosReloj);
+    }
+  }
+
+  // METODO PARA GUARDAR EN LA BASE DE DATOS
+  GuardarSistema(datosReloj: any) {
     this.rest.ActualizarDispositivo(datosReloj).subscribe(response => {
+      //console.log('ver respuesta ', response)
       if (response.message === 'actualizado') {
         this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
           timeOut: 6000,
@@ -210,7 +235,7 @@ export class EditarRelojComponent implements OnInit {
         this.CerrarVentana();
       }
       else if (response.message === 'existe') {
-        this.toastr.warning('Código ingresado ya existe en el sistema.',
+        this.toastr.warning('Código o serie del equipo ya existe en el sistema.',
           'Ups!!! algo salio mal.', {
           timeOut: 6000,
         })
@@ -231,7 +256,7 @@ export class EditarRelojComponent implements OnInit {
     }
   }
 
-  // METODO PARA REGISTRAR IP 
+  // METODO PARA REGISTRAR IP
   IngresarIp(evt: any) {
     if (window.event) {
       var keynum = evt.keyCode;

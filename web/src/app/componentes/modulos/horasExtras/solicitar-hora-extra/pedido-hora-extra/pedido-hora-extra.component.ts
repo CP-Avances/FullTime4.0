@@ -65,6 +65,10 @@ export class PedidoHoraExtraComponent implements OnInit {
   id_cargo_loggin: number;
   id_contrato_loggin: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private informacion: DatosGeneralesService,
     private realTime: RealTimeService,
@@ -83,6 +87,9 @@ export class PedidoHoraExtraComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     // OBTENER LA FECHA ACTUAL
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
@@ -102,7 +109,7 @@ export class PedidoHoraExtraComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -148,7 +155,7 @@ export class PedidoHoraExtraComponent implements OnInit {
       })
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   empleados: any = [];
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
@@ -157,7 +164,7 @@ export class PedidoHoraExtraComponent implements OnInit {
     })
   }
 
-  // METODO PARA OBTENER EL HORARIO DEL EMPLEADO 
+  // METODO PARA OBTENER EL HORARIO DEL EMPLEADO
   Horario: any
   HorarioEmpleadoSemanal(id_cargo: number) {
     this.restHE.HorarioEmpleadoSemanal(id_cargo).subscribe(res => {
@@ -171,7 +178,7 @@ export class PedidoHoraExtraComponent implements OnInit {
     });
   }
 
-  // METODO PARA VALIDAR LA FECHA DE LA SOLICITUD CON EL HORARIO DEL EMPLEADO 
+  // METODO PARA VALIDAR LA FECHA DE LA SOLICITUD CON EL HORARIO DEL EMPLEADO
   ValidarFechas(formFechas) {
     var fi = new Date(formFechas.fechaInicioForm);
     var ff = new Date(formFechas.FechaFinForm)
@@ -213,7 +220,7 @@ export class PedidoHoraExtraComponent implements OnInit {
     console.log(valor1, '===', valor2);
   }
 
-  // METODO PARA REGISTRAR LOS DATOS DEL PEDIDO DE HORA EXTRA 
+  // METODO PARA REGISTRAR LOS DATOS DEL PEDIDO DE HORA EXTRA
   HoraExtraResponse: any;
   NotifiRes: any;
   arrayNivelesDepa: any = [];
@@ -235,12 +242,14 @@ export class PedidoHoraExtraComponent implements OnInit {
       observacion: false,
       tipo_funcion: 0,
       depa_user_loggin: parseInt(localStorage.getItem('departamento') as string),
-      codigo: this.empleados[0].codigo
+      codigo: this.empleados[0].codigo,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.GuardarInformacion(form1, dataPedirHoraExtra);
   }
 
-  // METODO PARA VALIDAR EL INGRESO DE LETRAS 
+  // METODO PARA VALIDAR EL INGRESO DE LETRAS
   IngresarSoloLetras(e) {
     return this.validar.IngresarSoloLetras(e)
   }
@@ -250,7 +259,7 @@ export class PedidoHoraExtraComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt)
   }
 
-  // METODO PARA CALCULAR EL NÚMERO DE HORAS SOLICITADAS  
+  // METODO PARA CALCULAR EL NÚMERO DE HORAS SOLICITADAS
   CalcularTiempo(form: any) {
     this.PedirHoraExtraForm.patchValue({ horasForm: '' })
     if (form.horaInicioForm != '' && form.horaFinForm != '') {
@@ -283,7 +292,7 @@ export class PedidoHoraExtraComponent implements OnInit {
     }
   }
 
-  // METODO PARA LIMPIAR LOS CAMPOS DEL FORMULARIO 
+  // METODO PARA LIMPIAR LOS CAMPOS DEL FORMULARIO
   LimpiarCampoHoras() {
     this.PedirHoraExtraForm.patchValue({ horasForm: '' })
   }
@@ -394,6 +403,8 @@ export class PedidoHoraExtraComponent implements OnInit {
         desde + ' hasta ' +
         hasta +
         ' horario de ' + h_inicio + ' a ' + h_final,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     //Listado para eliminar el usuario duplicado
@@ -432,7 +443,7 @@ export class PedidoHoraExtraComponent implements OnInit {
   IngresarAutorizacion(horaExtra: any) {
     // ARREGLO DE DATOS PARA INGRESAR UNA AUTORIZACIÓN
     let newAutorizaciones = {
-      orden: 1, // ORDEN DE LA AUTORIZACIÓN 
+      orden: 1, // ORDEN DE LA AUTORIZACIÓN
       estado: 1, // ESTADO PENDIENTE
       id_departamento: parseInt(localStorage.getItem('departamento') as string),
       id_permiso: null,
@@ -440,6 +451,8 @@ export class PedidoHoraExtraComponent implements OnInit {
       id_hora_extra: horaExtra.id,
       id_documento: '',
       id_plan_hora_extra: null,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restAutoriza.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
     }, error => { })
@@ -469,6 +482,10 @@ export class PedidoHoraExtraComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restHE.SubirArchivoRespaldo(formData, id, form.respaldoForm).subscribe(res => {
       this.archivoForm.reset();
       this.nameFile = '';

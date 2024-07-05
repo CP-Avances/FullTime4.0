@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment'
-import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -17,13 +15,12 @@ export class RolesService {
   }
 
   // ELIMINAR REGISTRO DE ROL
-  EliminarRoles(id: any) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/rol/eliminar/${id}`).pipe(catchError(id));
-  }
-
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rol/xmlDownload`, data);
+  EliminarRoles(id: number, datos:any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/rol/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA REGISTRAR ROL
@@ -32,19 +29,18 @@ export class RolesService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rol`, data);
   }
 
+
   // Roles
   getOneRol(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/rol/${id}`);
   }
+
   ListarRolesActualiza(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/rol/actualiza/${id}`);
   }
+
   ActualizarRol(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/rol`, data);
   }
-
-
-
-
 
 }

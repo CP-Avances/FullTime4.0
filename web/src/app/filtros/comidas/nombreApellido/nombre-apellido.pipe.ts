@@ -6,7 +6,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class NombreApellidoPipe implements PipeTransform {
 
   transform(value: any, filtroEmpleado: any): any {
-    if (filtroEmpleado === '' || filtroEmpleado.length < 1) return value;
+
+    if(filtroEmpleado === undefined || filtroEmpleado === null || filtroEmpleado.length < 1 ) return value;
 
     const RESULTADO_BUSQUEDAS: any = [];
      for (const resultados of value) {

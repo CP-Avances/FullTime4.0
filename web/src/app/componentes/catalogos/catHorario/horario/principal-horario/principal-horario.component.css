@@ -1,39 +1,41 @@
 mat-form-field.input-tables {
-    background: transparent;
-    font-size: 14px;
-    text-align: center;
-    outline: none;
-    fill: none;
-    height: 65px;
+  background: transparent;
+  font-size: 14px;
+  text-align: center;
+  outline: none;
+  fill: none;
+  height: 65px;
 }
 
-.codigo { width: 80px; }
+.codigo {
+  width: 80px;
+}
 
 .btn-sm {
-    background-color: rgb(80, 87, 97);
-    margin: 5px 10px 5px 10px;
-    color: white;
+  background-color: rgb(80, 87, 97);
+  margin: 5px 10px 5px 10px;
+  color: white;
 }
 
 td {
-    padding-top: 10px;
-    text-align: center;
-    vertical-align: middle;
+  padding-top: 10px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 table {
-    width: 100%;
-    font-size: 13px;
+  width: 100%;
+  font-size: 12px;
 }
 
 p {
-    font-size: x-small;
+  font-size: x-small;
 }
 
 [type="file"] {
-    height: 0;
-    overflow: hidden;
-    width: 0;
+  height: 0;
+  overflow: hidden;
+  width: 0;
 }
 
 [type="file"]+label {
@@ -57,32 +59,33 @@ p {
 }
 
 [type="file"]+label.btn-2 {
-    background-color: rgb(150, 243, 141);
-    overflow: hidden;
+  background-color: rgb(150, 243, 141);
+  overflow: hidden;
 }
 
 [type="file"]+label.btn-2::before {
-    color: #fff;
-    content: "\f382";
-    font-family: "Font Awesome 5 Pro";
-    height: 100%;
-    right: 130%;
-    line-height: 3.3;
-    position: absolute;
-    top: 14%;
-    -webkit-transition: all 0.3s;
-    transition: all 0.3s;
+  color: #fff;
+  content: "\f382";
+  font-family: "Font Awesome 5 Pro";
+  height: 100%;
+  right: 130%;
+  line-height: 3.3;
+  position: absolute;
+  top: 14%;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
 }
 
 [type="file"]+label.btn-2:hover {
-    background-color: rgb(21, 130, 1);
+  background-color: rgb(21, 130, 1);
 }
 
 [type="file"]+label.btn-2:hover::before {
-    right: 80%
+  right: 80%
 }
 
-#descargar, #registrar {
+#descargar,
+#registrar {
   margin-top: 0px;
   padding-bottom: 6px;
   border-radius: 5px;
@@ -113,10 +116,10 @@ p {
   background-color: rgb(80, 87, 97);
 }
 
-.circulo{
+.circulo {
   margin-right: -50px;
-  width: 15px;
-  height: 15px;
+  width: 12px;
+  height: 12px;
   border-radius: 50px;
   float: left;
 }
@@ -125,8 +128,10 @@ p {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px; /* Espacio entre los elementos */
-  padding: 10px 20px; /* Espacio a los lados */
+  gap: 20px;
+  /* Espacio entre los elementos */
+  padding: 10px 20px;
+  /* Espacio a los lados */
 }
 
 .col-md.flex-item {

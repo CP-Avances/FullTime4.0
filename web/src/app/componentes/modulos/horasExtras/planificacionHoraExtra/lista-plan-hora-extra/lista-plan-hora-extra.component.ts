@@ -51,9 +51,6 @@ export class ListaPlanHoraExtraComponent implements OnInit {
   // BUSQUEDA
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
-  filtroCedula: '';
-  filtroCedulaO: '';
-  filtroEmpleado = '';
 
   // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
   auto_individual: boolean = true;
@@ -76,6 +73,11 @@ export class ListaPlanHoraExtraComponent implements OnInit {
   HabilitarAutoriza: boolean = true;
   HabilitarPlan: boolean = true;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
+
   constructor(
     public toastr: ToastrService,
     private restHEP: PlanHoraExtraService,
@@ -84,6 +86,9 @@ export class ListaPlanHoraExtraComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.obtenerPlanHorasExtras();
     this.obtenerPlanHorasExtrasObservacion();
     this.obtenerPlanHorasExtrasAutorizadas();
@@ -176,7 +181,7 @@ export class ListaPlanHoraExtraComponent implements OnInit {
     }
   }
 
-  // Evento para manejar paginación 
+  // Evento para manejar paginación
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
@@ -191,7 +196,7 @@ export class ListaPlanHoraExtraComponent implements OnInit {
     return numSelected === numRows;
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
@@ -292,7 +297,7 @@ export class ListaPlanHoraExtraComponent implements OnInit {
     });
   }
 
-  // Evento para manejar paginación 
+  // Evento para manejar paginación
   ManejarPaginaObserva(e: PageEvent) {
     this.tamanio_pagina_O = e.pageSize;
     this.numero_pagina_O = e.pageIndex + 1;
@@ -394,7 +399,7 @@ export class ListaPlanHoraExtraComponent implements OnInit {
       dato = this.selectionDos;
     }
     let EmpleadosSeleccionados: any;
-    EmpleadosSeleccionados = dato.selected.map(obj => {
+    EmpleadosSeleccionados = dato.selected.map((obj: any) => {
       return {
         id_plan_extra: obj.id_plan_extra,
         hora_total_timbre: obj.hora_total_timbre,
@@ -403,10 +408,12 @@ export class ListaPlanHoraExtraComponent implements OnInit {
         estado: obj.plan_estado,
         id_cargo: obj.id_empl_cargo
       }
-    })
+    });
     for (var i = 0; i <= EmpleadosSeleccionados.length - 1; i++) {
       let h = {
-        hora: EmpleadosSeleccionados[i].hora_total_timbre
+        hora: EmpleadosSeleccionados[i].hora_total_timbre,
+        user_name: this.user_name,
+        ip: this.ip
       }
       this.restHEP.AutorizarTiempoHoraExtra(EmpleadosSeleccionados[i].id_plan_extra, h).subscribe(res => {
       }, err => {
@@ -420,7 +427,6 @@ export class ListaPlanHoraExtraComponent implements OnInit {
   limpiarCampos() {
     this.cedula.reset();
     this.nombre.reset();
-    this.filtroEmpleado = '';
   }
 
   // METODO PARA INGRESAR SOLO NUMEROS
@@ -515,7 +521,7 @@ export class ListaPlanHoraExtraComponent implements OnInit {
   tamanio_pagina_auto: number = 5;
   numero_pagina_auto: number = 1;
   pageSizeOptions_auto = [5, 10, 20, 50];
-  // Evento para manejar paginación 
+  // Evento para manejar paginación
   ManejarPagina_auto(e: PageEvent) {
     this.tamanio_pagina_auto = e.pageSize;
     this.numero_pagina_auto = e.pageIndex + 1;

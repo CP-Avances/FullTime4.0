@@ -56,6 +56,10 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private rest: DepartamentosService,
     private toastr: ToastrService,
@@ -69,6 +73,8 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
   listaDepaNiveles: any = [];
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.datos = this.info;
     this.CargarDatos();
     this.FiltrarSucursales();
@@ -111,7 +117,9 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
         dep_nivel: form.depaPadreForm,
         dep_nivel_nombre: datos[0].nombre.toUpperCase(),
         id_establecimiento: parseInt(this.datos.id_sucursal),
-        id_suc_dep_nivel: parseInt(form.idSucursalForm)
+        id_suc_dep_nivel: parseInt(form.idSucursalForm),
+        user_name: this.user_name,
+        ip: this.ip
       };
       this.GuardarDatos(departamento);
     });

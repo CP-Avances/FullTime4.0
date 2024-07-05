@@ -21,6 +21,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
 import { RegistroDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/registro-departamento/registro-departamento.component';
 import { EditarDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/editar-departamento/editar-departamento.component';
@@ -39,15 +40,13 @@ import { ITableDepartamentos } from 'src/app/model/reportes.model';
 export class PrincipalDepartamentoComponent implements OnInit {
 
   // ALMACENAMIENTO DE DATOS CONSULTADOS Y FILTROS DE BUSQUEDA
-  filtroNombre = '';
-  filtroNombreSuc = '';
-  filtroEmpresaSuc = '';
-  filtroDeparPadre = '';
   departamentosEliminar: any = [];
   departamentos: any = [];
   depainfo: any = [];
   empleado: any = [];
   idEmpleado: number;
+
+  idDepartamentosAcceso: Set<any> = new Set();
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   departamentoPadreF = new FormControl('');
@@ -83,7 +82,12 @@ export class PrincipalDepartamentoComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
+    private asignacionesService: AsignacionesService,
     private scriptService: ScriptService,
     private toastr: ToastrService,
     private router: Router,
@@ -97,13 +101,18 @@ export class PrincipalDepartamentoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
+    this.idDepartamentosAcceso = this.asignacionesService.idDepartamentosAcceso;
+
     this.ListaDepartamentos();
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
     this.ObtenerLogo();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -119,7 +128,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -137,15 +146,21 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1
   }
 
+
   niveles: number = 0;
   depaSuperior: string = '';
   // METODO PARA BUSCAR DEPARTAMENTOS
   ListaDepartamentos() {
     this.departamentos = []
     this.rest.ConsultarDepartamentos().subscribe(datos => {
-      this.departamentos = datos;
+      this.departamentos = this.FiltrarDepartamentosAsignados(datos);
       this.OrdenarDatos(this.departamentos);
     })
+  }
+
+  // METODO PARA FILTRAR DEPARTAMENTOS ASIGNADOS
+  FiltrarDepartamentosAsignados(data: any) {
+    return data.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
   }
 
   // METODO PARA ABRIR VENTANA DE REGISTRO DE DEPARTAMENTO
@@ -161,7 +176,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.departamentosEliminar = [];
   }
 
-  // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO 
+  // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO
   AbrirEditarDepartamento(departamento: any): void {
     this.ventana.open(EditarDepartamentoComponent,
       { width: '400px', data: { data: departamento, establecimiento: false } })
@@ -195,7 +210,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.messajeExcel = '';
   }
 
-  // ORDENAR LOS DATOS SEGUN EL ID 
+  // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
       if (a.nomsucursal < b.nomsucursal) {
@@ -236,20 +251,20 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 13);
+    let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'departamentos') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre Departamentos', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta.', {
           timeOut: 6000,
         });
         this.nameFile = '';
       }
     } else {
-      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+      this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
         timeOut: 6000,
       });
       this.nameFile = '';
@@ -278,8 +293,15 @@ export class PrincipalDepartamentoComponent implements OnInit {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
-        this.DataDepartamentos.forEach(item => {
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña DEPARTAMENTOS en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.DataDepartamentos.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listDepartamentosCorrectos.push(item);
           }
@@ -287,7 +309,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       }
     }, error => {
       console.log('Serivicio rest -> metodo RevisarFormato - ', error);
-      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+      this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
       this.progreso = false;
@@ -310,15 +332,25 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   registrarDepartamentos() {
     if (this.listDepartamentosCorrectos.length > 0) {
-      this.rest.subirArchivoExcel(this.listDepartamentosCorrectos).subscribe(response => {
-        console.log('respuesta: ', response);
-        this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
-          timeOut: 3000,
-        });
-        //window.location.reload();
-        this.LimpiarCampos();
-        this.archivoForm.reset();
-        this.nameFile = '';
+      const data = {
+        plantilla: this.listDepartamentosCorrectos,
+        user_name: this.user_name,
+        ip: this.ip
+      }
+      this.rest.subirArchivoExcel(data).subscribe({
+        next: (response) => {
+          this.toastr.success('Plantilla de Contratos importada.', 'Operación exitosa.', {
+            timeOut: 3000,
+          });
+          this.LimpiarCampos();
+          this.archivoForm.reset();
+          this.nameFile = '';
+        },
+        error: (error) => {;
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal',  {
+            timeOut: 4000,
+          });
+        }
       });
     } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
@@ -358,7 +390,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   }
 
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                       METODO PARA EXPORTAR A PDF                             ** **
    ** ************************************************************************************************** **/
 
@@ -423,11 +455,10 @@ export class PrincipalDepartamentoComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto'],
             body: [
               [
                 { text: 'Código', style: 'tableHeader' },
-                { text: 'Empresa', style: 'tableHeader' },
                 { text: 'Establecimiento', style: 'tableHeader' },
                 { text: 'Departamento', style: 'tableHeader' },
                 { text: 'Nivel', style: 'tableHeader' },
@@ -436,7 +467,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
               ...this.departamentos.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
-                  { text: obj.nomempresa, style: 'itemsTable' },
                   { text: obj.nomsucursal, style: 'itemsTable' },
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.nivel, style: 'itemsTableC' },
@@ -457,7 +487,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     };
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A EXCEL                                 ** **
    ** ************************************************************************************************** **/
   exportToExcel() {
@@ -467,7 +497,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     xlsx.writeFile(wb, "Departamentos" + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A CSV                               ** **
    ** ************************************************************************************************** **/
 
@@ -626,7 +656,11 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
-    this.rest.EliminarRegistro(id_dep).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.rest.EliminarRegistro(id_dep, datos).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
@@ -639,8 +673,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
           this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
             this.departamentosNiveles = datos;
             this.departamentosNiveles.filter(item => {
-              this.rest.EliminarRegistroNivelDepa(item.id).subscribe(
-                res => {
+              this.rest.EliminarRegistroNivelDepa(item.id, datos).subscribe(
+                (res: any) => {
                   if (res.message === 'error') {
                     this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
                       timeOut: 6000,
@@ -667,7 +701,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -686,13 +720,17 @@ export class PrincipalDepartamentoComponent implements OnInit {
   }
 
   EliminarMultiple() {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
     this.ingresar = false;
     this.contador = 0;
     this.departamentosEliminar = this.selectionDepartamentos.selected;
     this.departamentosEliminar.forEach((datos: any) => {
       this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+      this.rest.EliminarRegistro(datos.id, datos).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -706,10 +744,10 @@ export class PrincipalDepartamentoComponent implements OnInit {
             this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
               this.departamentosNiveles = datos;
               this.departamentosNiveles.filter(item => {
-                this.rest.EliminarRegistroNivelDepa(item.id).subscribe(
-                  res => {
+                this.rest.EliminarRegistroNivelDepa(item.id, datos).subscribe(
+                  (res: any) => {
                     if (res.message === 'error') {
-                      this.toastr.error('Existen datos relacionados con ' + item.nombre + '.', 'No fue posible eliminar.',  {
+                      this.toastr.error('Existen datos relacionados con ' + item.nombre + '.', 'No fue posible eliminar.', {
                         timeOut: 6000,
                       });
                     } else {

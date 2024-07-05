@@ -86,6 +86,8 @@ class DepartamentoRutas {
         this.router.get('/documentos/:docs/contrato/:id', CONTRATO_EMPLEADO_CONTROLADOR.ObtenerDocumento);
         // METODO PARA BUSCAR CONTRATOS POR ID DE EMPLEADO
         this.router.get('/contrato-empleado/:id_empleado', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.BuscarContratoEmpleado);
+        // METODO PARA BUSCAR CONTRATOS POR ID DE EMPLEADO EXCLUYENDO CONTRATO A EDITAR
+        this.router.post('/contrato-empleado-editar', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.BuscarContratoEmpleadoEditar);
         // EDITAR DATOS DE CONTRATO
         this.router.put('/:id/actualizar', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EditarContrato);
         // ELIMINAR DOCUMENTO DE CONTRATO BASE DE DATOS - SERVIDOR
@@ -101,7 +103,7 @@ class DepartamentoRutas {
 
 
         /** ********************************************************************************************* **
-         ** **            METODOS PARA SER USADOS EN LA TABLA MODAL_TRABAJO O TIPO DE CONTRATOS        ** **
+         ** **            METODOS PARA SER USADOS EN LA TABLA MODALIDAD_TRABAJO O TIPO DE CONTRATOS        ** **
          ** ********************************************************************************************* **/
 
         // REGISTRAR MODALIDAD DE TRABAJO
@@ -110,11 +112,6 @@ class DepartamentoRutas {
         this.router.get('/modalidad/trabajo', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.ListarTiposContratos);
         // BUSCAR MODALIDAD LABORAL POR SU NOMBRE
         this.router.post('/modalidad/trabajo/nombre', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.BuscarModalidadLaboralNombre);
-
-
-        this.router.get('/', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.ListarContratos);
-        this.router.get('/:id/get', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.ObtenerUnContrato);
-        this.router.get('/:id_empleado', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarIdContrato);
 
         this.router.post('/buscarFecha/contrato', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarFechaContratoId);
 

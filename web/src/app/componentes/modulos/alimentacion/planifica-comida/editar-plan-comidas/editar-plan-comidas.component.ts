@@ -60,6 +60,10 @@ export class EditarPlanComidasComponent implements OnInit {
   empleados: any = []; // VARIABLE PARA ALMACENAR DATOS DE EMPLEADO
   FechaActual: any; // VARIBLE PARA ALMACENAR LA FECHA DEL DÍA DE HOY
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restPlan: PlanComidasService, // SERVICIO DATOS PLAN COMIDAS
     public validar: ValidacionesService,
@@ -76,7 +80,9 @@ export class EditarPlanComidasComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('datos editar plan', this.data)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerServicios();
     this.CargarDatos();
     this.BuscarParametro();
@@ -85,7 +91,7 @@ export class EditarPlanComidasComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -209,7 +215,7 @@ export class EditarPlanComidasComponent implements OnInit {
     })
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -243,7 +249,7 @@ export class EditarPlanComidasComponent implements OnInit {
    *     METODOS PARA REALIZAR ACTUALIZACIÓN DE UNA PLANIFICACIÓN DE FORMA INDIVIDUAL - FICHA EMPLEADO    *
    ** *************************************************************************************************** *
    */
-  // METODO PARA TOMAR LOS DATOS INGRESADOS EN EL FORMULARIO 
+  // METODO PARA TOMAR LOS DATOS INGRESADOS EN EL FORMULARIO
   InsertarPlanificacionIndividual(form: any) {
     let datosPlanComida = {
       observacion: form.observacionForm,
@@ -255,6 +261,8 @@ export class EditarPlanComidasComponent implements OnInit {
       hora_fin: form.horaFinForm,
       fecha: form.fechaForm,
       extra: form.extraForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.VerificarDuplicidadIndividual(form, datosPlanComida);
   }
@@ -293,8 +301,12 @@ export class EditarPlanComidasComponent implements OnInit {
 
   // METODO PARA ACTUALIZAR UN PLANIFICACIÓN, ELIMINAR LA ANTERIOR Y CREAR UNA NUEVA
   PlanificacionIndividual(form, datosPlanComida) {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     // METODO PARA ELIMINAR PLANIFICACIÓN ANTERIOR
-    this.restPlan.EliminarPlanComida(this.data.solicitud.id, this.data.solicitud.id_empleado)
+    this.restPlan.EliminarPlanComida(this.data.solicitud.id, this.data.solicitud.id_empleado, datos)
       .subscribe(eliminar => {
         // CREACIÓN DE LA PLANIFICACIÓN PARA UN EMPLEADO
         this.restPlan.CrearPlanComidas(datosPlanComida).subscribe(res => {
@@ -324,6 +336,8 @@ export class EditarPlanComidasComponent implements OnInit {
             hora_fin: form.horaFinForm,
             consumido: false,
             fecha: '',
+            user_name: this.user_name,
+            ip: this.ip,
           }
 
           // LECTURA DE DATOS DE USUARIO
@@ -338,7 +352,7 @@ export class EditarPlanComidasComponent implements OnInit {
           let h_inicio = this.validar.FormatearHora(plan.hora_inicio, this.formato_hora);
           let h_fin = this.validar.FormatearHora(plan.hora_fin, this.formato_hora);
 
-          this.fechasHorario.map(obj => {
+          this.fechasHorario.map((obj: any) => {
             planEmpleado.fecha = obj;
             this.restPlan.CrearPlanComidasEmpleado(planEmpleado).subscribe(res => {
               this.contadorFechas = this.contadorFechas + 1;
@@ -361,7 +375,7 @@ export class EditarPlanComidasComponent implements OnInit {
    ** **     METODOS PARA REALIZAR ACTUALIZACIÓN DE UNA PLANIFICACIÓN DE FORMA  MULTIPLE               ** **
    ** *************************************************************************************************** **/
 
-  // METODO PARA TOMAR LOS DATOS INGRESADOS EN EL FORMULARIO 
+  // METODO PARA TOMAR LOS DATOS INGRESADOS EN EL FORMULARIO
   InsertarPlanificacionMultiple(form: any) {
     let datosPlanComida = {
       observacion: form.observacionForm,
@@ -373,6 +387,8 @@ export class EditarPlanComidasComponent implements OnInit {
       hora_fin: form.horaFinForm,
       fecha: form.fechaForm,
       extra: form.extraForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this.ContarCorreos(this.leer_dato);
     if (this.cont_correo <= this.correos) {
@@ -392,7 +408,7 @@ export class EditarPlanComidasComponent implements OnInit {
     this.empleados_conPlanificacion = [];
     this.empleados_sinPlanificacion = [];
     var contar_seleccionados = 0;
-    this.data.solicitud.map(obj => {
+    this.data.solicitud.map((obj: any) => {
       let datosDuplicados = {
         fecha_inicio: form.fechaInicioForm,
         fecha_fin: form.fechaFinForm,
@@ -420,7 +436,7 @@ export class EditarPlanComidasComponent implements OnInit {
   empleados_sinHorario: any = [];
   VerificarHorariosEmpleadosMultiples(form, datosPlanComida, sin_planificacion, con_planificacion) {
     var contar_horario = 0;
-    sin_planificacion.map(obj => {
+    sin_planificacion.map((obj: any) => {
       let datosHorario = {
         fechaInicio: form.fechaInicioForm,
         fechaFinal: form.fechaFinForm
@@ -445,7 +461,7 @@ export class EditarPlanComidasComponent implements OnInit {
     })
   }
 
-  // METODO PARA MOSTRAR MENSAJES CUANDO NO SE REALIZAR PLANIFICACIÓN 
+  // METODO PARA MOSTRAR MENSAJES CUANDO NO SE REALIZAR PLANIFICACIÓN
   IndicarMensajePlanificados(array_datos: any) {
     if (array_datos.length != 0) {
       if (array_datos.length === this.data.solicitud.length) {
@@ -456,7 +472,7 @@ export class EditarPlanComidasComponent implements OnInit {
       }
       else {
         var nombres_empleados = '';
-        array_datos.map(obj => {
+        array_datos.map((obj: any) => {
           nombres_empleados = nombres_empleados + ' - ' + obj.nombre + ' ' + obj.apellido
         })
         this.toastr.info('No se ha registrado la planificación de los empleados ' + nombres_empleados, 'Empleados ya cuenta con una planificación registrada en las fechas indicas.', {
@@ -477,7 +493,7 @@ export class EditarPlanComidasComponent implements OnInit {
       }
       else {
         var nombres_empleados = '';
-        array_datos.map(obj => {
+        array_datos.map((obj: any) => {
           nombres_empleados = nombres_empleados + ' - ' + obj.nombre + ' ' + obj.apellido
         })
         this.toastr.info('No se ha registrado la planificación de los empleados ' + nombres_empleados, 'Empleados no tienen registrado un horario laboral en las fechas indicadas.', {
@@ -490,10 +506,14 @@ export class EditarPlanComidasComponent implements OnInit {
   // METODO PARA ELIMINAR TODAS LAS PLANIFICACIONES
   contar_eliminar: number = 0;
   EliminarPlanificacion(form: any, datosPlanComida: any, empleados_planificados: any) {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     if (empleados_planificados.length != 0) {
       this.contar_eliminar = 0;
-      empleados_planificados.map(obj => {
-        this.restPlan.EliminarPlanComida(obj.id, obj.id_empleado).subscribe(plan => {
+      empleados_planificados.map((obj: any) => {
+        this.restPlan.EliminarPlanComida(obj.id, obj.id_empleado, datos).subscribe(plan => {
           this.contar_eliminar = this.contar_eliminar + 1;
           if (this.contar_eliminar === empleados_planificados.length) {
             this.PlanificarMultiple(form, datosPlanComida, empleados_planificados);
@@ -540,11 +560,13 @@ export class EditarPlanComidasComponent implements OnInit {
         fecha: '',
         hora_inicio: form.horaInicioForm,
         hora_fin: form.horaFinForm,
-        consumido: false
+        consumido: false,
+        user_name: this.user_name,
+        ip: this.ip,
       }
 
       // LEER DATOS DE CADA USUARIOS
-      empleados_planificados.map(obj => {
+      empleados_planificados.map((obj: any) => {
         planEmpleado.codigo = obj.codigo;
         planEmpleado.id_empleado = obj.id;
 
@@ -638,6 +660,8 @@ export class EditarPlanComidasComponent implements OnInit {
       mensaje: 'Planificación de alimentación actualizada desde ' +
         desde + ' hasta ' + hasta +
         ' horario de ' + h_inicio + ' a ' + h_fin + ' servicio ',
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restPlan.EnviarMensajePlanComida(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);

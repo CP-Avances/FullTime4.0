@@ -120,8 +120,8 @@ function ListaHorasExtrasGrafica(fec_desde, fec_hasta) {
         let arrayUno = yield HorasExtrasSolicitadasGrafica(fec_desde, fec_hasta);
         let arrayDos = yield PlanificacionHorasExtrasSolicitadasGrafica(fec_desde, fec_hasta);
         let arrayUnido = arrayUno.concat(arrayDos);
-        let set = new Set(arrayUnido.map(obj => { return JSON.stringify(obj); }));
-        arrayUnido = Array.from(set).map(obj => { return JSON.parse(obj); });
+        let set = new Set(arrayUnido.map((obj) => { return JSON.stringify(obj); }));
+        arrayUnido = Array.from(set).map((obj) => { return JSON.parse(obj); });
         for (let j = 0; j < arrayUnido.length; j++) {
             let numMin;
             let i = numMin = j;
@@ -142,7 +142,7 @@ function HorasExtrasSolicitadasGrafica(fec_desde, fec_hasta) {
             h.tiempo_autorizado, h.codigo, h.id_empleado_cargo 
         FROM mhe_solicitud_hora_extra AS h 
         WHERE h.fecha_inicio BETWEEN $1 and $2 AND h.estado = 3   
-            AND h.fecha_final BETWEEN $1 and $2 ORDER BY h.fehac_inicio
+            AND h.fecha_final BETWEEN $1 and $2 ORDER BY h.fecha_inicio
         `, [fec_desde, fec_hasta])
             .then(result => {
             return Promise.all(result.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
@@ -169,7 +169,7 @@ function PlanificacionHorasExtrasSolicitadasGrafica(fec_desde, fec_hasta) {
         //estado = 3 para horas extras autorizadas
         `
         SELECT CAST(h.fecha_desde AS VARCHAR), CAST(h.hora_inicio AS VARCHAR), h.fecha_hasta, h.hora_fin, h.descripcion,
-            h.horas_totales, ph.tiempo_autorizado, ph.codigo, ph.id_empleado_cargo '
+            h.horas_totales, ph.tiempo_autorizado, ph.codigo, ph.id_empleado_cargo 
         FROM mhe_empleado_plan_hora_extra AS ph, mhe_detalle_plan_hora_extra AS h 
         WHERE ph.id_detalle_plan = h.id AND ph.estado = 3 
             AND h.fecha_desde BETWEEN $1 and $2 AND h.fecha_hasta BETWEEN $1 and $2 
@@ -261,8 +261,8 @@ function EmpleadoHorasExtrasGrafica(codigo, fec_desde, fec_hasta) {
         let arrayDos = yield EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(codigo, fec_desde, fec_hasta);
         // let arrayUnido  = [...new Set(arrayUno.concat(arrayDos))];  
         let arrayUnido = arrayUno.concat(arrayDos);
-        let set = new Set(arrayUnido.map(obj => { return JSON.stringify(obj); }));
-        arrayUnido = Array.from(set).map(obj => { return JSON.parse(obj); });
+        let set = new Set(arrayUnido.map((obj) => { return JSON.stringify(obj); }));
+        arrayUnido = Array.from(set).map((obj) => { return JSON.parse(obj); });
         for (let j = 0; j < arrayUnido.length; j++) {
             let numMin;
             let i = numMin = j;
@@ -423,7 +423,7 @@ const ModelarFechas = function (desde, hasta, horario) {
     };
     let objeto = DiasConEstado(horario, fechasRango);
     // console.log('Objeto JSON: ', objeto);
-    return objeto.filter(obj => { return (obj.estado === false); }).map(obj => { return { fecha: obj.fecha }; });
+    return objeto.filter(obj => { return (obj.estado === false); }).map((obj) => { return { fecha: obj.fecha }; });
 };
 exports.ModelarFechas = ModelarFechas;
 /**

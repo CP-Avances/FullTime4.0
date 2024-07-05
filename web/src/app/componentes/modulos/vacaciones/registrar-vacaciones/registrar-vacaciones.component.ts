@@ -13,6 +13,7 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-registrar-vacaciones',
@@ -36,6 +37,10 @@ export class RegistrarVacacionesComponent implements OnInit {
   idEmpleadoIngresa: number;
   nota = 'una solicitud';
   user = '';
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   nombreEmpleado = new FormControl('', [Validators.required]);
   fechaInicio = new FormControl('', Validators.required);
@@ -77,7 +82,9 @@ export class RegistrarVacacionesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.datoEmpleado);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
 
@@ -87,7 +94,7 @@ export class RegistrarVacacionesComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -301,11 +308,15 @@ export class RegistrarVacacionesComponent implements OnInit {
       fec_final: form.fecFinalForm,
       codigo: this.empleados[0].codigo,
       estado: 1,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     console.log(datosVacaciones);
     this.restV.RegistrarVacaciones(datosVacaciones).subscribe(vacacion => {
-      vacacion.EmpleadosSendNotiEmail.push(this.solInfo);
-      //TODO respuesta vacacion es solo un texto
+      const notificacion: any = [];
+      notificacion.push(this.solInfo);
+      vacacion.EmpleadosSendNotiEmail = notificacion;
+
       this.IngresarAutorizacion(vacacion);
       this.EnviarNotificacion(vacacion);
       this.EnviarCorreoEmpleados(vacacion);
@@ -426,8 +437,8 @@ export class RegistrarVacacionesComponent implements OnInit {
   EnviarNotificacion(vacaciones: any) {
 
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-    let desde = this.validar.FormatearFecha(vacaciones.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(vacaciones.fec_final, this.formato_fecha, this.validar.dia_completo);
+    let desde = this.validar.FormatearFecha(vacaciones.fecha_inicio, this.formato_fecha, this.validar.dia_completo);
+    let hasta = this.validar.FormatearFecha(vacaciones.fecha_final, this.formato_fecha, this.validar.dia_completo);
 
     let notificacion = {
       id_receives_empl: '',
@@ -440,6 +451,8 @@ export class RegistrarVacacionesComponent implements OnInit {
       estado: 'Pendiente',
       mensaje: 'Ha realizado ' + this.nota + ' de vacaciones ' + this.user + ' desde ' +
         desde + ' hasta ' + hasta,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
 
@@ -481,7 +494,7 @@ export class RegistrarVacacionesComponent implements OnInit {
   IngresarAutorizacion(vacacion: any) {
     // ARREGLO DE DATOS PARA INGRESAR UNA AUTORIZACIÓN
     let newAutorizaciones = {
-      orden: 1, // ORDEN DE LA AUTORIZACIÓN 
+      orden: 1, // ORDEN DE LA AUTORIZACIÓN
       estado: 1, // ESTADO PENDIENTE
       id_departamento: parseInt(localStorage.getItem('departamento') as string),
       id_permiso: null,
@@ -489,6 +502,8 @@ export class RegistrarVacacionesComponent implements OnInit {
       id_hora_extra: null,
       id_documento: '',
       id_plan_hora_extra: null,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restAutoriza.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
     }, error => { })

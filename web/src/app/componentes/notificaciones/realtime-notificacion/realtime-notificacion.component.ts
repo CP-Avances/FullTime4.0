@@ -32,10 +32,6 @@ export interface NotiRealtime {
 
 export class RealtimeNotificacionComponent implements OnInit {
 
-  filtroTimbreEmpl: '';
-  filtroTimbreEsta: '';
-  filtroTimbreFech: '';
-
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 10;
   numero_pagina: number = 1;
@@ -49,6 +45,10 @@ export class RealtimeNotificacionComponent implements OnInit {
   selectionUno = new SelectionModel<NotiRealtime>(true, []);
   id_loggin: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private realtime: RealTimeService,
     public ventana: MatDialog,
@@ -57,6 +57,8 @@ export class RealtimeNotificacionComponent implements OnInit {
 
   ngOnInit(): void {
     this.id_loggin = parseInt(localStorage.getItem("empleado") as string);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.ObtenerNotificaciones(this.id_loggin);
   }
 
@@ -102,7 +104,7 @@ export class RealtimeNotificacionComponent implements OnInit {
 
   // METODO PARA ELIMINAR NOTIFICACIONES
   EliminarNotificaciones(opcion: number) {
-    let EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
+    let EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
       return {
         id: obj.id,
         empleado: obj.nombre + ' ' + obj.apellido
@@ -127,7 +129,11 @@ export class RealtimeNotificacionComponent implements OnInit {
 
   // METODO PARA IDENTIFICAR SI LAS NOTIFICACIONES SON VISTAS
   CambiarVistaNotificacion(id_realtime: number) {
-    this.realtime.PutVistaNotificacion(id_realtime).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.realtime.PutVistaNotificacion(id_realtime, datos).subscribe(res => {
     });
   }
 

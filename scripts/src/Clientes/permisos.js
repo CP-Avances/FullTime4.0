@@ -10,10 +10,10 @@ class Permisos {
     }
 
     async Set_Cg_tipo_permiso(obj) {
-        let tipo_permiso = await bdd.fulltime.query('SELECT id FROM cg_tipo_permisos WHERE descripcion = $1',[obj.descripcion])
+        let tipo_permiso = await bdd.fulltime.query('SELECT id FROM mp_cat_tipo_permisos WHERE descripcion = $1',[obj.descripcion])
             .then(res => { return res.rows });
         if (tipo_permiso.length === 0) {
-            return await bdd.fulltime.query('INSERT INTO cg_tipo_permisos(descripcion, tipo_descuento, num_dia_maximo, num_dia_ingreso, vaca_afecta, anio_acumula, gene_justificacion, fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id',
+            return await bdd.fulltime.query('INSERT INTO mp_cat_tipo_permisos(descripcion, tipo_descuento, num_dia_maximo, num_dia_ingreso, vaca_afecta, anio_acumula, gene_justificacion, fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id',
             [obj.descripcion, obj.descuento, obj.maximo_dias, obj.maximo_horas, obj.afecta_fecha_vacacion, obj.acumula_anios, obj.genera_just, obj.valida_fechas, obj.acceso_empleados, obj.legalizar, obj.incluir_almuerzo, obj.dias_justificacion])
             .then(result => { 
                 console.log(result.command, 'TIPO PERMISO', obj.descripcion ) 

@@ -39,10 +39,6 @@ export class AsistenciaConsolidadoComponent implements OnInit {
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
 
-  filtroCodigo: number;
-  filtroCedula: '';
-  filtroEmpleado = '';
-
   // ITEMS DE PAGINACION DE LA TABLA
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
@@ -1102,7 +1098,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
       } else {
         this.asistencia = res;
         console.log(this.asistencia);
-        const wsd: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.asistencia.detalle.map(obj => {
+        const wsd: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.asistencia.detalle.map((obj: any) => {
           return {
             fecha: obj.fecha_mostrar,
             E_h_default: obj.E.hora_default,
@@ -1127,7 +1123,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
           }
         }));
         const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.asistencia.empleado);
-        const wso: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.asistencia.operaciones.map(obj => {
+        const wso: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.asistencia.operaciones.map((obj: any) => {
           return {
             HHMM_atraso: obj.HHMM.atraso,
             HHMM_sal_antes: obj.HHMM.sal_antes,
@@ -1172,7 +1168,6 @@ export class AsistenciaConsolidadoComponent implements OnInit {
     this.codigo.reset();
     this.cedula.reset();
     this.nombre.reset();
-    this.filtroEmpleado = '';
   }
 
   limpiarCamposRango() {

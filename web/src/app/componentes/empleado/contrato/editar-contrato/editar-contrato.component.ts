@@ -37,6 +37,10 @@ export class EditarContratoComponent implements OnInit {
   // BUSQUEDA DE PAISES AL INGRESAR INFORMACION
   filtro: Observable<any[]>;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   controlVacacionesF = new FormControl('', Validators.required);
   controlAsistenciaF = new FormControl('', Validators.required);
@@ -72,6 +76,9 @@ export class EditarContratoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.idSelectContrato = this.contrato.id;
     this.idEmpleado = this.contrato.id_empleado;
     this.ObtenerPaises();
@@ -179,7 +186,7 @@ export class EditarContratoComponent implements OnInit {
     }
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   empleados: any = [];
   ObtenerEmpleados() {
     this.empleados = [];
@@ -223,7 +230,9 @@ export class EditarContratoComponent implements OnInit {
   InsertarModalidad(form: any, datos: any) {
     if (form.contratoForm != '') {
       let tipo_contrato = {
-        descripcion: form.contratoForm
+        descripcion: form.contratoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.rest.CrearTiposContrato(tipo_contrato).subscribe(res => {
         datos.id_tipo_contrato = res.id;
@@ -250,12 +259,16 @@ export class EditarContratoComponent implements OnInit {
   // METODO PARA TOMAR DATOS DEL CONTRATO
   ActualizarContrato(form: any) {
     let datosContrato = {
+      subir_documento: false,
       id_tipo_contrato: form.tipoForm,
       vaca_controla: form.controlVacacionesForm,
       asis_controla: form.controlAsistenciaForm,
+      id_empleado: this.idEmpleado,
       fec_ingreso: form.fechaIngresoForm,
       fec_salida: form.fechaSalidaForm,
       id_regimen: form.idRegimenForm,
+      user_name: this.user_name,
+      ip: this.ip
     };
     if (form.tipoForm === undefined) {
       this.InsertarModalidad(form, datosContrato);
@@ -272,7 +285,11 @@ export class EditarContratoComponent implements OnInit {
     this.revisarFecha = [];
     this.duplicado = 0;
     // BUSQUEDA DE CONTRATOS QUE TIENE EL USUARIO
-    this.rest.BuscarContratosEmpleado(this.contrato.id_empleado).subscribe(data => {
+    let editar = {
+      id_empleado: this.contrato.id_empleado,
+      id_contrato: this.contrato.id
+    }
+    this.rest.BuscarContratosEmpleadoEditar(editar).subscribe(data => {
       this.revisarFecha = data;
       var ingreso = String(moment(datos.fec_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
       // COMPARACION DE CADA REGISTRO
@@ -300,9 +317,21 @@ export class EditarContratoComponent implements OnInit {
   // GUARDAR DATOS DE CONTRATO
   GuardarDatos(datos: any) {
     this.rest.ActualizarContratoEmpleado(this.idSelectContrato, datos).subscribe(response => {
-      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
-        timeOut: 6000,
-      });
+      if (response.message === 'error') {
+        this.toastr.warning('Intente nuevamente.', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        });
+      }
+      else {
+        if (this.opcion === 2) {
+          this.EliminarDocumentoServidor();
+          this.CargarContrato(this.contrato.id);
+        }
+        this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
+          timeOut: 6000,
+        });
+      }
+
     }, error => {
       this.toastr.error('Ups!!! algo salio mal.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
@@ -315,7 +344,9 @@ export class EditarContratoComponent implements OnInit {
     if (this.opcion === 1) {
       let eliminar = {
         documento: this.contrato.documento,
-        id: parseInt(this.contrato.id)
+        id: parseInt(this.contrato.id),
+        user_name: this.user_name,
+        ip: this.ip
       }
       this.GuardarDatos(datos);
       this.rest.EliminarArchivo(eliminar).subscribe(res => {
@@ -324,9 +355,8 @@ export class EditarContratoComponent implements OnInit {
     }
     else if (this.opcion === 2) {
       if (form.documentoForm != '' && form.documentoForm != null) {
-        this.EliminarDocumentoServidor();
+        datos.subir_documento = true;
         this.GuardarDatos(datos);
-        this.CargarContrato(this.contrato.id);
         this.Cancelar(2);
       }
       else {
@@ -381,10 +411,18 @@ export class EditarContratoComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.rest.SubirContrato(formData, id).subscribe(res => {
       this.archivoForm.reset();
       this.nameFile = '';
-    });
+    }, error => {
+      this.toastr.info('Verifique que este usuario tenga creadas capetas', 'No se ha podido cargar el archivo.', {
+        timeOut: 6000,
+      });
+    }
+    );
   }
 
   // RETIRAR ARCHIVO SELECCIONADO
@@ -403,7 +441,7 @@ export class EditarContratoComponent implements OnInit {
     });
   }
 
-  // METODOS DE ACTIVACION DE CARGA DE ARCHIVO 
+  // METODOS DE ACTIVACION DE CARGA DE ARCHIVO
   activar: boolean = false;
   opcion: number = 0;
   ActivarArchivo() {

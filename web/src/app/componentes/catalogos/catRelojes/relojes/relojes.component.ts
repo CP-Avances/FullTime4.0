@@ -5,8 +5,10 @@ import { Router } from '@angular/router';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
+import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-relojes',
@@ -21,6 +23,12 @@ export class RelojesComponent implements OnInit {
   departamento: any = [];
   registrar: boolean = true;
 
+  idEmpleadoLogueado: any;
+
+  idUsuariosAcceso: Set<any> = new Set();
+  idSucursalesAcceso: Set<any> = new Set();
+  idDepartamentosAcceso: Set<any> = new Set();
+
   // CONTROL DE FORMULARIOS
   isLinear = true;
   primerFormulario: FormGroup;
@@ -29,10 +37,14 @@ export class RelojesComponent implements OnInit {
   // ACTIVAR INGRESO DE NUMERO DE ACCIONES
   activarCampo: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
 
   // PRIMER FORMULARIO
-  ipF = new FormControl('', [Validators.required, Validators.pattern("[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}")]);
+  ipF = new FormControl('', [Validators.required, Validators.pattern(/^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/)]);
   nombreF = new FormControl('', [Validators.required, Validators.minLength(4)]);
   puertoF = new FormControl('', [Validators.required]);
   codigoF = new FormControl('', Validators.required);
@@ -53,14 +65,25 @@ export class RelojesComponent implements OnInit {
   constructor(
     private restCatDepartamento: DepartamentosService,
     private restSucursales: SucursalService,
+    private restUsuario: UsuarioService,
     private formulario: FormBuilder,
     private validar: ValidacionesService,
     private toastr: ToastrService,
     private router: Router,
     private rest: RelojesService,
-  ) { }
+    private asignaciones: AsignacionesService,
+  ) {
+    this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
+  }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
     this.FiltrarSucursales();
     this.ValidarFormulario();
   }
@@ -93,7 +116,7 @@ export class RelojesComponent implements OnInit {
     let idEmpre = parseInt(localStorage.getItem('empresa') as string);
     this.sucursales = [];
     this.restSucursales.BuscarSucursalEmpresa(idEmpre).subscribe(datos => {
-      this.sucursales = datos;
+      this.sucursales = this.FiltrarSucursalesAsignadas(datos);
     }, error => {
       this.toastr.info('No se han encntrado registros de establecimientos.', '', {
         timeOut: 6000,
@@ -101,12 +124,17 @@ export class RelojesComponent implements OnInit {
     })
   }
 
+  // METODO PARA FILTRAR SUCURSALES ASIGNADAS
+  FiltrarSucursalesAsignadas(data: any) {
+    return data.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
+  }
+
   // METODO PARA LISTAR DEPARTAMENTOS DE ESTABLECIMIENTO
   ObtenerDepartamentos(form: any) {
     this.departamento = [];
     let idSucursal = form.idSucursalForm;
     this.restCatDepartamento.BuscarDepartamentoSucursal(idSucursal).subscribe(datos => {
-      this.departamento = datos;
+      this.departamento = this.FiltrarDepartamentosAsignados(datos);
     }, error => {
       this.toastr.info('Sucursal no cuenta con departamentos registrados.', '', {
         timeOut: 6000,
@@ -114,10 +142,18 @@ export class RelojesComponent implements OnInit {
     });
   }
 
+  // METODO PARA FILTRAR DEPARTAMENTOS ASIGNADOS
+  FiltrarDepartamentosAsignados(data: any) {
+    return data.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
+  }
+
+
   // METODO PARA REGISTRAR DISPOSITIVO
   InsertarReloj(form1: any, form2: any) {
-    let reloj = {
+    // VALIDAR DIRECCION MAC
+    const direccMac = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$|^[0-9A-Fa-f]{12}$/;
 
+    let reloj = {
       // PRIMER FORMULARIO
       ip: form1.ipForm,
       codigo: form1.codigoForm,
@@ -136,9 +172,32 @@ export class RelojesComponent implements OnInit {
       fabricante: form2.fabricanteForm,
       contrasenia: form2.contraseniaForm,
       id_fabricacion: form2.idFabricacionForm,
+      user_name: this.user_name,
+      user_ip: this.ip,
     };
+    // VALIDAR DIRECCION MAC
+    console.log('mac ', reloj.mac)
+    if (reloj.mac != '') {
+      if (direccMac.test(reloj.mac.toString())) {
+        console.log('ingresa aqui mac')
+        this.GuardarSistema(reloj);
+      } else {
+        this.toastr.warning('MAC ingresada no es válida.',
+          'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        })
+      }
+    }
+    else {
+      console.log('ingresa aqui')
+      this.GuardarSistema(reloj);
+    }
+  }
+
+  // METODO PARA ALMACENAR LOS DATOS EN LA BASE
+  GuardarSistema(reloj: any) {
     this.rest.CrearNuevoReloj(reloj).subscribe(response => {
-      //--console.log('ver response', response)
+      console.log('ver response', response)
       if (response.message === 'guardado') {
         this.LimpiarCampos();
         this.VerDatosReloj(response.reloj.id);
@@ -147,7 +206,7 @@ export class RelojesComponent implements OnInit {
         })
       }
       else if (response.message === 'existe') {
-        this.toastr.warning('Código ingresado ya existe en el sistema.',
+        this.toastr.warning('Código o serie del equipo ya existe en el sistema.',
           'Ups!!! algo salio mal.', {
           timeOut: 6000,
         })

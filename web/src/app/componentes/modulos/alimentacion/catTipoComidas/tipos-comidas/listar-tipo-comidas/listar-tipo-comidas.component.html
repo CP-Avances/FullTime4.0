@@ -39,14 +39,12 @@
                         <tr>
                             <td>
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" minlength="1" [formControl]="tipoF"
-                                        [(ngModel)]="filtroTipo">
+                                    <input matInput placeholder="Buscar" minlength="1" [formControl]="tipoF">
                                 </mat-form-field>
                             </td>
                             <td>
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" minlength="2" [formControl]="nombreF"
-                                        [(ngModel)]="filtroNombre">
+                                    <input matInput placeholder="Buscar" minlength="2" [formControl]="nombreF">
                                 </mat-form-field>
                             </td>
                             <td></td>
@@ -59,7 +57,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let comida of tipoComidas | filtrosNombres: filtroNombre | tipo: filtroTipo | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let comida of tipoComidas | filtrosNombres: nombreF.value | tipo: tipoF.value | paginate:tamanio_pagina:numero_pagina">
                             <td id="centrar">{{comida.tipo}}</td>
                             <td id="centrar">{{comida.nombre}}</td>
                             <td id="centrar">{{comida.horaInicio}}</td>

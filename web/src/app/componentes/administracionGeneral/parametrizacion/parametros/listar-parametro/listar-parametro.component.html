@@ -29,8 +29,7 @@
                             <td></td>
                             <td style="text-align: center;">
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" minlength="2" [formControl]="descripcionF"
-                                        [(ngModel)]="filtroDescripcion">
+                                    <input matInput placeholder="Buscar" minlength="2" [formControl]="descripcionF">
                                 </mat-form-field>
                             </td>
                             <td style="text-align: center;">
@@ -41,7 +40,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let tp of parametros | filtroNombre: filtroDescripcion | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let tp of parametros | filtroNombre: descripcionF.value| paginate:tamanio_pagina:numero_pagina">
                             <th style="padding-top: 10px; text-align: center;" scope="row">{{tp.id}}</th>
                             <td style="padding-top: 10px; text-align: center;">{{tp.descripcion}}</td>
                             <td style="padding-top: 10px; text-align: center;" class="justify-content-center">

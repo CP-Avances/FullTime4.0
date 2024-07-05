@@ -1,34 +1,38 @@
-import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
-import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/metodos.component';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { CatModalidadLaboralService } from 'src/app/servicios/catalogos/catModalidadLaboral/cat-modalidad-laboral.service';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ThemePalette } from '@angular/material/core';
-import { RegistroModalidadComponent } from '../registro-modalidad/registro-modalidad.component';
-import { EditarModalidadComponent } from '../editar-modalidad/editar-modalidad.component';
 
-import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+import * as xml2js from 'xml2js';
+import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
+
+import { CatModalidadLaboralService } from 'src/app/servicios/catalogos/catModalidadLaboral/cat-modalidad-laboral.service';
 import { PlantillaReportesService } from '../../../reportes/plantilla-reportes.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableModalidad } from 'src/app/model/reportes.model';
+
+import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/metodos.component';
+import { EditarModalidadComponent } from '../editar-modalidad/editar-modalidad.component';
+import { RegistroModalidadComponent } from '../registro-modalidad/registro-modalidad.component';
 
 @Component({
   selector: 'app-cat-modalida-laboral',
   templateUrl: './cat-modalida-laboral.component.html',
   styleUrls: ['./cat-modalida-laboral.component.css']
 })
+
 export class CatModalidaLaboralComponent implements OnInit {
 
   modalidadesEliminar: any = [];
@@ -58,7 +62,10 @@ export class CatModalidaLaboralComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
 
-  filtroModalidad = ''; // VARIABLE DE BUSQUEDA DE DATOS
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   buscarModalidad = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
 
@@ -74,17 +81,20 @@ export class CatModalidaLaboralComponent implements OnInit {
   get logo(): string { return this.plantillaPDF.logoBase64 }
 
   constructor(
-    private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
     private _ModalidaLaboral: CatModalidadLaboralService,
+    private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
+    private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
     private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
-    private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
     public parametro: ParametrosService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit() {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.listaModalida_Laboral = [];
     this.ObtenerEmpleados(this.idEmpleado);
     this.BuscarParametro();
@@ -116,13 +126,19 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   ObtenerModalidaLaboral() {
     this._ModalidaLaboral.listaModalidad_laboral().subscribe(res => {
-      console.log('lista> ', res);
+      //console.log('lista> ', res);
       this.listaModalida_Laboral = res
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
-      this.toastr.error('Error al cargar los datos', 'Listado de Modalidad laboral', {
-        timeOut: 4000,
-      });
+      //console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      if (error.status == 400 || error.status == 404) {
+        this.toastr.info('No se ha encontrado registros.', '', {
+          timeOut: 1500,
+        });
+      } else {
+        this.toastr.error('Error al cargar los datos.', 'Ups!!! algo salio mal.', {
+          timeOut: 3500,
+        });
+      }
     });
   }
 
@@ -130,11 +146,13 @@ export class CatModalidaLaboralComponent implements OnInit {
     this.Datos_modalidad_laboral = null;
     this.archivoSubido = [];
     this.nameFile = '';
-    this.ngOnInit();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
     this.messajeExcel = '';
-    this.filtroModalidad = '';
+    this.formulario.setValue({
+      nombreForm: '',
+    });
+    this.ObtenerModalidaLaboral();
   }
 
   AbrirVentanaRegistrarModalidad(): void {
@@ -142,11 +160,11 @@ export class CatModalidaLaboralComponent implements OnInit {
       .afterClosed().subscribe(items => {
         this.ngOnInit();
       });
-      this.activar_seleccion = true;
-      this.plan_multiple = false;
-      this.plan_multiple_ = false;
-      this.selectionModalidad.clear();
-      this.modalidadesEliminar = [];
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionModalidad.clear();
+    this.modalidadesEliminar = [];
   }
 
   // METODO PARA EDITAR MODALIDAD LABORAL
@@ -156,8 +174,6 @@ export class CatModalidaLaboralComponent implements OnInit {
         this.ngOnInit();
       });
   }
-
-
 
   // CONTROL DE PAGINACION
   ManejarPagina(e: PageEvent) {
@@ -175,7 +191,7 @@ export class CatModalidaLaboralComponent implements OnInit {
   nameFile: string;
   archivoSubido: Array<File>;
   mostrarbtnsubir: boolean = false;
-  // METODO PARA SELECCIONAR PLANTILLA DE DATOS -----------------------------------------------------------------
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS
   FileChange(element: any) {
     this.archivoSubido = [];
     this.nameFile = '';
@@ -183,22 +199,22 @@ export class CatModalidaLaboralComponent implements OnInit {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 25);
+    let itemName = arrayItems[0];
     console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'modalidad_cargo') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre modalidad_cargo', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
 
         this.nameFile = '';
       }
     } else {
-      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+      this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
         timeOut: 6000,
       });
 
@@ -224,22 +240,28 @@ export class CatModalidaLaboralComponent implements OnInit {
     this._ModalidaLaboral.RevisarFormato(formData).subscribe(res => {
       this.Datos_modalidad_laboral = res.data;
       this.messajeExcel = res.message;
-      console.log('probando plantilla modalidad laboral', this.Datos_modalidad_laboral);
-
+      //console.log('probando plantilla modalidad laboral', this.Datos_modalidad_laboral);
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      } else {
-        this.Datos_modalidad_laboral.forEach(item => {
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña MODALIDAD_LABORAL en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.Datos_modalidad_laboral.forEach((item: any) => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaModalidadCorrectas.push(item);
           }
         });
       }
     }, error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      //console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
@@ -279,7 +301,7 @@ export class CatModalidaLaboralComponent implements OnInit {
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
-    console.log('listaContratosCorrectas: ', this.listaModalidadCorrectas.length);
+    //console.log('listaContratosCorrectas: ', this.listaModalidadCorrectas.length);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -290,18 +312,22 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   subirDatosPlantillaModal() {
     if (this.listaModalidadCorrectas.length > 0) {
-      this._ModalidaLaboral.subirArchivoExcel(this.listaModalidadCorrectas).subscribe(response => {
-        console.log('respuesta: ', response);
+      const data = {
+        plantilla: this.listaModalidadCorrectas,
+        user_name: this.user_name,
+        ip: this.ip
+      }
+      this._ModalidaLaboral.SubirArchivoExcel(data).subscribe(response => {
+        //console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de Modalidad laboral importada.', {
           timeOut: 3000,
         });
-        //window.location.reload();
         this.LimpiarCampos();
         this.archivoForm.reset();
         this.nameFile = '';
       });
     } else {
-      console.log('entro en salir')
+      //console.log('entro en salir')
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
       });
@@ -332,20 +358,20 @@ export class CatModalidaLaboralComponent implements OnInit {
   GenerarPdf(action = 'open') {
     this.OrdenarDatos(this.listaModalida_Laboral);
     const documentDefinition = this.GetDocumentDefinicion();
-    console.log('this.listaModalida_Laboral: ',this.listaModalida_Laboral)
-    console.log('documentDefinition: ',documentDefinition)
+    //console.log('this.listaModalida_Laboral: ', this.listaModalida_Laboral)
+    //console.log('documentDefinition: ', documentDefinition)
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download('Modalidas_laboral.pdf'); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Modalidad_laboral.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
     this.BuscarParametro();
   }
 
   GetDocumentDefinicion() {
-    console.log('this.empleado: ',this.empleado)
-    console.log('this.frase: ',this.frase)
+    //console.log('this.empleado: ', this.empleado)
+    //console.log('this.frase: ', this.frase)
     sessionStorage.setItem('ModalidadLabo', this.listaModalida_Laboral);
     return {
       // ENCABEZADO DE LA PAGINA
@@ -397,7 +423,7 @@ export class CatModalidaLaboralComponent implements OnInit {
                 { text: 'Item', style: 'tableHeader' },
                 { text: 'Modalidad laboral', style: 'tableHeader' },
               ],
-              ...this.listaModalida_Laboral.map(obj => {
+              ...this.listaModalida_Laboral.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTableD' },
@@ -423,7 +449,7 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   ExportToExcel() {
     this.OrdenarDatos(this.listaModalida_Laboral);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaModalida_Laboral.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaModalida_Laboral.map((obj: any) => {
       return {
         ITEM: obj.id,
         Modalidad_laboral: obj.descripcion,
@@ -450,7 +476,7 @@ export class CatModalidaLaboralComponent implements OnInit {
   data: any = [];
   ExportToXML() {
     this.OrdenarDatos(this.listaModalida_Laboral);
-    var objeto;
+    var objeto: any;
     var arregloFeriados: any = [];
     this.listaModalida_Laboral.forEach((obj: any) => {
       objeto = {
@@ -482,7 +508,6 @@ export class CatModalidaLaboralComponent implements OnInit {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
 
-
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Modalidad_laboral.xml';
@@ -498,7 +523,7 @@ export class CatModalidaLaboralComponent implements OnInit {
 
   ExportToCVS() {
     this.OrdenarDatos(this.listaModalida_Laboral);
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaModalida_Laboral.map(obj => {
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaModalida_Laboral.map((obj: any) => {
       return {
         ITEM: obj.id,
         MODALIDAD_LABORAL: obj.descripcion,
@@ -560,13 +585,16 @@ export class CatModalidaLaboralComponent implements OnInit {
   }
 
 
-
   ConfirmarDelete(modalidad: any) {
     const mensaje = 'eliminar';
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this._ModalidaLaboral.eliminar(modalidad.id).subscribe(res => {
+          this._ModalidaLaboral.Eliminar(modalidad.id, data).subscribe((res: any) => {
             if (res.message === 'error') {
               this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
                 timeOut: 6000,
@@ -591,13 +619,17 @@ export class CatModalidaLaboralComponent implements OnInit {
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
     this.ingresar = false;
     this.contador = 0;
     this.modalidadesEliminar = this.selectionModalidad.selected;
     this.modalidadesEliminar.forEach((datos: any) => {
       this.listaModalida_Laboral = this.listaModalida_Laboral.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this._ModalidaLaboral.eliminar(datos.id).subscribe(res => {
+      this._ModalidaLaboral.Eliminar(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.descripcion + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -630,7 +662,7 @@ export class CatModalidaLaboralComponent implements OnInit {
             this.selectionModalidad.clear();
             this.ngOnInit();
           } else {
-            this.toastr.warning('No ha seleccionado PROVINCIAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado MODALIDAD LABORAL.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
           }

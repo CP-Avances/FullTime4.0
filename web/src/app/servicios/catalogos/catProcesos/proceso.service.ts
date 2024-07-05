@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment'
+import { HttpClient, HttpParams, HttpRequest } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +12,7 @@ export class ProcesoService {
 
   // catalogo de Procesos
 
-  getProcesosRest() {
+  ConsultarProcesos() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/proceso`);
   }
 
@@ -25,9 +24,13 @@ export class ProcesoService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/proceso`, data);
   }
 
-  deleteProcesoRest(id: number){
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/proceso/eliminar/${id}`);
-  }
+  EliminarProceso(id: number, data: any){
+    const url= `${(localStorage.getItem('empresaURL') as string)}/proceso/eliminar/${id}`;
+    const httpOtions = {
+      body: data
+    };
+    return this.http.request('delete',url,httpOtions);
+}
 
   getIdProcesoPadre(procesoPadre: string) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/proceso/busqueda/${procesoPadre}`);

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -31,8 +30,22 @@ export class CatDiscapacidadService {
   }
 
   // METODO PARA ELIMINAR UN TIPO DE DISCAPACIDAD
-  Eliminar(id: any) {
-    return this.http.delete<any>(`${(localStorage.getItem('empresaURL') as string)}/discapacidades/eliminar/${id}`).pipe(catchError(id));
+  Eliminar(id: any, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/discapacidades/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
+  }
+
+  // METODO PARA LEER LOS DATOS DE LA PLANTILLA DE EXCEL
+  RevisarFormato(formData) {
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/discapacidades/upload/revision', formData);
+  }
+
+  // METODO PARA INGRESAR O GUARDAR LOS DATOS OK EN LA BASE DE DATOS
+  subirArchivoExcel(formData) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/discapacidades/cargar_plantilla`, formData);
   }
 
 

@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const permisosControlador_1 = __importDefault(require("../../controlador/permisos/permisosControlador"));
+const verificarPermisos_1 = require("../../libs/Modulos/verificarPermisos");
 const verificarToken_1 = require("../../libs/verificarToken");
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const express_1 = require("express");
@@ -89,16 +90,12 @@ class PermisosRutas {
         // ENVIAR CORREO EDICION MEDIANTE APLICACION WEB
         this.router.post('/mail-noti-editar/', verificarToken_1.TokenValidation, permisosControlador_1.default.EnviarCorreoWebEditar);
         // ENVIAR CORREO MEDIANTE APLICACION WEB SOLICITUDES MULTIPLES
-        this.router.post('/mail-noti/solicitud-multiple', verificarToken_1.TokenValidation, permisosControlador_1.default.EnviarCorreoWebMultiple);
-        this.router.get('/', verificarToken_1.TokenValidation, permisosControlador_1.default.ListarPermisos);
-        this.router.get('/lista/', verificarToken_1.TokenValidation, permisosControlador_1.default.ListarEstadosPermisos);
-        this.router.get('/lista-autorizados/', verificarToken_1.TokenValidation, permisosControlador_1.default.ListarPermisosAutorizados);
-        this.router.get('/:id', verificarToken_1.TokenValidation, permisosControlador_1.default.ObtenerUnPermiso);
-        this.router.get('/permiso/editar/:id', verificarToken_1.TokenValidation, permisosControlador_1.default.ObtenerPermisoEditar);
-        this.router.get('/permisoContrato/:id_empl_contrato', verificarToken_1.TokenValidation, permisosControlador_1.default.ObtenerPermisoContrato);
-        this.router.get('/datosSolicitud/:id_emple_permiso', verificarToken_1.TokenValidation, permisosControlador_1.default.ObtenerDatosSolicitud);
-        this.router.get('/datosAutorizacion/:id_permiso', verificarToken_1.TokenValidation, permisosControlador_1.default.ObtenerDatosAutorizacion);
-        this.router.post('/fechas_permiso/:codigo', verificarToken_1.TokenValidation, permisosControlador_1.default.ObtenerFechasPermiso);
+        this.router.post('/mail-noti/solicitud-multiple', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EnviarCorreoWebMultiple);
+        this.router.get('/lista/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.ListarEstadosPermisos);
+        this.router.get('/lista-autorizados/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.ListarPermisosAutorizados);
+        this.router.get('/permiso/editar/:id', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.ObtenerPermisoEditar);
+        this.router.get('/datosSolicitud/:id_emple_permiso', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.ObtenerDatosSolicitud);
+        this.router.get('/datosAutorizacion/:id_permiso', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.ObtenerDatosAutorizacion);
         this.router.post('/permisos-solicitados/movil', permisosControlador_1.default.BuscarPermisosDias);
         /** ************************************************************************************************** **
          ** **                         METODOS PARA MANEJO DE PERMISOS                                      ** **

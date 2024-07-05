@@ -10,7 +10,7 @@ class Timbres {
 
     async setRelojes(lista_relojes, id_depa, id_suc) {
         return Promise.all(lista_relojes.map(async(obj) => {
-            obj.id = await bdd.fulltime.query('INSERT INTO cg_relojes (nombre, ip, puerto, marca, modelo, serie, tien_funciones, id_sucursal, id_departamento) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id',
+            obj.id = await bdd.fulltime.query('INSERT INTO ed_relojes (nombre, ip, puerto, marca, modelo, serie, tien_funciones, id_sucursal, id_departamento) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id',
             [obj.descripcion, obj.ip, obj.puerto_com, obj.marca, obj.modelo, obj.serie, true, id_depa, id_suc])
             .then(result => { console.log(result.command, 'reloj', obj.descripcion ); return result.rows[0].id})
             return obj
@@ -18,7 +18,7 @@ class Timbres {
     }
 
     async ObtenerRelojesIngresados() {
-        return await bdd.fulltime.query('SELECT id, nombre FROM cg_relojes ORDER BY id ASC').then(res => { return res.rows})
+        return await bdd.fulltime.query('SELECT id, nombre FROM ed_relojes ORDER BY id ASC').then(res => { return res.rows})
     }
 
     async ObtenerTimbres() {

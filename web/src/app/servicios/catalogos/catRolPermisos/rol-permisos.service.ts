@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment'
 import { catchError } from 'rxjs';
 
 @Injectable({
@@ -39,7 +38,8 @@ export class RolPermisosService {
 
   // METODO PARA ASIGNAR PERMISOS AL ROL
   crearPaginaRol(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/insertar`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/menu/paginas/insertar`, data).pipe(
+      catchError(data));;
   }
 
   //METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL

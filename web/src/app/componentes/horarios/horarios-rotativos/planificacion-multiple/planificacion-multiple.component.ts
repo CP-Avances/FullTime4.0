@@ -48,6 +48,10 @@ export class PlanificacionMultipleComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public componentem: HorarioMultipleEmpleadoComponent,
     public componenteb: BuscarPlanificacionComponent,
@@ -64,7 +68,8 @@ export class PlanificacionMultipleComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    //--console.log('datos ', this.datosSeleccionados)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.BuscarHorarios();
     this.BuscarHora();
     this.InicialiciarDatos();
@@ -84,7 +89,7 @@ export class PlanificacionMultipleComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
   formato_hora: string = 'HH:mm:ss';
 
@@ -141,7 +146,7 @@ export class PlanificacionMultipleComponent implements OnInit {
   dia_inicio: any;
   dia_fin: any;
   ListarFechas(fecha_inicio: any, fecha_final: any) {
-    this.fechas_mes = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO 
+    this.fechas_mes = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
 
     this.dia_inicio = moment(fecha_inicio, 'YYYY-MM-DD').format('YYYY-MM-DD');
     this.dia_fin = moment(fecha_final, 'YYYY-MM-DD').format('YYYY-MM-DD');
@@ -1184,6 +1189,12 @@ export class PlanificacionMultipleComponent implements OnInit {
     //console.log('eliminar ', this.eliminar_lista)
     let contador = 0;
 
+    let datos = {
+      id_plan: this.plan_general,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
     if (this.eliminar_lista.length === 0) {
       this.RegistrarPlanificacionMultiple();
     }
@@ -1197,9 +1208,11 @@ export class PlanificacionMultipleComponent implements OnInit {
           fec_inicio: h.fec_inicio,
           id_horario: h.id_horario,
         };
-        this.restP.BuscarFechas(plan_fecha).subscribe(res => {
+
+        this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
+          datos.id_plan = res;
           // METODO PARA ELIMINAR DE LA BASE DE DATOS
-          this.restP.EliminarRegistro(res).subscribe(datos => {
+          this.restP.EliminarRegistro(datos).subscribe(datos => {
             contador = contador + 1;
             //console.log('ver contador ', contador, ' tamaño ', this.eliminar_lista.length)
             if (contador === this.eliminar_lista.length) {
@@ -1224,9 +1237,14 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   // METODO PARA GUARDAR REGISTRO DE HORARIOS
   RegistrarPlanificacionMultiple() {
-    //console.log('ver plan ', this.plan_general);
 
-    this.restP.CrearPlanGeneral(this.plan_general).subscribe(res => {
+    const datos = {
+      plan_general: this.plan_general,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
+    this.restP.CrearPlanGeneral(datos).subscribe(res => {
       if (res.message === 'OK') {
         this.progreso = false;
         this.toastr.success('Operación exitosa.', 'Registro guardado.', {

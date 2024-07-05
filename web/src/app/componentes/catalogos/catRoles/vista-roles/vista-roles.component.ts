@@ -20,7 +20,6 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 
 // IMPORTACION DE SERVICIOS
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service';
 
@@ -35,19 +34,22 @@ import { ITableRoles } from 'src/app/model/reportes.model';
 
 export class VistaRolesComponent implements OnInit {
 
-  rolesEliminar: any = [];
   ver_roles: boolean = true;
   ver_funciones: boolean = false;
-
-  filtroRoles = ''; // VARIABLE DE BUSQUEDA DE DATOS
+  
   idEmpleado: number; // VARIABLE DE ID DE EMPLEADO QUE INICIA SESIÓN
-  empleado: any = []; // VARIABLE DE ALMACENAMIENTO DE DATOS DE EMPLEADO
   roles: any = []; // VARIABLE DE ALMACENAMIENTO DE DATOS DE ROLES
+  empleado: any = []; // VARIABLE DE ALMACENAMIENTO DE DATOS DE EMPLEADO
+  rolesEliminar: any = [];
 
   // ITEMS DE PAGINACION DE LA TABLA
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // CAMPO DE BUSQUEDA DE DATOS
   buscarDescripcion = new FormControl('', Validators.minLength(2));
@@ -60,7 +62,6 @@ export class VistaRolesComponent implements OnInit {
 
   constructor(
     private plantilla: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
-    private validar: ValidacionesService, // VARIABLE PARA MANEJO DE SERVICIOS
     private toastr: ToastrService, // VARIABLE DE MANEJO DE MENSAJES DE NOTIFICACIONES
     private router: Router, // VARAIBLE MANEJO DE RUTAS URL
     private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
@@ -71,6 +72,9 @@ export class VistaRolesComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerRoles();
   }
@@ -82,7 +86,7 @@ export class VistaRolesComponent implements OnInit {
     this.tamanio_pagina = e.pageSize;
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -132,7 +136,7 @@ export class VistaRolesComponent implements OnInit {
     this.buscarDescripcion.reset();
   }
 
-  // ORDENAR LOS DATOS SEGÚN EL ID 
+  // ORDENAR LOS DATOS SEGÚN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
       if (a.id < b.id) {
@@ -150,7 +154,7 @@ export class VistaRolesComponent implements OnInit {
   rol_id: number = 0;
   VerFunciones(id_rol: number) {
     this.rol_id = id_rol;
-    console.log('ver rol --- ', this.rol_id)
+    //console.log('ver rol --- ', this.rol_id)
     this.ver_roles = false;
     this.ver_funciones = true;
   }
@@ -225,7 +229,7 @@ export class VistaRolesComponent implements OnInit {
                 { text: 'Código', style: 'tableHeader' },
                 { text: 'Nombre', style: 'tableHeader' },
               ],
-              ...this.roles.map(obj => {
+              ...this.roles.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -251,7 +255,7 @@ export class VistaRolesComponent implements OnInit {
 
   ExportToExcel() {
     this.OrdenarDatos(this.roles);
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.roles.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.roles.map((obj: any) => {
       return {
         CODIGO: obj.id,
         NOMBRE_ROL: obj.nombre
@@ -308,7 +312,7 @@ export class VistaRolesComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;
@@ -318,8 +322,7 @@ export class VistaRolesComponent implements OnInit {
     this.ObtenerRoles();
   }
 
-
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A CSV                               ** **
    ** ************************************************************************************************** **/
 
@@ -432,7 +435,6 @@ export class VistaRolesComponent implements OnInit {
   }
 
   // METODOS PARA LA SELECCION MULTIPLE
-
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
 
@@ -449,14 +451,11 @@ export class VistaRolesComponent implements OnInit {
 
   selectionRoles = new SelectionModel<ITableRoles>(true, []);
 
-
-
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
     const numSelected = this.selectionRoles.selected.length;
     return numSelected === this.roles.length
   }
-
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
@@ -465,7 +464,6 @@ export class VistaRolesComponent implements OnInit {
       this.roles.forEach((row: any) => this.selectionRoles.select(row));
   }
 
-
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelPag(row?: ITableRoles): string {
     if (!row) {
@@ -473,15 +471,17 @@ export class VistaRolesComponent implements OnInit {
     }
     this.rolesEliminar = this.selectionRoles.selected;
     //console.log('paginas para Eliminar',this.paginasEliminar);
-
     //console.log(this.selectionPaginas.selected)
     return `${this.selectionRoles.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
-
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(rol: any) {
-    this.rest.EliminarRoles(rol.id).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRoles(rol.id, datos).subscribe((res: any) => {
 
       if (res.message === 'error') {
         this.toastr.error('No se puede eliminar.', '', {
@@ -496,7 +496,7 @@ export class VistaRolesComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -514,18 +514,21 @@ export class VistaRolesComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA ELIMINAR LOS REGISTROS SELECCIONADOS 
+  // FUNCION PARA ELIMINAR LOS REGISTROS SELECCIONADOS
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ingresar = false;
     this.contador = 0;
     this.rolesEliminar = this.selectionRoles.selected;
     this.rolesEliminar.forEach((datos: any) => {
-
       this.roles = this.roles.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.rest.EliminarRoles(datos.id).subscribe(res => {
+      this.rest.EliminarRoles(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -569,4 +572,3 @@ export class VistaRolesComponent implements OnInit {
       });
   }
 }
-

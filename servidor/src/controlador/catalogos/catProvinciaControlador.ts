@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import pool from '../../database';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 
 class ProvinciaControlador {
 
@@ -68,37 +69,97 @@ class ProvinciaControlador {
   }
 
   // METODO PARA ELIMINAR REGISTROS
-
-  public async EliminarProvincia(req: Request, res: Response) {
-
-
+  public async EliminarProvincia(req: Request, res: Response): Promise<Response> {
     try {
-
+      const { user_name, ip } = req.body;
       const id = req.params.id;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const provincia = await pool.query('SELECT * FROM e_provincias WHERE id = $1', [id]);
+      const [datosOriginales] = provincia.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'e_provincias',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
       await pool.query(
         `
         DELETE FROM e_provincias WHERE id = $1
         `
         , [id]);
-      res.jsonp({ message: 'Registro eliminado.' });
-    }
-    catch (error) {
-      return res.jsonp({ message: 'error' });
-    }
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'e_provincias',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip: ip,
+        observacion: null
+      });
 
-
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      //return res.status(500).jsonp({ message: error });
+      return res.jsonp({ message: "error" });
+    }
   }
 
 
   // METODO PARA REGISTRAR PROVINCIA
   public async CrearProvincia(req: Request, res: Response): Promise<void> {
-    const { nombre, id_pais } = req.body;
-    await pool.query(
-      `
-      INSERT INTO e_provincias (nombre, id_pais) VALUES ($1, $2)
-      `
-      , [nombre, id_pais]);
-    res.jsonp({ message: 'Registro guardado.' });
+    try {
+      const { nombre, id_pais, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      const datosNuevos = await pool.query(
+        `
+        INSERT INTO e_provincias (nombre, id_pais) VALUES ($1, $2) RETURNING *
+        `
+        , [nombre, id_pais]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'e_provincias',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
+        ip: ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      res.jsonp({ message: 'Registro guardado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      res.status(500).jsonp({ message: error });
+    }
   }
 
   // METODO PARA BUSCAR INFORMACION DE UN PAIS
@@ -129,35 +190,6 @@ class ProvinciaControlador {
     }
     else {
       return res.status(404).jsonp({ text: 'El registro no ha sido encontrada.' });
-    }
-  }
-
-  public async ObtenerIdProvincia(req: Request, res: Response): Promise<any> {
-    const { nombre } = req.params;
-    const UNA_PROVINCIA = await pool.query(
-      `
-      SELECT * FROM e_provincias WHERE nombre = $1
-      `
-      , [nombre]);
-    if (UNA_PROVINCIA.rowCount != 0) {
-      return res.jsonp(UNA_PROVINCIA.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'El registro no ha sido encontrada.' });
-    }
-  }
-
-  public async ListarTodoPais(req: Request, res: Response) {
-    const PAIS = await pool.query(
-      `
-      SELECT * FROM e_cat_paises
-      `
-    );
-    if (PAIS.rowCount != 0) {
-      return res.jsonp(PAIS.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 

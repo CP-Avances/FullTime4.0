@@ -5,9 +5,11 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import moment from 'moment';
 
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
+import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 import { EditarTimbreComponent } from '../editar-timbre/editar-timbre.component';
@@ -27,6 +29,7 @@ export class BuscarTimbreComponent implements OnInit {
   fecha = new FormControl('', Validators.required);
 
   mostrarTabla: boolean = false;
+  existenTimbres: boolean = false;
 
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public formulario = new FormGroup({
@@ -35,13 +38,15 @@ export class BuscarTimbreComponent implements OnInit {
     fechaForm: this.fecha
   });
 
-  // ITEMS DE PAGINACION DE LA TABLA 
+  // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina_e: number = 1;
   tamanio_pagina_e: number = 5;
   pageSizeOptions_e = [5, 10, 20, 50];
 
   timbres: any = [];
   idEmpleadoLogueado: any;
+
+  idUsuariosAcceso: Set<any> = new Set();
 
   constructor(
     private timbresServicio: TimbresService,
@@ -50,18 +55,21 @@ export class BuscarTimbreComponent implements OnInit {
     public ventana: MatDialog,
     public parametro: ParametrosService,
     public restEmpleado: EmpleadoService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
     this.BuscarParametro();
     this.BuscarHora();
     this.ObtenerEmpleadoLogueado(this.idEmpleadoLogueado);
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -93,6 +101,10 @@ export class BuscarTimbreComponent implements OnInit {
     })
   }
 
+  async FiltrarEmpleadosAsignados(data: any) {
+    return data.filter((timbre: any) => this.idUsuariosAcceso.has(timbre.id_empleado));
+  }
+
   // METODO PARA CONTROLAR REGISTRO DE NUMEROS
   IngresarSoloNumeros(evt: any) {
     return this.validar.IngresarSoloNumeros(evt);
@@ -112,6 +124,7 @@ export class BuscarTimbreComponent implements OnInit {
   // METODO PARA BUSCAR TIMBRES
   BuscarTimbresFecha(form: any) {
     this.timbres = [];
+    this.existenTimbres = false;
 
     if (form.codigoForm === "" && form.cedulaForm === "") {
       return this.toastr.error('Ingrese código o cédula del usuario.', 'Llenar los campos.', {
@@ -125,17 +138,47 @@ export class BuscarTimbreComponent implements OnInit {
         fecha: moment(form.fechaForm).format('YYYY-MM-DD')
       }
 
-      this.timbresServicio.ObtenerTimbresFechaEmple(datos).subscribe(timbres => {
-        this.mostrarTabla = true;
-        //--console.log('ver timbres ', timbres)
-        this.timbres = timbres.timbres;
+      this.timbresServicio.ObtenerTimbresFechaEmple(datos).subscribe(async timbres => {
+        if (timbres.timbres.length > 0) {
+          this.existenTimbres = true;
+        }
+        this.timbres = await this.FiltrarEmpleadosAsignados(timbres.timbres);
+        if (this.timbres.length === 0 && this.existenTimbres) {
+          this.mostrarTabla = false;
+          return this.toastr.error('No tiene acceso a los datos de este usuario.', 'Notificación', {
+            timeOut: 6000,
+          })
+        }
         this.timbres.forEach((data: any) => {
           data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
           data.hora = this.validar.FormatearHora(data.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
+          if (data.tecla_funcion === '0') {
+            data.tecla_funcion_ = 'Entrada';
+          }
+          else if (data.tecla_funcion === '1') {
+            data.tecla_funcion_ = 'Salida';
+          }
+          else if (data.tecla_funcion === '2') {
+            data.tecla_funcion_ = 'Inicio alimentación';
+          }
+          else if (data.tecla_funcion === '3') {
+            data.tecla_funcion_ = 'Fin alimentación';
+          }
+          else if (data.tecla_funcion === '4') {
+            data.tecla_funcion_ = 'Inicio permiso';
+          }
+          else if (data.tecla_funcion === '5') {
+            data.tecla_funcion_ = 'Fin permiso';
+          }
+          if (data.tecla_funcion === '7') {
+            data.tecla_funcion_ = 'Timbre libre';
+          }
+          else if (data.tecla_funcion === '99') {
+            data.tecla_funcion_ = 'Desconocido';
+          }
         })
-        //console.log('ver timbres ', this.timbres)
+        this.mostrarTabla = true;
       }, error => {
-        //console.log('error: ', error);
         this.mostrarTabla = false;
         return this.toastr.error(error.error.message, 'Notificación', {
           timeOut: 6000,

@@ -38,6 +38,10 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   FechaActual: any;
   NotifiRes: any;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   public InfoListaAutoriza: any = [];
   public ArrayAutorizacionTipos: any = [];
   public autorizacion: any []
@@ -62,6 +66,9 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     if (this.data.auto.estado === 1) {
       this.toastr.info('Solicitud pendiente de aprobación.', '', {
         timeOut: 6000,
@@ -151,6 +158,8 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
     let aprobacion = {
       id_documento: this.data.auto.id_autoriza_estado + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     this.restA.ActualizarAprobacion(this.data.auto.id, aprobacion).subscribe(res => {
@@ -163,6 +172,8 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   EditarEstadoVacacion(id_vacacion: number, estado_vacacion: any) {
     let datosVacacion = {
       estado: estado_vacacion,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restV.ActualizarEstado(id_vacacion, datosVacacion).subscribe(respon => {
     });
@@ -268,7 +279,7 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
                 if(this.autorizaDirecto === true){
                   this.listaEnvioCorreo = this.listadoDepaAutoriza;
                 }
-                
+
                 console.log('listaEnvioCorreo 2: ',this.listaEnvioCorreo );
                 this.EnviarCorreo(this.listaEnvioCorreo, vacacion, estado_v, estado_c, desde, hasta);
               });
@@ -279,7 +290,7 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
             this.listadoDepaAutoriza = res;
             this.listadoDepaAutoriza.filter(item => {
               if(item.nivel < 3 ){
-                return this.listaEnvioCorreo.push(item);  
+                return this.listaEnvioCorreo.push(item);
               }
             })
 
@@ -288,10 +299,10 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
           });
         }
       })
-    });   
+    });
 
 
-    
+
   }
 
   EnviarCorreo(listaEnvioCorreo: any, vacacion: any, estado_v: string, estado_c: string, desde: any, hasta: any){
@@ -363,8 +374,8 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   // METODO PARA ENVIAR NOTIFICACIONES
   EnviarNotificacion(vacaciones: any, estado_v: string) {
     vacaciones.EmpleadosSendNotiEmail.push(this.solInfo);
-    let desde = moment.weekdays(moment(vacaciones.fec_inicio).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacaciones.fec_inicio).day()).slice(1);
-    let hasta = moment.weekdays(moment(vacaciones.fec_final).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacaciones.fec_final).day()).slice(1);
+    let desde = moment.weekdays(moment(vacaciones.fecha_inicio).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacaciones.fec_inicio).day()).slice(1);
+    let hasta = moment.weekdays(moment(vacaciones.fecha_final).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacaciones.fec_final).day()).slice(1);
 
     let notificacion = {
       id_receives_empl: '',
@@ -379,6 +390,8 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
         this.solInfo.fullname + ' desde ' +
         desde + ' ' + moment(vacaciones.fec_inicio).format('DD/MM/YYYY') + ' hasta ' +
         hasta + ' ' + moment(vacaciones.fec_final).format('DD/MM/YYYY'),
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     //Listado para eliminar el usuario duplicado

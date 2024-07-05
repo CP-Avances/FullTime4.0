@@ -53,12 +53,16 @@ export class DatosEmpleadoComponent implements OnInit {
   btnDisc = 'Añadir';
   editar: string = '';
 
-  // ITEMS DE PAGINACION DE LA TABLA 
+  // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
   hipervinculo: string = (localStorage.getItem('empresaURL') as string); // VARIABLE DE MANEJO DE RUTAS CON URL
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
 
   constructor(
@@ -89,6 +93,9 @@ export class DatosEmpleadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerLogo();
     this.ObtenerColores();
     this.BuscarParametro();
@@ -98,7 +105,7 @@ export class DatosEmpleadoComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -151,7 +158,7 @@ export class DatosEmpleadoComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -178,7 +185,7 @@ export class DatosEmpleadoComponent implements OnInit {
    ** **                      METODO PARA MOSTRAR DATOS PERFIL DE USUARIO                        ** **                                           *
    ** ********************************************************************************************* **/
 
-  // METODO PARA VER LA INFORMACIÓN DEL USUARIO 
+  // METODO PARA VER LA INFORMACIÓN DEL USUARIO
   urlImagen: any;
   iniciales: any;
   mostrarImagen: boolean = false;
@@ -307,6 +314,10 @@ export class DatosEmpleadoComponent implements OnInit {
       console.log(this.archivoSubido[i], this.archivoSubido[i].name)
       formData.append("image", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restEmpleado.SubirImagen(formData, parseInt(this.idEmpleado)).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Imagen registrada.', {
         timeOut: 6000,
@@ -315,6 +326,11 @@ export class DatosEmpleadoComponent implements OnInit {
       this.archivoForm.reset();
       this.nameFile = '';
       this.ResetDataMain();
+    }, error => {
+        this.toastr.info('Verifique que este usuario tenga creadas capetas', 'No se ha podido cargar el archivo.', {
+        timeOut: 6000,
+      });
+
     });
   }
 
@@ -357,9 +373,13 @@ export class DatosEmpleadoComponent implements OnInit {
       })
   }
 
-  // ELIMINAR REGISTRO DE TITULO 
+  // ELIMINAR REGISTRO DE TITULO
   EliminarTituloEmpleado(id: number) {
-    this.restEmpleado.EliminarTitulo(id).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+    this.restEmpleado.EliminarTitulo(id, datos).subscribe(res => {
       this.ObtenerTituloEmpleado();
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
@@ -367,7 +387,7 @@ export class DatosEmpleadoComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteTitulo(id: number) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -385,7 +405,7 @@ export class DatosEmpleadoComponent implements OnInit {
    ** **               BUSQUEDA DE DATOS DE ASIGNACIONES: DISCAPACIDAD                           ** **                        *
    ** ********************************************************************************************* **/
 
-  // METODO PARA OBTENER DATOS DE DISCAPACIDAD 
+  // METODO PARA OBTENER DATOS DE DISCAPACIDAD
   ObtenerDiscapacidadEmpleado() {
     this.discapacidadUser = [];
     this.restDiscapacidad.BuscarDiscapacidadUsuario(parseInt(this.idEmpleado)).subscribe(data => {
@@ -394,9 +414,14 @@ export class DatosEmpleadoComponent implements OnInit {
     });
   }
 
-  // ELIMINAR REGISTRO DE DISCAPACIDAD 
+  // ELIMINAR REGISTRO DE DISCAPACIDAD
   EliminarDiscapacidad(id_discapacidad: number) {
-    this.restDiscapacidad.EliminarDiscapacidad(id_discapacidad).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
+    this.restDiscapacidad.EliminarDiscapacidad(id_discapacidad, datos).subscribe(res => {
       this.ObtenerDiscapacidadEmpleado();
       this.btnDisc = 'Añadir';
       this.toastr.error('Registro eliminado.', '', {
@@ -405,7 +430,7 @@ export class DatosEmpleadoComponent implements OnInit {
     })
   };
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteDiscapacidad(id: number) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -437,7 +462,7 @@ export class DatosEmpleadoComponent implements OnInit {
     }
   }
 
-  // LÓGICA DE BOTÓN PARA MOSTRAR COMPONENTE DEL REGISTRO DE DISCAPACIDAD 
+  // LÓGICA DE BOTÓN PARA MOSTRAR COMPONENTE DEL REGISTRO DE DISCAPACIDAD
   MostrarDis() {
     if (this.discapacidadUser.length != 0) {
       this.AbrirVentanaDiscapacidad('editar');
@@ -474,7 +499,7 @@ export class DatosEmpleadoComponent implements OnInit {
       })
   }
 
-  // LÓGICA DE BOTÓN PARA MOSTRAR COMPONENTE DEL REGISTRO DE VACUNACION 
+  // LÓGICA DE BOTÓN PARA MOSTRAR COMPONENTE DEL REGISTRO DE VACUNACION
   MostrarVentanaVacuna() {
     this.ventana.open(CrearVacunaComponent, {
       data: { idEmpleado: this.idEmpleado }, width: '600px'
@@ -486,7 +511,12 @@ export class DatosEmpleadoComponent implements OnInit {
 
   // ELIMINAR REGISTRO DE VACUNA
   EliminarVacuna(datos: any) {
-    this.restVacuna.EliminarRegistroVacuna(datos.id, datos.carnet).subscribe(res => {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
+    this.restVacuna.EliminarRegistroVacuna(datos.id, datos.carnet, data).subscribe(res => {
       this.ObtenerDatosVacunas(this.formato_fecha);
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
@@ -494,7 +524,7 @@ export class DatosEmpleadoComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarEliminarVacuna(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -519,7 +549,7 @@ export class DatosEmpleadoComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER EL CONTRATO DE UN EMPLEADO CON SU RESPECTIVO REGIMEN LABORAL 
+  // METODO PARA OBTENER EL CONTRATO DE UN EMPLEADO CON SU RESPECTIVO REGIMEN LABORAL
   ObtenerContratoEmpleado(id_contrato: number, formato_fecha: string) {
     this.restEmpleado.BuscarDatosContrato(id_contrato).subscribe(res => {
       this.contratoEmpleado = res;
@@ -535,13 +565,13 @@ export class DatosEmpleadoComponent implements OnInit {
    ** ******************************************************************************************** **/
 
 
-  // METODO PARA OBTENER LOS DATOS DEL CARGO DEL EMPLEADO 
+  // METODO PARA OBTENER LOS DATOS DEL CARGO DEL EMPLEADO
   cargoEmpleado: any = [];
   ObtenerCargoEmpleado(id_cargo: number, formato_fecha: string) {
     this.cargoEmpleado = [];
     this.restCargo.BuscarCargoID(id_cargo).subscribe(datos => {
       this.cargoEmpleado = datos;
-      this.cargoEmpleado.forEach(data => {
+      this.cargoEmpleado.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado);
         data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, formato_fecha, this.validar.dia_abreviado);
       })
@@ -567,7 +597,7 @@ export class DatosEmpleadoComponent implements OnInit {
     let genero = this.GeneroSelect[this.empleadoUno[0].genero - 1];
     let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
     let nacionalidad: any;
-    this.nacionalidades.forEach(element => {
+    this.nacionalidades.forEach((element: any) => {
       if (this.empleadoUno[0].id_nacionalidad == element.id) {
         nacionalidad = element.nombre;
       }
@@ -662,7 +692,7 @@ export class DatosEmpleadoComponent implements OnInit {
               { text: 'NOMBRE', style: 'tableHeader' },
               { text: 'NIVEL', style: 'tableHeader' }
             ],
-            ...this.tituloEmpleado.map(obj => {
+            ...this.tituloEmpleado.map((obj: any) => {
               return [{ text: obj.nombre, style: 'tableCell' }, { text: obj.nivel, style: 'tableCell' }];
             })
           ]
@@ -742,7 +772,7 @@ export class DatosEmpleadoComponent implements OnInit {
               { text: 'PORCENTAJE', style: 'tableHeader' },
               { text: 'TIPO', style: 'tableHeader' },
             ],
-            ...this.discapacidadUser.map(obj => {
+            ...this.discapacidadUser.map((obj: any) => {
               return [
                 { text: obj.carnet_conadis, style: 'tableCell' },
                 { text: obj.porcentaje + ' %', style: 'tableCell' },
@@ -771,7 +801,7 @@ export class DatosEmpleadoComponent implements OnInit {
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
@@ -878,7 +908,7 @@ export class DatosEmpleadoComponent implements OnInit {
     FileSaver.saveAs(data, "EmpleadoCSV" + (datos[0])[0].Nombre + "_" + (datos[0])[0].Apellido + "_" + new Date().getTime() + '.csv');
   }
 
-  /** ******************************************************************************************* ** 
+  /** ******************************************************************************************* **
    ** **                             METODO PARA IMPRIMIR EN XML                               ** **
    ** ******************************************************************************************* **/
 
@@ -903,7 +933,7 @@ export class DatosEmpleadoComponent implements OnInit {
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }

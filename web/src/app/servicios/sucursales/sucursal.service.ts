@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment'
 import { catchError } from 'rxjs';
 
 @Injectable({
@@ -37,14 +36,13 @@ export class SucursalService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/sucursales`);
   }
 
-  // METODO PARA ELIMINAR REGISTRO 
-  EliminarRegistro(id: any) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/sucursales/eliminar/${id}`).pipe(catchError(id));
-  }
-
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/sucursales/xmlDownload`, data);
+  // METODO PARA ELIMINAR REGISTRO
+  EliminarRegistro(id: any, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/sucursales/eliminar/${id}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions).pipe(catchError(id));
   }
 
   // METODO PARA BUSCAR DATOS DE UNA SUCURSAL
@@ -52,9 +50,13 @@ export class SucursalService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/sucursales/unaSucursal/${id}`);
   }
 
-  
+
   RevisarFormato(formData) {
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/sucursales/upload/revision', formData);
+  }
+
+  RegistrarSucursales(data: any) {
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/sucursales/registraSucursales', data);
   }
 
 

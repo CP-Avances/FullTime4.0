@@ -13,53 +13,73 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PLAN_GENERAL_CONTROLADOR = void 0;
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
+const settingsMail_1 = require("../../libs/settingsMail");
 class PlanGeneralControlador {
-    // METODO PARA REGISTRAR PLAN GENERAL   --**VERIFICADO
+    // METODO PARA REGISTRAR PLAN GENERAL --**VERIFICADO
     CrearPlanificacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            var errores = 0;
-            var iterar = 0;
-            var cont = 0;
-            // CONTADORES INICIAN EN CERO (0)
-            errores = 0;
-            iterar = 0;
-            cont = 0;
-            for (var i = 0; i < req.body.length; i++) {
-                database_1.default.query(`
+            let errores = 0;
+            let ocurrioError = false;
+            let mensajeError = '';
+            let codigoError = 0;
+            const { user_name, ip, plan_general } = req.body;
+            for (let i = 0; i < plan_general.length; i++) {
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const result = yield database_1.default.query(`
                 INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
                     fecha_horario, id_empleado_cargo, tipo_accion, codigo, id_horario, tipo_dia, salida_otro_dia,
                     minutos_antes, minutos_despues, estado_origen, minutos_alimentacion) 
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                `, [req.body[i].fec_hora_horario, req.body[i].tolerancia, req.body[i].estado_timbre,
-                    req.body[i].id_det_horario, req.body[i].fec_horario, req.body[i].id_empl_cargo,
-                    req.body[i].tipo_entr_salida, req.body[i].codigo, req.body[i].id_horario, req.body[i].tipo_dia,
-                    req.body[i].salida_otro_dia, req.body[i].min_antes, req.body[i].min_despues, req.body[i].estado_origen,
-                    req.body[i].min_alimentacion], (error) => {
-                    iterar = iterar + 1;
-                    try {
-                        console.log('if error --> ', error);
-                        if (error) {
-                            errores = errores + 1;
-                            if (iterar === req.body.length && errores > 0) {
-                                return res.status(200).jsonp({ message: 'error' });
-                            }
-                        }
-                        else {
-                            cont = cont + 1;
-                            if (iterar === req.body.length && cont === req.body.length) {
-                                return res.status(200).jsonp({ message: 'OK' });
-                            }
-                            else if (iterar === req.body.length && cont != req.body.length) {
-                                return res.status(200).jsonp({ message: 'error' });
-                            }
-                        }
-                    }
-                    catch (error) {
-                        console.log('ver el error ', error);
-                        return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
-                    }
-                });
+                `, [
+                        plan_general[i].fec_hora_horario, plan_general[i].tolerancia, plan_general[i].estado_timbre,
+                        plan_general[i].id_det_horario, plan_general[i].fec_horario, plan_general[i].id_empl_cargo,
+                        plan_general[i].tipo_entr_salida, plan_general[i].codigo, plan_general[i].id_horario, plan_general[i].tipo_dia,
+                        plan_general[i].salida_otro_dia, plan_general[i].min_antes, plan_general[i].min_despues, plan_general[i].estado_origen,
+                        plan_general[i].min_alimentacion
+                    ]);
+                    const [plan] = result.rows;
+                    const fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(plan_general[i].fec_hora_horario.split(' ')[1]);
+                    const fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(plan_general[i].fec_hora_horario, 'ddd');
+                    const fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(plan_general[i].fec_horario, 'ddd');
+                    plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
+                    plan.fecha_horario = fecha_horario;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_asistencia_general',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(plan),
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    ocurrioError = true;
+                    mensajeError = error.message;
+                    codigoError = 500;
+                    errores++;
+                    break;
+                }
+            }
+            if (ocurrioError) {
+                return res.status(codigoError).jsonp({ message: mensajeError });
+            }
+            else {
+                if (errores > 0) {
+                    return res.status(200).jsonp({ message: 'error' });
+                }
+                else {
+                    return res.status(200).jsonp({ message: 'OK' });
+                }
             }
         });
     }
@@ -83,38 +103,75 @@ class PlanGeneralControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var errores = 0;
-            var iterar = 0;
-            var cont = 0;
+            let ocurrioError = false;
+            let mensajeError = '';
+            let codigoError = 0;
             // CONTADORES INICIAN EN CERO (0)
             errores = 0;
-            iterar = 0;
-            cont = 0;
-            for (var i = 0; i < req.body.length; i++) {
-                database_1.default.query(`
-                DELETE FROM eu_asistencia_general WHERE id = $1
-                `, [req.body[i].id], (error) => {
-                    iterar = iterar + 1;
-                    try {
-                        if (error) {
-                            errores = errores + 1;
-                            if (iterar === req.body.length && errores > 0) {
-                                return res.status(200).jsonp({ message: 'error' });
-                            }
-                        }
-                        else {
-                            cont = cont + 1;
-                            if (iterar === req.body.length && cont === req.body.length) {
-                                return res.status(200).jsonp({ message: 'OK' });
-                            }
-                            else if (iterar === req.body.length && cont != req.body.length) {
-                                return res.status(200).jsonp({ message: 'error' });
-                            }
-                        }
+            const { user_name, ip, id_plan } = req.body;
+            for (const plan of id_plan) {
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    // CONSULTAR DATOSORIGINALES
+                    const consulta = yield database_1.default.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [plan.id]);
+                    const [datosOriginales] = consulta.rows;
+                    if (!datosOriginales) {
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'eu_asistencia_general',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip,
+                            observacion: `Error al eliminar el registro con id ${plan.id}. Registro no encontrado.`
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        return res.status(404).jsonp({ message: 'error' });
                     }
-                    catch (error) {
-                        return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
-                    }
-                });
+                    yield database_1.default.query(`
+                    DELETE FROM eu_asistencia_general WHERE id = $1
+                    `, [plan.id]);
+                    const fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(datosOriginales.fecha_hora_horario.toLocaleString().split(' ')[1]);
+                    const fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_hora_horario, 'ddd');
+                    const fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_horario, 'ddd');
+                    datosOriginales.fecha_horario = fecha_horario;
+                    datosOriginales.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_asistencia_general',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: JSON.stringify(datosOriginales),
+                        datosNuevos: '',
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    console.log(error);
+                    yield database_1.default.query('ROLLBACK');
+                    errores++;
+                    ocurrioError = true;
+                    mensajeError = error;
+                    codigoError = 500;
+                    break;
+                }
+            }
+            if (ocurrioError) {
+                return res.status(500).jsonp({ message: mensajeError });
+            }
+            else {
+                if (errores > 0) {
+                    return res.status(200).jsonp({ message: 'error' });
+                }
+                else {
+                    return res.status(200).jsonp({ message: 'OK' });
+                }
             }
         });
     }
@@ -148,6 +205,7 @@ class PlanGeneralControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fecha_inicio, fecha_final, codigo } = req.body;
+                console.log('ver datos ', fecha_inicio, ' ', fecha_final, ' ', codigo);
                 const HORARIO = yield database_1.default.query("SELECT codigo_e, nombre_e, anio, mes, " +
                     "CASE WHEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') ELSE '-' END AS dia1, " +
                     "CASE WHEN STRING_AGG(CASE WHEN dia = 2 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 2 THEN codigo_dia end,', ') ELSE '-' END AS dia2, " +
@@ -255,28 +313,6 @@ class PlanGeneralControlador {
         });
     }
     // METODO PARA LISTAR PLANIFICACIONES DE DIAS LIBRES Y FERIADOS   --**VERIFICADO
-    ListarHorariosDescanso(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { fecha_inicio, fecha_final, codigo } = req.body;
-                const HORARIO = yield database_1.default.query("SELECT p_g.id_horario, horario.codigo  AS codigo_horario, horario.default " +
-                    "FROM eu_asistencia_general p_g " +
-                    "INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
-                    "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
-                    "WHERE fecha_horario BETWEEN $1 AND $2 AND (horario.default = 'FD' OR horario.default = 'L') " +
-                    "GROUP BY codigo_horario, p_g.id_horario, horario.default", [fecha_inicio, fecha_final]);
-                if (HORARIO.rowCount != 0) {
-                    return res.jsonp({ message: 'OK', data: HORARIO.rows });
-                }
-                else {
-                    return res.jsonp({ message: 'vacio', data: HORARIO.rows });
-                }
-            }
-            catch (error) {
-                return res.jsonp({ message: 'error', error: error });
-            }
-        });
-    }
     // METODO PARA BUSCAR ASISTENCIAS
     BuscarAsistencia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -323,13 +359,14 @@ class PlanGeneralControlador {
                 codigos = '\'' + codigo + '\'';
             }
             if (verificador === 0) {
-                const ASISTENCIA = yield database_1.default.query("SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios, " +
-                    "p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre, " +
-                    "empleado.cedula, empleado.nombre, empleado.apellido " +
-                    "FROM eu_asistencia_general p_g " +
-                    "INNER JOIN eu_empleados empleado on empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigos + ")" +
-                    "WHERE p_g.fecha_horario BETWEEN $1 AND $2 " +
-                    "ORDER BY p_g.fecha_hora_horario ASC", [inicio, fin]);
+                const ASISTENCIA = yield database_1.default.query(`
+                SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios,
+                p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre,
+                empleado.cedula, empleado.nombre, empleado.apellido, empleado.id AS id_empleado
+                FROM eu_asistencia_general p_g
+                INNER JOIN eu_empleados empleado on empleado.codigo = p_g.codigo AND p_g.codigo IN (${codigos})
+                WHERE p_g.fecha_horario BETWEEN $1 AND $2
+                ORDER BY p_g.fecha_hora_horario ASC`, [inicio, fin]);
                 if (ASISTENCIA.rowCount === 0) {
                     return res.status(404).jsonp({ message: 'vacio' });
                 }
@@ -346,26 +383,75 @@ class PlanGeneralControlador {
     ActualizarManual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { codigo, fecha, id, accion, id_timbre } = req.body;
+                const { codigo, fecha, id, accion, id_timbre, user_name, ip } = req.body;
                 console.log('ver datos ', codigo, ' ', fecha, ' ', id);
                 const ASIGNADO = yield database_1.default.query(`
                 SELECT * FROM fnbuscarregistroasignado ($1, $2::character varying);
                 `, [fecha, codigo]);
                 //console.log('ver asignado ', ASIGNADO)
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_asistencia_general WHERE id = $1`, [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_asistencia_general',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el registro con id ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
                 const PLAN = yield database_1.default.query(`
                 UPDATE eu_asistencia_general SET fecha_hora_timbre = $1, estado_timbre = 'R' WHERE id = $2 RETURNING *
                 `, [fecha, id]);
+                var fecha_hora_horario1 = yield (0, settingsMail_1.FormatearHora)(datosOriginales.fecha_hora_horario.toLocaleString().split(' ')[1]);
+                var fecha_hora_horario = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_hora_horario, 'ddd');
+                var fecha_horario = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_horario, 'ddd');
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_asistencia_general',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: `id: ${datosOriginales.id}
+                            , codigo: ${datosOriginales.codigo}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${datosOriginales.fecha_hora_timbre}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`,
+                    datosNuevos: `id: ${datosOriginales.id}
+                            , codigo: ${datosOriginales.codigo}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`, ip,
+                    observacion: null
+                });
                 if (PLAN.rowCount != 0) {
                     const TIMBRE = yield database_1.default.query(`
                     UPDATE eu_timbres SET accion = $1 WHERE id = $2
                     `, [accion, id_timbre]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'timbres',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(TIMBRE.rows),
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                     return res.jsonp({ message: 'OK', respuesta: PLAN.rows });
                 }
                 else {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
                     res.status(404).jsonp({ message: 'error' });
                 }
             }
             catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error', error: error });
             }
         });

@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.USUARIO_CONTROLADOR = void 0;
 const settingsMail_1 = require("../../libs/settingsMail");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -23,15 +24,31 @@ class UsuarioControlador {
     CrearUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { usuario, contrasena, estado, id_rol, id_empleado } = req.body;
+                const { usuario, contrasena, estado, id_rol, id_empleado, user_name, ip } = req.body;
                 let contrasena_encriptado = rsa_keys_service_1.default.encriptarLogin(contrasena);
-                yield database_1.default.query(`
+                // INCIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query(`
         INSERT INTO eu_usuarios (usuario, contrasena, estado, id_rol, id_empleado) 
-          VALUES ($1, $2, $3, $4, $5)
+          VALUES ($1, $2, $3, $4, $5) RETURNING *
         `, [usuario, contrasena_encriptado, estado, id_rol, id_empleado]);
-                res.jsonp({ message: 'Registro guardado.' });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_usuarios',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(response.rows[0]),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                res.jsonp({ message: 'Usuario Guardado' });
             }
             catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });
             }
         });
@@ -68,40 +85,166 @@ class UsuarioControlador {
             }
         });
     }
+    ObtenerIdUsuariosDepartamento(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_departamento } = req.body;
+            const Ids = yield database_1.default.query(`
+      SELECT id
+      FROM datos_actuales_empleado
+      WHERE id_departamento = $1
+      `, [id_departamento]);
+            if (Ids.rowCount != 0) {
+                return res.jsonp(Ids.rows);
+            }
+            else {
+                return res.jsonp(null);
+            }
+        });
+    }
     // METODO PARA ACTUALIZAR DATOS DE USUARIO
     ActualizarUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { usuario, contrasena, id_rol, id_empleado } = req.body;
-                yield database_1.default.query(`
-        UPDATE eu_usuarios SET usuario = $1, contrasena = $2, id_rol = $3 WHERE id_empleado = $4
+                const { usuario, contrasena, id_rol, id_empleado, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_usuarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                const datosNuevos = yield database_1.default.query(`
+        UPDATE eu_usuarios SET usuario = $1, contrasena = $2, id_rol = $3 WHERE id_empleado = $4 RETURNING *
         `, [usuario, contrasena, id_rol, id_empleado]);
-                res.jsonp({ message: 'Registro actualizado.' });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_usuarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                console.log('error *** ', error);
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
             }
         });
     }
     // METODO PARA ACTUALIZAR CONTRASEÑA
     CambiarPasswordUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { contrasena, id_empleado } = req.body;
-            let contrasena_encriptada = rsa_keys_service_1.default.encriptarLogin(contrasena);
-            yield database_1.default.query(`
-      UPDATE eu_usuarios SET contrasena = $1 WHERE id_empleado = $2
-      `, [contrasena_encriptada, id_empleado]);
-            res.jsonp({ message: 'Registro actualizado.' });
+            try {
+                const { contrasena, id_empleado, user_name, ip } = req.body;
+                let contrasena_encriptada = rsa_keys_service_1.default.encriptarLogin(contrasena);
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_usuarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        UPDATE eu_usuarios SET contrasena = $1 WHERE id_empleado = $2
+        `, [contrasena_encriptada, id_empleado]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'usuarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{contrasena: ${contrasena_encriptada}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     // ADMINISTRACION DEL MODULO DE ALIMENTACION
     RegistrarAdminComida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { admin_comida, id_empleado } = req.body;
-            yield database_1.default.query(`
-      UPDATE eu_usuarios SET administra_comida = $1 WHERE id_empleado = $2
-      `, [admin_comida, id_empleado]);
-            res.jsonp({ message: 'Registro guardado.' });
+            try {
+                const { admin_comida, id_empleado, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_usuarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        UPDATE eu_usuarios SET administra_comida = $1 WHERE id_empleado = $2
+        `, [admin_comida, id_empleado]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_usuarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{administra_comida: ${admin_comida}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     /** ************************************************************************************* **
@@ -110,11 +253,49 @@ class UsuarioControlador {
     // METODO PARA GUARDAR FRASE DE SEGURIDAD
     ActualizarFrase(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { frase, id_empleado } = req.body;
-            yield database_1.default.query(`
-      UPDATE eu_usuarios SET frase = $1 WHERE id_empleado = $2
-      `, [frase, id_empleado]);
-            res.jsonp({ message: 'Registro guardado.' });
+            try {
+                const { frase, id_empleado, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_usuarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        UPDATE eu_usuarios SET frase = $1 WHERE id_empleado = $2
+        `, [frase, id_empleado]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_usuarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{frase: ${frase}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     /** ******************************************************************************************** **
@@ -179,7 +360,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
               ig.name_regimen
@@ -262,7 +442,6 @@ class UsuarioControlador {
                 "WHERE ig.id_suc IN (" + id_sucursal + ")" +
                 "GROUP BY ig.id_suc, ig.name_suc " +
                 "ORDER BY ig.name_suc ASC").then((result) => { return result.rows; });
-            //console.log('sucursal ', sucursal_)
             if (sucursal_.length === 0)
                 return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
             // CONSULTA DE BUSQUEDA DE REGIMEN
@@ -307,7 +486,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
               SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
                   ig.name_regimen
@@ -432,7 +610,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
               ig.name_regimen
@@ -507,18 +684,51 @@ class UsuarioControlador {
     ActualizarEstadoTimbreWeb(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const array = req.body;
+                const { array, user_name, ip } = req.body;
                 if (array.length === 0)
                     return res.status(400).jsonp({ message: 'No se ha encontrado registros.' });
                 const nuevo = yield Promise.all(array.map((o) => __awaiter(this, void 0, void 0, function* () {
                     try {
+                        // INICIA TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // CONSULTA DATOSORIGINALES
+                        const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id = $1`, [o.userid]);
+                        const [datosOriginales] = consulta.rows;
+                        if (!datosOriginales) {
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'eu_usuarios',
+                                usuario: user_name,
+                                accion: 'U',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al actualizar usuario con id: ${o.userid}. Registro no encontrado.`
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                        }
                         const [result] = yield database_1.default.query(`
             UPDATE eu_usuarios SET web_habilita = $1 WHERE id = $2 RETURNING id
             `, [!o.web_habilita, o.userid])
                             .then((result) => { return result.rows; });
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'eu_usuarios',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: JSON.stringify(datosOriginales),
+                            datosNuevos: `{web_habilita: ${!o.web_habilita}}`,
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
                         return result;
                     }
                     catch (error) {
+                        // REVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
                         return { error: error.toString() };
                     }
                 })));
@@ -590,7 +800,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
               ig.name_regimen
@@ -673,7 +882,6 @@ class UsuarioControlador {
                 "WHERE ig.id_suc IN (" + id_sucursal + ")" +
                 "GROUP BY ig.id_suc, ig.name_suc " +
                 "ORDER BY ig.name_suc ASC").then((result) => { return result.rows; });
-            //console.log('sucursal ', sucursal_)
             if (sucursal_.length === 0)
                 return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
             // CONSULTA DE BUSQUEDA DE REGIMEN
@@ -718,7 +926,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
               ig.name_regimen
@@ -843,7 +1050,6 @@ class UsuarioControlador {
             let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
                 reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
                         car.cargos = yield database_1.default.query(`
             SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
               ig.name_regimen
@@ -918,19 +1124,51 @@ class UsuarioControlador {
     ActualizarEstadoTimbreMovil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log(req.body);
-                const array = req.body;
+                const { array, user_name, ip } = req.body;
                 if (array.length === 0)
                     return res.status(400).jsonp({ message: 'No se ha encontrado registros.' });
                 const nuevo = yield Promise.all(array.map((o) => __awaiter(this, void 0, void 0, function* () {
                     try {
+                        // INICIA TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // CONSULTA DATOSORIGINALES
+                        const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id = $1`, [o.userid]);
+                        const [datosOriginales] = consulta.rows;
+                        if (!datosOriginales) {
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'eu_usuarios',
+                                usuario: user_name,
+                                accion: 'U',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al actualizar usuario con id: ${o.userid}. Registro no encontrado.`
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                        }
                         const [result] = yield database_1.default.query(`
             UPDATE eu_usuarios SET app_habilita = $1 WHERE id = $2 RETURNING id
             `, [!o.app_habilita, o.userid])
                             .then((result) => { return result.rows; });
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'eu_usuarios',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: JSON.stringify(datosOriginales),
+                            datosNuevos: `{"app_habilita": ${!o.app_habilita}}`,
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
                         return result;
                     }
                     catch (error) {
+                        // REVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
                         return { error: error.toString() };
                     }
                 })));
@@ -967,19 +1205,53 @@ class UsuarioControlador {
     EliminarDispositivoMovil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const { user_name, ip } = req.body;
                 const array = req.params.dispositivo;
                 let dispositivos = array.split(',');
                 if (dispositivos.length === 0)
                     return res.status(400).jsonp({ message: 'No se han encontrado registros.' });
                 const nuevo = yield Promise.all(dispositivos.map((id_dispo) => __awaiter(this, void 0, void 0, function* () {
                     try {
+                        // INICIAR TRANSACCION
+                        yield database_1.default.query('BEGIN');
+                        // CONSULTA DATOSORIGINALES
+                        const consulta = yield database_1.default.query(`SELECT * FROM mrv_dispositivos WHERE id_dispositivo = $1`, [id_dispo]);
+                        const [datosOriginales] = consulta.rows;
+                        if (!datosOriginales) {
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'mrv_dispositivos',
+                                usuario: user_name,
+                                accion: 'D',
+                                datosOriginales: '',
+                                datosNuevos: '',
+                                ip,
+                                observacion: `Error al eliminar dispositivo con id: ${id_dispo}. Registro no encontrado.`
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
+                            return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                        }
                         const [result] = yield database_1.default.query(`
             DELETE FROM mrv_dispositivos WHERE id_dispositivo = $1 RETURNING *
             `, [id_dispo])
                             .then((result) => { return result.rows; });
+                        // AUDITORIA
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'mrv_dispositivos',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: JSON.stringify(datosOriginales),
+                            datosNuevos: '',
+                            ip,
+                            observacion: null
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
                         return result;
                     }
                     catch (error) {
+                        // REVERTIR TRANSACCION
+                        yield database_1.default.query('ROLLBACK');
                         return { error: error.toString() };
                     }
                 })));
@@ -1020,7 +1292,7 @@ class UsuarioControlador {
                     html: `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -1044,7 +1316,7 @@ class UsuarioControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
           `,
                     attachments: [
@@ -1084,55 +1356,65 @@ class UsuarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             var token = req.body.token;
             var frase = req.body.frase;
+            const { user_name, ip } = req.body;
             try {
                 const payload = jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail');
                 const id_empleado = payload._id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTA DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_usuarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar usuario con id: ${id_empleado}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
                 yield database_1.default.query(`
         UPDATE eu_usuarios SET frase = $2 WHERE id_empleado = $1
         `, [id_empleado, frase]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_usuarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{"frase": "${frase}"}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 return res.jsonp({ expiro: 'no', message: "Frase de seguridad actualizada." });
             }
             catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ expiro: 'si', message: "Tiempo para cambiar su frase de seguridad ha expirado." });
             }
         });
     }
-    list(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const USUARIOS = yield database_1.default.query(`
-      SELECT * FROM eu_usuarios
-      `);
-            if (USUARIOS.rowCount != 0) {
-                return res.jsonp(USUARIOS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    getIdByUsuario(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { usuario } = req.params;
-            const unUsuario = yield database_1.default.query(`
-      SELECT id FROM eu_usuarios WHERE usuario = $1
-      `, [usuario]);
-            if (unUsuario.rowCount != 0) {
-                return res.jsonp(unUsuario.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'No se ha encontrado el usuario.' });
-            }
-        });
-    }
     /** ************************************************************************************************** **
-     ** **                           METODOS TABLA USUARIO - SUCURSAL                                   ** **
+     ** **                           METODOS TABLA USUARIO - DEPARTAMENTO                               ** **
      ** ************************************************************************************************** */
-    // BUSCAR DATOS DE USUARIOS - SUCURSAL
+    // BUSCAR LISTA DE ID_SUCURSAL DE ASIGNACION USUARIO - DEPARTAMENTO
     BuscarUsuarioSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
             const USUARIOS = yield database_1.default.query(`
-      SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1
+      SELECT DISTINCT d.id_sucursal
+      FROM eu_usuario_departamento AS ud
+      JOIN ed_departamentos AS d ON ud.id_departamento = d.id 
+      WHERE id_empleado = $1
       `, [id_empleado]);
             if (USUARIOS.rowCount != 0) {
                 return res.jsonp(USUARIOS.rows);
@@ -1142,60 +1424,171 @@ class UsuarioControlador {
             }
         });
     }
-    // CREAR REGISTRO DE USUARIOS - SUCURSAL
-    CrearUsuarioSucursal(req, res) {
+    // CREAR REGISTRO DE USUARIOS - DEPARTAMENTO
+    CrearUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empleado, id_sucursal, principal } = req.body;
+                const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = req.body;
+                // INICIA TRANSACCION
+                yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
-        INSERT INTO eu_usuario_sucursal (id_empleado, id_sucursal, principal) 
-        VALUES ($1, $2, $3)
-        `, [id_empleado, id_sucursal, principal]);
+        INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
+        VALUES ($1, $2, $3, $4, $5)
+        `, [id_empleado, id_departamento, principal, personal, administra]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_usuario_departamento',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{"id_empleado": ${id_empleado}, "id_departamento": ${id_departamento}, "principal": ${principal}, "personal": ${personal}, "administra": ${administra}}`,
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
                 res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });
             }
         });
     }
-    // BUSCAR DATOS DE USUARIOS - SUCURSAL
-    BuscarUsuarioSucursalPrincipal(req, res) {
+    //BUSCAR DATOS DE USUARIOS - DEPARTAMENTO
+    BuscarUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
             const USUARIOS = yield database_1.default.query(`
-      SELECT * FROM eu_usuario_sucursal WHERE id_empleado = $1 AND principal = true;
+      SELECT ud.id, e.nombre, e.apellido, d.nombre AS departamento, d.id AS id_departamento, 
+      s.id AS id_sucursal, s.nombre AS sucursal, ud.principal, ud.personal, ud.administra
+      FROM eu_usuario_departamento AS ud
+      INNER JOIN eu_empleados AS e ON ud.id_empleado=e.id
+      INNER JOIN ed_departamentos AS d ON ud.id_departamento=d.id
+      INNER JOIN e_sucursales AS s ON d.id_sucursal=s.id
+      WHERE id_empleado = $1
+      ORDER BY ud.id ASC
       `, [id_empleado]);
             if (USUARIOS.rowCount != 0) {
                 return res.jsonp(USUARIOS.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+                return res.jsonp(null);
             }
         });
     }
-    // METODO PARA ACTUALIZAR DATOS DE USUARIO - SUCURSAL
-    ActualizarUsuarioSucursalPrincipal(req, res) {
+    // BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO
+    BuscarAsignacionUsuarioDepartamento(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.body;
+            const USUARIOS = yield database_1.default.query(`
+      SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 
+      AND principal = true
+      `, [id_empleado]);
+            if (USUARIOS.rowCount != 0) {
+                return res.jsonp(USUARIOS.rows);
+            }
+            else {
+                return res.jsonp(null);
+            }
+        });
+    }
+    // ACTUALIZAR DATOS DE USUARIOS - DEPARTAMENTO
+    ActualizarUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_sucursal, id_empleado } = req.body;
-                yield database_1.default.query(`
-        UPDATE eu_usuario_sucursal SET id_sucursal = $1 WHERE id_empleado = $2 AND principal = true;
-        `, [id_sucursal, id_empleado]);
-                res.jsonp({ message: 'Registro actualizado.' });
+                const { id, id_departamento, principal, personal, administra, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTA DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuario_departamento WHERE id = $1`, [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_usuario_departamento',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar registro con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                const datosActuales = yield database_1.default.query(`
+        UPDATE eu_usuario_departamento SET id_departamento = $2, principal = $3, personal = $4, administra = $5 
+        WHERE id = $1 RETURNING *
+        `, [id, id_departamento, principal, personal, administra]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_usuario_departamento',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(datosActuales.rows[0]),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado.' });
             }
             catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
                 return res.jsonp({ message: 'error' });
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTROS
-    EliminarUsuarioSucursal(req, res) {
+    // METODO PARA ELIMINAR ASIGNACIONES DE USUARIO - DEPARTAMENTO
+    EliminarUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-      DELETE FROM eu_usuario_sucursal WHERE id = $1
-      `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                const { user_name, ip, id } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTA DATOSORIGINALES
+                const consulta = yield database_1.default.query(`SELECT * FROM eu_usuario_departamento WHERE id = $1`, [id]);
+                const [datosOriginales] = consulta.rows;
+                if (!datosOriginales) {
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_usuario_departamento',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar eu_usuario_departamento con id: ${id}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                }
+                yield database_1.default.query(`
+        DELETE FROM eu_usuario_departamento WHERE id = $1
+        `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_usuario_departamento',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     //METODO PARA OBTENER TEXTO ENCRIPTADO

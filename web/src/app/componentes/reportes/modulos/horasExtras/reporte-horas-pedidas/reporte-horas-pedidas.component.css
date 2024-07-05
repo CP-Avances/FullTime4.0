@@ -1,10 +1,22 @@
-.btn-sm { background-color: rgb(80,87,97); color: white; } 
+.btn-sm {
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
 
-p { font-size: x-small; }
+p {
+    font-size: x-small;
+}
 
-table { width: 100%; font-size: 13px;}
+table {
+    width: 100%;
+    font-size: 12px;
+}
 
-tr { text-align: center; }
+tr {
+    text-align: center;
+}
 
-td { padding-top: 10px; text-align: center; }
-
+td {
+    padding-top: 10px;
+    text-align: center;
+}

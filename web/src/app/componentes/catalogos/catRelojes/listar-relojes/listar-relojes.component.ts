@@ -19,11 +19,16 @@ import { RelojesComponent } from 'src/app/componentes/catalogos/catRelojes/reloj
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableDispositivos } from 'src/app/model/reportes.model';
+import { ThemePalette } from '@angular/material/core';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+
 
 @Component({
   selector: 'app-listar-relojes',
@@ -33,16 +38,14 @@ import { ITableDispositivos } from 'src/app/model/reportes.model';
 
 export class ListarRelojesComponent implements OnInit {
 
-  // ALMACENAMIENTO DE DATOS Y BUSQUEDA
-  filtroDepartamentoReloj = '';
-  filtroSucursalReloj = '';
-  filtroEmpresaReloj = '';
-  filtroNombreReloj = '';
-  filtroIpReloj = '';
+  // ALMACENAMIENTO DE DATOS
   relojes: any = [];
 
   empleado: any = [];
   idEmpleado: number;
+
+  idDepartamentosAcceso: Set<any> = new Set();
+
   listar_relojes: boolean = true;
   dispositivosEliminar: any = [];
 
@@ -67,7 +70,20 @@ export class ListarRelojesComponent implements OnInit {
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
+  tamanio_paginaMul: number = 5;
+  numero_paginaMul: number = 1;
+
   hipervinculo: string = (localStorage.getItem('empresaURL') as string);
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
+  // VARIABLES PROGRESS SPINNER
+  progreso: boolean = false;
+  color: ThemePalette = 'primary';
+  mode: ProgressSpinnerMode = 'indeterminate';
+  value = 10;
 
   constructor(
     public restEmpre: EmpresaService,
@@ -76,18 +92,24 @@ export class ListarRelojesComponent implements OnInit {
     public restE: EmpleadoService,
     private rest: RelojesService,
     private toastr: ToastrService,
+    private restUsuario: UsuarioService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerColores();
     this.ObtenerReloj();
     this.ObtenerLogo();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -103,7 +125,7 @@ export class ListarRelojesComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -125,8 +147,14 @@ export class ListarRelojesComponent implements OnInit {
   ObtenerReloj() {
     this.relojes = [];
     this.rest.ConsultarRelojes().subscribe(datos => {
-      this.relojes = datos;
+      this.relojes = this.FiltrarRelojesAsignados(datos);
+      
     })
+  }
+
+  // METODO PARA FILTRAR RELOJES POR ASIGNACION USUARIO - DEPARTAMENTO
+  FiltrarRelojesAsignados(data: any) {
+    return data.filter((reloj: any) => this.idDepartamentosAcceso.has(reloj.id_departamento));
   }
 
   // METODO PARA INGRESAR IP
@@ -151,6 +179,9 @@ export class ListarRelojesComponent implements OnInit {
 
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
+    this.DataDispositivos = null;
+    this.archivoSubido = [];
+    this.nameFile = '';
     this.formulario.setValue({
       nombreForm: '',
       ipForm: '',
@@ -159,6 +190,9 @@ export class ListarRelojesComponent implements OnInit {
       departamentoForm: ''
     });
     this.ObtenerReloj();
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = false;
+    this.messajeExcel = '';
   }
 
 
@@ -196,6 +230,12 @@ export class ListarRelojesComponent implements OnInit {
     this.pagina = 'editar-reloj';
   }
 
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
+  }
+
   /** ********************************************************************************* **
    ** **                 METODOS Y VARIABLES PARA SUBIR PLANTILLAS                   ** **
    ** ********************************************************************************* **/
@@ -203,28 +243,159 @@ export class ListarRelojesComponent implements OnInit {
   nameFile: string;
   archivoSubido: Array<File>;
   archivoForm = new FormControl('', Validators.required);
-
+  mostrarbtnsubir: boolean = false;
   fileChange(element: any) {
+    this.archivoSubido = [];
+    this.nameFile = '';
     this.archivoSubido = element.target.files;
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 12);
+    let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'dispositivos') {
-        this.plantilla();
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
+        this.numero_paginaMul = 1;
+        this.tamanio_paginaMul = 5;
+        this.Revisarplantilla();
       } else {
-        this.toastr.error(
-          'Solo se acepta plantilla con nombre Dispositivos.',
-          'Plantilla seleccionada incorrecta.', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta.', {
           timeOut: 6000,
         });
-        this.archivoForm.reset();
         this.nameFile = '';
       }
     } else {
       this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
         timeOut: 6000,
+      });
+      this.nameFile = '';
+    }
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = true;
+  }
+
+  DataDispositivos: any;
+  listaDispositivosCorrectos: any = [];
+  messajeExcel: string = '';
+  Revisarplantilla() {
+    this.listaDispositivosCorrectos = [];
+    let formData = new FormData();
+    for (var i = 0; i < this.archivoSubido.length; i++) {
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+    }
+    this.progreso = true;
+    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    this.rest.VerificarArchivoExcel(formData).subscribe(res => {
+      this.DataDispositivos = res.data;
+      this.messajeExcel = res.message;
+      console.log('probando plantilla1 dispositivos', this.DataDispositivos);
+
+      if (this.messajeExcel == 'error') {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else if (this.messajeExcel == 'no_existe') {
+        this.toastr.error('No se ha encontrado pestaña BIOMETRICOS en la plantilla.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }
+      else {
+        this.DataDispositivos.forEach((item: any) => {
+          if (item.observacion.toLowerCase() == 'ok') {
+            this.listaDispositivosCorrectos.push(item);
+          }
+        });
+      }
+
+    }, error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
+        timeOut: 4000,
+      });
+      this.progreso = false;
+    }, () => {
+      this.progreso = false;
+    });
+  }
+
+  // METODO PARA DAR COLOR A LAS CELDAS Y REPRESENTAR LAS VALIDACIONES
+  colorCelda: string = ''
+  stiloCelda(observacion: string): string {
+    let arrayObservacion = observacion.split(" ");
+    if (observacion == 'Registro duplicado (código)' ||
+      observacion == 'Registro duplicado (dirección IP)' ||
+      observacion == 'Registro duplicado (número de serie)' ||
+      observacion == 'Registro duplicado (dirección MAC)'
+    ) {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya existe en el sistema' || 
+      observacion == 'Número de serie ya existe en el sistema' ||
+      observacion == 'Dirección MAC ya existe en el sistema'
+    ) {
+      return 'rgb(239, 203, 106)';
+    } else if (observacion == 'Establecimiento no existe en el sistema' ||
+      observacion == 'Departamento no existe en el sistema') {
+      return 'rgb(255, 192, 203)';
+    } else if (observacion == 'Departamento no pertenece al establecimiento' ||
+      observacion == 'El puerto debe ser de 6 dígitos'
+    ) {
+      return 'rgb(238, 34, 207)';
+    } else if (observacion == 'Dirección IP incorrecta' ||
+      observacion == 'Puerto incorrecto (solo números)' ||
+      observacion == 'Acción incorrecta ingrese (SI / NO)' ||
+      observacion == 'Número de acciones incorrecta ingrese (solo números)' ||
+      observacion == 'Formato de dirección MAC incorrecta (numeración hexadecimal)'
+    ) {
+      return 'rgb(222, 162, 73)';
+    } else {
+      return 'rgb(242, 21, 21)';
+    }
+  }
+  colorTexto: string = '';
+  stiloTextoCelda(texto: string): string {
+    let arrayObservacion = texto;
+    if (arrayObservacion == 'No registrado') {
+      return 'rgb(255, 80, 80)';
+    } else {
+      return 'black'
+    }
+  }
+
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    console.log('listDepartamentosCorrectos: ', this.listaDispositivosCorrectos.length);
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.registrarDispositivos();
+        }
+      });
+  }
+
+  registrarDispositivos() {
+    if (this.listaDispositivosCorrectos.length > 0) {
+      const data = {
+        plantilla: this.listaDispositivosCorrectos,
+        user_name: this.user_name,
+        ip: this.ip,
+      }
+      this.rest.subirArchivoExcel(data).subscribe(response => {
+        this.toastr.success('Operación exitosa.', 'Plantilla de Dispositivos importada.', {
+          timeOut: 3000,
+        });
+        //window.location.reload();
+        this.LimpiarCampos();
+        this.archivoForm.reset();
+        this.nameFile = '';
+      });
+    } else {
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
+        timeOut: 4000,
       });
       this.archivoForm.reset();
       this.nameFile = '';
@@ -262,6 +433,8 @@ export class ListarRelojesComponent implements OnInit {
             this.archivoForm.reset();
             this.nameFile = '';
           } else {
+            formData.append('user_name', this.user_name as string);
+            formData.append('user_ip', this.ip as string);
             this.rest.subirArchivoExcel(formData).subscribe(datos_reloj => {
               this.toastr.success('Operación exitosa.', 'Plantilla de Relojes importada.', {
                 timeOut: 10000,
@@ -401,7 +574,7 @@ export class ListarRelojesComponent implements OnInit {
     xlsx.writeFile(wb, "RelojesEXCEL" + new Date().getTime() + '.xlsx');
   }
 
-  /** ********************************************************************************************** ** 
+  /** ********************************************************************************************** **
    ** **                              METODO PARA EXPORTAR A CSV                                  ** **
    ** ********************************************************************************************** **/
 
@@ -592,7 +765,11 @@ export class ListarRelojesComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   EliminarRelojes(id_reloj: number) {
-    this.rest.EliminarRegistro(id_reloj).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistro(id_reloj, datos).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('No se puede eliminar.', '', {
           timeOut: 6000,
@@ -628,14 +805,18 @@ export class ListarRelojesComponent implements OnInit {
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ingresar = false;
     this.contador = 0;
     this.dispositivosEliminar = this.selectionDispositivos.selected;
     this.dispositivosEliminar.forEach((datos: any) => {
       this.relojes = this.relojes.filter((item: any) => item.id !== datos.id);
-      //AQUI MODIFICAR EL METODO 
+      //AQUI MODIFICAR EL METODO
       this.contador = this.contador + 1;
-      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+      this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.', {
             timeOut: 6000,

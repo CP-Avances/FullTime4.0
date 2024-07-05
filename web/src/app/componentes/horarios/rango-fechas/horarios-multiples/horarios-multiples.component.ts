@@ -39,18 +39,13 @@ export class HorariosMultiplesComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
-  // OPCIONES DE DIAS LIBRERIAS EN HORARIOS
-  miercoles = false;
-  domingo = false;
-  viernes = false;
-  martes = false;
-  jueves = false;
-  sabado = false;
-  lunes = false;
-
   // VARIABLE DE ALMACENAMIENTO DE DATOS
   horarios: any = [];
   feriados: any = [];
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // CAMPOS DE FORMULARIO
   fechaInicioF = new FormControl('', Validators.required);
@@ -94,7 +89,8 @@ export class HorariosMultiplesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    //--console.log('ver seleccionados ', this.seleccionados)
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.BuscarHorarios();
     this.LeerDatos();
   }
@@ -300,6 +296,28 @@ export class HorariosMultiplesComponent implements OnInit {
     this.validar = validar;
     this.cancelar = cancelar;
     this.registrar = formulario;
+    if (this.registrar === true) {
+      this.lunesF.disable();
+      this.martesF.disable();
+      this.miercolesF.disable();
+      this.juevesF.disable();
+      this.viernesF.disable();
+      this.sabadoF.disable();
+      this.domingoF.disable();
+      this.fechaInicioF.disable();
+      this.fechaFinalF.disable();
+    }
+    else {
+      this.lunesF.enable();
+      this.martesF.enable();
+      this.miercolesF.enable();
+      this.juevesF.enable();
+      this.viernesF.enable();
+      this.sabadoF.enable();
+      this.domingoF.enable();
+      this.fechaInicioF.enable();
+      this.fechaFinalF.enable();
+    }
     this.btn_eliminar_todo = eliminar_todo;
     this.btn_eliminar = eliminar;
   }
@@ -360,7 +378,7 @@ export class HorariosMultiplesComponent implements OnInit {
     })
   }
 
-  // METODO PARA VERIFICAR FECHAS DE CONTRATO 
+  // METODO PARA VERIFICAR FECHAS DE CONTRATO
   cont2: number = 0;
   VerificarContrato(form: any, correctos: any) {
     this.cont2 = 0;
@@ -377,8 +395,8 @@ export class HorariosMultiplesComponent implements OnInit {
         this.cont2 = this.cont2 + 1;
 
         // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS
-        if ((Date.parse(response[0].fecha_ingreso.split('T')[0]) <= Date.parse(form.fechaInicioForm)) &&
-          (Date.parse(response[0].fecha_salida.split('T')[0]) >= Date.parse(form.fechaFinalForm))) {
+        if ((Date.parse(response[0].fecha_ingreso.split('T')[0]) <= Date.parse(moment(form.fechaInicioForm).format('YYYY-MM-DD'))) &&
+          (Date.parse(response[0].fecha_salida.split('T')[0]) >= Date.parse(moment(form.fechaFinalForm).format('YYYY-MM-DD')))) {
 
           dh.observacion = 'OK';
           contrato = contrato.concat(dh);
@@ -641,27 +659,16 @@ export class HorariosMultiplesComponent implements OnInit {
       sumam = 0;
       sumah = sumah + 1;
     }
+
     let h = '00';
     let m = '00';
     let s = '00';
-    if (sumah < 10) {
-      h = '0' + sumah;
-    }
-    else {
-      h = String(sumah)
-    }
-    if (sumam < 10) {
-      m = '0' + sumam;
-    }
-    else {
-      m = String(sumam)
-    }
-    if (sumas < 10) {
-      s = '0' + sumas;
-    }
-    else {
-      s = String(sumas)
-    }
+
+    // CCONVERTIR A DOS DIGITOS
+    h = sumah < 10 ? '0' + sumah : String(sumah);
+    m = sumam < 10 ? '0' + sumam : String(sumam);
+    s = sumas < 10 ? '0' + sumas : String(sumas);
+
     return h + ':' + m + ':' + s;
   }
 
@@ -732,7 +739,7 @@ export class HorariosMultiplesComponent implements OnInit {
     const { default_ } = obj_res;
 
     //console.log('dh  --------------------------------- ', dh)
-    this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO 
+    this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
     this.inicioDate = moment(form.fechaInicioForm).format('YYYY-MM-DD');
     this.finDate = moment(form.fechaFinalForm).format('YYYY-MM-DD');
 
@@ -810,7 +817,7 @@ export class HorariosMultiplesComponent implements OnInit {
         origen = 'H' + default_;
       }
       else {
-        // BUSCAR FERIADOS 
+        // BUSCAR FERIADOS
         if (this.feriados.length != 0) {
           for (let i = 0; i < this.feriados.length; i++) {
             if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
@@ -880,6 +887,11 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA ELIMINAR HORARIOS Y REGISTRAR LIBRES
   EliminarRegistrosH(existe: any, obj: any, dh: any) {
+    let datos = {
+      id_plan: [],
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     existe.forEach((h: any) => {
       //console.log(' ver valor h ..... ', h)
       if (h.default_ === 'N' || h.default_ === 'DHA' || h.default_ === 'L' || h.default_ === 'FD') {
@@ -890,9 +902,10 @@ export class HorariosMultiplesComponent implements OnInit {
           id_horario: h.id_horario,
         };
         //console.log(' ingresa eliminar  ..... ', plan_fecha)
-        this.restP.BuscarFechas(plan_fecha).subscribe(res => {
+        this.restP.BuscarFechas(plan_fecha).subscribe((res: any) => {
+          datos.id_plan = res;
           // METODO PARA ELIMINAR DE LA BASE DE DATOS
-          this.restP.EliminarRegistro(res).subscribe(datos => {
+          this.restP.EliminarRegistro(datos).subscribe(datos => {
           })
         })
       }
@@ -967,7 +980,7 @@ export class HorariosMultiplesComponent implements OnInit {
         // ALMACENAMIENTO DE PLANIFICACION GENERAL
         this.plan_general = this.plan_general.concat(plan);
       })
-      //console.log('ver datos de plan_general ', this.plan_general)
+      console.log('ver datos de plan_general ', this.plan_general)
     }
   }
 
@@ -1031,7 +1044,12 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA ELIMINAR DESCANSOS - FERIADOS
   BorrarDescanso() {
-    this.restP.EliminarRegistro(this.eliminar).subscribe(datos_ => {
+    let datos = {
+      id_plan: this.eliminar,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+    this.restP.EliminarRegistro(datos).subscribe(datos_ => {
       if (datos_.message === 'OK') {
         this.GuardarInformacion();
       }
@@ -1051,8 +1069,12 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA REGISTRAR PLANIFICACION
   GuardarInformacion() {
-    //console.log('plan general ', this.plan_general)
-    this.restP.CrearPlanGeneral(this.plan_general).subscribe(res => {
+    const datos = {
+      plan_general: this.plan_general,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+    this.restP.CrearPlanGeneral(datos).subscribe(res => {
       //console.log('respuesta ****** ', res)
       if (res.message === 'OK') {
         this.progreso = false;
@@ -1134,6 +1156,7 @@ export class HorariosMultiplesComponent implements OnInit {
       lunesForm: false,
     });
     this.usuarios_validos = [];
+
   }
 
   // METODO PARA CERRAR VENTANA
@@ -1272,8 +1295,13 @@ export class HorariosMultiplesComponent implements OnInit {
   // METODO PARA BORRAR REGISTROS DE LA BASE DE DATOS
   BorrarDatos(opcion: number) {
     this.progreso = true;
+    let datos = {
+      id_plan: this.eliminar,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
     // METODO PARA ELIMINAR DE LA BASE DE DATOS
-    this.restP.EliminarRegistro(this.eliminar).subscribe(datos_ => {
+    this.restP.EliminarRegistro(datos).subscribe(datos_ => {
       if (datos_.message === 'OK') {
         this.progreso = false;
         this.toastr.error('Operación exitosa.', 'Registros eliminados.', {
@@ -1298,7 +1326,7 @@ export class HorariosMultiplesComponent implements OnInit {
     })
   }
 
-  // METODO PARA LLAMAR A FUNCIONES DE ELIMINACION 
+  // METODO PARA LLAMAR A FUNCIONES DE ELIMINACION
   EliminarRegistros(form: any, opcion: number) {
     if (form.horarioForm) {
       this.eliminar_horarios = [];

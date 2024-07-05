@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { AccionPersonalService } from 'src/app/servicios/accionPersonal/accion-personal.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ListarTipoAccionComponent } from '../listar-tipo-accion/listar-tipo-accion.component';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-crear-tipoaccion',
@@ -13,6 +14,10 @@ import { ListarTipoAccionComponent } from '../listar-tipo-accion/listar-tipo-acc
 })
 
 export class CrearTipoaccionComponent implements OnInit {
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   selec1: boolean = false;
   selec2: boolean = false;
@@ -49,6 +54,8 @@ export class CrearTipoaccionComponent implements OnInit {
     this.ObtenerTiposAccionPersonal();
     this.ObtenerTiposAccion();
     this.tipos[this.tipos.length] = { descripcion: "OTRO" };
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   // METODO PARA CREAR TIPO DE ACCION
@@ -59,7 +66,9 @@ export class CrearTipoaccionComponent implements OnInit {
       base_legal: form.baseLegalForm,
       tipo_permiso: this.selec1,
       tipo_vacacion: this.selec2,
-      tipo_situacion_propuesta: this.selec3
+      tipo_situacion_propuesta: this.selec3,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     if (form.tipoAccionForm != undefined) {
       this.GuardarInformacion(datosAccion);
@@ -73,7 +82,7 @@ export class CrearTipoaccionComponent implements OnInit {
   contador: number = 0;
   GuardarInformacion(datosAccion: any) {
     this.contador = 0;
-    this.tipos_acciones.map(obj => {
+    this.tipos_acciones.map((obj: any) => {
       if (obj.id_tipo === datosAccion.id_tipo) {
         this.contador = this.contador + 1;
       }
@@ -100,6 +109,7 @@ export class CrearTipoaccionComponent implements OnInit {
 
   // METODO PARA CAMBIAR ESTADO PERMISO
   CambiarEstadosPermisos() {
+    this.selec1 = true;
     this.selec2 = false;
     this.selec3 = false;
   }
@@ -107,12 +117,14 @@ export class CrearTipoaccionComponent implements OnInit {
 
   // METODO PARA CAMBIAR ESTADO VACACIONES
   CambiarEstadosVacaciones() {
+    this.selec2 = true;
     this.selec1 = false;
     this.selec3 = false;
   }
 
   // METODO PARA CAMBIAR ESTADO SITUACION PROPUESTA
   CambiarEstadosSituacion() {
+    this.selec3 = true;
     this.selec1 = false;
     this.selec2 = false;
   }
@@ -163,7 +175,9 @@ export class CrearTipoaccionComponent implements OnInit {
   IngresarNuevoTipo(form: any, datos: any) {
     if (form.otroTipoForm != '') {
       let tipo = {
-        descripcion: form.otroTipoForm
+        descripcion: form.otroTipoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.VerificarDuplicidad(form, tipo, datos);
     }
@@ -178,7 +192,7 @@ export class CrearTipoaccionComponent implements OnInit {
   contar: number = 0;
   VerificarDuplicidad(form: any, tipo: any, datos: any) {
     this.contar = 0;
-    this.tipos.map(obj => {
+    this.tipos.map((obj: any) => {
       if (obj.descripcion.toUpperCase() === form.otroTipoForm.toUpperCase()) {
         this.contar = this.contar + 1;
       }

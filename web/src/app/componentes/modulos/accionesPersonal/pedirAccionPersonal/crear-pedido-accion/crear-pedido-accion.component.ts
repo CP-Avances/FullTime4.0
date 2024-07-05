@@ -17,6 +17,8 @@ import { EmpresaService } from "src/app/servicios/catalogos/catEmpresa/empresa.s
 import { ProcesoService } from "src/app/servicios/catalogos/catProcesos/proceso.service";
 import { MainNavService } from "src/app/componentes/administracionGeneral/main-nav/main-nav.service";
 import { CiudadService } from "src/app/servicios/ciudad/ciudad.service";
+import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
+import { AsignacionesService } from "src/app/servicios/asignaciones/asignaciones.service";
 
 @Component({
   selector: "app-crear-pedido-accion",
@@ -40,14 +42,13 @@ export class CrearPedidoAccionComponent implements OnInit {
   filtroNombreG: Observable<any[]>;
   filtroNombreR: Observable<any[]>;
   filtroNombre: Observable<any[]>;
-  seleccionarEmpResponsable: any;
-  seleccionarEmpleados: any;
-  seleccionEmpleadoH: any;
-  seleccionEmpleadoG: any;
 
   //FILTRO CIUDAD
   filtroCiudad: Observable<any[]>;
-  seleccionarCiudad: any;
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // EVENTOS RELACIONADOS A SELECCION E INGRESO DE ACUERDOS - DECRETOS - RESOLUCIONES
   ingresoAcuerdo: boolean = false;
@@ -140,6 +141,8 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   // INICIACION DE VARIABLES
   idEmpleadoLogueado: any;
+  idUsuariosAcceso: Set<any> = new Set();
+
   empleados: any = [];
   ciudades: any = [];
   departamento: any;
@@ -150,21 +153,25 @@ export class CrearPedidoAccionComponent implements OnInit {
   }
 
   constructor(
-    public restAccion: AccionPersonalService,
+    private asignaciones: AsignacionesService,
     public restProcesos: ProcesoService,
     public restEmpresa: EmpresaService,
+    public restAccion: AccionPersonalService,
+    private funciones: MainNavService,
+    private validar: ValidacionesService,
     private toastr: ToastrService,
     public restE: EmpleadoService,
     public restC: CiudadService,
     public router: Router,
-    private funciones: MainNavService,
-    private validar: ValidacionesService
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem("empleado") as string);
     this.departamento = parseInt(localStorage.getItem("departamento") as string);
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem("usuario");
+    this.ip = localStorage.getItem("ip");
+
     if (this.habilitarAccion === false) {
       let mensaje = {
         access: false,
@@ -174,6 +181,9 @@ export class CrearPedidoAccionComponent implements OnInit {
       };
       return this.validar.RedireccionarHomeAdmin(mensaje);
     } else {
+
+      this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
       // INICIALIZACION DE FECHA Y MOSTRAR EN FORMULARIO
       var f = moment();
       this.FechaActual = f.format("YYYY-MM-DD");
@@ -192,28 +202,6 @@ export class CrearPedidoAccionComponent implements OnInit {
       // DATOS VACIOS INDICAR LA OPCION OTRO
       this.decretos[this.decretos.length] = { descripcion: "OTRO" };
       this.cargos[this.cargos.length] = { descripcion: "OTRO" };
-
-      // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
-      this.filtroNombre = this.idEmpleadoF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleado(value))
-      );
-      this.filtroNombreH = this.idEmpleadoHF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleado(value))
-      );
-      this.filtroNombreG = this.idEmpleadoGF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleado(value))
-      );
-      this.filtroNombreR = this.idEmpleadoRF.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarEmpleado(value))
-      );
-      this.filtroCiudad = this.idCiudad.valueChanges.pipe(
-        startWith(""),
-        map((value: any) => this._filtrarCiudad(value))
-      );
     }
   }
 
@@ -221,7 +209,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   private _filtrarEmpleado(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase();
-      return this.empleados.filter((info) =>
+      return this.empleados.filter((info: any) =>
         info.empleado.toUpperCase().includes(filterValue)
       );
     }
@@ -231,7 +219,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   private _filtrarCiudad(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase();
-      return this.ciudades.filter((info) =>
+      return this.ciudades.filter((info: any) =>
         info.descripcion.toUpperCase().includes(filterValue)
       );
     }
@@ -251,11 +239,11 @@ export class CrearPedidoAccionComponent implements OnInit {
       });
   }
 
-  // BUSQUEDA DE DATOS DE LA TABLA CG_PROCESOS
+  // BUSQUEDA DE DATOS DE LA TABLA PROCESOS
   procesos: any = [];
   ObtenerProcesos() {
     this.procesos = [];
-    this.restProcesos.getProcesosRest().subscribe((datos) => {
+    this.restProcesos.ConsultarProcesos().subscribe((datos) => {
       this.procesos = datos;
     });
   }
@@ -349,13 +337,35 @@ export class CrearPedidoAccionComponent implements OnInit {
   ObtenerEmpleados() {
     this.empleados = [];
     this.restE.BuscarListaEmpleados().subscribe((data) => {
-      this.empleados = data;
-      this.seleccionarEmpleados = "";
-      this.seleccionEmpleadoH = "";
-      this.seleccionEmpleadoG = "";
-      this.seleccionarEmpResponsable = "";
-      console.log("empleados", this.empleados);
+      this.empleados = this.FiltrarEmpleadosAsignados(data);
+
+      // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
+
+      this.filtroNombre = this.idEmpleadoF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
+
+      this.filtroNombreH = this.idEmpleadoHF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
+
+      this.filtroNombreG = this.idEmpleadoGF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
+
+      this.filtroNombreR = this.idEmpleadoRF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
     });
+  }
+
+  // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
+  FiltrarEmpleadosAsignados(data: any) {
+    return data.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
   }
 
   // METODO PARA OBTENER LISTA DE CIUDADES
@@ -363,8 +373,11 @@ export class CrearPedidoAccionComponent implements OnInit {
     this.ciudades = [];
     this.restC.ConsultarCiudades().subscribe((data) => {
       this.ciudades = data;
-      this.seleccionarCiudad = "";
-      console.log("ciudades", this.ciudades);
+      //console.log("ciudades", this.ciudades);
+      this.filtroCiudad = this.idCiudad.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarCiudad(value))
+      );
     });
   }
 
@@ -476,6 +489,8 @@ export class CrearPedidoAccionComponent implements OnInit {
               )) : null,
               posesion_notificacion: form4.posesionNotificacionForm,
               descripcion_pose_noti: form4.descripcionPForm,
+              user_name: this.user_name,
+              ip: this.ip,
             };
             // VALIDAR QUE FECHAS SE ENCUENTREN BIEN INGRESADA
             if (form4.fechaReempForm === "" || form4.fechaReempForm === null) {
@@ -583,6 +598,8 @@ export class CrearPedidoAccionComponent implements OnInit {
     if (form1.otroDecretoForm != "") {
       let acuerdo = {
         descripcion: form1.otroDecretoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       };
       this.restAccion.IngresarDecreto(acuerdo).subscribe((resol) => {
         // BUSCAR ID DE ULTIMO REGISTRO DE DECRETOS - ACUERDOS - RESOLUCIÓN - OTROS
@@ -618,6 +635,8 @@ export class CrearPedidoAccionComponent implements OnInit {
     if (form2.otroCargoForm != "") {
       let cargo = {
         descripcion: form2.otroCargoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       };
       this.restAccion.IngresarCargoPropuesto(cargo).subscribe((resol) => {
         // BUSCAR ID DE ULTIMO REGISTRO DE CARGOS PROPUESTOS

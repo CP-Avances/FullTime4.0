@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -18,8 +17,12 @@ export class TipoPermisosService {
   }
 
   // ELIMINAR REGISTRO
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/tipoPermisos/eliminar/${id}`);
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/tipoPermisos/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA CREAR ARCHIVO XML

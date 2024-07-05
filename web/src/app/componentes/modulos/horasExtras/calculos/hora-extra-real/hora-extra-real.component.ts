@@ -49,9 +49,6 @@ export class HoraExtraRealComponent implements OnInit {
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
   apellido = new FormControl('', [Validators.minLength(2)]);
-  departamentoF = new FormControl('', [Validators.minLength(2)]);
-  regimenF = new FormControl('', [Validators.minLength(2)]);
-  cargoF = new FormControl('', [Validators.minLength(2)]);
 
   fechaInicialF = new FormControl('', [Validators.required]);
   fechaFinalF = new FormControl('', [Validators.required]);
@@ -60,15 +57,6 @@ export class HoraExtraRealComponent implements OnInit {
     inicioForm: this.fechaInicialF,
     finalForm: this.fechaFinalF,
   });
-
-
-  filtroCodigo: number;
-  filtroCedula: '';
-  filtroNombre: '';
-  filtroApellido: '';
-  filtroDepartamento: '';
-  filtroRegimen: '';
-  filtroCargo: '';
 
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
@@ -106,17 +94,17 @@ export class HoraExtraRealComponent implements OnInit {
     })
   }
 
-    // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
-    p_color: any;
-    s_color: any;
-    frase: any;
-    ObtenerColores() {
-      this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-        this.p_color = res[0].color_principal;
-        this.s_color = res[0].color_secundario;
-        this.frase = res[0].marca_agua;
-      });
-    }
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  p_color: any;
+  s_color: any;
+  frase: any;
+  ObtenerColores() {
+    this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
+      this.frase = res[0].marca_agua;
+    });
+  }
 
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
@@ -137,7 +125,7 @@ export class HoraExtraRealComponent implements OnInit {
 
   CalcularEmpleado(id_seleccionado, form) {
     if (form.inicioForm === '' || form.finalForm === '') {
-      this.toastr.info('Ingresar fechas de periodo de búsqueda','', {
+      this.toastr.info('Ingresar fechas de periodo de búsqueda', '', {
         timeOut: 6000,
       })
     }
@@ -168,7 +156,7 @@ export class HoraExtraRealComponent implements OnInit {
 
   CalcularTodos(form: any) {
     if (form.inicioForm === '' || form.finalForm === '') {
-      this.toastr.info('Ingresar fechas de Inicio o Fin de periodo de búsqueda.','', {
+      this.toastr.info('Ingresar fechas de Inicio o Fin de periodo de búsqueda.', '', {
         timeOut: 6000,
       })
     }
@@ -213,7 +201,7 @@ export class HoraExtraRealComponent implements OnInit {
     console.log('pedidos', listaPedidos);
     console.log('timbres', listaTimbres);
     listaPedidos.forEach((obj: any) => {
-      listaTimbres.forEach(element => {
+      listaTimbres.forEach((element: any) => {
         if (obj.fec_inicio.split('T')[0] === element.fecha_inicio.split('T')[0]) {
           if (element.fecha_inicio.split('T')[1] <= obj.fec_inicio.split('T')[1]) {
             if (element.fecha_fin.split('T')[1] <= obj.fec_final.split('T')[1]) {
@@ -241,7 +229,7 @@ export class HoraExtraRealComponent implements OnInit {
     console.log('pedidos', listaPedidos);
     console.log('timbres', listaTimbres);
     listaPedidos.forEach((obj: any) => {
-      listaTimbres.forEach(element => {
+      listaTimbres.forEach((element: any) => {
         if (obj.fec_inicio.split('T')[0] === element.fecha_inicio.split('T')[0] && obj.id_usua_solicita === element.id_empleado) {
           if (element.fecha_inicio.split('T')[1] <= obj.fec_inicio.split('T')[1]) {
             if (element.fecha_fin.split('T')[1] <= obj.fec_final.split('T')[1]) {
@@ -320,9 +308,6 @@ export class HoraExtraRealComponent implements OnInit {
     this.cedula.reset();
     this.nombre.reset();
     this.apellido.reset();
-    this.departamentoF.reset();
-    this.regimenF.reset();
-    this.cargoF.reset();
   }
 
   LimpiarFechas() {
@@ -370,7 +355,7 @@ export class HoraExtraRealComponent implements OnInit {
         } else if (f.getMonth() >= 10 && f.getDate() < 10) {
           fecha = f.getFullYear() + "-" + [f.getMonth() + 1] + "-0" + f.getDate();
         }
-         // Formato de hora actual
+        // Formato de hora actual
         if (f.getMinutes() < 10) {
           var time = f.getHours() + ':0' + f.getMinutes();
         }
@@ -463,12 +448,12 @@ export class HoraExtraRealComponent implements OnInit {
                 { text: 'Estado', style: 'tableHeader' },
                 { text: 'Nacionalidad', style: 'tableHeader' },
               ],
-              ...this.empleado.map(obj => {
+              ...this.empleado.map((obj: any) => {
                 var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
                 var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
                 let nacionalidad;
-                this.nacionalidades.forEach(element => {
+                this.nacionalidades.forEach((element: any) => {
                   if (obj.id_nacionalidad == element.id) {
                     nacionalidad = element.nombre;
                   }
@@ -520,7 +505,7 @@ export class HoraExtraRealComponent implements OnInit {
       var genero = this.GeneroSelect[obj.genero - 1];
       var estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
@@ -618,7 +603,7 @@ export class HoraExtraRealComponent implements OnInit {
         } else if (f.getMonth() >= 10 && f.getDate() < 10) {
           fecha = f.getFullYear() + "-" + [f.getMonth() + 1] + "-0" + f.getDate();
         }
-         // Formato de hora actual
+        // Formato de hora actual
         if (f.getMinutes() < 10) {
           var time = f.getHours() + ':0' + f.getMinutes();
         }
@@ -692,7 +677,7 @@ export class HoraExtraRealComponent implements OnInit {
         {
           width: 'auto',
           table: {
-            widths: [30, 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: [30, 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
             body: [
               [
                 { text: 'Id', style: 'tableHeader' },
@@ -701,7 +686,6 @@ export class HoraExtraRealComponent implements OnInit {
                 { text: 'Cedula', style: 'tableHeader' },
                 { text: 'Fecha Nacimiento', style: 'tableHeader' },
                 { text: 'Correo', style: 'tableHeader' },
-                { text: 'Correo Alternativo', style: 'tableHeader' },
                 { text: 'Género', style: 'tableHeader' },
                 { text: 'Estado Civil', style: 'tableHeader' },
                 { text: 'Domicilio', style: 'tableHeader' },
@@ -709,12 +693,12 @@ export class HoraExtraRealComponent implements OnInit {
                 { text: 'Estado', style: 'tableHeader' },
                 { text: 'Nacionalidad', style: 'tableHeader' },
               ],
-              ...this.empleadoTimbre.map(obj => {
+              ...this.empleadoTimbre.map((obj: any) => {
                 var estadoCivil = this.EstadoCivilSelect[obj.estado_civil - 1];
                 var genero = this.GeneroSelect[obj.genero - 1];
                 var estado = this.EstadoSelect[obj.estado - 1];
                 let nacionalidad;
-                this.nacionalidades.forEach(element => {
+                this.nacionalidades.forEach((element: any) => {
                   if (obj.id_nacionalidad == element.id) {
                     nacionalidad = element.nombre;
                   }

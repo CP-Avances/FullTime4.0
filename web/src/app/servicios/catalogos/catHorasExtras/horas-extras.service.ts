@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +20,12 @@ export class HorasExtrasService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/horasExtras`);
   }
 
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/horasExtras/eliminar/${id}`);
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/horasExtras/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   CrearXML(data: any) {

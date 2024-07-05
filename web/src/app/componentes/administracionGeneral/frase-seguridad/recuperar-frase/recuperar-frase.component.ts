@@ -22,6 +22,10 @@ export class RecuperarFraseComponent implements OnInit {
   mensajeEmpresa: any = [];
   mensaje: any = [];//Almacenamiento de codigo empresarial encriptado
 
+   // VARIABLES PARA AUDITORIA
+   user_name: string | null;
+   ip: string | null;
+
   // CAMPOS DEL FORMULARIO
   NuevaFrase = new FormControl('', Validators.maxLength(100));
   empresa = new FormControl('', [Validators.required]);

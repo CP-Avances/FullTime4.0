@@ -34,6 +34,7 @@ const catVacunasRutas_1 = __importDefault(require("./rutas/catalogos/catVacunasR
 const catDiscapacidadRutas_1 = __importDefault(require("./rutas/catalogos/catDiscapacidadRutas"));
 const catHorarioRutas_1 = __importDefault(require("./rutas/catalogos/catHorarioRutas"));
 const detalleCatHorarioRutas_1 = __importDefault(require("./rutas/horarios/detalleCatHorario/detalleCatHorarioRutas"));
+const catPlanificacionHorariaRutas_1 = __importDefault(require("./rutas/catalogos/catPlanificacionHorariaRutas"));
 //EMPLEADOS
 const loginRuta_1 = __importDefault(require("./rutas/login/loginRuta"));
 const empleadoRutas_1 = __importDefault(require("./rutas/empleado/empleadoRegistro/empleadoRutas"));
@@ -139,6 +140,7 @@ class Servidor {
         this.app.use('/titulo', catTituloRutas_1.default);
         this.app.use('/horario', catHorarioRutas_1.default);
         this.app.use('/detalleHorario', detalleCatHorarioRutas_1.default);
+        this.app.use('/planificacionHoraria', catPlanificacionHorariaRutas_1.default);
         this.app.use('/rol', catRolesRutas_1.default);
         this.app.use('/rolPermisos', catRolPermisosRutas_1.default);
         this.app.use('/relojes', catRelojesRuta_1.default);
@@ -217,7 +219,6 @@ class Servidor {
         io.on('connection', (socket) => {
             console.log('Connected client on port %s.', this.app.get('puerto'));
             socket.on("nueva_notificacion", (data) => {
-                //--console.log('ver data que llega noti ', data)
                 let data_llega = {
                     id: data.id,
                     id_send_empl: data.id_empleado_envia,
@@ -232,12 +233,11 @@ class Servidor {
                     tipo: data.tipo,
                     usuario: data.usuario
                 };
-                //--console.log('server', data_llega);
+                console.log('server', data_llega);
                 socket.broadcast.emit('recibir_notificacion', data_llega);
                 socket.emit('recibir_notificacion', data_llega);
             });
             socket.on("nuevo_aviso", (data) => {
-                //--console.log('ver data que llega aviso ', data)
                 let data_llega = {
                     id: data.id,
                     create_at: data.fecha_hora,
@@ -249,7 +249,7 @@ class Servidor {
                     tipo: data.tipo,
                     usuario: data.usuario
                 };
-                //console.log('server aviso .......', data_llega);
+                console.log('server aviso .......', data_llega);
                 socket.broadcast.emit('recibir_aviso', data_llega);
                 socket.emit('recibir_aviso', data_llega);
             });

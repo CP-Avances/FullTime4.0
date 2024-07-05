@@ -204,7 +204,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
             //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
             this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
               this.listadoDepaAutoriza = res;
-              this.listadoDepaAutoriza.forEach(item => {
+              this.listadoDepaAutoriza.forEach((item: any) => {
                 if((this.idEmpleado == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
                   this.obtenerPlanificacionHoraria(this.InfoPermiso[0].fec_inicio, this.InfoPermiso[0].fec_final, this.InfoPermiso[0].codigo);
                 }else{
@@ -226,7 +226,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
           //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
           this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
             this.listadoDepaAutoriza = res;
-            this.listadoDepaAutoriza.forEach(item => {
+            this.listadoDepaAutoriza.forEach((item: any) => {
               if((this.idEmpleado == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
                 this.obtenerPlanificacionHoraria(this.InfoPermiso[0].fec_inicio, this.InfoPermiso[0].fec_final, this.InfoPermiso[0].codigo);
               }else{
@@ -519,7 +519,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
           }],
           [{
             columns: [
-              ...this.fila1firmas.map(obj => {
+              ...this.fila1firmas.map((obj: any) => {
                 return {
                   columns: [
                     { width: '*', text: '' },

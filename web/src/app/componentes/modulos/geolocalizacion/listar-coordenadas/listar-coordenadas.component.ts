@@ -2,7 +2,6 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -29,18 +28,21 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
   templateUrl: './listar-coordenadas.component.html',
   styleUrls: ['./listar-coordenadas.component.css']
 })
-export class ListarCoordenadasComponent implements OnInit {
 
-  tipoPermiso: any = [];
-  filtroDescripcion = '';
+export class ListarCoordenadasComponent implements OnInit {
 
   // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
-
+  
+  tipoPermiso: any = [];
   empleado: any = [];
   idEmpleado: number;
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   descripcionF = new FormControl('', [Validators.minLength(2)]);
@@ -77,6 +79,8 @@ export class ListarCoordenadasComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
       this.ObtenerCoordenadas();
       this.ObtenerEmpleados(this.idEmpleado);
       this.ObtenerLogo();
@@ -84,7 +88,7 @@ export class ListarCoordenadasComponent implements OnInit {
     }
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -100,7 +104,7 @@ export class ListarCoordenadasComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -155,9 +159,13 @@ export class ListarCoordenadasComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id: number) {
-    this.restU.EliminarCoordenadas(id).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.restU.EliminarCoordenadas(id,datos).subscribe((res: any) => {
       if (res.message === 'false') {
         this.toastr.warning('No es posible eliminar registro.', 'Verificar dependencias.', {
           timeOut: 6000,
@@ -172,7 +180,7 @@ export class ListarCoordenadasComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -194,7 +202,7 @@ export class ListarCoordenadasComponent implements OnInit {
     this.coordenada_id = id;
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                              METODO PARA EXPORTAR A PDF                                      ** **
    ** ************************************************************************************************** **/
   generarPdf(action = 'open') {
@@ -266,7 +274,7 @@ export class ListarCoordenadasComponent implements OnInit {
                 { text: 'Latitud', style: 'tableHeader' },
                 { text: 'Longitud', style: 'tableHeader' },
               ],
-              ...this.coordenadas.map(obj => {
+              ...this.coordenadas.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTable' },
@@ -288,7 +296,7 @@ export class ListarCoordenadasComponent implements OnInit {
     };
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                  METODO PARA EXPORTAR A EXCEL                                ** **
    ** ************************************************************************************************** **/
   exportToExcel() {
@@ -298,7 +306,7 @@ export class ListarCoordenadasComponent implements OnInit {
     xlsx.writeFile(wb, "CoordenadasGeograficasEXCEL" + new Date().getTime() + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                    METODO PARA EXPORTAR A CSV                                ** **
    ** ************************************************************************************************** **/
 

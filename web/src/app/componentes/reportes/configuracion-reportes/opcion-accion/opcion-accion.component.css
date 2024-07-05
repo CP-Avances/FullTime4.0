@@ -1,0 +1,72 @@
+.check-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.check-group mat-checkbox {
+  margin-bottom: 8px;
+}
+
+
+.tipo {
+  display: flex;
+  align-content: center;
+  align-items: center;
+  height: 50px;
+  font-size: 14px;
+  margin-top: 8px;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+.tipo {
+  display: flex;
+  align-content: center;
+  align-items: center;
+  height: 50px;
+  font-size: 14px;
+  margin-top: 8px;
+  margin-left: 8px;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.mat-radio-button~.mat-radio-button {
+  margin-left: 16px;
+}
+
+mat-icon {
+  cursor: pointer;
+}
+
+.rBoton label {
+  font-size: 14px;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  align-items: center;
+
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checkbox-label {
+  margin-right: 0px;
+  /* Espacio entre el texto y el checkbox */
+  display: flex;
+  align-content: center;
+  align-items: center;
+  margin-top: 8px;
+  /* Ajusta este valor según sea necesario */
+
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+}

@@ -39,10 +39,9 @@ class NivelTituloRutas {
         this.router.put('/', TokenValidation, NIVEL_TITULO_CONTROLADOR.ActualizarNivelTitulo);
         // METODO PARA BUSCAR NIVEL POR SU NOMBRE
         this.router.get('/buscar/:nombre', TokenValidation, NIVEL_TITULO_CONTROLADOR.ObtenerNivelNombre);
-
-        this.router.get('/:id', TokenValidation, NIVEL_TITULO_CONTROLADOR.getOne);
-
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], NIVEL_TITULO_CONTROLADOR.RevisarDatos);
+        // METODO PARA REGISTRAR NIVELES DE TITULO DE LA PLANTILLA
+        this.router.post('/registrarNiveles', TokenValidation, NIVEL_TITULO_CONTROLADOR.RegistrarNivelesPlantilla);
 
     }
 }

@@ -66,6 +66,10 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
   id_cargo_loggin: number;
   id_contrato_loggin: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private informacion: DatosGeneralesService,
     private realTime: RealTimeService,
@@ -83,7 +87,8 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.datos);
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');;
 
     this.estados.forEach((obj: any) => {
       if (this.datos.estado === obj.nombre) {
@@ -106,7 +111,7 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -161,6 +166,8 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
       fec_final: null,
       num_hora: form.horasForm + ":00",
       estado: form.estadoForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     data.fec_inicio = this.ValidarFechas(form.fechaInicioForm, form.horaInicioForm);
@@ -341,6 +348,8 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
       mensaje: 'Ha actualizado su solicitud de horas extras desde ' +
         desde + ' hasta ' +
         hasta + ' horario de ' + h_inicio + ' a ' + h_final,
+      user_name: this.user_name,
+      ip: this.ip,
     }
 
     //Listado para eliminar el usuario duplicado
@@ -446,6 +455,10 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    formData.append('uder_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restHE.SubirArchivoRespaldo(formData, id, form.respaldoForm).subscribe(res => {
       this.archivoForm.reset();
       this.nameFile = '';
@@ -492,11 +505,12 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
   }
 
   VerificarArchivo(datos: any, form: any) {
-    console.log('prueba ... ', this.opcion);
     if (this.opcion === 1) {
       let eliminar = {
         documento: this.datos.documento,
-        id: parseInt(this.datos.id)
+        id: parseInt(this.datos.id),
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.GuardarDatos(datos);
       this.restHE.EliminarArchivoRespaldo(eliminar).subscribe(res => {

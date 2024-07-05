@@ -1,5 +1,5 @@
 // IMPORTAR LIBRERIAS
-import { Validators, FormControl } from '@angular/forms';
+import { Validators, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
@@ -9,8 +9,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
 // IMPORTAR SERVICIOS
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
@@ -31,12 +32,18 @@ import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.mode
 @Component({
   selector: 'app-timbre-multiple',
   templateUrl: './timbre-multiple.component.html',
-  styleUrls: ['./timbre-multiple.component.css']
+  styleUrls: ['./timbre-multiple.component.css'],
+
 })
 
 export class TimbreMultipleComponent implements OnInit {
 
   idEmpleadoLogueado: any;
+
+  idCargosAcceso: Set<any> = new Set();
+  idUsuariosAcceso: Set<any> = new Set();
+  idSucursalesAcceso: Set<any> = new Set();
+  idDepartamentosAcceso: Set<any> = new Set();
 
   // CONTROL DE CRITERIOS DE BUSQUEDA
   codigo = new FormControl('');
@@ -57,6 +64,8 @@ export class TimbreMultipleComponent implements OnInit {
     bool_reg: false,
     bool_cargo: false,
   };
+
+  mostrarTablas: boolean = false;
 
   public check: checkOptions[];
 
@@ -99,27 +108,20 @@ export class TimbreMultipleComponent implements OnInit {
   numero_pagina_emp: number = 1;
 
   // FILTROS SUCURSALES
-  filtroNombreSuc_: string = '';
   get filtroNombreSuc() { return this.restR.filtroNombreSuc }
 
   // FILTROS DEPARTAMENTOS
-  filtroNombreDep_: string = '';
   get filtroNombreDep() { return this.restR.filtroNombreDep }
 
   // FILTROS EMPLEADO
-  filtroCodigo_: any;
-  filtroCedula_: string = '';
-  filtroNombreEmp_: string = '';
   get filtroNombreEmp() { return this.restR.filtroNombreEmp };
   get filtroCodigo() { return this.restR.filtroCodigo };
   get filtroCedula() { return this.restR.filtroCedula };
 
   // FILTRO CARGOS
-  filtroNombreCarg_: string = '';
   get filtroNombreCarg() { return this.restR.filtroNombreCarg };
 
   // FILTRO REGIMEN
-  filtroNombreReg_: string = '';
   get filtroNombreReg() { return this.restR.filtroNombreReg };
 
   // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
@@ -136,11 +138,16 @@ export class TimbreMultipleComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router,
     private restR: ReportesService,
+    private asignaciones: AsignacionesService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
+    this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
+    this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
     this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'd' }, { opcion: 'c' }, { opcion: 'e' }]);
     this.PresentarInformacion();
   }
@@ -155,6 +162,7 @@ export class TimbreMultipleComponent implements OnInit {
   PresentarInformacion() {
     let informacion = { id_empleado: this.idEmpleadoLogueado };
     let respuesta: any = [];
+
     this.informacion.ObtenerInformacionUserRol(informacion).subscribe(res => {
       respuesta = res[0];
       this.AdministrarInformacion(respuesta, informacion);
@@ -176,19 +184,10 @@ export class TimbreMultipleComponent implements OnInit {
     this.cargos = [];
 
     this.usua_sucursales = [];
-    let respuesta: any = [];
-    let codigos = '';
+
     //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
-      respuesta = data;
-      respuesta.forEach((obj: any) => {
-        if (codigos === '') {
-          codigos = '\'' + obj.id_sucursal + '\''
-        }
-        else {
-          codigos = codigos + ', \'' + obj.id_sucursal + '\''
-        }
-      })
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
+      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
       //console.log('ver sucursales ', codigos);
 
       // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
@@ -311,11 +310,22 @@ export class TimbreMultipleComponent implements OnInit {
 
     this.OmitirDuplicados();
 
-    console.log('ver sucursales ', this.sucursales)
-    console.log('ver regimenes ', this.regimen)
-    console.log('ver departamentos ', this.departamentos)
-    console.log('ver cargos ', this.cargos)
-    console.log('ver empleados ', this.empleados)
+    // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
+
+    this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+    this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
+    this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
+    this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
+
+    this.empleados.forEach((empleado: any) => {
+      this.idCargosAcceso.add(empleado.id_cargo_);
+    });
+
+    this.cargos = this.cargos.filter((cargo: any) =>
+      this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
+    );
+
+    this.mostrarTablas = true;
   }
 
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
@@ -456,13 +466,13 @@ export class TimbreMultipleComponent implements OnInit {
    ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
    ** ************************************************************************************** **/
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
     const numSelected = this.selectionSuc.selected.length;
     return numSelected === this.sucursales.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
@@ -477,13 +487,13 @@ export class TimbreMultipleComponent implements OnInit {
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedReg() {
     const numSelected = this.selectionReg.selected.length;
     return numSelected === this.regimen.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleReg() {
     this.isAllSelectedReg() ?
       this.selectionReg.clear() :
@@ -498,13 +508,13 @@ export class TimbreMultipleComponent implements OnInit {
     return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedCarg() {
     const numSelected = this.selectionCarg.selected.length;
     return numSelected === this.cargos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleCarg() {
     this.isAllSelectedCarg() ?
       this.selectionCarg.clear() :
@@ -519,13 +529,13 @@ export class TimbreMultipleComponent implements OnInit {
     return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedDep() {
     const numSelected = this.selectionDep.selected.length;
     return numSelected === this.departamentos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
@@ -540,13 +550,13 @@ export class TimbreMultipleComponent implements OnInit {
     return `${this.selectionDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedEmp() {
     const numSelected = this.selectionEmp.selected.length;
     return numSelected === this.empleados.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
@@ -688,10 +698,10 @@ export class TimbreMultipleComponent implements OnInit {
   }
 
   /** ************************************************************************************** **
-   ** **                         METODOS DE REGISTRO DE TIMBRES                           ** ** 
+   ** **                         METODOS DE REGISTRO DE TIMBRES                           ** **
    ** ************************************************************************************** **/
 
-  // FUNCION PARA CONFIRMAR CREACION DE TIMBRE 
+  // FUNCION PARA CONFIRMAR CREACION DE TIMBRE
   ConfirmarTimbre(empleado: any) {
     this.restEmpresa.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string))
       .subscribe(datos => {
@@ -738,6 +748,7 @@ export class TimbreMultipleComponent implements OnInit {
   RegistrarTimbre(empleado: any) {
     this.ventana.open(CrearTimbreComponent, { width: '400px', data: empleado })
       .afterClosed().subscribe(dataT => {
+        console.log('timbres ', dataT)
         if (dataT) {
           if (!dataT.close) {
             this.restTimbres.RegistrarTimbreAdmin(dataT).subscribe(res => {
@@ -889,7 +900,6 @@ export class TimbreMultipleComponent implements OnInit {
   MostrarLista() {
     if (this.opcion === 's') {
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
@@ -898,9 +908,7 @@ export class TimbreMultipleComponent implements OnInit {
     }
     else if (this.opcion === 'r') {
       this.nombre_reg.reset();
-      this.filtroNombreReg_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
@@ -910,9 +918,7 @@ export class TimbreMultipleComponent implements OnInit {
     }
     else if (this.opcion === 'c') {
       this.nombre_carg.reset();
-      this.filtroNombreCarg_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionEmp.clear();
       this.selectionDep.clear();
       this.selectionSuc.clear();
@@ -922,9 +928,7 @@ export class TimbreMultipleComponent implements OnInit {
     }
     else if (this.opcion === 'd') {
       this.nombre_dep.reset();
-      this.filtroNombreDep_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionEmp.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
@@ -936,11 +940,7 @@ export class TimbreMultipleComponent implements OnInit {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
-      this.filtroCodigo_ = '';
-      this.filtroCedula_ = '';
-      this.filtroNombreEmp_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();

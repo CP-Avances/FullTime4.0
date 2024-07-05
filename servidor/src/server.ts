@@ -31,6 +31,8 @@ import TIPO_VACUNAS_RUTAS from './rutas/catalogos/catVacunasRutas';
 import DISCAPACIDADES_RUTAS from './rutas/catalogos/catDiscapacidadRutas';
 import HORARIO_RUTA from './rutas/catalogos/catHorarioRutas';
 import DETALLE_CATALOGO_HORARIO_RUTAS from './rutas/horarios/detalleCatHorario/detalleCatHorarioRutas';
+import PLANIFICACION_HORARIA_RUTAS from './rutas/catalogos/catPlanificacionHorariaRutas';
+
 //EMPLEADOS
 import LOGIN_RUTA from './rutas/login/loginRuta';
 import EMPLEADO_RUTAS from './rutas/empleado/empleadoRegistro/empleadoRutas';
@@ -146,6 +148,7 @@ class Servidor {
         this.app.use('/titulo', TITULO_RUTAS);
         this.app.use('/horario', HORARIO_RUTA);
         this.app.use('/detalleHorario', DETALLE_CATALOGO_HORARIO_RUTAS);
+        this.app.use('/planificacionHoraria', PLANIFICACION_HORARIA_RUTAS);
         this.app.use('/rol', ROLES_RUTAS);
         this.app.use('/rolPermisos', ROL_PERMISOS_RUTAS);
         this.app.use('/relojes', RELOJES_RUTA);
@@ -225,7 +228,6 @@ class Servidor {
         io.on('connection', (socket: any) => {
             console.log('Connected client on port %s.', this.app.get('puerto'));
             socket.on("nueva_notificacion", (data: any) => {
-                //--console.log('ver data que llega noti ', data)
                 let data_llega = {
                     id: data.id,
                     id_send_empl: data.id_empleado_envia,
@@ -240,13 +242,12 @@ class Servidor {
                     tipo: data.tipo,
                     usuario: data.usuario
                 }
-                //--console.log('server', data_llega);
+                console.log('server', data_llega);
                 socket.broadcast.emit('recibir_notificacion', data_llega);
                 socket.emit('recibir_notificacion', data_llega);
             });
 
             socket.on("nuevo_aviso", (data: any) => {
-                //--console.log('ver data que llega aviso ', data)
                 let data_llega = {
                     id: data.id,
                     create_at: data.fecha_hora,
@@ -258,7 +259,7 @@ class Servidor {
                     tipo: data.tipo,
                     usuario: data.usuario
                 }
-                //console.log('server aviso .......', data_llega);
+                console.log('server aviso .......', data_llega);
                 socket.broadcast.emit('recibir_aviso', data_llega);
                 socket.emit('recibir_aviso', data_llega);
             });

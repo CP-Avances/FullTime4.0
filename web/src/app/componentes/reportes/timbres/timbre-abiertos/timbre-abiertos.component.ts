@@ -183,19 +183,10 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
   usua_sucursales: any = [];
   AdministrarSucursalesUsuario(opcion: number) {
     let empleado = { id_empleado: this.idEmpleadoLogueado };
-    let respuesta: any = [];
-    let codigos = '';
+
     //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
-      respuesta = data;
-      respuesta.forEach((obj: any) => {
-        if (codigos === '') {
-          codigos = '\'' + obj.id_sucursal + '\''
-        }
-        else {
-          codigos = codigos + ', \'' + obj.id_sucursal + '\''
-        }
-      })
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
+      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
       console.log('ver sucursales ', codigos);
       this.usua_sucursales = { id_sucursal: codigos };
       this.BuscarInformacion(opcion, this.usua_sucursales);
@@ -595,7 +586,7 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
         { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
         { text: `TIMBRES LIBRES - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
-        ...this.EstructurarDatosPDF(this.data_pdf).map(obj => {
+        ...this.EstructurarDatosPDF(this.data_pdf).map((obj: any) => {
           return obj
         })
       ],
@@ -905,7 +896,7 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
           })
         }
 
-        obj.departamentos.forEach(obj1 => {
+        obj.departamentos.forEach((obj1: any) => {
 
           // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
           if (this.bool.bool_dep === true) {
@@ -1179,7 +1170,7 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
     let accionT = '';
     let n = 0;
     array.forEach((obj1: IReporteTimbres) => {
-      obj1.departamentos.forEach(obj2 => {
+      obj1.departamentos.forEach((obj2: any) => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             n++;
@@ -1311,7 +1302,7 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
     let n = 0;
     let accionT = '';
     this.data_pdf.forEach((obj1: IReporteTimbres) => {
-      obj1.departamentos.forEach(obj2 => {
+      obj1.departamentos.forEach((obj2: any) => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             n = n + 1;

@@ -20,54 +20,46 @@
         </div>
 
         <!--  *******************************  REGISTRO MULTIPLE DE MODALIDAD LABORAL  *****************************  -->
-        <div class="col-md">
+        <div class="col-12 col-md-6">
             <div id="titulo">
                 <span>REGISTRO MULTIPLE</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
-                <div class="row" *ngIf="getCargarPlantillaModalidadLaboral()">
-                    <div class="col-12 col-md" style="padding-top: 5px; padding-bottom: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around"
-                            style="text-align: center; justify-content: center;">
-                            <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
-                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
-                                    style="height: 65px; padding-top: 25px"
-                                    matTooltip="Dar click para selecionar plantilla y cargar registros.">
-                                    Subir plantilla
-                                </label>
-                                <label for="file" matSuffix matTooltipPosition="right"
-                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
-                                    style="height: 64px; padding-top: 25px;"
-                                    matTooltip="Presionar para seleccionar Plantilla con nombre Modalidad.">
-                                    Subir nueva plantilla
-                                </label>
-                            </form>
-                        </div>
+                <div class="row m-auto" *ngIf="getCargarPlantillaModalidadLaboral()">
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <form method="post" class="btn-2" enctype="multipart/form-data">
+                            <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                            <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                style="height: 65px; padding-top: 25px"
+                                matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                Subir plantilla
+                            </label>
+                            <label for="file" matSuffix matTooltipPosition="right"
+                                *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                style="height: 65px; padding-top: 25px;"
+                                matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                Subir nueva plantilla
+                            </label>
+                        </form>
                     </div>
-                    <div class="col-12 col-md" *ngIf="!Datos_modalidad_laboral"
-                        style="padding-top: 5px; padding-bottom: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around">
-                            <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
-                                style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
-                                href="{{hipervinculo}}/plantillaD/documento/Modalidad.xlsx">
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div *ngIf="!Datos_modalidad_laboral" class="d-flex flex-wrap justify-content-around">
+                            <a id="descargar" class="btn m-auto" matSuffix matTooltipPosition="right"
+                                matTooltip="Dar click para ver o descargar el documento."
+                                href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
                                 <br>
                                 Descargar plantilla usuarios
                             </a>
                         </div>
-                    </div>
-                    <div class="col-12 col-md" style="padding-top: 5px; padding-bottom: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around"
-                            style="text-align: center; justify-content: center;">
+                        <div class="d-flex flex-wrap justify-content-center m-auto w-auto">
                             <button *ngIf="Datos_modalidad_laboral && messajeExcel != 'error'" id="descargar"
-                                class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
+                                class="btn m-auto" (click)="ConfirmarRegistroMultiple()" matSuffix
                                 matTooltipPosition="right" matTooltip="Guardar registro multiple.">
                                 Registrar
                             </button>
                         </div>
                     </div>
-
                 </div>
             </mat-card>
         </div>
@@ -114,8 +106,7 @@
                         <td></td>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [formControl]="buscarModalidad"
-                                    [(ngModel)]="filtroModalidad">
+                                <input matInput placeholder="Buscar" [formControl]="buscarModalidad">
                             </mat-form-field>
                         </td>
                         <td>
@@ -125,11 +116,13 @@
                             </mat-icon>
                         </td>
                     </tr>
-                    <tr *ngFor="let modalidad of listaModalida_Laboral | modalidadLaboral: filtroModalidad |  paginate:tamanio_pagina:numero_pagina">
+                    <tr
+                        *ngFor="let modalidad of listaModalida_Laboral | modalidadLaboral: buscarModalidad.value |  paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionModalidad.toggle(modalidad) : null"
-                                [checked]="selectionModalidad.isSelected(modalidad)" [aria-label]="checkboxLabelPag(modalidad)">
+                                [checked]="selectionModalidad.isSelected(modalidad)"
+                                [aria-label]="checkboxLabelPag(modalidad)">
                             </mat-checkbox>
                         </td>
                         <td>{{modalidad.descripcion}}</td>
@@ -150,31 +143,8 @@
         <mat-paginator id="pagina" [length]="listaModalida_Laboral.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-<<<<<<< HEAD:web/src/app/componentes/catalogos/cat-modalida-laboral/cat-modalida-laboral.component.html
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;" *ngIf="getDescargarReportesModalidadLaboral()">
-            <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
-                matTooltipPosition="right" matTooltip="Descargar Lista de Feriados en formato PDF.">
-                <p>PDF</p>
-            </i>
-            <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Feriados en formato EXCEL.">
-                <p>XLSL</p>
-            </i>
-            <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Feriados en formato CSV.">
-                <p>CSV</p>
-            </i>
-            <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Feriados en formato XML.">
-                <p>XML</p>
-            </i>
-        </div>
-        <div class="d-flex justify-content-end"
-            style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-            <p> Reporte de Modalidad Laboral. </p>
-=======
         <!--  *******************  DESCARGAR REPORTES  ***********************  -->
-        <div>
+        <div *ngIf="getDescargarReportesModalidadLaboral()">
             <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
                 <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
                     matTooltipPosition="right" matTooltip="Descargar Lista de Moodalidad Laboral en formato PDF.">
@@ -197,7 +167,6 @@
                 style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
                 <p> Reporte de Modalidad Laboral. </p>
             </div>
->>>>>>> a4c45f6e1a79ddd037e76bc9631636937e42761e:web/src/app/componentes/catalogos/catalogoModalidadLaboral/cat-modalida-laboral/cat-modalida-laboral.component.html
         </div>
     </div>
 </div>
@@ -218,14 +187,16 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center; font-size: 13px;">
-                        <th scope="col">Observación</th>
                         <th scope="col">Item</th>
+                        <th scope="col">Observación</th>
                         <th scope="col">Modalidad laboral</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
                         *ngFor="let dm of Datos_modalidad_laboral | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                            {{dm.fila}}</td>
                         <td style="font-size: 12px;">
                             <div style="width: 270px; margin: auto;">
                                 <div id="t-editar" class="circulo"
@@ -233,10 +204,9 @@
                                 {{dm.observacion}}
                             </div>
                         </td>
-                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
-                            {{dm.fila}}</td>
                         <td [style.color]="stiloTextoCelda(dm.modalida_laboral)" style="font-size: 12px;">
-                            {{dm.modalida_laboral}}</td>
+                            {{dm.modalida_laboral}}
+                        </td>
                     </tr>
                 </tbody>
             </table>

@@ -1,0 +1,157 @@
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;" [hidden]="verDetalle">
+    <div id="titulo">
+        <span>REPORTE DE AUDITORIA</span>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-lg-5" style="padding-bottom: 10px;">
+            <app-rango-fechas [limitarFecha]="true"></app-rango-fechas>
+        </div>
+        <div class="col-lg-7">
+            <div id="resultados">
+                <span>OPCIONES DE DESCARGA</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
+                    <button mat-icon-button (click)="ValidarReporte('ver')" matTooltipPosition="right"
+                        matTooltip="Previsualizar reporte en el navegador.">
+                        <mat-icon class="ver">visibility</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="ValidarReporte('open')" matTooltipPosition="right"
+                        matTooltip="Previsualizar reporte en el navegador en fomato PDF.">
+                        <mat-icon class="i-pdf">picture_as_pdf</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="ValidarReporte('print')" matTooltipPosition="right"
+                        matTooltip="Imprimir reporte en formato PDF.">
+                        <mat-icon class="i-print">local_printshop</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="ValidarReporte('download')" matTooltipPosition="right"
+                        matTooltip="Descargar reporte en formato PDF.">
+                        <mat-icon class="i-download">cloud_download</mat-icon>
+                    </button>
+                </div>
+                <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
+                    <app-opcion-accion (accionesSeleccionas)="ObtenerTipoAccion($event)"></app-opcion-accion>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+
+
+</div>
+
+
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px; padding-top: 30px;" [hidden]="verDetalle">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <div class="w-100 bd-highlight">
+                <h5>
+                    RESULTADO DE BÚSQUEDA
+                </h5>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+
+                        <th>
+                            <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                                id="SelectCheck" (click)="HabilitarSeleccion()">
+                                library_add_check
+                            </mat-icon>
+                            <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                                [checked]="selectionAuditoria.hasValue() && isAllSelectedPag()"
+                                [indeterminate]="selectionAuditoria.hasValue() && !isAllSelectedPag()"
+                                [aria-label]="checkboxLabelPag()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Tablas</th>
+                        <th scope="col">Modulo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let tabla of tablasD | paginate:tamanio_pagina:numero_pagina">
+                        <tr>
+                            <td>
+                                <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                    (change)="$event ? selectionAuditoria.toggle(tabla) : null"
+                                    [checked]="selectionAuditoria.isSelected(tabla)"
+                                    [aria-label]="checkboxLabelPag(tabla)">
+                                </mat-checkbox>
+                            </td>
+                            <td style="font-size: 14px;">{{tabla.nombre}}</td>
+                            <td style="font-size: 14px;">{{tabla.modulo}}</td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="tablasD.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
+<div class="container" style="padding-top: 15px" [hidden]="!verDetalle">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <span>DETALLES DE AUDITORIA</span>
+            <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
+                matTooltip="Regresar">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+        </div>
+        <mat-card-content>
+            <div class="container" style="padding-bottom: 25px; text-align: center; margin-top: 0.5rem">
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm" id="detalle">
+                        <thead class="thead-light">
+                            <tr style="text-align: center">
+                                <th class="t_horarios" scope="col" rowspan="2">N°</th>
+                                <th class="t_horarios" scope="col" rowspan="2">PLATAFORMA</th>
+                                <th class="t_horarios" scope="col" rowspan="2">USUARIO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">IP</th>
+                                <th class="t_horarios" scope="col" rowspan="2">NOMBRE TABLA</th>
+                                <th class="t_horarios" scope="col" rowspan="2">ACCIÓN</th>
+                                <th class="t_horarios" scope="col" rowspan="2">FECHA</th>
+                                <th class="t_horarios" scope="col" rowspan="2">HORA</th>
+                                <th class="t_horarios" scope="col" rowspan="2">DATOS ORIGINALES</th>
+                                <th class="t_horarios" scope="col" colspan="2">DATOS NUEVOS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let e of data_pdf | paginate:tamanio_pagina:numero_pagina, let i = index">
+                                <td class="t_horarios">{{ (numero_pagina * tamanio_pagina) + i -tamanio_pagina +1  }}</td>
+                                <td class="t_horarios">{{ e.plataforma }}</td>
+                                <td class="t_horarios">{{ e.user_name }}</td>
+                                <td class="t_horarios">{{ e.ip_address }}</td>
+                                <td class="t_horarios">{{ e.table_name }}</td>
+                                <td class="t_horarios">{{ transformAction(e.action) }}</td>
+                                <td class="t_horarios">{{validar.FormatearFecha(e.fecha_hora, this.formato_fecha, this.validar.dia_abreviado)}}</td>
+                                <td class="t_horarios">{{validar.FormatearHora(e.fecha_hora.split(' ')[1], this.formato_hora)}}</td>
+                                <td class="t_horarios">{{ e.original_data }}</td>
+                                <td class="t_horarios">{{ e.new_data }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <mat-paginator id="pagina" #paginatorDetalle  [length]="data_pdf.length" [pageSize]="tamanio_pagina"
+                    [pageSizeOptions]="pageSizeOptions" (page)="ManejarPaginaDet($event)" showFirstLastButtons
+                    aria-label="Seleccionar pagina">
+                </mat-paginator>
+            </div>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 0.5rem">
+                <i id="pdf" class="fas fa-file-pdf icon" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar reporte en formato PDF."  (click)="ValidarReporte('download')" >
+                    <p>PDF</p>
+                </i>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>
+
+<div class="pantalla-progress" *ngIf="habilitarprogress">
+    <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+    </mat-progress-spinner>
+</div>

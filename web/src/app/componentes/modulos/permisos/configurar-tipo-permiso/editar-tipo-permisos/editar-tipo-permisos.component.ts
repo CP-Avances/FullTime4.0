@@ -32,6 +32,10 @@ interface opcionesDiasHoras {
 
 export class EditarTipoPermisosComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // TIPOS DE DESCUENTO
   descuentos: TipoDescuentos[] = [
     { value: '1', viewValue: 'Vacaciones' },
@@ -51,11 +55,6 @@ export class EditarTipoPermisosComponent implements OnInit {
   ];
 
   validarGuardar: boolean = false;
-
-  // DEFINIR VALORES DE TIPO DE PERMISO
-  selectDiasHoras: string = this.diasHoras[0].valor;
-  selectAccess: number = this.solicitudes[0].valor;
-  selectTipoDescuento: string = this.descuentos[0].value;
 
   // FORMULARIO
   isLinear = true;
@@ -79,6 +78,9 @@ export class EditarTipoPermisosComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ValidarFormulario();
     this.CargarDatosPermiso();
     this.ObtenerTipoPermiso();
@@ -142,14 +144,10 @@ export class EditarTipoPermisosComponent implements OnInit {
   }
 
   // METODO PARA IMPRIMIR DATOS EN FORMULARIO
-  selec1: boolean = false;
-  selec2: boolean = false;
   ImprimirDatos() {
     // TIPO PERMISO HORAS - DIAS
     this.ActivarDiasHorasSet();
-    if (this.tipoPermiso.acce_empleado === 2) {
-      this.selectAccess = this.solicitudes[1].valor;
-    }
+    //console.log(' ver ', this.tipoPermiso)
     // PRIMER FORMULARIO
     this.primeroFormGroup.patchValue({
       descripcionForm: this.tipoPermiso.descripcion,
@@ -157,6 +155,7 @@ export class EditarTipoPermisosComponent implements OnInit {
       numDiasAtrasForm: this.tipoPermiso.crear_dias_anteriores,
       numDiaMaximoForm: this.tipoPermiso.dias_maximo_permiso,
       numHoraMaximoForm: this.tipoPermiso.horas_maximo_permiso,
+      acceEmpleadoForm: this.tipoPermiso.solicita_empleado,
       tipoDescuentoForm: this.tipoPermiso.tipo_descuento,
     });
     // SEGUNDO FORMULARIO
@@ -178,37 +177,25 @@ export class EditarTipoPermisosComponent implements OnInit {
       correo_preautorizarForm: this.tipoPermiso.correo_preautorizar,
       correo_legalizarForm: this.tipoPermiso.correo_legalizar,
     });
-    // DESCUENTO DE PERMISO
-    let j = 0;
-    this.descuentos.forEach((obj: any) => {
-      if (this.tipoPermiso.tipo_descuento === obj.value) {
-        this.selectTipoDescuento = this.descuentos[j].value;
-      }
-      j++;
-    });
     // JUSTIFICACION DE PERMISO
     this.ActivarJustificacionSet(this.tipoPermiso.justificar);
 
     if (this.tipoPermiso.fecha_inicio != '' && this.tipoPermiso.fecha_inicio != null &&
       this.tipoPermiso.fecha_fin != '' && this.tipoPermiso.fecha_fin != null) {
       this.calendario = true;
-      this.selec1 = true;
-      this.selec2 = false;
       this.rango.patchValue({
         start: moment(this.tipoPermiso.fecha_inicio, "YYYY/MM/DD").format("YYYY-MM-DD"),
         end: moment(this.tipoPermiso.fecha_fin, "YYYY/MM/DD").format("YYYY-MM-DD")
       });
     } else {
       this.calendario = false;
-      this.selec2 = true;
-      this.selec1 = false;
     }
   }
 
   // METODO PARA CONTROLAR DIAS - HORAS
   ActivarDiasHoras(form: any) {
     if (form.diasHorasForm === 'Dias') {
-      this.primeroFormGroup.patchValue({ numDiaMaximoForm: this.tipoPermiso.num_dia_maximo });
+      this.primeroFormGroup.patchValue({ numDiaMaximoForm: this.tipoPermiso.dias_maximo_permiso });
       this.primeroFormGroup.patchValue({ numHoraMaximoForm: '00:00' });
       this.HabilitarDias = false;
       this.HabilitarHoras = true;
@@ -217,7 +204,7 @@ export class EditarTipoPermisosComponent implements OnInit {
       });
     }
     else if (form.diasHorasForm === 'Horas') {
-      this.primeroFormGroup.patchValue({ numHoraMaximoForm: this.tipoPermiso.num_hora_maximo });
+      this.primeroFormGroup.patchValue({ numHoraMaximoForm: this.tipoPermiso.horas_maximo_permiso });
       this.primeroFormGroup.patchValue({ numDiaMaximoForm: 0 });
       this.HabilitarDias = true;
       this.HabilitarHoras = false;
@@ -231,12 +218,16 @@ export class EditarTipoPermisosComponent implements OnInit {
   HabilitarDias: boolean = false;
   HabilitarHoras: boolean = false;
   ActivarDiasHorasSet() {
-    if (this.tipoPermiso.num_dia_maximo === 0) {
-      this.selectDiasHoras = this.diasHoras[1].valor;
+    if (this.tipoPermiso.dias_maximo_permiso === 0) {
+      this.primeroFormGroup.patchValue({
+        diasHorasForm: this.diasHoras[1].valor
+      })
       this.HabilitarDias = true;
       this.HabilitarHoras = false;
-    } else if (this.tipoPermiso.num_hora_maximo === '00:00:00') {
-      this.selectDiasHoras = this.diasHoras[0].valor;
+    } else if (this.tipoPermiso.horas_maximo_permiso === '00:00:00') {
+      this.primeroFormGroup.patchValue({
+        diasHorasForm: this.diasHoras[0].valor
+      })
       this.HabilitarDias = false;
       this.HabilitarHoras = true;
     }
@@ -349,9 +340,9 @@ export class EditarTipoPermisosComponent implements OnInit {
       correo_autorizar: form3.correo_autorizarForm,
       correo_negar: form3.correo_negarForm,
       correo_legalizar: form3.correo_legalizarForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
-
-    console.log('ver data a registrar ', permiso)
 
     if (this.tipoPermiso.descripcion.toUpperCase() === permiso.descripcion.toUpperCase()) {
       this.VerificarIngresoFecha(permiso);

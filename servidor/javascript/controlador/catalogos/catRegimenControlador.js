@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class RegimenControlador {
     /** ** ************************************************************************************************ **
@@ -21,7 +22,9 @@ class RegimenControlador {
     CrearRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, meses_calculo } = req.body;
+                const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, meses_calculo, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query("BEGIN");
                 const response = yield database_1.default.query(`
         INSERT INTO ere_cat_regimenes (id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas,
           continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, 
@@ -56,6 +59,18 @@ class RegimenControlador {
                     meses_calculo
                 ]);
                 const [regimen] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "ere_cat_regimenes",
+                    usuario: user_name,
+                    accion: "I",
+                    datosOriginales: "",
+                    datosNuevos: JSON.stringify(regimen),
+                    ip: ip,
+                    observacion: null,
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query("COMMIT");
                 if (regimen) {
                     return res.status(200).jsonp(regimen);
                 }
@@ -64,49 +79,92 @@ class RegimenControlador {
                 }
             }
             catch (error) {
-                return res.jsonp({ message: "error" });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query("ROLLBACK");
+                return res.status(500).jsonp({ message: "error" });
             }
         });
     }
     // ACTUALIZAR REGISTRO DE REGIMEN LABORAL
     ActualizarRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, meses_calculo, id, } = req.body;
-            yield database_1.default.query(`
+            try {
+                const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, meses_calculo, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query("BEGIN");
+                // CONSULTAR DATOSORIGINALES
+                const regimen = yield database_1.default.query(`
+        SELECT * FROM ere_cat_regimenes WHERE id = $1
+        `, [id]);
+                const [datosOriginales] = regimen.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: "ere_cat_regimenes",
+                        usuario: user_name,
+                        accion: "U",
+                        datosOriginales: "",
+                        datosNuevos: "",
+                        ip: ip,
+                        observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`,
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query("COMMIT");
+                    return res.status(404).jsonp({ message: "Registro no encontrado" });
+                }
+                const datosNuevos = yield database_1.default.query(`
       UPDATE ere_cat_regimenes SET id_pais = $1, descripcion = $2, mes_periodo = $3, dias_mes = $4, trabajo_minimo_mes = $5, 
         trabajo_minimo_horas = $6, continuidad_laboral = $7, vacacion_dias_laboral = $8, vacacion_dias_libre = $9, 
         vacacion_dias_calendario = $10, acumular = $11, dias_maximo_acumulacion = $12, 
         vacacion_divisible = $13, antiguedad = $14, antiguedad_fija = $15, anio_antiguedad = $16, dias_antiguedad = $17, 
         antiguedad_variable = $18, vacacion_dias_calendario_mes = $19, vacacion_dias_laboral_mes = $20, calendario_dias = $21,
         laboral_dias = $22, meses_calculo = $23 
-      WHERE id = $24
+      WHERE id = $24 RETURNING *
       `, [
-                id_pais,
-                descripcion,
-                mes_periodo,
-                dias_mes,
-                trabajo_minimo_mes,
-                trabajo_minimo_horas,
-                continuidad_laboral,
-                vacacion_dias_laboral,
-                vacacion_dias_libre,
-                vacacion_dias_calendario,
-                acumular,
-                dias_max_acumulacion,
-                vacacion_divisible,
-                antiguedad,
-                antiguedad_fija,
-                anio_antiguedad,
-                dias_antiguedad,
-                antiguedad_variable,
-                vacacion_dias_calendario_mes,
-                vacacion_dias_laboral_mes,
-                calendario_dias,
-                laboral_dias,
-                meses_calculo,
-                id,
-            ]);
-            res.jsonp({ message: "Registro guardado." });
+                    id_pais,
+                    descripcion,
+                    mes_periodo,
+                    dias_mes,
+                    trabajo_minimo_mes,
+                    trabajo_minimo_horas,
+                    continuidad_laboral,
+                    vacacion_dias_laboral,
+                    vacacion_dias_libre,
+                    vacacion_dias_calendario,
+                    acumular,
+                    dias_max_acumulacion,
+                    vacacion_divisible,
+                    antiguedad,
+                    antiguedad_fija,
+                    anio_antiguedad,
+                    dias_antiguedad,
+                    antiguedad_variable,
+                    vacacion_dias_calendario_mes,
+                    vacacion_dias_laboral_mes,
+                    calendario_dias,
+                    laboral_dias,
+                    meses_calculo,
+                    id,
+                ]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "ere_cat_regimenes",
+                    usuario: user_name,
+                    accion: "U",
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
+                    ip: ip,
+                    observacion: null,
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query("COMMIT");
+                return res.jsonp({ message: "Regimen guardado" });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query("ROLLBACK");
+                return res.status(500).jsonp({ message: "error" });
+            }
         });
     }
     // METODO PARA BUSCAR DESCRIPCION DE REGIMEN LABORAL
@@ -175,13 +233,51 @@ class RegimenControlador {
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const { user_name, ip } = req.body;
                 const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query("BEGIN");
+                // CONSULTAR DATOSORIGINALES
+                const regimen = yield database_1.default.query(`
+        SELECT * FROM ere_cat_regimenes WHERE id = $1
+        `, [id]);
+                const [datosOriginales] = regimen.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: "ere_cat_regimenes",
+                        usuario: user_name,
+                        accion: "D",
+                        datosOriginales: "",
+                        datosNuevos: "",
+                        ip: ip,
+                        observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`,
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query("COMMIT");
+                    return res.status(404).jsonp({ message: "Registro no encontrado." });
+                }
                 yield database_1.default.query(`
         DELETE FROM ere_cat_regimenes WHERE id = $1
         `, [id]);
-                res.jsonp({ message: "Registro eliminado." });
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "ere_cat_regimenes",
+                    usuario: user_name,
+                    accion: "D",
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: "",
+                    ip: ip,
+                    observacion: null,
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query("COMMIT");
+                return res.jsonp({ message: "Registro eliminado." });
             }
             catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query("ROLLBACK");
+                //return res.status(500).jsonp({ message:'error'});
                 return res.jsonp({ message: 'error' });
             }
         });
@@ -193,12 +289,26 @@ class RegimenControlador {
     CrearPeriodo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_regimen, descripcion, dias_vacacion } = req.body;
+                const { id_regimen, descripcion, dias_vacacion, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query("BEGIN");
                 const response = yield database_1.default.query(`
         INSERT INTO ere_dividir_vacaciones (id_regimen, descripcion, dias_vacacion)
         VALUES ($1, $2, $3) RETURNING *
         `, [id_regimen, descripcion, dias_vacacion]);
                 const [periodo] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "ere_dividir_vacaciones",
+                    usuario: user_name,
+                    accion: "I",
+                    datosOriginales: "",
+                    datosNuevos: JSON.stringify(periodo),
+                    ip: ip,
+                    observacion: null,
+                });
+                // FINALIZAR TRANSACCION 
+                yield database_1.default.query("COMMIT");
                 if (periodo) {
                     return res.status(200).jsonp(periodo);
                 }
@@ -207,19 +317,61 @@ class RegimenControlador {
                 }
             }
             catch (error) {
-                console.log("periodo ", error);
-                return res.jsonp({ message: "error" });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query("ROLLBACK");
+                return res.status(500).jsonp({ message: "error" });
             }
         });
     }
     // ACTUALIZAR REGISTRO DE PERIODO DE VACACIONES
     ActualizarPeriodo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { descripcion, dias_vacacion, id } = req.body;
-            yield database_1.default.query(`
-      UPDATE ere_dividir_vacaciones SET descripcion = $1, dias_vacacion = $2 WHERE id = $3
-      `, [descripcion, dias_vacacion, id]);
-            res.jsonp({ message: "Registro guardado." });
+            try {
+                const { descripcion, dias_vacacion, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query("BEGIN");
+                // CONSULTAR DATOSORIGINALES
+                const periodo = yield database_1.default.query(`
+        SELECT * FROM ere_dividir_vacaciones WHERE id = $1
+        `, [id]);
+                const [datosOriginales] = periodo.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: "ere_dividir_vacaciones",
+                        usuario: user_name,
+                        accion: "U",
+                        datosOriginales: "",
+                        datosNuevos: "",
+                        ip: ip,
+                        observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`,
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query("COMMIT");
+                    return res.status(404).jsonp({ message: "error" });
+                }
+                yield database_1.default.query(`
+        UPDATE ere_dividir_vacaciones SET descripcion = $1, dias_vacacion = $2 WHERE id = $3
+        `, [descripcion, dias_vacacion, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "ere_dividir_vacaciones",
+                    usuario: user_name,
+                    accion: "U",
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{"descripcion": "${descripcion}", "dias_vacacion": "${dias_vacacion}"}`,
+                    ip: ip,
+                    observacion: null,
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query("COMMIT");
+                return res.jsonp({ message: "Periodo guardado" });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     // BUSCAR UN REGISTRO DE PERIODO DE VACACIONES POR REGIMEN LABORAL
@@ -241,11 +393,51 @@ class RegimenControlador {
     // ELIMINAR REGISTRO DE PERIODO DE VACACIONES
     EliminarPeriodo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-      DELETE FROM ere_dividir_vacaciones WHERE id = $1
-      `, [id]);
-            res.jsonp({ message: "Registro eliminado." });
+            try {
+                const { user_name, ip } = req.body;
+                const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query("BEGIN");
+                // CONSULTAR DATOSORIGINALES
+                const periodo = yield database_1.default.query(`
+        SELECT * FROM ere_dividir_vacaciones WHERE id = $1
+        `, [id]);
+                const [datosOriginales] = periodo.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: "ere_dividir_vacaciones",
+                        usuario: user_name,
+                        accion: "D",
+                        datosOriginales: "",
+                        datosNuevos: "",
+                        ip: ip,
+                        observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`,
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query("COMMIT");
+                    return res.status(404).jsonp({ message: "Registro no encontrado." });
+                }
+                yield database_1.default.query(`
+        DELETE FROM ere_dividir_vacaciones WHERE id = $1
+        `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "ere_dividir_vacaciones",
+                    usuario: user_name,
+                    accion: "D",
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: "",
+                    ip: ip,
+                    observacion: null,
+                });
+                return res.jsonp({ message: "Registro eliminado." });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query("ROLLBACK");
+                return res.status(500).jsonp({ message: error });
+            }
         });
     }
     /** ** ********************************************************************************************** **
@@ -255,12 +447,26 @@ class RegimenControlador {
     CrearAntiguedad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { anio_desde, anio_hasta, dias_antiguedad, id_regimen } = req.body;
+                const { anio_desde, anio_hasta, dias_antiguedad, id_regimen, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query("BEGIN");
                 const response = yield database_1.default.query(`
         INSERT INTO ere_antiguedad (anio_desde, anio_hasta, dias_antiguedad, id_regimen)
         VALUES ($1, $2, $3, $4) RETURNING *
         `, [anio_desde, anio_hasta, dias_antiguedad, id_regimen]);
                 const [antiguedad] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "ere_antiguedad",
+                    usuario: user_name,
+                    accion: "I",
+                    datosOriginales: "",
+                    datosNuevos: JSON.stringify(antiguedad),
+                    ip: ip,
+                    observacion: null,
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query("COMMIT");
                 if (antiguedad) {
                     return res.status(200).jsonp(antiguedad);
                 }
@@ -269,18 +475,61 @@ class RegimenControlador {
                 }
             }
             catch (error) {
-                return res.jsonp({ message: "error" });
+                // REVERTIR TRANSACCION
+                yield database_1.default.query("ROLLBACK");
+                return res.status(500).jsonp({ message: "error" });
             }
         });
     }
     // ACTUALIZAR ANTIGUEDAD DE VACACIONES
     ActualizarAntiguedad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { anio_desde, anio_hasta, dias_antiguedad, id } = req.body;
-            yield database_1.default.query(`
-      UPDATE ere_antiguedad SET anio_desde = $1, anio_hasta = $2, dias_antiguedad = $3 WHERE id = $4
-      `, [anio_desde, anio_hasta, dias_antiguedad, id]);
-            res.jsonp({ message: "Registro guardado." });
+            try {
+                const { anio_desde, anio_hasta, dias_antiguedad, id, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query("BEGIN");
+                // CONSULTAR DATOSORIGINALES
+                const antiguedad = yield database_1.default.query(`
+        SELECT * FROM ere_antiguedad WHERE id = $1
+        `, [id]);
+                const [datosOriginales] = antiguedad.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: "ere_antiguedad",
+                        usuario: user_name,
+                        accion: "U",
+                        datosOriginales: "",
+                        datosNuevos: "",
+                        ip: ip,
+                        observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`,
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query("COMMIT");
+                    return res.status(404).jsonp({ message: "error" });
+                }
+                yield database_1.default.query(`
+        UPDATE ere_antiguedad SET anio_desde = $1, anio_hasta = $2, dias_antiguedad = $3 WHERE id = $4
+        `, [anio_desde, anio_hasta, dias_antiguedad, id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "ere_antiguedad",
+                    usuario: user_name,
+                    accion: "U",
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: `{"anio_desde": "${anio_desde}", "anio_hasta": "${anio_hasta}", "dias_antiguedad": "${dias_antiguedad}"}`,
+                    ip: ip,
+                    observacion: null,
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query("COMMIT");
+                return res.jsonp({ message: "Antiguedad guardada" });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query("ROLLBACK");
+                return res.status(500).jsonp({ message: "error" });
+            }
         });
     }
     // BUSCAR UN REGISTRO DE ANTIGUEDAD
@@ -301,11 +550,53 @@ class RegimenControlador {
     // ELIMINAR REGISTRO DE ANTIGUEDAD DE VACACIONES
     EliminarAntiguedad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-      DELETE FROM ere_antiguedad WHERE id = $1
-      `, [id]);
-            res.jsonp({ message: "Registro eliminado." });
+            try {
+                const { user_name, ip } = req.body;
+                const id = req.params.id;
+                // INICIAR TRANSACCION
+                yield database_1.default.query("BEGIN");
+                // CONSULTAR DATOSORIGINALES
+                const antiguedad = yield database_1.default.query(`
+        SELECT * FROM ere_antiguedad WHERE id = $1
+        `, [id]);
+                const [datosOriginales] = antiguedad.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: "ere_antiguedad",
+                        usuario: user_name,
+                        accion: "D",
+                        datosOriginales: "",
+                        datosNuevos: "",
+                        ip: ip,
+                        observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`,
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query("COMMIT");
+                    return res.status(404).jsonp({ message: "Registro no encontrado." });
+                }
+                yield database_1.default.query(`
+        DELETE FROM ere_antiguedad WHERE id = $1
+        `, [id]);
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "ere_antiguedad",
+                    usuario: user_name,
+                    accion: "D",
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: "",
+                    ip: ip,
+                    observacion: null,
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query("COMMIT");
+                return res.jsonp({ message: "Registro eliminado." });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query("ROLLBACK");
+                return res.status(500).jsonp({ message: error });
+            }
         });
     }
     ListarRegimenSucursal(req, res) {

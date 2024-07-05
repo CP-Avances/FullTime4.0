@@ -33,12 +33,12 @@
                                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                     <label for="file1" class="btn-2" matSuffix matTooltipPosition="right"
                                         *ngIf="!mostrarbtnsubir" style="height: 64px;"
-                                        matTooltip="Presionar para seleccionar Plantilla con nombre plantillaGeneral.">
+                                        matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
                                         Subir plantilla
                                     </label>
                                     <label for="file1" class="btn-2" matSuffix matTooltipPosition="right"
                                         *ngIf="mostrarbtnsubir" style="height: 64px;"
-                                        matTooltip="Presionar para seleccionar Plantilla con nombre plantillaGeneral.">
+                                        matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
                                         Subir nueva <br> plantilla
                                     </label>
                                 </form>
@@ -48,8 +48,8 @@
                             <div>
                                 <a type="submit" id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                     matTooltip="Dar click para ver o descargar el documento."
-                                    href="{{hipervinculo}}/plantillaD/documento/plantillaGeneral.xlsx">
-                                    <span class="material-icons">cloud_download</span> <br>Descargar plantilla
+                                    href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
+                                    <br> Descargar plantilla
                                 </a>
                             </div>
                         </div>
@@ -112,8 +112,7 @@
                             <td></td>
                             <td>
                                 <mat-form-field class="input-tables codigo">
-                                    <input matInput placeholder="Buscar" [formControl]="nombreHorarioF"
-                                        [(ngModel)]="filtroNombreHorario">
+                                    <input matInput placeholder="Buscar" [formControl]="nombreHorarioF">
                                 </mat-form-field>
                             </td>
                             <td></td>
@@ -129,7 +128,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let horario of horarios | filtrosNombres: filtroNombreHorario | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let horario of horarios | filtroCodigo: nombreHorarioF.value | paginate:tamanio_pagina:numero_pagina">
 
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
@@ -181,8 +180,8 @@
                     </tbody>
                 </table>
             </div>
-            <mat-paginator id="pagina" [length]="horarios.length" [pageSize]="tamanio_pagina"
-                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            <mat-paginator #paginator id="pagina" [length]="horarios.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
             <!--  **********************  DESCARGAR REPORTES  ************************  -->
             <div *ngIf="getDescargarReportes()">
@@ -227,7 +226,7 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">N°</th>
+                        <th scope="col">Item</th>
                         <th scope="col">Descripción</th>
                         <th scope="col">Código Horario</th>
                         <th scope="col">Horas Totales</th>
@@ -239,11 +238,11 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let h of dataHorarios.plantillaHorarios | paginate:tamanio_paginaH:numero_paginaH ">
-                        <td>{{h.N}}</td>
+                        <td>{{h.ITEM}}</td>
                         <td [style.color]="ObtenerColorDatoRegistrado(h.DESCRIPCION)">{{h.DESCRIPCION}}</td>
                         <td [style.color]="ObtenerColorDatoRegistrado(h.CODIGO_HORARIO)">{{h.CODIGO_HORARIO}}</td>
                         <td [style.color]="ObtenerColorDatoRegistrado(h.HORAS_TOTALES)">{{h.HORAS_TOTALES}}</td>
-                        <td>{{h.MIN_ALIMENTACION}}</td>
+                        <td>{{h.MINUTOS_ALIMENTACION}}</td>
                         <td [style.color]="ObtenerColorDatoRegistrado(h.TIPO_HORARIO)">{{h.TIPO_HORARIO}}</td>
                         <td [style.color]="ObtenerColorDatoRegistrado(h.HORARIO_NOCTURNO)">{{h.HORARIO_NOCTURNO}}</td>
                         <td>
@@ -272,7 +271,7 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">N°</th>
+                        <th scope="col">Item</th>
                         <th scope="col">Código Horario</th>
                         <th scope="col">Tipo Acción</th>
                         <th scope="col">Hora</th>
@@ -286,15 +285,15 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let d of dataHorarios.plantillaDetalles | paginate:tamanio_paginaD:numero_paginaD ">
-                        <td>{{d.N}}</td>
+                        <td>{{d.ITEM}}</td>
                         <td [style.color]="ObtenerColorDatoRegistrado(d.CODIGO_HORARIO)">{{d.CODIGO_HORARIO}}</td>
                         <td [style.color]="ObtenerColorDatoRegistrado(d.TIPO_ACCION)">{{d.TIPO_ACCION}}</td>
                         <td [style.color]="ObtenerColorDatoRegistrado(d.HORA)">{{d.HORA}}</td>
                         <td>{{d.TOLERANCIA}}</td>
                         <td>{{d.ORDEN}}</td>
                         <td>{{d.SALIDA_SIGUIENTE_DIA}}</td>
-                        <td>{{d.MIN_ANTES}}</td>
-                        <td>{{d.MIN_DESPUES}}</td>
+                        <td>{{d.MINUTOS_ANTES}}</td>
+                        <td>{{d.MINUTOS_DESPUES}}</td>
                         <td>
                             <div style="width: 270px; margin: auto;">
                                 <div id="t-editar" class="circulo"

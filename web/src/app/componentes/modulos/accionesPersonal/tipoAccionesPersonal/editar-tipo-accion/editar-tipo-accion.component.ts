@@ -17,6 +17,10 @@ export class EditarTipoAccionComponent implements OnInit {
   @Input() data: any;
   @Input() pagina: any;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   selec1: boolean = false;
   selec2: boolean = false;
   selec3: boolean = false;
@@ -57,24 +61,26 @@ export class EditarTipoAccionComponent implements OnInit {
 
   // METODO PARA MOSTRAR DATOS
   CargarDatos() {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     this.selec1 = false;
     this.selec2 = false;
     this.selec3 = false;
     this.formulario.patchValue({
-      tipoAccionForm: this.data.id_tipo,
+      tipoAccionForm: this.data.id_tipo_accion_personal,
       descripcionForm: this.data.descripcion,
       baseLegalForm: this.data.base_legal,
     })
     if (this.data.tipo_permiso === true) {
-      this.selec1 = true;
+      this.tipoF.setValue('permiso');
       this.CambiarEstadosPermisos();
     }
     if (this.data.tipo_vacacion === true) {
-      this.selec2 = true;
+      this.tipoF.setValue('vacacion');
       this.CambiarEstadosVacaciones();
     }
     if (this.data.tipo_situacion_propuesta === true) {
-      this.selec3 = true;
+      this.tipoF.setValue('propuesta');
       this.CambiarEstadosSituacion();
     }
   }
@@ -88,7 +94,9 @@ export class EditarTipoAccionComponent implements OnInit {
       tipo_permiso: this.selec1,
       tipo_vacacion: this.selec2,
       tipo_situacion_propuesta: this.selec3,
-      id: this.data.id
+      id: this.data.id,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     if (form.tipoAccionForm != undefined) {
       this.GuardarInformacion(datosAccion);
@@ -102,7 +110,7 @@ export class EditarTipoAccionComponent implements OnInit {
   contador: number = 0;
   GuardarInformacion(datosAccion: any) {
     this.contador = 0;
-    this.tipos_acciones.map(obj => {
+    this.tipos_acciones.map((obj: any) => {
       if (obj.id_tipo === datosAccion.id_tipo) {
         this.contador = this.contador + 1;
       }
@@ -114,6 +122,7 @@ export class EditarTipoAccionComponent implements OnInit {
       })
     } else {
       this.rest.ActualizarDatos(datosAccion).subscribe(response => {
+        console.log(response);
         this.toastr.success('Operación exitosa.', 'Registro guardado.', {
           timeOut: 6000,
         })
@@ -131,7 +140,7 @@ export class EditarTipoAccionComponent implements OnInit {
   tipos_acciones: any = [];
   ObtenerTiposAccionPersonal() {
     this.tipos_acciones = [];
-    this.rest.BuscarDatosTipoEdicion(this.data.id_tipo).subscribe(datos => {
+    this.rest.BuscarDatosTipoEdicion(this.data.id_tipo_accion_personal).subscribe(datos => {
       this.tipos_acciones = datos;
     })
   }
@@ -222,7 +231,9 @@ export class EditarTipoAccionComponent implements OnInit {
   IngresarNuevoTipo(form: any, datos: any) {
     if (form.otroTipoForm != '') {
       let tipo = {
-        descripcion: form.otroTipoForm
+        descripcion: form.otroTipoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.VerificarDuplicidad(form, tipo, datos);
     }
@@ -237,7 +248,7 @@ export class EditarTipoAccionComponent implements OnInit {
   contar: number = 0;
   VerificarDuplicidad(form: any, tipo: any, datos: any) {
     this.contar = 0;
-    this.tipos.map(obj => {
+    this.tipos.map((obj: any) => {
       if (obj.descripcion.toUpperCase() === form.otroTipoForm.toUpperCase()) {
         this.contar = this.contar + 1;
       }

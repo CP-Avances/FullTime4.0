@@ -2,7 +2,7 @@
 <div *ngIf="ver_lista">
     <div class="container" style="padding-bottom: 10px; padding-top: 20px;">
         <div class="row">
-            <div class="col-md">
+            <div class="col-12 col-md-6">
                 <div id="titulo">
                     <span>ESTABLECIMIENTOS</span>
                 </div>
@@ -20,50 +20,44 @@
                     </div>
                 </mat-card>
             </div>
-            <!------------------ Registro multiple de establecimientos ------------------------------------->
-            <div class="col-md">
+            <!--  *********************************  REGISTRO MULTIPLE DE ESTABLECIMIENTOS  *****************************  -->
+            <div class="col-12 col-md-6">
                 <div id="titulo">
                     <span>REGISTRO MULTIPLE</span>
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
-                    <div class="row" *ngIf="getPlantillaEstablecimiento()">
-                        <div class="col-md" style="padding-top: 5px;">
-                            <div class="d-flex flex-wrap justify-content-around"
-                                style="text-align: center; justify-content: center;">
-                                <form method="post" enctype="multipart/form-data" style="width: max-content;">
-                                    <input type="file" (change)="FileChange($event)" [formControl]="archivoForm"
-                                        id="file"
-                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                    <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
-                                        style="height: 64px; padding-top: 25px;"
-                                        matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                        Subir plantilla
-                                    </label>
-                                    <label for="file" matSuffix matTooltipPosition="right"
-                                        *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
-                                        style="height: 64px; padding-top: 25px;"
-                                        matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                        Subir nueva plantilla
-                                    </label>
-                                </form>
-                            </div>
+                    <div class="row m-auto" *ngIf="getPlantillaEstablecimiento()">
+                        <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                            <form method="post" class="btn-2" enctype="multipart/form-data">
+                                <input type="file" (change)="FileChange($event)" [formControl]="archivoForm" id="file"
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                    style="height: 65px; padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                    Subir plantilla
+                                </label>
+                                <label for="file" matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                    style="height: 65px; padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                    Subir nueva plantilla
+                                </label>
+                            </form>
                         </div>
-                        <div class="col-md" *ngIf="!Datasucursales" style="padding-top: 5px; padding-bottom: 5px;">
-                            <div class="d-flex flex-wrap justify-content-around"
+                        <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                            <div *ngIf="!Datasucursales" class="d-flex flex-wrap justify-content-around"
                                 style="text-align: center; justify-content: center;">
                                 <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
-                                    matTooltip="Dar click para ver o descargar el documento.">
+                                    matTooltip="Dar click para ver o descargar el documento."
+                                    href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
                                     <br>
                                     Descargar plantilla
                                 </a>
                             </div>
-                        </div>
-                        <div class="col-md" *ngIf="mostrarbtnsubir" style="padding-top: 5px; padding-bottom: 5px;">
-                            <div class="d-flex flex-wrap justify-content-around"
-                                style="text-align: center; justify-content: center;">
+                            <div class="d-flex flex-wrap justify-content-center m-auto w-auto">
                                 <button *ngIf="Datasucursales && messajeExcel != 'error'" id="descargar"
                                     class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
-                                    matTooltipPosition="right" matTooltip="Guardar registro multiple.">
+                                    matTooltipPosition="right" matTooltip="Guardar registro múltiple.">
                                     Registrar
                                 </button>
                             </div>
@@ -115,14 +109,13 @@
                             <td></td>
                             <td>
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" [formControl]="buscarNombre"
-                                        [(ngModel)]="filtroNombreSuc">
+                                    <input matInput placeholder="Buscar" [formControl]="buscarNombre">
                                 </mat-form-field>
                             </td>
                             <td>
                                 <mat-form-field id="t-inputs">
                                     <input matInput placeholder="Buscar" (keypress)="IngresarSoloLetras($event)"
-                                        [formControl]="buscarCiudad" [(ngModel)]="filtroCiudadSuc">
+                                        [formControl]="buscarCiudad">
                                 </mat-form-field>
                             </td>
                             <td>
@@ -133,7 +126,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let s of sucursales | sucCiudad: filtroCiudadSuc | sucNombre: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let s of sucursales | sucCiudad: buscarCiudad.value | sucNombre: buscarNombre.value | paginate:tamanio_pagina:numero_pagina">
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionSucursales.toggle(s) : null"
@@ -212,25 +205,26 @@
                     <thead class="thead-light">
                         <tr style="text-align: center;">
                             <th scope="col">Item</th>
+                            <th scope="col">Observación</th>
                             <th scope="col">Establecimiento</th>
                             <th scope="col">Ciudad</th>
-
-                            <th scope="col">Observación</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr
                             *ngFor="let data of Datasucursales | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
                             <td style="width: 50px;" align="center">{{data.fila}}</td>
-                            <td [style.color]="stiloTextoCelda(data.nom_sucursal)">{{ data.nom_sucursal}}</td>
-                            <td [style.color]="stiloTextoCelda(data.ciudad)">{{ data.ciudad}}</td>
                             <td>
-                                <div style="width: 270px; margin: auto;">
+                                <div style="width: 250px; margin: auto;">
                                     <div id="t-editar" class="circulo"
-                                        [style.background-color]="stiloCelda(data.observacion)"></div>
+                                        [style.background-color]="stiloCelda(data.observacion)">
+                                    </div>
                                     {{ data.observacion}}
                                 </div>
                             </td>
+                            <td [style.color]="stiloTextoCelda(data.nom_sucursal)">{{ data.nom_sucursal}}</td>
+                            <td [style.color]="stiloTextoCelda(data.ciudad)">{{ data.ciudad}}</td>
+
                         </tr>
                     </tbody>
                 </table>
@@ -244,4 +238,4 @@
 </div>
 
 <!--  ********************  VER DEPARTAMETOS DE SUCURSALES  ************************  -->
-<app-ver-sucursal *ngIf="ver_departamentos" [idSucursal]="sucursal_id" [pagina_]="pagina"></app-ver-sucursal>
+<app-ver-sucursal *ngIf="ver_departamentos" [idSucursal]="sucursal_id" [idDepartamentosAcceso]="idDepartamentosAcceso" [pagina_]="pagina"></app-ver-sucursal>

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -24,8 +23,12 @@ export class CiudadFeriadosService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/ciudadFeriados/eliminar/${id}`);
+  EliminarRegistro(id: number, dato:any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/ciudadFeriados/eliminar/${id}`;
+    const httpOptions = {
+      body: dato
+    };
+    return this.http.request('delete', url, httpOptions);
   }
 
   // METODO PARA BUSCAR ID DE CIUDADES
@@ -42,25 +45,6 @@ export class CiudadFeriadosService {
   ActualizarDatos(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/ciudadFeriados`, data);
   }
-
-
-
-
-
-
-  // Asignar Ciudad Feriado
-
-
-
-
-
-
-
-
-
-
-
-
 
   BuscarFeriados(id_ciudad: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ciudadFeriados/ciudad/${id_ciudad}`);

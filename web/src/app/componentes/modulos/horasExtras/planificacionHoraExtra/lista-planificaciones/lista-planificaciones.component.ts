@@ -73,6 +73,10 @@ export class ListaPlanificacionesComponent implements OnInit {
   idEmpleadoLogueado: number; // VARIABLE PARA ALMACENAR ID DE EMPLEADO QUE INICIA SESION
   empleado: any = []; // VARIABLE DE ALMACENAMIENTO DE DATOS DE EMPLEADO
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   get habilitarHorasE(): boolean { return this.funciones.horasExtras; }
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
@@ -107,6 +111,9 @@ export class ListaPlanificacionesComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
+
       var f = moment();
       this.ObtenerEmpleados(this.idEmpleadoLogueado);
       this.fecha = f.format('YYYY-MM-DD');
@@ -136,7 +143,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -175,7 +182,7 @@ export class ListaPlanificacionesComponent implements OnInit {
 
       console.log('ver data ... ', this.listaPlan)
 
-      this.listaPlan.forEach(data => {
+      this.listaPlan.forEach((data: any) => {
         data.fecha_desde_ = this.validar.FormatearFecha(data.fecha_desde, formato_fecha, this.validar.dia_abreviado);
         data.fecha_hasta_ = this.validar.FormatearFecha(data.fecha_hasta, formato_fecha, this.validar.dia_abreviado);
         data.hora_inicio_ = this.validar.FormatearHora(data.hora_inicio, formato_hora);
@@ -194,6 +201,10 @@ export class ListaPlanificacionesComponent implements OnInit {
   planEmpleados: any = []; // VARIABLE PARA GUARDAR DATOS DE EMPLEADOS CON PLANIFICACIÓN
   lista_empleados: boolean = false; // LISTA DE USUARIOS
   ObtenerEmpleadosPlanificacion(id: any, accion: any, lista_empleados: any, icono: any, editar: any, eliminar: any) {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
     this.restPlan.BuscarPlanEmpleados(id).subscribe(res => {
       this.planEmpleados = res;
       this.FormatearDatos(this.planEmpleados);
@@ -203,7 +214,7 @@ export class ListaPlanificacionesComponent implements OnInit {
       this.ver_editar = editar;
       this.ver_eliminar = eliminar;
     }, error => {
-      this.restPlan.EliminarRegistro(id).subscribe(res => {
+      this.restPlan.EliminarRegistro(id, datos).subscribe(res => {
         this.toastr.warning('Planificación no ha sido asignada a ningún colaborador.', 'Registro eliminado.', {
           timeOut: 6000,
         })
@@ -213,7 +224,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   }
 
   FormatearDatos(lista: any) {
-    lista.forEach(data => {
+    lista.forEach((data: any) => {
       data.fecDesde = this.validar.FormatearFecha(data.fecha_desde, this.formato_fecha, this.validar.dia_abreviado);
       data.fecHasta = this.validar.FormatearFecha(data.fecha_hasta, this.formato_fecha, this.validar.dia_abreviado);
       data.horaInicio = this.validar.FormatearHora(data.hora_inicio, this.formato_hora);
@@ -269,6 +280,10 @@ export class ListaPlanificacionesComponent implements OnInit {
 
   // VERIFICAR SI LA PLANIFICACION TIENE DATOS DE EMPLEADOS
   VerificarPlanificacion(id: number, accion: any, editar: any, eliminar: any) {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
     this.restPlan.BuscarPlanEmpleados(id).subscribe(res => {
       this.lista_empleados = true;
       this.planEmpleados = res;
@@ -278,7 +293,7 @@ export class ListaPlanificacionesComponent implements OnInit {
       this.ver_editar = editar;
       this.ver_icono = false;
     }, res => {
-      this.restPlan.EliminarRegistro(id).subscribe(res => {
+      this.restPlan.EliminarRegistro(id, datos).subscribe(res => {
         this.tipo_accion = accion;
         this.lista_empleados = false;
         this.ver_icono = true;
@@ -289,7 +304,7 @@ export class ListaPlanificacionesComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeletePlan(datos: any) {
     console.log('ver data seleccionada... ', datos)
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
@@ -303,6 +318,11 @@ export class ListaPlanificacionesComponent implements OnInit {
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO DE PLANIFICACION
   EliminarPlanEmpleado(id_plan: number, id_empleado: number, datos: any) {
 
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+
     // LECTURA DE DATOS DE USUARIO
     let usuario = '<tr><th>' + datos.nombre +
       '</th><th>' + datos.cedula + '</th></tr>';
@@ -314,7 +334,7 @@ export class ListaPlanificacionesComponent implements OnInit {
     let h_inicio = this.validar.FormatearHora(datos.hora_inicio, this.formato_hora);
     let h_fin = this.validar.FormatearHora(datos.hora_fin, this.formato_hora);
 
-    this.restPlan.EliminarPlanEmpleado(id_plan, id_empleado).subscribe(res => {
+    this.restPlan.EliminarPlanEmpleado(id_plan, id_empleado, data).subscribe(res => {
       this.NotificarPlanificacion(desde, hasta, h_inicio, h_fin, id_empleado);
       this.EnviarCorreo(datos, cuenta_correo, usuario, desde, hasta, h_inicio, h_fin);
       this.toastr.error('Registro eliminado.', '', {
@@ -356,7 +376,7 @@ export class ListaPlanificacionesComponent implements OnInit {
     }
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   contar: number = 0;
   contar_eliminados: number = 0;
   ConfirmarDeletePlanMultiple(datos: any) {
@@ -375,7 +395,12 @@ export class ListaPlanificacionesComponent implements OnInit {
 
     this.contar_eliminados = 0;
 
-    datos.map(obj => {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    }
+
+    datos.map((obj: any) => {
 
       console.log('ver datos seleccionados', obj)
 
@@ -389,7 +414,7 @@ export class ListaPlanificacionesComponent implements OnInit {
       let h_fin = moment(obj.hora_fin, 'HH:mm').format('HH:mm');
 
 
-      this.restPlan.EliminarPlanEmpleado(obj.id_plan, obj.id_empleado).subscribe(res => {
+      this.restPlan.EliminarPlanEmpleado(obj.id_plan, obj.id_empleado, data).subscribe(res => {
         // CONTAR DATOS PROCESADOS
         this.contar_eliminados = this.contar_eliminados + 1;
         this.NotificarPlanificacion(desde, hasta, h_inicio, h_fin, obj.id_empleado);
@@ -441,14 +466,14 @@ export class ListaPlanificacionesComponent implements OnInit {
     }
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelected() {
     const numSelected = this.selectionUno.selected.length;
     const numRows = this.planEmpleados.length;
     return numSelected === numRows;
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
@@ -485,6 +510,8 @@ export class ListaPlanificacionesComponent implements OnInit {
       mensaje: 'Planificación de horas extras eliminada desde ' +
         desde + ' hasta ' +
         hasta + ' horario de ' + h_inicio + ' a ' + h_fin,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restPlan.EnviarNotiPlanificacion(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);
@@ -714,7 +741,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   ** ************************************************************************************************* **/
 
   exportToExcel() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaPlan.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaPlan.map((obj: any) => {
       return {
         Descripcion: obj.descripcion,
         Fecha_Inicio: obj.fecha_desde_,
@@ -736,12 +763,12 @@ export class ListaPlanificacionesComponent implements OnInit {
     xlsx.writeFile(wb, 'PlanificacionesHorasEXCEL' + new Date().getTime() + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
   ** **                                     METODO PARA EXPORTAR A CSV                               ** **
   ** ************************************************************************************************** **/
 
   exportToCVS() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaPlan.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaPlan.map((obj: any) => {
       return {
         Descripcion: obj.descripcion,
         Fecha_Inicio: obj.fecha_desde_,

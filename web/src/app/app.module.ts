@@ -13,6 +13,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 
+import { CommonModule } from '@angular/common';
+
 // COMPONENTES ADMINISTRADOR
 import { VistaRolesComponent } from './componentes/catalogos/catRoles/vista-roles/vista-roles.component';
 import { LoginComponent } from './componentes/iniciarSesion/login/login.component';
@@ -145,7 +147,7 @@ import { EmpleadoHorariosService } from './servicios/horarios/empleadoHorarios/e
 import { EmplCargosService } from './servicios/empleado/empleadoCargo/empl-cargos.service';
 import { CiudadService } from './servicios/ciudad/ciudad.service';
 import { TokenInterceptorService } from './servicios/login/token-interceptor.service';
-import { SpinnerService } from './servicios/intercepto/spinner.service';
+
 
 import { GraficasService } from './servicios/graficas/graficas.service';
 import { ProgressService } from './componentes/administracionGeneral/progress/progress.service';
@@ -156,6 +158,9 @@ import { AuthGuard } from "./servicios/guards/auth.guard";
 
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { ConfirmarDesactivadosComponent } from './componentes/empleado/datos-empleado/confirmar-desactivados/confirmar-desactivados.component';
+import { ConfirmarCrearCarpetaComponent } from './componentes/empleado/datos-empleado/confirmar-crearCarpeta/confirmar-crearCarpeta.component';
+
+
 import { PlanHoraExtraAutorizaComponent } from './componentes/autorizaciones/plan-hora-extra-autoriza/plan-hora-extra-autoriza.component';
 import { ColoresEmpresaComponent } from './componentes/catalogos/catEmpresa/colores-empresa/colores-empresa.component';
 import { AyudaComponent } from './componentes/administracionGeneral/preferecias/ayuda/ayuda.component';
@@ -208,7 +213,7 @@ import { CambiarFraseComponent } from './componentes/administracionGeneral/frase
 import { RecuperarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/recuperar-frase/recuperar-frase.component';
 
 import { OlvidarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/olvidar-frase/olvidar-frase.component';
-import { TipoVacunaComponent } from './componentes/empleado/vacunacion/tipo-vacuna/tipo-vacuna.component';
+import { TipoVacunaComponent } from './componentes/catalogos/catalogoVacuna/tipo-vacuna/tipo-vacuna.component';
 import { ListarParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/listar-parametro/listar-parametro.component';
 import { EditarParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/editar-parametro/editar-parametro.component';
 import { VerParametroComponent } from './componentes/administracionGeneral/parametrizacion/detalle-parametros/ver-parametro/ver-parametro.component';
@@ -333,6 +338,9 @@ import { RegistroDiscapacidadComponent } from './componentes/catalogos/catalogoD
 import { EditarDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/editar-discapacidad/editar-discapacidad.component';
 import { CatVacunasComponent } from './componentes/catalogos/catalogoVacuna/listar-vacuna/cat-vacunas.component';
 import { EditarVacunasComponent } from './componentes/catalogos/catalogoVacuna/editar-vacuna/editar-vacuna.component';
+import { VisualizarObservacionComponent } from './componentes/horarios/cargar-plantillas/visualizar-observacion/visualizar-observacion/visualizar-observacion.component';
+import { VisualizarAsignacionesComponent } from './componentes/empleado/sucursal-usuario/visualizar-asignaciones/visualizar-asignaciones.component';
+
 
 
 //Seteo de ruta por defecto al iniciar front
@@ -490,6 +498,7 @@ const config: SocketIoConfig = { url: String(url), options: {} };
     ListaEmplePlanHoraEComponent,
     TiempoAutorizadoComponent,
     ConfirmarDesactivadosComponent,
+    ConfirmarCrearCarpetaComponent,
     RealtimeAvisosComponent,
     EliminarRealtimeComponent,
     ListaPlanHoraExtraComponent,
@@ -602,30 +611,33 @@ const config: SocketIoConfig = { url: String(url), options: {} };
     RegistroDiscapacidadComponent,
     EditarDiscapacidadComponent,
     CatVacunasComponent,
-    EditarVacunasComponent
+    EditarVacunasComponent,
+    VisualizarObservacionComponent,
+    VisualizarAsignacionesComponent,
 
   ],
 
   imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    ReactiveFormsModule,
+   BrowserModule,
+   AppRoutingModule,
+   HttpClientModule,
+   ReactiveFormsModule,
     ToastrModule.forRoot(),
-    SocketIoModule.forRoot(config),
-    FontAwesomeModule,
-    FormsModule,
-    MatCardModule,
-    ScrollingModule,
-    FiltrosModule,
-    MaterialModule,
-    MatButtonModule,
-    MatPaginatorModule,
-    MatTableModule,
-    MatDatepickerModule,
+   SocketIoModule.forRoot(config),
+   FontAwesomeModule,
+   FormsModule,
+   MatCardModule,
+   ScrollingModule,
+   FiltrosModule,
+   MaterialModule,
+   MatButtonModule,
+   MatPaginatorModule,
+   MatTableModule,
+   MatDatepickerModule,
     MatNativeDateModule,
     ReportesModule,
-    SpinnerModule
+    SpinnerModule,
+    CommonModule
   ],
   providers: [
     AuthGuard,
@@ -639,7 +651,6 @@ const config: SocketIoConfig = { url: String(url), options: {} };
       useClass: SpinnerInterceptor,
       multi: true
     },
-
     {
       provide: LOCALE_ID, useValue: 'es-EC'
     },
@@ -681,8 +692,10 @@ const config: SocketIoConfig = { url: String(url), options: {} };
     VistaElementosComponent,
     ListaSucursalesComponent,
     VerEmpresaComponent,
-    HorariosEmpleadoComponent
+    HorariosEmpleadoComponent,
+    ListarVacacionesComponent,
   ],
+  exports: [CommonModule, TimbreMultipleComponent],
 
   bootstrap: [AppComponent]
 

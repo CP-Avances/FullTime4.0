@@ -47,6 +47,10 @@ export class ListarCiudadFeriadosComponent implements OnInit {
     color: ThemePalette = 'primary';
     value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public router: Router,
     private rest: FeriadosService,
@@ -59,12 +63,15 @@ export class ListarCiudadFeriadosComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.BuscarParametro();
     this.ListarCiudadesFeriados(this.idFeriado);
   }
 
   /** **************************************************************************************** **
-  ** **                          BUSQUEDA DE FORMATOS DE FECHAS                            ** ** 
+  ** **                          BUSQUEDA DE FORMATOS DE FECHAS                            ** **
   ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -93,7 +100,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
     this.datosFeriado = [];
     this.rest.ConsultarUnFeriado(idFeriado).subscribe(data => {
       this.datosFeriado = data;
-      this.datosFeriado.forEach(data => {
+      this.datosFeriado.forEach((data: any) => {
         data.fecha_ = this.validar.FormatearFecha(data.fecha, formato_fecha, this.validar.dia_abreviado);
         if (data.fecha_recuperacion != null) {
           data.fec_recuperacion_ = this.validar.FormatearFecha(data.fecha_recuperacion, formato_fecha, this.validar.dia_abreviado);
@@ -137,8 +144,13 @@ export class ListarCiudadFeriadosComponent implements OnInit {
     }
     else {
       this.habilitarprogress = true;
+      const data = {
+        user_name: this.user_name,
+        ip: this.ip,
+      };
+
       datos.forEach((obj: any) => {
-        this.restF.EliminarRegistro(obj.idciudad_asignada).subscribe(res => {
+        this.restF.EliminarRegistro(obj.idciudad_asignada, data).subscribe(res => {
           this.eliminar = this.eliminar + 1;
           if (this.eliminar === datos.length) {
             this.toastr.error('Registro eliminado.', '', {
@@ -155,7 +167,12 @@ export class ListarCiudadFeriadosComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_ciudad_asignada: number) {
-    this.restF.EliminarRegistro(id_ciudad_asignada).subscribe(res => {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
+    this.restF.EliminarRegistro(id_ciudad_asignada, data).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -232,7 +249,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
     return numSelected === numRows;
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggle() {
     this.isAllSelected() ?
       this.selection.clear() :

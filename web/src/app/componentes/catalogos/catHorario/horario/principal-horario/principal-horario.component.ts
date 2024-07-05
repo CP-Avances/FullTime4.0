@@ -1,11 +1,11 @@
 // IMPORTAR LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
@@ -19,7 +19,6 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { SpinnerService } from '../../../../../servicios/spinner/spinner.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
@@ -41,14 +40,10 @@ import { ITableHorarios } from 'src/app/model/reportes.model';
 
 export class PrincipalHorarioComponent implements OnInit {
 
-
   // ALMACENAMIENTO DE DATOS Y BUSQUEDA
   horarios: any = [];
   ver_horarios: boolean = true;
   horariosEliminar: any = [];
-
-  // FILTROS
-  filtroNombreHorario = '';
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreHorarioF = new FormControl('', Validators.minLength(2));
@@ -70,16 +65,19 @@ export class PrincipalHorarioComponent implements OnInit {
   archivoSubido: Array<File>;
 
   // ITEMS DE PAGINACION DE LA TABLA
+  @ViewChild('paginator') paginator: MatPaginator;
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
   // ITEMS DE PAGINACION DE LA TABLA HORARIOS
+  @ViewChild('paginatorH') paginatorH: MatPaginator;
   numero_paginaH: number = 1;
   tamanio_paginaH: number = 5;
   pageSizeOptionsH = [5, 10, 20, 50];
 
   // ITEMS DE PAGINACION DE LA TABLA DETALLES
+  @ViewChild('paginatorD') paginatorD: MatPaginator;
   numero_paginaD: number = 1;
   tamanio_paginaD: number = 5;
   pageSizeOptionsD = [5, 10, 20, 50];
@@ -97,11 +95,10 @@ export class PrincipalHorarioComponent implements OnInit {
   listaHorariosCorrectos: any = [];
   listaDetalleCorrectos: any = [];
 
-  // VARIABLES PROGRESS SPINNER
-  habilitarprogress: boolean = false;
-  mode: ProgressSpinnerMode = 'indeterminate';
-  color: ThemePalette = 'primary';
-  value = 10;
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
 
   constructor(
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
@@ -111,12 +108,14 @@ export class PrincipalHorarioComponent implements OnInit {
     public restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     private rest: HorarioService, // SERVICIO DATOS DE HORARIO
     private toastr: ToastrService, // VARIABLE DE MANEJO DE NOTIFICACIONES
-    private spinnerService: SpinnerService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.nameFile = '';
     this.ObtenerLogo();
     this.ObtenerColores();
@@ -230,6 +229,13 @@ export class PrincipalHorarioComponent implements OnInit {
     this.numero_paginaD = 1;
     this.tamanio_paginaH = 5;
     this.tamanio_paginaD = 5;
+    this.paginator.firstPage();
+    if (this.paginatorH) {
+      this.paginatorH.firstPage();
+    }
+    if (this.paginatorD) {
+      this.paginatorD.firstPage();
+    }
     this.mostrarbtnsubir = false;
     this.formulario.setValue({
       nombreHorarioForm: '',
@@ -269,24 +275,21 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // LIMPIAR CAMPOS PLANTILLA
   LimpiarCamposPlantilla() {
-    this.mostrarbtnsubir = false;
-    this.dataHorarios = null;
-    this.archivoSubido = [];
-    this.nameFile = '';
-    this.listaHorariosCorrectos = [];
-    this.listaDetalleCorrectos = [];
+    this.mostrarbtnsubir = true;
     this.archivo1Form.reset();
-    this.spinnerService.hide();
-    this.habilitarprogress = false;
     this.numero_paginaH = 1;
     this.numero_paginaD = 1;
     this.tamanio_paginaH = 5;
     this.tamanio_paginaD = 5;
+    if (this.paginatorH) {
+      this.paginatorH.firstPage();
+    }
+    if (this.paginatorD) {
+      this.paginatorD.firstPage();
+    }
   }
 
   CargarPlantillaGeneral(element: any) {
-    this.spinnerService.show();
-    this.habilitarprogress = true;
     if (element.target.files && element.target.files[0]) {
       this.archivoSubido = element.target.files;
       this.nameFile = this.archivoSubido[0].name;
@@ -295,28 +298,24 @@ export class PrincipalHorarioComponent implements OnInit {
       let itemName = arrayItems[0];
 
       if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-        if (itemName.toLowerCase() == 'plantillageneral') {
+        if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
           this.VerificarPlantilla();
         } else {
-          this.toastr.error('Solo se acepta plantillaGeneral', 'Plantilla seleccionada incorrecta', {
+          this.toastr.error('Solo se acepta plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
             timeOut: 6000,
           });
-          this.LimpiarCamposPlantilla();
         }
       } else {
-        this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+        this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
           timeOut: 6000,
         });
-        this.LimpiarCamposPlantilla();
       }
     } else {
-      this.toastr.error('Error al cargar el archivo', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Error al cargar el archivo.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       });
-      this.LimpiarCamposPlantilla();
     }
-    this.archivo1Form.reset();
-    this.mostrarbtnsubir = true;
+    this.LimpiarCamposPlantilla();
   }
 
   VerificarPlantilla() {
@@ -338,8 +337,6 @@ export class PrincipalHorarioComponent implements OnInit {
           this.listaDetalleCorrectos.push(obj);
         }
       });
-      this.spinnerService.hide();
-      this.habilitarprogress = false;
     });
   }
 
@@ -355,12 +352,13 @@ export class PrincipalHorarioComponent implements OnInit {
   }
 
   RegistrarHorariosDetalles() {
-    this.spinnerService.show();
-    this.habilitarprogress = true;
     const data = {
       horarios: this.listaHorariosCorrectos,
-      detalles: this.listaDetalleCorrectos
-    }
+      detalles: this.listaDetalleCorrectos,
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
     if (this.listaHorariosCorrectos.length == 0) {
       this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada.', {
         timeOut: 6000,
@@ -375,9 +373,22 @@ export class PrincipalHorarioComponent implements OnInit {
           });
           this.archivo1Form.reset();
           this.nameFile = '';
-          this.spinnerService.hide();
-          this.habilitarprogress = false;
-        } else {
+        }
+        else if (res.mensaje === 'no_existe_horario') {
+          this.toastr.error('No se ha encontrado pestaña HORARIOS en la plantilla.', 'Plantilla no aceptada.', {
+            timeOut: 4500,
+          });
+          this.archivo1Form.reset();
+          this.nameFile = '';
+        }
+        else if (res.mensaje === 'no_existe_detalle') {
+          this.toastr.error('No se ha encontrado pestaña DETALLE_HORARIOS en la plantilla.', 'Plantilla no aceptada.', {
+            timeOut: 4500,
+          });
+          this.archivo1Form.reset();
+          this.nameFile = '';
+        }
+        else {
           this.toastr.success('Plantilla de horarios importada', 'Operación exitosa.', {
             timeOut: 6000,
           });
@@ -726,7 +737,11 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
   EliminarDetalle(id_horario: any) {
-    this.rest.EliminarRegistro(id_horario).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistro(id_horario, datos).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
@@ -756,17 +771,21 @@ export class PrincipalHorarioComponent implements OnInit {
       });
   }
 
-// METODO PARA ELIMINAR REGISTROS
+  // METODO PARA ELIMINAR REGISTROS
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ingresar = false;
     this.contador = 0;
     this.horariosEliminar = this.selectionHorarios.selected;
     this.horariosEliminar.forEach((datos: any) => {
       this.horarios = this.horarios.filter(item => item.id !== datos.id);
       this.contador = this.contador + 1;
-      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+      this.rest.EliminarRegistro(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.codigo + '.', 'No fue posible eliminar.', {
             timeOut: 6000,
@@ -786,7 +805,7 @@ export class PrincipalHorarioComponent implements OnInit {
     )
   }
 
-// METODO PARA CONFIRMAR ELIMINACION MULTIPLE
+  // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {

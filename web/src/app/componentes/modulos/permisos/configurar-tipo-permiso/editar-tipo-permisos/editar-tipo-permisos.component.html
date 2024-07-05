@@ -59,7 +59,7 @@
                                     matTooltip="Seleccionar si el permiso será por días o por horas y minutos.">
                                     help_outline
                                 </mat-icon>
-                                <mat-select formControlName="diasHorasForm" [(ngModel)]="selectDiasHoras" required>
+                                <mat-select formControlName="diasHorasForm" required>
                                     <mat-option *ngFor="let dh of diasHoras" [value]="dh.valor"
                                         (click)="ActivarDiasHoras(primeroFormGroup.value)">
                                         {{dh.nombre}}
@@ -94,7 +94,7 @@
                                     matTooltip="Seleccionar si el usuario puede solicitar este tipo de permiso.">
                                     help_outline
                                 </mat-icon>
-                                <mat-select formControlName="acceEmpleadoForm" [(ngModel)]="selectAccess" required>
+                                <mat-select formControlName="acceEmpleadoForm" required>
                                     <mat-option *ngFor="let sol of solicitudes" [value]="sol.valor">
                                         {{sol.nombre}}
                                     </mat-option>
@@ -193,15 +193,13 @@
                                     <span style="font-size: 12px;">Restrición por fecha*</span>
                                 </label>
                                 <div class="d-flex justify-content-start">
-                                    <mat-radio-button (click)="VerCalendario()" ngDefaultControl [(ngModel)]="selec1"
-                                        [checked]="selec1" [ngModelOptions]="{standalone: true}" value="true" matSuffix
+                                    <mat-radio-button (click)="VerCalendario()" [value]="true" matSuffix
                                         matTooltipPosition="right"
                                         matTooltip="El usuario no podrá solicitar el permiso en una fecha determinada.">
                                         <label id="textoradiobtn">Si</label>
                                     </mat-radio-button>
-                                    <mat-radio-button (click)="OcultarCalendario()" ngDefaultControl
-                                        [(ngModel)]="selec2" [checked]="selec2" [ngModelOptions]="{standalone: true}"
-                                        value="false" matSuffix matTooltipPosition="right"
+                                    <mat-radio-button (click)="OcultarCalendario()" [value]="false" matSuffix
+                                        matTooltipPosition="right"
                                         matTooltip="El usuario podrá solicitar el permiso sin restricciones de fechas.">
                                         <label id="textoradiobtn">No</label>
                                     </mat-radio-button>

@@ -56,7 +56,7 @@ export class VerTipoPermisoComponent implements OnInit {
     this.rest.BuscarUnTipoPermiso(this.idPermiso).subscribe(datos => {
       this.datosPermiso = datos;
       console.log('ver datos de permiso', datos)
-      this.datosPermiso.forEach(data => {
+      this.datosPermiso.forEach((data: any) => {
         data.fecha_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato, this.validar.dia_abreviado);
         data.fecha_fin_ = this.validar.FormatearFecha(data.fecha_fin, formato, this.validar.dia_abreviado);
       })

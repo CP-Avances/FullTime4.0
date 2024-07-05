@@ -1,29 +1,29 @@
 <div class="container" style="padding-bottom: 15px;">
   <mat-card class="example-card mat-elevation-z8">
       <div id="titulo">
-          <span>CALENDARIO RANGO FECHAS</span>
+          <span>CARGAR PLANTILLA DE PLANIFICACIÓN HORARIA</span>
           <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">
               highlight_off
           </mat-icon>
       </div>
       <mat-card-content>
           <div class="row">
-              <div class="nota" style="margin-left: 15px; padding-top: 15px;">
+              <div class="nota" style="margin-left: 15px; padding-top: 15px;" *ngIf="datosSeleccionados.usuariosSeleccionados.length > 0">
                   <span>
-                      NOTA: Al presionar Generar calendario se visualizará todos los días del mes actual. Para generar
-                      un calendario de manera personalizada ingresar mes de inicio y fin de periodo.
+                      NOTA: Para generar la plantilla debe seleccionar el mes de inicio.
+                      No modificar el campo usuario y los dias del mes en la plantilla.
                   </span>
               </div>
-              <div class="col-md">
+              <div class="col-md" *ngIf="datosSeleccionados.usuariosSeleccionados.length > 0">
                   <div class="row">
                       <div class="col-md">
-                          <div class="row">
+                          <div class="row" style="margin-top: 5px;">
                               <div class="col-md">
                                   <div class="d-flex flex-wrap justify-content-center">
                                       <mat-form-field style="width: 160px;">
                                           <mat-label>Mes inicio</mat-label>
                                           <input matInput [matDatepicker]="fec1" [formControl]="fechaInicialF"
-                                              placeholder="DD/MM/YYYY">
+                                              placeholder="DD/MM/YYYY" readonly>
                                           <mat-datepicker-toggle matIconSuffix [for]="fec1"></mat-datepicker-toggle>
                                           <mat-datepicker #fec1 startView="year"
                                               (monthSelected)="FormatearFecha($event, fec1)" touchUi>
@@ -45,13 +45,6 @@
                                   </div>
                               </div>
                           </div>
-                          <div class="d-flex flex-wrap justify-content-center">
-                              <div style="margin: 0 auto;">
-                                  <button class="btn btn-sm" (click)="DescargarPlantilla()">
-                                      Descargar plantilla
-                                  </button>
-                              </div>
-                          </div>
                       </div>
 
 
@@ -60,14 +53,28 @@
               <div class="col-md">
                 <div class="row">
                   <div class="d-flex flex-wrap justify-content-center">
-                    <div style="margin: 0 auto;">
-                        <button class="btn btn-sm" >
-                            Cargar plantilla
-                        </button>
+                    <div style="margin: 0 auto;" *ngIf="datosSeleccionados.usuariosSeleccionados.length > 0">
+                      <button class="btn btn-2" id="descargar" (click)="DescargarPlantilla()"
+                      matTooltip="Presiona para descargar plantilla con nombre plantillaPlanificacionMultiple">
+                        <i class="fas fa-cloud-download-alt"></i> Descargar plantilla
+                      </button>
                     </div>
                     <div style="margin: 0 auto;">
-                        <button class="btn btn-sm" >
-                            Registar
+                      <input #fileInput (change)="CargarPlantilla($event)" type="file"
+                      [formControl]="archivo1Form" id="file1"
+                      accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                      style="display: none;">
+
+                      <button class="btn btn-2" id="cargar" (click)="fileInput.click()"
+                      matTooltip="Presiona para seleccionar plantilla con nombre plantillaPlanificacionMultiple">
+                        <i class="fas fa-cloud-upload-alt"></i> {{ textoBoton }}
+                      </button>
+                    </div>
+                    <div style="margin: 0 auto;">
+                        <button class="btn btn-2" id="registrar" [disabled]="deshabilitarRegistro"
+                          (click)="ConfirmarRegistroPlanificaciones()"
+                          matTooltip="Presiona para registrar planificaciones verificadas">
+                            <i class="fas fa-save"></i> Registrar planificaciones
                         </button>
                     </div>
                   </div>
@@ -75,10 +82,62 @@
               </div>
           </div>
 
+          <div class="mat-elevation-z8" style="background: white; margin-top: 15px;"  *ngIf="planificacionesHorarias">
+            <div class="d-flex bd-highlight" id="resultados">
+              <span class="w-100 bd-highlight">
+                  PLANIFICACIÓN MÚLTIPLE
+              </span>
+            </div>
+
+            <div class="container_ table-responsive">
+              <table id="table_horario" class="table table-hover table-sm">
+                <thead class="thead-light">
+                  <tr style="text-align: center;">
+                      <th class="sticky colum_1 td_horarios" scope="col" rowspan="2">CÓDIGO</th>
+                      <th class="sticky-2 colum_1 td_horarios" scope="col"  rowspan="2">USUARIO</th>
+
+                      <th scope="col" class="td_horarios" colspan="31">DÍAS DEL MES DE {{ mes }}</th>
+                  </tr>
+                  <tr style="text-align: center;">
+                      <th *ngFor="let dia of dias_mes" scope="col" class="td_horarios">{{dia.fecha_formato}}</th>
+                  </tr>
+              </thead>
+
+              <tbody>
+                  <tr *ngFor="let usuario of planificacionesHorarias | paginate:tamanio_pagina_planificacion:numero_pagina_planificacion">
+                      <td class="sticky colum_1 td_horarios">{{usuario.codigo_usuario}}</td>
+                      <td class="sticky-2 colum_1 td_horarios" [style.color]="ObtenerColorUsuario(usuario.observacion)">{{ObtenerNombreUsuario(usuario.nombre_usuario, usuario.usuario)}}</td>
+                      <td *ngFor="let dia of usuario.dias" class="td_observaciones">
+                        <div *ngFor="let horario of dia.horarios">
+                            {{horario.codigo}}
+                        </div>
+                        <div *ngIf="dia.observacion4" [style.color]="ObtenerColorObservacion(dia.observacion4)">
+                          Jornada superada
+                        </div>
+                        <div [style.color]="ObtenerColorObservacion(dia.observacion)">
+                          {{dia.observacion}}
+                        </div>
+                        <br>
+                        <div class="icon-container">
+                          <i id="ver" *ngIf="MostrarVisualizarObservacion(dia)"
+                            class="fa fa-eye" matSuffix matTooltipPosition="right"
+                            matTooltip="Visualizar observaciones completas"
+                            (click)="VisualizarObservacion(dia)">
+                          </i>
+                        </div>
+                      </td>
+                  </tr>
+              </tbody>
+
+              </table>
+            </div>
+            <mat-paginator #paginator [length]="planificacionesHorarias.length" [pageSize]="tamanio_pagina_planificacion"
+              [pageSizeOptions]="pageSizeOptions_planificacion" (page)="ManejarPaginaResultados($event)"
+              showFirstLastButtons>
+            </mat-paginator>
+
+          </div>
+
       </mat-card-content>
-      <div class="pantalla-progress" *ngIf="progreso">
-          <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
-          </mat-progress-spinner>
-      </div>
   </mat-card>
 </div>

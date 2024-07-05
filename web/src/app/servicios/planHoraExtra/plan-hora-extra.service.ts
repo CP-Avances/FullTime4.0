@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -20,10 +19,6 @@ export class PlanHoraExtraService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra`);
   }
 
-  ConsultarUltimoPlanHora() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/id_plan_hora`);
-  }
-
   ConsultarPlanHoraExtraObservacion() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/justificar`);
   }
@@ -32,9 +27,6 @@ export class PlanHoraExtraService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/autorizacion`);
   }
 
-  EditarObservacion(id: number, datos: any) {
-    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/observacion/${id}`, datos);
-  }
 
   EditarEstado(id: number, datos: any) {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/estado/${id}`, datos);
@@ -62,12 +54,20 @@ export class PlanHoraExtraService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/plan_empleado/${id_plan_hora}`);
   }
   // METODO PARA ELIMINAR PLANIFICACION DE HORA EXTRA
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/eliminar/${id}`);
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/eliminar/${id}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
   }
   // ELIMINAR PLANIFICACIÓN DE HORA EXTRA DE UN USUARIO
-  EliminarPlanEmpleado(id: number, id_empleado: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/eliminar/plan-hora/${id}/${id_empleado}`);
+  EliminarPlanEmpleado(id: number, id_empleado: number, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/eliminar/plan-hora/${id}/${id_empleado}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
   }
   // BUSQUEDA DE DATOS DE PLANIFICACION POR ID DE USUARIO
   ListarPlanificacionUsuario(id_empleado: number) {
@@ -81,7 +81,7 @@ export class PlanHoraExtraService {
 
 
   /** *************************************************************************************************** **
-   ** *                 ENVIO DE CORREO ELECTRONICO DE PLANIFICACIÓN DE HORAS EXTRAS                    * ** 
+   ** *                 ENVIO DE CORREO ELECTRONICO DE PLANIFICACIÓN DE HORAS EXTRAS                    * **
    ****************************************************************************************************** **/
 
   // CREACIÓN DE PLANIFICACIÓN DE HORAS EXTRAS
@@ -91,7 +91,7 @@ export class PlanHoraExtraService {
 
 
   /** *************************************************************************************************** **
-   ** *                 ENVIO DE NOTIFICACIONES DE PLANIFICACIÓN DE HORAS EXTRAS                    * ** 
+   ** *                 ENVIO DE NOTIFICACIONES DE PLANIFICACIÓN DE HORAS EXTRAS                    * **
    ****************************************************************************************************** **/
 
   // CREACIÓN DE PLANIFICACIÓN DE HORAS EXTRAS

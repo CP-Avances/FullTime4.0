@@ -21,6 +21,7 @@ export class ParametrosService {
     return this.http.get<any>(`${(this.url as string)}/parametrizacion`);
   }
 
+
   // ACTUALIZAR REGISTRO PARAMETRO
   ActualizarTipoParametro(datos: any) {
     return this.http.put(`${(this.url as string)}/parametrizacion/actual-tipo`, datos);
@@ -37,8 +38,12 @@ export class ParametrosService {
   }
 
   // METODO PARA ELIMINAR DETALLE DE PARAMETRO
-  EliminarDetalleParametro(id: number) {
-    return this.http.delete<any>(`${(this.url as string)}/parametrizacion/eliminar-detalle/${id}`);
+  EliminarDetalleParametro(id: number, datos: any) {
+    const url = `${(this.url as string)}/parametrizacion/eliminar-detalle/${id}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
   }
 
   // METODO PARA REGISTRAR DETALLE DE PARAMETRO
@@ -54,10 +59,6 @@ export class ParametrosService {
   // METODO PARA COMPARAR CORDENADAS
   ObtenerCoordenadas(data: any) {
     return this.http.post<any>(`${(this.url as string)}/parametrizacion/coordenadas`, data);;
-  }
-
-  CrearXML(data: any) {
-    return this.http.post(`${(this.url as string)}/parametrizacion/xmlDownload`, data);
   }
 
 }

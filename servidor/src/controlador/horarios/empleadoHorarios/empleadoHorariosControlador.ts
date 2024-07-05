@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
-import moment from 'moment';
-import excel from 'xlsx';
+import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import pool from '../../../database';
+import excel from 'xlsx';
 import fs from 'fs';
+import moment from 'moment';
 
 class EmpleadoHorariosControlador {
 
@@ -300,8 +301,6 @@ class EmpleadoHorariosControlador {
             contador_arreglo = contador_arreglo + 1;
         }
 
-        console.log('intermedios', contarFechas)
-
         if (contarFechas != 0) {
             return res.jsonp({ message: 'error' });
         }
@@ -327,6 +326,9 @@ class EmpleadoHorariosControlador {
         const sheet_name_list = workbook.SheetNames;
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
         var arrayDetalles: any = [];
+
+        const { user_name, ip } = req.body;
+
         //Leer la plantilla para llenar un array con los datos cedula y usuario para verificar que no sean duplicados
         plantilla.forEach(async (data: any) => {
             const { id } = req.params;
@@ -366,21 +368,45 @@ class EmpleadoHorariosControlador {
                 var newDate = start.setDate(start.getDate() + 1);
                 start = new Date(newDate);
             }
-            fechasHorario.map(obj => {
+            fechasHorario.map((obj: any) => {
                 arrayDetalles.map(async (element: any) => {
-                    var accion = 0;
-                    if (element.tipo_accion === 'E') {
-                        accion = element.tolerancia;
-                    }
-                    var estado = null;
-                    await pool.query(
-                        `
-                        INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado, id_detalle_horario,
-                            fecha_horario, id_empleado_cargo, tipo_accion, codigo, id_horario) 
-                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-                        `
-                        , [obj + ' ' + element.hora, accion, estado, element.id,
-                            obj, CARGO.rows[0]['max'], element.tipo_accion, codigo, HORARIO.rows[0]['id']]);
+                    try {
+                        var accion = 0;
+                        if (element.tipo_accion === 'E') {
+                            accion = element.minu_espera;
+                        }
+                        var estado = null;
+    
+                        // INICIAR TRANSACCION
+                        await pool.query('BEGIN');
+                        
+                        await pool.query(
+                            `
+                            INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado, id_detalle_horario,
+                                fecha_horario, id_empleado_cargo, tipo_accion, codigo, id_horario) 
+                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                            `
+                            ,
+                            [obj + ' ' + element.hora, accion, estado, element.id,
+                                obj, CARGO.rows[0]['max'], element.tipo_accion, codigo, HORARIO.rows[0]['id']]);
+                        
+                        // AUDITORIA
+                        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                            tabla: 'eu_asistencia_general',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: `{fecha_hora_horario: ${obj + ' ' + element.hora}, tolerancia: ${accion}, estado: ${estado}, id_detalle_horario: ${element.id}, fecha_horario: ${obj}, id_empleado_cargo: ${CARGO.rows[0]['max']}, tipo_accion: ${element.tipo_accion}, codigo: ${codigo}, id_horario: ${HORARIO.rows[0]['id']}}`,
+                            ip,
+                            observacion: null
+                        });
+
+                        // FINALIZAR TRANSACCION
+                        await pool.query('COMMIT');
+                   } catch (error) {
+                        // REVERTIR TRANSACCION
+                        await pool.query('ROLLBACK');
+                   }
                 })
             })
             return res.jsonp({ message: 'correcto' });

@@ -11,6 +11,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.serv
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-tiempo-autorizado',
@@ -47,6 +48,10 @@ export class TiempoAutorizadoComponent implements OnInit {
   ocultarPre: boolean = true;
   ocultarAu: boolean = true;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   public autorizacion: any []
   public lectura: any;
   public estado_auto: any;
@@ -69,6 +74,9 @@ export class TiempoAutorizadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.obtenerInformacionEmpleado();
     this.MostrarProceso();
     this.BuscarParametro();
@@ -76,7 +84,7 @@ export class TiempoAutorizadoComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -188,7 +196,9 @@ export class TiempoAutorizadoComponent implements OnInit {
   // ACTUALIZAR TIEMPO APROBADO EN SOLIICTUD
   TiempoAprobado(estado: number, valor: any) {
     let h = {
-      hora: valor
+      hora: valor,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     // GUARDAR HORAS EXTRAS REALIZADAS POR EL USUARIO
     this.restPH.AutorizarTiempoHoraExtra(this.data.horaExtra.id, h).subscribe(res => {
@@ -201,6 +211,8 @@ export class TiempoAutorizadoComponent implements OnInit {
     let aprobacion = {
       id_documento: this.data.auto.id_autoriza_estado + localStorage.getItem('empleado') as string + '_' + estado + ',',
       estado: estado,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restA.ActualizarAprobacion(this.data.auto.id, aprobacion).subscribe(res => {
       this.EditarEstadoHoraExtra(estado);
@@ -212,6 +224,8 @@ export class TiempoAutorizadoComponent implements OnInit {
   EditarEstadoHoraExtra(estado: number) {
     let datosHorasExtras = {
       estado: estado,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restPH.ActualizarEstado(this.data.horaExtra.id, datosHorasExtras).subscribe(horaExtra => {
     })
@@ -256,7 +270,9 @@ export class TiempoAutorizadoComponent implements OnInit {
   // METODO PARA CAMBIAR DE ESTADO EL CAMPO OBSERVACION DE SOLICITUD DE HORAS EXTRAS Y ENVIAR NOTIFICACIONES
   EnviarMensaje(form: any) {
     var datos = {
-      observacion: true
+      observacion: true,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restPH.EditarObservacionPedido(this.data.horaExtra.id, datos).subscribe(res => {
     });
@@ -352,7 +368,7 @@ export class TiempoAutorizadoComponent implements OnInit {
             this.listadoDepaAutoriza = res;
             this.listadoDepaAutoriza.filter(item => {
               if(item.nivel < 3 ){
-                return this.listaEnvioCorreo.push(item);  
+                return this.listaEnvioCorreo.push(item);
               }
             })
             console.log('this.listaEnvioCorreo3: ',this.listaEnvioCorreo);
@@ -436,7 +452,7 @@ export class TiempoAutorizadoComponent implements OnInit {
 
       }
     })
-  }  
+  }
 
 
   // METODO PARA ENVIAR NOTIIFICACIONES AL SISTEMA
@@ -459,6 +475,8 @@ export class TiempoAutorizadoComponent implements OnInit {
         ' horario de ' + h_inicio + ' a ' + h_final +
         ' estado ' + estado_n + ' horas ' + moment(valor, 'HH:mm').format('HH:mm'),
       tipo: 12,  // APROBACIONES DE SOLICITUD DE HORAS EXTRAS
+      user_name: this.user_name,
+      ip: this.ip
     }
 
     //Listado para eliminar el usuario duplicado
@@ -496,7 +514,7 @@ export class TiempoAutorizadoComponent implements OnInit {
 
 
   /** ****************************************************************************************************** **
-   ** **           NOTIFICACIONES PARA SOLICITAR JUSTIFICACIÓN DE SOLICITUD DE HORA EXTRA                 ** ** 
+   ** **           NOTIFICACIONES PARA SOLICITAR JUSTIFICACIÓN DE SOLICITUD DE HORA EXTRA                 ** **
    ** ****************************************************************************************************** **/
 
   EnviarCorreoJustificacion(horaExtra: any, mensaje: string) {
@@ -585,6 +603,8 @@ export class TiempoAutorizadoComponent implements OnInit {
         ' horario de ' + h_inicio + ' a ' + h_final +
         ' horas ' + moment(valor, 'HH:mm').format('HH:mm'),
       tipo: 11,  // JUSTIFICACION DE SOLICITUD DE HORAS EXTRAS
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.realTime.EnviarMensajeGeneral(mensaje).subscribe(res => {
       this.realTime.RecibirNuevosAvisos(res.respuesta);

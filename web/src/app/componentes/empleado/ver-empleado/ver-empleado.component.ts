@@ -1,20 +1,33 @@
 // IMPORTAR LIBRERIAS
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { MatTabChangeEvent, MatTabGroup } from '@angular/material/tabs';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { MatDatepicker } from '@angular/material/datepicker';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { switchMap } from 'rxjs/operators';
+import { default as _rollupMoment, Moment } from 'moment';
 import * as FileSaver from 'file-saver';
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
-import * as L from 'leaflet';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as xml2js from 'xml2js';
+
+// USO DE MAPAS EN EL SISTEMA
+import * as L from 'leaflet';
+// ELIMINA LAS URLS POR DEFECTO
+delete L.Icon.Default.prototype._getIconUrl;
+// ESTABLECE LAS NUEVAS RUTAS DE LAS IMAGENES
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
+  iconUrl: 'assets/leaflet/marker-icon.png',
+  shadowUrl: 'assets/leaflet/marker-shadow.png',
+});
 
 // IMPORTAR SERVICIOS
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
@@ -27,6 +40,7 @@ import { PlanHoraExtraService } from 'src/app/servicios/planHoraExtra/plan-hora-
 import { DiscapacidadService } from 'src/app/servicios/discapacidad/discapacidad.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
+import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
 import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.service';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { VacunacionService } from 'src/app/servicios/empleado/empleadoVacunas/vacunacion.service';
@@ -42,6 +56,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
 import { ScriptService } from 'src/app/servicios/empleado/script.service';
+import { LoginService } from 'src/app/servicios/login/login.service';
 
 // IMPORTAR COMPONENTES
 import { EditarVacacionesEmpleadoComponent } from 'src/app/componentes/modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
@@ -74,10 +89,6 @@ import { EmplLeafletComponent } from '../../modulos/geolocalizacion/empl-leaflet
 import { CrearVacunaComponent } from '../vacunacion/crear-vacuna/crear-vacuna.component';
 import { EmplCargosComponent } from 'src/app/componentes/empleado/cargo/empl-cargos/empl-cargos.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { LoginService } from 'src/app/servicios/login/login.service';
-import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
-import { MatDatepicker } from '@angular/material/datepicker';
-import { default as _rollupMoment, Moment } from 'moment';
 
 @Component({
   selector: 'app-ver-empleado',
@@ -85,9 +96,14 @@ import { default as _rollupMoment, Moment } from 'moment';
   styleUrls: ['./ver-empleado.component.css']
 })
 
-export class VerEmpleadoComponent implements OnInit {
+export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   @ViewChild('tabla2') tabla2: ElementRef;
+  @ViewChild('pestana') pestana!: MatTabGroup;
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS CONSULTADOS
   discapacidadUser: any = [];
@@ -111,7 +127,6 @@ export class VerEmpleadoComponent implements OnInit {
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
-  selectedIndex: number;
   imagenEmpleado: any;
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
@@ -140,8 +155,8 @@ export class VerEmpleadoComponent implements OnInit {
     public validar: ValidacionesService,
     public ventana: MatDialog, // VARIABLE MANEJO DE VENTANAS
     public router: Router, // VARIABLE NAVEGACIÓN DE RUTAS URL
-    public restU: UsuarioService, // SERVICIO DATOS USUARIO
     public aviso: RealTimeService,
+    private restU: UsuarioService, // SERVICIO DATOS USUARIO
     private restF: FuncionesService, // SERVICIO DATOS FUNCIONES DEL SISTEMA
     private toastr: ToastrService, // VARIABLE MANEJO DE MENSAJES DE NOTIFICACIONES
     private restHE: PedHoraExtraService, // SERVICIO DATOS PEDIDO HORA EXTRA
@@ -158,11 +173,11 @@ export class VerEmpleadoComponent implements OnInit {
     var cadena = this.router.url.split('#')[0];
     this.idEmpleado = cadena.split("/")[2];
     this.scriptService.load('pdfMake', 'vfsFonts');
-
-    console.log('cadena: ', cadena);
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
     var a = moment();
     this.FechaActual = a.format('YYYY-MM-DD');
     this.activatedRoute.params
@@ -170,15 +185,154 @@ export class VerEmpleadoComponent implements OnInit {
         switchMap(({ id }) => this.idEmpleado = id)
       )
       .subscribe(() => {
+        this.SeleccionarPestana(0);
+        this.InicializarVariablesTab(0);
         this.ObtenerEmpleadoLogueado(this.idEmpleadoLogueado);
-        this.ObtenerTituloEmpleado();
-        this.ObtenerDiscapacidadEmpleado();
         this.VerAccionContrasena();
         this.ObtenerNacionalidades();
         this.VerFuncionalidades();
+        this.LeerDatosIniciales();
         this.VerEmpresa();
       });
+  }
 
+  ngAfterViewInit(): void {
+    // VERIFICAR QUE ESTA DEFINIDA LA PESTAÑA
+    if (!this.pestana) {
+    } else {
+      this.SeleccionarPestana(0);
+    }
+  }
+
+  // METODO PARA CAMBIAR DE PESTAÑA
+  SeleccionarPestana(index: number): void {
+    if (this.pestana) {
+      this.pestana.selectedIndex = index;
+    }
+  }
+
+  // VARIABLES PARA DETECTAR EVENTO DE PESTAÑA
+  solicitudes_horas_extras: number = 0;
+  solicitudes_permisos: number = 0;
+  periodo_vacciones: number = 0;
+  accion_personal: number = 0;
+  contrato_cargo: number = 0;
+  autorizacion: number = 0;
+  alimentacion: number = 0;
+  asignacion: number = 0;
+  vacunacion: number = 0;
+
+  // METODO PARA INICIALIZAR LAS VARIABLES
+  InicializarVariablesTab(valor: number) {
+    // CONTADORES
+    this.solicitudes_horas_extras = valor;
+    this.solicitudes_permisos = valor;
+    this.periodo_vacciones = valor;
+    this.accion_personal = valor;
+    this.contrato_cargo = valor;
+    this.autorizacion = valor;
+    this.alimentacion = valor;
+    this.asignacion = valor;
+    this.vacunacion = valor;
+    // ASIGNACIONES
+    this.discapacidadUser = [];
+    this.tituloEmpleado = [];
+    // CONTRATO - CARGO
+    this.contratoEmpleado = [];
+    this.cargoEmpleado = [];
+    this.datosVacuna = [];
+    this.datoActual = [];
+    // PERMISOS
+    this.permisosTotales = [];
+    // VACACIONES
+    this.idPerVacacion = [];
+    this.vacaciones = [];
+    // HORAS EXTRAS
+    this.hora_extra_plan = [];
+    this.hora_extra = [];
+    // ALIMENTACION
+    this.planComidas = [];
+    this.solicitaComida = [];
+    this.administra_comida = [];
+    // ACCIONES PERSONAL
+    this.empleadoProcesos = [];
+    // AUTORIZACIONES SOLICITUDES
+    this.autorizacionesTotales = [];
+  }
+
+  // METODO PARA DETECTAR EVENTO DE PESTAÑA
+  DetectarEventoTab(event: MatTabChangeEvent) {
+    if (event.tab.textLabel === 'asignaciones') {
+      if (this.asignacion === 0) {
+        this.ObtenerTituloEmpleado();
+        this.ObtenerDiscapacidadEmpleado();
+        this.asignacion = 1;
+      }
+    }
+    else if (event.tab.textLabel === 'vacunacion') {
+      if (this.vacunacion === 0) {
+        this.ObtenerDatosVacunas(this.formato_fecha);
+        this.vacunacion = 1;
+      }
+    }
+    else if (event.tab.textLabel === 'contrato_cargo' || event.tab.textLabel === 'planificacion') {
+      if (this.contrato_cargo === 0) {
+        this.VerDatosActuales(this.formato_fecha);
+        this.ObtenerContratosEmpleado(this.formato_fecha);
+        this.contrato_cargo = 1;
+      }
+    }
+    else if (event.tab.textLabel === 'solicitudes_permisos') {
+      if (this.HabilitarPermisos === true && this.solicitudes_permisos === 0) {
+        this.ObtenerPermisos(this.formato_fecha, this.formato_hora);
+        this.solicitudes_permisos = 1;
+      }
+    }
+    else if (event.tab.textLabel === 'periodo_vacaciones') {
+      if (this.habilitarVacaciones === true && this.periodo_vacciones === 0) {
+        this.ObtenerVacaciones(this.formato_fecha);
+        this.periodo_vacciones = 1;
+      }
+    }
+    else if (event.tab.textLabel === 'solicitudes_horas_extras') {
+      if (this.HabilitarHorasE === true && this.solicitudes_horas_extras === 0) {
+        this.ObtenerlistaHorasExtrasEmpleado(this.formato_fecha, this.formato_hora);
+        this.ObtenerPlanHorasExtras(this.formato_fecha, this.formato_hora);
+        this.solicitudes_horas_extras = 1;
+      }
+    }
+    else if (event.tab.textLabel === 'alimentacion') {
+      if (this.HabilitarAlimentacion === true && this.alimentacion === 0) {
+        this.VerAdminComida();
+        this.ObtenerPlanComidasEmpleado(this.formato_fecha, this.formato_hora);
+        this.ObtenerSolComidas(this.formato_fecha, this.formato_hora);
+        this.alimentacion = 1;
+      }
+    }
+    else if (event.tab.textLabel === 'accion_personal') {
+      if (this.HabilitarAccion === true && this.accion_personal === 0) {
+        this.ObtenerEmpleadoProcesos(this.formato_fecha);
+        this.accion_personal = 1;
+      }
+    }
+    else if (event.tab.textLabel === 'autorizar') {
+      if (this.autorizacion === 0) {
+        this.ObtenerAutorizaciones();
+        this.autorizacion = 1;
+      }
+    }
+  }
+
+  // METODO PARA CONSULTAR DATOS PARA REPORTES
+  ver_buscar: boolean = true;
+  ver_ficha: boolean = false;
+  BuscarFichaEmpleado() {
+    this.ver_buscar = false;
+    this.ver_ficha = true;
+    this.VerDatosActuales(this.formato_fecha);
+    this.ObtenerDatosVacunas(this.formato_fecha);
+    this.ObtenerTituloEmpleado();
+    this.ObtenerDiscapacidadEmpleado();
   }
 
   /** ***************************************************************************************** **
@@ -194,6 +348,7 @@ export class VerEmpleadoComponent implements OnInit {
   autorizar: boolean = false;
   aprobacion: boolean = false;
 
+  funcionalidades: any = [];
   VerFuncionalidades() {
     let funcionesSistema = {
       "direccion": (localStorage.getItem('empresaURL') as string)
@@ -218,9 +373,21 @@ export class VerEmpleadoComponent implements OnInit {
         this.HabilitarPermisos = true;
         this.VerRegistroAutorizar();
       }
-      if (datos[0].vacaciones === true) {
+      if (this.funcionalidades.vacaciones === true) {
         this.habilitarVacaciones = true;
         this.VerRegistroAutorizar();
+      }
+      if (this.funcionalidades.hora_extra === true) {
+        if (this.idEmpleadoLogueado === parseInt(this.idEmpleado)) {
+          this.HabilitarHorasE = true;
+        }
+      }
+      if (this.funcionalidades.alimentacion === true) {
+        this.HabilitarAlimentacion = true;
+        this.autorizar = true;
+      }
+      if (this.funcionalidades.accion_personal === true) {
+        this.HabilitarAccion = true;
       }
       // METODOS DE CONSULTAS GENERALES
       this.BuscarParametro();
@@ -231,8 +398,6 @@ export class VerEmpleadoComponent implements OnInit {
   VerRegistroAutorizar() {
     this.autorizar = true;
     this.aprobacion = true;
-    // FUNCIONES DE AUTORIZACIONES
-    this.ObtenerAutorizaciones();
   }
 
   /** **************************************************************************************** **
@@ -261,37 +426,13 @@ export class VerEmpleadoComponent implements OnInit {
       res => {
         this.formato_hora = res[0].descripcion;
         // LLAMADO A PRESENTACION DE DATOS
-        this.LlamarMetodos(fecha, this.formato_hora);
+        this.VerEmpleado(fecha);
       },
       vacio => {
-        this.LlamarMetodos(fecha, this.formato_hora);
+        this.VerEmpleado(fecha);
       });
   }
 
-  // LLAMAR METODOS DE PRESENTACION DE INFORMACION
-  LlamarMetodos(formato_fecha: string, formato_hora: string) {
-    this.VerDatosActuales(formato_fecha);
-    this.VerEmpleado(formato_fecha);
-    this.ObtenerDatosVacunas(formato_fecha);
-    this.ObtenerContratosEmpleado(formato_fecha);
-    if (this.habilitarVacaciones === true) {
-      this.ObtenerVacaciones(formato_fecha);
-    }
-    if (this.HabilitarPermisos === true) {
-      this.ObtenerPermisos(formato_fecha, formato_hora);
-    }
-    if (this.HabilitarAlimentacion === true) {
-      this.ObtenerPlanComidasEmpleado(formato_fecha, formato_hora);
-      this.ObtenerSolComidas(formato_fecha, formato_hora);
-    }
-    if (this.HabilitarAccion === true) {
-      this.ObtenerEmpleadoProcesos(formato_fecha);
-    }
-    if (this.HabilitarHorasE === true) {
-      this.ObtenerlistaHorasExtrasEmpleado(formato_fecha, formato_hora);
-      this.ObtenerPlanHorasExtras(formato_fecha, formato_hora);
-    }
-  }
 
   /** **************************************************************************************** **
    ** **                       METODOS GENERALES DEL SISTEMA                                ** **
@@ -306,9 +447,16 @@ export class VerEmpleadoComponent implements OnInit {
       // LLAMADO A DATOS DE USUARIO
       this.ObtenerContratoEmpleado(this.datoActual.id_contrato, formato_fecha);
       this.ObtenerCargoEmpleado(this.datoActual.id_cargo, formato_fecha);
-
     }, vacio => {
       this.BuscarContratoActual(formato_fecha);
+    });
+  }
+
+  // METODO PARA LEER DATOS ACTUALES
+  LeerDatosIniciales() {
+    this.datoActual = [];
+    this.informacion.ObtenerDatosActuales(parseInt(this.idEmpleado)).subscribe(res => {
+      this.datoActual = res[0];
     });
   }
 
@@ -340,20 +488,21 @@ export class VerEmpleadoComponent implements OnInit {
     this.empleadoUno = [];
     this.restEmpleado.BuscarUnEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
       this.empleadoUno = data;
-      this.empleadoUno[0].fecha_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fecha_nacimiento, formato_fecha, this.validar.dia_abreviado);
-      var empleado = data[0].nombre + data[0].apellido;
+      this.empleadoUno[0].fec_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fecha_nacimiento, formato_fecha, this.validar.dia_abreviado);
+      var empleado = data[0].nombre + ' ' + data[0].apellido;
       if (data[0].imagen != null) {
         this.urlImagen = `${(localStorage.getItem('empresaURL') as string)}/empleado/img/` + data[0].id + '/' + data[0].imagen;
         this.restEmpleado.obtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
-          console.log('ver imagen data ', data)
-          if (data.imagen != 0) {
-            this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
-          }
-          else {
+          //console.log('ver imagen data ', data)
+          if (data.imagen === 0) {
             this.ImagenLocalUsuario("assets/imagenes/user.png").then(
               (result) => (this.imagenEmpleado = result)
             );
           }
+          else {
+            this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
+          }
+          //console.log('imagen codificado ', this.imagenEmpleado)
         });
         //console.log('ver urlImagen ', this.urlImagen)
         this.mostrarImagen = true;
@@ -394,44 +543,59 @@ export class VerEmpleadoComponent implements OnInit {
   // METODO PARA VER UBICACION EN EL MAPA
   MARKER: any;
   MAP: any;
-  MapGeolocalizar(latitud: number, longitud: number, empleado: string) {
+  MapGeolocalizar(latitud: any, longitud: any, empleado: any) {
     let zoom = 19;
-    if (latitud === null && longitud === null) {
+    if (latitud === null || longitud === null) {
       latitud = -0.1918213;
       longitud = -78.4875258;
-      zoom = 7
+      zoom = 7;
     }
 
-    if (this.MAP) {
-      this.MAP = this.MAP.remove();
+    if (!this.MAP) {
+      // INICIALIZAR EL MAPA SOLO SI NO ESTA YA INICIALIZADO
+      this.MAP = L.map('geolocalizacion', {
+        center: [latitud, longitud],
+        zoom: zoom
+      });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+      }).addTo(this.MAP);
+    } else {
+      // SOLO ACTUALIZAR LA VISTA DEL MAPA SI YA ESTA INICIALIZADO
+      this.MAP.setView([latitud, longitud], zoom);
     }
 
-    this.MAP = L.map('geolocalizacion', {
-      center: [latitud, longitud],
-      zoom: zoom
-    });
-    const marker = L.marker([latitud, longitud]);
-    if (this.MARKER !== undefined) {
+    // LIMPIAR MARCADORES EXISTENTES
+    if (this.MARKER) {
       this.MAP.removeLayer(this.MARKER);
     }
-    else {
-      marker.setLatLng([latitud, longitud]);
-    }
-    marker.bindPopup(empleado);
-    this.MAP.addLayer(marker);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>' }).addTo(this.MAP);
-    this.MARKER = marker;
+
+    // CREAR UN NUEVO MARCADOR Y AGREGARLO AL MAPA
+    this.MARKER = L.marker([latitud, longitud]).addTo(this.MAP);
+
+    // ACTUALIZAR EL POPUP DEL MARCADOR
+    this.MARKER.bindPopup(empleado).openPopup();
   }
 
   // METODO INCLUIR EL CROKIS
   AbrirUbicacion(nombre: string, apellido: string) {
     this.ventana.open(EmplLeafletComponent, { width: '500px', height: '500px' })
       .afterClosed().subscribe((res: any) => {
+        //console.log('res ', res)
         if (res.message === true) {
           if (res.latlng != undefined) {
-            this.restEmpleado.ActualizarDomicilio(parseInt(this.idEmpleado), res.latlng).subscribe(respuesta => {
+            const datos = {
+              lat: res.latlng.lat,
+              lng: res.latlng.lng,
+              user_name: this.user_name,
+              ip: this.ip,
+            }
+            this.restEmpleado.ActualizarDomicilio(parseInt(this.idEmpleado), datos).subscribe(respuesta => {
               this.toastr.success(respuesta.message);
-              this.MAP.off();
+              // LIMPIAR MARCADORES EXISTENTES
+              if (this.MARKER) {
+                this.MAP.removeLayer(this.MARKER);
+              }
               this.MapGeolocalizar(res.latlng.lat, res.latlng.lng, nombre + ' ' + apellido);
             }, err => {
               this.toastr.error(err);
@@ -442,7 +606,7 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   // METODO EDICION DE REGISTRO DE EMPLEADO
-  AbirVentanaEditarEmpleado(dataEmpley) {
+  AbirVentanaEditarEmpleado(dataEmpley: any) {
     this.ventana.open(EditarEmpleadoComponent, { data: dataEmpley, width: '800px' })
       .afterClosed().subscribe(result => {
         if (result) {
@@ -450,10 +614,6 @@ export class VerEmpleadoComponent implements OnInit {
         }
       })
   }
-
-
-
-
 
   /** ********************************************************************************************* **
    ** **                            PARA LA SUBIR LA IMAGEN DEL EMPLEADO                         ** **                                 *
@@ -495,7 +655,11 @@ export class VerEmpleadoComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("image", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restEmpleado.SubirImagen(formData, parseInt(this.idEmpleado)).subscribe(res => {
+      console.log('rees ', res)
       this.toastr.success('Operación exitosa.', 'Imagen registrada.', {
         timeOut: 6000,
       });
@@ -503,7 +667,12 @@ export class VerEmpleadoComponent implements OnInit {
       this.archivoForm.reset();
       this.nameFile = '';
       this.ResetDataMain();
-    });
+    }, error => {
+      this.toastr.info('No se ha encontrado el directorio.', 'No se ha podido cargar el archivo.', {
+        timeOut: 6000,
+      });
+    }
+    );
   }
 
   ResetDataMain() {
@@ -550,7 +719,11 @@ export class VerEmpleadoComponent implements OnInit {
 
   // ELIMINAR REGISTRO DE TITULO
   EliminarTituloEmpleado(id: number) {
-    this.restEmpleado.EliminarTitulo(id).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.restEmpleado.EliminarTitulo(id, datos).subscribe(res => {
       this.ObtenerTituloEmpleado();
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
@@ -587,7 +760,12 @@ export class VerEmpleadoComponent implements OnInit {
 
   // ELIMINAR REGISTRO DE DISCAPACIDAD
   EliminarDiscapacidad(id_discapacidad: number) {
-    this.restDiscapacidad.EliminarDiscapacidad(id_discapacidad).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.restDiscapacidad.EliminarDiscapacidad(id_discapacidad, datos).subscribe(res => {
       this.ObtenerDiscapacidadEmpleado();
       this.btnDisc = 'Añadir';
       this.toastr.error('Registro eliminado.', '', {
@@ -648,7 +826,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.datosVacuna = [];
     this.restVacuna.ObtenerVacunaEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
       this.datosVacuna = data;
-      this.datosVacuna.forEach(data => {
+      this.datosVacuna.forEach((data: any) => {
         data.fecha_ = this.validar.FormatearFecha(data.fecha, formato_fecha, this.validar.dia_completo);
       })
     });
@@ -676,7 +854,12 @@ export class VerEmpleadoComponent implements OnInit {
 
   // ELIMINAR REGISTRO DE VACUNA
   EliminarVacuna(datos: any) {
-    this.restVacuna.EliminarRegistroVacuna(datos.id, datos.carnet).subscribe(res => {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.restVacuna.EliminarRegistroVacuna(datos.id, datos.carnet, data).subscribe(res => {
       this.ObtenerDatosVacunas(this.formato_fecha);
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
@@ -713,7 +896,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.contratoEmpleado = [];
     this.restEmpleado.BuscarDatosContrato(id_contrato).subscribe(res => {
       this.contratoEmpleado = res;
-      this.contratoEmpleado.forEach(data => {
+      this.contratoEmpleado.forEach((data: any) => {
         data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, formato_fecha, this.validar.dia_abreviado);
         data.fec_salida_ = this.validar.FormatearFecha(data.fecha_salida, formato_fecha, this.validar.dia_abreviado);
       })
@@ -726,7 +909,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.contratoBuscado = [];
     this.restEmpleado.BuscarContratosEmpleado(parseInt(this.idEmpleado)).subscribe(res => {
       this.contratoBuscado = res;
-      this.contratoBuscado.forEach(data => {
+      this.contratoBuscado.forEach((data: any) => {
         data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, formato_fecha, this.validar.dia_abreviado);
       })
     });
@@ -744,14 +927,14 @@ export class VerEmpleadoComponent implements OnInit {
     this.contratoSeleccionado = [];
     this.restEmpleado.BuscarDatosContrato(form.fechaContratoForm).subscribe(res => {
       this.contratoSeleccionado = res;
-      this.contratoSeleccionado.forEach(data => {
+      this.contratoSeleccionado.forEach((data: any) => {
         data.fec_ingreso_ = this.validar.FormatearFecha(data.fecha_ingreso, this.formato_fecha, this.validar.dia_abreviado);
         data.fec_salida_ = this.validar.FormatearFecha(data.fecha_salida, this.formato_fecha, this.validar.dia_abreviado);
       })
     });
     this.restCargo.BuscarCargoIDContrato(form.fechaContratoForm).subscribe(datos => {
       this.listaCargos = datos;
-      this.listaCargos.forEach(data => {
+      this.listaCargos.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
       })
     }, error => {
@@ -816,7 +999,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.cargoEmpleado = [];
     this.restCargo.BuscarCargoID(id_cargo).subscribe(datos => {
       this.cargoEmpleado = datos;
-      this.cargoEmpleado.forEach(data => {
+      this.cargoEmpleado.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado);
         data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, formato_fecha, this.validar.dia_abreviado);
       })
@@ -840,7 +1023,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.cargoSeleccionado = [];
     this.restCargo.BuscarCargoID(form.fechaICargoForm).subscribe(datos => {
       this.cargoSeleccionado = datos;
-      this.cargoSeleccionado.forEach(data => {
+      this.cargoSeleccionado.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
         data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, this.formato_fecha, this.validar.dia_abreviado);
       })
@@ -1231,6 +1414,10 @@ export class VerEmpleadoComponent implements OnInit {
       formData.append("uploads[]", this.archivoSubidoHorario[i], this.archivoSubidoHorario[i].name);
       console.log("toda la data", this.archivoSubidoHorario[i])
     }
+
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restEmpleHorario.VerificarDatos_EmpleadoHorario(formData, parseInt(this.idEmpleado)).subscribe(res => {
       console.log('entra')
       if (res.message === 'error') {
@@ -1331,8 +1518,14 @@ export class VerEmpleadoComponent implements OnInit {
     };
     this.restPlanGeneral.BuscarFechas(plan_fecha).subscribe(res => {
       this.id_planificacion_general = res;
-      this.id_planificacion_general.map(obj => {
-        this.restPlanGeneral.EliminarRegistro(obj.id).subscribe(res => {
+      let datos = {
+        user_name: this.user_name,
+        ip: this.ip,
+        id_plan: '',
+      }
+      this.id_planificacion_general.map((obj: any) => {
+        datos.id_plan = obj.id;
+        this.restPlanGeneral.EliminarRegistro(datos).subscribe(res => {
         })
       })
     })
@@ -1349,7 +1542,7 @@ export class VerEmpleadoComponent implements OnInit {
     };
     this.restPlanGeneral.BuscarFecha(plan_fecha).subscribe(res => {
       this.id_planificacion_general = res;
-      this.id_planificacion_general.map(obj => {
+      this.id_planificacion_general.map((obj: any) => {
         this.restPlanGeneral.EliminarRegistro(obj.id).subscribe(res => {
         })
       })
@@ -1447,7 +1640,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.permisosTotales.splice(0, this.permisosTotales.length);
     this.restPermiso.BuscarPermisoEmpleado(parseInt(this.idEmpleado)).subscribe(datos => {
       this.permisosTotales = datos;
-      this.permisosTotales.forEach(p => {
+      this.permisosTotales.forEach((p: any) => {
         // TRATAMIENTO DE FECHAS Y HORAS
         p.fec_creacion_ = this.validar.FormatearFecha(p.fec_creacion, formato_fecha, this.validar.dia_completo);
         p.fec_inicio_ = this.validar.FormatearFecha(p.fec_inicio, formato_fecha, this.validar.dia_completo);
@@ -1514,7 +1707,6 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   // MANEJO DE FILTRO DE DATOS DE PERMISOS
-  filtradoFecha = '';
   fechaF = new FormControl('');
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
@@ -1927,7 +2119,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.restPerV.ObtenerPeriodoVacaciones(this.empleadoUno[0].codigo).subscribe(datos => {
       this.peridoVacaciones = datos;
 
-      this.peridoVacaciones.forEach(v => {
+      this.peridoVacaciones.forEach((v: any) => {
         // TRATAMIENTO DE FECHAS Y HORAS
         v.fec_inicio_ = this.validar.FormatearFecha(v.fecha_inicio, formato_fecha, this.validar.dia_completo);
         v.fec_final_ = this.validar.FormatearFecha(v.fecha_final, formato_fecha, this.validar.dia_completo);
@@ -1936,6 +2128,10 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   // VENTANA PARA INGRESAR PERÍODO DE VACACIONES
+  registrar_periodo: boolean = false;
+  data_registrar_periodo: any = [];
+  pagina_registrar_periodo: string = '';
+  ver_periodo: boolean = true;
   AbrirVentanaPerVacaciones(): void {
     if (this.datoActual.id_contrato != undefined) {
       this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
@@ -1945,16 +2141,13 @@ export class VerEmpleadoComponent implements OnInit {
           timeOut: 6000,
         })
       }, error => {
-        this.ventana.open(RegistrarPeriodoVComponent,
-          {
-            width: '900px', data: {
-              idEmpleado: this.idEmpleado,
-              idContrato: this.datoActual.id_contrato
-            }
-          })
-          .afterClosed().subscribe(item => {
-            this.ObtenerPeriodoVacaciones(this.formato_fecha);
-          });
+        this.ver_periodo = false;
+        this.registrar_periodo = true;
+        this.pagina_registrar_periodo = 'ver-empleado';
+        this.data_registrar_periodo = {
+          idEmpleado: this.idEmpleado,
+          idContrato: this.datoActual.id_contrato
+        };
       });
     }
     else {
@@ -1965,12 +2158,14 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   // VENTANA PARA PERIODO DE VACACIONES
+  editar_periodo: boolean = false;
+  data_periodo: any = [];
+  pagina_periodo: string = '';
   AbrirEditarPeriodoVacaciones(datoSeleccionado: any): void {
-    this.ventana.open(EditarPeriodoVacacionesComponent,
-      { width: '900px', data: { idEmpleado: this.idEmpleado, datosPeriodo: datoSeleccionado } })
-      .afterClosed().subscribe(item => {
-        this.ObtenerPeriodoVacaciones(this.formato_fecha);
-      });
+    this.data_periodo = { idEmpleado: this.idEmpleado, datosPeriodo: datoSeleccionado };
+    this.ver_periodo = false;
+    this.editar_periodo = true;
+    this.pagina_periodo = 'ver-empleado';
   }
 
 
@@ -1985,11 +2180,11 @@ export class VerEmpleadoComponent implements OnInit {
       this.idPerVacacion = datos;
       this.restVacaciones.ObtenerVacacionesPorIdPeriodo(this.idPerVacacion[0].id).subscribe(res => {
         this.vacaciones = res;
-        this.vacaciones.forEach(v => {
+        this.vacaciones.forEach((v: any) => {
           // TRATAMIENTO DE FECHAS Y HORAS
-          v.fec_ingreso_ = this.validar.FormatearFecha(v.fec_ingreso, formato_fecha, this.validar.dia_completo);
-          v.fec_inicio_ = this.validar.FormatearFecha(v.fec_inicio, formato_fecha, this.validar.dia_completo);
-          v.fec_final_ = this.validar.FormatearFecha(v.fec_final, formato_fecha, this.validar.dia_completo);
+          v.fecha_ingreso_ = this.validar.FormatearFecha(v.fecha_ingreso, formato_fecha, this.validar.dia_completo);
+          v.fecha_inicio_ = this.validar.FormatearFecha(v.fecha_inicio, formato_fecha, this.validar.dia_completo);
+          v.fecha_final_ = this.validar.FormatearFecha(v.fecha_final, formato_fecha, this.validar.dia_completo);
         })
       });
     });
@@ -2031,9 +2226,10 @@ export class VerEmpleadoComponent implements OnInit {
         width: '900px',
         data: {
           info: v, id_empleado: parseInt(this.idEmpleado),
-          id_contrato: this.datoActual.id_contrato
+          id_contrato: this.datoActual.id_contrato,
         }
       }).afterClosed().subscribe(items => {
+
         this.ObtenerVacaciones(this.formato_fecha);
       });
   }
@@ -2087,8 +2283,6 @@ export class VerEmpleadoComponent implements OnInit {
         h.fec_solicita_ = this.validar.FormatearFecha(h.fec_solicita, formato_fecha, this.validar.dia_completo);
       })
 
-    }, err => {
-      //return this.validar.RedireccionarEstadisticas(err.error);
     });
   }
 
@@ -2132,8 +2326,6 @@ export class VerEmpleadoComponent implements OnInit {
         h.hora_fin_ = this.validar.FormatearHora(h.hora_fin, formato_hora);
       })
 
-    }, err => {
-      // return this.validar.RedireccionarEstadisticas(err.error);
     });
   }
 
@@ -2200,6 +2392,11 @@ export class VerEmpleadoComponent implements OnInit {
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO DE PLANIFICACIÓN
   EliminarPlanEmpleado(id_plan: number, id_empleado: number, datos: any) {
 
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
     // LECTURA DE DATOS DE USUARIO
     let usuario = '<tr><th>' + datos.nombre +
       '</th><th>' + datos.cedula + '</th></tr>';
@@ -2211,7 +2408,7 @@ export class VerEmpleadoComponent implements OnInit {
     let h_inicio = this.validar.FormatearHora(datos.hora_inicio, this.formato_hora);
     let h_fin = this.validar.FormatearHora(datos.hora_fin, this.formato_hora);
 
-    this.plan_hora.EliminarPlanEmpleado(id_plan, id_empleado).subscribe(res => {
+    this.plan_hora.EliminarPlanEmpleado(id_plan, id_empleado, data).subscribe(res => {
       this.NotificarPlanHora(desde, hasta, h_inicio, h_fin, id_empleado);
       this.EnviarCorreoPlanH(datos, cuenta_correo, usuario, desde, hasta, h_inicio, h_fin);
       this.toastr.error('Registro eliminado.', '', {
@@ -2230,6 +2427,8 @@ export class VerEmpleadoComponent implements OnInit {
       mensaje: 'Planificación de horas extras eliminada desde ' +
         desde + ' hasta ' +
         hasta + ' horario de ' + h_inicio + ' a ' + h_fin,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.plan_hora.EnviarNotiPlanificacion(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);
@@ -2274,7 +2473,7 @@ export class VerEmpleadoComponent implements OnInit {
    ** **         METODO PARA MOSTRAR DATOS DE ADMINISTRACION MODULO DE ALIMENTACION           ** **
    ** ****************************************************************************************** **/
 
-  // MOSTRAR DATOS DE USUARIO - ADMINISTRACIÓN DE MÓDULO DE ALIMENTACIÓN
+  // MOSTRAR DATOS DE USUARIO - ADMINISTRACION DE MODULO DE ALIMENTACION
   administra_comida: any = [];
   VerAdminComida() {
     this.administra_comida = [];
@@ -2418,7 +2617,13 @@ export class VerEmpleadoComponent implements OnInit {
     let h_inicio = this.validar.FormatearHora(datos.hora_inicio, this.formato_hora);
     let h_fin = this.validar.FormatearHora(datos.hora_fin, this.formato_hora);
 
-    this.restPlanComidas.EliminarPlanComida(id_plan, id_empleado).subscribe(res => {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
+
+    this.restPlanComidas.EliminarPlanComida(id_plan, id_empleado, data).subscribe(res => {
       this.NotificarPlanificacion(datos, desde, hasta, h_inicio, h_fin, id_empleado);
       this.EnviarCorreo(datos, cuenta_correo, usuario, desde, hasta, h_inicio, h_fin);
       this.toastr.error('Registro eliminado.', '', {
@@ -2471,6 +2676,8 @@ export class VerEmpleadoComponent implements OnInit {
         desde + ' hasta ' +
         hasta +
         ' horario de ' + h_inicio + ' a ' + h_fin + ' servicio ',
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restPlanComidas.EnviarMensajePlanComida(mensaje).subscribe(res => {
     })
@@ -2521,7 +2728,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.empleadoProcesos = [];
     this.restEmpleadoProcesos.ObtenerProcesoUsuario(parseInt(this.idEmpleado)).subscribe(datos => {
       this.empleadoProcesos = datos;
-      this.empleadoProcesos.forEach(data => {
+      this.empleadoProcesos.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
         data.fec_final_ = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
       })
@@ -2555,7 +2762,11 @@ export class VerEmpleadoComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PROCESOS
   EliminarProceso(id_plan: number) {
-    this.restEmpleadoProcesos.EliminarRegistro(id_plan).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.restEmpleadoProcesos.EliminarRegistro(id_plan, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -2587,7 +2798,6 @@ export class VerEmpleadoComponent implements OnInit {
     this.autorizacionesTotales = [];
     this.restAutoridad.BuscarAutoridadEmpleado(parseInt(this.idEmpleado)).subscribe(datos => {
       this.autorizacionesTotales = datos;
-      console.log('depa autoriza: ', this.autorizacionesTotales[0]);
     })
   }
 
@@ -2618,7 +2828,12 @@ export class VerEmpleadoComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
   EliminarAutorizacion(id_auto: number) {
-    this.restAutoridad.EliminarRegistro(id_auto).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.restAutoridad.EliminarRegistro(id_auto, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -2737,7 +2952,7 @@ export class VerEmpleadoComponent implements OnInit {
     let genero = this.GeneroSelect[this.empleadoUno[0].genero - 1];
     let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
     let nacionalidad: any;
-    this.nacionalidades.forEach(element => {
+    this.nacionalidades.forEach((element: any) => {
       if (this.empleadoUno[0].id_nacionalidad == element.id) {
         nacionalidad = element.nombre;
       }
@@ -2832,7 +3047,7 @@ export class VerEmpleadoComponent implements OnInit {
               { text: 'NOMBRE', style: 'tableHeader' },
               { text: 'NIVEL', style: 'tableHeader' }
             ],
-            ...this.tituloEmpleado.map(obj => {
+            ...this.tituloEmpleado.map((obj: any) => {
               return [{ text: obj.nombre, style: 'tableCell' }, { text: obj.nivel, style: 'tableCell' }];
             })
           ]
@@ -2912,7 +3127,7 @@ export class VerEmpleadoComponent implements OnInit {
               { text: 'TIPO', style: 'tableHeader' },
               { text: 'PORCENTAJE', style: 'tableHeader' },
             ],
-            ...this.discapacidadUser.map(obj => {
+            ...this.discapacidadUser.map((obj: any) => {
               return [
                 { text: obj.carnet_conadis, style: 'tableCell' },
                 { text: obj.tipo, style: 'tableCell' },
@@ -2945,7 +3160,7 @@ export class VerEmpleadoComponent implements OnInit {
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
@@ -3096,7 +3311,7 @@ export class VerEmpleadoComponent implements OnInit {
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
-      this.nacionalidades.forEach(element => {
+      this.nacionalidades.forEach((element: any) => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
@@ -3188,7 +3403,7 @@ export class VerEmpleadoComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-    
+
 
     const a = document.createElement('a');
     a.href = xmlUrl;

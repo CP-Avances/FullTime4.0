@@ -29,10 +29,6 @@ export class RealtimeAvisosComponent implements OnInit {
   id_empleado_logueado: number;
   timbres_noti: any = [];
 
-  filtroTimbreEmpl: '';
-  filtroTimbreDesc: '';
-  filtroTimbreFech: '';
-
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 10;
   numero_pagina: number = 1;
@@ -103,7 +99,7 @@ export class RealtimeAvisosComponent implements OnInit {
 
   // METODO PARA ABRIR VENTANA DE ELIMINACION DE NOTIFICACIONES
   EliminarNotificaciones(opcion: number) {
-    let EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
+    let EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
       return {
         id: obj.id,
         empleado: obj.empleado

@@ -1,8 +1,8 @@
 <br>
-<mat-tab-group [(selectedIndex)]=selectedIndex>
+<mat-tab-group (selectedTabChange)="DetectarEventoTab($event)" #pestana>
 
     <!-- INFORMACION OFICIAL DEL EMPLEADO -->
-    <mat-tab>
+    <mat-tab label="perfil">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">person_pin</mat-icon>
             <h6 id="items">Perfil Usuario</h6>
@@ -110,35 +110,42 @@
                                     <i class="material-icons">keyboard_backspace</i><span>Atrás</span>
                                 </button>
                             </mat-grid-tile>
-                            <mat-grid-tile>
+                            <mat-grid-tile *ngIf="ver_buscar">
+                                <button (click)="BuscarFichaEmpleado()"
+                                    class="btn btn-block d-flex align-items-center justify-content-center"
+                                    id="Selector">
+                                    <i class="material-icons">person</i><span>Ver Ficha</span>
+                                </button>
+                            </mat-grid-tile>
+                            <mat-grid-tile *ngIf="ver_ficha">
                                 <button (click)="GenerarPdf('open')"
                                     class="btn btn-block d-flex align-items-center justify-content-center"
                                     id="Selector">
                                     <i class="material-icons">picture_as_pdf</i><span>Abrir PDF</span>
                                 </button>
                             </mat-grid-tile>
-                            <mat-grid-tile>
+                            <mat-grid-tile *ngIf="ver_ficha">
                                 <button (click)="GenerarPdf('download')"
                                     class="btn btn-block d-flex align-items-center justify-content-center"
                                     id="Selector">
                                     <i class="material-icons">cloud_download</i><span>Descargar PDF</span>
                                 </button>
                             </mat-grid-tile>
-                            <mat-grid-tile>
+                            <mat-grid-tile *ngIf="ver_ficha">
                                 <button (click)="ExportToXML()"
                                     class="btn btn-block d-flex align-items-center justify-content-center"
                                     id="Selector">
                                     <i class="material-icons fas fa-file-code"></i><span>Exportar a XML</span>
                                 </button>
                             </mat-grid-tile>
-                            <mat-grid-tile>
+                            <mat-grid-tile *ngIf="ver_ficha">
                                 <button (click)="ExportToExcel()"
                                     class="btn btn-block d-flex align-items-center justify-content-center"
                                     id="Selector">
                                     <i class="material-icons fas fa-file-excel"></i><span>Exportar a Excel</span>
                                 </button>
                             </mat-grid-tile>
-                            <mat-grid-tile>
+                            <mat-grid-tile *ngIf="ver_ficha">
                                 <button (click)="ExportToCVS()"
                                     class="btn btn-block d-flex align-items-center justify-content-center"
                                     id="Selector">
@@ -182,7 +189,7 @@
     </mat-tab>
 
     <!-- DISCAPACIDAD Y TITULO DEL EMPLEADO -->
-    <mat-tab>
+    <mat-tab label="asignaciones">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">school</mat-icon>
             <h6 id="items">Asignaciones</h6>
@@ -283,8 +290,9 @@
             </div>
         </div>
     </mat-tab>
+
     <!-- REGISTRO DE VACUNACION -->
-    <mat-tab>
+    <mat-tab label="vacunacion">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">local_hospital</mat-icon>
             <h6 id="items">Vacunación</h6>
@@ -361,7 +369,7 @@
     </mat-tab>
 
     <!-- CONTRATO DEL EMPLEADO Y CARGO DEL EMPLEADO -->
-    <mat-tab>
+    <mat-tab label="contrato_cargo">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">description</mat-icon>
             <h6 id="items">Contrato y Cargo</h6>
@@ -451,8 +459,7 @@
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
                                             <label id="datosF">Documento contrato:</label>
-                                            <a *ngIf="ce.documento != null && ce.documento != ''; else ContratoCargar"
-                                                class="fas fa-file-alt"
+                                            <a *ngIf="ce.documento; else ContratoCargar" class="fas fa-file-alt"
                                                 style="color:rgb(11, 70, 197); text-align: center; margin-left: 20px;"
                                                 matSuffix matTooltipPosition="right"
                                                 matTooltip="Dar click para descargar contrato de trabajo"
@@ -785,7 +792,7 @@
     </mat-tab>
 
     <!-- HORARIO DEL EMPLEADO -->
-    <mat-tab>
+    <mat-tab label="planificacion">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">event</mat-icon>
             <h6 id="items">Planificación horaria</h6>
@@ -982,7 +989,7 @@
         <div class="container" style="padding-bottom: 25px;" *ngIf="ver_tabla_horarios">
             <div class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="titulo">
-                    <i class="fa fa-pencil-square-o float-right" aria-hidden="true" id="activar_editar"
+                    <i class="fa fa-pencil-square-o float-right" aria-hidden="false" id="activar_editar"
                         *ngIf="ver_activar_editar" (click)="ActivarEditarHorario()">
                     </i>
                     <span class="w-100 bd-highlight">
@@ -1041,7 +1048,7 @@
                                         [ngStyle]="{'background':CambiarColores(h.color)}">{{h.mes}}</td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 1 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 1, h.dia1, h.index)">
                                         </i>
@@ -1053,7 +1060,7 @@
                                     </td>
                                     <td id="td_horarios" style="white-space: pre;"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 2 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 2, h.dia2, h.index)">
                                         </i>
@@ -1065,7 +1072,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 3 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 3, h.dia3, h.index)">
                                         </i>
@@ -1077,7 +1084,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 4 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 4, h.dia4, h.index)">
                                         </i>
@@ -1089,7 +1096,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 5 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 5, h.dia5, h.index)">
                                         </i>
@@ -1101,7 +1108,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 6 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 6, h.dia6, h.index)">
                                         </i>
@@ -1113,7 +1120,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 7 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 7, h.dia7, h.index)">
                                         </i>
@@ -1125,7 +1132,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 8 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 8, h.dia8, h.index)">
                                         </i>
@@ -1137,7 +1144,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 9 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 9, h.dia9, h.index)">
                                         </i>
@@ -1149,7 +1156,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 10 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 10, h.dia10, h.index)">
                                         </i>
@@ -1161,7 +1168,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 11 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 11, h.dia11, h.index)">
                                         </i>
@@ -1173,7 +1180,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 12 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 12, h.dia12, h.index)">
                                         </i>
@@ -1185,7 +1192,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 13 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 13, h.dia13, h.index)">
                                         </i>
@@ -1197,7 +1204,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 14 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 14, h.dia14, h.index)">
                                         </i>
@@ -1209,7 +1216,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 15 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 15, h.dia15, h.index)">
                                         </i>
@@ -1218,7 +1225,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 16 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 16, h.dia16, h.index)">
                                         </i>
@@ -1230,7 +1237,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 17 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 17, h.dia17, h.index)">
                                         </i>
@@ -1242,7 +1249,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 18 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 18, h.dia18, h.index)">
                                         </i>
@@ -1254,7 +1261,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 19 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 19, h.dia19, h.index)">
                                         </i>
@@ -1266,7 +1273,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 20 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 20, h.dia20, h.index)">
                                         </i>
@@ -1278,7 +1285,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 21 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 21, h.dia21, h.index)">
                                         </i>
@@ -1290,7 +1297,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 22 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 22, h.dia22, h.index)">
                                         </i>
@@ -1302,7 +1309,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 23 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 23, h.dia23, h.index)">
                                         </i>
@@ -1314,7 +1321,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 24 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 24, h.dia24, h.index)">
                                         </i>
@@ -1326,7 +1333,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 25 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 25, h.dia25, h.index)">
                                         </i>
@@ -1338,7 +1345,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 26 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 26, h.dia26, h.index)">
                                         </i>
@@ -1350,7 +1357,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 27 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 27, h.dia27, h.index)">
                                         </i>
@@ -1362,7 +1369,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 28 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 28, h.dia28, h.index)">
                                         </i>
@@ -1374,7 +1381,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 29 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 29, h.dia29, h.index)">
                                         </i>
@@ -1386,7 +1393,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 30 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 30, h.dia30, h.index)">
                                         </i>
@@ -1398,7 +1405,7 @@
                                     </td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 31 ? '#9CF7B9' : '' }">
-                                        <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
+                                        <i class="fa fa-pencil-square-o" aria-hidden="false" id="editar_horario"
                                             *ngIf="editar_activar"
                                             (click)="AbrirEditarHorario(h.anio, h.mes, 31, h.dia31, h.index)">
                                         </i>
@@ -1449,14 +1456,13 @@
     </mat-tab>
 
     <!-- PLANTILLAS DE CARGA DE HORARIOS -->
-    <mat-tab *ngIf="plantillas">
+    <mat-tab *ngIf="plantillas" label="cargar_plantilla">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">today</mat-icon>
             <h6 id="items">Plantillas</h6>
         </ng-template>
 
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="ver_rotativo">
-
             <div class="row">
                 <div class="col-md">
                     <mat-card class="mat-elevation-z8">
@@ -1464,7 +1470,7 @@
                             <button type="submit" class="redondo">
                                 <a style="text-decoration: none;" matSuffix matTooltipPosition="right"
                                     matTooltip="Dar click para ver o descargar el documento."
-                                    href="{{hipervinculo}}/plantillaD/documento/Horario Empleado.xlsx">
+                                    href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">>
                                     <mat-icon style="color: white; font-size: 20px;">cloud_download</mat-icon>
                                     <span style="color: white; font-size: xx-small;">
                                         Descargar plantilla
@@ -1492,7 +1498,7 @@
     </mat-tab>
 
     <!-- PERMISOS -->
-    <mat-tab *ngIf="HabilitarPermisos">
+    <mat-tab *ngIf="HabilitarPermisos" label="solicitudes_permisos">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">transfer_within_a_station</mat-icon>
             <h6 id="items">Permisos</h6>
@@ -1525,8 +1531,7 @@
                             matTooltip="Búsqueda de permisos de acuerdo a la fecha ingresada en formato YYYY-MM-DD. Ejemplo: 2023-01-01">
                             search
                         </mat-icon>
-                        <input matInput placeholder="Fecha (YYYY-MM-DD)" [formControl]="fechaF"
-                            [(ngModel)]="filtradoFecha">
+                        <input matInput placeholder="Fecha (YYYY-MM-DD)" [formControl]="fechaF">
                     </mat-form-field>
                     <i class="fa fa-refresh" id="listar" style="padding-top: 10px;" (click)="LimpiarCamposPermisos()"
                         matSuffix matTooltipPosition="right"
@@ -1535,7 +1540,7 @@
                     </i>
                 </div>
                 <mat-divider style="margin-bottom: 10px;"></mat-divider>
-                <div *ngFor="let pt of permisosTotales | filtroFecha: filtradoFecha | paginate:tamanio_pagina:numero_pagina"
+                <div *ngFor="let pt of permisosTotales | filtroFecha: fechaF.value | paginate:tamanio_pagina:numero_pagina"
                     style="padding-top: 15px;">
                     <div class="container">
                         <div class="row">
@@ -1637,13 +1642,26 @@
     </mat-tab>
 
     <!-- PERIODO DE VACACIONES DEL EMPLEADO Y VACACIONES DEL EMPLEADO -->
-    <mat-tab *ngIf="habilitarVacaciones">
+    <mat-tab *ngIf="habilitarVacaciones" label="periodo_vacaciones">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">flight_takeoff</mat-icon>
             <h6 id="items"> Vacaciones</h6>
         </ng-template>
 
-        <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+        <!--  *********************  PANTALLA DE EDICION DE PERIODO DE VACACIONES  *************************  -->
+        <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="editar_periodo">
+            <app-editar-periodo-vacaciones [data]="data_periodo" [pagina]="pagina_periodo">
+            </app-editar-periodo-vacaciones>
+        </div>
+
+        <!--  *********************  PANTALLA DE REGISTRO DE PERIODO DE VACACIONES  *************************  -->
+        <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="registrar_periodo">
+            <app-registrar-periodo-v [datoEmpleado]="data_registrar_periodo" [pagina]="pagina_registrar_periodo">
+            </app-registrar-periodo-v>
+        </div>
+
+        <!--  *********************  PANTALLA DE VISTA DE PERIODO DE VACACIONES  *************************  -->
+        <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="ver_periodo">
             <mat-card class="mat-elevation-z8">
                 <div class="d-flex bd-highlight" id="titulo">
                     <div class="w-100 bd-highlight">
@@ -1715,7 +1733,8 @@
             </mat-card>
         </div>
 
-        <div class="container" style="padding-bottom: 25px;">
+        <!--  *********************  PANTALLA DE SOLICITUDES DE VACACIONES  *************************  -->
+        <div class="container" style="padding-bottom: 25px;" *ngIf="ver_periodo">
             <mat-card class="mat-elevation-z8">
                 <div class="d-flex bd-highlight" id="titulo">
                     <div class="w-100 bd-highlight">
@@ -1733,15 +1752,15 @@
                                 <div class="col-md">
                                     <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Fecha Desde:</label>
-                                        <label>{{v.fec_inicio_}}</label>
+                                        <label>{{v.fecha_inicio_}}</label>
                                     </div>
                                     <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Fecha Hasta:</label>
-                                        <label>{{v.fec_final_}}</label>
+                                        <label>{{v.fecha_final_}}</label>
                                     </div>
                                     <div class="espacio d-flex justify-content-start">
                                         <label id="datosF">Fecha Ingreso:</label>
-                                        <label>{{v.fec_ingreso_}}</label>
+                                        <label>{{v.fecha_ingreso_}}</label>
                                     </div>
                                 </div>
                                 <div class="col-md">
@@ -1792,9 +1811,8 @@
         </div>
     </mat-tab>
 
-
     <!-- HORAS EXTRAS -->
-    <mat-tab *ngIf="HabilitarHorasE">
+    <mat-tab *ngIf="HabilitarHorasE" label="solicitudes_horas_extras">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">query_builder</mat-icon>
             <h6 id="items"> Horas Extras</h6>
@@ -1961,7 +1979,7 @@
     </mat-tab>
 
     <!-- PLANIFICACION DE ALMUERZO -->
-    <mat-tab *ngIf="HabilitarAlimentacion">
+    <mat-tab *ngIf="HabilitarAlimentacion" label="alimentacion">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">local_dining</mat-icon>
             <h6 id="items"> Alimentación</h6>
@@ -2143,7 +2161,7 @@
     </mat-tab>
 
     <!-- PROCESOS DEL EMPLEADO -->
-    <mat-tab *ngIf="HabilitarAccion">
+    <mat-tab *ngIf="HabilitarAccion" label="accion_personal">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">wc</mat-icon>
             <h6 id="items"> Procesos</h6>
@@ -2155,7 +2173,9 @@
                         <div class="d-flex bd-highlight" id="titulo">
                             <span class="w-100 bd-highlight">PROCESOS</span>
                             <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                                (click)="AbrirVentanaProcesos()" *ngIf="getCrearDatos()">Añadir</button>
+                                (click)="AbrirVentanaProcesos()" *ngIf="getCrearDatos()">
+                                Añadir
+                            </button>
                         </div>
                         <mat-card-content>
                             <div class="container"
@@ -2208,7 +2228,7 @@
     </mat-tab>
 
     <!-- AUTORIZACIONES -->
-    <mat-tab *ngIf="autorizar">
+    <mat-tab *ngIf="autorizar" label="autorizar">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">supervisor_account</mat-icon>
             <h6 id="items">Autorización</h6>
@@ -2296,6 +2316,5 @@
             </div>
         </div>
     </mat-tab>
-
 
 </mat-tab-group>

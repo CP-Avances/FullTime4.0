@@ -381,26 +381,6 @@ class NotificacionesControlador {
             }
         });
     }
-    ListarSolicitudHoraExtraRecibidas_Usuario(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { recibe, id_empleado } = req.params;
-            const DATOS = yield database_1.default.query(`
-            SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_hora_extra, e.nombre, e.apellido, e.cedula, 
-                h.fecha_inicio, h.fecha_final, h.descripcion, h.horas_solicitud, h.tiempo_autorizado 
-            FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mhe_solicitud_hora_extra AS h 
-            WHERE rn.id_hora_extra IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 AND 
-                rn.id_empleado_envia = $2 AND h.id = rn.id_hora_extra 
-            ORDER BY rn.id DESC
-            `, [recibe, id_empleado]);
-            if (DATOS.rowCount != 0) {
-                return res.jsonp(DATOS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
     ListarVacacionesEnviadas_Usuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { envia, id_empleado } = req.params;
@@ -518,26 +498,6 @@ class NotificacionesControlador {
                 AND h.id = rn.id_hora_extra 
             ORDER BY rn.id DESC
             `, [envia, id_empleado, fec_inicio, fec_final]);
-            if (DATOS.rowCount != 0) {
-                return res.jsonp(DATOS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-            }
-        });
-    }
-    ListarSolicitudHoraExtraRecibidas_UsuarioFecha(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { recibe, id_empleado, fec_inicio, fec_final } = req.params;
-            const DATOS = yield database_1.default.query(`
-            SELECT rn.id, rn.id_empleado_envia, rn.id_empleado_recibe, 
-                rn.id_departamento_recibe, rn.estado, rn.fecha_hora, rn.id_hora_extra, e.nombre, e.apellido, e.cedula, 
-                h.fecha_inicio, h.fecha_final, h.descripcion, h.horas_solicitud, h.tiempo_autorizado 
-            FROM ecm_realtime_notificacion AS rn, eu_empleados AS e, mhe_solicitud_hora_extra AS h 
-            WHERE rn.id_hora_extra IS NOT null AND e.id = rn.id_empleado_envia AND rn.id_empleado_recibe = $1 
-                AND rn.id_empleado_envia = $2 AND rn.fecha_hora BETWEEN $3 AND $4 
-                AND h.id = rn.id_hora_extra ORDER BY rn.id DESC
-            `, [recibe, id_empleado, fec_inicio, fec_final]);
             if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
             }

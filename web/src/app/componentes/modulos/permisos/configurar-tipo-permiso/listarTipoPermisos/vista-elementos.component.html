@@ -44,8 +44,7 @@
                         <tr>
                             <td>
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" minlength="2" [formControl]="nombreF"
-                                        [(ngModel)]="filtroDescripcion">
+                                    <input matInput placeholder="Buscar" minlength="2" [formControl]="nombreF">
                                 </mat-form-field>
                             </td>
                             <td></td>
@@ -64,7 +63,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let tp of tipoPermiso | filtroNombre: filtroDescripcion | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let tp of tipoPermiso | filtroNombre: nombreF.value | paginate:tamanio_pagina:numero_pagina">
                             <td>{{tp.descripcion}}</td>
                             <td>{{tp.dias_maximo_permiso}}</td>
                             <td>{{tp.horas_maximo_permiso}}</td>

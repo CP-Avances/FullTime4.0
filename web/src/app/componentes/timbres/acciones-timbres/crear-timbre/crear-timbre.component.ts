@@ -18,6 +18,7 @@ export class CrearTimbreComponent implements OnInit {
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   teclaFuncionF = new FormControl('');
+  observacionF = new FormControl('');
   accionF = new FormControl('', Validators.required);
   FechaF = new FormControl('', Validators.required);
   HoraF = new FormControl('', Validators.required);
@@ -40,12 +41,17 @@ export class CrearTimbreComponent implements OnInit {
     { value: 'F/P', name: 'Fin permiso' },
   ]
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // AGREGAR CAMPOS DE FORMULARIO A UN GRUPO
   public formulario = new FormGroup({
     horaForm: this.HoraF,
     fechaForm: this.FechaF,
     accionForm: this.accionF,
     teclaFuncionForm: this.teclaFuncionF,
+    observacionForm: this.observacionF,
   });
 
   // METODO DE CONTROL DE MEMORIA
@@ -66,6 +72,9 @@ export class CrearTimbreComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     if (this.data.length === undefined) {
       this.nombre = this.data.name_empleado;
     }
@@ -138,18 +147,20 @@ export class CrearTimbreComponent implements OnInit {
     let timbre = {
       fec_hora_timbre: form.fechaForm.toJSON().split('T')[0] + 'T' + form.horaForm + ':00',
       tecl_funcion: this.TeclaFuncion(form.accionForm),
-      observacion: 'Timbre creado por ' + this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido,
+      observacion: 'Timbre creado por ' + this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido + ', ' + form.observacionForm,
       id_empleado: '',
       id_reloj: 98,
       longitud: this.longitud,
       latitud: this.latitud,
       accion: form.accionForm,
       tipo: 'administrar',
+      user_name: this.user_name,
+      ip: this.ip,
     }
-
     if (this.data.length === undefined) {
       //-console.log(' id' + this.data.id);
       timbre.id_empleado = this.data.id;
+      //console.log('timbre ', timbre)
       this.ventana.close(timbre);
     }
     else {

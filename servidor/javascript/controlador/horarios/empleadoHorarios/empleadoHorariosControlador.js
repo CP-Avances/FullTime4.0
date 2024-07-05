@@ -13,10 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPLEADO_HORARIOS_CONTROLADOR = void 0;
-const moment_1 = __importDefault(require("moment"));
-const xlsx_1 = __importDefault(require("xlsx"));
+const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../../database"));
+const xlsx_1 = __importDefault(require("xlsx"));
 const fs_1 = __importDefault(require("fs"));
+const moment_1 = __importDefault(require("moment"));
 class EmpleadoHorariosControlador {
     // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA  --**VERIFICADO
     VerificarHorariosExistentes(req, res) {
@@ -262,7 +263,6 @@ class EmpleadoHorariosControlador {
                 }
                 contador_arreglo = contador_arreglo + 1;
             }
-            console.log('intermedios', contarFechas);
             if (contarFechas != 0) {
                 return res.jsonp({ message: 'error' });
             }
@@ -288,6 +288,7 @@ class EmpleadoHorariosControlador {
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             var arrayDetalles = [];
+            const { user_name, ip } = req.body;
             //Leer la plantilla para llenar un array con los datos cedula y usuario para verificar que no sean duplicados
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params;
@@ -316,19 +317,39 @@ class EmpleadoHorariosControlador {
                     var newDate = start.setDate(start.getDate() + 1);
                     start = new Date(newDate);
                 }
-                fechasHorario.map(obj => {
+                fechasHorario.map((obj) => {
                     arrayDetalles.map((element) => __awaiter(this, void 0, void 0, function* () {
-                        var accion = 0;
-                        if (element.tipo_accion === 'E') {
-                            accion = element.tolerancia;
+                        try {
+                            var accion = 0;
+                            if (element.tipo_accion === 'E') {
+                                accion = element.minu_espera;
+                            }
+                            var estado = null;
+                            // INICIAR TRANSACCION
+                            yield database_1.default.query('BEGIN');
+                            yield database_1.default.query(`
+                            INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado, id_detalle_horario,
+                                fecha_horario, id_empleado_cargo, tipo_accion, codigo, id_horario) 
+                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                            `, [obj + ' ' + element.hora, accion, estado, element.id,
+                                obj, CARGO.rows[0]['max'], element.tipo_accion, codigo, HORARIO.rows[0]['id']]);
+                            // AUDITORIA
+                            yield auditoriaControlador_1.default.InsertarAuditoria({
+                                tabla: 'eu_asistencia_general',
+                                usuario: user_name,
+                                accion: 'I',
+                                datosOriginales: '',
+                                datosNuevos: `{fecha_hora_horario: ${obj + ' ' + element.hora}, tolerancia: ${accion}, estado: ${estado}, id_detalle_horario: ${element.id}, fecha_horario: ${obj}, id_empleado_cargo: ${CARGO.rows[0]['max']}, tipo_accion: ${element.tipo_accion}, codigo: ${codigo}, id_horario: ${HORARIO.rows[0]['id']}}`,
+                                ip,
+                                observacion: null
+                            });
+                            // FINALIZAR TRANSACCION
+                            yield database_1.default.query('COMMIT');
                         }
-                        var estado = null;
-                        yield database_1.default.query(`
-                        INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado, id_detalle_horario,
-                            fecha_horario, id_empleado_cargo, tipo_accion, codigo, id_horario) 
-                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-                        `, [obj + ' ' + element.hora, accion, estado, element.id,
-                            obj, CARGO.rows[0]['max'], element.tipo_accion, codigo, HORARIO.rows[0]['id']]);
+                        catch (error) {
+                            // REVERTIR TRANSACCION
+                            yield database_1.default.query('ROLLBACK');
+                        }
                     }));
                 });
                 return res.jsonp({ message: 'correcto' });

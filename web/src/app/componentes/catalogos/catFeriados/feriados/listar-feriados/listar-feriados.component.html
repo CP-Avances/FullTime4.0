@@ -2,7 +2,7 @@
 <div *ngIf="ver_lista">
     <div class="container" style="padding-bottom: 10px; padding-top: 20px;">
         <div class="row">
-            <div class="col-md">
+            <div class="col-12 col-md-6">
                 <div id="titulo">
                     <span>FERIADOS</span>
                 </div>
@@ -20,47 +20,40 @@
                     </div>
                 </mat-card>
             </div>
-            <div class="col-md">
+            <div class="col-12 col-md-6">
                 <div id="titulo">
                     <span>REGISTRO MULTIPLE DE FERIADOS</span>
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
-                    <div class="row" *ngIf="getPlantilla()">
-                        <div class="col-md" style="padding-top: 5px;">
-                            <div class="d-flex flex-wrap justify-content-around"
-                                style="text-align: center; justify-content: center;">
-                                <form method="post" enctype="multipart/form-data" style="width: max-content;">
-                                    <input (change)="FileChange($event)" type="file" [formControl]="archivoForm"
-                                        id="file"
-                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                    <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
-                                        style="height: 64px;  padding-top: 25px;"
-                                        matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                        Subir plantilla
-                                    </label>
-                                    <label for="file" matSuffix matTooltipPosition="right"
-                                        *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
-                                        style="height: 64px;  padding-top: 25px;"
-                                        matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                        Subir nueva plantilla
-                                    </label>
-                                </form>
-                            </div>
+                    <div class="row m-auto" *ngIf="getPlantilla()">
+                        <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                            <form method="post" class="btn-2" enctype="multipart/form-data">
+                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                    style="height: 65px; padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                    Subir plantilla
+                                </label>
+                                <label for="file" matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                    style="height: 65px;  padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
+                                    Subir nueva plantilla
+                                </label>
+                            </form>
                         </div>
-                        <div class="col-md" *ngIf="!DataFeriados" style="padding-top: 5px; padding-bottom: 5px;">
-                            <div class="d-flex flex-wrap justify-content-around"
+                        <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                            <div *ngIf="!DataFeriados" class="d-flex flex-wrap justify-content-around"
                                 style="text-align: center; justify-content: center;">
                                 <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                     matTooltip="Dar click para ver o descargar el documento."
-                                    href="{{hipervinculo}}/plantillaD/documento/Feriados.xlsx">
-                                    <!--span class="material-icons">cloud_download</span-->
+                                    href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
                                     <br>
                                     Descargar plantilla
                                 </a>
                             </div>
-                        </div>
-                        <div class="col-md" *ngIf="mostrarbtnsubir" style="padding-top: 5px; padding-bottom: 5px;">
-                            <div class="d-flex flex-wrap justify-content-around"
+                            <div *ngIf="mostrarbtnsubir" class="d-flex flex-wrap justify-content-around"
                                 style="text-align: center; justify-content: center;">
                                 <button *ngIf="DataFeriados && messajeExcel != 'error'" id="descargar"
                                     class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
@@ -78,28 +71,20 @@
     <!--  **************************************  LISTA DE FERIADOS ***************************************** -->
     <div class="container" style="padding-top: 15px; padding-bottom: 50px; margin-bottom: 35px;" *ngIf="!DataFeriados">
         <div class="mat-elevation-z8" style="background: white;">
-
             <div class="d-flex bd-highlight" id="titulo">
-
-
                 <div class="w-100 bd-highlight">
                     <h5>
                         LISTA DE FERIADOS </h5>
                 </div>
-
-
                 <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-
                     <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
                         (click)="ConfirmarDeleteMultiple()" *ngIf="getEliminarFeriado()">Eliminar </button>
                 </div>
             </div>
-
             <div class="table-responsive">
                 <table class="table table-hover table-sm">
                     <thead class="thead-light">
                         <tr style="text-align: center;">
-
                             <th>
                                 <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
                                     matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
@@ -121,17 +106,15 @@
                     <tbody>
                         <tr>
                             <td></td>
-
                             <td>
                                 <mat-form-field id="t-inputs">
                                     <input matInput placeholder="Buscar" [formControl]="descripcionF"
-                                        [(ngModel)]="filtroDescripcion" (keypress)="IngresarSoloLetras($event)">
+                                        (keypress)="IngresarSoloLetras($event)">
                                 </mat-form-field>
                             </td>
                             <td>
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="yyyy-mm-dd" [formControl]="fechaF"
-                                        [(ngModel)]="filtradoFecha">
+                                    <input matInput placeholder="yyyy-mm-dd" [formControl]="fechaF">
                                 </mat-form-field>
                             </td>
                             <td></td>
@@ -143,9 +126,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let f of feriados | filtroNombre: filtroDescripcion | filtroFecha: filtradoFecha | paginate:tamanio_pagina:numero_pagina ">
-
-
+                            *ngFor="let f of feriados | filtroNombre: descripcionF.value | filtroFecha: fechaF.value | paginate:tamanio_pagina:numero_pagina ">
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionFeriados.toggle(f) : null"
@@ -224,8 +205,8 @@
                 <table class="table table-hover table-sm">
                     <thead class="thead-light">
                         <tr style="text-align: center; font-size: 13px;">
-                            <th scope="col">Observación</th>
                             <th scope="col">Item</th>
+                            <th scope="col">Observación</th>
                             <th scope="col">Fecha</th>
                             <th scope="col">Descripción</th>
                             <th scope="col">Fecha recuperación</th>
@@ -233,6 +214,8 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let f of DataFeriados | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                                {{f.fila}}</td>
                             <td style="font-size: 12px;">
                                 <div style="width: 270px; margin: auto;">
                                     <div id="t-editar" class="circulo"
@@ -240,8 +223,6 @@
                                     {{f.observacion}}
                                 </div>
                             </td>
-                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
-                                {{f.fila}}</td>
                             <td [style.color]="stiloTextoCelda(f.fecha)" style="font-size: 12px;">{{f.fecha}}</td>
                             <td [style.color]="stiloTextoCelda(f.descripcion)" id="letras" style="font-size: 12px;">
                                 {{f.descripcion}}</td>
@@ -258,15 +239,16 @@
     </div>
 
     <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS_CIUDADES ------------------------------------------------->
-    <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="DataFeriados && messajeExcel != 'error'">
+    <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;"
+        *ngIf="DataFeriados && messajeExcel != 'error'">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="titulo">REGISTRO MULTIPLE</div>
             <div class="table-responsive">
                 <table class="table table-hover table-sm">
                     <thead class="thead-light">
                         <tr style="text-align: center; font-size: 13px;">
-                            <th scope="col">Observación</th>
                             <th scope="col">Item</th>
+                            <th scope="col">Observación</th>
                             <th scope="col">Provincia</th>
                             <th scope="col">Ciudad</th>
                             <th scope="col">Fereiado</th>
@@ -275,6 +257,8 @@
                     <tbody>
                         <tr
                             *ngFor="let fc of DataFerieados_ciudades | paginate:tamanio_paginaMul2:numero_paginaMul2; let i = index">
+                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                                {{fc.fila}}</td>
                             <td style="font-size: 12px;">
                                 <div style="width: 270px; margin: auto;">
                                     <div id="t-editar" class="circulo"
@@ -282,10 +266,12 @@
                                     {{fc.observacion}}
                                 </div>
                             </td>
-                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{fc.fila}}</td>
-                            <td [style.color]="stiloTextoCelda(fc.provincia)" style="font-size: 12px;">{{fc.provincia}}</td>
-                            <td [style.color]="stiloTextoCelda(fc.ciudad)" id="letras" style="font-size: 12px;"> {{fc.ciudad}}</td>
-                            <td [style.color]="stiloTextoCelda(fc.feriado)" id="letras" style="font-size: 12px;"> {{fc.feriado}}</td>
+                            <td [style.color]="stiloTextoCelda(fc.provincia)" style="font-size: 12px;">{{fc.provincia}}
+                            </td>
+                            <td [style.color]="stiloTextoCelda(fc.ciudad)" id="letras" style="font-size: 12px;">
+                                {{fc.ciudad}}</td>
+                            <td [style.color]="stiloTextoCelda(fc.feriado)" id="letras" style="font-size: 12px;">
+                                {{fc.feriado}}</td>
                         </tr>
                     </tbody>
                 </table>

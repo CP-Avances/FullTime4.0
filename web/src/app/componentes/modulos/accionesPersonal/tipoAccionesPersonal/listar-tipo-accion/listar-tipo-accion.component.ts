@@ -30,8 +30,6 @@ import { MainNavService } from 'src/app/componentes/administracionGeneral/main-n
 
 export class ListarTipoAccionComponent implements OnInit {
 
-  filtroNombre = '';
-
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
@@ -39,6 +37,10 @@ export class ListarTipoAccionComponent implements OnInit {
 
   empleado: any = [];
   idEmpleado: number;
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.minLength(2)]);
@@ -64,6 +66,9 @@ export class ListarTipoAccionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     if (this.habilitarAccion === false) {
       let mensaje = {
         access: false,
@@ -81,7 +86,7 @@ export class ListarTipoAccionComponent implements OnInit {
     }
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -97,7 +102,7 @@ export class ListarTipoAccionComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -125,11 +130,21 @@ export class ListarTipoAccionComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTROS
   Eliminar(id_accion: number) {
-    this.rest.EliminarRegistro(id_accion).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerTipoAccionesPersonal();
+    let datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistro(id_accion, datos).subscribe((res: any) => {
+      if (res.message === 'error') {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerTipoAccionesPersonal();
+      }
     });
   }
 
@@ -182,7 +197,7 @@ export class ListarTipoAccionComponent implements OnInit {
     this.accion_id = id;
   }
 
-  /****************************************************************************************************** 
+  /******************************************************************************************************
  *                                         METODO PARA EXPORTAR A PDF
  ******************************************************************************************************/
   generarPdf(action = 'open') {
@@ -255,7 +270,7 @@ export class ListarTipoAccionComponent implements OnInit {
                 { text: 'Base Legal', style: 'tableHeader' },
                 { text: 'Tipo', style: 'tableHeader' },
               ],
-              ...this.tipo_acciones.map(obj => {
+              ...this.tipo_acciones.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.nombre, style: 'itemsTable' },
@@ -278,7 +293,7 @@ export class ListarTipoAccionComponent implements OnInit {
     };
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   exportToExcel() {
@@ -288,7 +303,7 @@ export class ListarTipoAccionComponent implements OnInit {
     xlsx.writeFile(wb, "TipoAccionesPersonalEXCEL" + new Date().getTime() + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
    ** ************************************************************************************************** **/
 

@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment'
-import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +11,8 @@ export class DocumentosService {
     private http: HttpClient,
   ) { }
 
-  /** ************************************************************************************* ** 
-   ** **                       MANEJO DE ARCHIVOS DESDE EL SERVIDOR                      ** ** 
+  /** ************************************************************************************* **
+   ** **                       MANEJO DE ARCHIVOS DESDE EL SERVIDOR                      ** **
    ** ************************************************************************************* **/
 
   // METODO PARA LISTAR CARPETAS EXISTENTES EN EL SERVIDOR
@@ -58,7 +56,7 @@ export class DocumentosService {
   }
 
   /** ********************************************************************************************* **
-   ** **                        MANEJO DE ARCHIVOS DOCUMENTACION                                 ** **        
+   ** **                        MANEJO DE ARCHIVOS DOCUMENTACION                                 ** **
    ** ********************************************************************************************* **/
 
   // REGISTRAR DOCUMENTO
@@ -67,14 +65,17 @@ export class DocumentosService {
   }
 
   // ELIMINAR REGISTRO DE DOCUMENTACION
-  EliminarRegistro(id: any, documento: string) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/archivosCargados/eliminar/${id}/${documento}`).pipe(catchError(id));
+  EliminarRegistro(id: number, documento: string, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/archivosCargados/eliminar/${id}/${documento}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA LISTAR LOS ARCHIVOS DE CADA CARPETA   --**VERIFICADO
   ListarDocumentacion(nom_carpeta: string) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/archivosCargados/documentacion/${nom_carpeta}`)
   }
-
 
 }

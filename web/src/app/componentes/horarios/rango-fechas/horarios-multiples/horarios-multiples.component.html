@@ -23,8 +23,7 @@
                                     <mat-label>Fecha desde</mat-label>
                                     <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
                                         [formControl]="fechaInicioF" min="1950-01-31" max="2050-01-31" required
-                                        (click)="LimpiarHorario()" (dateInput)="LimpiarHorario()"
-                                        [disabled]="registrar">
+                                        (click)="LimpiarHorario()" (dateInput)="LimpiarHorario()">
                                     <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor"
                                         matTooltipPosition="right"
                                         matTooltip="Seleccionar la fecha dando click en el ícono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
@@ -37,7 +36,7 @@
                                     <mat-label>Fecha hasta</mat-label>
                                     <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
                                         [formControl]="fechaFinalF" required (click)="LimpiarHorario()"
-                                        (dateInput)="LimpiarHorario()" [disabled]="registrar">
+                                        (dateInput)="LimpiarHorario()">
                                     <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
                                         matTooltipPosition="right"
                                         matTooltip="Seleccionar la fecha dando click en el ícono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
@@ -72,35 +71,34 @@
                         <div class="container" style="text-align: center;">
                             <div class="row">
                                 <div class="col-sm" style="text-align: left;">
-                                    <mat-checkbox [formControl]="lunesF" [(ngModel)]="lunes" [disabled]="registrar">
+                                    <mat-checkbox [formControl]="lunesF">
                                         <label id="textoradiobtn">Lunes</label>
                                     </mat-checkbox>
                                     <br>
-                                    <mat-checkbox [formControl]="martesF" [(ngModel)]="martes" [disabled]="registrar">
+                                    <mat-checkbox [formControl]="martesF">
                                         <label id="textoradiobtn">Martes</label>
                                     </mat-checkbox>
                                 </div>
                                 <div class="col-sm" style="text-align: left;">
-                                    <mat-checkbox [formControl]="miercolesF" [(ngModel)]="miercoles"
-                                        [disabled]="registrar">
+                                    <mat-checkbox [formControl]="miercolesF">
                                         <label id="textoradiobtn">Miércoles</label>
                                     </mat-checkbox>
                                     <br>
-                                    <mat-checkbox [formControl]="juevesF" [(ngModel)]="jueves" [disabled]="registrar">
+                                    <mat-checkbox [formControl]="juevesF">
                                         <label id="textoradiobtn">Jueves</label>
                                     </mat-checkbox>
                                 </div>
                                 <div class="col-sm" style="text-align: left;">
-                                    <mat-checkbox [formControl]="viernesF" [(ngModel)]="viernes" [disabled]="registrar">
+                                    <mat-checkbox [formControl]="viernesF">
                                         <label id="textoradiobtn">Viernes</label>
                                     </mat-checkbox>
                                 </div>
                                 <div class="col-sm" style="text-align: left;">
-                                    <mat-checkbox [formControl]="sabadoF" [(ngModel)]="sabado" [disabled]="registrar">
+                                    <mat-checkbox [formControl]="sabadoF">
                                         <label id="textoradiobtn">Sábado</label>
                                     </mat-checkbox>
                                     <br>
-                                    <mat-checkbox [formControl]="domingoF" [(ngModel)]="domingo" [disabled]="registrar">
+                                    <mat-checkbox [formControl]="domingoF">
                                         <label id="textoradiobtn">Domingo</label>
                                     </mat-checkbox>
                                 </div>
@@ -132,8 +130,7 @@
                 *ngIf="guardar">
                 Guardar
             </button>
-            <button id="btn-raised" class="btn btn-sm" (click)="CargarTimbres(formulario.value)"
-                *ngIf="cargar">
+            <button id="btn-raised" class="btn btn-sm" (click)="CargarTimbres(formulario.value)" *ngIf="cargar">
                 Cargar timbres
             </button>
             <button id="btn-raised" class="btn btn-sm" *ngIf="btn_eliminar"

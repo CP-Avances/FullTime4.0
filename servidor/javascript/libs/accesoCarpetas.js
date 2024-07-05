@@ -12,9 +12,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ObtenerRutaLeerPlantillas1 = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaContrato = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = void 0;
+exports.ObtenerIndicePlantilla = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaContrato = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = exports.ObtenerRuta = void 0;
 const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
+// METODO PARA OBTENER RUTAS ORIGINALES
+const ObtenerRuta = function (codigo, cedula, directorio) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let ruta = '';
+        let separador = path_1.default.sep;
+        ruta = path_1.default.join(__dirname, `..${separador}..`);
+        return `${ruta}${separador}${directorio}${separador}${codigo}_${cedula}`;
+    });
+};
+exports.ObtenerRuta = ObtenerRuta;
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE IMAGENES DE USUARIO
 const ObtenerRutaUsuario = function (id) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -54,6 +64,19 @@ const ObtenerRutaPermisos = function (codigo) {
     });
 };
 exports.ObtenerRutaPermisos = ObtenerRutaPermisos;
+// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE CONTRATOS DEL USUARIO
+const ObtenerRutaContrato = function (id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let ruta = '';
+        let separador = path_1.default.sep;
+        const usuario = yield database_1.default.query(`
+        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
+        `, [id]);
+        ruta = path_1.default.join(__dirname, `..${separador}..`);
+        return ruta + separador + 'contratos' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
+    });
+};
+exports.ObtenerRutaContrato = ObtenerRutaContrato;
 const ObtenerRutaHorarios = function () {
     let ruta = '';
     let separador = path_1.default.sep;
@@ -85,19 +108,6 @@ const ObtenerRutaLogos = function () {
     return ruta + separador + 'logos';
 };
 exports.ObtenerRutaLogos = ObtenerRutaLogos;
-// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE CONTRATOS DEL USUARIO
-const ObtenerRutaContrato = function (id) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let ruta = '';
-        let separador = path_1.default.sep;
-        const usuario = yield database_1.default.query(`
-        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
-        `, [id]);
-        ruta = path_1.default.join(__dirname, `..${separador}..`);
-        return ruta + separador + 'contratos' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
-    });
-};
-exports.ObtenerRutaContrato = ObtenerRutaContrato;
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO
 const ObtenerRutaPlatilla = function () {
     let ruta = '';
@@ -114,11 +124,23 @@ const ObtenerRutaLeerPlantillas = function () {
     return ruta + separador + 'leerPlantillas';
 };
 exports.ObtenerRutaLeerPlantillas = ObtenerRutaLeerPlantillas;
-// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE ARCHIVOS DE DATOS
-const ObtenerRutaLeerPlantillas1 = function () {
-    let ruta = '';
-    let separador = path_1.default.sep;
-    ruta = path_1.default.join(__dirname, `..${separador}..`);
-    return ruta + separador + 'leerPlantillas';
+// METODO PARA OBTENER POSICION DE PLANTILLA
+const ObtenerIndicePlantilla = function (libroExcel, hoja) {
+    const sheet_name_list = libroExcel.SheetNames;
+    let indice = 0;
+    let verificador = 0;
+    for (var i = 0; i < sheet_name_list.length; i++) {
+        if ((sheet_name_list[i]).toUpperCase() === hoja) {
+            indice = i;
+            verificador = 1;
+            break;
+        }
+    }
+    if (verificador === 1) {
+        return indice;
+    }
+    else {
+        return false;
+    }
 };
-exports.ObtenerRutaLeerPlantillas1 = ObtenerRutaLeerPlantillas1;
+exports.ObtenerIndicePlantilla = ObtenerIndicePlantilla;

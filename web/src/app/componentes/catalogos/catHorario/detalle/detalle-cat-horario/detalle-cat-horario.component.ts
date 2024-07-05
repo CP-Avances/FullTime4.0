@@ -64,6 +64,10 @@ export class DetalleCatHorarioComponent implements OnInit {
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public ventana: MatDialogRef<DetalleCatHorarioComponent>,
     public validar: ValidacionesService,
@@ -76,6 +80,9 @@ export class DetalleCatHorarioComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.VerEmpresa();
     this.ListarDetalles(this.data.datosHorario.id);
     this.BuscarDatosHorario(this.data.datosHorario.id);
@@ -93,7 +100,7 @@ export class DetalleCatHorarioComponent implements OnInit {
       else {
         this.acciones = false;
       }
-      console.log('ver acciones', this.acciones)
+      //console.log('ver acciones', this.acciones)
     });
   }
 
@@ -157,13 +164,14 @@ export class DetalleCatHorarioComponent implements OnInit {
       segundo_dia: form.segundoForm,
       min_antes: 0,
       min_despues: 0,
+      user_name: this.user_name,
+      ip: this.ip
     };
     if (this.acciones === true) {
       detalle.min_antes = parseInt(form.min_antesForm);
       detalle.min_despues = parseInt(form.min_despuesForm);
     }
-
-    console.log('ver datos de horario ', detalle)
+    //console.log('ver datos de horario ', detalle)
     this.ValidarMinEspera(form, detalle);
     if (this.datosHorario[0].minutos_comida === 0) {
       this.ValidarDetallesSinAlimentacion(detalle);
@@ -192,7 +200,7 @@ export class DetalleCatHorarioComponent implements OnInit {
     // VERIFICAR SI EXISTEN REGISTROS DE DETALLES
     if (this.datosDetalle.length != 0) {
 
-      this.datosDetalle.map(obj => {
+      this.datosDetalle.map((obj: any) => {
 
         // VALIDAR ORDEN DE DETALLES
         contador = contador + 1;
@@ -327,7 +335,7 @@ export class DetalleCatHorarioComponent implements OnInit {
     if (this.datosDetalle.length != 0) {
 
       // VALIDAR ORDEN DE DETALLES
-      this.datosDetalle.map(obj => {
+      this.datosDetalle.map((obj: any) => {
         contador = contador + 1;
         if (obj.orden === datos.orden && obj.orden === 1) {
           orden1 = orden1 + 1;

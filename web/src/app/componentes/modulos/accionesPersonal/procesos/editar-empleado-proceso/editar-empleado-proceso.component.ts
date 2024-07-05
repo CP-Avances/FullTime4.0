@@ -26,6 +26,10 @@ export class EditarEmpleadoProcesoComponent implements OnInit {
   empleados: any = [];
   procesos: any = [];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   nombreEmpleado = new FormControl('', [Validators.required]);
   fechaInicio = new FormControl('', Validators.required);
   fechaFinal = new FormControl('', Validators.required);
@@ -48,12 +52,15 @@ export class EditarEmpleadoProcesoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerEmpleados(this.data.idEmpleado);
     this.ObtenerProcesos();
     this.ImprimirDatos();
   }
 
-  // metodo para ver la informacion del empleado 
+  // metodo para ver la informacion del empleado
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -67,7 +74,7 @@ export class EditarEmpleadoProcesoComponent implements OnInit {
 
   ObtenerProcesos() {
     this.procesos = [];
-    this.restPro.getProcesosRest().subscribe(data => {
+    this.restPro.ConsultarProcesos().subscribe(data => {
       this.procesos = data;
     });
   }
@@ -97,7 +104,9 @@ export class EditarEmpleadoProcesoComponent implements OnInit {
       id_empl_cargo: this.data.datosProcesos.id_empl_cargo,
       fec_inicio: form.fecInicioForm,
       fec_final: form.fecFinalForm,
-      id: form.idProcesoForm
+      id: form.idProcesoForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     console.log("datos cambiados", datosProceso);
     this.restP.ActualizarUnProceso(datosProceso).subscribe(response => {

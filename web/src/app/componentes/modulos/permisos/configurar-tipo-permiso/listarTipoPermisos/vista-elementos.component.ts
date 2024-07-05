@@ -41,6 +41,10 @@ export class VistaElementosComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.minLength(2)]);
 
@@ -76,6 +80,9 @@ export class VistaElementosComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
+
       this.ObtenerEmpleados(this.idEmpleado);
       this.ObtenerTipoPermiso();
       this.ObtenerColores();
@@ -83,7 +90,7 @@ export class VistaElementosComponent implements OnInit {
     }
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -99,7 +106,7 @@ export class VistaElementosComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -133,9 +140,14 @@ export class VistaElementosComponent implements OnInit {
     this.ObtenerTipoPermiso();
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_permiso: number) {
-    this.rest.EliminarRegistro(id_permiso).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.rest.EliminarRegistro(id_permiso, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -143,7 +155,7 @@ export class VistaElementosComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -182,7 +194,7 @@ export class VistaElementosComponent implements OnInit {
     this.permiso_id = id;
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                  METODO PARA EXPORTAR A PDF                                  ** **
    ** ************************************************************************************************** **/
   generarPdf(action = 'open') {
@@ -275,24 +287,24 @@ export class VistaElementosComponent implements OnInit {
                 { text: 'Fecha de restricción', style: 'tableHeader' },
 
               ],
-              ...this.tipoPermiso.map(obj => {
+              ...this.tipoPermiso.map((obj: any) => {
                 var descuento = this.DescuentoSelect[obj.tipo_descuento - 1];
-                var acceso = this.AccesoEmpleadoSelect[obj.acce_empleado - 1];
-                var fecha = this.obtenerFecha(obj.fecha);
+                var acceso = this.AccesoEmpleadoSelect[obj.solicita_empleado - 1];
+                var fecha = this.obtenerFecha(obj.fecha_fin);
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTable' },
-                  { text: obj.num_dia_maximo, style: 'itemsTable' },
-                  { text: obj.num_hora_maximo, style: 'itemsTable' },
+                  { text: obj.dias_maximo_permiso, style: 'itemsTable' },
+                  { text: obj.horas_maximo_permiso, style: 'itemsTable' },
                   { text: acceso, style: 'itemsTable' },
-                  { text: obj.num_dia_ingreso, style: 'itemsTable' },
+                  { text: obj.dias_anticipar_permiso, style: 'itemsTable' },
                   { text: descuento, style: 'itemsTable' },
-                  { text: obj.almu_incluir == true ? 'Sí' : 'No', style: 'itemsTable' },
+                  { text: obj.incluir_minutos_comida == true ? 'Sí' : 'No', style: 'itemsTable' },
                   { text: obj.legalizar == true ? 'Sí' : 'No', style: 'itemsTable' },
-                  { text: obj.gene_justificacion == true ? 'Sí' : 'No', style: 'itemsTable' },
-                  { text: obj.num_dia_justifica, style: 'itemsTable' },
+                  { text: obj.justificar == true ? 'Sí' : 'No', style: 'itemsTable' },
+                  { text: obj.dias_justificar, style: 'itemsTable' },
                   { text: obj.documento == true ? 'Sí' : 'No', style: 'itemsTable' },
-                  { text: obj.fec_validar == true ? 'Sí' : 'No', style: 'itemsTable' },
+                  { text: obj.fecha_restriccion == true ? 'Sí' : 'No', style: 'itemsTable' },
                   { text: fecha, style: 'itemsTable' },
                 ];
               })
@@ -310,7 +322,7 @@ export class VistaElementosComponent implements OnInit {
     };
   }
 
-  /** ************************************************************************************************* ** 
+  /** ************************************************************************************************* **
    ** **                                 METODO PARA EXPORTAR A EXCEL                                ** **
    ** ************************************************************************************************* **/
   exportToExcel() {
@@ -320,7 +332,7 @@ export class VistaElementosComponent implements OnInit {
     xlsx.writeFile(wb, "TipoPermisos" + new Date().getTime() + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                               METODO PARA EXPORTAR A CSV                                     ** **
    ** ************************************************************************************************** **/
 
@@ -342,23 +354,23 @@ export class VistaElementosComponent implements OnInit {
     var arregloTipoPermisos: any = [];
     this.tipoPermiso.forEach((obj: any) => {
       var descuento = this.DescuentoSelect[obj.tipo_descuento - 1];
-      var acceso = this.AccesoEmpleadoSelect[obj.acce_empleado - 1];
-      var fecha = this.obtenerFecha(obj.fecha);
+      var acceso = this.AccesoEmpleadoSelect[obj.solicita_empleado - 1];
+      var fecha = this.obtenerFecha(obj.fecha_fin);
       objeto = {
         "tipo_permiso": {
           '@id': obj.id,
           "descripcion": obj.descripcion,
-          "numfecha_dia_maximo": obj.num_dia_maximo,
-          "num_hora_maximo": obj.num_hora_maximo,
+          "numfecha_dia_maximo": obj.dias_maximo_permiso,
+          "num_hora_maximo": obj.horas_maximo_permiso,
           "acce_empleado": acceso,
-          "num_dia_ingreso": obj.num_dia_ingreso,
+          "num_dia_ingreso": obj.dias_anticipar_permiso,
           "tipo_descuento": descuento,
-          "almu_incluir": obj.almu_incluir,
+          "almu_incluir": obj.incluir_minutos_comida,
           "legalizar": obj.legalizar,
-          "gene_justificacion": obj.gene_justificacion,
-          "num_dia_justifica": obj.num_dia_justifica,
+          "gene_justificacion": obj.justificar,
+          "num_dia_justifica": obj.dias_justificar,
           "documento": obj.documento,
-          "fec_validar": obj.fec_validar,
+          "fec_validar": obj.fecha_restriccion,
           "fecha": fecha,
         }
       }

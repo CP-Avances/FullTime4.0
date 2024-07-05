@@ -39,12 +39,30 @@
     </div>
     <mat-card-content *ngIf="eliminar">
         <div style="padding: 2%;">
-            <p>Se le recuerda que los datos que se subirán al sistema son aquellos que tienen como 
+            <p>Se le recuerda que los datos que se subirán al sistema son aquellos que tienen como
                 <b>observación “ok”</b>.
             </p>
             <p id="mensaje">¿ESTA SEGURO DE IMPORTAR LA PLANTILLA?</p>
         </div>
     </mat-card-content>
+</ng-container>
+
+<ng-container *ngIf="mensaje == 'registro-planificacion'">
+  <div id="resultados" >
+      <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+          IMPORTAR PLANTILLA
+      </span>
+  </div>
+  <mat-card-content *ngIf="eliminar">
+      <div style="padding: 2%;">
+          <p>Se le recuerda que los datos que se subirán al sistema son aquellos que tienen como
+              <b>observación “OK”</b>.
+              Los días que indiquen alguna observación diferente a “OK” se subirán como días libres,
+              o como días feriados si ya existe el registro en el sistema.
+          </p>
+          <p id="mensaje">¿ESTA SEGURO DE IMPORTAR LA PLANTILLA?</p>
+      </div>
+  </mat-card-content>
 </ng-container>
 
 
@@ -63,6 +81,23 @@
                 <b>Podría afectar al buen funcionamiento del sistema.</b>
             </p>
             <p id="mensaje">¿ESTÁ SEGURO DE ELIMINAR ESTE REGISTRO?</p>
+        </div>
+    </mat-card-content>
+</ng-container>
+
+<ng-container *ngIf="mensaje == 'deshabilitar'">
+    <div id="resultados" >
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+            DESHABILITAR REGISTRO
+        </span>
+    </div>
+    <mat-card-content *ngIf="eliminar">
+        <div style="padding: 2%;">
+            <p>Se le recuerda que al deshabilitar este registro automáticamente se deshabilitaran <b>TODOS</b> los registro con los
+                que guarde alguna relación.
+                <b>Podría afectar al buen funcionamiento del sistema.</b>
+            </p>
+            <p id="mensaje">¿ESTÁ SEGURO DE DESHABILITAR ESTE REGISTRO?</p>
         </div>
     </mat-card-content>
 </ng-container>

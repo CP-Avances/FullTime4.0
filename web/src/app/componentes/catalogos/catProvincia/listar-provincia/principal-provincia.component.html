@@ -61,13 +61,13 @@
                         <td>
                             <mat-form-field id="t-inputs">
                                 <input matInput placeholder="Buscar" (keypress)="IngresarSoloLetras($event)"
-                                    [formControl]="paisF" [(ngModel)]="filtroPais">
+                                    [formControl]="paisF">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field id="t-inputs">
                                 <input matInput placeholder="Buscar" (keypress)="IngresarSoloLetras($event)"
-                                    [formControl]="provinciaF" [(ngModel)]="filtroProvincia">
+                                    [formControl]="provinciaF">
                             </mat-form-field>
                         </td>
                         <td>
@@ -77,7 +77,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let prov of provincias | provincia: filtroProvincia | bPaises: filtroPais | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let prov of provincias | provincia: provinciaF.value | bPaises: paisF.value | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionProvincias.toggle(prov) : null"

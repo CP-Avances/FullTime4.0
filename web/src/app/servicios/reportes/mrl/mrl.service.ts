@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment';
 
 
 @Injectable({
@@ -17,4 +16,5 @@ export class MrlService {
   ReporteTimbresMrlRegimenCargo(data: any, desde: string, hasta: string){
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/reporte-timbres-mrl/timbres-regimen-cargo/${desde}/${hasta}`, data);
   }
+  
 }

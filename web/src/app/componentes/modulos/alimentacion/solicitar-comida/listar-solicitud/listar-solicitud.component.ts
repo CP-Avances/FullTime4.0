@@ -173,7 +173,7 @@ export class ListarSolicitudComponent implements OnInit {
   }
 
   FormatearDatos(lista: any, formato_fecha: string, formato_hora: string) {
-    lista.forEach(data => {
+    lista.forEach((data: any) => {
       data.fec_comida_ = this.validar.FormatearFecha(data.fec_comida, formato_fecha, this.validar.dia_abreviado);
       data.hora_inicio_ = this.validar.FormatearHora(data.hora_inicio, formato_hora);
       data.hora_fin_ = this.validar.FormatearHora(data.hora_fin, formato_hora);
@@ -255,7 +255,7 @@ export class ListarSolicitudComponent implements OnInit {
   // METODO PARA LEER TODOS LOS DATOS SELECCIONADOS
   AutorizarSolicitudMultiple() {
     let EmpleadosSeleccionados: any;
-    EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
+    EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
       return {
         empleado: obj.nombre + ' ' + obj.apellido,
         id_empleado: obj.id_empleado,
@@ -382,7 +382,7 @@ export class ListarSolicitudComponent implements OnInit {
   // METODO PARA LEER LOS DATOS TOMADOS DE LA LISTA DE SOLICITUDES AUTORIZADAS O NEGADAS
   AutorizarSolicitudMultipleEstado() {
     let EmpleadosSeleccionados: any;
-    EmpleadosSeleccionados = this.selectionUnoEstado.selected.map(obj => {
+    EmpleadosSeleccionados = this.selectionUnoEstado.selected.map((obj: any) => {
       return {
         empleado: obj.nombre + ' ' + obj.apellido,
         id_empleado: obj.id_empleado,
@@ -615,7 +615,7 @@ export class ListarSolicitudComponent implements OnInit {
    exportToExcel(opcion: string) {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Servicios de alimentación solicitados"?this.lista_solicitudes_filtradas:(
       opcion=="Servicios de alimentación aprobados"?this.solicitudesAutorizadas_filtradas:this.solicitudesExpiradas_filtradas
-      )).map(obj => {
+      )).map((obj: any) => {
       return {
         Nombre: obj.nombre +' '+ obj.apellido,
         Estado: (opcion=="Servicios de alimentación solicitados"?"Solicitado":obj.aprobada),
@@ -646,7 +646,7 @@ export class ListarSolicitudComponent implements OnInit {
    exportToCVS(opcion: string) {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Servicios de alimentación solicitados"?this.lista_solicitudes_filtradas:(
       opcion=="Servicios de alimentación aprobados"?this.solicitudesAutorizadas_filtradas:this.solicitudesExpiradas_filtradas
-      )).map(obj => {
+      )).map((obj: any) => {
       return {
         Nombre: obj.nombre +' '+ obj.apellido,
         Estado: (opcion=="Servicios de alimentación solicitados"?"Solicitado":obj.aprobada),

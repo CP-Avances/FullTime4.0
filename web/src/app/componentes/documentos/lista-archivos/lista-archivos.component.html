@@ -1,26 +1,17 @@
 <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;" *ngIf="listad">
   <div id="titulo">
-
-
     <div class="d-flex bd-highlight" id="titulo">
-
-
       <div class="w-100 bd-highlight">
         <h5>
-          LISTA DE DOCUMENTOS 
+          LISTA DE DOCUMENTOS
         </h5>
       </div>
-
-
       <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
 
         <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
           (click)="ConfirmarDeleteMultiple()">Eliminar </button>
       </div>
     </div>
-
-
-
   </div>
   <br>
   <nav aria-label="breadcrumb">
@@ -37,10 +28,9 @@
       <mat-form-field id="t-inputs">
         <mat-icon matPrefix>search</mat-icon>
         <input matInput placeholder="Buscar archivo" minlength="2" [formControl]="nombreF"
-          [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'archivo')">
+          (input)="Filtrar($event, 'archivo')">
       </mat-form-field>
     </div>
-
     <button *ngIf="subir" style="float: right;" type="submit" class="btn btn-sm btn-primary"
       (click)="AbrirVentanaRegistrar()">
       Subir documento
@@ -59,7 +49,8 @@
             </mat-icon>
             <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
               [checked]="selectionArchivos.hasValue() && isAllSelectedPag()"
-              [indeterminate]="selectionArchivos.hasValue() && !isAllSelectedPag()" [aria-label]="checkboxLabelPag()">
+              [indeterminate]="selectionArchivos.hasValue() && !isAllSelectedPag()" [aria-label]="checkboxLabelPag()"
+              id="check1">
             </mat-checkbox>
           </th>
           <th scope="col">Tipo</th>
@@ -69,9 +60,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let a of archivosFiltro">
-
-
-          <td>
+          <td id="check">
             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
               (change)="$event ? selectionArchivos.toggle(a) : null" [checked]="selectionArchivos.isSelected(a)"
               [aria-label]="checkboxLabelPag(a)">
@@ -96,8 +85,8 @@
               href="{{hipervinculo}}/archivosCargados/download/files/{{Dirname}}/{{a.nombre}}" target="_blank">
               <mat-icon style="color: rgb(38, 184, 46);" matTooltip="Ver documento.">cloud_download</mat-icon>
             </a>
-            <i *ngIf="subir" class="far fa-trash-alt" (click)="EliminarArchivo(a.file, a.id)" matSuffix
-              matTooltipPosition="right" matTooltip="Eliminar este documento.">
+            <i *ngIf="subir" class="far fa-trash-alt" (click)="ConfirmarDelete(a)" matSuffix matTooltipPosition="right"
+              matTooltip="Eliminar este documento.">
               <p>Eliminar</p>
             </i>
           </td>
@@ -107,15 +96,13 @@
   </div>
 
   <div class="table-responsive" *ngIf="Dirname === 'permisos' || Dirname === 'contratos'">
-
     <div>
       <mat-form-field id="t-inputs">
         <mat-icon matPrefix>search</mat-icon>
         <input matInput placeholder="Buscar Carpeta" minlength="2" [formControl]="nombreF"
-          [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'carpeta')">
+          (input)="Filtrar($event, 'carpeta')">
       </mat-form-field>
     </div>
-
     <table class="table table-hover table-sm">
       <thead class="thead-light">
         <tr style="text-align: center;">
@@ -126,7 +113,7 @@
       <tbody>
         <tr *ngFor="let a of archivosFiltro">
           <td style="padding-top: 10px; cursor: pointer; padding-left: 10px;" (click)="VerPermisos(a, 'permisos')">
-            <i class="fa fa-folder" aria-hidden="true" id="folder">
+            <i class="fa fa-folder" aria-hidden="false" id="folder">
             </i>
             &nbsp;&nbsp; {{a}}
           </td>
@@ -163,7 +150,7 @@
       <mat-form-field id="t-inputs">
         <mat-icon matPrefix>search</mat-icon>
         <input matInput placeholder="Buscar archivo" minlength="2" [formControl]="nombreF"
-          [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'archivo')">
+           (input)="Filtrar($event, 'archivo')">
       </mat-form-field>
     </div>
     <table class="table table-hover table-sm">

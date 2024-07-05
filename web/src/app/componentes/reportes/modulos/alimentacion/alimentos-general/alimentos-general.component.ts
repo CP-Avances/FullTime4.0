@@ -473,13 +473,13 @@ export class AlimentosGeneralComponent implements OnInit {
     var t_total2 = 0;
     var t_total3 = 0;
     var suma_total = 0;
-    arreglo1.forEach(obj1 => {
+    arreglo1.forEach((obj1: any) => {
       t_total1 = t_total1 + parseFloat(obj1.total)
     })
-    arreglo2.forEach(obj2 => {
+    arreglo2.forEach((obj2: any) => {
       t_total2 = t_total2 + parseFloat(obj2.total)
     })
-    arreglo3.forEach(obj3 => {
+    arreglo3.forEach((obj3: any) => {
       t_total3 = t_total3 + parseFloat(obj3.total)
     })
     suma_total = t_total1 + t_total2 + t_total3;
@@ -526,7 +526,7 @@ export class AlimentosGeneralComponent implements OnInit {
             { text: 'COSTO', style: 'centrado' },
             { text: 'COSTO TOTAL', style: 'centrado' },
           ],
-          ...arreglo.map(obj => {
+          ...arreglo.map((obj: any) => {
             return [
               { text: obj.comida_tipo, style: 'itemsTableD' },
               { text: obj.menu, style: 'itemsTableD' },
@@ -609,7 +609,7 @@ export class AlimentosGeneralComponent implements OnInit {
     ******************************************************************************************************/
   exportToExcelAlimentacion(form: any) {
     var j = 0;
-    const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificados.map(obj => {
+    const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificados.map((obj: any) => {
       return {
         N_REGISTROS: j = j + 1,
         TIPO_COMIDA: obj.comida_tipo,
@@ -631,7 +631,7 @@ export class AlimentosGeneralComponent implements OnInit {
     }
 
     var i = 0;
-    const wss: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.solicitados.map(obj => {
+    const wss: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.solicitados.map((obj: any) => {
       return {
         N_REGISTROS: i = i + 1,
         TIPO_COMIDA: obj.comida_tipo,
@@ -653,7 +653,7 @@ export class AlimentosGeneralComponent implements OnInit {
     }
 
     var k = 0;
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.extras.map(obj => {
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.extras.map((obj: any) => {
       return {
         N_REGISTROS: k = k + 1,
         TIPO_COMIDA: obj.comida_tipo,

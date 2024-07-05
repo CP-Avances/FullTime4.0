@@ -14,8 +14,7 @@
                         <mat-form-field>
                             <mat-label>Fecha Inicial</mat-label>
                             <input matInput [matDatepicker]="picker1" [formControl]="fechaInicialF" required>
-                            <mat-datepicker-toggle matSuffix [for]="picker1" id="i-cursor"
-                                 matTooltipPosition="right"
+                            <mat-datepicker-toggle matSuffix [for]="picker1" id="i-cursor" matTooltipPosition="right"
                                 matTooltip="Fecha de inicio de periodo.">
                             </mat-datepicker-toggle>
                             <mat-datepicker touchUi #picker1></mat-datepicker>
@@ -24,8 +23,7 @@
                         <mat-form-field>
                             <mat-label>Fecha Final</mat-label>
                             <input matInput [matDatepicker]="picker2" [formControl]="fechaFinalF" required>
-                            <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
-                                 matTooltipPosition="right"
+                            <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor" matTooltipPosition="right"
                                 matTooltip="Fecha de fin de periodo.">
                             </mat-datepicker-toggle>
                             <mat-datepicker touchUi #picker2></mat-datepicker>
@@ -33,7 +31,8 @@
                     </div>
                 </form>
                 <div class="d-flex justify-content-around">
-                    <button mat-raised-button id="btn-raised" type="submit" class="btn btn-sm" (click)="LimpiarFechas()">Cancelar
+                    <button mat-raised-button id="btn-raised" type="submit" class="btn btn-sm"
+                        (click)="LimpiarFechas()">Cancelar
                     </button>
                 </div>
                 <br>
@@ -61,21 +60,21 @@
                     <tr>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo" [formControl]="codigo"
+                                <input matInput placeholder="Buscar" [formControl]="codigo"
                                     (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula" maxlength="10"
+                                <input matInput placeholder="Buscar" maxlength="10"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroEmpleado" [formControl]="nombre"
-                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td></td>
@@ -93,7 +92,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let d of datosEmpleado | emplCargo: filtroCargo | regimen: filtroRegimen | departamento: filtroDepartamento | emplCodigo: filtroCodigo | emplCedula: filtroCedula | nombreApellido: filtroEmpleado  | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let d of datosEmpleado | emplCodigo: codigo.value | emplCedula: cedula.value | nombreApellido: nombre.value  | paginate:tamanio_pagina:numero_pagina">
                         <th scope="row">{{d.codigo}}</th>
                         <td>{{d.cedula}}</td>
                         <td>{{d.apellido}} {{d.nombre}}</td>
@@ -116,8 +115,8 @@
                 </tbody>
             </table>
         </div>
-        <mat-paginator id="pagina" [length]="datosEmpleado.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
-            id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        <mat-paginator id="pagina" [length]="datosEmpleado.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
         <br>
     </div>

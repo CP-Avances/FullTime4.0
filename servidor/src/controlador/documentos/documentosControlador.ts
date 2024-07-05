@@ -1,6 +1,7 @@
 import { DescargarArchivo, listaCarpetas, ListarContratos, ListarDocumentos, ListarHorarios, ListarPermisos, ListarDocumentosIndividuales, DescargarArchivoIndividuales } from '../../libs/listarArchivos';
 import { ObtenerRutaDocumento } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import fs from 'fs';
 import pool from '../../database';
 import path from 'path';
@@ -85,20 +86,57 @@ class DocumentosControlador {
     }
 
     // METODO PARA ELIMINAR REGISTROS DE DOCUMENTACION
-    public async EliminarRegistros(req: Request, res: Response) {
-
-
+    public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
         try {
-
+            const { user_name, ip } = req.body;
             let { id, documento } = req.params;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOSORIGINALES
+            const doc = await pool.query('SELECT * FROM e_documentacion WHERE id = $1', [id]);
+            const [datosOriginales] = doc.rows;
+
+            if (!datosOriginales) {
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_documentacion',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar el documento con id ${id}. Registro no encontrado.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+            }
+
             await pool.query(
                 `
                 DELETE FROM e_documentacion WHERE id = $1
                 `
                 , [id]);
+            
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'e_documentacion',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: '',
+                ip,
+                observacion: null
+            });
 
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+    
             let separador = path.sep;
-
+    
             let ruta = ObtenerRutaDocumento() + separador + documento;
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
             fs.access(ruta, fs.constants.F_OK, (err) => {
@@ -108,33 +146,57 @@ class DocumentosControlador {
                     fs.unlinkSync(ruta);
                 }
             });
-
-            res.jsonp({ message: 'Registro eliminado.' });
-
-
+    
+            return res.jsonp({ message: 'Registro eliminado.' });
         } catch (error) {
-            return res.jsonp({ message: 'error' });
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
         }
-
-
     }
 
     // METODO PARA REGISTRAR UN DOCUMENTO    --**VERIFICADO
     public async CrearDocumento(req: Request, res: Response): Promise<void> {
-        // FECHA DEL SISTEMA
-        var fecha = moment();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
+        try {
+            // TODO ANALIZAR COMOOBTENER USER_NAME E IP DESDE EL FRONT
+            const { user_name, ip } = req.body;
 
-        let documento = anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
+            // FECHA DEL SISTEMA
+            var fecha = moment();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
+    
+            let documento = anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
+    
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            
+            await pool.query(
+                `
+                INSERT INTO e_documentacion (documento) VALUES ($1)
+                `
+                , [documento]);
+            
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'e_documentacion',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify({ documento }),
+                ip,
+                observacion: null
+            });
 
-        await pool.query(
-            `
-            INSERT INTO e_documentacion (documento) VALUES ($1)
-            `
-            , [documento]);
-        res.jsonp({ message: 'Registro guardado.' });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            res.jsonp({ message: 'Registro guardado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            res.status(500).jsonp({ message: 'Error al guardar el registro.' });
+        }
     }
 
 }

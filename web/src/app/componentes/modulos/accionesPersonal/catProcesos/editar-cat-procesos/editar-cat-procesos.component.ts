@@ -20,20 +20,22 @@ interface Nivel {
 
 export class EditarCatProcesosComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   procesoPadre = new FormControl('', Validators.required);
   nombre = new FormControl('', [Validators.required, Validators.pattern('[a-zA-Z ]*')]);
   nivel = new FormControl('', Validators.required);
 
   procesos: any = [];
-  seleccionarNivel: any;
-  seleccionarProceso: any;
 
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
-  public nuevoProcesoForm = new FormGroup({
+  public formulario = new FormGroup({
     procesoNivelForm: this.nivel,
     procesoNombreForm: this.nombre,
-    procesoProcesoPadreForm: this.procesoPadre
+    procesoPadreForm: this.procesoPadre,
   });
 
   // ARREGLO DE NIVELES EXISTENTES
@@ -57,46 +59,39 @@ export class EditarCatProcesosComponent implements OnInit {
   ngOnInit(): void {
     this.ObtenerProcesos();
     this.ImprimirDatos();
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+    //console.log('data ', this.data)
   }
 
   // METODO PARA MOSTRAR DATOS DEL REGISTRO
   ImprimirDatos() {
-    this.nuevoProcesoForm.patchValue({
+    this.formulario.patchValue({
       procesoNombreForm: this.data.datosP.nombre,
-      procesoNivelForm: this.data.datosP.nivel,
+      procesoNivelForm: String(this.data.datosP.nivel),
     })
-    this.seleccionarNivel = String(this.data.datosP.nivel);
     if (this.data.datosP.proc_padre === null) {
-      this.seleccionarProceso = 0;
-      this.nuevoProcesoForm.patchValue({
-        procesoProcesoPadreForm: 'Ningún Proceso'
-      })
+      this.procesoPadre.setValue('Ninguno');
     }
     else {
-      this.nuevoProcesoForm.patchValue({
-        procesoProcesoPadreForm: this.data.datosP.proc_padre
+      this.formulario.patchValue({
+        procesoPadreForm: this.data.datosP.proc_padre,
       })
-      this.seleccionarProceso = this.data.datosP.proc_padre;
     }
   }
 
-  // METODO PARA VALIDAR CAMPOS
-  ObtenerMensajeErrorNombre() {
-    if (this.nombre.hasError('required')) {
-      return 'Campo obligatorio.';
-    }
-    return this.nombre.hasError('pattern') ? 'No ingresar números.' : '';
-  }
 
   // METODO PARA EDITAR REGISTRO
   EditarProceso(form: any) {
     var procesoPadreId: any;
-    var procesoPadreNombre = form.procesoProcesoPadreForm;
-    if (procesoPadreNombre == 0) {
+    var procesoPadreNombre = form.procesoPadreForm;
+    if (procesoPadreNombre === 'Ninguno') {
       let dataProceso = {
         id: this.data.datosP.id,
         nombre: form.procesoNombreForm,
         nivel: form.procesoNivelForm,
+        user_name: this.user_name,
+        ip: this.ip
       };
       this.ActualizarDatos(dataProceso);
     } else {
@@ -106,7 +101,9 @@ export class EditarCatProcesosComponent implements OnInit {
           id: this.data.datosP.id,
           nombre: form.procesoNombreForm,
           nivel: form.procesoNivelForm,
-          proc_padre: procesoPadreId
+          proc_padre: procesoPadreId,
+          user_name: this.user_name,
+          ip: this.ip
         };
         this.ActualizarDatos(dataProceso);
       });
@@ -116,33 +113,39 @@ export class EditarCatProcesosComponent implements OnInit {
   // METODO PARA ACTUALIZAR DATOS EN BASE DE DATOS
   ActualizarDatos(datos: any) {
     this.rest.ActualizarUnProceso(datos).subscribe(response => {
-      console.log(datos)
+      //console.log(datos)
       this.toastr.success('Operacion exitosa.', 'Proceso actualizado', {
         timeOut: 6000,
       });
+      this.ObtenerProcesos();
+      this.LimpiarCampos();
       this.CerrarVentana();
     }, error => { });
   }
 
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
-    this.nuevoProcesoForm.reset();
+    this.formulario.reset();
+    this.ObtenerProcesos();
   }
 
   // METODO PARA BUSCAR PROCESOS
   ObtenerProcesos() {
     this.procesos = [];
-    this.rest.getProcesosRest().subscribe(data => {
-      this.procesos = data
+    this.rest.ConsultarProcesos().subscribe(data => {
+      this.procesos = data;
+      this.procesos.push({ nombre: 'Ninguno' });
+      //console.log('procesos', this.procesos)
     })
   }
 
   // METODO PARA CERRRA PROCESOS
   CerrarVentana() {
-    this.ObtenerProcesos();
     this.LimpiarCampos();
     this.ImprimirDatos();
     this.ventana.close();
+    this.ObtenerProcesos();
+
   }
 
   // METODO PARA SALIR DEL REGISTRO

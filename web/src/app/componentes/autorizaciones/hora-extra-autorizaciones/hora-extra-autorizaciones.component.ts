@@ -8,6 +8,7 @@ import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { use } from 'echarts';
 
 interface Orden {
   valor: number
@@ -49,6 +50,10 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
 
   estados: Estado[] = [];
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   Habilitado: boolean = true;
   id_empleado_loggin: number;
   FechaActual: any;
@@ -86,6 +91,9 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
     if (this.data.datosHora.length == 0) {
       this.toastr.error("No ha seleccionado solicitudes para aprobar");
     }
+
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   BuscarTipoAutorizacion() {
@@ -321,7 +329,7 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
       }
     }
     else if (this.data.carga === 'multiple') {
-      this.listafiltrada.map(obj => {
+      this.listafiltrada.map((obj: any) => {
         if (obj.estado === 'Pre-Autorizado') {
           this.restH.BuscarDatosAutorizacion(obj.id).subscribe(data => {
             var documento = data[0].empleado_estado;
@@ -407,6 +415,8 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
       id_hora_extra: id_hora_extra,
       id_documento: localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       id_plan_hora_extra: null,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.restAutorizaciones.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
       console.log('pasa')
@@ -435,8 +445,10 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
       estado: estado_hora,
       id_hora_extra: id_hora,
       id_departamento: id_departamento,
+      user_name: this.user_name,
+      ip: this.ip,
     }
-    console.log('datos', datosHorasExtras);
+
     this.restH.ActualizarEstado(id_hora, datosHorasExtras).subscribe(res => {
       this.resEstado = [res];
       console.log('estado', this.resEstado);
@@ -470,7 +482,9 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
         create_at: `${this.FechaActual}T${f.toLocaleTimeString()}.000Z`,
         id_permiso: null,
         id_vacaciones: null,
-        id_hora_extra: id_hora
+        id_hora_extra: id_hora,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.realTime.IngresarNotificacionEmpleado(notificacion).subscribe(res1 => {
         this.NotifiRes = res1;

@@ -11,6 +11,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-reporte-kardex',
@@ -31,11 +32,6 @@ export class ReporteKardexComponent implements OnInit {
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre = new FormControl('', [Validators.minLength(2)]);
   apellido = new FormControl('', [Validators.minLength(2)]);
-
-  filtroCodigo: number;
-  filtroCedula: '';
-  filtroNombre: '';
-  filtroApellido: '';
 
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
@@ -58,6 +54,7 @@ export class ReporteKardexComponent implements OnInit {
     private restKardex: KardexService,
     private empresa: EmpresaService,
     private toastr: ToastrService,
+    private validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -107,27 +104,25 @@ export class ReporteKardexComponent implements OnInit {
 
   f_inicio_reqK: string = '';
   f_final_reqK: string = '';
-  habilitarK: boolean = false;
   estiloK: any = { 'visibility': 'hidden' };
   ValidarRangofechasKardex(form: any) {
     var f_i = new Date(form.fec_inicio)
     var f_f = new Date(form.fec_final)
 
     if (f_i < f_f) {
-      this.toastr.success('Fechas validas','', {
+      this.toastr.success('Fechas validas', '', {
         timeOut: 6000,
       });
       this.f_inicio_reqK = f_i.toJSON().split('T')[0];
       this.f_final_reqK = f_f.toJSON().split('T')[0];
-      this.habilitarK = true
       this.estiloK = { 'visibility': 'visible' };
     } else if (f_i > f_f) {
-      this.toastr.info('Fecha final es menor a la fecha inicial','', {
+      this.toastr.info('Fecha final es menor a la fecha inicial', '', {
         timeOut: 6000,
       });
       this.fechasKardexForm.reset();
     } else if (f_i.toLocaleDateString() === f_f.toLocaleDateString()) {
-      this.toastr.info('Fecha inicial es igual a la fecha final','', {
+      this.toastr.info('Fecha inicial es igual a la fecha final', '', {
         timeOut: 6000,
       });
       this.fechasKardexForm.reset();
@@ -409,7 +404,7 @@ export class ReporteKardexComponent implements OnInit {
               text: 'Min'
             }
           ],
-          ...d.map(obj => {
+          ...d.map((obj: any) => {
             return [
               { style: 'itemsTableCentrado', text: obj.periodo },
               { style: 'itemsTable', text: obj.detalle },
@@ -492,50 +487,16 @@ export class ReporteKardexComponent implements OnInit {
    * METODOS PARA CONTROLAR INGRESO DE LETRAS
    */
 
-  IngresarSoloLetras(e) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    //Se define todo el abecedario que se va a usar.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    //Es la validación del KeyCodes, que teclas recibe el campo de texto.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
   }
 
-  IngresarSoloNumeros(evt) {
-    if (window.event) {
-      var keynum = evt.keyCode;
-    }
-    else {
-      keynum = evt.which;
-    }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
-    if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
-      return true;
-    }
-    else {
-      this.toastr.info('No se admite el ingreso de letras', 'Usar solo números', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
   limpiarCamposRangoKardex() {
     this.fechasKardexForm.reset();
-    this.habilitarK = false;
     this.estiloK = { 'visibility': 'hidden' };
   }
 

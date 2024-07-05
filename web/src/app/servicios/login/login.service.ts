@@ -29,17 +29,6 @@ export class LoginService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/login/cambiar-contrasenia`, data)
   }
 
-
-
-
-
-
-
-
-
-
-
-
   loggedIn() {
     return !!localStorage.getItem('token');
   }
@@ -49,7 +38,6 @@ export class LoginService {
   }
 
   getRol() {
-    //console.log(' ver rol ', parseInt(localStorage.getItem('rol') as string))
     return parseInt(localStorage.getItem('rol') as string);//Empleado
   }
 
@@ -79,18 +67,9 @@ export class LoginService {
     this.router.navigate(['/'], { relativeTo: this.route, skipLocationChange: false });
   }
 
-
-
-
-
-  // AUDITAR
-  Auditar(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/login/auditar`, data)
-  }
-
-
   //SELECTOR DE EMPRESAS
   getEmpresa(data: any){
     return this.http.post<any>(`${environment.url}/fulltime`, data);
   }
+ 
 }

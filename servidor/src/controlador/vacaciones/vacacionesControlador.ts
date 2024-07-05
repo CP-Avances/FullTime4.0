@@ -1,11 +1,12 @@
+import { RestarPeriodoVacacionAutorizada } from '../../libs/CargarVacacion';
+import { Request, Response } from 'express';
+import { QueryResult } from 'pg';
 import {
   enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
   FormatearFecha, FormatearHora, dia_completo
 }
   from '../../libs/settingsMail';
-import { RestarPeriodoVacacionAutorizada } from '../../libs/CargarVacacion';
-import { Request, Response } from 'express';
-import { QueryResult } from 'pg';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 import path from 'path';
 
@@ -135,7 +136,10 @@ class VacacionesControlador {
   public async CrearVacaciones(req: Request, res: Response): Promise<Response> {
     try {
       const { fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado,
-        id_peri_vacacion, depa_user_loggin, id_empl_cargo, codigo } = req.body;
+        id_peri_vacacion, depa_user_loggin, id_empl_cargo, codigo, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCIÓN
+      await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
         `
@@ -148,6 +152,20 @@ class VacacionesControlador {
 
       const [objetoVacacion] = response.rows;
 
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'mv_solicitud_vacacion',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: JSON.stringify(objetoVacacion),
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCIÓN
+      await pool.query('COMMIT');
+
       if (!objetoVacacion) return res.status(400)
         .jsonp({ message: 'Upps!!! algo salio mal. Solicitud de vacación no ingresada.' })
 
@@ -157,6 +175,8 @@ class VacacionesControlador {
 
 
     } catch (error) {
+      // REVERTIR TRANSACCIÓN
+      await pool.query('ROLLBACK');
       return res.status(500).
         jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
@@ -167,7 +187,30 @@ class VacacionesControlador {
     try {
       const id = req.params.id
 
-      const { fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, depa_user_loggin } = req.body;
+      const { fec_inicio, fec_final, fec_ingreso, dia_libre, dia_laborable, depa_user_loggin, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCIÓN
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query('SELECT * FROM mv_solicitud_vacacion WHERE id = $1', [id]);
+      const [datosOriginales] = consulta.rows; 
+
+      if (!datosOriginales){
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'mv_solicitud_vacacion',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al intentar actualizar registro de vacación con id ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCIÓN
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
 
       const response: QueryResult = await pool.query(
         `
@@ -178,6 +221,20 @@ class VacacionesControlador {
 
       const [objetoVacacion] = response.rows;
 
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'mv_solicitud_vacacion',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: JSON.stringify(objetoVacacion),
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCIÓN
+      await pool.query('COMMIT');
+
       if (!objetoVacacion) return res.status(400)
         .jsonp({ message: 'Upps !!! algo salio mal. Solicitud de vacación no ingresada.' })
 
@@ -187,6 +244,8 @@ class VacacionesControlador {
 
 
     } catch (error) {
+      // REVERTIR TRANSACCIÓN
+      await pool.query('ROLLBACK');
       return res.status(500)
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
@@ -195,33 +254,132 @@ class VacacionesControlador {
   // ELIMINAR SOLICITUD DE VACACION
   public async EliminarVacaciones(req: Request, res: Response): Promise<Response> {
 
-    let { id_vacacion } = req.params;
+    try {
+      const { user_name, ip } = req.body;
+      let { id_vacacion } = req.params;
 
-    await pool.query(
-      `
-      DELETE FROM ecm_realtime_notificacion WHERE id_vacaciones = $1
-      `
-      , [id_vacacion]);
+      // INICIAR TRANSACCIÓN
+      await pool.query('BEGIN');
 
-    await pool.query(
-      `
-      DELETE FROM ecm_autorizaciones WHERE id_vacacion = $1
-      `
-      , [id_vacacion])
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query('SELECT * FROM ecm_realtime_notificacion WHERE id_vacaciones = $1', [id_vacacion]);
+      const [datosOriginales] = consulta.rows;
 
-    const response: QueryResult = await pool.query(
-      `
-      DELETE FROM mv_solicitud_vacacion WHERE id = $1 RETURNING *
-      `
-      , [id_vacacion]);
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'ecm_realtime_notificacion',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al intentar eliminar registro con id_vacaciones ${id_vacacion}. Registro no encontrado.`
+        });
 
-    const [objetoVacacion] = response.rows;
+        // FINALIZAR TRANSACCIÓN
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+  
+      await pool.query(
+        `
+        DELETE FROM ecm_realtime_notificacion WHERE id_vacaciones = $1
+        `
+        , [id_vacacion]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ecm_realtime_notificacion',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
 
-    if (objetoVacacion) {
-      return res.status(200).jsonp(objetoVacacion)
-    }
-    else {
-      return res.status(404).jsonp({ message: 'Solicitud no eliminada.' })
+      // CONSULTAR DATOSORIGINALESAUTORIZACIONES
+      const consultaAutorizaciones = await pool.query('SELECT * FROM ecm_autorizaciones WHERE id_vacacion = $1', [id_vacacion]);
+      const [datosOriginalesAutorizaciones] = consultaAutorizaciones.rows;
+
+      if (!datosOriginalesAutorizaciones) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'ecm_autorizaciones',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al intentar eliminar registro con id_vacacion ${id_vacacion}. Registro no encontrado.`
+        });
+      }
+  
+      await pool.query(
+        `
+        DELETE FROM ecm_autorizaciones WHERE id_vacacion = $1
+        `
+        , [id_vacacion]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ecm_autorizaciones',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginalesAutorizaciones),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // CONSULTAR DATOSORIGINALESVACACIONES
+      const consultaVacaciones = await pool.query('SELECT * FROM mv_solicitud_vacacion WHERE id = $1', [id_vacacion]);
+      const [datosOriginalesVacaciones] = consultaVacaciones.rows;
+
+      if (!datosOriginalesVacaciones) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'mv_solicitud_vacacion',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al intentar eliminar registro con id ${id_vacacion}. Registro no encontrado.`
+        });
+      }
+  
+      const response: QueryResult = await pool.query(
+        `
+        DELETE FROM mv_solicitud_vacacion WHERE id = $1 RETURNING *
+        `
+        , [id_vacacion]);
+  
+      const [objetoVacacion] = response.rows;
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'mv_solicitud_vacacion',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginalesVacaciones),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCIÓN
+      await pool.query('COMMIT');
+  
+      if (objetoVacacion) {
+        return res.status(200).jsonp(objetoVacacion)
+      }
+      else {
+        return res.status(404).jsonp({ message: 'Solicitud no eliminada.' })
+      }
+    } catch (error) {
+      // REVERTIR TRANSACCIÓN
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+      
     }
   }
 
@@ -246,19 +404,61 @@ class VacacionesControlador {
   }
 
   // ACTUALIZAR ESTADO DE SOLICITUD DE VACACIONES
-  public async ActualizarEstado(req: Request, res: Response): Promise<void> {
+  public async ActualizarEstado(req: Request, res: Response): Promise<any> {
 
-    const id = req.params.id;
-    const { estado } = req.body;
+    try {
+      const id = req.params.id;
+      const { estado, user_name, ip} = req.body;
 
-    await pool.query(
-      `
-      UPDATE mv_solicitud_vacacion SET estado = $1 WHERE id = $2
-      `
-      , [estado, id]);
+      // INICIAR TRANSACCIÓN
+      await pool.query('BEGIN');
 
-    if (3 === estado) {
-      RestarPeriodoVacacionAutorizada(parseInt(id));
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query('SELECT * FROM mv_solicitud_vacacion WHERE id = $1', [id]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'mv_solicitud_vacacion',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al intentar actualizar registro de vacación con id ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCIÓN
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+  
+      await pool.query(
+        `
+        UPDATE mv_solicitud_vacacion SET estado = $1 WHERE id = $2
+        `, [estado, id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'mv_solicitud_vacacion',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCIÓN
+      await pool.query('COMMIT');
+  
+      if (3 === estado) {
+        RestarPeriodoVacacionAutorizada(parseInt(id), user_name, ip);
+      }
+    } catch (error) {
+      // REVERTIR TRANSACCIÓN
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
 
   }
@@ -328,7 +528,7 @@ class VacacionesControlador {
           `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -360,7 +560,7 @@ class VacacionesControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
           `
         ,
@@ -436,7 +636,7 @@ class VacacionesControlador {
           `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -467,7 +667,7 @@ class VacacionesControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
           `
         ,

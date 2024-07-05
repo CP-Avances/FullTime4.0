@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -59,48 +58,12 @@ export class EmplCargosService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/fecha_cargo/editar`, data);
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-  getEmpleadoCargosRest() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos`);
-  }
-
-  getListaEmpleadoCargosRest() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/lista-empleados`);
-  }
-
-
-
-
-
-
   BuscarIDCargo(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/buscar/${id}`);
   }
 
   BuscarIDCargoActual(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/buscar/cargoActual/${id}`);
-  }
-
-
-
-  ListarEmpleadosAutorizacion(id: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/empleadosAutorizan/${id}`);
-  }
-
-
-  ObtenerUnTipoCargo(id: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/buscar/ultimoTipo/nombreCargo/${id}`);
   }
 
   ObtenerCargoDepartamento(id: number) {

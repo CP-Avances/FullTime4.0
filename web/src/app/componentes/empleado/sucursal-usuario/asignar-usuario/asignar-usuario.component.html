@@ -9,8 +9,7 @@
                 <span>{{name_sucursal}}</span>
             </div>
             <mat-card-content>
-                <div class="mat-elevation-z8" style="background: white;"
-                    style="padding-top: 10px; padding-bottom: 5px;">
+                <div class="mat-elevation-z8" style="background: white;" style="margin-top: 10px; padding-bottom: 5px;">
                     <div class="row">
                         <!--  **************************** LISTA DE USUARIOS QUE PERTENECEN A UNA SUCURSAL *********************************  -->
                         <div class="col-md" *ngIf="ver_principal" style="padding-bottom: 10px;">
@@ -19,96 +18,76 @@
                                 <table class="table table-hover table-sm">
                                     <thead class="thead-light">
                                         <tr style="text-align: center;">
-                                            <th scope="col">Usuario</th>
+                                            <th>
+                                                <mat-checkbox (change)="$event ? masterToggleU() : null"
+                                                    [checked]="usuariosSeleccionados.hasValue() && isAllSelectedU()"
+                                                    [indeterminate]="usuariosSeleccionados.hasValue() && !isAllSelectedU()"
+                                                    [aria-label]="checkboxLabelU()">
+                                                </mat-checkbox>
+                                            </th>
                                             <th scope="col">Rol</th>
-                                            <th scope="col">Jefe/Coordinador</th>
+                                            <th scope="col">Nombre</th>
+                                            <th scope="col">Departamento</th>
+                                            <th scope="col">Asignaciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr *ngFor="let p of principales">
-                                            <td>{{p.apellido}} {{p.nombre}} </td>
-                                            <td>{{p.rol}}</td>
+                                        <tr>
+                                            <td></td>
                                             <td>
-                                                <mat-checkbox *ngIf="p.jefe === true" matSuffix
-                                                    matTooltipPosition="right" disabled [checked]="p.jefe">
+                                                <mat-form-field class="input-tables">
+                                                    <input matInput placeholder="Buscar" type="text"
+                                                        [formControl]="rol">
+                                                </mat-form-field>
+                                            </td>
+                                            <td>
+                                                <mat-form-field class="input-tables">
+                                                    <input matInput placeholder="Buscar" type="text"
+                                                        [formControl]="nombre">
+                                                </mat-form-field>
+                                            </td>
+                                            <td>
+                                                <mat-form-field class="input-tables">
+                                                    <input matInput placeholder="Buscar" type="text"
+                                                        [formControl]="departamento">
+                                                </mat-form-field>
+                                            </td>
+                                        </tr>
+                                        <tr
+                                            *ngFor="let u of usuarios | sucRolEmpleado: rol.value | sucNomEmpleado: nombre.value | sucDepEmpleado: departamento.value | paginate: tamanio_pagina_p:numero_pagina_p">
+                                            <td>
+                                                <mat-checkbox (click)="$event.stopPropagation()"
+                                                    (change)="$event ? usuariosSeleccionados.toggle(u) : null"
+                                                    [checked]="usuariosSeleccionados.isSelected(u)"
+                                                    [aria-label]="checkboxLabelU(u)">
                                                 </mat-checkbox>
+                                            </td>
+                                            <td>{{u.rol}}</td>
+                                            <td>{{u.apellido}} {{u.nombre}} </td>
+                                            <td>{{u.departamento}}</td>
+                                            <td class="justify-content-center">
+                                                <i matSuffix matTooltipPosition="right" *ngIf="u.asignaciones !=null"
+                                                    matTooltip="Ingresar a pantalla de información de asignaciones de este usuario."
+                                                    class="fas fa-eye" id="t-ver" (click)="VisualizarAsignaciones(u)">
+                                                    <p>Ver</p>
+                                                </i>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <mat-paginator id="pagina" [length]="principales.length" [pageSize]="tamanio_pagina_p"
+                            <mat-paginator id="pagina" [length]="usuarios.length" [pageSize]="tamanio_pagina_p"
                                 [pageSizeOptions]="pageSizeOptions_p" (page)="ManejarPaginaPrincipal($event)"
                                 showFirstLastButtons>
                             </mat-paginator>
                         </div>
-                        <!--  **************************** LISTA DE USUARIOS ASIGNADOS A UNA SUCURSAL *********************************  -->
-                        <div class="col-md" *ngIf="ver_asignados">
-                            <div id="resultados">Usuarios asignados a {{name_sucursal}}</div>
-                            <div class="table-responsive">
-                                <table class="table table-hover table-sm ">
-                                    <thead class="thead-light">
-                                        <tr style="text-align: center;">
-                                            <th>
-                                                <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight"
-                                                    matSuffix matTooltipPosition="right"
-                                                    matTooltip="Dar clic para activar selección múltiple."
-                                                    id="SelectCheck" (click)="HabilitarSeleccion()">
-                                                    library_add_check
-                                                </mat-icon>
-                                                <mat-checkbox *ngIf="plan_multiple"
-                                                    (change)="$event ? masterToggleDep() : null"
-                                                    [checked]="selectionAsignados.hasValue() && isAllSelectedDep()"
-                                                    [indeterminate]="selectionAsignados.hasValue() && !isAllSelectedDep()"
-                                                    [aria-label]="checkboxLabelDep()" (click)="InhabilitarSeleccion()">
-                                                </mat-checkbox>
-                                            </th>
-                                            <th scope="col">Usuario</th>
-                                            <th scope="col">Rol</th>
-                                            <th scope="col">Jefe/Coordinador</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr *ngFor="let a of asignados">
-                                            <td>
-                                                <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
-                                                    (change)="$event ? selectionAsignados.toggle(a) : null"
-                                                    [checked]="selectionAsignados.isSelected(a)"
-                                                    [aria-label]="checkboxLabelDep(a)">
-                                                </mat-checkbox>
-                                            </td>
-                                            <td>{{a.apellido}} {{a.nombre}} </td>
-                                            <td>{{a.rol}}</td>
-                                            <td>
-                                                <mat-checkbox *ngIf="a.jefe === true" matSuffix
-                                                    matTooltipPosition="right" disabled [checked]="a.jefe">
-                                                </mat-checkbox>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="container d-flex flex-wrap justify-content-center">
-                                <button *ngIf="this.selectionAsignados.selected.length != 0 && getEliminarAsignacionEstablecimiento()" id="btn-raised"
-                                    class="btn btn-sm" (click)="ConfirmarDeleteProceso()">
-                                    Eliminar
-                                </button>
-                            </div>
-                            <mat-paginator id="pagina" [length]="asignados.length" [pageSize]="tamanio_pagina_a"
-                                [pageSizeOptions]="pageSizeOptions_a" (page)="ManejarPaginaAsignados($event)"
-                                showFirstLastButtons>
-                            </mat-paginator>
-                        </div>
                     </div>
-
                     <hr>
-
                     <div style="padding-top: 10px;">
-                        <div id="resultados">Usuarios asignados a {{name_sucursal}}</div>
+                        <div id="resultados">Administración de información</div>
                         <div class="nota" id="espacio" style="text-align: justify; margin-left: 15px;">
                             <span>
-                                NOTA: Asignación de usuarios a la administración de los datos del establecimiento
-                                {{name_sucursal}}.
+                                NOTA: Asignación de usuarios a la administración de los datos del establecimiento.
                             </span>
                         </div>
                         <div class="container d-flex flex-wrap justify-content-center">
@@ -117,7 +96,7 @@
                                     [formControl]="sucursalForm" [matAutocomplete]="auto" required>
                                 <mat-autocomplete #auto="matAutocomplete">
                                     <mat-option *ngFor="let option of filteredOptions | async" [value]="option.nombre"
-                                        (click)="ObtenerUsuarios()">
+                                        (click)="ObtenerDepartamentos()">
                                         {{option.nombre}}
                                     </mat-option>
                                 </mat-autocomplete>
@@ -130,33 +109,53 @@
 
                         <div class="row">
                             <div class="col-md" style="padding-bottom: 10px;">
-                                <div class="container" style="padding-top: 20px;" *ngIf="ver_administradores">
+                                <div class="container" style="padding-top: 20px;" *ngIf="ver_departamentos">
                                     <div id="resultados">
                                         <span>
-                                            LISTA DE USUARIOS
+                                            LISTA DE DEPARTAMENTOS
                                         </span>
                                     </div>
                                 </div>
                                 <div class="d-flex flex-wrap justify-content-start">
                                     <div class="modal-body" style="margin-left: 60px; padding-top: 15px;">
                                         <div class="container-fluid">
-                                            <input class="form-check-input" type="checkbox" id="seleccionar"
-                                                [(ngModel)]="isChecked" (change)="SeleccionarTodas(isChecked)"
-                                                [ngModelOptions]="{standalone: true}" *ngIf="ver_seleccion">
-                                            <label *ngIf="ver_seleccion" class="form-check-label" for="inlineCheckbox1"
-                                                style="margin-left: 10px; font-size: 12px; color: blue; font-weight: bold;">
-                                                Todas
-                                            </label>
+                                            <div class="row" style="text-align: center; padding-top: 10px;">
+                                                <div class="col-md-6 col-lg-6 col-6"
+                                                    style="text-align:left; padding-bottom: 10px;">
+                                                    <input class="form-check-input" type="checkbox" id="seleccionar"
+                                                        [(ngModel)]="isChecked" (change)="SeleccionarTodas(isChecked)"
+                                                        [ngModelOptions]="{standalone: true}" *ngIf="ver_seleccion">
+                                                    <label *ngIf="ver_seleccion" class="form-check-label"
+                                                        for="inlineCheckbox1"
+                                                        style="margin-left: 10px; font-size: 12px; color: blue; font-weight: bold;">
+                                                        TODOS
+                                                    </label>
+                                                </div>
+
+                                                <div class="col-md-6 col-lg-6 col-6"
+                                                    style="text-align:left; padding-bottom: 10px;">
+                                                    <input class="form-check-input" type="checkbox" id="personal"
+                                                        [(ngModel)]="isPersonal" *ngIf="ver_seleccion && ver_personal"
+                                                        (change)="ModificarPersonal($event)">
+                                                    <label *ngIf="ver_seleccion && ver_personal"
+                                                        class="form-check-label" for="inlineCheckbox1"
+                                                        style="margin-left: 10px; font-size: 12px; color: blue; font-weight: bold;">
+                                                        PERSONAL
+                                                    </label>
+                                                </div>
+                                            </div>
                                             <div class="row" style="text-align: center; padding-top: 10px;">
                                                 <div class="col-md-6 col-lg-6 col-6"
                                                     style="text-align:left; padding-bottom: 10px;"
-                                                    *ngFor="let n of administradores; index as i">
+                                                    *ngFor="let n of departamentos; index as i">
                                                     <input class="form-check-input" type="checkbox"
-                                                        name="adminSeleccionados" id="adminSeleccionados{{i}}"
-                                                        (change)="SeleccionarIndividual($event, n)">
+                                                        [(ngModel)]="n.seleccionado" name="departamentosSeleccionados"
+                                                        id="departamentosSeleccionados{{i}}"
+                                                        (change)="SeleccionarIndividual($event, n)"
+                                                        [disabled]="deshabilitarTodos">
                                                     <label style="margin-left: 10px; font-size: 11px;"
                                                         class="form-check-label" for="inlineCheckbox1">
-                                                        {{n.apellido}} {{n.nombre}}
+                                                        {{n.nombre}}
                                                     </label>
                                                 </div>
                                             </div>
@@ -165,29 +164,27 @@
                                 </div>
                             </div>
                             <div class="col-md">
-                                <div class="container" style="padding-top: 20px;" *ngIf="ver_administradores">
+                                <div class="container" style="padding-top: 20px;" *ngIf="ver_departamentos">
                                     <div id="resultados">
                                         <span>
-                                            LISTA DE USUARIOS SELECCIONADOS
+                                            LISTA DE DEPARTAMENTOS SELECCIONADOS
                                         </span>
                                     </div>
                                     <div class="table-responsive">
                                         <table class="table table-hover table-sm" id="detalle">
                                             <thead class="thead-light">
                                                 <tr style="text-align: center;">
-                                                    <th scope="col" colspan="2">Usuario</th>
+                                                    <th scope="col" colspan="2">Departamento</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr *ngFor="let a of adminSeleccionados">
-                                                    <td>{{a.apellido}} {{a.nombre}}
-                                                        <span *ngIf="a.jefe === true">(Jefe)</span>
-                                                    </td>
+                                                <tr *ngFor="let d of departamentosSeleccionados">
+                                                    <td> {{d.nombre}}</td>
                                                     <td>
                                                         <i matSuffix matTooltipPosition="right"
                                                             matTooltip="Retirar de la lista"
                                                             class="fa fa-times-circle-o" id="t-eliminar"
-                                                            (click)="RetirarLista(a.id)">
+                                                            (click)="RetirarLista(d.id)">
                                                         </i>
                                                     </td>
                                                 </tr>
@@ -195,12 +192,8 @@
                                         </table>
                                     </div>
                                     <div class="container d-flex flex-wrap justify-content-center">
-                                        <button *ngIf="adminSeleccionados.length != 0" id="btn-raised"
-                                            class="btn btn-sm" (click)="VerificarDatos()">
-                                            Verificar
-                                        </button>
-                                        <button *ngIf="ver_guardar && getAsignarEstablecimiento()" id="btn-raised" class="btn btn-sm"
-                                            (click)="IngresarUsuarioSucursal()">
+                                        <button *ngIf="ver_guardar" id="btn-raised" class="btn btn-sm"
+                                            (click)="IngresarUsuarioDepartamento()">
                                             Guardar
                                         </button>
                                     </div>

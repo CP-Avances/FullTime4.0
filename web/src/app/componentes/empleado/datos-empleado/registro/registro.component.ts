@@ -9,10 +9,11 @@ import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
-// SECCIÓN DE SERVICIOS
+// SECCION DE SERVICIOS
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-registro',
@@ -46,6 +47,10 @@ export class RegistroComponent implements OnInit {
   NacionalidadControl = new FormControl('', Validators.required);
   filteredOptions: Observable<any[]>;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private rol: RolesService,
     private rest: EmpleadoService,
@@ -53,10 +58,14 @@ export class RegistroComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router,
     private _formBuilder: FormBuilder,
+    public validar: ValidacionesService,
     public ventana: MatDialog,
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.CargarRoles();
     this.VerificarCodigo();
     this.AsignarFormulario();
@@ -93,8 +102,8 @@ export class RegistroComponent implements OnInit {
   // METODO PARA VALIDAR CAMPOS DE FORMULARIO
   AsignarFormulario() {
     this.primeroFormGroup = this._formBuilder.group({
-      apellidoForm: ['', Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,64}")],
-      nombreForm: ['', Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")],
+      apellidoForm: [''],
+      nombreForm: [''],
       cedulaForm: ['', Validators.required],
       codigoForm: [''],
       emailForm: ['', Validators.email],
@@ -103,8 +112,8 @@ export class RegistroComponent implements OnInit {
     this.segundoFormGroup = this._formBuilder.group({
       nacionalidadForm: this.NacionalidadControl,
       estadoCivilForm: ['', Validators.required],
-      domicilioForm: ['', Validators.required],
-      telefonoForm: ['', Validators.required],
+      domicilioForm: [''],
+      telefonoForm: [''],
       generoForm: ['', Validators.required],
     });
     this.terceroFormGroup = this._formBuilder.group({
@@ -132,9 +141,9 @@ export class RegistroComponent implements OnInit {
       }
       else {
         this.escritura = false;
-        
+
       }
-     
+
     }, error => {
       this.toastr.info('Configurar ingreso de código de usuarios.', '', {
         timeOut: 6000,
@@ -192,6 +201,8 @@ export class RegistroComponent implements OnInit {
       correo: form1.emailForm,
       codigo: form1.codigoForm,
       estado: 1,
+      user_name: this.user_name,
+      ip: this.ip
     };
 
     // CONTADOR 0 EL REGISTRO SE REALIZA UNA SOL VEZ, CONTADOR 1 SE DIO UN ERROR Y SE REALIZA NUEVAMENTE EL PROCESO
@@ -225,6 +236,8 @@ export class RegistroComponent implements OnInit {
       usuario: form3.userForm,
       id_rol: form3.rolForm,
       estado: true,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.user.RegistrarUsuario(dataUser).subscribe(data => {
       if (data.message === 'error') {
@@ -255,7 +268,9 @@ export class RegistroComponent implements OnInit {
     if (this.datosCodigo.automatico === true) {
       let dataCodigo = {
         valor: codigo,
-        id: 1
+        id: 1,
+        user_name: this.user_name,
+        ip: this.ip
       }
       this.rest.ActualizarCodigo(dataCodigo).subscribe(res => {
       })
@@ -267,33 +282,18 @@ export class RegistroComponent implements OnInit {
     let key = e.keyCode || e.which;
     let tecla = String.fromCharCode(key).toString();
     const patron = /^[a-zA-Z\s]*$/
-     if (!patron.test(tecla)) {
+    if (!patron.test(tecla)) {
       this.toastr.info('No se admite datos numéricos o caracteres especiales', 'Usar solo letras', {
         timeOut: 6000,
       });
       return false;
     }
   }
-  
+
 
   // METODO DE VALIDACION DE INGRESO DE NUMEROS
   IngresarSoloNumeros(evt: any) {
-    if (window.event) {
-      var keynum = evt.keyCode;
-    }
-    else {
-      keynum = evt.which;
-    }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
-    if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
-      return true;
-    }
-    else {
-      this.toastr.info('No se admite el ingreso de letras', 'Usar solo números', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
   IngresarSoloLetrasNumeros(e: any) {
@@ -308,23 +308,18 @@ export class RegistroComponent implements OnInit {
       });
       return false;
     }
-
-    // this.LlenarCodigo(cedula,form1,tecla)
-    
   }
 
-  LlenarCodigo(form1: any){
-   
+  // METODO PARA COLOCAR EL CODIGO SIMILAR AL CAMPO CEDULA
+  LlenarCodigo(form1: any) {
     if (this.cedula) {
-      let codigo:number = form1.cedulaForm;
-
-        this.primeroFormGroup.patchValue({
-          codigoForm: codigo 
-        })
-      
+      let codigo: number = form1.cedulaForm;
+      this.primeroFormGroup.patchValue({
+        codigoForm: codigo
+      })
     }
   }
-  
+
 
   // METODO PARA LIMPIAR FORMULARIOS
   LimpiarCampos() {

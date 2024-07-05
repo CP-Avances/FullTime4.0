@@ -213,7 +213,7 @@ export class MarcacionesEmpMacroComponent implements OnInit {
         { text: 'Métrica Marcaciones', bold: true, fontSize: 20, alignment: 'center', margin: [0, -40, 0, 10] },
         { text: 'Desde: ' + this.f_inicio_req + " Hasta: " + this.f_final_req, bold: true, fontSize: 13, alignment: 'center' },
         { image: this.graficaBase64, width: 525, margin: [0, 10, 0, 10] },
-        ...this.ImprimirDatos().map(obj => {
+        ...this.ImprimirDatos().map((obj: any) => {
           return obj
         }),
         { text: this.texto_grafica, margin: [10, 10, 10, 10], alignment: 'justify' },

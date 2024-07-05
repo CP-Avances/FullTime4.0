@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -30,8 +29,12 @@ export class EmpleadoUbicacionService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ubicacion/coordenadas-usuarios/general/${id_ubicacion}`);
   }
 
-  EliminarCoordenadasUsuario(id: number) {
-    return this.http.delete<any>(`${(localStorage.getItem('empresaURL') as string)}/ubicacion/eliminar-coordenadas-usuario/${id}`);
+  EliminarCoordenadasUsuario(id: number, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/ubicacion/eliminar-coordenadas-usuario/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
 
@@ -59,16 +62,17 @@ export class EmpleadoUbicacionService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/ubicacion/determinada/${id}`);
   }
 
-  ConsultarUltimoRegistro() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ubicacion/ultimo-registro`);
-  }
-
-  EliminarCoordenadas(id: number) {
-    return this.http.delete<any>(`${(localStorage.getItem('empresaURL') as string)}/ubicacion/eliminar/${id}`);
+  EliminarCoordenadas(id: number, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/ubicacion/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA CREAR ARCHIVO XML
   CrearXML(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/ubicacion/xmlDownload`, data);
   }
+
 }

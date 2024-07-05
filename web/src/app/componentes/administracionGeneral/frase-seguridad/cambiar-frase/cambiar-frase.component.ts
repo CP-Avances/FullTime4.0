@@ -8,6 +8,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { Router } from '@angular/router';
+import { use } from 'echarts';
 
 
 @Component({
@@ -20,6 +21,10 @@ export class CambiarFraseComponent implements OnInit {
 
   usuario: string; // VARIABLE DE ALMACENAMIENTO DE ID DE USUARIO
   datosUser: any = []; // VARIABLE DE ALMACENAMIENTO DE DATOS DE USUARIO
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // CAMPOS DEL FORMULARIO
   ActualFrase = new FormControl('', Validators.maxLength(100));
@@ -42,6 +47,8 @@ export class CambiarFraseComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   // METODO PARA COMPARAR FRASE ACTUAL CON LA INGRESADA POR EL USUARIO
@@ -69,7 +76,9 @@ export class CambiarFraseComponent implements OnInit {
   IngresarFrase(form: any) {
     let data = {
       frase: form.nFrase,
-      id_empleado: parseInt(this.usuario)
+      id_empleado: parseInt(this.usuario),
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restUser.ActualizarFrase(data).subscribe(data => {
       this.toastr.success('Frase ingresada exitosamente.', '', {

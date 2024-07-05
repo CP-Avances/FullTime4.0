@@ -36,9 +36,9 @@ class Empleados {
     }
 
     async setContrato(obj){
-        let id_regimen = await bdd.fulltime.query('SELECT id FROM cg_regimenes WHERE UPPER(descripcion) like $1',[obj.dgco_id.regimen]).then(result => {return result.rows[0].id})
+        let id_regimen = await bdd.fulltime.query('SELECT id FROM ere_cat_regimenes WHERE UPPER(descripcion) like $1',[obj.dgco_id.regimen]).then(result => {return result.rows[0].id})
         
-        return await bdd.fulltime.query('INSERT INTO empl_contratos (id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen) VALUES($1, $2, $3, $4, $5, $6) RETURNING id',
+        return await bdd.fulltime.query('INSERT INTO eu_empleado_contratos (id_empleado, fec_ingreso, fec_salida, vaca_controla, asis_controla, id_regimen) VALUES($1, $2, $3, $4, $5, $6) RETURNING id',
         [obj.id, obj.dgco_id.fechas[0].fecha_ingreso, obj.dgco_id.fechas[0].fecha_salida, obj.controla_vacacion, true, id_regimen])
         .then(result => {
             console.log(result.command, 'Contrato' , obj.id);
@@ -51,7 +51,7 @@ class Empleados {
         let sueldo = parseInt(obj.sueldo);
         (sueldo === 0) ? obj.sueldo = parseInt(obj.carg_id.cargo[0].sueldo) : obj.sueldo = sueldo;
         
-        return await bdd.fulltime.query('INSERT INTO empl_cargos(id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
+        return await bdd.fulltime.query('INSERT INTO eu_empleado_cargos(id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
         [obj.carg_id.id_empl_contrato, id_depa, obj.dgco_id.fechas[0].fecha_ingreso, obj.dgco_id.fechas[0].fecha_salida, id_suc, obj.sueldo, obj.horas_trabaja, obj.carg_id.cargo[0].descripcion])
         .then(result => { 
             console.log(result.command, 'Cargo', obj.carg_id.id_empl_contrato);
@@ -67,7 +67,7 @@ class Empleados {
             const id_empleado = await bdd.fulltime.query('SELECT id FROM empleados WHERE cedula = $1',[obj.cedula]).then(result => { return result.rows})
             // console.log('Consulta 1: ',id_empleado);
             if (id_empleado.length === 0) {
-                obj.id  = await bdd.fulltime.query('INSERT INTO empleados(cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, id_nacionalidad, codigo) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id', [obj.cedula, obj.apellido, obj.nombre, obj.estado_civil, obj.sexo, obj.correo, obj.fecha_nacimiento, obj.estado, obj.correo_alternativo, 94, obj.codigo_empleado])
+                obj.id  = await bdd.fulltime.query('INSERT INTO empleados(cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, id_nacionalidad, codigo) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id', [obj.cedula, obj.apellido, obj.nombre, obj.estado_civil, obj.sexo, obj.correo, obj.fecha_nacimiento, obj.estado, 94, obj.codigo_empleado])
                             .then(async(res) => {
                                 console.log(res.command, 'Empleado', res.rows[0].id);
                                 let clave = md5(obj.cedula);
@@ -95,8 +95,8 @@ class Empleados {
         }));
     }
 
-    async SetAdmin(cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, id_nacionalidad, codigo, usuario, id_rol, app_habilita) {
-        let id = await bdd.fulltime.query('INSERT INTO empleados(cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, id_nacionalidad, codigo) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id', [cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, id_nacionalidad, codigo])
+    async SetAdmin(cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, id_nacionalidad, codigo, usuario, id_rol, app_habilita) {
+        let id = await bdd.fulltime.query('INSERT INTO empleados(cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, id_nacionalidad, codigo) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id', [cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado, id_nacionalidad, codigo])
         .then(result => {
             console.log(result.command);
             return result.rows[0].id;

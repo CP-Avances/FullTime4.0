@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -34,32 +33,18 @@ export class AutorizaDepartamentoService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/autorizaDepartamento/eliminar/${id}`);
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-  //Empleado que autoriza en un departamento
-
-  ConsultarAutorizaDepartamento() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/autorizaDepartamento`);
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/autorizaDepartamento/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
 
   BuscarEmpleadosAutorizan(id: any) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/autorizaDepartamento/empleadosAutorizan/${id}`);
   }
-
 
   // METODO PARA LISTAR USUARIOS QUE APRUEBAN EN UN DEPARTAMENTO    --**VERIFICADO
   BuscarListaEmpleadosAutorizan(id: any) {

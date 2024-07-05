@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col-md">
                 <div id="titulo">
-                    <span>PEDIDOS DE ACCIONES DE PERSONAL</span>
+                    <span>LISTA DE PEDIDOS DE ACCIONES DE PERSONAL</span>
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="d-flex justify-content-around" style="margin-top: 1%; margin-bottom: 2%;">
@@ -43,14 +43,14 @@
                         <tr>
                             <td>
                                 <mat-form-field id="t-inputs" style="width: 125px;">
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroApellido"
-                                        [formControl]="apellido" type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" [formControl]="apellido" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
                                 </mat-form-field>
                             </td>
                             <td>
                                 <mat-form-field id="t-inputs" style="width: 125px;">
-                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroNombre"
-                                        [formControl]="nombre" type="text" (keypress)="IngresarSoloLetras($event)">
+                                    <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
                                 </mat-form-field>
                             </td>
                             <td></td>
@@ -65,13 +65,13 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let a of listaPedidos  | emplNombre: filtroNombre | emplApellido: filtroApellido  | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let a of listaPedidos  | emplNombre: nombre.value | emplApellido: apellido.value  | paginate:tamanio_pagina:numero_pagina">
                             <td>{{a.apellido}}</td>
                             <td>{{a.nombre}}</td>
                             <td>{{a.fecCreacion_}}</td>
                             <td>{{a.fecDesde_}}</td>
                             <td>{{a.fecHasta_}}</td>
-                            <td>{{a.num_partida}}</td>
+                            <td>{{a.numero_partida_empresa}}</td>
                             <td class="justify-content-center" style="margin-right: 1rem;">
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"

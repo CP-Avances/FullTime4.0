@@ -17,6 +17,10 @@ export class ConfirmarDesactivadosComponent implements OnInit {
   contenidoDeshabilitar: boolean = false;
   contenidoReactivar: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private toastr: ToastrService,
     private restE: EmpleadoService,
@@ -25,7 +29,10 @@ export class ConfirmarDesactivadosComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.ids = this.Empleados.lista.map(obj => {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
+    this.ids = this.Empleados.lista.map((obj: any) => {
       return obj.id
     });
     this.Opcion();
@@ -49,9 +56,14 @@ export class ConfirmarDesactivadosComponent implements OnInit {
 
   // METODO PARA GUARDAR CAMBIOS EN BASE DE DATOS
   ConfirmarListaEmpleados() {
+    const datos = {
+      arrayIdsEmpleados: this.ids,
+      user_name: this.user_name,
+      ip: this.ip
+    }
     // INACTIVAR EMPLEADOS
     if (this.Empleados.opcion === 1) {
-      this.restE.DesactivarVariosUsuarios(this.ids).subscribe(res => {
+      this.restE.DesactivarVariosUsuarios(datos).subscribe(res => {
         this.toastr.success(res.message, '', {
           timeOut: 6000,
         })
@@ -60,7 +72,7 @@ export class ConfirmarDesactivadosComponent implements OnInit {
 
       // ACTIVAR EMPLEADOS
     } else if (this.Empleados.opcion === 2) {
-      this.restE.ActivarVariosUsuarios(this.ids).subscribe(res => {
+      this.restE.ActivarVariosUsuarios(datos).subscribe(res => {
         this.toastr.success(res.message, '', {
           timeOut: 6000,
         })
@@ -69,7 +81,7 @@ export class ConfirmarDesactivadosComponent implements OnInit {
 
       // REACTIVAR EMPLEADOS
     } else if (this.Empleados.opcion === 3) {
-      this.restE.ReActivarVariosUsuarios(this.ids).subscribe(res => {
+      this.restE.ReActivarVariosUsuarios(datos).subscribe(res => {
         this.toastr.success(res.message, '', {
           timeOut: 6000,
         })

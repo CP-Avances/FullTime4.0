@@ -14,42 +14,25 @@
     </div>
     <div class="container" style="padding: 10px; text-align: center; margin-top: 10px; margin-bottom: 10px;">
         <div class="mat-elevation-z8" style="background: white;">
-
-
-
-
             <div class="d-flex bd-highlight" id="titulo">
-
-
-
                 <div class="w-100 bd-highlight">
                     <h5>
                         DEPARTAMENTO {{info.nombre}} - ESTABLECIMIENTO {{nombre_sucursal}}
                     </h5>
-                </div>
-
-                
-                <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-    
+                </div>             
+                <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">    
                     <mat-icon class="float-right" id="cerrar" (click)="CargarDatos(info)" matTooltipPosition="right"
                     matTooltip="Actualización de niveles de aprobación.">autorenew</mat-icon>
-                </div>
-    
-    
-                <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-    
+                </div>   
+                <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">   
                     <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
                         (click)="ConfirmarDeleteMultiple()" *ngIf="getVerDepartamentoEliminarNiveles()">Eliminar </button>
                 </div>
-            </div>
-
-
-    
+            </div>    
             <div class="table-responsive">
                 <table class="table table-hover table-sm">
                     <thead class="thead-light">
                         <tr>
-
                             <th>
                                 <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
                                     matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
@@ -70,7 +53,6 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let departamento of departamentos">
-
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionNivel.toggle(departamento) : null"
@@ -98,7 +80,6 @@
             </div>
         </div>
     </div>
-
     <div [hidden]="mostrar" class="container"
         style="padding: 10px; text-align: center; margin-top: 5px; margin-bottom: 10px;">
         <div class="mat-elevation-z8" style="background: white;">
@@ -118,8 +99,6 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let empleado of empleados">
-
-
                             <td>{{empleado.nombre}} {{empleado.apellido}}</td>
                             <td>{{empleado.cargo}}</td>
                             <td>

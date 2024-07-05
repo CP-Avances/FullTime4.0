@@ -28,22 +28,21 @@
                 <table class="table table-hover table-sm">
                     <thead class="thead-light">
                         <tr style="text-align: center;">
-                            <th scope="col">Descripción</th>
-                            <th scope="col">Recargo</th>
-                            <th scope="col">Recarga porcentual</th>
-                            <th scope="col">Hora desde</th>
-                            <th scope="col">Hora hasta</th>
-                            <th scope="col">Jornada</th>
-                            <th scope="col">Tipo día</th>
-                            <th scope="col">Acción</th>
+                            <th id="cabecera" scope="col">Descripción</th>
+                            <th id="cabecera" scope="col">Recargo</th>
+                            <th id="cabecera" scope="col">Recarga porcentual</th>
+                            <th id="cabecera" scope="col">Hora desde</th>
+                            <th id="cabecera" scope="col">Hora hasta</th>
+                            <th id="cabecera" scope="col">Jornada</th>
+                            <th id="cabecera" scope="col">Tipo día</th>
+                            <th id="cabecera" scope="col">Acción</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>
                                 <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" minlength="2" [formControl]="nombreF"
-                                        [(ngModel)]="filtroDescripcion">
+                                    <input matInput placeholder="Buscar" minlength="2" [formControl]="nombreF">
                                 </mat-form-field>
                             </td>
                             <td></td>
@@ -60,10 +59,10 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let he of horasExtras | filtroNombre: filtroDescripcion | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let he of horasExtras | filtroNombre: nombreF.value | paginate:tamanio_pagina:numero_pagina">
                             <td style="padding-top: 10px;text-align: center;">{{he.descripcion}}</td>
                             <td style="padding-top: 10px;text-align: center;">{{he.tipo_descuento}}</td>
-                            <td style="padding-top: 10px;text-align: center;">{{he.reca_porcentaje}}</td>
+                            <td style="padding-top: 10px;text-align: center;">{{he.recargo_porcentaje}}</td>
                             <td style="padding-top: 10px;text-align: center;">{{he.h_inicio_}}</td>
                             <td style="padding-top: 10px;text-align: center;">{{he.h_final_}}</td>
                             <td style="padding-top: 10px;text-align: center;">{{he.hora_jornada}}</td>

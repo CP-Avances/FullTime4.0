@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -28,8 +27,12 @@ export class AccionPersonalService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal`, datos);
   }
 
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/eliminar/${id}`);
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/accionPersonal/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   BuscarDatosTipoEdicion(id: any) {
@@ -43,10 +46,6 @@ export class AccionPersonalService {
 
   IngresarTipoAccion(datos: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/accion/tipo`, datos);
-  }
-
-  BuscarIdTipoAccion() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/ultimo/accion/tipo`);
   }
 
   /** SERVICIOS PARA TABLA CARGO_PROPUESTO*/
@@ -66,7 +65,7 @@ export class AccionPersonalService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/tipo/cargo`);
   }
 
-  /** SERVICIOS PARA TABLA DECRETO_ACUERDO_RESOLUCION*/
+  /** SERVICIOS PARA TABLA CONTEXTO LEGAL*/
   ConsultarDecreto() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/decreto`);
   }

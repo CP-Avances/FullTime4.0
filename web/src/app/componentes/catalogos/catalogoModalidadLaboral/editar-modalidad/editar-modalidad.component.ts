@@ -11,6 +11,10 @@ import { CatModalidadLaboralService } from 'src/app/servicios/catalogos/catModal
 })
 export class EditarModalidadComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   modalidad = new FormControl('', Validators.required)
 
   public formulario = new FormGroup({
@@ -25,6 +29,9 @@ export class EditarModalidadComponent implements OnInit {
   ){}
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ImprimirDatos();
   }
 
@@ -45,6 +52,8 @@ export class EditarModalidadComponent implements OnInit {
     let modalidad = {
       id: this.data.id,
       modalidad: form.modalidad,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     this._ModalidaLaboral.ActualizarModalidadLab(modalidad).subscribe(response => {
       console.log('response: ',response);
@@ -62,14 +71,14 @@ export class EditarModalidadComponent implements OnInit {
           timeOut: 4000,
         });
       }
-      
+
     }, error => {
       this.toastr.info(error, 'Error', {
         timeOut: 4000,
       })
     });
   }
-  
+
     // METODO PARA VALIDAR INGRESO DE LETRAS
     IngresarSoloLetras(e: any) {
       let key = e.keyCode || e.which;
@@ -92,7 +101,7 @@ export class EditarModalidadComponent implements OnInit {
         return false;
       }
     }
-  
+
     // METODO PARA CERRAR VENTANA DE REGISTRO
     CerrarVentana() {
       this.LimpiarCampos();

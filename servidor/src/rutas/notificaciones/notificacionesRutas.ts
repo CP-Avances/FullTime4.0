@@ -18,17 +18,6 @@ class NotificacionTiempoRealRutas {
         // RUTA PARA CREAR NOTIFICACION
         this.router.post('/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.CrearNotificacion);
 
-
-
-
-
-
-
-
-        this.router.get('/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ListarNotificacion);
-
-        this.router.get('/send/:id_send', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ListaPorEmpleado);
-
         this.router.get('/all-receives/:id_receive', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ListaNotificacionesRecibidas);
 
         this.router.put('/vista/:id', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ActualizarVista);
@@ -37,7 +26,7 @@ class NotificacionTiempoRealRutas {
         // NOTIFICACIONES RECIBIDAS POR UN USUARIO
         this.router.get('/receives/:id_receive', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ListarNotificacionUsuario);
 
-        // RUTAS CONFIGURACION DE RECEPCION DE NOTIFICACIONES CONFIG_NOTI 
+        // RUTAS CONFIGURACION DE RECEPCION DE NOTIFICACIONES CONFIGURAR_ALERTAS 
    
         this.router.post('/config/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.CrearConfiguracion);
         this.router.put('/config/noti-put/:id', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ActualizarConfigEmpleado);
@@ -60,15 +49,6 @@ class NotificacionTiempoRealRutas {
         
         // METODO PARA ENVIAR CORREO DE APROBACION MULTIPLE DESDE LA APLICACION  MÓVIL
         this.router.post('/mail-multiple-movil/', NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarCorreoSolicitudes);
-
-
-
-
-
-
-
-
-
 
         /** *************************************************************************************** **
          ** **                    MANEJO DE DATOS DE COMUNICADOS                                 ** ** 

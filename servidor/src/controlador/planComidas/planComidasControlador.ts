@@ -1,10 +1,14 @@
-import {
-  enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
-  FormatearFecha, FormatearHora, dia_completo
-}
-  from '../../libs/settingsMail';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import {
+  enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
+  FormatearFecha, FormatearHora, dia_completo, FormatearFecha2
+}
+  from '../../libs/settingsMail';
+
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
+
+const builder = require('xmlbuilder');
 import pool from '../../database';
 import path from 'path';
 
@@ -91,12 +95,6 @@ class PlanComidasControlador {
     }
   }
 
-
-
-
-
-
-
   public async EncontrarSolicitaComidaIdEmpleado(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
     const PLAN_COMIDAS = await pool.query(
@@ -141,7 +139,10 @@ class PlanComidasControlador {
   public async CrearPlanComidas(req: Request, res: Response): Promise<Response> {
     try {
       const { fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin,
-        extra, fec_inicio, fec_final } = req.body;
+        extra, fec_inicio, fec_final, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
         `
@@ -153,6 +154,34 @@ class PlanComidasControlador {
 
       const [planAlimentacion] = response.rows;
 
+
+      console.log("fecha: ", fec_inicio);
+
+      const fechaHora = await FormatearHora(fec_inicio.split('T')[1]);
+      console.log("fecha: ", fechaHora);
+
+      const fechaTimbre = await FormatearFecha2(fec_inicio.toLocaleString(), 'ddd')
+      console.log("fecha: ", fechaTimbre);
+
+      console.log(fec_inicio)
+
+
+
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ma_detalle_plan_comida',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: JSON.stringify(planAlimentacion),
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
       if (!planAlimentacion) {
         return res.status(404).jsonp({ message: 'error' })
       }
@@ -161,41 +190,10 @@ class PlanComidasControlador {
       }
 
     } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
-  }
-
-
-
-
-
-  public async ObtenerUltimaPlanificacion(req: Request, res: Response) {
-    const PLAN_COMIDAS = await pool.query(
-      `
-      SELECT MAX(id) AS ultimo FROM ma_detalle_plan_comida
-      `
-    );
-    if (PLAN_COMIDAS.rowCount != 0) {
-      return res.jsonp(PLAN_COMIDAS.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-    }
-  }
-
-  public async ActualizarPlanComidas(req: Request, res: Response): Promise<void> {
-    const {
-      fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin,
-      extra, id
-    } = req.body;
-    await pool.query(
-      `
-      UPDATE ma_detalle_plan_comida SET id_empleado = $1, fecha = $2, id_comida = $3,
-        observacion = $4, fecha_comida = $5, hora_inicio = $6, hora_fin = $7, extra = $8
-      WHERE id = $9
-      `
-      , [fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id]);
-    res.jsonp({ message: 'Registro guardado.' });
   }
 
   public async EncontrarPlanComidaEmpleadoConsumido(req: Request, res: Response): Promise<any> {
@@ -280,34 +278,46 @@ class PlanComidasControlador {
   }
 
   public async CrearTipoComidas(req: Request, res: Response) {
-    const { nombre } = req.body;
-    const response: QueryResult = await pool.query(
-      `
-      INSERT INTO ma_cat_comidas (nombre) VALUES ($1) RETURNING *
-      `
-      , [nombre]);
-    const [tipo] = response.rows;
+    try {
+      const { nombre, user_name, ip } = req.body;
 
-    if (tipo) {
-      return res.status(200).jsonp(tipo);
-    } else {
-      return res.status(404).jsonp({ message: "error" });
-    };
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      const response: QueryResult = await pool.query(
+        `
+        INSERT INTO ma_cat_comidas (nombre) VALUES ($1) RETURNING *
+        `
+        ,
+        [nombre]);
+      const [tipo] = response.rows;
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ma_cat_comidas',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: JSON.stringify(tipo),
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
+      if (tipo) {
+        return res.status(200).jsonp(tipo);
+      } else {
+        return res.status(404).jsonp({ message: "error" });
+      };
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
 
-  public async VerUltimoTipoComidas(req: Request, res: Response) {
-    const PLAN_COMIDAS = await pool.query(
-      `
-      SELECT MAX(id) FROM ma_cat_comidas
-      `
-    );
-    if (PLAN_COMIDAS.rowCount != 0) {
-      return res.jsonp(PLAN_COMIDAS.rows)
-    }
-    else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
-    }
-  }
 
   /** **************************************************************************************************** **
    ** **                          METODOS DE CREACION DE SOLICITUD DE COMIDAS                           ** ** 
@@ -318,7 +328,10 @@ class PlanComidasControlador {
 
     try {
       const { id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin,
-        extra, verificar, id_departamento } = req.body;
+        extra, verificar, id_departamento, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
         `
@@ -329,7 +342,27 @@ class PlanComidasControlador {
         , [id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, verificar]);
       const [objetoAlimento] = response.rows;
 
-      if (!objetoAlimento) return res.status(404).jsonp({ message: 'Registro guardado.' })
+      var fechaN = await FormatearFecha2(fecha, 'ddd');
+      var fechaComidaN = await FormatearFecha2(fec_comida, 'ddd');
+      var horaInicioN = await FormatearHora(hora_inicio);
+      var horaFinN = await FormatearHora(hora_fin);
+
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ma_solicitud_comida',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}, observacion: ${observacion}, extra: ${extra}, verificar: ${verificar}} `,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
+      if (!objetoAlimento) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
 
       const alimento = objetoAlimento;
 
@@ -337,7 +370,8 @@ class PlanComidasControlador {
 
 
     } catch (error) {
-      console.log(error);
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
   }
@@ -345,45 +379,147 @@ class PlanComidasControlador {
   // METODO DE ACTUALIZACIÓN DE SERVICIO DE ALIMENTACION
   public async ActualizarSolicitaComida(req: Request, res: Response): Promise<Response> {
 
-    const { id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin,
-      extra, id, id_departamento } = req.body;
+    try {
+      const { id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin,
+        extra, id, id_departamento, user_name, ip } = req.body;
 
-    const response: QueryResult = await pool.query(
-      `
-      UPDATE ma_solicitud_comida SET id_empleado = $1, fecha = $2, id_comida = $3, 
-        observacion = $4, fecha_comida = $5, hora_inicio = $6, hora_fin = $7, extra = $8 
-      WHERE id = $9 RETURNING *
-      `
-      , [id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id]);
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-    const [objetoAlimento] = response.rows;
+      // CONSULTAR DATOSORIGINALES
+      const planComida = await pool.query('SELECT * FROM ma_solicitud_comida WHERE id = $1', [id]);
+      const [datosOriginales] = planComida.rows;
 
-    if (!objetoAlimento) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'ma_solicitud_comida',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar solicitud de comidas con id: ${id}. Registro no encontrado`
+        });
 
-    const alimento = objetoAlimento;
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado' });
+      }
 
-    return res.status(200).jsonp(alimento);
+      const response: QueryResult = await pool.query(
+        `
+        UPDATE ma_solicitud_comida SET id_empleado = $1, fecha = $2, id_comida = $3, 
+          observacion = $4, fecha_comida = $5, hora_inicio = $6, hora_fin = $7, extra = $8 
+        WHERE id = $9 RETURNING *
+        `
+        , [id_empleado, fecha, id_comida, observacion, fec_comida, hora_inicio, hora_fin, extra, id]);
 
+      const [objetoAlimento] = response.rows;
+
+
+      var fechaN = await FormatearFecha2(fecha, 'ddd');
+      var fechaComidaN = await FormatearFecha2(fec_comida, 'ddd');
+      var horaInicioN = await FormatearHora(hora_inicio);
+      var horaFinN = await FormatearHora(hora_fin);
+
+
+      var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+      var fechaComidaO = await FormatearFecha2(datosOriginales.fecha_comida, 'ddd');
+      var horaInicioO = await FormatearHora(datosOriginales.hora_inicio);
+      var horaFinO = await FormatearHora(datosOriginales.hora_fin);
+
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ma_solicitud_comida',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_detalle_comida: ${datosOriginales.id_detalle_comida}, fecha: ${fechaO}, fecha_comida: ${fechaComidaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${datosOriginales.observacion}, extra: ${datosOriginales.extra}, verificar: ${datosOriginales.verificar}} `,
+        datosNuevos: `{id_empleado: ${id_empleado}, id_detalle_comida: ${id_comida}, fecha: ${fechaN}, fecha_comida: ${fechaComidaN}, hora_inicio: ${horaInicioN}, hora_fin: ${horaFinN}, observacion: ${observacion}, extra: ${extra}}} `,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
+      if (!objetoAlimento) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
+
+      const alimento = objetoAlimento;
+
+      return res.status(200).jsonp(alimento);
+
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
 
   // ELIMINAR REGISTRO DE SOLIICTUD DE COMIDA
   public async EliminarSolicitudComida(req: Request, res: Response): Promise<Response> {
 
-    const id = req.params.id;
+    try {
+      const { user_name, ip } = req.body;
+      const id = req.params.id;
 
-    const response: QueryResult = await pool.query(
-      `
-      DELETE FROM ma_solicitud_comida WHERE id = $1 RETURNING *
-      `
-      , [id]);
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-    const [alimentacion] = response.rows;
+      // CONSULTAR DATOSORIGINALES
+      const planComida = await pool.query('SELECT * FROM ma_solicitud_comida WHERE id = $1', [id]);
+      const [datosOriginales] = planComida.rows;
 
-    if (alimentacion) {
-      return res.status(200).jsonp(alimentacion)
-    }
-    else {
-      return res.status(404).jsonp({ message: 'Registro no eliminado.' })
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'ma_solicitud_comida',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar solicitud de comidas con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado' });
+      }
+      const response: QueryResult = await pool.query(
+        `
+        DELETE FROM ma_solicitud_comida WHERE id = $1 RETURNING *
+        `, [id]);
+
+      const [alimentacion] = response.rows;
+      var fechaO = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+      var fechaComidaO = await FormatearFecha2(datosOriginales.fecha_comida, 'ddd');
+      var horaInicioO = await FormatearHora(datosOriginales.hora_inicio);
+      var horaFinO = await FormatearHora(datosOriginales.hora_fin);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ma_solicitud_comida',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_detalle_comida: ${datosOriginales.id_detalle_comida}, fecha: ${fechaO}, fecha_comida: ${fechaComidaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, observacion: ${datosOriginales.observacion}, extra: ${datosOriginales.extra}, verificar: ${datosOriginales.verificar}} `,
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
+      if (alimentacion) {
+        return res.status(200).jsonp(alimentacion)
+      }
+      else {
+        return res.status(404).jsonp({ message: 'Solicitud no eliminada.' })
+      }
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
 
   }
@@ -391,94 +527,317 @@ class PlanComidasControlador {
   // METODO PARA ACTUALIZAR ESTADO DE SOLICITUD DE ALIMENTACION
   public async AprobarSolicitaComida(req: Request, res: Response): Promise<Response> {
 
-    const { aprobada, verificar, id } = req.body;
+    try {
+      const { aprobada, verificar, id, user_name, ip } = req.body;
 
-    const response: QueryResult = await pool.query(
-      `
-      UPDATE ma_solicitud_comida SET aprobada = $1, verificar = $2 WHERE id = $3 RETURNING *
-      `
-      , [aprobada, verificar, id]);
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-    const [objetoAlimento] = response.rows;
+      // CONSULTAR DATOSORIGINALES
+      const planComida = await pool.query('SELECT * FROM ma_solicitud_comida WHERE id = $1', [id]);
+      const [datosOriginales] = planComida.rows;
 
-    if (objetoAlimento) {
-      return res.status(200).jsonp(objetoAlimento)
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'ma_solicitud_comida',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar estado de solicitud de comidas con id: ${id}. Registro no encontrado`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado' });
+      }
+
+      const response: QueryResult = await pool.query(
+        `
+        UPDATE ma_solicitud_comida SET aprobada = $1, verificar = $2 WHERE id = $3 RETURNING *
+        `
+        , [aprobada, verificar, id]);
+
+      const [objetoAlimento] = response.rows;
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ma_solicitud_comida',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: JSON.stringify(objetoAlimento),
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
+      if (objetoAlimento) {
+        return res.status(200).jsonp(objetoAlimento)
+      }
+      else {
+        return res.status(404).jsonp({ message: 'error' })
+      }
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
-    else {
-      return res.status(404).jsonp({ message: 'error' })
-    }
-
   }
 
   //  CREAR REGISTRO DE ALIMENTOS APROBADOS POR EMPLEADO
   public async CrearComidaAprobada(req: Request, res: Response): Promise<Response> {
 
-    const { codigo, id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido } = req.body;
+    try {
+      const { codigo, id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
 
-    const response: QueryResult = await pool.query(
-      `
-      INSERT INTO ma_empleado_plan_comida_general (codigo, id_empleado, id_sol_comida, fecha,
-        hora_inicio, hora_fin, consumido) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-      `
-      , [codigo, id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido]);
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-    const [objetoAlimento] = response.rows;
+      const response: QueryResult = await pool.query(
+        `
+        INSERT INTO ma_empleado_plan_comida_general (codigo, id_empleado, id_solicitud_comida, fecha,
+          hora_inicio, hora_fin, consumido) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+        `
+        , [codigo, id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido]);
 
-    if (objetoAlimento) {
-      return res.status(200).jsonp(objetoAlimento)
-    }
-    else {
-      return res.status(404).jsonp({ message: 'error' })
+      const [objetoAlimento] = response.rows;
+
+
+      var fechaN = await FormatearFecha2(fecha, 'ddd');
+      var horaInicio = await FormatearHora(hora_inicio)
+      var horaFin = await FormatearHora(hora_fin)
+
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ma_empleado_plan_comida_general',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{codigo: ${codigo}, id_empleado: ${id_empleado}, id_detalle_plan: null, id_solicitud_comida: ${id_sol_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
+      if (objetoAlimento) {
+        return res.status(200).jsonp(objetoAlimento)
+      }
+      else {
+        return res.status(404).jsonp({ message: 'error' })
+      }
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
   // ELIMINAR ALIMENTACION APROBADA
   public async EliminarComidaAprobada(req: Request, res: Response): Promise<Response> {
 
-    const id = req.params.id;
-    const fecha = req.params.fecha;
-    const id_empleado = req.params.id_empleado;
-    const response: QueryResult = await pool.query(
-      `
-      DELETE FROM ma_empleado_plan_comida_general 
-      WHERE id_solicitud_comida = $1 AND fecha = $2 AND id_empleado = $3
-      RETURNING *
-      `
-      , [id, fecha, id_empleado]);
+    try {
+      const id = req.params.id;
+      const fecha = req.params.fecha;
+      const id_empleado = req.params.id_empleado;
 
-    const [objetoAlimento] = response.rows;
+      const { user_name, ip } = req.body;
 
-    if (objetoAlimento) {
-      return res.status(200).jsonp(objetoAlimento)
-    }
-    else {
-      return res.status(404).jsonp({ message: 'error' })
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const planComida = await pool.query(
+        `
+        SELECT * FROM ma_empleado_plan_comida_general WHERE id_solicitud_comida = $1 AND fecha = $2 AND id_empleado = $3
+        `
+        , [id, fecha, id_empleado]);
+      const [datosOriginales] = planComida.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'ma_empleado_plan_comida_general',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar registro de planificación de comidas con id: ${id}. Registro no encontrado`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado' });
+      }
+
+      const response: QueryResult = await pool.query(
+        `
+        DELETE FROM ma_empleado_plan_comida_general 
+        WHERE id_solicitud_comida = $1 AND fecha = $2 AND id_empleado = $3
+        RETURNING *
+        `
+        , [id, fecha, id_empleado]);
+
+      const [objetoAlimento] = response.rows;
+      var fechaN = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+      var horaInicio = await FormatearHora(datosOriginales.hora_inicio)
+      var horaFin = await FormatearHora(datosOriginales.hora_fin)
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ma_empleado_plan_comida_general',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado: ${datosOriginales.id_empleado}, id_detalle_plan: ${datosOriginales.id_detalle_plan}, id_solicitud_comida: ${datosOriginales.id_solicitud_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: ${datosOriginales.ticket}, consumido: ${datosOriginales.consumido}}`,
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
+      if (objetoAlimento) {
+        return res.status(200).jsonp(objetoAlimento)
+      }
+      else {
+        return res.status(404).jsonp({ message: 'error' })
+      }
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
   // ELIMINAR REGISTRO DE ALIMENTACION
-  public async EliminarRegistros(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    await pool.query(
-      `
-      DELETE FROM ma_detalle_plan_comida WHERE id = $1
-      `
-      , [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+  public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
+    try {
+      const { user_name, ip } = req.body;
+      const id = req.params.id;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const planComida = await pool.query('SELECT * FROM ma_detalle_plan_comida WHERE id = $1', [id]);
+      const [datosOriginales] = planComida.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'ma_detalle_plan_comida',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar registro de planificación de comidas con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado' });
+      }
+
+      await pool.query(
+        `
+        DELETE FROM ma_detalle_plan_comida WHERE id = $1
+        `
+        , [id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ma_detalle_plan_comida',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
 
   // ELIMINAR PLANIFICACION DE UN USUARIO ESPECIFICO
-  public async EliminarPlanComidaEmpleado(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    const id_empleado = req.params.id_empleado;
-    await pool.query(
-      `
-      DELETE FROM ma_empleado_plan_comida_general WHERE id_detalle_plan = $1 AND id_empleado = $2
-      `
-      , [id, id_empleado]);
+  public async EliminarPlanComidaEmpleado(req: Request, res: Response): Promise<Response> {
+    try {
+      const { user_name, ip } = req.body;
 
-    res.jsonp({ message: 'Registro eliminado.' });
+      const id = req.params.id;
+      const id_empleado = req.params.id_empleado;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const planComida = await pool.query(
+        `
+        SELECT * FROM ma_empleado_plan_comida_general WHERE id_detalle_plan = $1 AND id_empleado = $2
+        `
+        , [id, id_empleado]);
+      const [datosOriginales] = planComida.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'ma_empleado_plan_comida_general',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar registro de planificación de comidas con id: ${id}. Registro no encontrado`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado' });
+      }
+
+      await pool.query(
+        `
+        DELETE FROM ma_empleado_plan_comida_general WHERE id_detalle_plan = $1 AND id_empleado = $2
+        `
+        , [id, id_empleado]);
+        
+      var fechaN = await FormatearFecha2(datosOriginales.fecha, 'ddd');
+      var horaInicio = await FormatearHora(datosOriginales.hora_inicio)
+      var horaFin = await FormatearHora(datosOriginales.hora_fin)
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ma_empleado_plan_comida_general',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado: ${datosOriginales.id_empleado}, id_detalle_plan: ${datosOriginales.id_detalle_plan}, id_solicitud_comida: ${datosOriginales.id_solicitud_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: ${datosOriginales.ticket}, consumido: ${datosOriginales.consumido}}`,
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
+      return res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
 
   // BUSQUEDA DE PLANIFICCAIONES DE ALIMENTACION POR ID DE PLANIFICACION
@@ -506,16 +865,44 @@ class PlanComidasControlador {
   // CREAR PLANIFICACIÓN POR EMPLEADO
   public async CrearPlanEmpleado(req: Request, res: Response): Promise<void> {
 
-    const { codigo, id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido } = req.body;
+    try {
+      const { codigo, id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
 
-    await pool.query(
-      `
-      INSERT INTO plan_comida_empleado (codigo, id_empleado, id_detalle_plan, fecha, 
-        hora_inicio, hora_fin, consumido) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      `
-      , [codigo, id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido]);
-    res.jsonp({ message: 'Registro guardado.' });
+      // INICIAR TRANSACCION
+      await pool.query('COMMIT');
+
+      const response = await pool.query(
+        `
+        INSERT INTO ma_empleado_plan_comida_general (codigo, id_empleado, id_detalle_plan, fecha, 
+          hora_inicio, hora_fin, consumido) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+        `
+        , [codigo, id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido]);
+
+      const [planAlimentacion] = response.rows;
+      var fechaN = await FormatearFecha2(fecha, 'ddd');
+      var horaInicio = await FormatearHora(hora_inicio)
+      var horaFin = await FormatearHora(hora_fin)
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ma_empleado_plan_comida_general',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{codigo: ${codigo}, id_empleado: ${id_empleado}, id_detalle_plan: ${id_plan_comida}, id_solicitud_comida: null, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      res.jsonp({ message: 'Planificación del almuerzo ha sido guardada con éxito' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      res.status(500).jsonp({ message: 'error' });
+    }
   }
 
   // METODO PARA BUSCAR DATOS DE PLANIFICACIÓN DE ALIMENTACIÓN POR ID DE USUARIO
@@ -546,47 +933,70 @@ class PlanComidasControlador {
 
   // NOTIFICACIONES DE SOLICITUDES Y PLANIFICACIÓN DE SERVICIO DE ALIMENTACIÓN
   public async EnviarNotificacionComidas(req: Request, res: Response): Promise<Response> {
-    let { id_empl_envia, id_empl_recive, mensaje, tipo, id_comida } = req.body;
-    var tiempo = fechaHora();
-    let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
-    const SERVICIO_SOLICITADO = await pool.query(
-      `
+    try {
+      let { id_empl_envia, id_empl_recive, mensaje, tipo, id_comida, user_name, ip } = req.body;
+      var tiempo = fechaHora();
+      let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
+      const SERVICIO_SOLICITADO = await pool.query(
+        `
         SELECT tc.nombre AS servicio, ctc.nombre AS menu, ctc.hora_inicio, ctc.hora_fin, 
           dm.nombre AS comida, dm.valor, dm.observacion 
         FROM ma_cat_comidas AS tc, ma_horario_comidas AS ctc, ma_detalle_comida AS dm 
         WHERE tc.id = ctc.id_comida AND ctc.id = dm.id_horario_comida AND dm.id = $1
-      `
-      , [id_comida]);
+        `,
+        [id_comida]);
 
-    let notifica = mensaje + SERVICIO_SOLICITADO.rows[0].servicio;
+      let notifica = mensaje + SERVICIO_SOLICITADO.rows[0].servicio;
 
-    const response: QueryResult = await pool.query(
-      `
-      INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
-      VALUES($1, $2, $3, $4, $5) 
-      RETURNING *
-      `
-      , [create_at, id_empl_envia, id_empl_recive, notifica, tipo]);
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-    const [notificiacion] = response.rows;
+      const response: QueryResult = await pool.query(
+        `
+        INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
+        VALUES($1, $2, $3, $4, $5) 
+        RETURNING *
+        `,
+        [create_at, id_empl_envia, id_empl_recive, notifica, tipo]);
 
-    if (!notificiacion) return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
+      const [notificiacion] = response.rows;
+      const fechaHoraN = await FormatearHora(create_at.toLocaleString().split(' ')[1])
+      const fechaN = await FormatearFecha2(create_at.toLocaleString(), 'ddd')
 
-    const USUARIO = await pool.query(
-      `
-      SELECT (nombre || ' ' || apellido) AS usuario
-      FROM eu_empleados WHERE id = $1
-      `
-      , [id_empl_envia]);
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ecm_realtime_timbres',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `id_empleado_envia: ${id_empl_envia}, id_empleado_recibe: ${id_empl_recive}, fecha_hora: ${fechaN + ' ' + fechaHoraN}, descripcion: ${notifica}, id_timbre: null, visto: null, tipo: ${tipo}`,
+        ip,
+        observacion: null
+      });
 
-    notificiacion.usuario = USUARIO.rows[0].usuario;
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
 
-    return res.status(200)
-      .jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
+      if (!notificiacion) return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
+
+      const USUARIO = await pool.query(
+        `
+        SELECT (nombre || ' ' || apellido) AS usuario
+        FROM eu_empleados WHERE id = $1
+        `,
+        [id_empl_envia]);
+
+      notificiacion.usuario = USUARIO.rows[0].usuario;
+
+      return res.status(200)
+        .jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
 
   }
-
-
 
   /** ******************************************************************************************** **
    ** *            METODO ENVÍO DE CORREO ELECTRÓNICO DE SOLICITUDES DE ALIMENTACIÓN             * **
@@ -645,7 +1055,7 @@ class PlanComidasControlador {
           `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -681,7 +1091,7 @@ class PlanComidasControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
           `
         ,
@@ -768,7 +1178,7 @@ class PlanComidasControlador {
           `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -803,7 +1213,7 @@ class PlanComidasControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
           `
         ,
@@ -894,7 +1304,7 @@ class PlanComidasControlador {
           `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -940,7 +1350,7 @@ class PlanComidasControlador {
                 <b>Gracias por la atención</b><br>
                 <b>Saludos cordiales,</b> <br><br>
               </p>
-              <img src="cid:pief" width="50%" height="50%"/>
+              <img src="cid:pief" width="100%" height="100%"/>
           </body>
           `
         ,

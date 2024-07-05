@@ -11,6 +11,7 @@ import { CiudadFeriadosService } from 'src/app/servicios/ciudadFeriados/ciudad-f
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
+import { use } from 'echarts';
 
 @Component({
   selector: 'app-editar-sucursal',
@@ -51,6 +52,10 @@ export class EditarSucursalComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   public formulario = new FormGroup({
     nombreContinenteForm: this.nombreContinenteF,
     sucursalNombreForm: this.nombre,
@@ -70,6 +75,9 @@ export class EditarSucursalComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerContinentes();
   }
 
@@ -237,6 +245,8 @@ export class EditarSucursalComponent implements OnInit {
         id: this.data.id,
         nombre: form.sucursalNombreForm,
         id_ciudad: ciudad_id,
+        user_name: this.user_name,
+        ip: this.ip,
       }
 
       // VERIFICAR SI EL NOMBRE DEL REGISTRO FUE CAMBIADO

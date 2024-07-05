@@ -10,6 +10,7 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { RolesService } from 'src/app/servicios/catalogos/catRoles/roles.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-empleado',
@@ -36,6 +37,10 @@ export class EditarEmpleadoComponent implements OnInit {
 
   empleado_inicia: number;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private _formBuilder: FormBuilder,
     private toastr: ToastrService,
@@ -44,6 +49,7 @@ export class EditarEmpleadoComponent implements OnInit {
     private rol: RolesService,
     public router: Router,
     public ventana: MatDialogRef<EditarEmpleadoComponent>,
+    public validar: ValidacionesService,
     public loginService: LoginService,
     @Inject(MAT_DIALOG_DATA) public empleado: any
   ) {
@@ -52,17 +58,20 @@ export class EditarEmpleadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.CargarRoles();
-    this.VerificarCodigo();
     this.VerificarFormulario();
     this.ObtenerNacionalidades();
+    this.VerificarCodigo();
   }
 
   // METODO PARA FILTRAR DATOS DE NACIONALIDAD
   private _filter(value: string): any {
     if (value != null) {
       const filterValue = value.toLowerCase();
-      return this.nacionalidades.filter(nacionalidades => nacionalidades.nombre.toLowerCase().includes(filterValue));
+      return this.nacionalidades.filter((nacionalidades: any) => nacionalidades.nombre.toLowerCase().includes(filterValue));
     }
   }
 
@@ -76,8 +85,8 @@ export class EditarEmpleadoComponent implements OnInit {
   // METODO PARA VERIFICAR FORMULARIO
   VerificarFormulario() {
     this.primeroFormGroup = this._formBuilder.group({
-      apellidoForm: ['', Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,64}")],
-      nombreForm: ['', Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")],
+      apellidoForm: [''],
+      nombreForm: [''],
       codigoForm: [''],
       cedulaForm: ['', Validators.required],
       emailForm: ['', Validators.email],
@@ -86,8 +95,8 @@ export class EditarEmpleadoComponent implements OnInit {
     this.segundoFormGroup = this._formBuilder.group({
       nacionalidadForm: this.NacionalidadControl,
       estadoCivilForm: ['', Validators.required],
-      domicilioForm: ['', Validators.required],
-      telefonoForm: ['', Validators.required],
+      domicilioForm: [''],
+      telefonoForm: [''],
       generoForm: ['', Validators.required],
       estadoForm: ['', Validators.required],
     });
@@ -124,7 +133,7 @@ export class EditarEmpleadoComponent implements OnInit {
     });
 
     this.segundoFormGroup.setValue({
-      nacionalidadForm: this.nacionalidades.filter((o: any) => { return id_nacionalidad === o.id }).map(o => { return o.nombre }),
+      nacionalidadForm: this.nacionalidades.filter((o: any) => { return id_nacionalidad === o.id }).map((o: any) => { return o.nombre }),
       estadoCivilForm: estado_civil,
       domicilioForm: domicilio,
       telefonoForm: telefono,
@@ -146,6 +155,7 @@ export class EditarEmpleadoComponent implements OnInit {
   // METODO PARA VALIDAR INGRESO MANUAL O AUTOMATICO DE CODIGO DE USUARIO
   datosCodigo: any = [];
   escritura = false;
+  cedula: boolean = false;
   VerificarCodigo() {
     this.datosCodigo = [];
     this.rest.ObtenerCodigo().subscribe(datos => {
@@ -153,8 +163,16 @@ export class EditarEmpleadoComponent implements OnInit {
       if (this.datosCodigo.automatico === true) {
         this.escritura = true;
       }
+      else if (this.datosCodigo.cedula === true) {
+        this.cedula = true;
+        this.escritura = true;
+        this.primeroFormGroup.patchValue({
+          codigoForm: this.empleado.cedula
+        })
+      }
       else {
         this.escritura = false;
+
       }
     }, error => {
       this.toastr.info('Configurar ingreso de código de usuarios.', '', {
@@ -212,21 +230,25 @@ export class EditarEmpleadoComponent implements OnInit {
       genero: form2.generoForm,
       correo: form1.emailForm,
       estado: form2.estadoForm,
-      codigo: form1.codigoForm
+      codigo: form1.codigoForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
 
     // CONTADOR 0 EL REGISTRO SE REALIZA UNA SOL VEZ, CONTADOR 1 SE DIO UN ERROR Y SE REALIZA NUEVAMENTE EL PROCESO
     if (this.contador === 0) {
-      this.rest.ActualizarEmpleados(empleado, this.idEmpleado).subscribe(response => {
-        if (response.message === 'error') {
-          this.toastr.error('Código o cédula ya se encuentran registrados.', 'Upss!!! algo slaio mal.', {
+      this.rest.ActualizarEmpleados(empleado, this.idEmpleado).subscribe(
+        (response: any) => {
+          if (response.message === 'Registro actualizado.') {
+            this.ActualizarUser(form3, form1);
+          }
+        },
+        error => {
+          this.toastr.error(error.error.message, 'Upss!!! algo salió mal.', {
             timeOut: 6000,
           });
         }
-        else {
-          this.ActualizarUser(form3, form1);
-        }
-      });
+      );
     }
     else {
       this.ActualizarUser(form3, form1);
@@ -242,6 +264,8 @@ export class EditarEmpleadoComponent implements OnInit {
       contrasena: this.usuario[0].contrasena,
       usuario: form3.userForm,
       id_rol: form3.rolForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     this.user.ActualizarDatos(dataUser).subscribe(data => {
       if (data.message === 'error') {
@@ -282,53 +306,54 @@ export class EditarEmpleadoComponent implements OnInit {
     if (this.datosCodigo.automatico === true) {
       let dataCodigo = {
         valor: codigo,
-        id: 1
+        id: 1,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.rest.ActualizarCodigo(dataCodigo).subscribe(res => {
       })
     }
   }
 
+  // METODO DE VALIDACION DE INGRESO DE NUMEROS
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt);
+  }
+
   // METODO DE VALIDACION DE INGRESO DE LETRAS
   IngresarSoloLetras(e: any) {
     let key = e.keyCode || e.which;
     let tecla = String.fromCharCode(key).toString();
-    // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACION DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
+    const patron = /^[a-zA-Z\s]*$/
+    if (!patron.test(tecla)) {
+      this.toastr.info('No se admite datos numéricos o caracteres especiales.', 'Usar solo letras.', {
         timeOut: 6000,
-      })
+      });
       return false;
     }
   }
 
-  // METODO DE VALIDACION DE INGRESO DE NUMEROS
-  IngresarSoloNumeros(evt: any) {
-    if (window.event) {
-      var keynum = evt.keyCode;
-    }
-    else {
-      keynum = evt.which;
-    }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
-    if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
-      return true;
-    }
-    else {
-      this.toastr.info('No se admite el ingreso de letras', 'Usar solo números', {
+  IngresarSoloLetrasNumeros(e: any) {
+    let key = e.keyCode || e.which;
+    let tecla = String.fromCharCode(key).toString();
+    // SE DEFINE TODO EL CONJUNTO DE CARACTERES PERMITIDOS.
+    const patron = /^[a-zA-Z0-9]*$/;
+
+    if (!patron.test(tecla)) {
+      this.toastr.info('No se admite caracteres especiales', 'Usar solo letras y números.', {
         timeOut: 6000,
-      })
+      });
       return false;
+    }
+  }
+
+  // METODO PARA COLOCAR EL CODIGO SIMILAR AL CAMPO CEDULA
+  LlenarCodigo(form1: any) {
+    if (this.cedula) {
+      let codigo: number = form1.cedulaForm;
+      this.primeroFormGroup.patchValue({
+        codigoForm: codigo
+      })
     }
   }
 

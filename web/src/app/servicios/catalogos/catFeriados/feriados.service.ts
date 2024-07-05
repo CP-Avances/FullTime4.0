@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -12,21 +11,18 @@ export class FeriadosService {
     private http: HttpClient
   ) { }
 
-  // METODO PARA BUSCAR LISTA DE FERIADOS
+  // METODO PARA BUSCAR LISTA DE FERI-	CrearFeriadoPlantillaOS
   ConsultarFeriado() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/feriados`);
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarFeriado(id: any) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/feriados/delete/${id}`).pipe(
-      catchError(id)
-    );
-  }
-
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/feriados/xmlDownload`, data);
+  EliminarFeriado(id: number, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/feriados/delete/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
 
   // METODO PARA CREAR NUEVO REGISTRO DE FERIADO
@@ -63,23 +59,16 @@ export class FeriadosService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/feriados/listar-feriados-recuperar/ciudad`, datos);
   }
 
-
-  subirArchivoExcel(formData) {
-    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/feriados/upload', formData);
-  }
-
   RevisarFormato(formData) {
-    console.log('formDataferiados: ',formData);
-    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/feriados/upload/revision', formData);
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string)+ '/feriados/upload/revision', formData);
   }
 
-  RevisarDuplicidad(formData) {
-    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/feriados/upload/revision_data', formData);
+  Crear_feriados(form){
+    console.log('form: ',form);
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/feriados/upload/crearFeriado', form);
   }
-
 
   Crear_feriados_ciudad(form){
-    console.log('form: ',form);
     return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/feriados/upload/crearFeriadoCiudad', form);
   }
 

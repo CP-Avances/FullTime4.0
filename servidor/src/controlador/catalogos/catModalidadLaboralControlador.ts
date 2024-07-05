@@ -1,6 +1,7 @@
-import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import fs from 'fs';
 import path from 'path';
 import pool from '../../database';
@@ -29,7 +30,7 @@ class ModalidaLaboralControlador {
     // METODO PARA REGISTRAR MODALIDAD LABORAL
     public async CrearMadalidadLaboral(req: Request, res: Response): Promise<Response> {
         try {
-            const { modalidad } = req.body;
+            const { modalidad, user_name, ip } = req.body;
             var VERIFICAR_MODALIDAD = await pool.query(
                 `
                 SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
@@ -40,6 +41,9 @@ class ModalidaLaboralControlador {
 
                 const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
 
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
                 const response: QueryResult = await pool.query(
                     `
                     INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1) RETURNING *
@@ -47,6 +51,21 @@ class ModalidaLaboralControlador {
                     , [modali]);
 
                 const [modalidadLaboral] = response.rows;
+
+                // REGISTRAR AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_modalidad_trabajo',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(modalidadLaboral),
+                    ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
 
                 if (modalidadLaboral) {
                     return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' })
@@ -58,6 +77,8 @@ class ModalidaLaboralControlador {
             }
         }
         catch (error) {
+            // ROLLBACK SI HAY ERROR
+            await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error', status: '500' });
         }
     }
@@ -65,7 +86,7 @@ class ModalidaLaboralControlador {
     // METODO PARA EDITAR MODALIDAD LABORAL
     public async EditarModalidadLaboral(req: Request, res: Response): Promise<Response> {
         try {
-            const { id, modalidad } = req.body;
+            const { id, modalidad, user_name, ip } = req.body;
             const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
             const modalExiste = await pool.query(
                 `
@@ -73,9 +94,31 @@ class ModalidaLaboralControlador {
                 `
                 , [modali.toUpperCase()]);
 
+            const consulta = await pool.query('SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1', [id]);
+            const [datosOriginales] = consulta.rows;
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_modalidad_trabajo',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar el registro con id ${id}. No existe el registro en la base de datos.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+            }
+
+
             if (modalExiste.rows[0] != undefined && modalExiste.rows[0].descripcion != '' && modalExiste.rows[0].descripcion != null) {
                 return res.status(200).jsonp({ message: 'Modalidad Laboral ya esiste en el sistema.', status: '300' })
             } else {
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
                 const response: QueryResult = await pool.query(
                     `
                     UPDATE e_cat_modalidad_trabajo SET descripcion = $2
@@ -85,6 +128,20 @@ class ModalidaLaboralControlador {
 
                 const [modalidadLaboral] = response.rows;
 
+                // REGISTRAR AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_modalidad_trabajo',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(modalidadLaboral),
+                    ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
                 if (modalidadLaboral) {
                     return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' })
                 } else {
@@ -93,6 +150,8 @@ class ModalidaLaboralControlador {
             }
         }
         catch (error) {
+            // ROLLBACK SI HAY ERROR
+            await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error', status: '500' });
         }
     }
@@ -101,14 +160,60 @@ class ModalidaLaboralControlador {
     public async EliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
+            const { user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOS ANTES DE ELIMINAR
+            const modalidad = await pool.query(
+                `
+                SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1
+                `
+                , [id]);
+
+            const [modalidadLaboral] = modalidad.rows;
+
+            if (!modalidadLaboral) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_modalidad_trabajo',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar el registro con id: ${id}, no se encuentra el registro.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+            }
+
             await pool.query(
                 `
                 DELETE FROM e_cat_modalidad_trabajo WHERE id = $1
                 `
                 , [id]);
+
+            // REGISTRAR AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'e_cat_modalidad_trabajo',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(modalidadLaboral),
+                datosNuevos: '',
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
             res.jsonp({ message: 'Registro eliminado.' });
 
         } catch (error) {
+            // ROLLBACK SI HAY ERROR
+            await pool.query('ROLLBACK');
             return res.jsonp({ message: 'error' });
         }
     }
@@ -119,138 +224,142 @@ class ModalidaLaboralControlador {
             const documento = req.file?.originalname;
             let separador = path.sep;
             let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-
             const workbook = excel.readFile(ruta);
-            const sheet_name_list = workbook.SheetNames;
-            const plantilla_modalidad_laboral = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            let verificador = ObtenerIndicePlantilla(workbook, 'MODALIDAD_LABORAL');
+            if (verificador === false) {
+                return res.jsonp({ message: 'no_existe', data: undefined });
+            }
+            else {
+                const sheet_name_list = workbook.SheetNames;
+                const plantilla_modalidad_laboral = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[verificador]]);
+                let data: any = {
+                    fila: '',
+                    modalida_laboral: '',
+                    observacion: ''
+                };
+                var listModalidad: any = [];
+                var duplicados: any = [];
+                var mensaje: string = 'correcto';
 
-            let data: any = {
-                fila: '',
-                modalida_laboral: '',
-                observacion: ''
-            };
-
-            var listModalidad: any = [];
-            var duplicados: any = [];
-            var mensaje: string = 'correcto';
-
-            // LECTURA DE LOS DATOS DE LA PLANTILLA
-            plantilla_modalidad_laboral.forEach(async (dato: any, indice: any, array: any) => {
-                var { item, modalida_laboral } = dato;
-                // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
-                if ((item != undefined && item != '') &&
-                    (modalida_laboral != undefined && modalida_laboral != '')) {
-                    data.fila = item;
-                    data.modalida_laboral = modalida_laboral;
-                    data.observacion = 'no registrada';
-
-                    listModalidad.push(data);
-                } else {
-                    data.fila = item;
-                    data.modalida_laboral = modalida_laboral;
-                    data.observacion = 'no registrada';
-
-                    if (data.fila == '' || data.fila == undefined) {
-                        data.fila = 'error';
-                        mensaje = 'error'
-                    }
-
-                    if (modalida_laboral == undefined) {
-                        data.modalida_laboral = 'No registrado';
-                        data.observacion = 'Modalidad Laboral ' + data.observacion;
-                    }
-
-                    listModalidad.push(data);
-                }
-                data = {};
-            });
-
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs.access(ruta, fs.constants.F_OK, (err) => {
-                if (err) {
-                } else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs.unlinkSync(ruta);
-                }
-            });
-
-            listModalidad.forEach(async (item: any) => {
-                if (item.observacion == 'no registrada') {
-                    var VERIFICAR_MODALIDAD = await pool.query(
-                        `
-                        SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
-                        `
-                        , [item.modalida_laboral.toUpperCase()])
-                    if (VERIFICAR_MODALIDAD.rows[0] == undefined || VERIFICAR_MODALIDAD.rows[0] == '') {
-                        item.observacion = 'ok'
+                // LECTURA DE LOS DATOS DE LA PLANTILLA
+                plantilla_modalidad_laboral.forEach(async (dato: any, indice: any, array: any) => {
+                    var { ITEM, MODALIDAD_LABORAL } = dato;
+                    // VERIFICAR QUE EL REGISTO NO TENGA DATOS VACIOS
+                    if ((ITEM != undefined && ITEM != '') &&
+                        (MODALIDAD_LABORAL != undefined && MODALIDAD_LABORAL != '')) {
+                        data.fila = ITEM;
+                        data.modalida_laboral = MODALIDAD_LABORAL;
+                        data.observacion = 'no registrada';
+                        listModalidad.push(data);
                     } else {
-                        item.observacion = 'Ya existe en el sistema'
-                    }
+                        data.fila = ITEM;
+                        data.modalida_laboral = MODALIDAD_LABORAL;
+                        data.observacion = 'no registrada';
 
-                    // Discriminación de elementos iguales
-                    if (duplicados.find((p: any) => p.modalida_laboral.toLowerCase() === item.modalida_laboral.toLowerCase()) == undefined) {
-                        duplicados.push(item);
-                    } else {
-                        item.observacion = '1';
-                    }
-                }
-            });
+                        if (data.fila == '' || data.fila == undefined) {
+                            data.fila = 'error';
+                            mensaje = 'error'
+                        }
 
-            setTimeout(() => {
-                listModalidad.sort((a: any, b: any) => {
-                    // COMPARA LOS NUMEROS DE LOS OBJETOS
-                    if (a.fila < b.fila) {
-                        return -1;
+                        if (MODALIDAD_LABORAL == undefined) {
+                            data.modalida_laboral = 'No registrado';
+                            data.observacion = 'Modalidad Laboral ' + data.observacion;
+                        }
+                        listModalidad.push(data);
                     }
-                    if (a.fila > b.fila) {
-                        return 1;
-                    }
-                    return 0; // SON IGUALES
+                    data = {};
                 });
 
-                var filaDuplicada: number = 0;
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs.access(ruta, fs.constants.F_OK, (err) => {
+                    if (err) {
+                    } else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs.unlinkSync(ruta);
+                    }
+                });
 
                 listModalidad.forEach(async (item: any) => {
-                    if (item.observacion == '1') {
-                        item.observacion = 'Registro duplicado'
-                    }
-
-                    // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
-                    if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-                        // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
-                        if (item.fila == filaDuplicada) {
-                            mensaje = 'error';
+                    if (item.observacion == 'no registrada') {
+                        var VERIFICAR_MODALIDAD = await pool.query(
+                            `
+                            SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                            `
+                            , [item.modalida_laboral.toUpperCase()])
+                        if (VERIFICAR_MODALIDAD.rows[0] == undefined || VERIFICAR_MODALIDAD.rows[0] == '') {
+                            item.observacion = 'ok'
+                        } else {
+                            item.observacion = 'Ya existe en el sistema'
                         }
-                    } else {
-                        return mensaje = 'error';
+
+                        // DISCRIMINACIÓN DE ELEMENTOS IGUALES
+                        if (duplicados.find((p: any) => p.modalida_laboral.toLowerCase() === item.modalida_laboral.toLowerCase()) == undefined) {
+                            duplicados.push(item);
+                        } else {
+                            item.observacion = '1';
+                        }
                     }
-
-                    filaDuplicada = item.fila;
-
                 });
 
-                if (mensaje == 'error') {
-                    listModalidad = undefined;
-                }
-                return res.jsonp({ message: mensaje, data: listModalidad });
-            }, 1000)
+                setTimeout(() => {
+                    listModalidad.sort((a: any, b: any) => {
+                        // COMPARA LOS NUMEROS DE LOS OBJETOS
+                        if (a.fila < b.fila) {
+                            return -1;
+                        }
+                        if (a.fila > b.fila) {
+                            return 1;
+                        }
+                        return 0; // SON IGUALES
+                    });
+
+                    var filaDuplicada: number = 0;
+
+                    listModalidad.forEach(async (item: any) => {
+                        if (item.observacion == '1') {
+                            item.observacion = 'Registro duplicado'
+                        }
+
+                        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
+                        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                            // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
+                            if (item.fila == filaDuplicada) {
+                                mensaje = 'error';
+                            }
+                        } else {
+                            return mensaje = 'error';
+                        }
+
+                        filaDuplicada = item.fila;
+
+                    });
+
+                    if (mensaje == 'error') {
+                        listModalidad = undefined;
+                    }
+                    return res.jsonp({ message: mensaje, data: listModalidad });
+                }, 1000)
+            }
         } catch (error) {
             return res.status(500).jsonp({ message: error });
         }
     }
 
-    // REGISTRAR PLANTILLA MODALIDAD_CARGO 
+    // REGISTRAR PLANTILLA MODALIDAD_LABORAL
     public async CargarPlantilla(req: Request, res: Response) {
         try {
-            const plantilla = req.body;
-            console.log('datos Modalidad laboral: ', plantilla);
+            const { plantilla, user_name, ip } = req.body;
+
             var contador = 1;
             var respuesta: any
 
             plantilla.forEach(async (data: any) => {
                 // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
-                const { item, modalida_laboral, observacion } = data;
+                const { modalida_laboral } = data;
                 const modalidad = modalida_laboral.charAt(0).toUpperCase() + modalida_laboral.slice(1).toLowerCase();
+
+                // INICIO DE TRANSACCION
+                await pool.query('BEGIN');
 
                 // REGISTRO DE LOS DATOS DE MODLAIDAD LABORAL
                 const response: QueryResult = await pool.query(
@@ -261,6 +370,20 @@ class ModalidaLaboralControlador {
 
                 const [modalidad_la] = response.rows;
 
+                // REGISTRAR AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'e_cat_modalidad_trabajo',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(modalidad_la),
+                    ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
                 if (contador === plantilla.length) {
                     if (modalidad_la) {
                         return respuesta = res.status(200).jsonp({ message: 'ok' });
@@ -268,13 +391,12 @@ class ModalidaLaboralControlador {
                         return respuesta = res.status(404).jsonp({ message: 'error' });
                     }
                 }
-
                 contador = contador + 1;
-
             });
 
-
         } catch (error) {
+            // ROLLBACK SI HAY ERROR
+            await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: error });
         }
     }

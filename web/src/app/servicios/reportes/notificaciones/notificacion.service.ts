@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment'
-
 
 @Injectable({
   providedIn: 'root'
@@ -98,10 +96,6 @@ export class NotificacionService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/notificacionSistema/usuario_extras_enviados_todas/${id}/${id_empleado}`);
   }
 
-  ObtenerUsuariosExtrasRecibidos_Todas(id: number, id_empleado: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/notificacionSistema/usuario_extras_recibidos_todas/${id}/${id_empleado}`);
-  }
-
   ObtenerUsuariosComidasEnviados_Todas(id: number, id_empleado: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/notificacionSistema/usuario_comidas_enviados_todas/${id}/${id_empleado}`);
   }
@@ -131,10 +125,6 @@ export class NotificacionService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/notificacionSistema/usuario_extras_enviados_fecha/${id}/${id_empleado}/${inicio}/${final}`);
   }
 
-  ObtenerUsuariosExtrasRecibidos_Fecha(id: number, id_empleado: number, inicio: string, final: string) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/notificacionSistema/usuario_extras_recibidos_fecha/${id}/${id_empleado}/${inicio}/${final}`);
-  }
-
   ObtenerUsuariosComidasEnviados_Fecha(id: number, id_empleado: number, inicio: string, final: string) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/notificacionSistema/usuario_comidas_enviados_fecha/${id}/${id_empleado}/${inicio}/${final}`);
   }
@@ -142,4 +132,5 @@ export class NotificacionService {
   ObtenerUsuariosComidasRecibidos_Fecha(id: number, id_empleado: number, inicio: string, final: string) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/notificacionSistema/usuario_comidas_recibidos_fecha/${id}/${id_empleado}/${inicio}/${final}`);
   }
+  
 }

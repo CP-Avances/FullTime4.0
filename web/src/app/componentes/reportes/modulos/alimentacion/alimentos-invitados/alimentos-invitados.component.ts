@@ -310,7 +310,7 @@ export class AlimentosInvitadosComponent implements OnInit {
   presentarSumatoriaTotal(arreglo1: any) {
     var t_total1 = 0;
     var suma_total = 0;
-    arreglo1.forEach(obj1 => {
+    arreglo1.forEach((obj1: any) => {
       t_total1 = t_total1 + parseFloat(obj1.total)
     })
     suma_total = t_total1
@@ -360,7 +360,7 @@ export class AlimentosInvitadosComponent implements OnInit {
             { text: 'COSTO', style: 'centrado' },
             { text: 'COSTO TOTAL', style: 'centrado' },
           ],
-          ...arreglo.map(obj => {
+          ...arreglo.map((obj: any) => {
             return [
               { text: obj.ticket, style: 'itemsTableD' },
               { text: obj.apellido_invitado + ' ' + obj.nombre_invitado, style: 'itemsTableD' },
@@ -436,7 +436,7 @@ export class AlimentosInvitadosComponent implements OnInit {
      ******************************************************************************************************/
   exportToExcelAlimentacion(form: any) {
     var j = 0;
-    const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.invitados.map(obj => {
+    const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.invitados.map((obj: any) => {
       return {
         N_REGISTROS: j = j + 1,
         TICKET: obj.ticket,

@@ -25,6 +25,10 @@ export class EliminarRealtimeComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private toastr: ToastrService,
     private realtime: RealTimeService,
@@ -34,11 +38,14 @@ export class EliminarRealtimeComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.MostrarInformacion();
   }
 
   MostrarInformacion() {
-    this.ids = this.Notificaciones.lista.map(obj => {
+    this.ids = this.Notificaciones.lista.map((obj: any) => {
       return obj.id
     });
     this.Opcion();
@@ -55,9 +62,20 @@ export class EliminarRealtimeComponent implements OnInit {
 
   // ELIMINAR NOTIFICACIONES
   ConfirmarListaNotificaciones() {
+    const datos = {
+      arregloNotificaciones: this.ids,
+      user_name: this.user_name,
+      ip: this.ip
+    }
+
+    const datosAvisos = {
+      arregloAvisos: this.ids,
+      user_name: this.user_name,
+      ip: this.ip
+    }
     // ELIMINACION DE NOTIFICACIONES DE AVISOS
     if (this.Notificaciones.opcion === 1) {
-      this.restAvisos.EliminarAvisos(this.ids).subscribe(res => {
+      this.restAvisos.EliminarAvisos(datosAvisos).subscribe(res => {
         console.log(res);
         if (res.message === 'OK') {
           this.progreso = false;
@@ -78,7 +96,7 @@ export class EliminarRealtimeComponent implements OnInit {
       // ELIMINACION DE NOTIFICACIONES DE PERMISOS, HORAS EXTRAS Y VACACIONES
     } else if (this.Notificaciones.opcion === 2) {
       this.progreso = true;
-      this.realtime.EliminarNotificaciones(this.ids).subscribe(res => {
+      this.realtime.EliminarNotificaciones(datos).subscribe(res => {
         console.log(res);
         if (res.message === 'OK') {
           this.progreso = false;

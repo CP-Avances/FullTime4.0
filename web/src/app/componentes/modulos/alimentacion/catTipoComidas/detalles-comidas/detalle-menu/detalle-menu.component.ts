@@ -13,6 +13,10 @@ import { TipoComidasService } from 'src/app/servicios/catalogos/catTipoComidas/t
 
 export class DetalleMenuComponent implements OnInit {
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   valorF = new FormControl('', [Validators.required, Validators.pattern("^[0-9]+(.[0-9][0-9])?$")]);
   nombreF = new FormControl('', [Validators.required, Validators.minLength(4)]);
@@ -33,6 +37,8 @@ export class DetalleMenuComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   // METODO PARA REGISTRAR DETALLE
@@ -42,7 +48,10 @@ export class DetalleMenuComponent implements OnInit {
       valor: form.valorForm,
       observacion: form.observacionForm,
       id_menu: this.data.menu.id,
+      user_name: this.user_name,
+      ip: this.ip,
     };
+
     this.rest.CrearDetalleMenu(datosMenu).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,

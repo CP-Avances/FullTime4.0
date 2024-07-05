@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from '../../../../environments/environment'
-import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -54,13 +52,12 @@ export class HorarioService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarRegistro(id: any) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/horario/eliminar/${id}`).pipe(catchError(id));
-  }
-
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/horario/xmlDownload`, data);
+  EliminarRegistro(id: number, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/horario/eliminar/${id}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.delete(url, httpOptions);
   }
 
   // BUSCAR DATOS DE UN HORARIO
@@ -73,22 +70,9 @@ export class HorarioService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/horario/update-horas-trabaja/${id}`, data);
   }
 
-
-
-
-
-
-
-
-
-
-
   // VERIFICAR DATOS DE LA PLANTILLA DE CATÁLOGO HORARIO Y CARGAR AL SISTEMA
   VerificarDatosHorario(formData) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/horario/cargarHorario/verificarDatos/upload`, formData);
-  }
-  VerificarPlantillaHorario(formData) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/horario/cargarHorario/verificarPlantilla/upload`, formData);
   }
   CargarHorariosMultiples(formData) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/horario/cargarHorario/upload`, formData);

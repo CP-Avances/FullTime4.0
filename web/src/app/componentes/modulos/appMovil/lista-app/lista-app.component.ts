@@ -85,32 +85,25 @@ export class ListaAppComponent implements OnInit {
   numero_pagina_emp: number = 1;
 
   // FILTROS SUCURSALES
-  filtroNombreSuc_: string = '';
   get filtroNombreSuc() { return this.restR.filtroNombreSuc }
 
   // FILTROS DEPARTAMENTOS
-  filtroNombreDep_: string = '';
   get filtroNombreDep() { return this.restR.filtroNombreDep }
 
   // FILTROS EMPLEADO
-  filtroCodigo_: any;
-  filtroCedula_: string = '';
-  filtroNombreEmp_: string = '';
   get filtroNombreEmp() { return this.restR.filtroNombreEmp };
   get filtroCodigo() { return this.restR.filtroCodigo };
   get filtroCedula() { return this.restR.filtroCedula };
 
   // FILTRO CARGOS
-  filtroNombreCarg_: string = '';
   get filtroNombreCarg() { return this.restR.filtroNombreCarg };
 
   // FILTRO REGIMEN
-  filtroNombreReg_: string = '';
   get filtroNombreReg() { return this.restR.filtroNombreReg };
 
 
   /** ********************************************************************************************************************** **
-   ** **                         INICIALIZAR VARIABLES DE USUARIOS DESHABILITADOS TIMBRE WEB                              ** ** 
+   ** **                         INICIALIZAR VARIABLES DE USUARIOS DESHABILITADOS TIMBRE WEB                              ** **
    ** ********************************************************************************************************************** **/
 
   // CONTROL DE CRITERIOS DE BUSQUEDA
@@ -172,32 +165,29 @@ export class ListaAppComponent implements OnInit {
   numero_pagina_emp_dh: number = 1;
 
   // FILTROS SUCURSALES
-  dh_filtroNombreSuc_: string = '';
   get dh_filtroNombreSuc() { return this.restR.filtroNombreSuc }
 
   // FILTROS DEPARTAMENTOS
-  dh_filtroNombreDep_: string = '';
   get dh_filtroNombreDep() { return this.restR.filtroNombreDep }
 
   // FILTROS EMPLEADO
-  dh_filtroCodigo_: any;
-  dh_filtroCedula_: string = '';
-  dh_filtroNombreEmp_: string = '';
   get dh_filtroNombreEmp() { return this.restR.filtroNombreEmp };
   get dh_filtroCodigo() { return this.restR.filtroCodigo };
   get dh_filtroCedula() { return this.restR.filtroCedula };
 
   // FILTROS CARGOS
-  dh_filtroNombreCarg_: string = '';
   get dh_filtroNombreCarg() { return this.restR.filtroNombreCarg };
 
   // FILTRO REGIMEN
-  dh_filtroNombreReg_: string = '';
   get dh_filtroNombreReg() { return this.restR.filtroNombreReg };
 
   // HABILITAR O DESHABILITAR EL ICONO DE PROCESO INDIVIDUAL
   individual: boolean = true;
   individual_dh: boolean = true;
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   get habilitarMovil(): boolean { return this.funciones.app_movil; }
 
@@ -223,6 +213,8 @@ export class ListaAppComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
       this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
       this.check_dh = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);;
       this.PresentarInformacion();
@@ -266,19 +258,10 @@ export class ListaAppComponent implements OnInit {
     this.cargos_dh = [];
 
     this.usua_sucursales = [];
-    let respuesta: any = [];
-    let codigos = '';
+
     //console.log('empleado ', empleado)
-    this.informacion.BuscarUsuarioSucursal(empleado).subscribe(data => {
-      respuesta = data;
-      respuesta.forEach((obj: any) => {
-        if (codigos === '') {
-          codigos = '\'' + obj.id_sucursal + '\''
-        }
-        else {
-          codigos = codigos + ', \'' + obj.id_sucursal + '\''
-        }
-      })
+    this.informacion.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
+      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
       //console.log('ver sucursales ', codigos);
 
       // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
@@ -442,11 +425,11 @@ export class ListaAppComponent implements OnInit {
 
     this.OmitirDuplicados(departamentos_, cargos_, estado);
 
-    console.log('ver sucursales ', sucursales_)
+    /*console.log('ver sucursales ', sucursales_)
     console.log('ver regimenes ', regimenes_)
     console.log('ver departamentos ', departamentos_)
     console.log('ver cargos ', cargos_)
-    console.log('ver empleados ', empleados_)
+    console.log('ver empleados ', empleados_)*/
   }
 
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
@@ -598,7 +581,6 @@ export class ListaAppComponent implements OnInit {
   MostrarLista_DH() {
     if (this.opcion_dh === 's') {
       this.nombre_suc_dh.reset();
-      this.dh_filtroNombreSuc_ = '';
       this.selectionEmp_dh.clear();
       this.selectionCarg_dh.clear();
       this.selectionSuc_dh.clear();
@@ -607,9 +589,7 @@ export class ListaAppComponent implements OnInit {
     }
     else if (this.opcion_dh === 'r') {
       this.nombre_reg_dh.reset();
-      this.dh_filtroNombreReg_ = '';
       this.nombre_suc_dh.reset();
-      this.dh_filtroNombreSuc_ = '';
       this.selectionDep_dh.clear();
       this.selectionCarg_dh.clear();
       this.selectionEmp_dh.clear();
@@ -618,10 +598,8 @@ export class ListaAppComponent implements OnInit {
       this.Filtrar_DH('', 12)
     }
     else if (this.opcion_dh === 'c') {
-      this.nombre_carg_dh.reset();
-      this.dh_filtroNombreCarg_ = '';
+      this.nombre_carg_dh.reset();;
       this.nombre_suc_dh.reset();
-      this.dh_filtroNombreSuc_ = '';
       this.selectionEmp_dh.clear();
       this.selectionDep_dh.clear();
       this.selectionSuc_dh.clear();
@@ -631,9 +609,7 @@ export class ListaAppComponent implements OnInit {
     }
     else if (this.opcion_dh === 'd') {
       this.nombre_dep_dh.reset();
-      this.dh_filtroNombreDep_ = '';
       this.nombre_suc_dh.reset();
-      this.dh_filtroNombreSuc_ = '';
       this.selectionEmp_dh.clear();
       this.selectionCarg_dh.clear();
       this.selectionSuc_dh.clear();
@@ -645,11 +621,7 @@ export class ListaAppComponent implements OnInit {
       this.codigo_dh.reset();
       this.cedula_dh.reset();
       this.nombre_emp_dh.reset();
-      this.dh_filtroCodigo_ = '';
-      this.dh_filtroCedula_ = '';
-      this.dh_filtroNombreEmp_ = '';
       this.nombre_suc_dh.reset();
-      this.dh_filtroNombreSuc_ = '';
       this.selectionDep_dh.clear();
       this.selectionCarg_dh.clear();
       this.selectionSuc_dh.clear();
@@ -706,13 +678,13 @@ export class ListaAppComponent implements OnInit {
    ** **            METODOS DE SELECCION DE DATOS DE USUARIOS DESHABILITADOS              ** **
    ** ************************************************************************************** **/
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc_DH() {
     const numSelected = this.selectionSuc_dh.selected.length;
     return numSelected === this.sucursales_dh.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleSuc_DH() {
     this.isAllSelectedSuc_DH() ?
       this.selectionSuc_dh.clear() :
@@ -727,13 +699,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionSuc_dh.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedReg_DH() {
     const numSelected = this.selectionReg_dh.selected.length;
     return numSelected === this.regimen_dh.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleReg_DH() {
     this.isAllSelectedReg_DH() ?
       this.selectionReg_dh.clear() :
@@ -748,13 +720,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionReg_dh.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedCarg_DH() {
     const numSelected = this.selectionCarg_dh.selected.length;
     return numSelected === this.cargos_dh.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleCarg_DH() {
     this.isAllSelectedCarg_DH() ?
       this.selectionCarg_dh.clear() :
@@ -769,13 +741,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionCarg_dh.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedDep_DH() {
     const numSelected = this.selectionDep_dh.selected.length;
     return numSelected === this.departamentos_dh.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDep_DH() {
     this.isAllSelectedDep_DH() ?
       this.selectionDep_dh.clear() :
@@ -790,13 +762,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionDep_dh.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedEmp_DH() {
     const numSelected = this.selectionEmp_dh.selected.length;
     return numSelected === this.empleados_dh.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleEmp_DH() {
     this.isAllSelectedEmp_DH() ?
       this.selectionEmp_dh.clear() :
@@ -951,13 +923,13 @@ export class ListaAppComponent implements OnInit {
    ** **            METODOS DE SELECCION DE DATOS DE USUARIOS HABILITADOS                 ** **
    ** ************************************************************************************** **/
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
     const numSelected = this.selectionSuc.selected.length;
     return numSelected === this.sucursales.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
@@ -972,13 +944,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedReg() {
     const numSelected = this.selectionReg.selected.length;
     return numSelected === this.regimen.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleReg() {
     this.isAllSelectedReg() ?
       this.selectionReg.clear() :
@@ -993,13 +965,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedCarg() {
     const numSelected = this.selectionCarg.selected.length;
     return numSelected === this.cargos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleCarg() {
     this.isAllSelectedCarg() ?
       this.selectionCarg.clear() :
@@ -1014,13 +986,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedDep() {
     const numSelected = this.selectionDep.selected.length;
     return numSelected === this.departamentos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
@@ -1035,13 +1007,13 @@ export class ListaAppComponent implements OnInit {
     return `${this.selectionDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedEmp() {
     const numSelected = this.selectionEmp.selected.length;
     return numSelected === this.empleados.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
@@ -1183,7 +1155,7 @@ export class ListaAppComponent implements OnInit {
 
 
   /** ************************************************************************************** **
-   ** **               METODOS DE ACTUALIZACION DE ESTADO DE TIMBRE WEB                   ** ** 
+   ** **               METODOS DE ACTUALIZACION DE ESTADO DE TIMBRE WEB                   ** **
    ** ************************************************************************************** **/
 
   RegistrarConfiguracion(usuario: any, tipo: number) {
@@ -1208,7 +1180,14 @@ export class ListaAppComponent implements OnInit {
     if (seleccionados.length === undefined) {
       seleccionados = [seleccionados];
     }
-    this.informacion.ActualizarEstadoTimbreMovil(seleccionados).subscribe(res => {
+
+    const datos = {
+      array: seleccionados,
+      user_name: this.user_name,
+      ip: this.ip,
+    }
+
+    this.informacion.ActualizarEstadoTimbreMovil(datos).subscribe(res => {
       this.toastr.success(res.message)
       this.individual = true;
       this.individual_dh = true;
@@ -1340,7 +1319,6 @@ export class ListaAppComponent implements OnInit {
   MostrarLista() {
     if (this.opcion === 's') {
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
@@ -1349,9 +1327,7 @@ export class ListaAppComponent implements OnInit {
     }
     else if (this.opcion === 'r') {
       this.nombre_reg.reset();
-      this.filtroNombreReg_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
@@ -1361,9 +1337,7 @@ export class ListaAppComponent implements OnInit {
     }
     else if (this.opcion === 'c') {
       this.nombre_carg.reset();
-      this.filtroNombreCarg_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionEmp.clear();
       this.selectionDep.clear();
       this.selectionSuc.clear();
@@ -1373,9 +1347,7 @@ export class ListaAppComponent implements OnInit {
     }
     else if (this.opcion === 'd') {
       this.nombre_dep.reset();
-      this.filtroNombreDep_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionEmp.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
@@ -1387,11 +1359,7 @@ export class ListaAppComponent implements OnInit {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
-      this.filtroCodigo_ = '';
-      this.filtroCedula_ = '';
-      this.filtroNombreEmp_ = '';
       this.nombre_suc.reset();
-      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
@@ -1413,7 +1381,7 @@ export class ListaAppComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getActivarUsuarios(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

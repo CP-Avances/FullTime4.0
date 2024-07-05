@@ -170,12 +170,10 @@
                                             </label>
                                         </label>
                                         <div class="d-flex justify-content-start">
-                                            <mat-radio-button ngDefaultControl [(ngModel)]="selec1" [checked]="selec1"
-                                                [ngModelOptions]="{standalone: true}" value="true">
+                                            <mat-radio-button [value]="true">
                                                 <label id="textoradiobtn">Si</label>
                                             </mat-radio-button>
-                                            <mat-radio-button ngDefaultControl [(ngModel)]="selec2" [checked]="selec2"
-                                                [ngModelOptions]="{standalone: true}" value="false">
+                                            <mat-radio-button [value]="false">
                                                 <label id="textoradiobtn">No</label>
                                             </mat-radio-button>
                                         </div>

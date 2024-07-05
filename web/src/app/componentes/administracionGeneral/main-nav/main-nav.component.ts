@@ -20,7 +20,6 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 import { FraseSeguridadComponent } from 'src/app/componentes/administracionGeneral/frase-seguridad/frase-seguridad/frase-seguridad.component';
 
 import { MenuNode } from 'src/app/model/menu.model';
-import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { RolPermisosService } from 'src/app/servicios/catalogos/catRolPermisos/rol-permisos.service';
@@ -214,7 +213,6 @@ export class MainNavComponent implements OnInit {
     private funciones: MainNavService,
     private plantillaPDF: PlantillaReportesService,
     private breakpointObserver: BreakpointObserver,
-    public spinnerService: SpinnerService
   ) { }
 
   hasChild = (_: number, node: MenuNode) => !!node.children && node.children.length > 0;
@@ -300,12 +298,6 @@ export class MainNavComponent implements OnInit {
         });
       }
     });
-
-    var f = moment();
-    let hora: number = parseInt(moment(f).format('HH'));
-    let fecha: string = moment(f).format('YYYY-MM-DD');
-    console.log('HORAS ', hora, ' fechas ', fecha)
-
   }
 
   // METODO PARA REGISTRAR FRASE DE SEGURIDAD

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -87,64 +86,11 @@ export class EmpresaService {
   ActualizarAccionesTimbres(formData: any) {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/acciones-timbre`, formData);
   }
-
-
-
-
-
-
-
   
-
   //Empresas
 
   ConsultarEmpresas() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empresas`);
   }
-
-  IngresarEmpresas(datos: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empresas`, datos);
-  }
-
-
-
-  ConsultarUnaEmpresa(nombre: string) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empresas/buscar/${nombre}`);
-  }
-
-  CrearXML(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empresas/xmlDownload`, data);
-  }
-
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/empresas/eliminar/${id}`);
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

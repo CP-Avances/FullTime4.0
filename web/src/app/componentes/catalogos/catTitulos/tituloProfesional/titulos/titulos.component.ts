@@ -32,6 +32,10 @@ export class TitulosComponent implements OnInit {
 
   HabilitarDescrip: boolean = true;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private rest: TituloService,
     private nivel_: NivelTitulosService,
@@ -42,6 +46,9 @@ export class TitulosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerNivelesTitulo();
     this.niveles[this.niveles.length] = { nombre: "OTRO" };
   }
@@ -96,6 +103,8 @@ export class TitulosComponent implements OnInit {
   GuardarNivel(form: any) {
     let nivel = {
       nombre: form.nombreNivelForm,
+      user_name: this.user_name,
+      ip: this.ip,
     };
     // VERIIFCAR DUPLICIDAD
     let nombre_nivel = (nivel.nombre).toUpperCase();
@@ -116,6 +125,8 @@ export class TitulosComponent implements OnInit {
     let titulo = {
       nombre: form.tituloNombreForm,
       id_nivel: idNivel,
+      user_name: this.user_name,
+      ip: this.ip
     };
     // METODO PARA VALIDAR DUPLICADOS
     let verificar = {

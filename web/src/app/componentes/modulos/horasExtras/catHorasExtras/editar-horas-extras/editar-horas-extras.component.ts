@@ -72,8 +72,6 @@ export class EditarHorasExtrasComponent implements OnInit {
   ];
 
   datosHoraExtra: any = [];
-  selec1: boolean = false;
-  selec2: boolean = false;
 
   isLinear = true;
   primeroFormGroup: FormGroup;
@@ -87,6 +85,10 @@ export class EditarHorasExtrasComponent implements OnInit {
   value = 10;
   habilitarprogress: boolean = false;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private toastr: ToastrService,
     private rest: HorasExtrasService,
@@ -95,6 +97,9 @@ export class EditarHorasExtrasComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.primeroFormGroup = this._formBuilder.group({
       descripcionForm: this.descripcion,
       tipoDescuentoForm: this.tipoDescuento,
@@ -129,7 +134,9 @@ export class EditarHorasExtrasComponent implements OnInit {
       codigo: form2.codigoForm,
       incl_almuerzo: form2.inclAlmuerzoForm,
       tipo_funcion: form2.tipoFuncionForm,
-      id: this.data.id
+      id: this.data.id,
+      user_name: this.user_name,
+      ip: this.ip
     };
 
     this.rest.ActualizarDatos(dataHoraExtra)
@@ -157,7 +164,7 @@ export class EditarHorasExtrasComponent implements OnInit {
       this.primeroFormGroup.patchValue({
         descripcionForm: this.datosHoraExtra[0].descripcion,
         tipoDescuentoForm: this.datosHoraExtra[0].tipo_descuento,
-        recaPorcentajeForm: this.datosHoraExtra[0].reca_porcentaje,
+        recaPorcentajeForm: this.datosHoraExtra[0].recargo_porcentaje,
         horaInicioForm: this.datosHoraExtra[0].hora_inicio,
         horaFinalForm: this.datosHoraExtra[0].hora_final,
         horaJornadaForm: this.datosHoraExtra[0].hora_jornada,
@@ -165,16 +172,9 @@ export class EditarHorasExtrasComponent implements OnInit {
       this.segundoFormGroup.patchValue({
         tipoDiaForm: this.datosHoraExtra[0].tipo_dia,
         codigoForm: parseInt(this.datosHoraExtra[0].codigo),
-        inclAlmuerzoForm: this.datosHoraExtra[0].incl_almuerzo,
+        inclAlmuerzoForm: this.datosHoraExtra[0].minutos_comida,
         tipoFuncionForm: this.datosHoraExtra[0].tipo_funcion
       })
-
-      if (this.datosHoraExtra[0].incl_almuerzo === true) {
-        this.selec1 = true;
-      }
-      else {
-        this.selec2 = true;
-      }
     }, err => {
       const { access, message } = err.error.message;
       if (access === false) {

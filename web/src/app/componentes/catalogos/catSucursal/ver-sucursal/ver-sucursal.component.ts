@@ -28,6 +28,7 @@ export class VerSucursalComponent implements OnInit {
 
   @Input() idSucursal: number;
   @Input() pagina_: string = '';
+  @Input() idDepartamentosAcceso: Set<any> = new Set();
 
   datosSucursal: any = [];
   datosDepartamentos: any = [];
@@ -37,6 +38,10 @@ export class VerSucursalComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   constructor(
     public componentes: ListaSucursalesComponent,
@@ -49,6 +54,9 @@ export class VerSucursalComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.CargarDatosSucursal();
     this.ListaDepartamentos();
     console.log('pagina_', this.pagina_);
@@ -72,12 +80,17 @@ export class VerSucursalComponent implements OnInit {
   ListaDepartamentos() {
     this.datosDepartamentos = []
     this.restD.BuscarInformacionDepartamento(this.idSucursal).subscribe(datos => {
-      this.datosDepartamentos = datos;
+      this.datosDepartamentos = this.FiltrarDepartamentosAsignados(datos);
       this.OrdenarDatos(this.datosDepartamentos);
     })
   }
 
-  // ORDENAR LOS DATOS SEGÚN EL ID 
+  // METODO PARA FILTRAR DEPARTAMENTOS ASIGNADOS
+  FiltrarDepartamentosAsignados(data: any) {
+    return data.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
+  }
+
+  // ORDENAR LOS DATOS SEGÚN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
       if (a.nombre < b.nombre) {
@@ -91,7 +104,7 @@ export class VerSucursalComponent implements OnInit {
     array.sort(compare);
   }
 
-  // VENTANA PARA EDITAR DATOS DE REGISTRO SELECCIONADO 
+  // VENTANA PARA EDITAR DATOS DE REGISTRO SELECCIONADO
   EditarDatosSucursal(datosSeleccionados: any): void {
     console.log(datosSeleccionados);
     this.ventana.open(EditarSucursalComponent, { width: '650px', data: datosSeleccionados })
@@ -104,7 +117,7 @@ export class VerSucursalComponent implements OnInit {
       });
   }
 
-  // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO 
+  // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO
   AbrirVentanaEditarDepartamento(departamento: any): void {
     this.ventana.open(EditarDepartamentoComponent,
       { width: '400px', data: { data: departamento, establecimiento: true } })
@@ -113,7 +126,7 @@ export class VerSucursalComponent implements OnInit {
       });
   }
 
-  // VENTANA PARA REGISTRO DE DEPARTAMENTO 
+  // VENTANA PARA REGISTRO DE DEPARTAMENTO
   AbrirVentanaRegistrarDepartamento(): void {
     this.ventana.open(RegistroDepartamentoComponent,
       { width: '350px', data: this.idSucursal }).
@@ -194,9 +207,13 @@ export class VerSucursalComponent implements OnInit {
 
   public departamentosNiveles: any = [];
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
-    this.restD.EliminarRegistro(id_dep).subscribe(res => {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.restD.EliminarRegistro(id_dep, data).subscribe((res: any) => {
       if (res.message === 'error') {
         this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
@@ -209,8 +226,8 @@ export class VerSucursalComponent implements OnInit {
           this.restD.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
             this.departamentosNiveles = datos;
             this.departamentosNiveles.filter(item => {
-              this.restD.EliminarRegistroNivelDepa(item.id).subscribe(
-                res => {
+              this.restD.EliminarRegistroNivelDepa(item.id, data).subscribe(
+                (res: any) => {
                   if (res.message === 'error') {
                     this.toastr.error('No se puede eliminar.', '', {
                       timeOut: 6000,
@@ -257,14 +274,18 @@ export class VerSucursalComponent implements OnInit {
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
     this.ingresar = false;
     this.contador = 0;
     this.departamentosEliminar = this.selectionDepartamentos.selected;
     this.departamentosEliminar.forEach((datos: any) => {
       this.datosDepartamentos = this.datosDepartamentos.filter(item => item.id !== datos.id);
-      //AQUI MODIFICAR EL METODO 
+      //AQUI MODIFICAR EL METODO
       this.contador = this.contador + 1;
-      this.restD.EliminarRegistro(datos.id).subscribe(res => {
+      this.restD.EliminarRegistro(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
           this.toastr.error('Existen datos relacionados con ' + datos.nombre + '.', 'No fue posible eliminar.',  {
             timeOut: 6000,
@@ -278,8 +299,8 @@ export class VerSucursalComponent implements OnInit {
             this.restD.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
               this.departamentosNiveles = datos;
               this.departamentosNiveles.filter(item => {
-                this.restD.EliminarRegistroNivelDepa(item.id).subscribe(
-                  res => {
+                this.restD.EliminarRegistroNivelDepa(item.id, data).subscribe(
+                  (res: any) => {
                     if (res.message === 'error') {
                       this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
                         timeOut: 6000,

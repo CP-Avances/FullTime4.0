@@ -77,29 +77,22 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
 
   inicioFor = 0;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // VARIABLES USADAS EN BUSQUEDA DE FILTRO DE DATOS
   Depata: any = new FormControl('');
   Usuario: any = new FormControl('');
   Estado: any = new FormControl('');
-  filtroDepa: any;
-  filtroUsuario: any;
-  filtroEstado: any;
-
-  //VARIABLES DE FILTRO DE LA TABLA DE AUTORIZADOS O NEGADOS
-  AutoriDepata: any = new FormControl('');
-  AutoriUsuario: any = new FormControl('');
-  AutoriEstado: any = new FormControl('');
-  AutorifiltroDepa: any;
-  AutorifiltroUsuario: any;
-  AutorifiltroEstado: any;
 
   get habilitarHorasE(): boolean { return this.funciones.horasExtras; }
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
-  get s_color(): string {return this.plantilla.color_Secundary;}
-  get p_color(): string {return this.plantilla.color_Primary;}
-  get logoE(): string {return this.plantilla.logoBase64;}
-  get frase(): string {return this.plantilla.marca_Agua;}
+  get s_color(): string { return this.plantilla.color_Secundary; }
+  get p_color(): string { return this.plantilla.color_Primary; }
+  get logoE(): string { return this.plantilla.logoBase64; }
+  get frase(): string { return this.plantilla.marca_Agua; }
 
   autorizacion: boolean = false;
   preautorizacion: boolean = false;
@@ -114,7 +107,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     private funciones: MainNavService,
     public restAutoriza: AutorizaDepartamentoService,
     public usuarioDepa: UsuarioService,
-  ) { 
+  ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
@@ -129,11 +122,14 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
+
       this.BuscarParametro();
       this.ObtenerEmpleados(this.idEmpleado);
       this.calcularHoraPaginacion();
       this.calcularHoraPaginacionObservacion();
-    }  
+    }
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -145,7 +141,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -161,12 +157,12 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         this.obtenerHorasExtras(this.formato_fecha);
         this.obtenerHorasExtrasAutorizadas(this.formato_fecha);
         this.obtenerHorasExtrasObservacion(this.formato_fecha);
-    },
-    vacio => {
+      },
+      vacio => {
         this.obtenerHorasExtras(this.formato_fecha);
         this.obtenerHorasExtrasAutorizadas(this.formato_fecha);
         this.obtenerHorasExtrasObservacion(this.formato_fecha);
-    });
+      });
 
     this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleado).subscribe(
       (res) => {
@@ -204,7 +200,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
 
       //Filtra la lista de Horas Extras para descartar las solicitudes del mismo usuario y almacena en una nueva lista
       this.sumaHorasfiltro = this.sumaHoras.filter((o: any) => {
-        if(this.idEmpleado !== o.id_usua_solicita){
+        if (this.idEmpleado !== o.id_usua_solicita) {
           return this.sumaHorasfiltro.push(o);
         }
       })
@@ -224,7 +220,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
           break;
         }
       }
-     
+
     }, err => {
       return this.validar.RedireccionarHomeAdmin(err.error)
     });
@@ -246,12 +242,12 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
 
       //Filtra la lista de Horas Extras para descartar las solicitudes del mismo usuario y almacena en una nueva lista
       this.lista_pedidosFiltradas = this.horas_extras.filter((o: any) => {
-        if(this.idEmpleado !== o.id_usua_solicita){
+        if (this.idEmpleado !== o.id_usua_solicita) {
           return this.lista_pedidosFiltradas.push(o);
         }
       })
 
-      this.lista_pedidosFiltradas.forEach(data => {
+      this.lista_pedidosFiltradas.forEach((data: any) => {
 
         if (data.estado === 1) {
           data.estado = 'Pendiente';
@@ -276,30 +272,30 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       let i = 0;
       this.lista_pedidosFiltradas.filter(item => {
         this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
-            (usuaDep) => {
-              i = i+1;
-              this.ArrayAutorizacionTipos.filter(x => {
-                if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
-                  this.gerencia = true;
-                  if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
-                    return this.HorasExtraLista.push(item);
-                  }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
-                    return this.HorasExtraLista.push(item);
-                  }
-                }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
-                  if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true){
-                    return this.HorasExtraLista.push(item);
-                  }else if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true){
-                    return this.HorasExtraLista.push(item);
-                  }
+          (usuaDep) => {
+            i = i + 1;
+            this.ArrayAutorizacionTipos.filter(x => {
+              if ((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)) {
+                this.gerencia = true;
+                if (item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)) {
+                  return this.HorasExtraLista.push(item);
+                } else if (item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)) {
+                  return this.HorasExtraLista.push(item);
                 }
-              })
+              } else if ((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)) {
+                if ((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true) {
+                  return this.HorasExtraLista.push(item);
+                } else if ((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true) {
+                  return this.HorasExtraLista.push(item);
+                }
+              }
+            })
 
             //Filtra la lista de autorizacion para almacenar en un array
-            if(this.lista_pedidosFiltradas.length == i){
+            if (this.lista_pedidosFiltradas.length == i) {
               this.lista_HorasExtras = this.HorasExtraLista;
 
-              console.log('this.lista_HorasExtras: ',this.lista_HorasExtras);
+              console.log('this.lista_HorasExtras: ', this.lista_HorasExtras);
 
               if (Object.keys(this.lista_HorasExtras).length == 0) {
                 this.validarMensaje1 = true;
@@ -312,7 +308,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
                 this.lista_pedidos = false;
               }
             }
-        });
+          });
 
       });
 
@@ -330,7 +326,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     return numSelected === numRows;
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
@@ -382,12 +378,12 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
 
       //Filtra la lista de Horas Extras Autorizadas para descartar las solicitudes del mismo usuario y almacena en una nueva lista
       this.listaHorasExtrasObservaFiltradas = this.solicitudes_observacion.filter((o: any) => {
-        if(this.idEmpleado !== o.id_usua_solicita){
+        if (this.idEmpleado !== o.id_usua_solicita) {
           return this.listaHorasExtrasObservaFiltradas.push(o);
         }
       });
 
-      this.listaHorasExtrasObservaFiltradas.forEach(data => {
+      this.listaHorasExtrasObservaFiltradas.forEach((data: any) => {
 
         if (data.estado === 1) {
           data.estado = 'Pendiente';
@@ -419,27 +415,27 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       let i = 0;
       this.listaHorasExtrasObservaFiltradas.filter(item => {
         this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
-            (usuaDep) => {
-              i = i+1;
-              this.ArrayAutorizacionTipos.filter(x => {
-                if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
-                  this.gerencia = true;
-                  if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
-                    return this.lista_HorasExtrasObservacion.push(item);
-                  }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
-                    return this.lista_HorasExtrasObservacion.push(item);
-                  }
-                }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
-                  if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true){
-                    return this.lista_HorasExtrasObservacion.push(item);
-                  }else if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true){
-                    return this.lista_HorasExtrasObservacion.push(item);
-                  }
+          (usuaDep) => {
+            i = i + 1;
+            this.ArrayAutorizacionTipos.filter(x => {
+              if ((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)) {
+                this.gerencia = true;
+                if (item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)) {
+                  return this.lista_HorasExtrasObservacion.push(item);
+                } else if (item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)) {
+                  return this.lista_HorasExtrasObservacion.push(item);
                 }
-              })
+              } else if ((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)) {
+                if ((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true) {
+                  return this.lista_HorasExtrasObservacion.push(item);
+                } else if ((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true) {
+                  return this.lista_HorasExtrasObservacion.push(item);
+                }
+              }
+            })
 
             //Filtra la lista de autorizacion para almacenar en un array
-            if(this.listaHorasExtrasObservaFiltradas.length == i){
+            if (this.listaHorasExtrasObservaFiltradas.length == i) {
               this.listaHorasExtrasObservaFiltradas = this.lista_HorasExtrasObservacion;
 
               if (Object.keys(this.lista_HorasExtras).length == 0) {
@@ -453,14 +449,14 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
                 this.lista_observacion = false;
               }
             }
-        });
+          });
 
       });
 
       if (Object.keys(this.listaHorasExtrasObservaFiltradas).length == 0) {
         this.validarMensaje2 = true;
       }
-      
+
     }, err => {
       this.validarMensaje2 = true;
       return this.validar.RedireccionarHomeAdmin(err.error)
@@ -499,7 +495,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
 
       //Filtra la lista de Horas Extras Autorizadas para descartar las solicitudes del mismo usuario y almacena en una nueva lista
       this.susmaHoras_observacionFiltada = this.sumaHoras_observacion.filter((o: any) => {
-        if(this.idEmpleado !== o.id_usua_solicita){
+        if (this.idEmpleado !== o.id_usua_solicita) {
           return this.susmaHoras_observacionFiltada.push(o);
         }
       });
@@ -526,14 +522,14 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   }
 
   selectionUnoObserva = new SelectionModel<HoraExtraElemento>(true, []);
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedObserva() {
     const numSelected = this.selectionUnoObserva.selected.length;
     const numRows = this.listaHorasExtrasObservaFiltradas.length;
     return numSelected === numRows;
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleObserva() {
     this.isAllSelectedObserva() ?
       this.selectionUnoObserva.clear() :
@@ -561,7 +557,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   }
 
   /** ************************************************************************************* **
-   ** **                       LISTAS DE HORAS EXTRAS AUTORIZADAS                        ** ** 
+   ** **                       LISTAS DE HORAS EXTRAS AUTORIZADAS                        ** **
    ** ************************************************************************************* **/
 
   pedido_hora_autoriza: any = [];
@@ -574,11 +570,11 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     this.restHE.ListaAllHoraExtraAutorizada().subscribe(res => {
       this.pedido_hora_autoriza = res;
 
-      console.log('this.pedido_hora_autoriza: ',this.pedido_hora_autoriza);
+      console.log('this.pedido_hora_autoriza: ', this.pedido_hora_autoriza);
 
       //Filtra la lista de Horas Extras Autorizadas para descartar las solicitudes del mismo usuario y almacena en una nueva lista
       this.pedido_hora_autoriza.filter((o: any) => {
-        if(this.idEmpleado !== o.id_usua_solicita){
+        if (this.idEmpleado !== o.id_usua_solicita) {
           return this.listaHorasExtrasAutorizadasFiltradas.push(o);
         }
       });
@@ -590,7 +586,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         this.lista_autorizacion = false;
       }
 
-      this.listaHorasExtrasAutorizadasFiltradas.forEach(data => {
+      this.listaHorasExtrasAutorizadasFiltradas.forEach((data: any) => {
 
         if (data.estado === 1) {
           data.estado = 'Pendiente';
@@ -621,7 +617,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
 
       })
 
-      console.log('this.listaHorasExtrasAutorizadasFiltradas: ',this.listaHorasExtrasAutorizadasFiltradas)
+      console.log('this.listaHorasExtrasAutorizadasFiltradas: ', this.listaHorasExtrasAutorizadasFiltradas)
 
       if (Object.keys(this.listaHorasExtrasAutorizadasFiltradas).length == 0) {
         this.validarMensaje3 = true;
@@ -651,7 +647,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       dato = this.selectionUnoObserva;
     }
     let EmpleadosSeleccionados: any;
-    EmpleadosSeleccionados = dato.selected.map(obj => {
+    EmpleadosSeleccionados = dato.selected.map((obj: any) => {
       return {
         id: obj.id,
         empleado: obj.nombre + ' ' + obj.apellido,
@@ -665,7 +661,9 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     })
     for (var i = 0; i <= EmpleadosSeleccionados.length - 1; i++) {
       let h = {
-        hora: EmpleadosSeleccionados[i].num_hora
+        hora: EmpleadosSeleccionados[i].num_hora,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.restHE.AutorizarTiempoHoraExtra(EmpleadosSeleccionados[i].id, h).subscribe(res => {
         console.log(res);
@@ -695,7 +693,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
           this.btnCheckHabilitarObserva = false;
         }
       }
-    );
+      );
   }
 
 
@@ -846,30 +844,30 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
 
   //Metodo seleccionar que lista de permisos mostrar (solicitados o autorizados)
   mostrarDatosSolicitudes(opcion: string) {
-      return (opcion == "Solicitudes de horas extras con observaciones"?this.lista_pedidosFiltradas:(
-        opcion=="Solicitudes de horas extras con observaciones"?this.listaHorasExtrasObservaFiltradas:this.listaHorasExtrasAutorizadasFiltradas
-        )).map((obj) => {
-        return [
-          { text: obj.nombre +' '+ obj.apellido, style: "itemsTable" },
-          { text: obj.estado, style: "itemsTable" },
-          { text: obj.descripcion, style: "itemsTable" },
-          { text: obj.fec_inicio, style: "itemsTable" },
-          { text: obj.fec_final, style: "itemsTable" },
-          { text: obj.num_hora, style: "itemsTable" },
-        ];
-      });
+    return (opcion == "Solicitudes de horas extras con observaciones" ? this.lista_pedidosFiltradas : (
+      opcion == "Solicitudes de horas extras con observaciones" ? this.listaHorasExtrasObservaFiltradas : this.listaHorasExtrasAutorizadasFiltradas
+    )).map((obj) => {
+      return [
+        { text: obj.nombre + ' ' + obj.apellido, style: "itemsTable" },
+        { text: obj.estado, style: "itemsTable" },
+        { text: obj.descripcion, style: "itemsTable" },
+        { text: obj.fec_inicio, style: "itemsTable" },
+        { text: obj.fec_final, style: "itemsTable" },
+        { text: obj.num_hora, style: "itemsTable" },
+      ];
+    });
   }
 
-   /** ************************************************************************************************* **
-   ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
-   ** ************************************************************************************************* **/
+  /** ************************************************************************************************* **
+  ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
+  ** ************************************************************************************************* **/
 
-   exportToExcel(opcion: string) {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Solicitudes de horas extras con observaciones"?this.lista_pedidosFiltradas:(
-      opcion=="Solicitudes de horas extras con observaciones"?this.listaHorasExtrasObservaFiltradas:this.listaHorasExtrasAutorizadasFiltradas
-      )).map(obj => {
+  exportToExcel(opcion: string) {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Solicitudes de horas extras con observaciones" ? this.lista_pedidosFiltradas : (
+      opcion == "Solicitudes de horas extras con observaciones" ? this.listaHorasExtrasObservaFiltradas : this.listaHorasExtrasAutorizadasFiltradas
+    )).map((obj: any) => {
       return {
-        Nombre: obj.nombre +' '+ obj.apellido,
+        Nombre: obj.nombre + ' ' + obj.apellido,
         Estado: obj.estado,
         Descripcion: obj.descripcion,
         Fecha_inicio: obj.fec_inicio,
@@ -878,9 +876,9 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       }
     }));
     // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(opcion == "Solicitudes de horas extras con observaciones"?this.lista_pedidosFiltradas[0]:(
-        opcion=="Solicitudes de horas extras con observaciones"?this.listaHorasExtrasObservaFiltradas[0]:this.listaHorasExtrasAutorizadasFiltradas[0]
-      )); // NOMBRE DE CABECERAS DE COLUMNAS
+    const header = Object.keys(opcion == "Solicitudes de horas extras con observaciones" ? this.lista_pedidosFiltradas[0] : (
+      opcion == "Solicitudes de horas extras con observaciones" ? this.listaHorasExtrasObservaFiltradas[0] : this.listaHorasExtrasAutorizadasFiltradas[0]
+    )); // NOMBRE DE CABECERAS DE COLUMNAS
     var wscols: any = [];
     for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
       wscols.push({ wpx: 100 })
@@ -891,16 +889,16 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     xlsx.writeFile(wb, `${opcion}EXCEL` + new Date().getTime() + '.xlsx');
   }
 
-   /** ************************************************************************************************** ** 
-   ** **                                     METODO PARA EXPORTAR A CSV                               ** **
-   ** ************************************************************************************************** **/
+  /** ************************************************************************************************** **
+  ** **                                     METODO PARA EXPORTAR A CSV                               ** **
+  ** ************************************************************************************************** **/
 
-   exportToCVS(opcion: string) {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Solicitudes de horas extras con observaciones"?this.lista_pedidosFiltradas:(
-      opcion=="Solicitudes de horas extras con observaciones"?this.listaHorasExtrasObservaFiltradas:this.listaHorasExtrasAutorizadasFiltradas
-      )).map(obj => {
+  exportToCVS(opcion: string) {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Solicitudes de horas extras con observaciones" ? this.lista_pedidosFiltradas : (
+      opcion == "Solicitudes de horas extras con observaciones" ? this.listaHorasExtrasObservaFiltradas : this.listaHorasExtrasAutorizadasFiltradas
+    )).map((obj: any) => {
       return {
-        Nombre: obj.nombre +' '+ obj.apellido,
+        Nombre: obj.nombre + ' ' + obj.apellido,
         Estado: obj.estado,
         Descripcion: obj.descripcion,
         Fecha_inicio: obj.fec_inicio,
@@ -922,18 +920,18 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   exportToXML(opcion: String) {
     var objeto: any;
     var arregloSolicitudes: any = [];
-    (opcion == "Solicitudes de horas extras con observaciones"?this.lista_pedidosFiltradas:(
-      opcion=="Solicitudes de horas extras con observaciones"?this.listaHorasExtrasObservaFiltradas:this.listaHorasExtrasAutorizadasFiltradas
-      )).forEach((obj: any) => {
+    (opcion == "Solicitudes de horas extras con observaciones" ? this.lista_pedidosFiltradas : (
+      opcion == "Solicitudes de horas extras con observaciones" ? this.listaHorasExtrasObservaFiltradas : this.listaHorasExtrasAutorizadasFiltradas
+    )).forEach((obj: any) => {
       objeto = {
         "lista_solicitudes_horas_extras": {
-        '@id': obj.id,
-        "nombre": obj.nombre +' '+ obj.apellido,
-        "estado": obj.estado,
-        "descripcion": obj.descripcion,
-        "fecha_inicial": obj.fec_inicio,
-        "fecha_final": obj.fec_final,
-        "horas": obj.num_hora,
+          '@id': obj.id,
+          "nombre": obj.nombre + ' ' + obj.apellido,
+          "estado": obj.estado,
+          "descripcion": obj.descripcion,
+          "fecha_inicial": obj.fec_inicio,
+          "fecha_final": obj.fec_final,
+          "horas": obj.num_hora,
         }
       }
       arregloSolicitudes.push(objeto)

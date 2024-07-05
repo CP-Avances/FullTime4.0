@@ -47,13 +47,10 @@ export class ListarTipoComidasComponent implements OnInit {
     tipoForm: this.tipoF
   });
 
-  // ALMACENAMIENTO DE DATOS CONSULTADOS  
+  // ALMACENAMIENTO DE DATOS CONSULTADOS
   tipoComidas: any = [];
   empleado: any = [];
-
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESIÓN
-  filtroNombre = ''; // VARIABLE DE BUSQUEDA FILTRO DE DATOS
-  filtroTipo = ''; // VARIABLE DE BUSQUEDA DE FILTRO DE DATOS TIPO SERVICIO
 
   // ITEMS DE PAGINACION DE LA TABLA
   pageSizeOptions = [5, 10, 20, 50];
@@ -61,7 +58,11 @@ export class ListarTipoComidasComponent implements OnInit {
   numero_pagina: number = 1;
 
   // VARIABLE DE NAVEGACION ENTRE RUTAS
-  hipervinculo: string = (localStorage.getItem('empresaURL') as string)
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
+
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
@@ -96,6 +97,9 @@ export class ListarTipoComidasComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
+
       this.ObtenerEmpleados(this.idEmpleado);
       this.BuscarHora();
     }
@@ -103,7 +107,7 @@ export class ListarTipoComidasComponent implements OnInit {
 
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_hora: string = 'HH:mm:ss';
@@ -120,7 +124,7 @@ export class ListarTipoComidasComponent implements OnInit {
       });
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -139,7 +143,7 @@ export class ListarTipoComidasComponent implements OnInit {
     this.tipoComidas = [];
     this.rest.ConsultarTipoComida().subscribe(datos => {
       this.tipoComidas = datos;
-      this.tipoComidas.forEach(data => {
+      this.tipoComidas.forEach((data: any) => {
         data.horaInicio = this.validar.FormatearHora(data.hora_inicio, formato_hora);
         data.horaFin = this.validar.FormatearHora(data.hora_fin, formato_hora);
       })
@@ -171,6 +175,8 @@ export class ListarTipoComidasComponent implements OnInit {
           }
         }
       });
+      this.BuscarHora();
+
   }
 
   // METODO PARA ABRIR FORMULARIO MENU
@@ -195,17 +201,30 @@ export class ListarTipoComidasComponent implements OnInit {
     this.BuscarHora();
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_tipo: number) {
-    this.rest.EliminarRegistro(id_tipo).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.BuscarHora();
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+    this.rest.EliminarRegistro(id_tipo, datos).subscribe((res: any) => {
+
+      if (res.message === 'error') {
+        this.toastr.error('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
+          timeOut: 6000,
+        });
+
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.BuscarHora();
+      }
+
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -295,7 +314,7 @@ export class ListarTipoComidasComponent implements OnInit {
                 { text: 'Hora Finaliza', style: 'tableHeader' },
                 { text: 'Observaciones', style: 'tableHeader' },
               ],
-              ...this.tipoComidas.map(obj => {
+              ...this.tipoComidas.map((obj: any) => {
                 return [
                   { text: obj.id, style: 'itemsTableD' },
                   { text: obj.tipo, style: 'itemsTableD' },
@@ -321,11 +340,11 @@ export class ListarTipoComidasComponent implements OnInit {
     };
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   ExportToExcel() {
-    const wsc: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipoComidas.map(obj => {
+    const wsc: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipoComidas.map((obj: any) => {
       return {
         CODIGO: obj.id,
         SERVICIO: obj.tipo,
@@ -334,7 +353,7 @@ export class ListarTipoComidasComponent implements OnInit {
         VALOR: obj.valor,
         HORA_INICIA: obj.hora_inicio,
         HORA_FINALIZA: obj.hora_fin,
-        OBSERVACIONES: obj.observa_menu
+        OBSERVACIONES: obj.observacion
       }
     }));
     // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
@@ -349,7 +368,7 @@ export class ListarTipoComidasComponent implements OnInit {
     xlsx.writeFile(wb, "Comidas" + new Date().getTime() + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
    ** ************************************************************************************************** **/
   ExportToCVS() {

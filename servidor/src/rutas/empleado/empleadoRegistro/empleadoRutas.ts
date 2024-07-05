@@ -1,58 +1,15 @@
 // SECCIÓN DE LIBRERIAS
 import EMPLEADO_CONTROLADOR from '../../../controlador/empleado/empleadoRegistro/empleadoControlador';
-import { ObtenerRutaUsuario, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
+import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { TokenValidation } from '../../../libs/verificarToken';
 import { Router } from 'express';
 import multer from 'multer';
-import pool from '../../../database';
 import moment from 'moment';
 moment.locale('es');
 
-const multipart = require('connect-multiparty');
-
-const multipartMiddlewarePlantilla = multipart({
-    uploadDir: './plantillas',
-});
 
 /** ************************************************************************************** **
- ** **                   METODO PARA OBTENER CARPETA IMAGENES DE USUARIO                   **   
- ** ************************************************************************************** **/
-
-const storage = multer.diskStorage({
-
-    destination: async function (req, file, cb) {
-        let id = req.params.id_empleado;
-        var ruta = await ObtenerRutaUsuario(id);
-        cb(null, ruta)
-    },
-    filename: async function (req, file, cb) {
-
-        // FECHA DEL SISTEMA
-        var fecha = moment();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
-
-        // DATOS DOCUMENTO
-        let id = req.params.id_empleado;
-
-        const usuario = await pool.query(
-            `
-            SELECT codigo FROM eu_empleados WHERE id = $1
-            `
-            , [id]);
-
-        let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
-
-        cb(null, documento)
-    }
-})
-
-const upload = multer({ storage: storage });
-
-
-/** ************************************************************************************** **
- ** **                   METODO PARA OBTENER CARPETA IMAGENES DE USUARIO                   **   
+ ** **                   METODO PARA OBTENER CARPETA DE PLANTILLAS                         **   
  ** ************************************************************************************** **/
 
 const storage_plantilla = multer.diskStorage({
@@ -118,11 +75,11 @@ class EmpleadoRutas {
         // METODO PARA REACTIVAR EMPLEADOS
         this.router.put('/re-activar/masivo', TokenValidation, EMPLEADO_CONTROLADOR.ReactivarMultiplesEmpleados);
         // METODO PARA CARGAR IMAGEN DEL USUARIO
-        this.router.put('/:id_empleado/uploadImage', [TokenValidation, upload.single('image')], EMPLEADO_CONTROLADOR.CrearImagenEmpleado);
+        this.router.put('/:id_empleado/uploadImage', [TokenValidation, upload_plantilla.single('image')], EMPLEADO_CONTROLADOR.CrearImagenEmpleado);
         // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO
         this.router.put('/geolocalizacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.GeolocalizacionCrokis);
         // METODO PARA ELIMINAR EMPLEADOS
-        this.router.delete('/eliminar/:id', TokenValidation, EMPLEADO_CONTROLADOR.EliminarEmpleado);
+        this.router.delete('/eliminar', TokenValidation, EMPLEADO_CONTROLADOR.EliminarEmpleado);
 
 
 
@@ -149,26 +106,9 @@ class EmpleadoRutas {
 
         // METODO PARA CONSULTAR COORDENADAS DEL DOMICILIO DEL USUARIO
         this.router.get('/ubicacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.BuscarCoordenadas);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         this.router.post('/buscar/informacion', TokenValidation, EMPLEADO_CONTROLADOR.BuscarEmpleadoNombre);
 
-
         // INFORMACIÓN TÍTULO PROFESIONALES
-
-
         this.router.post('/buscarDepartamento', TokenValidation, EMPLEADO_CONTROLADOR.ObtenerDepartamentoEmpleado);
 
         // INFORMACIÓN DE LA IMAGEN
@@ -176,7 +116,6 @@ class EmpleadoRutas {
 
         // INFORMACIÓN DE LA IMAGEN
         this.router.get('/img/codificado/:id/:imagen', EMPLEADO_CONTROLADOR.getImagenBase64);
-
 
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMÁTICA 
         this.router.post('/verificar/automatico/plantillaExcel/', [TokenValidation, upload_plantilla.single('uploads')], EMPLEADO_CONTROLADOR.VerificarPlantilla_Automatica);
@@ -188,6 +127,11 @@ class EmpleadoRutas {
         //this.router.post('/verificar/datos/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosManual);
         this.router.post('/cargar_manual/plantillaExcel/', TokenValidation, EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
 
+
+        /** **************************************************************************************** **
+         ** **                CREACION DE CARPETAS DE LOS EMPLEADOS SELECCIONADOS                 ** ** 
+         ** **************************************************************************************** **/
+        this.router.post('/crear_carpetas/', TokenValidation, EMPLEADO_CONTROLADOR.CrearCarpetasEmpleado);
 
     }
 

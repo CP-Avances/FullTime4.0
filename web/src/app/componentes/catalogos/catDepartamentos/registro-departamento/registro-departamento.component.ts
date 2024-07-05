@@ -40,6 +40,10 @@ export class RegistroDepartamentoComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private rest: DepartamentosService,
     private restS: SucursalService,
@@ -49,6 +53,9 @@ export class RegistroDepartamentoComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     if (this.data != undefined) {
       this.Habilitar = false;
       this.rest.BuscarDepartamentoSucursal(this.data).subscribe(datos => {
@@ -89,6 +96,8 @@ export class RegistroDepartamentoComponent implements OnInit {
     var departamento = {
       id_sucursal: form.idSucursalForm,
       nombre: form.nombreForm.toUpperCase(),
+      user_name: this.user_name,
+      ip: this.ip
     };
 
     // VERIFICAR ID DE SUCURSAL
@@ -136,7 +145,7 @@ export class RegistroDepartamentoComponent implements OnInit {
     // VERIFICAR DUPLICIDAD EN NOMBRES
     if (this.contador === 1) {
       this.contador = 0;
-      this.toastr.error('Nombre de departamento ya se encuentra registrado.', '', {
+      this.toastr.warning('Nombre de departamento ya se encuentra registrado.', '', {
         timeOut: 6000,
       });
     }

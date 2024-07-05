@@ -1,10 +1,12 @@
-import {
-  enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
-  FormatearFecha, FormatearHora, dia_completo
-}
-  from '../../libs/settingsMail';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import {
+  enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
+  FormatearFecha, FormatearHora, dia_completo, FormatearFecha2
+}
+  from '../../libs/settingsMail';
+
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 import path from 'path';
 
@@ -81,26 +83,6 @@ class PlanHoraExtraControlador {
     }
   }
 
-  public async EncontrarUltimoPlan(req: Request, res: Response): Promise<any> {
-    const PLAN = await pool.query(
-      `
-      SELECT MAX(id) AS id_plan_hora FROM mhe_detalle_plan_hora_extra
-      `
-    );
-    if (PLAN.rowCount != 0) {
-      if (PLAN.rows[0]['id_plan_hora'] != null) {
-        return res.jsonp(PLAN.rows)
-      }
-      else {
-        return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-      }
-    }
-    else {
-      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
-    }
-  }
-
-
 
   public async ObtenerDatosAutorizacion(req: Request, res: Response) {
     const id = req.params.id_plan_extra;
@@ -121,39 +103,118 @@ class PlanHoraExtraControlador {
   }
 
   // ACTUALIZAR 
-  public async TiempoAutorizado(req: Request, res: Response) {
-    const id = parseInt(req.params.id);
-    const { hora } = req.body;
-    let respuesta = await pool.query(
-      `
-      UPDATE mhe_empleado_plan_hora_extra SET tiempo_autorizado = $2 WHERE id = $1
-      `
-      , [id, hora]).then((result: any) => {
-        return { message: 'Registro guardado.' }
+  public async TiempoAutorizado(req: Request, res: Response): Promise<Response> {
+    try {
+      const id = parseInt(req.params.id);
+      const { hora, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query('SELECT tiempo_autorizado FROM mhe_empleado_plan_hora_extra WHERE id = $1', [id]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'mhe_empleado_plan_hora_extra',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar tiempo autorizado en plan_hora_extra_empleado con id ${id}. Registro no encontrado`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado' });
+      }
+
+      let respuesta = await pool.query(
+        `
+        UPDATE mhe_empleado_plan_hora_extra SET tiempo_autorizado = $2 WHERE id = $1
+        `
+        , [id, hora]).then((result: any) => {
+          return { message: 'Tiempo de hora autorizada confirmada' }
+        });
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'mhe_empleado_plan_hora_extra',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{"tiempo_autorizado": "${hora}"}`,
+        ip,
+        observacion: null
       });
-    res.jsonp(respuesta)
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp(respuesta);
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'Error al actualizar tiempo autorizado' });
+    }
   }
 
-  public async ActualizarObservacion(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    const { observacion } = req.body;
-    await pool.query(
-      `
-      UPDATE mhe_empleado_plan_hora_extra SET observacion = $1 WHERE id = $2
-      `
-      , [observacion, id]);
-    res.jsonp({ message: 'Registro guardado.' });
-  }
 
-  public async ActualizarEstado(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    const { estado } = req.body;
-    await pool.query(
-      `
-      UPDATE mhe_empleado_plan_hora_extra SET estado = $1 WHERE id = $2
-      `
-      , [estado, id]);
-    res.jsonp({ message: 'Registro actualizado.' });
+
+  public async ActualizarEstado(req: Request, res: Response): Promise<Response> {
+    try {
+      const id = req.params.id;
+      const { estado, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query('SELECT estado FROM mhe_empleado_plan_hora_extra WHERE id = $1', [id]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'mhe_empleado_plan_hora_extra',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar estado en plan_hora_extra_empleado con id ${id}. Registro no encontrado`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado' });
+      }
+
+      await pool.query(
+        `
+        UPDATE mhe_empleado_plan_hora_extra SET estado = $1 WHERE id = $2
+        `
+        , [estado, id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'mhe_empleado_plan_hora_extra',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{"estado": "${estado}"}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Estado de Planificación Actualizada' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'Error al actualizar estado' });
+    }
   }
 
   /** ************************************************************************************************* **
@@ -165,7 +226,10 @@ class PlanHoraExtraControlador {
     try {
 
       const { id_empl_planifica, fecha_desde, fecha_hasta, hora_inicio, hora_fin, descripcion,
-        horas_totales } = req.body;
+        horas_totales, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
         `
@@ -178,6 +242,28 @@ class PlanHoraExtraControlador {
 
       const [planHoraExtra] = response.rows;
 
+      var fecha_DesdeN = await FormatearFecha2(fecha_desde, 'ddd');
+      var fecha_HastaN = await FormatearFecha2(fecha_hasta, 'ddd');
+
+      const horaInicio = await FormatearHora(hora_inicio)
+      const horaFin = await FormatearHora(hora_fin)
+
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'mhe_detalle_plan_hora_extra',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{ id_empleado_planifica: ${id_empl_planifica}, fecha_desde: ${fecha_DesdeN}, fecha_hasta: ${fecha_HastaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, 
+          descripcion: ${descripcion}, horas_totales: ${horas_totales}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
       if (!planHoraExtra) {
         return res.status(404).jsonp({ message: 'error' })
       }
@@ -186,6 +272,8 @@ class PlanHoraExtraControlador {
       }
 
     } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
       return res.status(500)
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
@@ -197,7 +285,10 @@ class PlanHoraExtraControlador {
     try {
 
       const { id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, id_empl_contrato, estado,
-        codigo } = req.body;
+        codigo, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
         `
@@ -208,12 +299,29 @@ class PlanHoraExtraControlador {
         , [id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, id_empl_contrato, estado, codigo]);
 
       const [planEmpleado] = response.rows;
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'mhe_empleado_plan_hora_extra',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: JSON.stringify(planEmpleado),
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
       if (!planEmpleado) return res.status(400).jsonp({ message: 'error' });
 
       return res.status(200)
         .jsonp({ message: 'Registro guardado.', info: planEmpleado });
 
     } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
       return res.status(500)
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
@@ -256,27 +364,124 @@ class PlanHoraExtraControlador {
   }
 
   // ELIMINAR REGISTRO DE PLANIFICACION HORAS EXTRAS
-  public async EliminarRegistros(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    await pool.query(
-      `
-      DELETE FROM mhe_detalle_plan_hora_extra WHERE id = $1
-      `
-      , [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+  public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
+    try {
+      const { user_name, ip } = req.body;
+      const id = req.params.id;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query('SELECT * FROM mhe_detalle_plan_hora_extra WHERE id = $1', [id]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'mhe_detalle_plan_hora_extra',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar plan_hora_extra con id ${id}. Registro no encontrado`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado' });
+      }
+
+      await pool.query(
+        `
+        DELETE FROM mhe_detalle_plan_hora_extra WHERE id = $1
+        `
+        , [id]);
+        var fecha_DesdeO = await FormatearFecha2(datosOriginales.fecha_desde, 'ddd');
+        var fecha_HastaO = await FormatearFecha2(datosOriginales.fecha_hasta, 'ddd');
+  
+        const horaInicioO = await FormatearHora(datosOriginales.hora_inicio)
+        const horaFinO = await FormatearHora(datosOriginales.hora_fin)
+  
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'mhe_detalle_plan_hora_extra',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: `{ id_empleado_planifica: ${datosOriginales.id_empleado_planifica}, fecha_desde: ${fecha_DesdeO}, fecha_hasta: ${fecha_HastaO}, hora_inicio: ${horaInicioO}, hora_fin: ${horaFinO}, 
+          descripcion: ${datosOriginales.descripcion}, horas_totales: ${datosOriginales.horas_totales}}`,
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'Error al eliminar registro' });
+    }
   }
 
   // ELIMINAR PLANIFICACION DE UN USUARIO ESPECIFICO
-  public async EliminarPlanEmpleado(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    const id_empleado = req.params.id_empleado;
-    await pool.query(
-      `
-      DELETE FROM plan_hora_extra_empleado WHERE id_detalle_plan = $1 AND id_empleado_realiza = $2
-      `
-      , [id, id_empleado]);
+  public async EliminarPlanEmpleado(req: Request, res: Response): Promise<Response> {
+    try {
+      const { user_name, ip } = req.body;
+      const id = req.params.id;
+      const id_empleado = req.params.id_empleado;
 
-    res.jsonp({ message: 'Registro eliminado.' });
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query('SELECT * FROM mhe_empleado_plan_hora_extra WHERE id = $1', [id]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'mhe_empleado_plan_hora_extra',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar plan_hora_extra_empleado con id ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado' });
+      }
+
+      await pool.query(
+        `
+        DELETE FROM mhe_empleado_plan_hora_extra WHERE id_detalle_plan = $1 AND id_empleado_realiza = $2
+        `
+        , [id, id_empleado]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'mhe_empleado_plan_hora_extra',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
+      return res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'Error al eliminar registro' });
+    }
   }
 
   // BUSQUEDA DE PLANIFICACIONES POR ID DE USUARIO -- verificar si se requiere estado
@@ -338,7 +543,7 @@ class PlanHoraExtraControlador {
           `
           <body>
             <div style="text-align: center;">
-              <img width="25%" height="25%" src="cid:cabeceraf"/>
+              <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -379,7 +584,7 @@ class PlanHoraExtraControlador {
               <b>Gracias por la atención</b> <br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>                 
+            <img src="cid:pief" width="100%" height="100%"/>                 
           </body>
           `
         ,
@@ -424,8 +629,11 @@ class PlanHoraExtraControlador {
     try {
       var tiempo = fechaHora();
 
-      const { id_empl_envia, id_empl_recive, mensaje, tipo } = req.body;
+      const { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip } = req.body;
       let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
         `
@@ -434,6 +642,20 @@ class PlanHoraExtraControlador {
         `
         , [create_at, id_empl_envia, id_empl_recive, mensaje, tipo]);
       const [notificiacion] = response.rows;
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'ecm_realtime_timbres',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: JSON.stringify(notificiacion),
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
 
       if (!notificiacion) return res.status(400).jsonp({ message: 'error' });
 
@@ -449,6 +671,8 @@ class PlanHoraExtraControlador {
       return res.status(200).jsonp({ message: 'ok', respuesta: notificiacion });
 
     } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
       return res.status(500)
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }

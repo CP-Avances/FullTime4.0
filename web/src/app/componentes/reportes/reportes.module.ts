@@ -8,6 +8,8 @@ import { FiltrosModule } from '../../filtros/filtros.module';
 
 import { RangoFechasComponent } from './configuracion-reportes/rango-fechas/rango-fechas.component';
 import { ReporteFaltasComponent } from './asistencia/reporte-faltas/reporte-faltas.component';
+import { ReporteAuditoriaComponent } from './reporte-auditoria/reporte-auditoria.component';
+
 import { CriteriosBusquedaComponent } from './configuracion-reportes/criterios-busqueda/criterios-busqueda.component';
 import { ReporteTimbresMultiplesComponent } from './timbres/reporte-timbres-multiples/reporte-timbres-multiples.component';
 
@@ -32,7 +34,6 @@ import { VacunaMultipleComponent } from './generales/vacuna-multiple/vacuna-mult
 import { AlimentosInvitadosComponent } from './modulos/alimentacion/alimentos-invitados/alimentos-invitados.component';
 import { TimbreIncompletoComponent } from './timbres/timbre-incompleto/timbre-incompleto.component';
 import { SalidasAntesComponent } from './asistencia/salidas-antes/salidas-antes.component';
-import { AuditoriaComponent } from './auditoria/auditoria.component';
 import { SolicitudVacacionComponent } from './modulos/vacaciones/solicitud-vacacion/solicitud-vacacion.component';
 import { HorasPlanificadasComponent } from './modulos/horasExtras/horas-planificadas/horas-planificadas.component';
 import { TimbreSistemaComponent } from './timbres/timbre-sistema/timbre-sistema.component';
@@ -41,6 +42,8 @@ import { ReporteTiempoAlimentacionComponent } from './asistencia/reporte-tiempo-
 import { ReportePlanificacionHorariaComponent } from './asistencia/reporte-planificacion-horaria/reporte-planificacion-horaria.component';
 import { ReporteResumenAsistenciaComponent } from './asistencia/reporte-resumen-asistencia/reporte-resumen-asistencia.component';
 import { OpcionUsuarioComponent } from './configuracion-reportes/opcion-usuario/opcion-usuario.component';
+import { OpcionAccionComponent } from './configuracion-reportes/opcion-accion/opcion-accion.component';
+
 import { TimbreMrlComponent } from './timbres/timbre-mrl/timbre-mrl.component';
 import { AnalisisDatosComponent } from './analisis-datos/analisis-datos.component';
 
@@ -50,6 +53,7 @@ import { AnalisisDatosComponent } from './analisis-datos/analisis-datos.componen
     CriteriosBusquedaComponent,
     ReporteTimbresMultiplesComponent,
     ReporteFaltasComponent,
+    ReporteAuditoriaComponent,
     ReporteEmpleadosComponent,
     ReporteKardexComponent,
     ReporteHorasPedidasComponent,
@@ -70,7 +74,6 @@ import { AnalisisDatosComponent } from './analisis-datos/analisis-datos.componen
     AlimentosInvitadosComponent,
     TimbreIncompletoComponent,
     SalidasAntesComponent,
-    AuditoriaComponent,
     SolicitudVacacionComponent,
     HorasPlanificadasComponent,
     TimbreSistemaComponent,
@@ -79,6 +82,7 @@ import { AnalisisDatosComponent } from './analisis-datos/analisis-datos.componen
     ReportePlanificacionHorariaComponent,
     ReporteResumenAsistenciaComponent,
     OpcionUsuarioComponent,
+    OpcionAccionComponent,
     TimbreMrlComponent,
     AnalisisDatosComponent,
   ],

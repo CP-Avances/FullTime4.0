@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment'
 import { rango, checkOptions, FormCriteriosBusqueda } from "src/app/model/reportes.model";
 
 @Injectable({
@@ -13,28 +12,8 @@ export class ReportesService {
     private http: HttpClient,
   ) { }
 
-  ObtenerTimbres(empleado_id: any, data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteTimbres/listaTimbres/${empleado_id}`, data);
-  }
-
   ObtenerPermisosHorarios(codigo: any) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/horarios/${codigo}`);
-  }
-
-  ObtenerPermisosPlanificacion(empleado_id: any) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/planificacion/${empleado_id}`);
-  }
-
-  ObtenerAutorizacionPermiso(empleado_id: any) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/autorizaciones/${empleado_id}`);
-  }
-
-  ObtenerTimbresAtrasosHorario(empleado_id: any, data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteAtrasos/horarios/${empleado_id}`, data);
-  }
-
-  ObtenerTimbresAtrasosPlanificacion(empleado_id: any, data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteAtrasos/planificacion/${empleado_id}`, data);
   }
 
   ObtenerEntradaSalidaHorario(codigo: any, data: any) {
@@ -47,14 +26,6 @@ export class ReportesService {
 
   ObtenerPermisosHorariosFechas(codigo: any, data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/fechas/horarios/${codigo}`, data);
-  }
-
-  ObtenerPermisosPlanificacionFechas(empleado_id: any, data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/fechas/planificacion/${empleado_id}`, data);
-  }
-
-  ObtenerPlanificacionEmpleado(codigo: any, data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteTimbres/buscarPlan/${codigo}`, data);
   }
 
   /**

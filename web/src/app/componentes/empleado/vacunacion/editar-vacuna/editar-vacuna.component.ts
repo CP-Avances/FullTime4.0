@@ -9,7 +9,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { VacunacionService } from 'src/app/servicios/empleado/empleadoVacunas/vacunacion.service';
 
 // IMPORTAR COMPONENTES
-import { TipoVacunaComponent } from '../tipo-vacuna/tipo-vacuna.component';
+import { TipoVacunaComponent } from '../../../catalogos/catalogoVacuna/tipo-vacuna/tipo-vacuna.component';
 
 @Component({
   selector: 'app-editar-vacuna',
@@ -22,6 +22,10 @@ export class EditarVacunaComponent implements OnInit {
   idEmploy: string;
   dvacuna: any;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restVacuna: VacunacionService, // SERVICIO DE DATOS DE VACUNACIÓN
     public validar: ValidacionesService, // VARIABLE USADA EN VALIDACIONES
@@ -32,6 +36,9 @@ export class EditarVacunaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.idEmploy = this.datos.idEmpleado;
     this.dvacuna = this.datos.vacuna;
     this.ObtenerTipoVacunas();
@@ -92,13 +99,15 @@ export class EditarVacunaComponent implements OnInit {
     }
   }
 
-  // METODO PARA CAPTURRA DATOS 
+  // METODO PARA CAPTURRA DATOS
   GuardarDatosCarnet(form: any) {
     let vacuna = {
       id_tipo_vacuna: form.vacunaForm,
       descripcion: form.nombreForm,
       id_empleado: parseInt(this.idEmploy),
       fecha: form.fechaForm,
+      user_name: this.user_name,
+      ip: this.ip
     }
     // VERIFICAR SI EL REGISTRO ES SIMILAR AL EXISTENTE
     if (vacuna.fecha === this.dvacuna.fecha && vacuna.id_tipo_vacuna === this.dvacuna.id_vacuna) {
@@ -124,9 +133,20 @@ export class EditarVacunaComponent implements OnInit {
   // METODO PARA ACTUALIZAR DATOS DE REGISTRO DE VACUNACION
   GuardarDatos(datos: any) {
     this.restVacuna.ActualizarVacunacion(this.dvacuna.id, datos).subscribe(response => {
-      this.toastr.success('', 'Registro Vacunación guardado.', {
-        timeOut: 6000,
-      });
+      if (response.message === 'error') {
+        this.toastr.info('Intente otra vez.', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        });
+      }
+      else {
+        if (this.opcion === 2) {
+          this.EliminarCarnetServidor();
+          this.CargarDocumento();
+        }
+        this.toastr.success('', 'Registro Vacunación guardado.', {
+          timeOut: 6000,
+        });
+      }
     });
   }
 
@@ -134,8 +154,11 @@ export class EditarVacunaComponent implements OnInit {
   VerificarInformacion(datos: any, form: any) {
     if (this.opcion === 1) {
       let eliminar = {
+        subir_documento: false,
         documento: this.dvacuna.carnet,
-        id: parseInt(this.dvacuna.id)
+        id: parseInt(this.dvacuna.id),
+        user_name: this.user_name,
+        ip: this.ip,
       }
       this.GuardarDatos(datos);
       this.restVacuna.EliminarArchivo(eliminar).subscribe(res => {
@@ -145,9 +168,8 @@ export class EditarVacunaComponent implements OnInit {
     else if (this.opcion === 2) {
       if (form.certificadoForm != '' && form.certificadoForm != null) {
         if (this.archivoSubido[0].size <= 2e+6) {
-          this.EliminarCarnetServidor();
+          datos.subir_documento = true;
           this.GuardarDatos(datos);
-          this.CargarDocumento(form);
           this.CerrarRegistro();
         }
         else {
@@ -211,18 +233,27 @@ export class EditarVacunaComponent implements OnInit {
   }
 
   // METODO PARA GUARDAR ARCHIVO SELECCIONADO
-  CargarDocumento(form: any) {
+  CargarDocumento() {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.restVacuna.SubirDocumento(formData, this.dvacuna.id, this.idEmploy).subscribe(res => {
       this.archivoF.reset();
       this.nameFile = '';
-    });
+    }, error => {
+      this.toastr.warning('Intente cargar nuevamente el archivo.', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
+      });
+    }
+    );
   }
 
-  // METODOS DE ACTIVACION DE CARGA DE ARCHIVO 
+  // METODOS DE ACTIVACION DE CARGA DE ARCHIVO
   activar: boolean = false;
   opcion: number = 0;
   ActivarArchivo() {

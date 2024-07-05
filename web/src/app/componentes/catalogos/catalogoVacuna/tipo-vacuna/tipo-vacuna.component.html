@@ -1,0 +1,29 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        TIPO DE VACUNA
+    </span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+</div>
+<form [formGroup]="formulario">
+    <div class="container">
+        <div class="nota">
+            <span>
+                NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                Guardar.
+            </span>
+        </div>
+        <div class="d-flex flex-wrap justify-content-center">
+            <mat-form-field>
+                <mat-label>Nombre</mat-label>
+                <input matInput placeholder="SINOVAC" [formControl]="vacuna" required>
+                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar nombre de vacuna.">help_outline
+                </mat-icon>
+            </mat-form-field>
+        </div>
+    </div>
+</form>
+<div class="d-flex flex-wrap justify-content-center">
+    <input type="submit" class="btn btn-sm" [disabled]="!formulario.valid" (click)="GuardarTipoVacuna(formulario.value)"
+        value="Guardar">
+</div>

@@ -56,9 +56,6 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.idEmpleado = localStorage.getItem('empleado');
     this.BuscarParametro();
-
-    var min_aleatoria = Math.floor(Math.random() * 10)
-    console.log('ver valor aleatorio ', min_aleatoria)
   }
 
   /** **************************************************************************************** **
@@ -103,7 +100,7 @@ export class HomeComponent implements OnInit {
       if (data[0].imagen != null) {
         this.urlImagen = `${(localStorage.getItem('empresaURL') as string)}/empleado/img/` + data[0].id + '/' + data[0].imagen;
         this.restEmpleado.obtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
-          console.log('ver imagen data ', data)
+          //console.log('ver imagen data ', data)
           if (data.imagen != 0) {
             this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
           }

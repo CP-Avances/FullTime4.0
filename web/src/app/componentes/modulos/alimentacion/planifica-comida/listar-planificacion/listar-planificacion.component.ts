@@ -27,6 +27,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.serv
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { use } from 'echarts';
 
 // EXPORTACION DE DATOS A SER LEIDOS EN COMPONENTE DE EMPLEADOS PLANIFICACIÓN
 export interface SolicitudElemento {
@@ -92,6 +93,10 @@ export class ListarPlanificacionComponent implements OnInit {
   idEmpleadoLogueado: number; // VARIABLE PARA ALMACENAR ID DE EMPLEADO QUE INICIA SESIÓN
   empleado: any = []; // VARIABLE DE ALMACENAMIENTO DE DATOS DE EMPLEADO
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   get habilitarComida(): boolean { return this.funciones.alimentacion; }
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
@@ -127,6 +132,8 @@ export class ListarPlanificacionComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
       this.ObtenerEmpleados(this.idEmpleadoLogueado);
       this.BuscarParametro();
       this.BuscarFecha();
@@ -142,7 +149,7 @@ export class ListarPlanificacionComponent implements OnInit {
     }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -271,6 +278,11 @@ export class ListarPlanificacionComponent implements OnInit {
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO DE PLANIFICACION
   EliminarPlanComidas(id_plan: number, id_empleado: number, datos: any) {
 
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
     // LECTURA DE DATOS DE USUARIO
     let usuario = '<tr><th>' + datos.nombre +
       '</th><th>' + datos.cedula + '</th></tr>';
@@ -282,7 +294,7 @@ export class ListarPlanificacionComponent implements OnInit {
     let h_inicio = this.validar.FormatearHora(datos.hora_inicio, this.formato_hora);
     let h_fin = this.validar.FormatearHora(datos.hora_fin, this.formato_hora);
 
-    this.restC.EliminarPlanComida(id_plan, id_empleado).subscribe(res => {
+    this.restC.EliminarPlanComida(id_plan, id_empleado, data).subscribe(res => {
       this.NotificarPlanificacion(datos, desde, hasta, h_inicio, h_fin, id_empleado);
       this.EnviarCorreo(datos, cuenta_correo, usuario, desde, hasta, h_inicio, h_fin);
       this.toastr.error('Registro eliminado.', '', {
@@ -296,7 +308,7 @@ export class ListarPlanificacionComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeletePlanComidas(datos: any) {
     console.log('ver data seleccionada... ', datos)
     // VERIFICAR SI HAY UN REGISTRO CON ESTADO CONSUMIDO DENTRO DE LA PLANIFICACION
@@ -319,7 +331,7 @@ export class ListarPlanificacionComponent implements OnInit {
   }
 
   FormatearDatos(lista: any, formato_fecha: string, formato_hora: string) {
-    lista.forEach(data => {
+    lista.forEach((data: any) => {
       data.fecInicio = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
       data.fecFinal = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
       data.horaInicio = this.validar.FormatearHora(data.hora_inicio, formato_hora);
@@ -342,6 +354,11 @@ export class ListarPlanificacionComponent implements OnInit {
   planEmpleados: any = []; // VARIABLE PARA GUARDAR DATOS DE EMPLEADOS CON PLANIFICACIÓN
   ObtenerEmpleadosPlanificacion(id: any, accion: any, lista_empleados: any, icono: any, editar: any, eliminar: any) {
 
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
     this.restC.ObtenerPlanComidaPorIdPlan(id).subscribe(res => {
       this.planEmpleados = res;
       this.FormatearDatos(this.planEmpleados, this.formato_fecha, this.formato_hora);
@@ -357,7 +374,7 @@ export class ListarPlanificacionComponent implements OnInit {
       }
 
     }, error => {
-      this.restC.EliminarRegistro(id).subscribe(res => {
+      this.restC.EliminarRegistro(id, datos).subscribe(res => {
         this.toastr.warning('Planificación no ha sido asignada a ningún colaborador.', 'Registro eliminado.', {
           timeOut: 6000,
         })
@@ -400,14 +417,14 @@ export class ListarPlanificacionComponent implements OnInit {
     }
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelected() {
     const numSelected = this.selectionUno.selected.length;
     const numRows = this.planEmpleados.length;
     return numSelected === numRows;
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
@@ -425,7 +442,7 @@ export class ListarPlanificacionComponent implements OnInit {
   // METODO PARA LEER TODOS LOS DATOS SELECCIONADOS Y EDITAR
   EditarRegistrosMultiple() {
     let EmpleadosSeleccionados: any;
-    EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
+    EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
       return {
         nombre: obj.nombre,
         cedula: obj.cedula,
@@ -460,7 +477,7 @@ export class ListarPlanificacionComponent implements OnInit {
   // METODO PARA LEER TODOS LOS DATOS SELECCIONADOS Y ELIMINAR
   EliminarRegistrosMultiple() {
     let EmpleadosSeleccionados: any;
-    EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
+    EmpleadosSeleccionados = this.selectionUno.selected.map((obj: any) => {
       console.log('ver data obj... ', obj)
       return {
         alimentacion: obj
@@ -495,9 +512,14 @@ export class ListarPlanificacionComponent implements OnInit {
   id_plan: any;
   EliminarPlanComidasMultiple(datos: any) {
 
+    const data = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
     var usuario = '';
 
-    datos.map(obj => {
+    datos.map((obj: any) => {
 
       console.log('ver eliminar 56666 ', plan)
       var plan = obj.alimentacion
@@ -510,7 +532,7 @@ export class ListarPlanificacionComponent implements OnInit {
       // LECTURA DE NOMBRES DE USUARIOS
       usuario = usuario + '<tr><th>' + plan.nombre + '</th><th>' + plan.cedula + '</th></tr>';
 
-      this.restC.EliminarPlanComida(plan.id, plan.id_empleado).subscribe(res => {
+      this.restC.EliminarPlanComida(plan.id, plan.id_empleado, data).subscribe(res => {
         this.contar_eliminados = this.contar_eliminados + 1;
         this.NotificarPlanificacion(datos, desde, hasta, h_inicio, h_fin, plan.id_empleado);
 
@@ -529,7 +551,7 @@ export class ListarPlanificacionComponent implements OnInit {
     })
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   empleado_conConsumo: any = [];
   empleado_sinConsumo: any = [];
   contar: number = 0;
@@ -541,7 +563,7 @@ export class ListarPlanificacionComponent implements OnInit {
     this.empleado_sinConsumo = [];
     this.contar = 0;
     this.contar_eliminados = 0;
-    datos.map(obj => {
+    datos.map((obj: any) => {
 
       // VERIFICAR SI HAY UN REGISTRO CON ESTADO CONSUMIDO DENTRO DE LA PLANIFICACION
       let datosConsumido = {
@@ -597,6 +619,12 @@ export class ListarPlanificacionComponent implements OnInit {
 
   // VERIFICAR SI LA PLANIFICACION TIENE DATOS DE EMPLEADOS
   VerificarPlanificacion(id: any, accion: any, editar: any, eliminar: any) {
+
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip,
+    };
+
     this.restC.ObtenerPlanComidaPorIdPlan(id).subscribe(res => {
       this.lista_empleados = true;
       this.validarMensaje2 = false;
@@ -607,7 +635,7 @@ export class ListarPlanificacionComponent implements OnInit {
       this.ver_editar = editar;
       this.ver_icono = false;
     }, res => {
-      this.restC.EliminarRegistro(id).subscribe(res => {
+      this.restC.EliminarRegistro(id, datos).subscribe(res => {
         this.tipo_accion = accion;
         this.lista_empleados = false;
         this.validarMensaje2 = true;
@@ -673,6 +701,8 @@ export class ListarPlanificacionComponent implements OnInit {
       mensaje: 'Planificación de alimentación eliminada desde ' +
         desde + ' hasta ' + hasta +
         ' horario de ' + h_inicio + ' a ' + h_fin + ' servicio ',
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restC.EnviarMensajePlanComida(mensaje).subscribe(res => {
       this.aviso.RecibirNuevosAvisos(res.respuesta);
@@ -861,7 +891,7 @@ export class ListarPlanificacionComponent implements OnInit {
    ** ************************************************************************************************* **/
 
    exportToExcel() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificaciones.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificaciones.map((obj: any) => {
       return {
         Codigo: obj.id,
         Servicio: obj.nombre_servicio,
@@ -884,12 +914,12 @@ export class ListarPlanificacionComponent implements OnInit {
     xlsx.writeFile(wb, 'PAlimentacionEXCEL' + new Date().getTime() + '.xlsx');
   }
 
-   /** ************************************************************************************************** ** 
+   /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A CSV                               ** **
    ** ************************************************************************************************** **/
 
    exportToCVS() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificaciones.map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificaciones.map((obj: any) => {
       return {
         Codigo: obj.id,
         Servicio: obj.nombre_servicio,

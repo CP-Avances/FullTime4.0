@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 
-import { environment } from '../../../../environments/environment'
-
 @Injectable({
   providedIn: 'root'
 })
@@ -35,13 +33,12 @@ export class ProvinciaService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarProvincia(id: any) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/provincia/eliminar/${id}`).pipe( catchError(id));
-  }
-
-  // METODO PARA CREAR ARCHIVO XML
-  CrearXML(data: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/provincia/xmlDownload`, data);
+  EliminarProvincia(id: any, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/provincia/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
 
   // METODO PARA REGISTRAR PROVINCIA
@@ -58,20 +55,6 @@ export class ProvinciaService {
   BuscarPaisId(id: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/buscar/pais/${id}`);
   }
-
-
-
-
-  
-  getIdProvinciaRest(nombre: string) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/nombreProvincia/${nombre}`);
-  }
-
-  BuscarTodosPaises() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/paises`);
-  }
-
-
 
 }
 

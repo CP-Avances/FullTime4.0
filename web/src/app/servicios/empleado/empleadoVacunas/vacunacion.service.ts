@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
-import { catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -30,17 +28,17 @@ export class VacunacionService {
 
   // SERVICIO PARA BUSCAR VACUNA FECHA - TIPO
   BuscarVacunaFechaTipo(data: any) {
-    return this.http.post<any>(`${environment.url}/vacunas/fecha_nombre/tipo_vacuna`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/vacunas/fecha_nombre/tipo_vacuna`, data);
   }
 
   // METODO PARA SUBIR UN DOCUMENTO
-  SubirDocumento(formData: any, id: number, nombre: string) {
-    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/vacunas/${id}/documento/${nombre}`, formData)
+  SubirDocumento(formData: any, id: number, id_empleado: any) {
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/vacunas/${id}/documento/${id_empleado}`, formData)
   }
 
   // METODO PARA ACTUALIZAR REGISTRO
   ActualizarVacunacion(id: number, data: any) {
-    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/vacunas/${id}`, data);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/vacunas/${id}`, data);
   }
 
   // ELIMINAR CARNET DE VACUNA DEL SERVIDOR
@@ -54,18 +52,12 @@ export class VacunacionService {
   }
 
   // METODO PARA ELIMINAR REGISTRO VACUNA EMPLEADO
-  EliminarRegistroVacuna(id: number, documento: string) {
-    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/vacunas/eliminar/${id}/${documento}`);
-  }
-
-  // METODO DE REGISTROS DE TIPO DE VACUNACION
-  CrearTipoVacuna(data: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/vacunas/tipo_vacuna`, data).pipe(catchError(data));
-  }
-
-  // METODO DE REGISTROS DE TIPO DE VACUNACION
-  BuscarVacunaNombre(data: any) {
-    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/vacunas/tipo_vacuna/nombre`, data);
+  EliminarRegistroVacuna(id: number, documento: string, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/vacunas/eliminar/${id}/${documento}`;
+    const httpOptions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOptions);
   }
 
 }

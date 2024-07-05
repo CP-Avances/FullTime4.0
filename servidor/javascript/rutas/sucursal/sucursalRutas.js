@@ -39,6 +39,7 @@ class SucursalRutas {
         // METODO PARA BUSCAR DATOS DE UNA SUCURSAL
         this.router.get('/unaSucursal/:id', verificarToken_1.TokenValidation, sucursalControlador_1.default.ObtenerUnaSucursal);
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], sucursalControlador_1.default.RevisarDatos);
+        this.router.post('/registraSucursales', verificarToken_1.TokenValidation, sucursalControlador_1.default.RegistrarSucursales);
     }
 }
 const SUCURSAL_RUTAS = new SucursalRutas();

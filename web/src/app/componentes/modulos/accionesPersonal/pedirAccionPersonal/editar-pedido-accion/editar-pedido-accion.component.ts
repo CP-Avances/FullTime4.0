@@ -9,7 +9,7 @@ import { Observable } from "rxjs";
 import { Router } from "@angular/router";
 import * as moment from "moment";
 
-// IMPORTACION DE SERVICIOS 
+// IMPORTACION DE SERVICIOS
 import { AccionPersonalService } from "src/app/servicios/accionPersonal/accion-personal.service";
 import { ValidacionesService } from "src/app/servicios/validaciones/validaciones.service";
 import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
@@ -39,19 +39,18 @@ export class EditarPedidoAccionComponent implements OnInit {
   @Input() idPedido: number;
   @Input() pagina: string = '';
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // FILTRO DE NOMBRES DE LOS EMPLEADOS
   filtroNombreH: Observable<any[]>;
   filtroNombreG: Observable<any[]>;
   filtroNombreR: Observable<any[]>;
   filtroNombre: Observable<any[]>;
-  seleccionarEmpResponsable: any;
-  seleccionarEmpleados: any;
-  seleccionEmpleadoH: any;
-  seleccionEmpleadoG: any;
 
   //FILTRO CIUDAD
   filtroCiudad: Observable<any[]>;
-  seleccionarCiudad: any;
 
   // EVENTOS RELACIONADOS A SELECCION E INGRESO DE ACUERDOS - DECRETOS - RESOLUCIONES
   ingresoAcuerdo: boolean = false;
@@ -163,6 +162,9 @@ export class EditarPedidoAccionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.CargarInformacion();
     // INICIALIZACION DE FECHA Y MOSTRAR EN FORMULARIO
     var f = moment();
@@ -182,28 +184,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     // DATOS VACIOS INDICAR LA OPCION OTRO
     this.decretos[this.decretos.length] = { descripcion: "OTRO" };
     this.cargos[this.cargos.length] = { descripcion: "OTRO" };
-
-    // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
-    this.filtroNombre = this.idEmpleadoF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleado(value))
-    );
-    this.filtroNombreH = this.idEmpleadoHF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleado(value))
-    );
-    this.filtroNombreG = this.idEmpleadoGF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleado(value))
-    );
-    this.filtroNombreR = this.idEmpleadoRF.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarEmpleado(value))
-    );
-    this.filtroCiudad = this.idCiudad.valueChanges.pipe(
-      startWith(""),
-      map((value: any) => this._filtrarCiudad(value))
-    );
   }
 
   // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
@@ -234,49 +214,49 @@ export class EditarPedidoAccionComponent implements OnInit {
         console.log("datos", this.datosPedido);
         this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empleado)
           .subscribe((data1) => {
-            this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empl_uno)
+            this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empleado_uno)
               .subscribe((data2) => {
-                this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empl_dos)
+                this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empleado_dos)
                   .subscribe((data3) => {
-                    this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empl_responsable)
+                    this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empleado_responsable)
                       .subscribe((data4) => {
                         this.restAccion.BuscarDatosPedidoCiudades(this.datosPedido[0].id_ciudad)
                           .subscribe((data5) => {
                             this.firstFormGroup.patchValue({
-                              identificacionForm: this.datosPedido[0].identi_accion_p,
-                              tipoDecretoForm: this.datosPedido[0].decre_acue_resol,
+                              identificacionForm: this.datosPedido[0].identificacion_accion_personal,
+                              tipoDecretoForm: this.datosPedido[0].id_contexto_legal,
                               baseForm: this.datosPedido[0].adicion_legal,
-                              accionForm: this.datosPedido[0].tipo_accion,
+                              accionForm: this.datosPedido[0].id_detalle_tipo_accion_personal,
                             });
                             this.secondFormGroup.patchValue({
                               idEmpleadoForm: data1[0].apellido + " " + data1[0].nombre,
-                              fechaDesdeForm: this.datosPedido[0].fec_rige_desde,
-                              fechaHastaForm: this.datosPedido[0].fec_rige_hasta,
-                              numPartidaForm: this.datosPedido[0].num_partida,
-                              tipoProcesoForm: this.datosPedido[0].proceso_propuesto,
+                              fechaDesdeForm: this.datosPedido[0].fecha_rige_desde,
+                              fechaHastaForm: this.datosPedido[0].fecha_rige_hasta,
+                              numPartidaForm: this.datosPedido[0].numero_partida_empresa,
+                              tipoProcesoForm: this.datosPedido[0].id_proceso_propuesto,
                               idCiudad: data5[0].descripcion,
-                              tipoCargoForm: this.datosPedido[0].cargo_propuesto,
+                              tipoCargoForm: this.datosPedido[0].id_cargo_propuesto,
                               sueldoForm: this.datosPedido[0].salario_propuesto,
-                              numPropuestaForm: this.datosPedido[0].num_partida_propuesta,
-                              numPartidaIForm: this.datosPedido[0].num_partida_individual,
+                              numPropuestaForm: this.datosPedido[0].numero_partida_propuesta,
+                              numPartidaIForm: this.datosPedido[0].numero_partida_individual,
                             });
                             this.thirdFormGroup.patchValue({
-                              actaForm: this.datosPedido[0].act_final_concurso,
-                              fechaActaForm: this.datosPedido[0].fec_act_final_concurso,
+                              actaForm: this.datosPedido[0].acta_final_concurso,
+                              fechaActaForm: this.datosPedido[0].fecha_acta_final_concurso,
                               idEmpleadoHForm: data2[0].apellido + " " + data2[0].nombre,
                               idEmpleadoGForm: data3[0].apellido + " " + data3[0].nombre,
                               idEmpleadoRForm: data4[0].apellido + " " + data4[0].nombre,
-                              abrevHForm: this.datosPedido[0].abrev_empl_uno,
-                              abrevGForm: this.datosPedido[0].abrev_empl_dos,
+                              abrevHForm: this.datosPedido[0].titulo_empleado_uno,
+                              abrevGForm: this.datosPedido[0].titulo_empleado_dos,
                             });
                             this.fourthFormGroup.patchValue({
-                              funcionesReempForm: this.datosPedido[0].funciones_reemp,
-                              nombreReempForm: this.datosPedido[0].nombre_reemp,
-                              puestoReempForm: this.datosPedido[0].puesto_reemp,
-                              accionReempForm: this.datosPedido[0].num_accion_reemp,
-                              fechaReempForm: this.datosPedido[0].primera_fecha_reemp,
+                              funcionesReempForm: this.datosPedido[0].funciones_reemplazo,
+                              nombreReempForm: this.datosPedido[0].nombre_reemplazo,
+                              puestoReempForm: this.datosPedido[0].puesto_reemplazo,
+                              accionReempForm: this.datosPedido[0].numero_accion_reemplazo,
+                              fechaReempForm: this.datosPedido[0].primera_fecha_reemplazo,
                               posesionNotificacionForm: this.datosPedido[0].posesion_notificacion,
-                              descripcionPForm: this.datosPedido[0].descripcion_pose_noti,
+                              descripcionPForm: this.datosPedido[0].descripcion_posesion_notificacion,
                             });
                           });
                       });
@@ -300,11 +280,11 @@ export class EditarPedidoAccionComponent implements OnInit {
       });
   }
 
-  // BUSQUEDA DE DATOS DE LA TABLA CG_PROCESOS
+  // BUSQUEDA DE DATOS DE LA TABLA PROCESOS
   procesos: any = [];
   ObtenerProcesos() {
     this.procesos = [];
-    this.restProcesos.getProcesosRest().subscribe((datos) => {
+    this.restProcesos.ConsultarProcesos().subscribe((datos) => {
       this.procesos = datos;
     });
   }
@@ -399,10 +379,24 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.empleados = [];
     this.restE.BuscarListaEmpleados().subscribe((data) => {
       this.empleados = data;
-      this.seleccionarEmpleados = "";
-      this.seleccionEmpleadoH = "";
-      this.seleccionEmpleadoG = "";
-      console.log("empleados", this.empleados);
+      //console.log("empleados", this.empleados);
+      // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
+      this.filtroNombre = this.idEmpleadoF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
+      this.filtroNombreH = this.idEmpleadoHF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
+      this.filtroNombreG = this.idEmpleadoGF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
+      this.filtroNombreR = this.idEmpleadoRF.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarEmpleado(value))
+      );
     });
   }
 
@@ -411,8 +405,11 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.ciudades = [];
     this.restC.ConsultarCiudades().subscribe((data) => {
       this.ciudades = data;
-      this.seleccionarCiudad = "";
-      console.log("ciudades", this.ciudades);
+      //console.log("ciudades", this.ciudades);
+      this.filtroCiudad = this.idCiudad.valueChanges.pipe(
+        startWith(""),
+        map((value: any) => this._filtrarCiudad(value))
+      );
     });
   }
 
@@ -524,6 +521,8 @@ export class EditarPedidoAccionComponent implements OnInit {
               posesion_notificacion: form4.posesionNotificacionForm,
               descripcion_pose_noti: form4.descripcionPForm,
               id: this.idPedido,
+              user_name: this.user_name,
+              ip: this.ip,
             };
             // VALIDAR QUE FECHAS SE ENCUENTREN BIEN INGRESADA
             if (form4.fechaReempForm === "" || form4.fechaReempForm === null) {
@@ -631,6 +630,8 @@ export class EditarPedidoAccionComponent implements OnInit {
     if (form1.otroDecretoForm != "") {
       let acuerdo = {
         descripcion: form1.otroDecretoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       };
       this.restAccion.IngresarDecreto(acuerdo).subscribe((resol) => {
         // BUSCAR ID DE ULTIMO REGISTRO DE DECRETOS - ACUERDOS - RESOLUCION - OTROS
@@ -666,6 +667,8 @@ export class EditarPedidoAccionComponent implements OnInit {
     if (form2.otroCargoForm != "") {
       let cargo = {
         descripcion: form2.otroCargoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       };
       this.restAccion.IngresarCargoPropuesto(cargo).subscribe((resol) => {
         // BUSCAR ID DE ULTIMO REGISTRO DE CARGOS PROPUESTOS

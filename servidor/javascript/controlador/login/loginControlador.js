@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // IMPORTAR LIBRERIAS
 const settingsMail_1 = require("../../libs/settingsMail");
+const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -194,7 +195,7 @@ class LoginControlador {
                     html: `
           <body>
             <div style="text-align: center;">
-               <img width="25%" height="25%" src="cid:cabeceraf"/>
+               <img width="100%" height="100%" src="cid:cabeceraf"/>
             </div>
             <br>
             <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
@@ -218,7 +219,7 @@ class LoginControlador {
               <b>Gracias por la atención</b><br>
               <b>Saludos cordiales,</b> <br><br>
             </p>
-            <img src="cid:pief" width="50%" height="50%"/>
+            <img src="cid:pief" width="100%" height="100%"/>
           </body>
           `,
                     attachments: [
@@ -256,16 +257,55 @@ class LoginControlador {
     // METODO PARA CAMBIAR CONTRASEÑA
     CambiarContrasenia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            var token = req.body.token;
-            var contrasena = req.body.contrasena;
+            let { token, contrasena, user_name, ip } = req.body;
             var contrasena_encriptada = rsa_keys_service_1.default.encriptarLogin(contrasena);
             console.log(contrasena, '_', contrasena_encriptada);
             try {
                 const payload = jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail');
                 const id_empleado = payload._id;
-                yield database_1.default.query(`
-        UPDATE eu_usuarios SET contrasena = $2 WHERE id_empleado = $1
-        `, [id_empleado, contrasena_encriptada]);
+                try {
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    // OBTENER DATOSORIGINALES
+                    const datosOriginales = yield database_1.default.query(`
+          SELECT contrasena FROM eu_usuarios WHERE id_empleado = $1
+          `, [id_empleado]);
+                    const [contrasenaOriginal] = datosOriginales.rows;
+                    if (!contrasenaOriginal) {
+                        yield auditoriaControlador_1.default.InsertarAuditoria({
+                            tabla: 'eu_usuarios',
+                            usuario: user_name,
+                            accion: 'U',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip,
+                            observacion: `Error al cambiar la contraseña del usuario con id ${id_empleado}`
+                        });
+                        // FINALIZAR TRANSACCION
+                        yield database_1.default.query('COMMIT');
+                        return res.status(404).jsonp({ message: 'error' });
+                    }
+                    yield database_1.default.query(`
+          UPDATE eu_usuarios SET contrasena = $2 WHERE id_empleado = $1
+          `, [id_empleado, contrasena_encriptada]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_usuarios',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: JSON.stringify(contrasenaOriginal),
+                        datosNuevos: `{"contrasena": "${contrasena_encriptada}"}`, //FIXME COLOCAR TODA LA DATA DE LA ACTUALIZACION
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                }
+                catch (error) {
+                    // ROLLBACK
+                    yield database_1.default.query('ROLLBACK');
+                    return res.status(500).jsonp({ message: 'error' });
+                }
                 return res.jsonp({
                     expiro: 'no',
                     message: "Contraseña actualizada. Intente ingresar con la nueva contraseña."
@@ -277,17 +317,6 @@ class LoginControlador {
                     message: "Tiempo para cambiar contraseña ha expirado. Vuelva a solicitar cambio de contraseña."
                 });
             }
-        });
-    }
-    // PRUEBA AUDITAR
-    Auditar(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { esquema, tabla, user, ip, old_data, new_data, accion } = req.body;
-            yield database_1.default.query(' INSERT INTO audit.auditoria (plataforma, table_name, user_name, action, ' +
-                'original_data, new_data, ip_address) ' +
-                'VALUES ($1, $2, $3, substring($7,1,1), $4, $5, $6)', [esquema, tabla, user, old_data, new_data, ip, accion]);
-            console.log('req auditar', req.body);
-            res.jsonp({ message: 'Auditar' });
         });
     }
 }

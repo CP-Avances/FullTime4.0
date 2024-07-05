@@ -30,6 +30,10 @@ export class RegistroContratoComponent implements OnInit {
   // BUSQUEDA DE PAISES AL INGRESAR INFORMACION
   filtro: Observable<any[]>;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   controlVacacionesF = new FormControl('', Validators.required);
   controlAsistenciaF = new FormControl('', Validators.required);
@@ -65,6 +69,9 @@ export class RegistroContratoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerPaises();
     this.ObtenerEmpleados();
     this.ObtenerTipoContratos();
@@ -117,7 +124,7 @@ export class RegistroContratoComponent implements OnInit {
     })
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados() {
     this.empleados = [];
     this.rest.BuscarUnEmpleado(this.datoEmpleado).subscribe(data => {
@@ -157,12 +164,15 @@ export class RegistroContratoComponent implements OnInit {
   InsertarContrato(form: any) {
     let datosContrato = {
       id_tipo_contrato: form.tipoForm,
+      subir_documento: false,
       vaca_controla: form.controlVacacionesForm,
       asis_controla: form.controlAsistenciaForm,
       id_empleado: this.datoEmpleado,
       fec_ingreso: form.fechaIngresoForm,
       fec_salida: form.fechaSalidaForm,
       id_regimen: form.idRegimenForm,
+      user_name: this.user_name,
+      ip: this.ip,
     }
     if (form.tipoForm === undefined) {
       this.InsertarModalidad(form, datosContrato);
@@ -190,7 +200,9 @@ export class RegistroContratoComponent implements OnInit {
   InsertarModalidad(form: any, datos: any) {
     if (form.contratoForm != '') {
       let tipo_contrato = {
-        descripcion: form.contratoForm
+        descripcion: form.contratoForm,
+        user_name: this.user_name,
+        ip: this.ip,
       }
       // VERIFICAR DUPLICIDAD DE MODALIDAD LABORAL
       let modalidad = {
@@ -216,12 +228,23 @@ export class RegistroContratoComponent implements OnInit {
 
   // METODO PARA REGISTRAR DATOS DE CONTRATO
   RegistrarContrato(form: any, datos: any) {
+    if (this.isChecked === true && form.documentoForm != '') {
+      datos.subir_documento = true;
+    }
     this.rest.CrearContratoEmpleado(datos).subscribe(response => {
-      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
-        timeOut: 6000,
-      })
-      if (this.isChecked === true && form.documentoForm != '') {
-        this.CargarContrato(response.id, form);
+      //console.log('res ', response)
+      if (response.message === 'error' || response.message === 'error_carpeta') {
+        this.toastr.success('Intente nuevamente.', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        })
+      }
+      else {
+        this.toastr.success('Operación exitosa.', 'Registro guardado.', {
+          timeOut: 6000,
+        })
+        if (this.isChecked === true && form.documentoForm != '') {
+          this.CargarContrato(response.id, form);
+        }
       }
       this.CerrarVentana();
     }, error => {
@@ -293,13 +316,21 @@ export class RegistroContratoComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
+
     this.rest.SubirContrato(formData, id).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Documento guardado.', {
         timeOut: 6000,
       });
       this.archivoForm.reset();
       this.nameFile = '';
-    });
+    }, error => {
+      this.toastr.info('Intente cargar nuevamente el archivo.', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
+      });
+    }
+    );
   }
 
   // RETIRAR ARCHIVO SELECCIONADO

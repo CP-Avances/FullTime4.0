@@ -32,8 +32,7 @@
                                         matTooltip="Seleccionar el tipo de permiso a registrar.">
                                         help_outline
                                     </mat-icon>
-                                    <mat-select formControlName="descripcionForm" [(ngModel)]="seleccionarPermiso"
-                                        required>
+                                    <mat-select formControlName="descripcionForm" required>
                                         <mat-option *ngFor="let permiso of permisos" [value]="permiso.nombre"
                                             (click)="ActivarDesactivarNombre(primeroFormGroup.value)">
                                             {{permiso.valor}}

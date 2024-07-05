@@ -1,0 +1,88 @@
+mat-form-field {
+  padding: 10px 15px 0px 15px;
+}
+
+table {
+  width: 100%;
+  font-size: 12px;
+}
+
+tr {
+  text-align: center;
+}
+
+th {
+  text-align: center;
+  vertical-align: middle !important;
+}
+
+td {
+  padding-top: 10px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+p {
+  font-size: x-small;
+}
+
+mat-icon {
+  cursor: pointer;
+  width: 1.625rem;
+}
+
+.ver {
+  color: indianred;
+}
+
+#busqueda {
+  margin-top: 10px;
+}
+
+#detalle {
+  width: 100%;
+  font-size: 12px;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+#detalle .t_horarios {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+#detalle th,
+#detalle td {
+  border-right: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+}
+
+#detalle tbody tr {
+  background-color: #fbfbfb;
+}
+
+#detalle tbody tr:nth-child(2n) {
+  background-color: #e6f3ff;
+}
+
+mat-progress-spinner {
+  background: transparent;
+  z-index: 100;
+}
+
+.pantalla-progress {
+  background: #ffff;
+  position: fixed;
+  opacity: 0.8;
+  height: 100%;
+  width: 100%;
+  left: 0px;
+  top: 0px;
+}
+
+.progress {
+  opacity: 1;
+  margin: 250px auto auto auto;
+}

@@ -31,14 +31,16 @@ import { MainNavService } from 'src/app/componentes/administracionGeneral/main-n
 
 export class ListaHorasExtrasComponent implements OnInit {
 
-  horasExtras: any = [];
-  filtroDescripcion = '';
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
 
   // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
-
+  
+  horasExtras: any = [];
   empleado: any = [];
   idEmpleado: number;
 
@@ -77,6 +79,9 @@ export class ListaHorasExtrasComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.user_name = localStorage.getItem('usuario');
+      this.ip = localStorage.getItem('ip');
+
       this.BuscarHora();
       this.ObtenerLogo();
       this.ObtenerColores();
@@ -86,12 +91,13 @@ export class ListaHorasExtrasComponent implements OnInit {
 
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_hora: string = 'HH:mm:ss';
 
   BuscarHora() {
+    this.horasExtras = [];
     // id_tipo_parametro Formato hora = 26
     this.parametro.ListarDetalleParametros(26).subscribe(
       res => {
@@ -103,7 +109,7 @@ export class ListaHorasExtrasComponent implements OnInit {
       });
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -119,7 +125,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -139,10 +145,11 @@ export class ListaHorasExtrasComponent implements OnInit {
 
   // METODO PARA CONSULTAR CONFIGURACION HORAS EXTRAS
   ObtenerHorasExtras(formato_hora: string) {
+    this.horasExtras = [];
     this.rest.ListarHorasExtras().subscribe(datos => {
       this.horasExtras = datos;
 
-      this.horasExtras.forEach(data => {
+      this.horasExtras.forEach((data: any) => {
         data.h_inicio_ = this.validar.FormatearHora(data.hora_inicio, formato_hora);
         data.h_final_ = this.validar.FormatearHora(data.hora_final, formato_hora);
 
@@ -181,7 +188,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     this.BuscarHora();
   }
 
-  // VENTANA PARA EDITAR DATOS DE HORA EXTRA SELECCIONADO 
+  // VENTANA PARA EDITAR DATOS DE HORA EXTRA SELECCIONADO
   ver_editar: boolean = false;
   pagina: string = '';
   EditarDatos(datosSeleccionados: any): void {
@@ -191,9 +198,14 @@ export class ListaHorasExtrasComponent implements OnInit {
     this.pagina = 'listar-configuracion';
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_permiso: number) {
-    this.rest.EliminarRegistro(id_permiso).subscribe(res => {
+    const datos = {
+      user_name: this.user_name,
+      ip: this.ip
+    };
+
+    this.rest.EliminarRegistro(id_permiso, datos).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -203,7 +215,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -232,7 +244,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     this.hora_id = id;
   }
 
-  /** ******************************************************************************************** ** 
+  /** ******************************************************************************************** **
    ** **                           METODO PARA EXPORTAR A PDF                                   ** **
    ** ******************************************************************************************** **/
   generarPdf(action = 'open') {
@@ -322,13 +334,13 @@ export class ListaHorasExtrasComponent implements OnInit {
                 { text: 'Tipo Día', style: 'tableHeader' },
                 { text: 'Incluir Almuerzo', style: 'tableHeader' },
               ],
-              ...this.horasExtras.map(obj => {
-                var incluirAlmuerzo = this.Almuerzo[obj.incl_almuerzo - 1];
+              ...this.horasExtras.map((obj: any) => {
+                var incluirAlmuerzo = this.Almuerzo[obj.minutos_comida - 1];
                 return [
                   { text: obj.id, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTable' },
                   { text: obj.tipo_descuento, style: 'itemsTable' },
-                  { text: obj.reca_porcentaje, style: 'itemsTable' },
+                  { text: obj.recargo_porcentaje, style: 'itemsTable' },
                   { text: obj.hora_inicio, style: 'itemsTable' },
                   { text: obj.hora_final, style: 'itemsTable' },
                   { text: obj.hora_jornada, style: 'itemsTable' },
@@ -350,7 +362,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     };
   }
 
-  /** ********************************************************************************************** ** 
+  /** ********************************************************************************************** **
    ** **                                  METODO PARA EXPORTAR A EXCEL                            ** **
    ** ********************************************************************************************** **/
   exportToExcel() {
@@ -364,7 +376,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     }
   }
 
-  /** ********************************************************************************************** ** 
+  /** ********************************************************************************************** **
    ** **                                   METODO PARA EXPORTAR A CSV                             ** **
    ** ********************************************************************************************** **/
 
@@ -392,13 +404,13 @@ export class ListaHorasExtrasComponent implements OnInit {
       var objeto;
       var arreglohorasExtras: any = [];
       this.horasExtras.forEach((obj: any) => {
-        var incluirAlmuerzo = this.Almuerzo[obj.incl_almuerzo - 1];
+        var incluirAlmuerzo = this.Almuerzo[obj.minutos_comida - 1];
         objeto = {
           "horas_extras": {
             '@id': obj.id,
             "descripcion": obj.descripcion,
             "tipo_descuento": obj.tipo_descuento,
-            "reca_porcentaje": obj.reca_porcentaje,
+            "reca_porcentaje": obj.recargo_porcentaje,
             "hora_inicio": obj.hora_inicio,
             "hora_final": obj.hora_final,
             "hora_jornada": obj.hora_jornada,

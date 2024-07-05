@@ -1,6 +1,6 @@
 <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;">
     <div class="row">
-        <div class="col-md">
+        <div class="col-12 col-md-6">
             <div id="titulo">
                 <span>USUARIOS</span>
             </div>
@@ -30,34 +30,31 @@
                 </div>
             </mat-card>
         </div>
-        <div class="col-md">
+        <div class="col-12 col-md-6">
             <div id="titulo">
                 <span>REGISTRO MÚLTIPLE DE USUARIOS</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
-                <div class="row" *ngIf="getPlantilla()">
-                    <div class="col-md" style="padding-top: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around"
-                            style="text-align: center; justify-content: center;">
-                            <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
-                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
-                                    style="height: 65px; padding-top: 25px;"
-                                    matTooltip="Dar click para selecionar plantilla y cargar registros.">
-                                    Subir plantilla
-                                </label>
-                                <label for="file" matSuffix matTooltipPosition="right"
-                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
-                                    style="height: 64px; padding-top: 25px;"
-                                    matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                    Subir nueva plantilla
-                                </label>
-                            </form>
-                        </div>
+                <div class="row m-auto" *ngIf="getPlantilla()">
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <form method="post" class="btn-2" enctype="multipart/form-data">
+                            <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                            <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                style="height: 65px; padding-top: 25px;"
+                                matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                Subir plantilla
+                            </label>
+                            <label for="file" matSuffix matTooltipPosition="right"
+                                *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                style="height: 65px; padding-top: 25px;"
+                                matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                Subir nueva plantilla
+                            </label>
+                        </form>
                     </div>
-                    <div class="col-md" *ngIf="!DataEmpleados">
-                        <div class="d-flex flex-wrap justify-content-around">
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div *ngIf="!DataEmpleados" class="d-flex flex-wrap justify-content-around">
                             <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                 style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
                                 href="{{link}}">
@@ -65,9 +62,7 @@
                                 Descargar plantilla usuarios
                             </a>
                         </div>
-                    </div>
-                    <div class="col-md" *ngIf="DataEmpleados" style="padding-top: 5px; padding-bottom: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around"
+                        <div *ngIf="DataEmpleados" class="d-flex flex-wrap justify-content-around"
                             style="text-align: center; justify-content: center;">
                             <button id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
                                 matTooltipPosition="right" matTooltip="Guardar registro multiple.">
@@ -75,7 +70,6 @@
                             </button>
                         </div>
                     </div>
-
                 </div>
             </mat-card>
         </div>
@@ -85,27 +79,44 @@
 <!--  ****  LISTA DE EMPLEADOS QUE HAN SIDO INACTIVADOS O QUE YA NO FORMAN PARTE DE LA EMPRESA  ****  -->
 <div *ngIf="Hab_Deshabilitados && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container"
     style="padding-bottom: 50px; text-align: center;">
+    <div style="text-align: center; padding-bottom: 12px;" *ngIf="btnCheckDeshabilitado">
+        <div class="row">
+            <div class="col-md">
+                <button class="btn btn-primary btn-outline-light" style="margin-left: 20px; padding-left: 20px;"
+                    (click)="Deshabilitar(2)">
+                    Habilitar
+                </button>
+            </div>
+            <div class="col-md">
+                <button class="btn btn-primary btn-outline-light" style="margin-left: 10px ; padding-left: 20px;"
+                    (click)="Deshabilitar(3)">
+                    Reincorporar
+                </button>
+            </div>
+            <div class="col-md" *ngIf="mostrarCrearCarpeta">
+                <button class="btn btn-primary btn-outline-light" style="margin-right: 10px; padding-left: 10px;"
+                    (click)="CrearCarpeta(2)">
+                    Crear Carpeta
+                </button>
+            </div>
+            <div class="col-md">
+                <button class="btn btn-primary btn-outline-light" style="margin-right: 10px;"
+                    (click)="ConfirmarDeleteMultiple(2)">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccionDesactivados()" matSuffix
                 matTooltipPosition="right" matTooltip="Selección múltiple para habilitar empleados." id="SelectCheck" *ngIf="getActivarDesactivarUsuarios()">
                 library_add_check
             </mat-icon>
-            <button *ngIf="btnCheckDeshabilitado" class="btn btn-primary btn-outline-light"
-                style="float: left; margin-left: 20px; padding-left: 20px;" (click)="Deshabilitar(2)">
-                Habilitar
-            </button>
-            <button *ngIf="btnCheckDeshabilitado" class="btn btn-info btn-outline-light"
-                style="float: left; margin-left: 10px ; padding-left: 20px;" (click)="Deshabilitar(3)">
-                Reincorporar
-            </button>
             <span class="w-100 bd-highlight">
                 LISTA DE USUARIOS INACTIVOS
             </span>
-            <button *ngIf="btnCheckDeshabilitado" class="btn btn-info btn-outline-light"
-                style="float: left; margin-right: 10px;" (click)="ConfirmarDeleteMultipleInactivos()">
-                Eliminar
-            </button>
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
@@ -172,28 +183,46 @@
             </div>
         </div>
     </div>
+
 </div>
 
 <!--  ********************  LISTA DE EMPLEADOS QUE FORMAN PARTE DE LA EMPRESA  ***********************  -->
-<div *ngIf="tabla_activos && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container"
+<div *ngIf="tabla_activos && !DataEmpleados && mostarTabla && (messajeExcel == 'error' || messajeExcel == '')" class="container"
     style="padding-bottom: 50px; text-align: center;">
+
+    <div style="text-align: center; padding-bottom: 12px;" *ngIf="btnCheckHabilitar">
+      <div class="row">
+        <div class="col-md">
+          <button class="btn btn-primary btn-outline-light" style="margin-left: 20px; padding-left: 20px;"
+              (click)="Deshabilitar(1)">
+              Confirmar
+          </button>
+        </div>
+
+        <div class="col-md" *ngIf="mostrarCrearCarpeta">
+          <button class="btn btn-primary btn-outline-light" style="margin-right: 10px; padding-left: 10px;"
+              style="text-align: center; margin-right: 10px; padding-left: 10px;" (click)="CrearCarpeta(1)">
+              Crear Carpeta
+          </button>
+        </div>
+        <div class="col-md">
+          <button class="btn btn-primary btn-outline-light" style="margin-right: 10px;"
+              (click)="ConfirmarDeleteMultiple(1)">
+              Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
                 matTooltipPosition="right" matTooltip="Selección múltiple para inhabilitar empleados." id="SelectCheck" *ngIf="getActivarDesactivarUsuarios()">
                 library_add_check
             </mat-icon>
-            <button *ngIf="btnCheckHabilitar" class="btn btn-primary btn-outline-light"
-                style="float: left; margin-left: 20px; padding-left: 10px;" (click)="Deshabilitar(1)">
-                Confirmar
-            </button>
             <span class="w-100 bd-highlight">
                 LISTA DE USUARIOS ACTIVOS
             </span>
-            <button *ngIf="btnCheckHabilitar" class="btn btn-primary btn-outline-light"
-                style="float: left; margin-right: 10px;" (click)="ConfirmarDeleteMultipleActivos()">
-                Eliminar
-            </button>
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
@@ -220,25 +249,25 @@
                         <td></td>
                         <td>
                             <mat-form-field class="input-tables codigo">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo" [formControl]="codigo"
+                                <input matInput placeholder="Buscar" [formControl]="codigo"
                                     (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field class="input-tables cedula">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombre" [formControl]="nombre"
-                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" [formControl]="nombre" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field class="input-tables cedula">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroApellido"
-                                    [formControl]="apellido" type="text" (keypress)="IngresarSoloLetras($event)">
+                                <input matInput placeholder="Buscar" [formControl]="apellido" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
                             <mat-form-field class="input-tables cedula">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula" maxlength="10"
+                                <input matInput placeholder="Buscar" maxlength="10"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
                             </mat-form-field>
@@ -253,7 +282,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let e of empleado | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombre | emplApellido: filtroApellido | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let e of empleado | emplCodigo: codigo.value | emplCedula: cedula.value | emplNombre: nombre.value | emplApellido: apellido.value | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionUno.toggle(e) : null" [checked]="selectionUno.isSelected(e)"
@@ -351,27 +380,27 @@
                 <tbody>
                     <tr *ngFor="let e of DataEmpleados | paginate:tamanio_paginaMul:numero_paginaMul ">
                         <td style="width: 400px;">
-                            <div id="t-editar" class="circulo" [style.background-color]="stiloCelda(e.observacion)">
+                            <div id="t-editar" class="circulo" [style.background-color]="EstiloCelda(e.observacion)">
                             </div>
                             {{e.observacion}}
                         </td>
                         <td style="font-size: 14px; width: 50px;" align="center">{{e.fila}}</td>
-                        <td [style.color]="stiloTextoCelda(e.cedula)">{{e.cedula}}</td>
-                        <td [style.color]="stiloTextoCelda(e.codigo)" *ngIf="datosManuales">{{e.codigo}}</td>
-                        <td [style.color]="stiloTextoCelda(e.apellido)">{{e.apellido}}</td>
-                        <td [style.color]="stiloTextoCelda(e.nombre)">{{e.nombre}}</td>
-                        <td [style.color]="stiloTextoCelda(e.estado_civil)">{{e.estado_civil}}</td>
-                        <td [style.color]="stiloTextoCelda(e.genero)">{{e.genero}}</td>
-                        <td [style.color]="stiloTextoCelda(e.fec_nacimiento)">{{e.fec_nacimiento}}</td>
-                        <td [style.color]="stiloTextoCelda(e.domicilio)">{{e.domicilio}}</td>
-                        <td [style.color]="stiloTextoCelda(e.telefono)">{{e.telefono}}</td>
-                        <td [style.color]="stiloTextoCelda(e.nacionalidad)">{{e.nacionalidad}}</td>
-                        <td [style.color]="stiloTextoCelda(e.correo)">{{e.correo}}</td>
-                        <td [style.color]="stiloTextoCelda(e.latitud)">{{e.latitud}}</td>
-                        <td [style.color]="stiloTextoCelda(e.longitud)">{{e.longitud}}</td>
-                        <td [style.color]="stiloTextoCelda(e.usuario)">{{e.usuario}}</td>
-                        <td [style.color]="stiloTextoCelda(e.contrasena)">{{e.contrasena}}</td>
-                        <td [style.color]="stiloTextoCelda(e.rol)">{{e.rol}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.cedula)">{{e.cedula}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.codigo)" *ngIf="datosManuales">{{e.codigo}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.apellido)">{{e.apellido}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.nombre)">{{e.nombre}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.estado_civil)">{{e.estado_civil}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.genero)">{{e.genero}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.fec_nacimiento)">{{e.fec_nacimiento}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.domicilio)">{{e.domicilio}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.telefono)">{{e.telefono}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.nacionalidad)">{{e.nacionalidad}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.correo)">{{e.correo}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.latitud)">{{e.latitud}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.longitud)">{{e.longitud}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.usuario)">{{e.usuario}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.contrasena)">{{e.contrasena}}</td>
+                        <td [style.color]="EstiloTextoCelda(e.rol)">{{e.rol}}</td>
                     </tr>
                 </tbody>
             </table>

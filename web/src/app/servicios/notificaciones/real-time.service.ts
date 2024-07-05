@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment'
 import { Socket } from 'ngx-socket-io';
 
 @Injectable({
@@ -28,37 +27,26 @@ export class RealTimeService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time`, datos);
   }
 
-
-  ObtenerTodasNotificaciones() {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/`);
-  }
-
   ObtenerUnaNotificacion(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/one/${id}`);
   }
-
-  ObtenerNotificacionesSend(id_empleado: number) {
-    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/send/${id_empleado}`);
-  }
-
-
 
   ObtenerNotificacionesAllReceives(id_empleado: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/all-receives/${id_empleado}`);
   }
 
 
-  PutVistaNotificacion(id_realtime: number) {
-    let data = { visto: true };
+  PutVistaNotificacion(id_realtime: number, data: any) {
+    data.append('visto', true);
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/vista/${id_realtime}`, data);
   }
 
-  EliminarNotificaciones(Seleccionados: any[]) {
+  EliminarNotificaciones(Seleccionados: any) {
     return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/eliminar-multiples/avisos`, Seleccionados); //Eliminacion de datos seleccionados.
   }
 
   /** ************************************************************************************ **
-   ** **                        METODOS PARA CONFIG_NOTI                                ** ** 
+   ** **                        METODOS PARA CONFIGURAR_ALERTAS                         ** **
    ** ************************************************************************************ **/
 
 
@@ -77,21 +65,11 @@ export class RealTimeService {
 
   // METODO PARA ENVIO DE CORREO MULTIPLE
   EnviarCorreoMultiple(datos: any) {
-    console.log('datos: ',datos);
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/mail-multiple`, datos);
   }
 
-
-  
-
-
-
-
-
-
-
   /** ************************************************************************************ **
-   ** **                 METODOS DE CONSULTA DE DATOS DE COMUNICADOS                    ** ** 
+   ** **                 METODOS DE CONSULTA DE DATOS DE COMUNICADOS                    ** **
    ** ************************************************************************************ **/
 
   // METODO PARA ENVIO DE CORREO DE COMUNICADOS

@@ -28,6 +28,10 @@ export class RegistrarBirthdayComponent implements OnInit {
 
   id_empresa: number = parseInt(localStorage.getItem('empresa') as string);
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     private toastr: ToastrService,
     private restB: BirthdayService,
@@ -35,6 +39,8 @@ export class RegistrarBirthdayComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   // GUARDAR DATOS DE MENSAJE
@@ -44,10 +50,13 @@ export class RegistrarBirthdayComponent implements OnInit {
       mensaje: form.mensajeForm,
       titulo: form.tituloForm,
       link: form.linkForm,
+      user_name: this.user_name,
+      ip: this.ip
     }
     this.restB.CrearMensajeCumpleanios(dataMensaje).subscribe(res => {
-      this.ventana.close(true);
+      //console.log('ver res ', res)
       this.SubirRespaldo(res[0].id)
+      this.ventana.close(true);
     })
   }
 
@@ -78,8 +87,8 @@ export class RegistrarBirthdayComponent implements OnInit {
       let arrayItems = name.split(".");
       let itemExtencion = arrayItems[arrayItems.length - 1];
       if (this.archivoSubido[0].size <= 2e+6) {
-        if (itemExtencion == 'png' || itemExtencion == 'jpg' ||
-          itemExtencion == 'jpeg' || itemExtencion == 'gif') {
+        if (itemExtencion === 'png' || itemExtencion === 'jpg' ||
+          itemExtencion === 'jpeg' || itemExtencion === 'gif') {
           this.formulario.patchValue({ imagenForm: name });
         }
         else {
@@ -104,6 +113,8 @@ export class RegistrarBirthdayComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+    formData.append('user_name', this.user_name as string);
+    formData.append('ip', this.ip as string);
     this.restB.SubirImagenBirthday(formData, id).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Imagen subida con éxito.', {
         timeOut: 6000,

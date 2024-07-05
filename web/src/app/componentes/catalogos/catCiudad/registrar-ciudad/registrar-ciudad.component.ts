@@ -36,6 +36,10 @@ export class RegistrarCiudadComponent implements OnInit {
   ver_ciudad: boolean = true;
   ver_pais: boolean = true;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public formulario = new FormGroup({
     nombreContinenteForm: this.nombreContinenteF,
@@ -53,6 +57,9 @@ export class RegistrarCiudadComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
+
     this.ObtenerContinentes();
   }
 
@@ -181,6 +188,8 @@ export class RegistrarCiudadComponent implements OnInit {
       let ciudad = {
         descripcion: form.nombreForm,
         id_provincia: provinciaId,
+        user_name: this.user_name,
+        ip: this.ip
       };
       // VERIFICAR SI CIUDAD --- NO EXISTE REGISTRO
       if (this.ciudades.length === 0) {

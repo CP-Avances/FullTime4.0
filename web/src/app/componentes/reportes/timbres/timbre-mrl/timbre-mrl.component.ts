@@ -144,19 +144,10 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   usua_sucursales: any = [];
   AdministrarSucursalesUsuario(opcion: number) {
     let empleado = { id_empleado: this.idEmpleadoLogueado };
-    let respuesta: any = [];
-    let codigos = '';
+
     //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
-      respuesta = data;
-      respuesta.forEach((obj: any) => {
-        if (codigos === '') {
-          codigos = '\'' + obj.id_sucursal + '\''
-        }
-        else {
-          codigos = codigos + ', \'' + obj.id_sucursal + '\''
-        }
-      })
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
+      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
       console.log('ver sucursales ', codigos);
       this.usua_sucursales = { id_sucursal: codigos };
       this.BuscarInformacion(opcion, this.usua_sucursales);
@@ -505,7 +496,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
     let n = 0;
     let accionT = '';
     this.data_pdf.forEach((obj1: IReporteTimbres) => {
-      obj1.departamentos.forEach(obj2 => {
+      obj1.departamentos.forEach((obj2: any) => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             n = n + 1;

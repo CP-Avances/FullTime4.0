@@ -70,8 +70,6 @@ class VacunaRutas {
         this.router.put('/eliminar_carnet/base_servidor', [verificarToken_1.TokenValidation], vacunasControlador_1.default.EliminarDocumento);
         // METODO DE ELIMINACION DE REGISTRO DE VACUNA
         this.router.delete('/eliminar/:id/:documento', verificarToken_1.TokenValidation, vacunasControlador_1.default.EliminarRegistro);
-        // METODO REGISTRO DE TIPO DE VACUNA
-        this.router.post('/tipo_vacuna', verificarToken_1.TokenValidation, vacunasControlador_1.default.CrearTipoVacuna);
         // METODO PARA BUSCAR UN DOCUMENTO
         this.router.get('/documentos/:docs/:id', vacunasControlador_1.default.ObtenerDocumento);
         // METODO PARA LEER TODOS LOS REGISTROS DE VACUNACION

@@ -7,8 +7,10 @@ import { PageEvent } from '@angular/material/paginator';
 
 // IMPORTACION DE SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 @Component({
@@ -22,19 +24,13 @@ export class TimbreAdminComponent implements OnInit {
   // VARIABLE DE ALMACENAMIENTO DE DATOS DE EMPLEADO
   datosEmpleado: any = [];
 
+  idEmpleadoLogueado: any;
+  idUsuariosAcceso: Set<any> = new Set();
+
   // DATOS DEL FORMULARIO DE BUSQUEDA
-  departamentoF = new FormControl('', Validators.minLength(2));
   cedula = new FormControl('', Validators.minLength(2));
   nombre = new FormControl('', Validators.minLength(2));
-  cargoF = new FormControl('', Validators.minLength(2));
   codigo = new FormControl('');
-
-  // DATOS DE FILTROS DE BUSQUEDA
-  filtroDepartamento: '';
-  filtroEmpleado = '';
-  filtroCodigo: number;
-  filtroCedula: '';
-  filtroCargo: '';
 
   // ITEMS DE PAGINACION DE LA TABLA DE LISTA DE EMPLEADOS
   numero_pagina_e: number = 1;
@@ -60,17 +56,22 @@ export class TimbreAdminComponent implements OnInit {
     private toastr: ToastrService, // VARIABLE MANEJO DE NOTIFICACIONES
     public restD: DatosGeneralesService, // SERVICIO DATOS GENERALES
     public parametro: ParametrosService,
-
-  ) { }
+    private restUsuario: UsuarioService,
+    private asignaciones: AsignacionesService,
+  ) {
+    this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
+  }
 
   ngOnInit(): void {
+    this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+
     this.VerDatosEmpleado();
     this.BuscarParametro();
     this.BuscarHora();
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -103,8 +104,13 @@ export class TimbreAdminComponent implements OnInit {
   VerDatosEmpleado() {
     this.datosEmpleado = [];
     this.restD.ListarInformacionActual().subscribe(data => {
-      this.datosEmpleado = data;
+      this.datosEmpleado = this.FiltrarEmpleadosAsignados(data);
     });
+  }
+
+  // METODO PARA FILTRAR EMPLEADOS A LOS QUE EL USUARIO TIENE ACCESO
+  FiltrarEmpleadosAsignados(data: any) {
+    return data.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
   }
 
   // EVENTO PARA MANEJAR LA PAGINACION DE TABLA DE TIMBRES
@@ -119,11 +125,36 @@ export class TimbreAdminComponent implements OnInit {
     this.restTimbres.ObtenerTimbresEmpleado(id).subscribe(res => {
       this.dataSource = new MatTableDataSource(res.timbres);
       this.timbres = this.dataSource.data;
+      console.log('ver timbres ', this.timbres)
       this.lista = true;
       this.selec_nombre = nombre + ' ' + apellido;
       this.timbres.forEach((data: any) => {
         data.fecha = this.validar.FormatearFecha(data.fecha_hora_timbre, this.formato_fecha, this.validar.dia_abreviado);
         data.hora = this.validar.FormatearHora(data.fecha_hora_timbre.split(' ')[1], this.formato_hora);
+        if (data.tecla_funcion === '0') {
+          data.tecla_funcion_ = 'Entrada';
+        }
+        else if (data.tecla_funcion === '1') {
+          data.tecla_funcion_ = 'Salida';
+        }
+        else if (data.tecla_funcion === '2') {
+          data.tecla_funcion_ = 'Inicio alimentación';
+        }
+        else if (data.tecla_funcion === '3') {
+          data.tecla_funcion_ = 'Fin alimentación';
+        }
+        else if (data.tecla_funcion === '4') {
+          data.tecla_funcion_ = 'Inicio permiso';
+        }
+        else if (data.tecla_funcion === '5') {
+          data.tecla_funcion_ = 'Fin permiso';
+        }
+        if (data.tecla_funcion === '7') {
+          data.tecla_funcion_ = 'Timbre libre';
+        }
+        else if (data.tecla_funcion === '99') {
+          data.tecla_funcion_ = 'Desconocido';
+        }
       })
     }, err => {
       this.toastr.info(err.error.message)
@@ -157,12 +188,9 @@ export class TimbreAdminComponent implements OnInit {
 
   // METODO PARA LIMPIAR CAMPOS DE FORMULARIO
   LimpiarCampos() {
-    this.departamentoF.reset();
-    this.filtroEmpleado = '';
     this.codigo.reset();
     this.cedula.reset();
     this.nombre.reset();
-    this.cargoF.reset();
   }
 
   // METODO PARA CERRAR TABLA

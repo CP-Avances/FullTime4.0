@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment'
 
 @Injectable({
   providedIn: 'root'
@@ -12,14 +11,11 @@ export class CatVacunasService {
     private http: HttpClient,
   ) { }
 
-  
-
   listaVacuna(){
     return this.http.get<any>((localStorage.getItem('empresaURL') as string) + '/vacunasTipos');
   }
   CrearVacuna(Vacuna: any){
-    console.log('Vacuna: ',Vacuna)
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/vacunasTipos/crearVacunas`, Vacuna).pipe(
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/vacunasTipos/crearVacuna`, Vacuna).pipe(
       catchError(Vacuna)
     );
   }
@@ -28,9 +24,23 @@ export class CatVacunasService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/vacunasTipos`, datos)
     .pipe(catchError(datos));
   }
-  eliminar(id: any){
-    return this.http.delete<any>(`${(localStorage.getItem('empresaURL') as string)}/vacunasTipos/eliminar/${id}`).pipe( catchError(id));
+
+  Eliminar(id: any, datos: any) {
+    const url = `${(localStorage.getItem('empresaURL') as string)}/vacunasTipos/eliminar/${id}`;
+    const httpOtions = {
+      body: datos
+    };
+    return this.http.request('delete', url, httpOtions);
   }
- 
+
+   // METODO PARA LEER LOS DATOS DE LA PLANTILLA DE EXCEL
+   RevisarFormato(formData) {
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/vacunasTipos/upload/revision', formData);
+  }
+
+  // METODO PARA INGRESAR O GUARDAR LOS DATOS OK EN LA BASE DE DATOS
+  SubirArchivoExcel(formData) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/vacunasTipos/cargar_plantilla`, formData);
+  }
 
 }

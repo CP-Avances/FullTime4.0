@@ -47,20 +47,20 @@ class UsuarioRutas {
         this.router.post('/lista-app-movil-general/:estado/activo/:habilitado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.UsuariosTimbreMovil_ADMIN);
         // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL SUPER ADMINISTRADOR
         this.router.post('/lista-app-movil-jefe/:estado/activo/:habilitado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.UsuariosTimbreMovil_JEFE);
-        // METODO PARA BUSCAR DATOS DE USUARIOS Y SUCURSALES
+        // METODO PARA BUSCAR LISTA DE ID_SUCURSAL DE ASIGNACIONES USUARIO - DEPARTAMENTO
         this.router.post('/buscar-usuario-sucursal', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.BuscarUsuarioSucursal);
-        // CREAR REGISTRO DE USUARIOS - SUCURSAL
-        this.router.post('/usuario-sucursal', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.CrearUsuarioSucursal);
-        // METODO PARA BUSCAR DATOS DE USUARIO SUCURSAL PRINCIPAL (TRUE)
-        this.router.post('/principal-usuario-sucursal', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.BuscarUsuarioSucursalPrincipal);
-        // METODO PARA ACTUALIZAR DATOS DE USUARIO - SUCURSAL
-        this.router.put('/actualizar-usuario-sucursal', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ActualizarUsuarioSucursalPrincipal);
-        // METODO PARA ELIMINAR REGISTRO USUARIO - SUCURSAL
-        this.router.delete('/eliminar-usuario-sucursal/:id', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.EliminarUsuarioSucursal);
-        this.router.get('/', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.list);
-        this.router.get('/busqueda/:usuario', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getIdByUsuario);
-        //METODO PARA DEVOLVER STRING ENCRIPTADO
-        this.router.post('/datos-usuario', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ObtenerDatoEncriptado);
+        // CREAR REGISTRO DE USUARIOS - DEPARTAMENTOS
+        this.router.post('/usuario-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.CrearUsuarioDepartamento);
+        // METODO PARA BUSCAR DATOS DE USUARIO - DEPARTAMENTOS
+        this.router.post('/buscar-usuario-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.BuscarUsuarioDepartamento);
+        // METODO PARA OBTENER IDS DE USUARIOS - DEPARTAMENTOS
+        this.router.post('/buscar-ids-usuarios-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ObtenerIdUsuariosDepartamento);
+        // METODO BUSCAR ASIGNACION DE USUARIO - DEPARTAMENTO
+        this.router.post('/buscar-asignacion-usuario-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.BuscarAsignacionUsuarioDepartamento);
+        // METODO PARA ACTUALIZAR DATOS DE USUARIO - DEPARTAMENTO
+        this.router.put('/actualizar-usuario-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ActualizarUsuarioDepartamento);
+        // METODO PARA ELIMINAR REGISTRO USUARIO - DEPARTAMENTO
+        this.router.delete('/eliminar-usuario-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.EliminarUsuarioDepartamento);
     }
 }
 const USUARIO_RUTA = new UsuarioRutas();

@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
-import excel from 'xlsx';
+import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import pool from '../../../database';
+import excel from 'xlsx';
 import fs from 'fs';
+import { FormatearHora } from '../../../libs/settingsMail';
 
 class DetalleCatalogoHorarioControlador {
 
@@ -55,57 +57,168 @@ class DetalleCatalogoHorarioControlador {
     }
 
     // METODO PARA ELIMINAR REGISTRO
-    public async EliminarRegistros(req: Request, res: Response): Promise<void> {
-        const id = req.params.id;
-        await pool.query(
-            `
-            DELETE FROM eh_detalle_horarios WHERE id = $1
-            `
-            , [id]);
-        res.jsonp({ message: 'Registro eliminado.' });
+    public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
+        try {
+            const id = req.params.id;
+
+            const { user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // OBTENER DATOSORIGINALES
+            const consulta = await pool.query('SELECT * FROM eh_detalle_horarios WHERE id = $1', [id]);
+            const [datosOriginales] = consulta.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'eh_detalle_horarios',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar registro con id ${id}`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+            }
+
+            await pool.query(
+                `
+                DELETE FROM eh_detalle_horarios WHERE id = $1
+                `
+                , [id]);
+
+            const horadetalle = await FormatearHora(datosOriginales.hora);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'eh_detalle_horarios',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: `{orden: ${datosOriginales.orden}, hora: ${horadetalle}, tolerancia: ${datosOriginales.tolerancia}, id_horario: ${datosOriginales.id_horario}, tipo_accion: ${datosOriginales.tipo_accion}, segundo_dia: ${datosOriginales.segundo_dia}, tercer_dia: ${datosOriginales.tercer_dia}, min_antes: ${datosOriginales.minutos_antes}, min_despues: ${datosOriginales.minutos_despues}}`,
+                datosNuevos: '',
+                ip,
+                observacion: ''
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.jsonp({ message: 'Registro eliminado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
+        }
     }
 
     // METODO PARA REGISTRAR DETALLES
     public async CrearDetalleHorarios(req: Request, res: Response): Promise<void> {
-        const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues } = req.body;
-        await pool.query(
-            `
-            INSERT INTO eh_detalle_horarios (orden, hora, tolerancia, id_horario, tipo_accion, segundo_dia, tercer_dia, 
-                minutos_antes, minutos_despues) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            `
-            , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues]);
-        res.jsonp({ message: 'Registro guardado.' });
+        try {
+            const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            await pool.query(
+                `
+                INSERT INTO eh_detalle_horarios (orden, hora, tolerancia, id_horario, tipo_accion, segundo_dia, tercer_dia, 
+                    minutos_antes, minutos_despues) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                `
+                , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues]);
+
+            // AUDITORIA
+
+
+            const horadetalle = await FormatearHora(hora);
+
+
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'eh_detalle_horarios',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: `{orden: ${orden}, hora: ${horadetalle}, tolerancia: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
+                ip,
+                observacion: ''
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            res.jsonp({ message: 'Registro guardado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            res.status(500).jsonp({ message: 'Error al guardar registro.' });
+        }
     }
 
     // METODO PARA ACTUALIZAR DETALLE DE HORARIO
-    public async ActualizarDetalleHorarios(req: Request, res: Response): Promise<void> {
-        const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues,
-            id } = req.body;
-        await pool.query(
-            `
-            UPDATE eh_detalle_horarios SET orden = $1, hora = $2, tolerancia = $3, id_horario = $4,
-                tipo_accion = $5, segundo_dia = $6, tercer_dia = $7, minutos_antes = $8, minutos_despues= $9 
-            WHERE id = $10
-            `
-            , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id]);
-        res.jsonp({ message: 'Registro actualizado.' });
+    public async ActualizarDetalleHorarios(req: Request, res: Response): Promise<Response> {
+        try {
+            const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues,
+                id, user_name, ip } = req.body;
 
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // OBTENER DATOSORIGINALES
+            const consulta = await pool.query('SELECT * FROM eh_detalle_horarios WHERE id = $1', [id]);
+            const [datosOriginales] = consulta.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'eh_detalle_horarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar registro con id ${id}`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+            }
+
+            await pool.query(
+                `
+                UPDATE eh_detalle_horarios SET orden = $1, hora = $2, tolerancia = $3, id_horario = $4,
+                    tipo_accion = $5, segundo_dia = $6, tercer_dia = $7, minutos_antes = $8, minutos_despues= $9 
+                WHERE id = $10
+                `
+                , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id]);
+
+            const horadetalle = await FormatearHora(hora);
+            const horadetalleO = await FormatearHora(datosOriginales.hora);
+
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'eh_detalle_horarios',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: `{orden: ${datosOriginales.orden}, hora: ${horadetalleO}, tolerancia: ${datosOriginales.tolerancia}, id_horario: ${datosOriginales.id_horario}, tipo_accion: ${datosOriginales.tipo_accion}, segundo_dia: ${datosOriginales.segundo_dia}, tercer_dia: ${datosOriginales.tercer_dia}, min_antes: ${datosOriginales.minutos_antes}, min_despues: ${datosOriginales.minutos_despues}}`,
+                datosNuevos: `{orden: ${orden}, hora: ${horadetalle}, tolerancia: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
+                ip,
+                observacion: ''
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            return res.jsonp({ message: 'Registro actualizado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'Error al actualizar registro.' });
+        }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     public async ListarDetalleHorarios(req: Request, res: Response) {
         const HORARIO = await pool.query(
@@ -122,115 +235,6 @@ class DetalleCatalogoHorarioControlador {
     }
 
 
-
-
-
-    /** Verificar que el nombre del horario exista dentro del sistema */
-    public async VerificarDatosDetalles(req: Request, res: Response): Promise<void> {
-        let list: any = req.files;
-        let cadena = list.uploads[0].path;
-        let filename = cadena.split("\\")[1];
-        var filePath = `./plantillas/${filename}`
-
-        const workbook = excel.readFile(filePath);
-        const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
-        const plantillaD = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-        var contarHorario = 0;
-        var contarDatos = 0;
-        var contador = 1;
-        /** Detalle de Horarios */
-        plantillaD.forEach(async (data: any) => {
-            const { nombre_horario, orden, hora, tipo_accion, minutos_espera } = data;
-
-            // Verificar que los datos obligatorios existan
-            if (nombre_horario != undefined && orden != undefined && hora != undefined &&
-                tipo_accion != undefined) {
-                contarDatos = contarDatos + 1;
-            }
-
-            // Verificar que exita el nombre del horario
-            if (nombre_horario != undefined) {
-                const HORARIO = await pool.query(
-                    `
-                    SELECT * FROM eh_cat_horarios WHERE UPPER(nombre) = $1
-                    `
-                    ,
-                    [nombre_horario.toUpperCase()]);
-                if (HORARIO.rowCount != 0) {
-                    contarHorario = contarHorario + 1;
-                }
-            }
-
-            //Verificar que todos los datos sean correctos
-            console.log('datos', contarHorario, contarDatos)
-            if (contador === plantillaD.length) {
-                if (contarHorario === plantillaD.length && contarDatos === plantillaD.length) {
-                    return res.jsonp({ message: 'correcto' });
-                } else {
-                    return res.jsonp({ message: 'error' });
-                }
-            }
-            contador = contador + 1;
-        });
-        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-        fs.access(filePath, fs.constants.F_OK, (err) => {
-            if (err) {
-            } else {
-                // ELIMINAR DEL SERVIDOR
-                fs.unlinkSync(filePath);
-            }
-        });
-
-    }
-
-    public async CrearDetallePlantilla(req: Request, res: Response): Promise<void> {
-        let list: any = req.files;
-        let cadena = list.uploads[0].path;
-        let filename = cadena.split("\\")[1];
-        var filePath = `./plantillas/${filename}`
-
-        const workbook = excel.readFile(filePath);
-        const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
-        const plantillaD = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-
-        /** Detalle de Horarios */
-        plantillaD.forEach(async (data: any) => {
-            var { nombre_horario, orden, hora, tipo_accion, minutos_espera } = data;
-            var nombre = nombre_horario;
-            const idHorario = await pool.query(
-                `
-                SELECT id FROM eh_cat_horarios WHERE UPPER(nombre) = $1
-                `
-                , [nombre.toUpperCase()]);
-            var id_horario = idHorario.rows[0]['id'];
-            if (minutos_espera != undefined) {
-                await pool.query(
-                    `
-                    INSERT INTO eh_detalle_horarios (orden, hora, tolerancia, id_horario, tipo_accion) 
-                    VALUES ($1, $2, $3, $4, $5)
-                    `
-                    , [orden, hora, minutos_espera, id_horario, tipo_accion.split("=")[0]]);
-                res.jsonp({ message: 'correcto' });
-            }
-            else {
-                minutos_espera = 0;
-                await pool.query(
-                    `
-                    INSERT INTO eh_detalle_horarios (orden, hora, tolerancia, id_horario, tipo_accion) VALUES ($1, $2, $3, $4, $5)
-                    `
-                    , [orden, hora, minutos_espera, id_horario, tipo_accion.split("=")[0]]);
-                res.jsonp({ message: 'correcto' });
-            }
-        });
-        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-        fs.access(filePath, fs.constants.F_OK, (err) => {
-            if (err) {
-            } else {
-                // ELIMINAR DEL SERVIDOR
-                fs.unlinkSync(filePath);
-            }
-        });
-    }
 
 }
 

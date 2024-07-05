@@ -53,6 +53,8 @@ class CiudadRutas {
         this.router.post('/informacion-general-cargo/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesCargo);
         // METODO PARA LISTAR INFORMACION ACTUAL DEL USUARIO
         this.router.get('/info_actual', TokenValidation, DATOS_GENERALES_CONTROLADOR.ListarDatosActualesEmpleado);
+        // METODO PARA LISTAR ID ACTUALES DE USUARIOS
+        this.router.get('/info_actual_id', TokenValidation, DATOS_GENERALES_CONTROLADOR.ListarIdDatosActualesEmpleado);
         // METODO DE BUSQUEDA DE DATOS DE USUARIO QUE APRUEBA SOLICITUDES
         this.router.get('/empleadoAutoriza/:empleado_id', TokenValidation, DATOS_GENERALES_CONTROLADOR.ListarDatosEmpleadoAutoriza);
         // METODO PARA BUSCAR JEFES DE DEPARTAMENTOS
@@ -69,6 +71,9 @@ class CiudadRutas {
 
         // METODO PARA BUSCAR ADMNISTRADORES Y JEFES
         this.router.post('/datos-actuales-sucursales', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarAdminJefes);
+
+        // METODO PARA BUSCAR USUARIOS DE UNA SUCURSAL
+        this.router.post('/datos-actuales-sucursal', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarUsuariosSucursal);
 
 
 

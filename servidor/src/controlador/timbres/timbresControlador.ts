@@ -1,57 +1,82 @@
 import { Request, Response } from 'express';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
+import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/settingsMail';
+import moment from 'moment';
+
 
 class TimbresControlador {
 
     // ELIMINAR NOTIFICACIONES TABLA DE AVISOS --**VERIFICADO
     public async EliminarMultiplesAvisos(req: Request, res: Response): Promise<any> {
-        const arregloAvisos = req.body;
-        let contador: number = 0;
-        if (arregloAvisos.length > 0) {
-            contador = 0;
-            arregloAvisos.forEach(async (obj: number) => {
-                await pool.query(
-                    `
-                    DELETE FROM ecm_realtime_timbres WHERE id = $1
-                    `
-                    , [obj])
-                    .then((result: any) => {
-                        contador = contador + 1;
-                        if (contador === arregloAvisos.length) {
-                            return res.jsonp({ message: 'OK' });
-                        }
-                        console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
-                    });
-            });
-        }
-        else {
-            return res.jsonp({ message: 'error' });
+        try {
+            const { arregloAvisos, user_name, ip } = req.body;
+            let contador: number = 0;
+            if (arregloAvisos.length > 0) {
+                contador = 0;
+                arregloAvisos.forEach(async (obj: number) => {
+                    // INICIAR TRANSACCION
+                    await pool.query('BEGIN');
+
+                    // CONSULTAR DATOSORIGINALES
+                    const consulta = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [obj]);
+                    const [datosOriginales] = consulta.rows;
+
+
+                    if (!datosOriginales) {
+                        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                            tabla: 'ecm_realtime_timbres',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: '',
+                            datosNuevos: '',
+                            ip,
+                            observacion: `Error al eliminar el registro con id ${obj}. Registro no encontrado.`
+                        });
+
+                        //FINALIZAR TRANSACCION
+                        await pool.query('COMMIT');
+                        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+                    }
+
+                    await pool.query(
+                        `
+                        DELETE FROM ecm_realtime_timbres WHERE id = $1
+                        `
+                        , [obj])
+                        .then(async (result: any) => {
+                            contador = contador + 1;
+                            // AUDITORIA
+                            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                                tabla: 'ecm_realtime_timbres',
+                                usuario: user_name,
+                                accion: 'D',
+                                datosOriginales: JSON.stringify(datosOriginales),
+                                datosNuevos: '',
+                                ip,
+                                observacion: null
+                            });
+
+                            //FINALIZAR TRANSACCION
+                            await pool.query('COMMIT');
+
+                            if (contador === arregloAvisos.length) {
+                                return res.jsonp({ message: 'OK' });
+                            }
+                            console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
+                        });
+                });
+            }
+            else {
+                return res.jsonp({ message: 'error' });
+            }
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
         }
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     // METODO PARA LISTAR MARCACIONES
     public async ObtenerTimbres(req: Request, res: Response): Promise<any> {
@@ -101,7 +126,7 @@ class TimbresControlador {
                 timbres_AES: await pool.query(
                     `
                     SELECT count(*) 
-                    FROM eu_empleados AS e, eu_:timbres AS t 
+                    FROM eu_empleados AS e, eu_timbres AS t 
                     WHERE e.id = $1 AND e.codigo = t.codigo 
                     AND t.accion in (\'AES\', \'E/A\', \'S/A\')
                     `
@@ -177,10 +202,10 @@ class TimbresControlador {
             }
 
             let timbresRows: any = 0;
-            //TODO merge
+
             let timbres = await pool.query(
                 `
-                SELECT (da.nombre || ' ' || da.apellido) AS empleado, CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
+                SELECT (da.nombre || ' ' || da.apellido) AS empleado, da.id AS id_empleado, CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
                     t.tecla_funcion, t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
                     CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id 
                 FROM eu_timbres AS t, datos_actuales_empleado AS da
@@ -240,20 +265,15 @@ class TimbresControlador {
     // METODO DE REGISTRO DE TIMBRES PERSONALES
     public async CrearTimbreWeb(req: Request, res: Response): Promise<any> {
         try {
-            // OBTENCION DE DIRECCION IP
-            var ip_cliente = '';
-            var requestIp = require('request-ip');
-            var clientIp = requestIp.getClientIp(req);
-
-            if (clientIp != null && clientIp != '' && clientIp != undefined) {
-                ip_cliente = clientIp.split(':')[3];
-            }
-
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
-                ubicacion } = req.body;
+                ubicacion, user_name, ip } = req.body;
 
-            //console.log('ingresa informacion ', req.body)
-            let f = new Date();
+            // Obtener la fecha y hora actual
+            var now = moment();
+
+            // Formatear la fecha y hora actual en el formato deseado
+            var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
+
             const id_empleado = req.userIdEmpleado;
 
             let code = await pool.query(
@@ -266,55 +286,66 @@ class TimbresControlador {
 
             var codigo = parseInt(code[0].codigo);
 
-            const [timbre] = await pool.query(
+            console.log('codigo ', codigo)
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            pool.query(
                 `
                 INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, 
                     codigo, fecha_hora_timbre_servidor, id_reloj, ubicacion, dispositivo_timbre)
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id
-                `
-                , [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
-                    f.toLocaleString(), id_reloj, ubicacion, ip_cliente])
-                .then((result: any) => {
-                    return result.rows
-                }).catch((err: any) => {
-                    return err
-                })
+                `,
+                [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
+                    fecha_hora, id_reloj, ubicacion, 'APP_WEB'],
 
-            if (timbre) {
-                return res.status(200).jsonp({ message: 'Registro guardado.' });
-            }
+                async (error, results) => {
+                    const fechaHora = await FormatearHora(fec_hora_timbre.split('T')[1]);
+                    const fechaTimbre = await FormatearFecha(fec_hora_timbre.toLocaleString(), 'ddd');
 
-            return res.status(400).jsonp({ message: 'Ups!!! algo ha salido mal.' });
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'eu_timbres',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, fecha_hora_timbre_servidor: ${fecha_hora}, id_reloj: ${id_reloj}, ubicacion: ${ubicacion}, dispositivo_timbre: 'APP_WEB'}`,
+                        ip,
+                        observacion: null
+                    });
+
+                    //FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
+                    res.status(200).jsonp({ message: 'Registro guardado.' });
+
+                }
+            )
 
         } catch (error) {
-            res.status(400).jsonp({ message: error });
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            res.status(500).jsonp({ message: error });
         }
     }
 
     // METODO PARA REGISTRAR TIMBRES ADMINISTRADOR
+
     public async CrearTimbreWebAdmin(req: Request, res: Response): Promise<any> {
         try {
-
-            // OBTENCION DE DIRECCION IP
-            var ip_cliente = '';
-            var requestIp = require('request-ip');
-            var clientIp = requestIp.getClientIp(req);
-
-            if (clientIp != null && clientIp != '' && clientIp != undefined) {
-                ip_cliente = clientIp.split(':')[3];
-            }
-
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud,
-                id_empleado, id_reloj, tipo } = req.body
+                id_empleado, id_reloj, tipo, ip, user_name } = req.body
 
-            let f = new Date();
+            // Obtener la fecha y hora actual
+            var now = moment();
+
+            // Formatear la fecha y hora actual en el formato deseado
+            var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
             let servidor: any;
 
             if (tipo === 'administrar') {
                 servidor = fec_hora_timbre;
             }
             else {
-                servidor = f.toLocaleString();
+                servidor = fecha_hora;
             }
 
             let code = await pool.query(
@@ -328,6 +359,9 @@ class TimbresControlador {
             // var codigo = parseInt(code[0].codigo);
             var codigo = code[0].codigo;
 
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
             await pool.query(
                 `
                 INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, 
@@ -335,14 +369,36 @@ class TimbresControlador {
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 `
                 , [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
-                    id_reloj, ip_cliente, servidor])
-                .then((result: any) => {
+                    id_reloj, 'APP_WEB', servidor]
+
+                , async (error, results) => {
+
+                    console.log("ver fecha", fec_hora_timbre)
+                    const fechaHora = await FormatearHora(fec_hora_timbre.split('T')[1])
+                    const fechaTimbre = await FormatearFecha2(fec_hora_timbre, 'ddd')
+
+
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'eu_timbres',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}}`,
+                        ip,
+                        observacion: null
+                    });
+
+                    await pool.query('COMMIT');
                     res.status(200).jsonp({ message: 'Registro guardado.' });
-                }).catch((err: any) => {
-                    res.status(400).jsonp({ message: err });
-                })
+
+                }
+
+            )
+
         } catch (error) {
-            res.status(400).jsonp({ message: error });
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            res.status(500).jsonp({ message: error });
         }
     }
 
@@ -391,17 +447,6 @@ class TimbresControlador {
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
     // METODO DE BUSQUEDA DE AVISOS GENERALES POR EMPLEADO
     public async ObtenerAvisosColaborador(req: Request, res: Response) {
         const { id_empleado } = req.params
@@ -441,11 +486,14 @@ class TimbresControlador {
                 return []
             });
 
-        if (TIMBRES_NOTIFICACION.length > 0) {
+        if (TIMBRES_NOTIFICACION.length != 0) {
             return res.jsonp(TIMBRES_NOTIFICACION)
         }
+        else {
+            return res.status(404).jsonp({ message: 'No se encuentran registros.' });
+        }
 
-        return res.status(404).jsonp({ message: 'No se encuentran registros.' });
+
     }
 
     // METODO DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA
@@ -509,61 +557,61 @@ class TimbresControlador {
 
     }
 
-    public async ActualizarVista(req: Request, res: Response): Promise<void> {
-        const id = req.params.id_noti_timbre;
-        const { visto } = req.body;
-        console.log(id, visto);
-        await pool.query(
-            `
-            UPDATE ecm_realtime_timbres SET visto = $1 WHERE id = $2
-            `
-            , [visto, id])
-            .then((result: any) => {
-                res.jsonp({ message: 'Vista actualizada.' });
-            });
-    }
-
-
-
-
-
-
-
-    public async ObtenerUltimoTimbreEmpleado(req: Request, res: Response): Promise<any> {
+    public async ActualizarVista(req: Request, res: Response): Promise<Response> {
         try {
-            const codigo = req.userCodigo
-            let timbre = await pool.query(
-                `
-                SELECT CAST(fecha_hora_timbre AS VARCHAR) as timbre, accion 
-                FROM eu_timbres 
-                WHERE codigo = $1 
-                ORDER BY fecha_hora_timbre DESC LIMIT 1
-                `
-                , [codigo])
-                .then((result: any) => {
-                    return result.rows.map((obj: any) => {
-                        switch (obj.accion) {
-                            case 'EoS': obj.accion = 'Entrada o salida'; break;
-                            case 'AES': obj.accion = 'Inicio o fin alimentación'; break;
-                            case 'PES': obj.accion = 'Inicio o fin permiso'; break;
-                            case 'E': obj.accion = 'Entrada'; break;
-                            case 'S': obj.accion = 'Salida'; break;
-                            case 'I/A': obj.accion = 'Inicio alimentación'; break;
-                            case 'F/A': obj.accion = 'Fin alimentación'; break;
-                            case 'I/P': obj.accion = 'Inicio permiso'; break;
-                            case 'F/P': obj.accion = 'Fin permiso'; break;
-                            case 'HA': obj.accion = 'Timbre libre'; break;
-                            default: obj.accion = 'Desconocido'; break;
-                        }
-                        return obj
-                    })
+            const id = req.params.id_noti_timbre;
+            const { visto, user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOSORIGINALES
+            const consulta = await pool.query('SELECT * FROM ecm_realtime_timbres WHERE id = $1', [id]);
+            const [datosOriginales] = consulta.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'ecm_realtime_timbres',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar el registro con id ${id}. Registro no encontrado.`
                 });
-            if (timbre.length === 0) return res.status(400).jsonp({ mensaje: 'No ha timbrado.' });
-            return res.status(200).jsonp(timbre[0]);
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+            }
+
+            await pool.query(
+                `
+                UPDATE ecm_realtime_timbres SET visto = $1 WHERE id = $2
+                `
+                , [visto, id]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'ecm_realtime_timbres',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: `{visto: ${visto}}`,
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.status(200).jsonp({ message: 'Vista actualizada' });
         } catch (error) {
-            return res.status(400).jsonp({ message: error });
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'Error al actualizar la vista.' });
         }
     }
+
 
 
 

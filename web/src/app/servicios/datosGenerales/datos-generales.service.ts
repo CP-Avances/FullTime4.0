@@ -53,15 +53,6 @@ export class DatosGeneralesService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/datos_generales_comunicados-jefe/${estado}`, data);
   }
 
-
-
-
-
-
-
-
-
-
   // METODO PARA CONSULTAR DATOS DEL USUARIO
   ObtenerDatosActuales(id_empleado: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/generalidades/datos-actuales/${id_empleado}`);
@@ -78,7 +69,6 @@ export class DatosGeneralesService {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/informacion-general-cargo/${estado}`, sucursales);
   }
 
-
   // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR ASIGNADOS UBICACION
   ObtenerInformacionUbicacion(estado: any, ubicacion: any) {
     return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/informacion-general-ubicacion/${estado}`, ubicacion);
@@ -92,6 +82,11 @@ export class DatosGeneralesService {
   // METODO PARA LISTAR INFORMACION ACTUAL DE USUARIO
   ListarInformacionActual() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/generalidades/info_actual`);
+  }
+
+  // METODO PARA LISTAR ID ACTUALES DE USUARIOS
+  ListarIdInformacionActual() {
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/generalidades/info_actual_id`);
   }
 
   // METODO PARA BUSCAR INFORMACION DEL USUARIO QUE APRUEBA SOLICITUDES
@@ -115,7 +110,9 @@ export class DatosGeneralesService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/generalidades/datos-actuales-sucursales`, datos);
   }
 
-
-
+  // METODO PARA OBTENER USUARIOS DE UNA SUCURSAL
+  ObtenerUsuariosSucursal(datos: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/generalidades/datos-actuales-sucursal`, datos);
+  }
 
 }

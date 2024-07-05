@@ -71,8 +71,8 @@ export const GraficaHorasExtras = async function (id_empresa: number, fec_inicio
     ]
     // console.log(data);
 
-    let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map(obj => { return obj.mes });
-    let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map(obj => { return obj.valor });
+    let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map((obj: any) => { return obj.mes });
+    let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map((obj: any) => { return obj.valor });
 
     return {
         datos: data,
@@ -170,8 +170,8 @@ export const GraficaMarcaciones = async function (id_empresa: number, fec_inicio
         { id: 11, mes: 'Diciembre', valor: modelarAnio.diciembre.length }
     ]
 
-    let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map(obj => { return obj.mes });
-    let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map(obj => { return obj.valor });
+    let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map((obj: any) => { return obj.mes });
+    let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map((obj: any) => { return obj.valor });
 
     return {
         datos: data,
@@ -275,8 +275,8 @@ export const MetricaHorasExtraEmpleado = async function (codigo: number | string
     ]
     // console.log(data);
 
-    let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map(obj => { return obj.mes });
-    let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map(obj => { return obj.valor });
+    let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map((obj: any) => { return obj.mes });
+    let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map((obj: any) => { return obj.valor });
 
     return {
         tooltip: {
@@ -373,8 +373,8 @@ export const MetricaVacacionesEmpleado = async function (codigo: number | string
     ]
     // console.log(data);
 
-    let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map(obj => { return obj.mes });
-    let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map(obj => { return obj.valor });
+    let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map((obj: any) => { return obj.mes });
+    let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map((obj: any) => { return obj.valor });
 
     return {
         tooltip: {
@@ -471,8 +471,8 @@ export const MetricaPermisosEmpleado = async function (codigo: number | string, 
     ]
     // // console.log(data);
 
-    let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map(obj => { return obj.mes });
-    let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map(obj => { return obj.valor });
+    let meses = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map((obj: any) => { return obj.mes });
+    let valor_mensual = data.filter(obj => { return (obj.id >= fec_inicio.getUTCMonth() && obj.id <= fec_final.getUTCMonth()) }).map((obj: any) => { return obj.valor });
 
     return {
         tooltip: {
