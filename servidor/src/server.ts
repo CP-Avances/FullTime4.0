@@ -101,16 +101,17 @@ class Servidor {
 
     constructor() {
         this.app = express();
+        this.app.use(cors());
         this.configuracion();
         this.rutas();
         this.server = createServer(this.app);
-        this.app.use(cors());
         io = require('socket.io')(this.server, {
             cors: {
                 origin: '*',
                 methods: ['GET', 'POST'],
             }
         });
+
     }
 
     configuracion(): void {
@@ -182,7 +183,7 @@ class Servidor {
         this.app.use('/perVacacion', PERIODO_VACACION__RUTAS);
         this.app.use('/vacaciones', VACACIONES__RUTAS);
         // MODULO HORAS EXTRAS
-        this.app.use('/horas-extras-pedidas', HORA_EXTRA_PEDIDA_RUTAS); 
+        this.app.use('/horas-extras-pedidas', HORA_EXTRA_PEDIDA_RUTAS);
         this.app.use('/horasExtras', HORAS_EXTRAS_RUTAS);
         this.app.use('/planificacionHoraExtra', PLAN_HORAS_EXTRAS_RUTAS);
         // MODULO GEOLOCALIZACION
@@ -217,6 +218,8 @@ class Servidor {
         this.app.use('/licencias', LICENCIAS_RUTAS);
     }
 
+
+
     start(): void {
         this.server.listen(this.app.get('puerto'), () => {
             console.log('Servidor en el puerto', this.app.get('puerto'));
@@ -225,8 +228,10 @@ class Servidor {
             res.header('Access-Control-Allow-Origin', '*');
             next();
         })
+
+
         io.on('connection', (socket: any) => {
-            console.log('Connected client on port %s.', this.app.get('puerto'));
+            console.log('Conexion con el socket ', this.app.get('puerto'));
             socket.on("nueva_notificacion", (data: any) => {
                 let data_llega = {
                     id: data.id,
@@ -242,12 +247,13 @@ class Servidor {
                     tipo: data.tipo,
                     usuario: data.usuario
                 }
-                console.log('server', data_llega);
+                //console.log('server', data_llega);
                 socket.broadcast.emit('recibir_notificacion', data_llega);
                 socket.emit('recibir_notificacion', data_llega);
             });
 
             socket.on("nuevo_aviso", (data: any) => {
+                //console.log('ver aviso .......', data);
                 let data_llega = {
                     id: data.id,
                     create_at: data.fecha_hora,
@@ -255,11 +261,12 @@ class Servidor {
                     id_receives_empl: data.id_empleado_recibe,
                     visto: data.visto,
                     descripcion: data.descripcion,
+                    mensaje: data.mensaje,
                     id_timbre: data.id_timbre,
                     tipo: data.tipo,
                     usuario: data.usuario
                 }
-                console.log('server aviso .......', data_llega);
+                //console.log('server aviso .......', data_llega);
                 socket.broadcast.emit('recibir_aviso', data_llega);
                 socket.emit('recibir_aviso', data_llega);
             });

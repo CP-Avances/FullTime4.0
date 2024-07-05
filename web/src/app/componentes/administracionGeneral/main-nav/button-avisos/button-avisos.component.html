@@ -1,4 +1,4 @@
-<button mat-mini-fab style="margin-right: 8px;" [matMenuTriggerFor]="timbre" (click)="numeroTimbres()">
+<button mat-mini-fab style="margin-right: 8px;" [matMenuTriggerFor]="timbre" (click)="MostarNumeroAvisos()">
     <mat-icon id="iconos-navegador" [matBadgeHidden]="estadoTimbres" matBadge="{{num_timbre_false}}"
         matBadgeColor="warn" style="margin-left: 8px; margin-right: 8px;" matSuffix matTooltip="Avisos Generales"
         aria-hidden="false">
@@ -11,6 +11,70 @@
     </div>
     <div *ngIf="avisos.message !== 'No se encuentran registros'">
         <div *ngFor="let n of avisos">
+
+            <!-- MENSAJE DE COMUNICADOS -->
+            <div *ngIf="n.visto === false && n.tipo === 6" style="background: rgb(245, 202, 252)">
+                <a mat-menu-item type="submit" class="noti_menu">
+                    <ul style="list-style: none; margin-left: -8%;" (click)="ActualizarVista(n)">
+                        <li style="font-size: 11px; margin-top: 3%;">
+                            <b>Enviado por:</b> {{n.empleado}}
+                        </li>
+                        <li style="font-size: 12px; margin-top: 1%;">
+                             <b>Comunicado:</b> &nbsp; 
+                             <i class="fa fa-exclamation" aria-hidden="true" style="color: red;"></i>
+                        </li>
+                        <li style="font-size: 11px; margin-top: 1%;">
+                             {{n.descripcion}}
+                        </li>
+                        <li style="font-size: 11px; margin-top: 1%;">
+                            <b>Fecha:</b> {{n.fecha_}}
+                            <b>&nbsp;&nbsp;Hora:</b> {{n.hora_}}
+                        </li>
+                    </ul>
+                    <mat-divider class="divider"></mat-divider>
+                </a>
+            </div>
+
+            <!-- MENSAJE DE COMUNICADOS VISTOS-->
+            <div *ngIf="n.visto === true && n.tipo === 6" style="background: rgb(226, 226, 226)">
+                <a mat-menu-item type="submit" class="noti_menu">
+                    <ul style="list-style: none; margin-left: -8%;" (click)="ActualizarVista(n)">
+                        <li style="font-size: 11px; margin-top: 3%;">
+                            <b>Enviado por:</b> {{n.empleado}}
+                        </li>
+                        <li style="font-size: 11px; margin-top: 1%;">
+                            <b>Comunicado:</b> {{n.descripcion}}.
+                        </li>
+                        <li style="font-size: 11px; margin-top: 1%;">
+                            <b>Fecha:</b> {{n.fecha_}}
+                            <b>&nbsp;&nbsp;Hora:</b> {{n.hora_}}
+                        </li>
+                    </ul>
+                    <mat-divider class="divider"></mat-divider>
+                </a>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             <!-- FORMA DE AVISO PARA 'TE FALTA TIMBRE DE ENTRADA' -->
             <div *ngIf="n.visto == false && n.descripcion === 'Te falta timbre de entrada'"
@@ -27,7 +91,8 @@
                     <mat-divider class="divider"></mat-divider>
                 </a>
             </div>
-            <!-- Forma de aviso para 'Te falta timbre de salida' -->
+
+            <!-- FORMA DE AVISO PARA 'TE FALTA TIMBRE DE SALIDA' -->
             <div *ngIf="n.visto == false && n.descripcion === 'Te falta timbre de salida'"
                 style="background: rgb(201,79,78);">
                 <a mat-menu-item type="submit" class="noti_menu">
@@ -42,7 +107,8 @@
                     <mat-divider class="divider"></mat-divider>
                 </a>
             </div>
-            <!-- Forma de aviso para 'Salio antes al almuerzo' -->
+
+            <!-- FORMA DE AVISO PARA 'SALIO ANTES AL ALMUERZO' -->
             <div *ngIf="n.visto == false && n.descripcion === 'Salio antes al almuerzo'"
                 style="background: rgb(201,79,78);">
                 <a mat-menu-item type="submit" class="noti_menu">
@@ -57,7 +123,8 @@
                     <mat-divider class="divider"></mat-divider>
                 </a>
             </div>
-            <!-- Forma de aviso para 'Se tomo mucho tiempo de almuerzo' -->
+
+            <!-- FORMA DE AVISO PARA 'SE TOMO MUCHO TIEMPO DE ALMUERZO' -->
             <div *ngIf="n.visto == false && n.descripcion === 'Se tomo mucho tiempo de almuerzo'"
                 style="background: rgb(201,79,78);">
                 <a mat-menu-item type="submit" class="noti_menu">
@@ -72,7 +139,8 @@
                     <mat-divider class="divider"></mat-divider>
                 </a>
             </div>
-            <!-- Forma de aviso para 'Llego atrasado al trabajo' -->
+
+            <!-- FORMA DE AVISO PARA 'LLEGO ATRASADO AL TRABAJO' -->
             <div *ngIf="n.visto == false && n.descripcion === 'Llego atrasado al trabajo'"
                 style="background: rgb(201,79,78);">
                 <a mat-menu-item type="submit" class="noti_menu">
@@ -87,7 +155,8 @@
                     <mat-divider class="divider"></mat-divider>
                 </a>
             </div>
-            <!-- Forma de aviso para 'Salio antes al trabajo' -->
+
+            <!-- FORMA DE AVISO PARA 'SALIO ANTES AL TRABAJO' -->
             <div *ngIf="n.visto == false && n.descripcion === 'Salio antes al trabajo'"
                 style="background: rgb(201,79,78);">
                 <a mat-menu-item type="submit" class="noti_menu">
@@ -102,9 +171,6 @@
                     <mat-divider class="divider"></mat-divider>
                 </a>
             </div>
-
-
-
 
             <!-- NOTIFICACION DE SOLICITUD DE ALIMENTACION -->
             <div *ngIf="n.visto === false && n.tipo === 1" style="background: rgb(251, 212, 166)">
@@ -172,9 +238,6 @@
                 </a>
             </div>
 
-
-
-
             <!-- NOTIFICACIÓN DE APROBACION DE SOLICITUD DE ALIMENTACION -->
             <div *ngIf="n.visto === false && n.tipo === 2" style="background: rgb(252, 227, 206)">
                 <a mat-menu-item type="submit" class="noti_menu">
@@ -208,7 +271,7 @@
                 </a>
             </div>
 
-            <!-- NOTIFICACIÓN VISTA DE APROBACION DE SOLICITUD DE ALIMENTACION -->
+            <!-- NOTIFICACION VISTA DE APROBACION DE SOLICITUD DE ALIMENTACION -->
             <div *ngIf="n.visto === true && n.tipo === 2" style="background: rgb(226, 226, 226)">
                 <a mat-menu-item type="submit" class="noti_menu">
                     <ul style="list-style: none; margin-left: -6%;" (click)="ActualizarVista(n)">
@@ -241,11 +304,7 @@
                 </a>
             </div>
 
-
-
-
-
-            <!-- NOTIFICACIÓN DE PLANIFICACION DE ALIMENTACION -->
+            <!-- NOTIFICACION DE PLANIFICACION DE ALIMENTACION -->
             <div *ngIf="n.visto === false && n.tipo === 20" style="background: rgb(251, 212, 169)">
                 <a mat-menu-item type="submit" class="noti_menu">
                     <ul style="list-style: none; margin-left: -6%;" (click)="ActualizarVista(n)">
@@ -260,8 +319,7 @@
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b>Tipo de servicio:</b>
-                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario
-                            de')[1].split('servicio')[1]}}
+                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('servicio')[1]}}
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b>Inicia:</b> {{n.descripcion.split('desde')[1].split('hasta')[0]}}
@@ -271,8 +329,7 @@
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b>Horario:</b>
-                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario
-                            de')[1].split('servicio')[0]}}
+                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('servicio')[0]}}
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b>Fecha:</b> {{n.fecha_}}
@@ -283,7 +340,7 @@
                 </a>
             </div>
 
-            <!-- AVISOS YA VISTOS NOTIFICACIÓN DE PLANIFICACION DE ALIMENTACION-->
+            <!-- AVISOS YA VISTOS NOTIFICACION DE PLANIFICACION DE ALIMENTACION -->
             <div *ngIf="n.visto === true && n.tipo === 20" style="background: rgb(226, 226, 226)">
                 <a mat-menu-item type="submit" class="noti_menu">
                     <ul style="list-style: none; margin-left: -6%;" (click)="ActualizarVista(n)">
@@ -298,8 +355,7 @@
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b> Tipo de servicio:</b>
-                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario
-                            de')[1].split('servicio')[1]}}
+                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('servicio')[1]}}
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b>Inicia:</b> {{n.descripcion.split('desde')[1].split('hasta')[0]}}
@@ -309,8 +365,7 @@
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b>Horario:</b>
-                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario
-                            de')[1].split('servicio')[0]}}
+                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('servicio')[0]}}
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b>Fecha:</b> {{n.fecha_}}
@@ -321,11 +376,7 @@
                 </a>
             </div>
 
-
-
-
-
-            <!-- NOTIFICACIONES DE PLANIFICACIÓN DE HORAS EXTRAS -->
+            <!-- NOTIFICACIONES DE PLANIFICACION DE HORAS EXTRAS -->
             <div *ngIf="n.visto === false && n.tipo === 10" style="background: rgb(187, 246, 250)">
                 <a mat-menu-item type="submit" class="noti_menu">
                     <ul style="list-style: none; margin-left: -5%;" (click)="ActualizarVista(n)">
@@ -358,7 +409,7 @@
                 </a>
             </div>
 
-            <!-- NOTIFICACIONES VISTAS DE PLANIFICACIÓN DE HORAS EXTRAS -->
+            <!-- NOTIFICACIONES VISTAS DE PLANIFICACION DE HORAS EXTRAS -->
             <div *ngIf="n.visto === true && n.tipo === 10" style="background: rgb(226, 226, 226)">
                 <a mat-menu-item type="submit" class="noti_menu">
                     <ul style="list-style: none; margin-left: -5%;" (click)="ActualizarVista(n)">
@@ -391,9 +442,6 @@
                 </a>
             </div>
 
-
-
-
             <!-- NOTIFICACIONES NO VISTAS DE JUSTIFICACION DE HORAS EXTRAS -->
             <div *ngIf="n.visto === false && n.tipo === 11" style="background: rgb(187, 246, 250)">
                 <a mat-menu-item type="submit" class="noti_menu">
@@ -416,13 +464,11 @@
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b>Horario:</b>
-                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario
-                            de')[1].split('horas')[0]}}
+                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('horas')[0]}}
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b>Num. horas solicitadas:</b>
-                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario
-                            de')[1].split('horas')[1]}}
+                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('horas')[1]}}
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b>Fecha:</b> {{n.fecha_}}
@@ -455,13 +501,11 @@
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b>Horario:</b>
-                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario
-                            de')[1].split('horas')[0]}}
+                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('horas')[0]}}
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b>Num. horas solicitadas:</b>
-                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario
-                            de')[1].split('horas')[1]}}
+                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('horas')[1]}}
                         </li>
                     </ul>
                     <mat-divider class="divider"></mat-divider>
@@ -486,14 +530,11 @@
                             <b>Finaliza:</b> {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario')[0]}}
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
-                            <b> Horario: </b>{{n.descripcion.split('desde')[1].split('hasta')[1].split('horario
-                            de')[1].split('estado')[0]}}
+                            <b> Horario: </b>{{n.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('estado')[0]}}
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
-                            <b> Num. horas {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario
-                                de')[1].split('estado')[1].split('horas')[0]}}:</b>
-                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario
-                            de')[1].split('estado')[1].split('horas')[1]}}
+                            <b> Num. horas {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('estado')[1].split('horas')[0]}}:</b>
+                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('estado')[1].split('horas')[1]}}
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
                             <b>Fecha:</b> {{n.fecha_}}
@@ -522,60 +563,13 @@
                             <b>Finaliza:</b> {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario')[0]}}
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
-                            <b> Horario: </b>{{n.descripcion.split('desde')[1].split('hasta')[1].split('horario
-                            de')[1].split('estado')[0]}}
+                            <b> Horario: </b>{{n.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('estado')[0]}}
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
-                            <b> Num. horas {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario
-                                de')[1].split('estado')[1].split('horas')[0]}}:</b>
-                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario
-                            de')[1].split('estado')[1].split('horas')[1]}}
+                            <b> Num. horas {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('estado')[1].split('horas')[0]}}:</b>
+                            {{n.descripcion.split('desde')[1].split('hasta')[1].split('horario de')[1].split('estado')[1].split('horas')[1]}}
                         </li>
                         <li style="font-size: 11px; margin-top: 1%;">
-                            <b>Fecha:</b> {{n.fecha_}}
-                            <b>&nbsp;&nbsp;Hora:</b> {{n.hora_}}
-                        </li>
-                    </ul>
-                    <mat-divider class="divider"></mat-divider>
-                </a>
-            </div>
-
-
-            <!-- MENSAJE DE COMUNICADOS -->
-            <div *ngIf="n.visto === false && n.tipo === 6" style="background: rgb(245, 202, 252)">
-                <a mat-menu-item type="submit" class="noti_menu">
-                    <ul style="list-style: none; margin-left: -8%;" (click)="ActualizarVista(n)">
-                        <li style="font-size: 12px; margin-top: 3%;">
-                            <b>Enviado por:</b> {{n.empleado}}
-                        </li>
-                        <li style="font-size: 11px; margin-top: 1%;">
-                            <b> Comunicado:</b> {{n.descripcion.split(';')[0]
-                            }}
-                        </li>
-                        <li style="font-size: 11px; margin-top: 1%;">
-                            <b>Fecha:</b> {{n.fecha_}}
-                            <b>&nbsp;&nbsp;Hora:</b> {{n.hora_}}
-                        </li>
-                    </ul>
-                    <mat-divider class="divider"></mat-divider>
-                </a>
-            </div>
-
-            <!-- MENSAJE DE COMUNICADOS VISTOS-->
-            <div *ngIf="n.visto === true && n.tipo === 6" style="background: rgb(226, 226, 226)">
-                <a mat-menu-item type="submit" class="noti_menu">
-                    <ul style="list-style: none; margin-left: -8%;" (click)="ActualizarVista(n)">
-                        <li style="font-size: 12px; margin-top: 3%;">
-                            <b>Enviado por:</b> {{n.empleado}}
-                        </li>
-                        <li style="font-size: 11px; margin-top: 1%;">
-                            <b>Comunicado:</b>
-                            {{n.descripcion.split('.')[0]}}. {{n.descripcion.split('.')[1]}}.
-                        </li>
-                        <li style="font-size: 11px; margin-top: 1%;">
-                            {{n.descripcion.split('.')[2]}}.
-                        </li>
-                        <li style="font-size: 12px; margin-top: 1%;">
                             <b>Fecha:</b> {{n.fecha_}}
                             <b>&nbsp;&nbsp;Hora:</b> {{n.hora_}}
                         </li>

@@ -341,8 +341,6 @@ import { EditarVacunasComponent } from './componentes/catalogos/catalogoVacuna/e
 import { VisualizarObservacionComponent } from './componentes/horarios/cargar-plantillas/visualizar-observacion/visualizar-observacion/visualizar-observacion.component';
 import { VisualizarAsignacionesComponent } from './componentes/empleado/sucursal-usuario/visualizar-asignaciones/visualizar-asignaciones.component';
 
-
-
 const config: SocketIoConfig = { url: environment.url, options: {} };
 
 @NgModule({
@@ -611,22 +609,22 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
   ],
 
   imports: [
-   BrowserModule,
-   AppRoutingModule,
-   HttpClientModule,
-   ReactiveFormsModule,
+    BrowserModule,
+    SocketIoModule.forRoot(config),
+    AppRoutingModule,
+    HttpClientModule,
+    ReactiveFormsModule,
     ToastrModule.forRoot(),
-   SocketIoModule.forRoot(config),
-   FontAwesomeModule,
-   FormsModule,
-   MatCardModule,
-   ScrollingModule,
-   FiltrosModule,
-   MaterialModule,
-   MatButtonModule,
-   MatPaginatorModule,
-   MatTableModule,
-   MatDatepickerModule,
+    FontAwesomeModule,
+    FormsModule,
+    MatCardModule,
+    ScrollingModule,
+    FiltrosModule,
+    MaterialModule,
+    MatButtonModule,
+    MatPaginatorModule,
+    MatTableModule,
+    MatDatepickerModule,
     MatNativeDateModule,
     ReportesModule,
     SpinnerModule,

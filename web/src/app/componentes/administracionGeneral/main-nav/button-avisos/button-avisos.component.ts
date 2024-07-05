@@ -35,25 +35,34 @@ export class ButtonAvisosComponent implements OnInit {
     private aviso: TimbresService,
     private router: Router,
   ) {
+    /** ********************************************************************************** **
+     ** **               METODO DE ESCUCHA A NOTIFICACIONES EN TIEMPO REAL              ** **
+     ** ********************************************************************************** **/
+    
     // VERIFICAR QUE EL USUARIO TIENEN INICIO DE SESION
     if (this.loginService.loggedIn()) {
       // METODO DE ESCUCHA DE EVENTOS DE NOTIFICACIONES
-      this.socket.on('recibir_aviso', (data) => {
+      this.socket.on('recibir_aviso', (data: any) => {
+        //console.log('Escuchando aviso', data);
         // VERIFICACION DE USUARIO QUE RECIBE NOTIFICACION
-        if (parseInt(data.id_empleado_recibe) === this.id_empleado_logueado) {
+        if (parseInt(data.id_receives_empl) === this.id_empleado_logueado) {
           // BUSQUEDA DE LOS DATOS DE LA NOTIFICACION RECIBIDA
           this.aviso.ObtenerUnAviso(data.id).subscribe(res => {
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION
             res.fecha_ = this.validar.FormatearFecha(moment(res.create_at).format('YYYY-MM-DD'), this.formato_fecha, this.validar.dia_abreviado);
             res.hora_ = this.validar.FormatearHora(moment(res.create_at).format('HH:mm:ss'), this.formato_hora);
-            if (res.descripcion.split('para')[0] != undefined && res.descripcion.split('para')[1] != undefined) {
-              res.aviso = res.descripcion.split('para')[0];;
-              res.usuario = 'del usuario ' + res.descripcion.split('para')[1].split('desde')[0];
+            
+            if(res.tipo != 6){
+              if (res.descripcion.split('para')[0] != undefined && res.descripcion.split('para')[1] != undefined) {
+                res.aviso = res.descripcion.split('para')[0];;
+                res.usuario = 'del usuario ' + res.descripcion.split('para')[1].split('desde')[0];
+              }
+              else {
+                res.aviso = res.descripcion.split('desde')[0];
+                res.usuario = '';
+              }
             }
-            else {
-              res.aviso = res.descripcion.split('desde')[0];
-              res.usuario = '';
-            }
+
             this.estadoTimbres = false;
             if (this.avisos.length < 10) {
               // METODO QUE AGREGA NOTIFICACION AL INICIO DE LA LISTA
@@ -98,45 +107,54 @@ export class ButtonAvisosComponent implements OnInit {
       });
   }
 
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
   BuscarHora(fecha: string) {
     // id_tipo_parametro Formato hora = 26
     this.parametro.ListarDetalleParametros(26).subscribe(
       res => {
         this.formato_hora = res[0].descripcion;
-        this.LlamarNotificacionesAvisos(fecha, this.formato_hora);
+        this.LeerAvisos(fecha, this.formato_hora);
       },
       vacio => {
-        this.LlamarNotificacionesAvisos(fecha, this.formato_hora);
+        this.LeerAvisos(fecha, this.formato_hora);
       });
   }
 
-  numeroTimbres() {
+  // METODO PARA MOSTRAR EL NUMERO DE AVISOS
+  MostarNumeroAvisos() {
     if (this.num_timbre_false > 0) {
       this.num_timbre_false = 0;
       this.estadoTimbres = !this.estadoTimbres;
     }
   }
 
-  LlamarNotificacionesAvisos(formato_fecha: string, formato_hora: string) {
+  // METODO PARA LEER AVISOS
+  LeerAvisos(formato_fecha: string, formato_hora: string) {
     this.aviso.BuscarAvisosGenerales(this.id_empleado_logueado).subscribe(res => {
       this.avisos = res;
+      //console.log('ver avisos leidos ', this.avisos)
       if (!this.avisos.message) {
         if (this.avisos.length > 0) {
+          // LEER TODOS LOS AVISOS
           this.avisos.forEach((obj: any) => {
-
+            // AVISOS QUE NO SEN HAN ABIERTO
             if (obj.visto === false) {
               this.num_timbre_false = this.num_timbre_false + 1;
               this.estadoTimbres = false;
             }
+            // FORMATEAR DATOS DE FECHA Y HORA
             obj.fecha_ = this.validar.FormatearFecha(moment(obj.create_at).format('YYYY-MM-DD'), formato_fecha, this.validar.dia_abreviado);
             obj.hora_ = this.validar.FormatearHora(moment(obj.create_at).format('HH:mm:ss'), formato_hora);
-            if (obj.descripcion.split('para')[0] != undefined && obj.descripcion.split('para')[1] != undefined) {
-              obj.aviso = obj.descripcion.split('para')[0];;
-              obj.usuario = 'del usuario ' + obj.descripcion.split('para')[1].split('desde')[0];
-            }
-            else {
-              obj.aviso = obj.descripcion.split('desde')[0];
-              obj.usuario = '';
+            // VERIFICAR DESCRIPCIONES DE AVISOS
+            if (obj.tipo != 6) {
+              if (obj.descripcion.split('para')[0] != undefined && obj.descripcion.split('para')[1] != undefined) {
+                obj.aviso = obj.descripcion.split('para')[0];;
+                obj.usuario = 'del usuario ' + obj.descripcion.split('para')[1].split('desde')[0];
+              }
+              else {
+                obj.aviso = obj.descripcion.split('desde')[0];
+                obj.usuario = '';
+              }
             }
           });
         }
@@ -144,23 +162,23 @@ export class ButtonAvisosComponent implements OnInit {
     });
   }
 
-
+  // METODO PARA ACTUALIZAR LA VISTA DE AVISOS
   ActualizarVista(data: any) {
     const datos = {
       visto: true,
       user_name: this.user_name,
       ip: this.ip
     }
-    this.aviso.PutVistaTimbre(data.id, datos).subscribe(res => {
-      this.LlamarNotificacionesAvisos(this.formato_fecha, this.formato_hora);
+    this.aviso.ActualizarVistaAvisos(data.id, datos).subscribe(res => {
+      this.LeerAvisos(this.formato_fecha, this.formato_hora);
     });
-
-    const rol = parseInt(localStorage.getItem('rol') as string);
-
+    // NAVEGABILIDAD COMUNICADOS
     if (data.tipo === 6) {
       this.router.navigate(['/lista-avisos']);
     }
 
+    // REVISAR NAVEGABILIDAD EN PANTALLAS DE NOTIFICACIONES
+    const rol = parseInt(localStorage.getItem('rol') as string);
     if (rol === 1) {
       if (data.tipo === 1) {
         this.router.navigate(['/listaSolicitaComida']);
