@@ -94,8 +94,8 @@ export class PlanificacionMultipleComponent implements OnInit {
   formato_hora: string = 'HH:mm:ss';
 
   BuscarHora() {
-    // id_tipo_parametro Formato hora = 26
-    this.parametro.ListarDetalleParametros(26).subscribe(
+    // id_tipo_parametro Formato hora = 2
+    this.parametro.ListarDetalleParametros(2).subscribe(
       res => {
         this.formato_hora = res[0].descripcion;
       });

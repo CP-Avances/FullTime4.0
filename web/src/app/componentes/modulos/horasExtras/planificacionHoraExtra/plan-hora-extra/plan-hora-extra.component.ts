@@ -106,16 +106,16 @@ export class PlanHoraExtraComponent implements OnInit {
 
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarFecha() {
-    // id_tipo_parametro Formato fecha = 25
-    this.parametro.ListarDetalleParametros(25).subscribe(
+    // id_tipo_parametro Formato fecha = 1
+    this.parametro.ListarDetalleParametros(1).subscribe(
       res => {
         this.formato_fecha = res[0].descripcion;
       });
   }
 
   BuscarHora() {
-    // id_tipo_parametro Formato hora = 26
-    this.parametro.ListarDetalleParametros(26).subscribe(
+    // id_tipo_parametro Formato hora = 2
+    this.parametro.ListarDetalleParametros(2).subscribe(
       res => {
         this.formato_hora = res[0].descripcion;
       });
@@ -380,9 +380,9 @@ export class PlanHoraExtraComponent implements OnInit {
   // METODO DE BUSQUEDA DE NUMERO PERMITIDO DE CORREOS
   correos: number;
   BuscarParametro() {
-    // id_tipo_parametro LIMITE DE CORREOS = 24
+    // id_tipo_parametro LIMITE DE CORREOS = 13
     let datos: any = [];
-    this.parametro.ListarDetalleParametros(24).subscribe(
+    this.parametro.ListarDetalleParametros(13).subscribe(
       res => {
         datos = res;
         if (datos.length != 0) {

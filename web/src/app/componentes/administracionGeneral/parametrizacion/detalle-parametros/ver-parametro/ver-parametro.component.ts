@@ -1,4 +1,4 @@
-// SECCIÓN DE LIBRERIAS
+// SECCION DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
 import { MatRadioChange } from '@angular/material/radio';
@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 
-// SECCIÓN DE SERVICIOS
+// SECCION DE SERVICIOS
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
@@ -45,14 +45,14 @@ export class VerParametroComponent implements OnInit {
   formato: boolean = true;
   formato_fecha: boolean = false;
   formato_hora: boolean = false;
+  tolerancia_atrasos: boolean = false;
+  ubicacion: boolean = false;
+  dispositivos: boolean = false;
+  segundos_timbres: boolean = false;
   carga: boolean = false;
   kardex: boolean = false;
   laboral_calendario: boolean = false;
   limite_correo: boolean = false;
-  ubicacion: boolean = false;
-  dispositivos: boolean = false;
-  segundos_timbres: boolean = false;
-  tolerancia_atrasos: boolean = false;
 
   ingreso: number = 0;
 
@@ -77,47 +77,58 @@ export class VerParametroComponent implements OnInit {
   }
 
   ActivarBoton() {
-    if (this.idParametro === '22') {
-      this.formato = true;
-      this.ubicacion = true;
-    }
-    if (this.idParametro === '24') {
-      this.formato = true;
-      this.limite_correo = true;
-    }
-    if (this.idParametro === '25') {
+    // FORMATO FECHA
+    if (this.idParametro === '1') {
       this.formato = false;
       this.formato_fecha = true;
     }
-    if (this.idParametro === '26') {
+    // FORMATO HORA
+    if (this.idParametro === '2') {
       this.formato = false;
       this.formato_hora = true;
     }
-    if (this.idParametro === '27') {
-      this.formato = false;
-      this.carga = true;
-    }
-    if (this.idParametro === '28') {
-      this.formato = false;
-      this.kardex = true;
-    }
-    if (this.idParametro === '31') {
-      this.formato = false;
-      this.laboral_calendario = true;
-    }
-    if (this.idParametro === '32') {
-      this.formato = false;
-      this.dispositivos = true;
-    }
-    if (this.idParametro === '1') {
-      this.formato = false;
-      this.segundos_timbres = true;
-    }
-    if (this.idParametro === '2') {
+    // TOLERANCIA ATRASOS
+    if (this.idParametro === '3') {
       this.formato = false;
       this.tolerancia_atrasos = true;
       this.ver_detalles = false;
     }
+    // TOLERANCIA UBICACION
+    if (this.idParametro === '4') {
+      this.formato = true;
+      this.ubicacion = true;
+    }
+    // DISPOSITIVOS MOVILES
+    if (this.idParametro === '6') {
+      this.formato = false;
+      this.dispositivos = true;
+    }
+    // CONSIDERAR SEGUNDOS MARCACIONES
+    if (this.idParametro === '9') {
+      this.formato = false;
+      this.segundos_timbres = true;
+    }
+    // TIPO CARGA VACACIONES
+    if (this.idParametro === '10') {
+      this.formato = false;
+      this.carga = true;
+    }
+    // DESCARGAR KARDEX
+    if (this.idParametro === '11') {
+      this.formato = false;
+      this.kardex = true;
+    }
+    // FORMATO LABORAL CALENDARIO
+    if (this.idParametro === '12') {
+      this.formato = false;
+      this.laboral_calendario = true;
+    }
+    // LIMITE CORREO
+    if (this.idParametro === '13') {
+      this.formato = true;
+      this.limite_correo = true;
+    }
+
   }
 
   // METODO PARA MANEJAR PAGINACION DE TABLAS
@@ -170,11 +181,11 @@ export class VerParametroComponent implements OnInit {
         this.formatoA = 'rgb(80, 87, 97)';
       }
 
-      if (this.idParametro === '2') {
+      if (this.idParametro === '3') {
         this.VerConfiguracionAtrasos();
       }
     }, vacio => {
-      if (this.idParametro === '2') {
+      if (this.idParametro === '3') {
         this.ver_actualizar_atraso = false;
         this.ver_eliminar_atraso = false;
         this.ver_guardar_atraso = true;

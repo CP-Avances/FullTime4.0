@@ -70,8 +70,8 @@ export class HomeComponent implements OnInit {
 
     this.VerEmpleado(this.formato_fecha)
 
-    // id_tipo_parametro Formato fecha = 25
-    this.parametro.ListarDetalleParametros(25).subscribe(
+    // id_tipo_parametro Formato fecha = 1
+    this.parametro.ListarDetalleParametros(1).subscribe(
       res => {
         this.formato_fecha = res[0].descripcion;
         this.FormatearFechas(this.formato_fecha);

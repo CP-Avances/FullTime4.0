@@ -872,9 +872,9 @@ export class ComunicadosComponent implements OnInit {
   // METODO PARA LEER NUMERO DE CORREOS PERMITIDOS
   correos: number = 0;
   BuscarParametro() {
-    // id_tipo_parametro LIMITE DE CORREO = 24
+    // id_tipo_parametro LIMITE DE CORREO = 13
     let datos: any = [];
-    this.restP.ListarDetalleParametros(24).subscribe(
+    this.restP.ListarDetalleParametros(13).subscribe(
       res => {
         datos = res;
         if (datos.length != 0) {
