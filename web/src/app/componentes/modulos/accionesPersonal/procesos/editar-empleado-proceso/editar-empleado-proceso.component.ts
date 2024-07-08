@@ -81,9 +81,9 @@ export class EditarEmpleadoProcesoComponent implements OnInit {
 
   ImprimirDatos() {
     this.EmpleProcesoForm.patchValue({
-      fecInicioForm: this.data.datosProcesos.fec_inicio,
-      fecFinalForm: this.data.datosProcesos.fec_final,
-      idProcesoForm: this.data.datosProcesos.id
+      fecInicioForm: this.data.datosProcesos.fecha_inicio,
+      fecFinalForm: this.data.datosProcesos.fecha_final,
+      idProcesoForm: this.data.datosProcesos.id_proceso
     })
   }
 
@@ -100,15 +100,15 @@ export class EditarEmpleadoProcesoComponent implements OnInit {
 
   InsertarProceso(form: any) {
     let datosProceso = {
-      id_p: this.data.datosProcesos.id_p,
-      id_empl_cargo: this.data.datosProcesos.id_empl_cargo,
+      id_p: this.data.datosProcesos.id_proceso,
+      id_empleado_cargo: this.data.datosProcesos.id_empleado_cargo,
       fec_inicio: form.fecInicioForm,
       fec_final: form.fecFinalForm,
-      id: form.idProcesoForm,
+      id: this.data.datosProcesos.id,
+      id_proceso: form.idProcesoForm,
       user_name: this.user_name,
       ip: this.ip,
     };
-    console.log("datos cambiados", datosProceso);
     this.restP.ActualizarUnProceso(datosProceso).subscribe(response => {
       this.toastr.success('Operación exitosa.', 'Proceso del Empleado actualizado', {
         timeOut: 6000,

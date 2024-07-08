@@ -55,11 +55,11 @@ class EmpleadoProcesoControlador {
     ActualizarProcesoEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, id_empl_cargo, fec_inicio, fec_final, id_p, user_name, ip } = req.body;
+                const { id, id_empleado_cargo, fec_inicio, fec_final, id_proceso, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const proceso = yield database_1.default.query('SELECT * FROM map_empleado_procesos WHERE id_p = $1', [id_p]);
+                const proceso = yield database_1.default.query('SELECT * FROM map_empleado_procesos WHERE id = $1', [id]);
                 const [datosOriginales] = proceso.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -69,27 +69,31 @@ class EmpleadoProcesoControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al actualizar proceso con id_p: ${id_p}`
+                        observacion: `Error al actualizar proceso con id: ${id}`
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Error al actualizar proceso' });
                 }
-                yield database_1.default.query(`
-        UPDATE map_empleado_procesos SET id = $1, id_empleado_cargo = $2, fecha_inicio = $3, fecha_final = $4 
-        WHERE id = $5
-        `, [id, id_empl_cargo, fec_inicio, fec_final, id_p]);
-                var fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
-                var fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
-                var fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
-                var fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
+                const datosNuevos = yield database_1.default.query(`
+        UPDATE map_empleado_procesos SET id_proceso = $5, id_empleado_cargo = $2, fecha_inicio = $3, fecha_final = $4 
+        WHERE id = $1 RETURNING *
+        `, [id, id_empleado_cargo, fec_inicio, fec_final, id_proceso]);
+                const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
+                const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
+                const fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
+                const fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
+                datosOriginales.fecha_inicio = fechaInicioO;
+                datosOriginales.fecha_final = fechaFinalO;
+                datosNuevos.rows[0].fecha_inicio = fechaInicioN;
+                datosNuevos.rows[0].fecha_final = fechaFinalN;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_empleado_procesos',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: `{id: ${datosOriginales.id}, id_empleado_cargo: ${datosOriginales.id_empl_cargo}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}}`,
-                    datosNuevos: `{id: ${id}, id_empleado_cargo: ${id_empl_cargo}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}}`,
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(datosNuevos.rows[0]),
                     ip,
                     observacion: null
                 });
@@ -99,6 +103,7 @@ class EmpleadoProcesoControlador {
             }
             catch (error) {
                 // REVERTIR TRANSACCION
+                console.log('error ', error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'Error al actualizar proceso.' });
             }
@@ -145,14 +150,16 @@ class EmpleadoProcesoControlador {
                 yield database_1.default.query(`
         DELETE FROM map_empleado_procesos WHERE id = $1
         `, [id]);
-                var fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
-                var fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
+                const fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
+                const fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
+                datosOriginales.fecha_inicio = fechaInicioO;
+                datosOriginales.fecha_final = fechaFinalO;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'map_empleado_procesos',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: `{id: ${datosOriginales.id}, id_empleado_cargo: ${datosOriginales.id_empl_cargo}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}}`,
+                    datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
                     ip,
                     observacion: null

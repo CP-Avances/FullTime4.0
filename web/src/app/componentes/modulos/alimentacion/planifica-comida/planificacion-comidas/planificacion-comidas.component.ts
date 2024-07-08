@@ -1,7 +1,7 @@
 import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Inject, Optional } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import * as moment from 'moment';
 
@@ -15,6 +15,8 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.serv
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 import { PlanComidasComponent } from '../plan-comidas/plan-comidas.component';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { PlanHoraExtraComponent } from '../../../horasExtras/planificacionHoraExtra/plan-hora-extra/plan-hora-extra.component';
 
 @Component({
   selector: 'app-planificacion-comidas',
@@ -79,6 +81,8 @@ export class PlanificacionComidasComponent implements OnInit {
     public restPlan: PlanComidasService,
     private restUsuario: UsuarioService,
     public compenentel: PlanComidasComponent,
+    public ventana: MatDialogRef<PlanHoraExtraComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public datos: any,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -86,6 +90,13 @@ export class PlanificacionComidasComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+
+    console.log('DATOS RECIBIDOS', this.datos);
+
+    if (this.datos) {
+      console.log('DATOS RECIBIDOS', this.datos);
+      this.data = this.datos.servicios;
+    }
 
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
@@ -679,6 +690,7 @@ export class PlanificacionComidasComponent implements OnInit {
     this.compenentel.ver_lista = true;
     this.compenentel.ver_registrar = false;
     this.compenentel.LimpiarFormulario();
+    this.ventana.close();
   }
 
   // METODO PARA LIMPIAR FORMULARIO

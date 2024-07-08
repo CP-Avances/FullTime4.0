@@ -409,6 +409,7 @@ class VacacionesControlador {
     try {
       const id = req.params.id;
       const { estado, user_name, ip} = req.body;
+      console.log('estado', id);
 
       // INICIAR TRANSACCIÓN
       await pool.query('BEGIN');

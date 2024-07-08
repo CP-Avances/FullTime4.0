@@ -133,11 +133,9 @@ class PlanHoraExtraControlador {
 
       let respuesta = await pool.query(
         `
-        UPDATE mhe_empleado_plan_hora_extra SET tiempo_autorizado = $2 WHERE id = $1
+        UPDATE mhe_empleado_plan_hora_extra SET tiempo_autorizado = $2 WHERE id = $1 RETURNING *
         `
-        , [id, hora]).then((result: any) => {
-          return { message: 'Tiempo de hora autorizada confirmada' }
-        });
+        , [id, hora]);
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -145,14 +143,14 @@ class PlanHoraExtraControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{"tiempo_autorizado": "${hora}"}`,
+        datosNuevos: JSON.stringify(respuesta.rows[0]),
         ip,
         observacion: null
       });
 
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-      return res.jsonp(respuesta);
+      return res.jsonp({ message: 'Tiempo de hora autorizada confirmada' });
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -190,9 +188,9 @@ class PlanHoraExtraControlador {
         return res.status(404).jsonp({ message: 'Registro no encontrado' });
       }
 
-      await pool.query(
+      const respuesta = await pool.query(
         `
-        UPDATE mhe_empleado_plan_hora_extra SET estado = $1 WHERE id = $2
+        UPDATE mhe_empleado_plan_hora_extra SET estado = $1 WHERE id = $2 RETURNING *
         `
         , [estado, id]);
 
@@ -202,7 +200,7 @@ class PlanHoraExtraControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{"estado": "${estado}"}`,
+        datosNuevos: JSON.stringify(respuesta.rows[0]),
         ip,
         observacion: null
       });
@@ -242,11 +240,16 @@ class PlanHoraExtraControlador {
 
       const [planHoraExtra] = response.rows;
 
-      var fecha_DesdeN = await FormatearFecha2(fecha_desde, 'ddd');
-      var fecha_HastaN = await FormatearFecha2(fecha_hasta, 'ddd');
+      const fecha_DesdeN = await FormatearFecha2(fecha_desde, 'ddd');
+      const fecha_HastaN = await FormatearFecha2(fecha_hasta, 'ddd');
 
-      const horaInicio = await FormatearHora(hora_inicio)
-      const horaFin = await FormatearHora(hora_fin)
+      const horaInicio = await FormatearHora(hora_inicio);
+      const horaFin = await FormatearHora(hora_fin);
+
+      planHoraExtra.fecha_desde = fecha_DesdeN;
+      planHoraExtra.fecha_hasta = fecha_HastaN;
+      planHoraExtra.hora_inicio = horaInicio;
+      planHoraExtra.hora_fin = horaFin;
 
 
       // AUDITORIA
@@ -255,8 +258,7 @@ class PlanHoraExtraControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{ id_empleado_planifica: ${id_empl_planifica}, fecha_desde: ${fecha_DesdeN}, fecha_hasta: ${fecha_HastaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, 
-          descripcion: ${descripcion}, horas_totales: ${horas_totales}}`,
+        datosNuevos: JSON.stringify(planHoraExtra),
         ip,
         observacion: null
       });
@@ -272,6 +274,7 @@ class PlanHoraExtraControlador {
       }
 
     } catch (error) {
+      console.log('error hoara extra', error);
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500)
@@ -292,7 +295,7 @@ class PlanHoraExtraControlador {
 
       const response: QueryResult = await pool.query(
         `
-        INSERT INTO mhe_empleado_plan_hora_extra (id_plan_hora, id_empleado_realiza, observacion, 
+        INSERT INTO mhe_empleado_plan_hora_extra (id_detalle_plan, id_empleado_realiza, observacion, 
           id_empleado_cargo, id_empleado_contrato, estado, codigo)
         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
         `
@@ -320,6 +323,7 @@ class PlanHoraExtraControlador {
         .jsonp({ message: 'Registro guardado.', info: planEmpleado });
 
     } catch (error) {
+      console.log('error hoara extra', error);
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500)
@@ -437,7 +441,7 @@ class PlanHoraExtraControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM mhe_empleado_plan_hora_extra WHERE id = $1', [id]);
+      const consulta = await pool.query('SELECT * FROM mhe_empleado_plan_hora_extra WHERE id_detalle_plan = $1', [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
@@ -448,7 +452,7 @@ class PlanHoraExtraControlador {
           datosOriginales: '',
           datosNuevos: '',
           ip,
-          observacion: `Error al eliminar plan_hora_extra_empleado con id ${id}. Registro no encontrado.`
+          observacion: `Error al eliminar mhe_empleado_plan_hora_extra con id ${id}. Registro no encontrado.`
         });
 
         // FINALIZAR TRANSACCION
