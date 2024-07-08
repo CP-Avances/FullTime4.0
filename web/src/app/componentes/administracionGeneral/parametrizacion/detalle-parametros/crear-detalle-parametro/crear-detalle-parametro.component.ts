@@ -40,13 +40,14 @@ export class CrearDetalleParametroComponent implements OnInit {
 
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
-    if (this.data.parametros.id === 22) {
+    // PARAMETRO TOLERANCIA UBICACION
+    if (this.data.parametros.id === 4) {
       this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
         'Guardar.'
       this.especificacion = 'Rango de perímetro en metros.';
     }
-    else if (this.data.parametros.id === 24) {
+    // PARAMETRO LIMITE CORREO
+    else if (this.data.parametros.id === 13) {
       this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
         'Guardar.'
       this.especificacion = 'Ingrese el número máximo de correos permitidos.';
@@ -54,7 +55,7 @@ export class CrearDetalleParametroComponent implements OnInit {
     else {
       this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
         'Guardar.'
-        this.especificacion = '';
+      this.especificacion = '';
     }
   }
 

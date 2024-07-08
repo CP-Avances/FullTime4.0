@@ -88,14 +88,14 @@
                         <div class="d-flex flex-wrap justify-content-start">
                             <mat-radio-button value="1" (change)="SeleccionarOpcion($event)">
                                 <label id="textoradiobtn" style="color: black;">
-                                    No considerar minutos de tolerancia.
+                                    No considerar minutos de tolerancia
                                 </label>
                             </mat-radio-button>
                         </div>
                         <div class="d-flex flex-wrap justify-content-start">
                             <mat-radio-button value="2" (change)="SeleccionarOpcion($event)">
                                 <label id="textoradiobtn" style="color: black;">
-                                    Considerar minutos de tolerancia.
+                                    Considerar minutos de tolerancia
                                 </label>
                             </mat-radio-button>
                             <div class="nota" style="text-align: center; margin-left: 15px;" *ngIf="ver_con_tolerancia">
@@ -111,14 +111,14 @@
                         <div class="d-flex flex-wrap justify-content-start" style="margin-left: 30px;">
                             <mat-radio-button value="2-1" (change)="SeleccionarTipo($event)">
                                 <label id="textoradiobtn" style="color: black;">
-                                    Horario de entrada.
+                                    Horario de entrada
                                 </label>
                             </mat-radio-button>
                         </div>
                         <div class="d-flex flex-wrap justify-content-start" style="margin-left: 30px;">
                             <mat-radio-button value="2-2" (change)="SeleccionarTipo($event)">
                                 <label id="textoradiobtn" style="color: black;">
-                                    Minutos de tolerancia.
+                                    Minutos de tolerancia
                                 </label>
                             </mat-radio-button>
                         </div>
@@ -155,9 +155,6 @@
                 </div>
 
                 <div style="text-align: center; margin-top: 1.5rem;">
-                    <button class="btn btn-sm" *ngIf="ver_eliminar_atraso" (click)="EliminarAtrasos()">
-                        Eliminar
-                    </button>
                     <button class="btn btn-sm" *ngIf="ver_guardar_atraso" (click)="RegistrarAtraso()"
                         [disabled]="ver_registrar_atraso">
                         Registrar
@@ -167,24 +164,69 @@
                         Actualizar
                     </button>
                 </div>
-
             </div>
 
-            <!-- CONTENIDO DISPOSITIVOS REGISTRADOS -->
+            <!-- CONTENIDO TOLERANCIA DE UBICACION (4) -->
+            <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="ubicacion">
+                <div class="nota" id="espacio" style="text-align: justify;">
+                    <span>
+                        NOTA: El usuario podrá realizar su marcación o timbre dentro del perímetro definido.
+                    </span>
+                </div>
+            </div>
+
+
+            <!-- CONTENIDO FORMULARIO SELECCIONAR ACTIVAR (Si) - DESACTIVAR (No) -->
+            <div class="container" style="padding-bottom: 20px;" *ngIf="ver_formulario">
+                <div class="nota" id="espacio" style="text-align: justify;">
+
+                    <!-- CONTENIDO PERMITIR TIMBRE UBICACION DESCONOCIDA (5) -->
+                    <span *ngIf="ubicacion_desconocida">
+                        NOTA: Permitir al usuario timbrar en una ubicación diferente a las configuradas en el sistema.
+                    </span>
+
+                    <!-- CONTENIDO INDICAR USO DE CERTIFICADOS SSL (7) -->
+                    <span *ngIf="certificados">
+                        NOTA: Revisar el uso de certificados de seguridad (SSL) en el sistema (GEOLOCALIZACIÓN).
+                    </span>
+
+                    <!-- CONTENIDO INDICAR ENVIO DE MENSAJES DE CUMPLEAÑOS (8) -->
+                    <span *ngIf="cumpleanios">
+                        NOTA: Enviar mensajes de felicitaciones de cumpleaños de los colaboradores.
+                    </span>
+
+                    <!-- CONTENIDO USAR SEGUNDOS EN LOS TIMBRES (9) -->
+                    <span *ngIf="segundos_timbres">
+                        NOTA: De los timbres realizados por los usuarios considerar o no los segundos para realizar
+                        cálculos referentes a la asistencia.
+                    </span>
+                </div>
+                <form [formGroup]="formulario">
+                    <mat-radio-group aria-label="Select an option" [formControl]="descripcionF">
+                        <div class="d-flex flex-wrap justify-content-start">
+                            <mat-radio-button value="Si" (change)="SelecionarEvento($event)">
+                                <label id="textoradiobtn" style="color: black;">
+                                    Activar
+                                </label>
+                            </mat-radio-button>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-start">
+                            <mat-radio-button value="No" (change)="SelecionarEvento($event)">
+                                <label id="textoradiobtn" style="color: black;">
+                                    Desactivar
+                                </label>
+                            </mat-radio-button>
+                        </div>
+                    </mat-radio-group>
+                </form>
+            </div>
+
+            <!-- CONTENIDO DISPOSITIVOS REGISTRADOS (6) -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="dispositivos">
                 <div class="nota" id="espacio" style="text-align: justify;">
                     <span>
                         NOTA: Definir el número de dispositivos que pueden usar los usuarios para registrar sus timbres
                         en la aplicación móvil.
-                    </span>
-                </div>
-            </div>
-
-            <!-- CONTENIDO TOLERANCIA DE UBICACION -->
-            <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="ubicacion">
-                <div class="nota" id="espacio" style="text-align: justify;">
-                    <span>
-                        NOTA: El usuario podrá realizar su marcación o timbre dentro del perímetro definido.
                     </span>
                 </div>
             </div>
@@ -249,6 +291,7 @@
                     <div class="col-md"></div>
                 </div>
             </div>
+
             <!-- CONTENIDO DE SELECCION DE TIPO DE DESCARGA DE KARDEX DE VACACIONES -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="kardex">
                 <div class="nota" id="espacio" style="text-align: justify;">
@@ -279,6 +322,7 @@
                     <div class="col-md"></div>
                 </div>
             </div>
+
             <!-- CONTENIDO HABILITAR OPCIONES FORMATO LABORAL - CALENDARIO -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="laboral_calendario">
                 <div class="nota" id="espacio" style="text-align: justify;">
@@ -310,23 +354,14 @@
                 </div>
             </div>
 
-            <!-- CONTENIDO CONSIDERAR SEGUNDOS EN MARCACIONES -->
-            <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="segundos_timbres">
-                <div class="nota" id="espacio" style="text-align: justify;">
-                    <span>
-                        NOTA: De los timbres realizados por los usuarios considerar o no los segundos para realizar
-                        cálculos referentes a la asistencia.
-                    </span>
-                </div>
-            </div>
-
+            <!-- CONTENIDO VISTA DE DETALLE DE PARAMETOS -->
             <div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 5px;"
                 *ngIf="ver_detalles">
                 <div class="mat-elevation-z8" style="background: white;">
                     <div id="titulo">
                         <span>DETALLES DE PARÁMETRO GENERAL</span>
-                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                            (click)="AbrirVentanaDetalles(tp)">
+                        <button *ngIf="boton_registrar" class="btn btn-outline-light btn-sm"
+                            style="float: right; margin-right: 10px;" (click)="AbrirVentanaDetalles(tp)">
                             Registrar detalle
                         </button>
                     </div>
@@ -342,7 +377,7 @@
                                 <tr *ngFor="let dp of datosDetalle | paginate:tamanio_pagina:numero_pagina">
                                     <td>{{dp.descripcion}} <span *ngIf="ubicacion">m</span> </td>
                                     <td>
-                                        <i *ngIf="formato" id="editarI" (click)="AbrirVentanaEditarDetalle(dp)"
+                                        <i *ngIf="ver_editar" id="editarI" (click)="AbrirVentanaEditarDetalle(dp)"
                                             matSuffix matTooltipPosition="right"
                                             matTooltip="Modificar datos de este registro." class="fas fa-edit">
                                             <p>Editar</p>

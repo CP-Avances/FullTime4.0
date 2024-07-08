@@ -1,5 +1,5 @@
 // SECCION DE LIBRERIAS
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
 import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
@@ -39,19 +39,37 @@ export class VerParametroComponent implements OnInit {
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
-  ver_detalles: boolean = true;
 
   // ACTIVADORES
-  formato: boolean = true;
+  ver_editar: boolean = true;
+  ver_detalles: boolean = true;
+  boton_registrar: boolean = true;
+
+  // PARAMETRO FECHA
   formato_fecha: boolean = false;
+  // PARAMETRO HORA
   formato_hora: boolean = false;
+  // PARAMETRO ATRASOS
   tolerancia_atrasos: boolean = false;
+  // PARAMETRO UBICACION
   ubicacion: boolean = false;
+  // PARAMETRO UBICACION DESCONOCIDA
+  ubicacion_desconocida: boolean = false;
+  // PARAMTERO DISPOSITIVOS
   dispositivos: boolean = false;
+  // PARAMETRO CERTIFICADO SSL
+  certificados: boolean = false;
+  // PARAMETRO CUMPLEANIOS
+  cumpleanios: boolean = false;
+  // PARAMETRO CONSIDERAR SEGUNDOS
   segundos_timbres: boolean = false;
+  // PARAMETRO CARGAR VACACIONES
   carga: boolean = false;
+  // PARAMETRO DESCARGAR KARDEX
   kardex: boolean = false;
+  // PARAMETRO FORMATO LABORAL - CALENDARIO
   laboral_calendario: boolean = false;
+  // PARAMETRO LIMITE CORREO
   limite_correo: boolean = false;
 
   ingreso: number = 0;
@@ -70,62 +88,78 @@ export class VerParametroComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
-
     this.BuscarParametros(this.idParametro);
     this.ListarDetalles(this.idParametro);
     this.ActivarBoton();
   }
 
+  // METODO PARA ACTIVAR BOTONES SEGUN PARAMETRO
   ActivarBoton() {
+
+    this.ver_editar = false;
+    this.ver_detalles = false;
+    this.boton_registrar = false;
+
     // FORMATO FECHA
     if (this.idParametro === '1') {
-      this.formato = false;
       this.formato_fecha = true;
     }
     // FORMATO HORA
     if (this.idParametro === '2') {
-      this.formato = false;
       this.formato_hora = true;
     }
     // TOLERANCIA ATRASOS
     if (this.idParametro === '3') {
-      this.formato = false;
       this.tolerancia_atrasos = true;
-      this.ver_detalles = false;
     }
     // TOLERANCIA UBICACION
     if (this.idParametro === '4') {
-      this.formato = true;
+      this.ver_detalles = true;
+      this.ver_editar = true;
       this.ubicacion = true;
+    }
+    // FORMATO PERMITIR TIMBRE UBICACION DESCONOCIDA
+    if (this.idParametro === '5') {
+      this.ver_formulario = true;
+      this.ubicacion_desconocida = true;
     }
     // DISPOSITIVOS MOVILES
     if (this.idParametro === '6') {
-      this.formato = false;
+      this.ver_editar = true;
+      this.ver_detalles = true;
       this.dispositivos = true;
+    }
+    // FORMATO CERTIFICADOS SSL
+    if (this.idParametro === '7') {
+      this.certificados = true;
+      this.ver_formulario = true;
+    }
+    // FORMATO CERTIFICADOS SSL
+    if (this.idParametro === '8') {
+      this.cumpleanios = true;
+      this.ver_formulario = true;
     }
     // CONSIDERAR SEGUNDOS MARCACIONES
     if (this.idParametro === '9') {
-      this.formato = false;
       this.segundos_timbres = true;
+      this.ver_formulario = true;
     }
     // TIPO CARGA VACACIONES
     if (this.idParametro === '10') {
-      this.formato = false;
       this.carga = true;
     }
     // DESCARGAR KARDEX
     if (this.idParametro === '11') {
-      this.formato = false;
       this.kardex = true;
     }
     // FORMATO LABORAL CALENDARIO
     if (this.idParametro === '12') {
-      this.formato = false;
       this.laboral_calendario = true;
     }
     // LIMITE CORREO
     if (this.idParametro === '13') {
-      this.formato = true;
+      this.ver_editar = true;
+      this.ver_detalles = true;
       this.limite_correo = true;
     }
 
@@ -148,10 +182,12 @@ export class VerParametroComponent implements OnInit {
   id_detalle: number;
   // METODO PARA BUSCAR DETALLES DE PARAMETRO GENERAL
   ListarDetalles(id: any) {
+    this.boton_registrar = true;
     this.datosDetalle = [];
     this.parametro.ListarDetalleParametros(id).subscribe(datos => {
       this.datosDetalle = datos;
       //console.log('ver detalles ', this.datosDetalle)
+      // SELECCION DE OPCIONES
       if (this.ingreso === 0) {
         this.seleccion = this.datosDetalle[0].descripcion;
         this.opcion_kardex = this.datosDetalle[0].descripcion;
@@ -183,6 +219,16 @@ export class VerParametroComponent implements OnInit {
 
       if (this.idParametro === '3') {
         this.VerConfiguracionAtrasos();
+      }
+
+      // PARAMETROS QUE EXISTEN Y NO NECESITAN REGISTRO ADICIONAL
+      if (this.idParametro === '4' || this.idParametro === '6' || this.idParametro === '13') {
+        this.boton_registrar = false;
+      }
+
+      // PARAMETROS CON DETALLES
+      if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8' || this.idParametro === '9') {
+        this.VerConfiguracionRegistro();
       }
     }, vacio => {
       if (this.idParametro === '3') {
@@ -231,7 +277,7 @@ export class VerParametroComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACION
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   EliminarDetalle(id_detalle: number) {
     const datos = {
       user_name: this.user_name,
@@ -265,71 +311,11 @@ export class VerParametroComponent implements OnInit {
   }
 
   /** ******************************************************************************************* **
-   ** **        REGISTRAR O EDITAR DETALLE DE PARAMETRO FORMATO DE FECHA Y HORA                ** **
-   ** ******************************************************************************************* **/
-
-  GuardarDatos(seleccion: number) {
-    let formato = '';
-    if (seleccion === 1) {
-      formato = 'DD/MM/YYYY';
-    }
-    else if (seleccion === 2) {
-      formato = 'MM/DD/YYYY';
-    }
-    else if (seleccion === 3) {
-      formato = 'YYYY-MM-DD';
-    }
-    else if (seleccion === 4) {
-      formato = 'hh:mm:ss A';
-    }
-    else if (seleccion === 5) {
-      formato = 'HH:mm:ss';
-    }
-
-    this.RegistrarValores(formato);
-  }
-
-  /** ******************************************************************************************* **
-   ** **           REGISTRAR O EDITAR DETALLE DE PARAMETRO CARGA DE VACACIONES                 ** **
-   ** ******************************************************************************************* **/
-
-  seleccion: any;
-  SelecionarCarga(event: MatRadioChange) {
-    this.seleccion = event.value;
-    console.log('seleccion ... ', this.seleccion)
-    this.RegistrarValores(this.seleccion);
-  }
-
-
-  /** ******************************************************************************************* **
-   ** **           REGISTRAR O EDITAR DETALLE DE PARAMETRO CARGA DE VACACIONES                 ** **
-   ** ******************************************************************************************* **/
-
-  opcion_kardex: any;
-  SelecionarDescarga(event: MatRadioChange) {
-    this.opcion_kardex = event.value;
-    console.log('seleccion ... ', this.opcion_kardex)
-    this.RegistrarValores(this.opcion_kardex);
-  }
-
-  /** ******************************************************************************************* **
-   ** **           REGISTRAR O EDITAR DETALLE DE PARAMETRO LABORAL - CALENDARIO                ** **
-   ** ******************************************************************************************* **/
-
-  opcion_laboral: any;
-  SelecionarLaboral(event: MatRadioChange) {
-    this.opcion_laboral = event.value;
-    console.log('seleccion ... ', this.opcion_laboral)
-    this.RegistrarValores(this.opcion_laboral);
-  }
-
-
-  /** ******************************************************************************************* **
    ** **                   ALMACENAMIENTO DE PARAMETROS EN BASE DE DATOS                       ** **
    ** ******************************************************************************************* **/
 
   // METODO PARA REGISTRAR DETALLES
-  RegistrarValores(detalle: string) {
+  RegistrarValores(detalle: any) {
     this.ingreso = 1;
     this.parametro.ListarDetalleParametros(parseInt(this.idParametro)).subscribe(datos => {
       this.ActualizarDetalle(datos[0].id_detalle, detalle);
@@ -378,12 +364,62 @@ export class VerParametroComponent implements OnInit {
     this.ListarDetalles(this.idParametro);
   }
 
-  // LIMPIAR OPCIONES DE SELECCION
-  LimpiarSeleccion() {
-    this.seleccion = '';
-    this.opcion_kardex = '';
-    this.opcion_laboral = '';
-    this.formularioT.reset();
+  /** ******************************************************************************************* **
+   ** **                            FORMULARIO GENERAL DE DATOS                                ** **
+   ** ******************************************************************************************* **/
+
+  // ACTIVAR VISTA FORMULARIO
+  ver_formulario: boolean = false;
+
+  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
+  descripcionF = new FormControl('');
+
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
+  public formulario = new FormGroup({
+    descripcionForm: this.descripcionF,
+  });
+
+  // METODO PARA SELECCIONAR EVENTO
+  SelecionarEvento(event: MatRadioChange) {
+    var seleccion = event.value;
+    this.RegistrarValores(seleccion);
+  }
+
+  // METODO PARA REGISTRAR DETALLE DE ATRASOS
+  ActualizarRegistro(detalle: any) {
+    this.ActualizarDetalle(this.datosDetalle[0].id_detalle, detalle);
+  }
+
+  // METODO PARA LEER EL REGISTRO
+  VerConfiguracionRegistro() {
+    if (this.datosDetalle[0].descripcion != '' && this.datosDetalle[0].descripcion != null) {
+      this.descripcionF.setValue(this.datosDetalle[0].descripcion);
+    }
+  }
+
+  /** ******************************************************************************************* **
+   ** **        REGISTRAR O EDITAR DETALLE DE PARAMETRO FORMATO DE FECHA Y HORA                ** **
+   ** ******************************************************************************************* **/
+
+  GuardarDatos(seleccion: number) {
+    let formato = '';
+    if (seleccion === 1) {
+      formato = 'DD/MM/YYYY';
+    }
+    else if (seleccion === 2) {
+      formato = 'MM/DD/YYYY';
+    }
+    else if (seleccion === 3) {
+      formato = 'YYYY-MM-DD';
+    }
+    else if (seleccion === 4) {
+      formato = 'hh:mm:ss A';
+    }
+    else if (seleccion === 5) {
+      formato = 'HH:mm:ss';
+    }
+
+    this.RegistrarValores(formato);
   }
 
   /** ******************************************************************************************* **
@@ -410,7 +446,7 @@ export class VerParametroComponent implements OnInit {
   ver_eliminar_atraso: boolean = false;
   ver_actualizar_atraso: boolean = false;
 
-  // METODO PARA SELECCION TIPO DE EMPRESA, ESTABLECIMIENTOS Y RESTRICCIONES
+  // METODO PARA SELECCION 
   SeleccionarOpcion(event: MatRadioChange) {
     var opcion = event.value;
     this.ver_atraso = true;
@@ -428,10 +464,9 @@ export class VerParametroComponent implements OnInit {
       this.ver_sin_tolerancia = true;
       this.ver_registrar_atraso = false;
     }
-    console.log('ver opcion ', opcion)
   }
 
-  // METODO PARA SELECCION TIPO DE EMPRESA, ESTABLECIMIENTOS Y RESTRICCIONES
+  // METODO PARA SELECCION TIPO ATRASO
   SeleccionarTipo(event: MatRadioChange) {
     var opcion = event.value;
     this.ver_registrar_atraso = false;
@@ -445,17 +480,16 @@ export class VerParametroComponent implements OnInit {
       this.ver_con_tolerancia_2 = true;
       this.ver_sin_tolerancia = false;
     }
-    console.log('ver opcion ', opcion)
   }
 
   // METODO PARA REGISTRAR DETALLE DE ATRASOS
   RegistrarAtraso() {
     if (this.tipoF.value) {
-      console.log('ver registro ', this.tipoF.value)
+      //console.log('ver registro ', this.tipoF.value)
       this.CrearDetalle(this.tipoF.value)
     }
     else {
-      console.log('ver registro ', this.toleranciaF.value)
+      //console.log('ver registro ', this.toleranciaF.value)
       this.CrearDetalle(this.toleranciaF.value)
     }
   }
@@ -463,23 +497,18 @@ export class VerParametroComponent implements OnInit {
   // METODO PARA REGISTRAR DETALLE DE ATRASOS
   ActualizarAtraso() {
     if (this.tipoF.value) {
-      console.log('ver registro ', this.tipoF.value)
+      //console.log('ver registro ', this.tipoF.value)
       this.ActualizarDetalle(this.datosDetalle[0].id_detalle, this.tipoF.value)
     }
     else {
-      console.log('ver registro ', this.toleranciaF.value)
+      //console.log('ver registro ', this.toleranciaF.value)
       this.ActualizarDetalle(this.datosDetalle[0].id_detalle, this.toleranciaF.value)
     }
   }
 
-  // METODO PARA ELIMINAR DETALLE DE ATRASOS
-  EliminarAtrasos() {
-    this.ConfirmarDelete(this.datosDetalle[0]);
-  }
-
   // METODO PARA VER CONFIGURACION DE ATRASOS
   VerConfiguracionAtrasos() {
-    console.log('ver detalles ', this.datosDetalle)
+    //console.log('ver detalles ', this.datosDetalle)
     if (this.datosDetalle[0].descripcion != '' && this.datosDetalle[0].descripcion != null) {
       this.ver_actualizar_atraso = true;
       this.ver_eliminar_atraso = true;
@@ -518,4 +547,48 @@ export class VerParametroComponent implements OnInit {
       this.ver_guardar_atraso = true;
     }
   }
+
+
+  /** ******************************************************************************************* **
+   ** **           REGISTRAR O EDITAR DETALLE DE PARAMETRO CARGA DE VACACIONES                 ** **
+   ** ******************************************************************************************* **/
+
+  seleccion: any;
+  SelecionarCarga(event: MatRadioChange) {
+    this.seleccion = event.value;
+    this.RegistrarValores(this.seleccion);
+  }
+
+
+  /** ******************************************************************************************* **
+   ** **           REGISTRAR O EDITAR DETALLE DE PARAMETRO CARGA DE VACACIONES                 ** **
+   ** ******************************************************************************************* **/
+
+  opcion_kardex: any;
+  SelecionarDescarga(event: MatRadioChange) {
+    this.opcion_kardex = event.value;
+    this.RegistrarValores(this.opcion_kardex);
+  }
+
+  /** ******************************************************************************************* **
+   ** **           REGISTRAR O EDITAR DETALLE DE PARAMETRO LABORAL - CALENDARIO                ** **
+   ** ******************************************************************************************* **/
+
+  opcion_laboral: any;
+  SelecionarLaboral(event: MatRadioChange) {
+    this.opcion_laboral = event.value;
+    this.RegistrarValores(this.opcion_laboral);
+  }
+
+
+  // LIMPIAR OPCIONES DE SELECCION
+  LimpiarSeleccion() {
+    this.seleccion = '';
+    this.opcion_kardex = '';
+    this.opcion_laboral = '';
+    this.formularioT.reset();
+    this.formulario.reset();
+  }
+
+
 }
