@@ -449,7 +449,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
       this.componentel.ver_listas = true;
       this.componentel.VerificarPlanificacion(id_plan, '1', true, false);
     }
-    // this.ventana.close();
+    this.ventana.close();
   }
 
   // METODO PARA INGRESAR SOLO LETRAS
