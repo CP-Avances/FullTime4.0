@@ -1,7 +1,7 @@
 import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Validators, FormGroup, FormControl } from '@angular/forms';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Optional, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import * as moment from 'moment';
 
@@ -13,6 +13,7 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 
 import { ListaPlanificacionesComponent } from '../lista-planificaciones/lista-planificaciones.component';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-editar-plan-hora-extra',
@@ -68,12 +69,18 @@ export class EditarPlanHoraExtraComponent implements OnInit {
     public parametro: ParametrosService,
     public validar: ValidacionesService,
     public aviso: RealTimeService,
+    public ventana: MatDialogRef<EditarPlanHoraExtraComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public datos: any
   ) { }
 
   ngOnInit(): void {
 
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+
+    if (this.datos) {
+      this.data = this.datos;
+    }
 
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
@@ -442,6 +449,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
       this.componentel.ver_listas = true;
       this.componentel.VerificarPlanificacion(id_plan, '1', true, false);
     }
+    // this.ventana.close();
   }
 
   // METODO PARA INGRESAR SOLO LETRAS

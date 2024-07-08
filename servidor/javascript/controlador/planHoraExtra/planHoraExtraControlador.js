@@ -127,23 +127,21 @@ class PlanHoraExtraControlador {
                     return res.status(404).jsonp({ message: 'Registro no encontrado' });
                 }
                 let respuesta = yield database_1.default.query(`
-        UPDATE mhe_empleado_plan_hora_extra SET tiempo_autorizado = $2 WHERE id = $1
-        `, [id, hora]).then((result) => {
-                    return { message: 'Tiempo de hora autorizada confirmada' };
-                });
+        UPDATE mhe_empleado_plan_hora_extra SET tiempo_autorizado = $2 WHERE id = $1 RETURNING *
+        `, [id, hora]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mhe_empleado_plan_hora_extra',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"tiempo_autorizado": "${hora}"}`,
+                    datosNuevos: JSON.stringify(respuesta.rows[0]),
                     ip,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                return res.jsonp(respuesta);
+                return res.jsonp({ message: 'Tiempo de hora autorizada confirmada' });
             }
             catch (error) {
                 // REVERTIR TRANSACCION
@@ -176,8 +174,8 @@ class PlanHoraExtraControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado' });
                 }
-                yield database_1.default.query(`
-        UPDATE mhe_empleado_plan_hora_extra SET estado = $1 WHERE id = $2
+                const respuesta = yield database_1.default.query(`
+        UPDATE mhe_empleado_plan_hora_extra SET estado = $1 WHERE id = $2 RETURNING *
         `, [estado, id]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -185,7 +183,7 @@ class PlanHoraExtraControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"estado": "${estado}"}`,
+                    datosNuevos: JSON.stringify(respuesta.rows[0]),
                     ip,
                     observacion: null
                 });
@@ -217,18 +215,21 @@ class PlanHoraExtraControlador {
         `, [id_empl_planifica, fecha_desde, fecha_hasta,
                     hora_inicio, hora_fin, descripcion, horas_totales]);
                 const [planHoraExtra] = response.rows;
-                var fecha_DesdeN = yield (0, settingsMail_1.FormatearFecha2)(fecha_desde, 'ddd');
-                var fecha_HastaN = yield (0, settingsMail_1.FormatearFecha2)(fecha_hasta, 'ddd');
+                const fecha_DesdeN = yield (0, settingsMail_1.FormatearFecha2)(fecha_desde, 'ddd');
+                const fecha_HastaN = yield (0, settingsMail_1.FormatearFecha2)(fecha_hasta, 'ddd');
                 const horaInicio = yield (0, settingsMail_1.FormatearHora)(hora_inicio);
                 const horaFin = yield (0, settingsMail_1.FormatearHora)(hora_fin);
+                planHoraExtra.fecha_desde = fecha_DesdeN;
+                planHoraExtra.fecha_hasta = fecha_HastaN;
+                planHoraExtra.hora_inicio = horaInicio;
+                planHoraExtra.hora_fin = horaFin;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mhe_detalle_plan_hora_extra',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{ id_empleado_planifica: ${id_empl_planifica}, fecha_desde: ${fecha_DesdeN}, fecha_hasta: ${fecha_HastaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, 
-          descripcion: ${descripcion}, horas_totales: ${horas_totales}}`,
+                    datosNuevos: JSON.stringify(planHoraExtra),
                     ip,
                     observacion: null
                 });
@@ -242,6 +243,7 @@ class PlanHoraExtraControlador {
                 }
             }
             catch (error) {
+                console.log('error hoara extra', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500)
@@ -257,7 +259,7 @@ class PlanHoraExtraControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-        INSERT INTO mhe_empleado_plan_hora_extra (id_plan_hora, id_empleado_realiza, observacion, 
+        INSERT INTO mhe_empleado_plan_hora_extra (id_detalle_plan, id_empleado_realiza, observacion, 
           id_empleado_cargo, id_empleado_contrato, estado, codigo)
         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
         `, [id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, id_empl_contrato, estado, codigo]);
@@ -280,6 +282,7 @@ class PlanHoraExtraControlador {
                     .jsonp({ message: 'Registro guardado.', info: planEmpleado });
             }
             catch (error) {
+                console.log('error hoara extra', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500)
@@ -384,7 +387,7 @@ class PlanHoraExtraControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const consulta = yield database_1.default.query('SELECT * FROM mhe_empleado_plan_hora_extra WHERE id = $1', [id]);
+                const consulta = yield database_1.default.query('SELECT * FROM mhe_empleado_plan_hora_extra WHERE id_detalle_plan = $1', [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -394,7 +397,7 @@ class PlanHoraExtraControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al eliminar plan_hora_extra_empleado con id ${id}. Registro no encontrado.`
+                        observacion: `Error al eliminar mhe_empleado_plan_hora_extra con id ${id}. Registro no encontrado.`
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
