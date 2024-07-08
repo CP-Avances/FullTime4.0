@@ -153,7 +153,7 @@ export class CargarPlantillaComponent {
     if (this.listaNivelesCorrectas.length > 0) {
       this.restDep.subirDepaNivel(this.listaNivelesCorrectas).subscribe(response => {
         console.log('respuesta: ', response);
-        this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
+        this.toastr.success('Operación exitosa.', 'Plantilla de Nivel departamentos importada.', {
           timeOut: 3000,
         });
         window.location.reload();
@@ -320,7 +320,9 @@ export class CargarPlantillaComponent {
       return 'rgb(255, 192, 203)';
     } else if (observacion == 'Departamento no pertenece al establecimiento' ||
       observacion == 'Departamento no pertenece a la sucursal' ||
-      observacion == 'El nivel no puede ser mayor a 5'
+      observacion == 'El nivel no puede ser 0 ni mayor a 5' ||
+      observacion == 'faltan niveles por registrar' ||
+      observacion == 'Deparatemto superior ya se encuentra configurado'
     ) {
       return 'rgb(238, 34, 207)';
     } else if (observacion == 'Nivel incorrecto (solo números)') {
@@ -497,7 +499,7 @@ export class CargarPlantillaComponent {
     if (this.listaCargosCorrectas.length > 0) {
       this.restCa.subirArchivoExcelCargo(this.listaCargosCorrectas).subscribe(response => {
         console.log('respuesta: ', response);
-        this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
+        this.toastr.success('Operación exitosa.', 'Plantilla de Cargos importada.', {
           timeOut: 3000,
         });
         window.location.reload();
