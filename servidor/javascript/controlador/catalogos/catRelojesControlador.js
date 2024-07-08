@@ -537,38 +537,40 @@ class RelojesControlador {
                             if (CONTRASENA == undefined) {
                                 data.contrasena = ' - ';
                             }
-                            if (data.codigo != 'No registrado' && data.direccion_ip != 'No registrado') {
-                                // DISCRIMINACION DE ELEMENTOS IGUALES CODIGO
-                                if (duplicados.find((p) => p.codigo === data.codigo) == undefined) {
-                                    // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION IP
-                                    if (duplicados1.find((a) => a.direccion_ip === data.direccion_ip) == undefined) {
-                                        if (data.numero_serie != ' - ') {
-                                            // DISCRIMINACIÓN DE ELEMENTOS IGUALES NUMERO DE SERIE
-                                            if (duplicados2.find((b) => b.numero_serie === data.numero_serie) == undefined) {
-                                                duplicados2.push(data);
+                            if (data.observacion == 'no registrado') {
+                                if (data.codigo != 'No registrado' && data.direccion_ip != 'No registrado') {
+                                    // DISCRIMINACION DE ELEMENTOS IGUALES CODIGO
+                                    if (duplicados.find((p) => p.codigo === data.codigo) == undefined) {
+                                        // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION IP
+                                        if (duplicados1.find((a) => a.direccion_ip === data.direccion_ip) == undefined) {
+                                            if (data.numero_serie != ' - ') {
+                                                // DISCRIMINACIÓN DE ELEMENTOS IGUALES NUMERO DE SERIE
+                                                if (duplicados2.find((b) => b.numero_serie === data.numero_serie) == undefined) {
+                                                    duplicados2.push(data);
+                                                }
+                                                else {
+                                                    data.observacion = '3';
+                                                }
                                             }
-                                            else {
-                                                data.observacion = '3';
+                                            if (data.direccion_mac != ' - ') {
+                                                // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION MAC
+                                                if (duplicados3.find((c) => c.direccion_mac === data.direccion_mac) == undefined) {
+                                                    duplicados3.push(data);
+                                                }
+                                                else {
+                                                    data.observacion = '4';
+                                                }
                                             }
+                                            duplicados1.push(data);
                                         }
-                                        if (data.direccion_mac != ' - ') {
-                                            // DISCRIMINACIÓN DE ELEMENTOS IGUALES DIRECCION MAC
-                                            if (duplicados3.find((c) => c.direccion_mac === data.direccion_mac) == undefined) {
-                                                duplicados3.push(data);
-                                            }
-                                            else {
-                                                data.observacion = '4';
-                                            }
+                                        else {
+                                            data.observacion = '2';
                                         }
-                                        duplicados1.push(data);
+                                        duplicados.push(data);
                                     }
                                     else {
-                                        data.observacion = '2';
+                                        data.observacion = '1';
                                     }
-                                    duplicados.push(data);
-                                }
-                                else {
-                                    data.observacion = '1';
                                 }
                             }
                             listDispositivos.push(data);
