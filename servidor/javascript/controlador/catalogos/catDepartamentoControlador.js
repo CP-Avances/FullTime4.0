@@ -1003,43 +1003,52 @@ class DepartamentoControlador {
         }
     }
     CargarPlantillaNivelesDep(req, res) {
-        try {
-            const plantilla = req.body;
-            console.log('datos departamento: ', plantilla);
-            var contador = 1;
-            var respuesta;
-            plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                console.log('data: ', data);
-                // Datos que se guardaran de la plantilla ingresada
-                const { fila, sucursal, departamento, nivel, depa_superior, sucursal_depa_superior, observacion } = data;
-                var validSucursal = yield database_1.default.query(`SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`, [sucursal.toUpperCase()]);
-                var validDeparta = yield database_1.default.query(`SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1`, [departamento.toUpperCase()]);
-                var validDepSuperior = yield database_1.default.query(`SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1`, [depa_superior.toUpperCase()]);
-                var validSucSuperior = yield database_1.default.query(`SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`, [sucursal_depa_superior.toUpperCase()]);
-                //Variables de id de almacenamiento
-                var id_sucursal = validSucursal.rows[0].id;
-                var id_departamento = validDeparta.rows[0].id;
-                var id_sucuDepSuperior = validDepSuperior.rows[0].id;
-                var id_depaDepSuperior = validSucSuperior.rows[0].id;
-                // Registro de los datos de contratos
-                const response = yield database_1.default.query(`INSERT INTO ed_niveles_departamento (id_sucursal, id_departamento, departamento, nivel, id_departamento_nivel, departamento_nombre_nivel, id_sucursal_departamento_nivel) 
+        return __awaiter(this, void 0, void 0, function* () {
+            const { plantilla, user_name, ip } = req.body;
+            let error = false;
+            for (const data of plantilla) {
+                try {
+                    const { fila, sucursal, departamento, nivel, depa_superior, sucursal_depa_superior, observacion } = data;
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    var validSucursal = yield database_1.default.query(`SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`, [sucursal.toUpperCase()]);
+                    var validDeparta = yield database_1.default.query(`SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1`, [departamento.toUpperCase()]);
+                    var validDepSuperior = yield database_1.default.query(`SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1`, [depa_superior.toUpperCase()]);
+                    var validSucSuperior = yield database_1.default.query(`SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`, [sucursal_depa_superior.toUpperCase()]);
+                    //Variables de id de almacenamiento
+                    var id_sucursal = validSucursal.rows[0].id;
+                    var id_departamento = validDeparta.rows[0].id;
+                    var id_sucuDepSuperior = validDepSuperior.rows[0].id;
+                    var id_depaDepSuperior = validSucSuperior.rows[0].id;
+                    // Registro de los datos de contratos
+                    const response = yield database_1.default.query(`INSERT INTO ed_niveles_departamento (id_sucursal, id_departamento, departamento, nivel, id_departamento_nivel, departamento_nombre_nivel, id_sucursal_departamento_nivel) 
             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
           `, [id_sucursal, id_departamento, departamento, nivel, id_sucuDepSuperior, depa_superior, id_depaDepSuperior]);
-                const [depaNivel] = response.rows;
-                if (contador === plantilla.length) {
-                    if (depaNivel) {
-                        return respuesta = res.status(200).jsonp({ message: 'ok' });
-                    }
-                    else {
-                        return respuesta = res.status(404).jsonp({ message: 'error' });
-                    }
+                    const [depaNivel] = response.rows;
+                    // INSERTAR AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ed_niveles_departamento',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(depaNivel),
+                        ip: ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                 }
-                contador = contador + 1;
-            }));
-        }
-        catch (error) {
-            return res.status(500).jsonp({ message: error });
-        }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    error = true;
+                }
+            }
+            if (error) {
+                return res.status(500).jsonp({ message: error });
+            }
+            return res.status(200).jsonp({ message: 'ok' });
+        });
     }
 }
 exports.DEPARTAMENTO_CONTROLADOR = new DepartamentoControlador();

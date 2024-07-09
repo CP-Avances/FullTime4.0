@@ -1167,18 +1167,17 @@ class DepartamentoControlador {
     }
   }
 
-  CargarPlantillaNivelesDep(req: Request, res: Response){
-    try {
-      const plantilla = req.body;
-      console.log('datos departamento: ', plantilla);
-      var contador = 1;
-      var respuesta: any;
+  public async CargarPlantillaNivelesDep(req: Request, res: Response){
+    const {plantilla, user_name, ip} = req.body;
+    let error: boolean = false;
 
-      plantilla.forEach(async (data: any) => {
-        console.log('data: ', data);
-        // Datos que se guardaran de la plantilla ingresada
+    for (const data of plantilla) {
+      try {
         const { fila, sucursal, departamento, nivel, depa_superior, sucursal_depa_superior, observacion } = data;
 
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+        
         var validSucursal = await pool.query(
           `SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1`
           ,[sucursal.toUpperCase()])
@@ -1210,21 +1209,33 @@ class DepartamentoControlador {
 
         const [depaNivel] = response.rows;
 
-        if (contador === plantilla.length) {
-          if (depaNivel) {
-            return respuesta = res.status(200).jsonp({ message: 'ok' })
-          } else {
-            return respuesta = res.status(404).jsonp({ message: 'error' })
-          }
-        }
+        // INSERTAR AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'ed_niveles_departamento',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: JSON.stringify(depaNivel),
+          ip: ip,
+          observacion: null
+        });
 
-        contador = contador + 1;
-
-      });
-
-    }catch(error){
-      return res.status(500).jsonp({message: error});
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        
+      } catch (error) {
+        // REVERTIR TRANSACCION
+        await pool.query('ROLLBACK');
+        error = true;
+        
+      }
     }
+
+    if (error) {
+      return res.status(500).jsonp({ message: error });
+    }
+
+    return res.status(200).jsonp({ message: 'ok' });
   }
 
 }
