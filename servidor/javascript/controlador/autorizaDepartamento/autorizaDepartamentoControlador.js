@@ -69,17 +69,18 @@ class AutorizaDepartamentoControlador {
                 const { id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
+                const respuesta = yield database_1.default.query(`
                 INSERT INTO ed_autoriza_departamento (id_departamento, id_empleado_cargo, estado, id_empleado, autorizar, preautorizar)
-                VALUES ($1, $2, $3, $4, $5, $6)
+                VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
                 `, [id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar]);
+                const [datosNuevos] = respuesta.rows;
                 // INSERTAR REGISTRO DE AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ed_autoriza_departamento',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{id_departamento: ${id_departamento}, id_empleado_cargo: ${id_empl_cargo}, estado: ${estado}, id_empleado: ${id_empleado}, autorizar: ${autorizar}, preautorizar: ${preautorizar}}`,
+                    datosNuevos: JSON.stringify(datosNuevos),
                     ip,
                     observacion: null
                 });
@@ -88,8 +89,7 @@ class AutorizaDepartamentoControlador {
                 return res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
-                console.log('error ', error);
-                // CANCELAR TRANSACCION
+                // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'Error al guardar registro.' });
             }
@@ -119,18 +119,19 @@ class AutorizaDepartamentoControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
-                yield database_1.default.query(`
+                const actualizacion = yield database_1.default.query(`
                 UPDATE ed_autoriza_departamento SET id_departamento = $1, id_empleado_cargo = $2, estado = $3, autorizar = $5, 
                     preautorizar = $6
-                WHERE id = $4
+                WHERE id = $4 RETURNING *
                 `, [id_departamento, id_empl_cargo, estado, id, autorizar, preautorizar]);
+                const [datosNuevos] = actualizacion.rows;
                 // INSERTAR REGISTRO DE AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'ed_autoriza_departamento',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datos),
-                    datosNuevos: `{id_departamento: ${id_departamento}, id_empl_cargo: ${id_empl_cargo}, estado: ${estado}, autorizar: ${autorizar}, preautorizar: ${preautorizar}}`,
+                    datosNuevos: JSON.stringify(datosNuevos),
                     ip,
                     observacion: null
                 });

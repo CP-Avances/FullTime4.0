@@ -201,6 +201,7 @@ class UsuarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { admin_comida, id_empleado, user_name, ip } = req.body;
+                const adminComida = (yield admin_comida.toLowerCase()) === 'si' ? true : false;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -220,16 +221,17 @@ class UsuarioControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'Registro no encontrado.' });
                 }
-                yield database_1.default.query(`
-        UPDATE eu_usuarios SET administra_comida = $1 WHERE id_empleado = $2
-        `, [admin_comida, id_empleado]);
+                const actualizacion = yield database_1.default.query(`
+        UPDATE eu_usuarios SET administra_comida = $1 WHERE id_empleado = $2 RETURNING *
+        `, [adminComida, id_empleado]);
+                const [datosNuevos] = actualizacion.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_usuarios',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{administra_comida: ${admin_comida}}`,
+                    datosNuevos: JSON.stringify(datosNuevos),
                     ip,
                     observacion: null
                 });
