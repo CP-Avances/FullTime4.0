@@ -744,100 +744,116 @@ class EmpleadoCargosControlador {
   }
 
 
-  public async CargarPlantilla_cargos(req: Request, res: Response): Promise<void> {
-    const plantilla = req.body;
-    var contador = 1;
-    plantilla.forEach(async (data: any) => {
-      // Datos que se guardaran de la plantilla ingresada
-      const { item, cedula, departamento, fecha_desde, fecha_hasta, sucursal, sueldo,
-        cargo, hora_trabaja, admini_depa} = data;
+  public async CargarPlantilla_cargos(req: Request, res: Response): Promise<any> {
+    const {plantilla, user_name, ip} = req.body;
+    let error: boolean = false;
 
-      const ID_EMPLEADO: any = await pool.query(
-        `
-        SELECT id FROM eu_empleados WHERE cedula = $1
-        `
-        , [cedula]);
-      const ID_CONTRATO: any = await pool.query(
-        `
-        SELECT id_contrato FROM datos_contrato_actual WHERE cedula = $1
-        `
-        , [cedula]);
-      const ID_DEPARTAMENTO: any = await pool.query(
-        `
-        SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
-        `
-        , [departamento.toUpperCase()]);
-      const ID_SUCURSAL: any = await pool.query(
-        `
-        SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
-        `
-        , [sucursal.toUpperCase()]);
-      const ID_TIPO_CARGO: any = await pool.query(
-        `
-        SELECT id FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
-        `
-        , [cargo.toUpperCase()]);
+    for (const data of plantilla) {
+      try {
 
-      console.log('id_empleado: ', ID_EMPLEADO.rows[0]);
-      console.log('depa: ', departamento.toUpperCase());
+        const { item, cedula, departamento, fecha_desde, fecha_hasta, sucursal, sueldo,
+          cargo, hora_trabaja, admini_depa} = data;
+  
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
 
-      var id_empleado = ID_EMPLEADO.rows[0].id;
-      var id_contrato = ID_CONTRATO.rows[0].id_contrato;
-      var id_departamento = ID_DEPARTAMENTO.rows[0].id;
-      var id_sucursal = ID_SUCURSAL.rows[0].id;
-      var id_cargo = ID_TIPO_CARGO.rows[0].id;
-      var admin_dep = false;
-
-      if(admini_depa.toLowerCase() == 'si'){
-          admin_dep = true;
-      }
-
-      console.log('id_empleado: ', id_empleado);
-      console.log('departamento: ', id_departamento);
-
-      /*
-      console.log('id_empleado: ', id_empleado);
-      console.log('id_contrato: ', id_contrato);
-      console.log('fecha inicio: ', fecha_inicio);
-      console.log('fecha final: ', fecha_final);
-      console.log('departamento: ', id_departamento);
-      console.log('sucursal: ', id_sucursal);
-      console.log('sueldo: ', sueldo);
-      console.log('hora_trabaja: ', hora_trabaja);
-      console.log('tipo cargo: ', id_cargo);
-      */
-
-      // Registro de los datos de contratos
-      const response: QueryResult = await pool.query(
-        `
-        INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal, 
-          sueldo, id_tipo_cargo, hora_trabaja, jefe) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
-        `
-        , [id_contrato, id_departamento, fecha_desde, fecha_hasta, id_sucursal, sueldo, id_cargo,
-          hora_trabaja, admin_dep]);
-
-      const [cargos] = response.rows;
-
-      await pool.query(
-        `
-        INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
-        VALUES ($1, $2, $3, $4, $5)
-        `
-        , [id_empleado, id_departamento, true, true, admin_dep])
-
-      console.log(contador,' == ', plantilla.length);
-      if (contador === plantilla.length) {
-        if (cargos) {
-          return res.status(200).jsonp({ message: 'ok' })
-        } else {
-          return res.status(404).jsonp({ message: 'error' })
+        const ID_EMPLEADO: any = await pool.query(
+          `
+          SELECT id FROM eu_empleados WHERE cedula = $1
+          `
+          , [cedula]);
+        const ID_CONTRATO: any = await pool.query(
+          `
+          SELECT id_contrato FROM datos_contrato_actual WHERE cedula = $1
+          `
+          , [cedula]);
+        const ID_DEPARTAMENTO: any = await pool.query(
+          `
+          SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
+          `
+          , [departamento.toUpperCase()]);
+        const ID_SUCURSAL: any = await pool.query(
+          `
+          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+          `
+          , [sucursal.toUpperCase()]);
+        const ID_TIPO_CARGO: any = await pool.query(
+          `
+          SELECT id FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+          `
+          , [cargo.toUpperCase()]);
+  
+  
+        let id_empleado = ID_EMPLEADO.rows[0].id;
+        let id_contrato = ID_CONTRATO.rows[0].id_contrato;
+        let id_departamento = ID_DEPARTAMENTO.rows[0].id;
+        let id_sucursal = ID_SUCURSAL.rows[0].id;
+        let id_cargo = ID_TIPO_CARGO.rows[0].id;
+        let admin_dep = false;
+  
+        if(admini_depa.toLowerCase() == 'si'){
+            admin_dep = true;
         }
+  
+        console.log('id_empleado: ', id_empleado);
+        console.log('departamento: ', id_departamento);
+
+        const response: QueryResult = await pool.query(
+          `
+          INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal, 
+            sueldo, id_tipo_cargo, hora_trabaja, jefe) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
+          `
+          , [id_contrato, id_departamento, fecha_desde, fecha_hasta, id_sucursal, sueldo, id_cargo,
+            hora_trabaja, admin_dep]);
+  
+        const [cargos] = response.rows;
+  
+        const response2 = await pool.query(
+          `
+          INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
+          VALUES ($1, $2, $3, $4, $5) RETURNING *
+          `
+          , [id_empleado, id_departamento, true, true, admin_dep]);
+
+        const [usuarioDep] = response2.rows;
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_empleado_cargos',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: JSON.stringify(cargos),
+          ip,
+          observacion: null
+        });
+
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'eu_usuario_departamento',
+          usuario: user_name,
+          accion: 'I',
+          datosOriginales: '',
+          datosNuevos: JSON.stringify(usuarioDep),
+          ip,
+          observacion: null
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        
+      } catch (error) {
+        // REVERTIR TRANSACCION
+        await pool.query('ROLLBACK');
+        error = true;      
       }
+    }
+    
+    if (error) {
+      return res.status(500).jsonp({ message: 'error' });
+    }
 
-      contador = contador + 1;
-
-    });
+    return res.status(200).jsonp({ message: 'ok' });
 
   }
 

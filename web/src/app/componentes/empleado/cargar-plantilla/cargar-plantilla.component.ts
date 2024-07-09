@@ -531,14 +531,27 @@ export class CargarPlantillaComponent implements OnInit{
 
   registroCargos() {
     if (this.listaCargosCorrectas.length > 0) {
-      this.restCa.subirArchivoExcelCargo(this.listaCargosCorrectas).subscribe(response => {
-        console.log('respuesta: ', response);
-        this.toastr.success('Operación exitosa.', 'Plantilla de Cargos importada.', {
-          timeOut: 3000,
-        });
-        window.location.reload();
-        this.archivoForm.reset();
-        this.nameFile = '';
+      const datos = {
+        plantilla: this.listaCargosCorrectas,
+        user_name: this.user_name,
+        ip: this.ip
+      }
+
+      this.restCa.subirArchivoExcelCargo(datos).subscribe({
+        next: (response) => {
+          this.toastr.success('Plantilla de Cargos importada.', 'Operación exitosa.', {
+            timeOut: 3000,
+          });
+          window.location.reload();
+          this.archivoForm.reset();
+          this.nameFile = '';
+        },
+        error: (error) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+          this.progreso = false;
+        }
       });
     } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
