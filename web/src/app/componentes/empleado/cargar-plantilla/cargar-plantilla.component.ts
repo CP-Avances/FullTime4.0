@@ -304,15 +304,29 @@ export class CargarPlantillaComponent implements OnInit{
 
   registroContratos() {
     if (this.listaContratosCorrectas.length > 0) {
-      this.restE.subirArchivoExcelContrato(this.listaContratosCorrectas).subscribe(response => {
-        console.log('respuesta: ', response);
-        this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
-          timeOut: 3000,
-        });
-        window.location.reload();
-        this.archivoForm.reset();
-        this.nameFile = '';
+      const datos = {
+        plantilla: this.listaContratosCorrectas,
+        user_name: this.user_name,
+        ip: this.ip
+      }
+
+      this.restE.subirArchivoExcelContrato(datos).subscribe({
+        next: (response) => {
+          this.toastr.success('Plantilla de Contratos importada.', 'Operación exitosa.', {
+            timeOut: 3000,
+          });
+          window.location.reload();
+          this.archivoForm.reset();
+          this.nameFile = '';
+        },
+        error: (error) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+          this.progreso = false;
+        }
       });
+
     } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,

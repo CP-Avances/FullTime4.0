@@ -884,16 +884,18 @@ class ContratoEmpleadoControlador {
 
     }
 
-    // TODO: revisar
-    public async CargarPlantilla_contrato(req: Request, res: Response): Promise<void> {
-        const plantilla = req.body;
-        console.log('datos contrato: ', plantilla);
-        var contador = 1;
-        plantilla.forEach(async (data: any) => {
-            console.log('data: ', data);
-            // Datos que se guardaran de la plantilla ingresada
+    public async CargarPlantilla_contrato(req: Request, res: Response): Promise<any> {
+        const {plantilla, user_name, ip} = req.body;
+        let error: boolean = false;
+
+        for (const data of plantilla) {
+            try {
+
             const { item, cedula, pais, regimen_la, modalida_la, fecha_desde, fecha_hasta,
                 control_asis, control_vaca } = data;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
 
             const ID_EMPLEADO: any = await pool.query(
                 `
@@ -912,35 +914,24 @@ class ContratoEmpleadoControlador {
                 , [modalida_la.toUpperCase()]);
 
             //Transformar el string en booleano
-            var vaca_controla: any;
+            let vaca_controla: any;
             if (control_vaca.toUpperCase() === 'SI') {
                 vaca_controla = true;
             } else {
                 vaca_controla = false;
             }
 
-            var asis_controla: any;
+            let asis_controla: any;
             if (control_asis.toUpperCase() === 'SI') {
                 asis_controla = true;
             } else {
                 asis_controla = false;
             }
 
-            var id_empleado = ID_EMPLEADO.rows[0].id;
-            var id_regimen = ID_REGIMEN.rows[0].id;
-            var id_tipo_contrato = ID_TIPO_CONTRATO.rows[0].id;
+            const id_empleado = ID_EMPLEADO.rows[0].id;
+            const id_regimen = ID_REGIMEN.rows[0].id;
+            const id_tipo_contrato = ID_TIPO_CONTRATO.rows[0].id;
 
-            console.log('id_empleado: ', id_empleado);
-            console.log('id_regimen: ', id_regimen);
-            console.log('id_tipo_contrato: ', id_tipo_contrato);
-            console.log('fecha inicio: ', fecha_desde);
-            console.log('fecha final: ', fecha_hasta);
-            console.log('vacaciones: ', vaca_controla);
-            console.log('asistencias: ', asis_controla);
-
-
-
-            // Registro de los datos de contratos
             const response: QueryResult = await pool.query(
                 `
                 INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
@@ -952,18 +943,32 @@ class ContratoEmpleadoControlador {
 
             const [contrato] = response.rows;
 
-            console.log(contador, ' == ', plantilla.length);
-            if (contador === plantilla.length) {
-                if (contrato) {
-                    return res.status(200).jsonp({ message: 'ok' })
-                } else {
-                    return res.status(404).jsonp({ message: 'error' })
-                }
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'eu_empleado_contratos',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(contrato),
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                error = true;
             }
+        }
 
-            contador = contador + 1;
+        if (error) {
+            return res.status(500).jsonp({ message: 'error' });
+          }
+    
+          return res.status(200).jsonp({ message: 'ok' });
 
-        });
     }
 
 }
