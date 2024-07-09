@@ -326,15 +326,15 @@ export class ListarRelojesComponent implements OnInit {
     let arrayObservacion = observacion.split(" ");
     if (observacion == 'Registro duplicado (código)' ||
       observacion == 'Registro duplicado (dirección IP)' ||
-      observacion == 'Registro duplicado (numero de serie)' ||
-      observacion == 'Registro duplicado (dirección mac)'
+      observacion == 'Registro duplicado (número de serie)' ||
+      observacion == 'Registro duplicado (dirección MAC)'
     ) {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
     } else if (observacion == 'Ya existe en el sistema' || 
-      observacion == 'Número de serie ya existe en la base' ||
-      observacion == 'Dirección MAC ya existe en la base'
+      observacion == 'Número de serie ya existe en el sistema' ||
+      observacion == 'Dirección MAC ya existe en el sistema'
     ) {
       return 'rgb(239, 203, 106)';
     } else if (observacion == 'Establecimiento no existe en el sistema' ||

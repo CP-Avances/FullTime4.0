@@ -203,11 +203,12 @@ export const FormatearHora = async function (hora: string) {
   return valor;
 }
 
+// METODO PARA BUSCAR PARAMETRO FECHA (1)
 export const BuscarFecha = async function () {
   return {
     fecha: await pool.query(
       `
-      SELECT descripcion FROM ep_detalle_parametro WHERE id_parametro = 25
+      SELECT descripcion FROM ep_detalle_parametro WHERE id_parametro = 1
       `
     ).then(result => {
       if (result.rowCount != 0) {
@@ -220,11 +221,12 @@ export const BuscarFecha = async function () {
   }
 }
 
+// METODO PARA BUSCAR PARAMETRO HORA (2)
 export const BuscarHora = async function () {
   return {
     hora: await pool.query(
       `
-      SELECT descripcion FROM ep_detalle_parametro WHERE id_parametro = 26
+      SELECT descripcion FROM ep_detalle_parametro WHERE id_parametro = 2
       `
     ).then(result => {
       if (result.rowCount != 0) {

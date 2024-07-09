@@ -264,6 +264,7 @@ class TimbresControlador {
 
     // METODO DE REGISTRO DE TIMBRES PERSONALES
     public async CrearTimbreWeb(req: Request, res: Response): Promise<any> {
+        console.log('ingresa aqui timbre personal')
         try {
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
                 ubicacion, user_name, ip } = req.body;
@@ -294,7 +295,7 @@ class TimbresControlador {
                 `
                 INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, longitud, 
                     codigo, fecha_hora_timbre_servidor, id_reloj, ubicacion, dispositivo_timbre)
-                VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id
+                VALUES(to_timestamp($1, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $2, $3, $4, $5, $6, $7, to_timestamp($8, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $9, $10, $11) RETURNING id
                 `,
                 [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
                     fecha_hora, id_reloj, ubicacion, 'APP_WEB'],
@@ -321,6 +322,7 @@ class TimbresControlador {
             )
 
         } catch (error) {
+            console.log('error ------- ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             res.status(500).jsonp({ message: error });
@@ -366,7 +368,8 @@ class TimbresControlador {
                 `
                 INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, 
                     longitud, codigo, id_reloj, dispositivo_timbre, fecha_hora_timbre_servidor) 
-                VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, 
+                to_timestamp($10, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
                 `
                 , [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
                     id_reloj, 'APP_WEB', servidor]
@@ -454,7 +457,7 @@ class TimbresControlador {
         const TIMBRES_NOTIFICACION = await pool.query(
             `
             SELECT id, to_char(fecha_hora, 'yyyy-MM-dd HH24:mi:ss') AS fecha_hora, id_empleado_envia, visto, 
-                descripcion, id_timbre, tipo, id_empleado_recibe
+                descripcion, mensaje, id_timbre, tipo, id_empleado_recibe
             FROM ecm_realtime_timbres WHERE id_empleado_recibe = $1 
             ORDER BY (visto is FALSE) DESC, id DESC LIMIT 20
             `
@@ -472,14 +475,15 @@ class TimbresControlador {
                                 return ele.rows[0].nombre + ' ' + ele.rows[0].apellido
                             })
                         return {
-                            create_at: obj.fecha_hora,
-                            descripcion: obj.descripcion,
                             id_receives_empl: obj.id_empleado_recibe,
-                            visto: obj.visto,
+                            descripcion: obj.descripcion,
+                            create_at: obj.fecha_hora,
                             id_timbre: obj.id_timbre,
                             empleado: nombre,
+                            mensaje: obj.mensaje,
+                            visto: obj.visto,
+                            tipo: obj.tipo,
                             id: obj.id,
-                            tipo: obj.tipo
                         }
                     }));
                 }

@@ -36,7 +36,7 @@ export class ListarCoordenadasComponent implements OnInit {
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
-  
+
   tipoPermiso: any = [];
   empleado: any = [];
   idEmpleado: number;
@@ -144,7 +144,7 @@ export class ListarCoordenadasComponent implements OnInit {
   CrearParametro(): void {
     this.ventana.open(CrearCoordenadasComponent,
       { width: '400px' }).afterClosed().subscribe(item => {
-        if(item){
+        if (item) {
           this.VerDetallesCoordenadas(item);
         }
       });
@@ -154,7 +154,7 @@ export class ListarCoordenadasComponent implements OnInit {
   AbrirEditar(datos: any): void {
     this.ventana.open(EditarCoordenadasComponent,
       { width: '400px', data: { ubicacion: datos, actualizar: false } }).afterClosed().subscribe(item => {
-        if(item){
+        if (item) {
           this.VerDetallesCoordenadas(item);
         }
       });
@@ -166,9 +166,9 @@ export class ListarCoordenadasComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip
     };
-    this.restU.EliminarCoordenadas(id,datos).subscribe((res: any) => {
+    this.restU.EliminarCoordenadas(id, datos).subscribe((res: any) => {
       if (res.message === 'false') {
-        this.toastr.warning('No es posible eliminar registro.', 'Verificar dependencias.', {
+        this.toastr.warning('Existen datos relacionados con este registro.', 'No fue posible eliminar.', {
           timeOut: 6000,
         });
       }

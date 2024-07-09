@@ -697,6 +697,7 @@ export class ComunicadosComponent implements OnInit {
               });
             }
             else {
+            //console.log('ingresa a ver correo')
               this.EnviarCorreo(this.info_correo, form);
             }
             this.LimpiarFormulario();
@@ -743,12 +744,14 @@ export class ComunicadosComponent implements OnInit {
     let mensaje = {
       id_empl_envia: empleado_envia,
       id_empl_recive: empleado_recive,
-      mensaje: form.tituloForm + '; ' + form.mensajeForm,
+      descripcion: form.tituloForm,
+      mensaje: form.mensajeForm,
       tipo: 6,  // ES EL TIPO DE NOTIFICACION - COMUNICADOS
       user_name: this.user_name,
       ip: this.ip
     }
     this.realTime.EnviarMensajeGeneral(mensaje).subscribe(res => {
+      //console.log('ver res noti ', res)
       this.realTime.RecibirNuevosAvisos(res.respuesta);
     })
   }
@@ -869,9 +872,9 @@ export class ComunicadosComponent implements OnInit {
   // METODO PARA LEER NUMERO DE CORREOS PERMITIDOS
   correos: number = 0;
   BuscarParametro() {
-    // id_tipo_parametro LIMITE DE CORREO = 24
+    // id_tipo_parametro LIMITE DE CORREO = 13
     let datos: any = [];
-    this.restP.ListarDetalleParametros(24).subscribe(
+    this.restP.ListarDetalleParametros(13).subscribe(
       res => {
         datos = res;
         if (datos.length != 0) {

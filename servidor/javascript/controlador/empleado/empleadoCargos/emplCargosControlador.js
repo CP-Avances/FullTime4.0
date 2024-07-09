@@ -402,18 +402,22 @@ class EmpleadoCargosControlador {
                                             data.observacion = 'El sueldo es incorrecto';
                                         }
                                         else {
-                                            if ((0, moment_1.default)(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) { }
+                                            if ((0, moment_1.default)(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) {
+                                                if (data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no') {
+                                                    data.observacion = 'Valor de Jefe incoreccto';
+                                                }
+                                            }
                                             else {
                                                 data.observacion = 'Formato horas invalido  (HH:mm:ss)';
                                             }
                                         }
                                     }
                                     else {
-                                        data.observacion = 'Formato de fecha final incorrecto (YYYY-MM-DD)';
+                                        data.observacion = 'Formato de fecha hasta incorrecto (YYYY-MM-DD)';
                                     }
                                 }
                                 else {
-                                    data.observacion = 'Formato de fecha inicio incorrecto (YYYY-MM-DD)';
+                                    data.observacion = 'Formato de fecha desde incorrecto (YYYY-MM-DD)';
                                 }
                             }
                         }
@@ -444,11 +448,11 @@ class EmpleadoCargosControlador {
                         }
                         if (FECHA_DESDE == undefined) {
                             data.fecha_desde = 'No registrado';
-                            data.observacion = 'Fecha inicio ' + data.observacion;
+                            data.observacion = 'Fecha desde ' + data.observacion;
                         }
                         if (FECHA_HASTA == undefined) {
                             data.fecha_hasta = 'No registrado';
-                            data.observacion = 'Fecha final ' + data.observacion;
+                            data.observacion = 'Fecha hasta ' + data.observacion;
                         }
                         if (SUCURSAL == undefined) {
                             data.sucursal = 'No registrado';
@@ -464,10 +468,11 @@ class EmpleadoCargosControlador {
                         }
                         if (HORA_TRABAJA == undefined) {
                             data.hora_trabaja = 'No registrado';
-                            data.observacion = 'Hora trabaja ' + data.observacion;
+                            data.observacion = 'Hora trabajo ' + data.observacion;
                         }
                         if (JEFE == undefined) {
                             data.admini_depa = 'No registrado';
+                            data.observacion = 'Jefe ' + data.observacion;
                         }
                         if (CEDULA == undefined) {
                             data.cedula = 'No registrado';
@@ -487,16 +492,25 @@ class EmpleadoCargosControlador {
                                             // Verificar si la variable tiene el formato de fecha correcto con moment
                                             if (data.fecha_hasta != 'No registrado') {
                                                 if ((0, moment_1.default)(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
-                                                    //Verifica el valor del suelo que sea solo numeros
-                                                    if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
-                                                        data.observacion = 'El sueldo es incorrecto';
-                                                    }
-                                                    else 
-                                                    //Verficar formato de horas
-                                                    if (data.hora_trabaja != 'No registrado') {
-                                                        if ((0, moment_1.default)(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) { }
+                                                    if (data.sueldo != 'No registrado') {
+                                                        //Verifica el valor del suelo que sea solo numeros
+                                                        if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
+                                                            data.observacion = 'El sueldo es incorrecto';
+                                                        }
                                                         else {
-                                                            data.observacion = 'Formato horas invalido  (HH:mm:ss)';
+                                                            //Verficar formato de horas
+                                                            if (data.hora_trabaja != 'No registrado') {
+                                                                if ((0, moment_1.default)(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) {
+                                                                    if (data.admini_depa != 'No registrado') {
+                                                                        if (data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no') {
+                                                                            data.observacion = 'Valor de Jefe incoreccto';
+                                                                        }
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    data.observacion = 'Formato horas invalido  (HH:mm:ss)';
+                                                                }
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -543,8 +557,8 @@ class EmpleadoCargosControlador {
                                     if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
                                         var VERFICAR_CARGO = yield database_1.default.query(`SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1`, [valor.cargo.toUpperCase()]);
                                         if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                                            if ((0, moment_1.default)(valor.fecha_inicio).format('YYYY-MM-DD') >= (0, moment_1.default)(valor.fecha_final).format('YYYY-MM-DD')) {
-                                                valor.observacion = 'La fecha de inicio no puede ser mayor o igual a la fecha salida';
+                                            if ((0, moment_1.default)(valor.fecha_desde).format('YYYY-MM-DD') >= (0, moment_1.default)(valor.fecha_hasta).format('YYYY-MM-DD')) {
+                                                valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta';
                                             }
                                             else {
                                                 const fechaRango = yield database_1.default.query(`

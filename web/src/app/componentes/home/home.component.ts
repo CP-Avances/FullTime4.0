@@ -70,8 +70,8 @@ export class HomeComponent implements OnInit {
 
     this.VerEmpleado(this.formato_fecha)
 
-    // id_tipo_parametro Formato fecha = 25
-    this.parametro.ListarDetalleParametros(25).subscribe(
+    // id_tipo_parametro Formato fecha = 1
+    this.parametro.ListarDetalleParametros(1).subscribe(
       res => {
         this.formato_fecha = res[0].descripcion;
         this.FormatearFechas(this.formato_fecha);
@@ -100,7 +100,7 @@ export class HomeComponent implements OnInit {
       if (data[0].imagen != null) {
         this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
         this.restEmpleado.obtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
-          console.log('ver imagen data ', data)
+          //console.log('ver imagen data ', data)
           if (data.imagen != 0) {
             this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
           }

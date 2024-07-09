@@ -451,17 +451,21 @@ class EmpleadoCargosControlador {
                   if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
                     data.observacion = 'El sueldo es incorrecto';
                   }else{
-                      if (moment(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) { } else {
+                      if (moment(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) { 
+                        if(data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no'){
+                          data.observacion = 'Valor de Jefe incoreccto';
+                        }
+                      } else {
                         data.observacion = 'Formato horas invalido  (HH:mm:ss)';
                       }
                   }
 
                 } else {
-                  data.observacion = 'Formato de fecha final incorrecto (YYYY-MM-DD)';
+                  data.observacion = 'Formato de fecha hasta incorrecto (YYYY-MM-DD)';
                 }
 
               } else {
-                data.observacion = 'Formato de fecha inicio incorrecto (YYYY-MM-DD)';
+                data.observacion = 'Formato de fecha desde incorrecto (YYYY-MM-DD)';
               }
               
             }
@@ -491,11 +495,11 @@ class EmpleadoCargosControlador {
           }
           if (FECHA_DESDE == undefined) {
             data.fecha_desde = 'No registrado';
-            data.observacion = 'Fecha inicio ' + data.observacion;
+            data.observacion = 'Fecha desde ' + data.observacion;
           }
           if (FECHA_HASTA == undefined) {
             data.fecha_hasta = 'No registrado';
-            data.observacion = 'Fecha final ' + data.observacion;
+            data.observacion = 'Fecha hasta ' + data.observacion;
           }
           if (SUCURSAL == undefined) {
             data.sucursal = 'No registrado';
@@ -511,10 +515,11 @@ class EmpleadoCargosControlador {
           }
           if (HORA_TRABAJA == undefined) {
             data.hora_trabaja = 'No registrado';
-            data.observacion = 'Hora trabaja ' + data.observacion;
+            data.observacion = 'Hora trabajo ' + data.observacion;
           }
           if (JEFE == undefined) {
             data.admini_depa = 'No registrado';
+            data.observacion = 'Jefe ' + data.observacion;
           }
   
           if (CEDULA == undefined) {
@@ -535,16 +540,28 @@ class EmpleadoCargosControlador {
                     if (data.fecha_hasta != 'No registrado') {
                       if (moment(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) { 
 
-                        //Verifica el valor del suelo que sea solo numeros
-                        if(typeof data.sueldo != 'number' && isNaN(data.sueldo)){
-                          data.observacion = 'El sueldo es incorrecto';
-                        }else
-                          //Verficar formato de horas
-                          if (data.hora_trabaja != 'No registrado') {
-                            if (moment(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) { } else {
-                              data.observacion = 'Formato horas invalido  (HH:mm:ss)';
+                        if(data.sueldo != 'No registrado'){
+                          //Verifica el valor del suelo que sea solo numeros
+                          if(typeof data.sueldo != 'number' && isNaN(data.sueldo)){
+                            data.observacion = 'El sueldo es incorrecto';
+                          }else{
+                            //Verficar formato de horas
+                            if (data.hora_trabaja != 'No registrado') {
+                              if (moment(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) { 
+
+                                if(data.admini_depa != 'No registrado'){
+                                  if(data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no'){
+                                    data.observacion = 'Valor de Jefe incoreccto';
+                                  }
+                                }
+
+                              } else {
+                                data.observacion = 'Formato horas invalido  (HH:mm:ss)';
+                              }
                             }
                           }
+                        }
+                        
 
                       } else {
                         data.observacion = 'Formato de fecha hasta incorrecto (YYYY-MM-DD)';
@@ -616,10 +633,9 @@ class EmpleadoCargosControlador {
                             , [valor.cargo.toUpperCase()])
                             if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
 
-                              if(moment(valor.fecha_inicio).format('YYYY-MM-DD') >= moment(valor.fecha_final).format('YYYY-MM-DD')){
-                                valor.observacion = 'La fecha de inicio no puede ser mayor o igual a la fecha salida'
+                              if(moment(valor.fecha_desde).format('YYYY-MM-DD') >= moment(valor.fecha_hasta).format('YYYY-MM-DD')){
+                                valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta'
                               }else{
-
                                   const fechaRango: any = await pool.query(
                                   `
                                   SELECT id FROM eu_empleado_cargos 

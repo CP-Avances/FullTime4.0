@@ -175,13 +175,31 @@ class ContratoEmpleadoControlador {
     BuscarContratoEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
-            const CONTRATO_EMPLEADO_REGIMEN = yield database_1.default.query(`
+            const CONTRATO_EMPLEADO = yield database_1.default.query(`
             SELECT ec.id, ec.fecha_ingreso, ec.fecha_salida 
             FROM eu_empleado_contratos AS ec
             WHERE ec.id_empleado = $1 ORDER BY ec.id ASC
             `, [id_empleado]);
-            if (CONTRATO_EMPLEADO_REGIMEN.rowCount != 0) {
-                return res.jsonp(CONTRATO_EMPLEADO_REGIMEN.rows);
+            if (CONTRATO_EMPLEADO.rowCount != 0) {
+                return res.jsonp(CONTRATO_EMPLEADO.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
+    // METODO PARA CONSULTAR CONTRATOS A EXCEPCION DEL QUE SE ESTA EDITANDO
+    BuscarContratoEmpleadoEditar(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado, id_contrato } = req.body;
+            const CONTRATO_EMPLEADO = yield database_1.default.query(`
+                SELECT ec.id, ec.fecha_ingreso, ec.fecha_salida 
+                FROM eu_empleado_contratos AS ec
+                WHERE ec.id_empleado = $1 AND NOT ec.id = $2 
+                ORDER BY ec.id ASC
+                `, [id_empleado, id_contrato]);
+            if (CONTRATO_EMPLEADO.rowCount != 0) {
+                return res.jsonp(CONTRATO_EMPLEADO.rows);
             }
             else {
                 return res.status(404).jsonp({ text: 'Registro no encontrado.' });
@@ -599,7 +617,7 @@ class ContratoEmpleadoControlador {
                         }
                         if (MODALIDAD_LABORAL == undefined) {
                             data.modalida_la = 'No registrado';
-                            data.observacion = 'Modalida laboral ' + data.observacion;
+                            data.observacion = 'Modalidad laboral ' + data.observacion;
                         }
                         if (FECHA_DESDE == undefined) {
                             data.fecha_desde = 'No registrado';
@@ -637,12 +655,12 @@ class ContratoEmpleadoControlador {
                                                 if ((0, moment_1.default)(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
                                                     if (data.control_vaca != 'No registrado') {
                                                         if (data.control_vaca.toUpperCase() != 'NO' && data.control_vaca.toUpperCase() != 'SI') {
-                                                            data.observacion = 'El control de vacaiones es incorrecto';
+                                                            data.observacion = 'Control de vacaciones es incorrecto';
                                                         }
                                                         else {
                                                             if (data.control_asis != 'No registrado') {
                                                                 if (data.control_asis.toUpperCase() != 'NO' && data.control_asis.toUpperCase() != 'SI') {
-                                                                    data.observacion = 'El control de asistencias es incorrecto';
+                                                                    data.observacion = 'Control de asistencia es incorrecto';
                                                                 }
                                                             }
                                                         }

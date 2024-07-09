@@ -130,7 +130,7 @@ export class EmpleadoService {
     };
     return this.http.request('delete', url, httpOtions).pipe(
       catchError(error => {
-        return of({ error: true, message: error.error.message, status: error.status});
+        return of({ error: true, message: error.error.message, status: error.status });
       })
     );
   }
@@ -220,6 +220,11 @@ export class EmpleadoService {
   // BUSCAR CONTRATOS POR ID DE EMPLEADO
   BuscarContratosEmpleado(id: number) {
     return this.http.get<any>(`${environment.url}/contratoEmpleado/contrato-empleado/${id}`);
+  }
+
+  // BUSCAR CONTRATOS POR ID DE EMPLEADO EXCLUYENDO CONTRATO A EDITAR
+  BuscarContratosEmpleadoEditar(data: any) {
+    return this.http.post<any>(`${environment.url}/contratoEmpleado/contrato-empleado-editar`, data);
   }
 
   // EDITAR DATOS DE CONTRATO

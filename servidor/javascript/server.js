@@ -96,10 +96,10 @@ var io;
 class Servidor {
     constructor() {
         this.app = (0, express_1.default)();
+        this.app.use((0, cors_1.default)());
         this.configuracion();
         this.rutas();
         this.server = (0, http_1.createServer)(this.app);
-        this.app.use((0, cors_1.default)());
         io = require('socket.io')(this.server, {
             cors: {
                 origin: '*',
@@ -217,9 +217,8 @@ class Servidor {
             next();
         });
         io.on('connection', (socket) => {
-            console.log('Connected client on port %s.', this.app.get('puerto'));
+            console.log('Conexion con el socket ', this.app.get('puerto'));
             socket.on("nueva_notificacion", (data) => {
-                //--console.log('ver data que llega noti ', data)
                 let data_llega = {
                     id: data.id,
                     id_send_empl: data.id_empleado_envia,
@@ -234,12 +233,12 @@ class Servidor {
                     tipo: data.tipo,
                     usuario: data.usuario
                 };
-                //--console.log('server', data_llega);
+                //console.log('server', data_llega);
                 socket.broadcast.emit('recibir_notificacion', data_llega);
                 socket.emit('recibir_notificacion', data_llega);
             });
             socket.on("nuevo_aviso", (data) => {
-                //--console.log('ver data que llega aviso ', data)
+                //console.log('ver aviso .......', data);
                 let data_llega = {
                     id: data.id,
                     create_at: data.fecha_hora,
@@ -247,11 +246,12 @@ class Servidor {
                     id_receives_empl: data.id_empleado_recibe,
                     visto: data.visto,
                     descripcion: data.descripcion,
+                    mensaje: data.mensaje,
                     id_timbre: data.id_timbre,
                     tipo: data.tipo,
                     usuario: data.usuario
                 };
-                //--console.log('server aviso .......', data_llega);
+                //console.log('server aviso .......', data_llega);
                 socket.broadcast.emit('recibir_aviso', data_llega);
                 socket.emit('recibir_aviso', data_llega);
             });

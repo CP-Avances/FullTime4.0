@@ -91,8 +91,8 @@ export class VerVacacionComponent implements OnInit {
   BuscarParametro() {
     var f = moment();
     this.fechaActual = f.format('YYYY-MM-DD');
-    // id_tipo_parametro Formato fecha = 25
-    this.parametro.ListarDetalleParametros(25).subscribe(
+    // id_tipo_parametro Formato fecha = 1
+    this.parametro.ListarDetalleParametros(1).subscribe(
       res => {
         this.formato_fecha = res[0].descripcion;
         this.BuscarDatos(this.formato_fecha);

@@ -55,24 +55,24 @@ export class CargarPlantillaComponent {
 
   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
   ManejarPaginaMulti(e: PageEvent, tipo: string) {
-    if(tipo == 'depaNivel'){
+    if (tipo == 'depaNivel') {
       this.tamanio_paginaDepaNivel = e.pageSize;
       this.numero_paginaDepaNivel = e.pageIndex + 1
-    }else if(tipo == 'contrato'){
+    } else if (tipo == 'contrato') {
       this.tamanio_paginaMul = e.pageSize;
       this.numero_paginaMul = e.pageIndex + 1
-    }else if(tipo == 'cargo'){
+    } else if (tipo == 'cargo') {
       this.tamanio_paginaMulCargo = e.pageSize;
       this.numero_paginaMulCargo = e.pageIndex + 1
     }
-    
+
   }
 
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
     //NIVELES DEPARTAMENTO
     this.DatosNivelesDep = [];
-   
+
     //CONTRATOS
     this.DatosContrato = [];
     this.archivoSubido = [];
@@ -94,14 +94,14 @@ export class CargarPlantillaComponent {
   mostrarbtnsubir: boolean = false;
 
 
-   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS NIVELES DE DEPARTAMENTO DEL ARCHIVO EXCEL
-     /** ************************************************************************************************************* **
-   ** **                       TRATAMIENTO DE PLANTILLA DE NIVELES DE DEPARTAMENTO                               ** **
-   ** ************************************************************************************************************* **/
-   DatosNivelesDep: any
-   listaNivelesCorrectas: any = [];
-   messajeExcel: string = '';
-   RevisarplantillaNiveles() {
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS NIVELES DE DEPARTAMENTO DEL ARCHIVO EXCEL
+  /** ************************************************************************************************************* **
+** **                       TRATAMIENTO DE PLANTILLA DE NIVELES DE DEPARTAMENTO                               ** **
+** ************************************************************************************************************* **/
+  DatosNivelesDep: any
+  listaNivelesCorrectas: any = [];
+  messajeExcel: string = '';
+  RevisarplantillaNiveles() {
     this.listaNivelesCorrectas = [];
     this.DatosNivelesDep = [];
     let formData = new FormData();
@@ -147,20 +147,20 @@ export class CargarPlantillaComponent {
     }, () => {
       this.progreso = false;
     });
-   }
+  }
 
-   RegistrarDepaNiveles(){
+  RegistrarDepaNiveles() {
     if (this.listaNivelesCorrectas.length > 0) {
       this.restDep.subirDepaNivel(this.listaNivelesCorrectas).subscribe(response => {
         console.log('respuesta: ', response);
-        this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
+        this.toastr.success('Operación exitosa.', 'Plantilla de Nivel departamentos importada.', {
           timeOut: 3000,
         });
         window.location.reload();
         this.archivoForm.reset();
         this.nameFile = '';
       });
-    }else{
+    } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
       });
@@ -168,9 +168,9 @@ export class CargarPlantillaComponent {
       this.nameFile = '';
     }
 
-   }
+  }
 
-  
+
 
   /** ************************************************************************************************************* **
    ** **                       TRATAMIENTO DE PLANTILLA DE CONTRATOS DE EMPLEADOS                                ** **
@@ -190,10 +190,10 @@ export class CargarPlantillaComponent {
       if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
-        console.log('niveles: ',tipo);
-        if(tipo == 'niveles'){
+        console.log('niveles: ', tipo);
+        if (tipo == 'niveles') {
           this.RevisarplantillaNiveles();
-        }else{
+        } else {
           this.Revisarplantilla();
         }
       } else {
@@ -272,12 +272,12 @@ export class CargarPlantillaComponent {
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          if (this.listaContratosCorrectas.length > 0){
+          if (this.listaContratosCorrectas.length > 0) {
             this.registroContratos();
-          }else if(this.listaNivelesCorrectas.length > 0){
+          } else if (this.listaNivelesCorrectas.length > 0) {
             this.RegistrarDepaNiveles();
           }
-          
+
         }
       });
   }
@@ -312,20 +312,22 @@ export class CargarPlantillaComponent {
       return 'rgb(159, 221, 154)';
     } else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
-    } else if (observacion == 'Sucursal no existe en el sistema' || 
+    } else if (observacion == 'Sucursal no existe en el sistema' ||
       observacion == 'Departamento no existe en el sistema' ||
       observacion == 'Departamento superior no existe en el sistema' ||
-      observacion == 'Sucursal superior no existe en el sistema' 
+      observacion == 'Sucursal superior no existe en el sistema'
     ) {
       return 'rgb(255, 192, 203)';
-    } else if (observacion == 'Departamento no pertenece al establecimiento' || 
+    } else if (observacion == 'Departamento no pertenece al establecimiento' ||
       observacion == 'Departamento no pertenece a la sucursal' ||
-      observacion == 'El nivel no puede ser mayor a 5'
+      observacion == 'El nivel no puede ser 0 ni mayor a 5' ||
+      observacion == 'faltan niveles por registrar' ||
+      observacion == 'Deparatemto superior ya se encuentra configurado'
     ) {
       return 'rgb(238, 34, 207)';
-    }else if (observacion == 'Nivel incorrecto (solo números)') {
+    } else if (observacion == 'Nivel incorrecto (solo números)') {
       return 'rgb(222, 162, 73)';
-    }else {
+    } else {
       return 'rgb(242, 21, 21)';
     }
   }
@@ -335,41 +337,47 @@ export class CargarPlantillaComponent {
     let arrayObservacion = observacion.split(" ");
     if (observacion == 'Fecha duplicada') {
       return 'rgb(170, 129, 236)';
-    } else if (observacion == 'ok') {
+    }
+    else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Cédula no existe en el sistema' ||
+    }
+    else if (observacion == 'Cédula no existe en el sistema' ||
       observacion == 'Cargo no existe en el sistema' ||
       observacion == 'Departamento no existe en el sistema' ||
       observacion == 'Sucursal no existe en el sistema' ||
       observacion == 'Cédula no tiene registrado un contrato') {
       return 'rgb(255, 192, 203)';
-    } else if (observacion == 'Registro duplicado (cédula)') {
+    }
+    else if (observacion == 'Registro duplicado (cédula)') {
       return 'rgb(156, 214, 255)';
-    } else if (arrayObservacion[0] == 'Formato') {
+    }
+    else if (arrayObservacion[0] == 'Formato') {
       return 'rgb(222, 162, 73)';
-    } else if (observacion == 'País no existe en el sistema' ||
+    }
+    else if (observacion == 'País no existe en el sistema' ||
       observacion == 'Régimen Laboral no existe en el sistema' ||
-      observacion == 'Modalidad Laboral no existe en el sistema'
-    ) {
+      observacion == 'Modalidad Laboral no existe en el sistema') {
       return 'rgb(255, 192, 203)';
-    } else if (observacion == 'Existe un cargo vigente en esas fechas' ||
+    }
+    else if (observacion == 'Existe un cargo vigente en esas fechas' ||
       observacion == 'Existe un contrato vigente en esas fechas') {
       return 'rgb(239, 203, 106)';
-    } else if (observacion == 'País no corresponde con el Régimen Laboral' ||
-      observacion == 'La fecha de desde no puede ser mayor o igual a la fecha hasta' 
-    ) {
+    }
+    else if (observacion == 'País no corresponde con el Régimen Laboral' ||
+      observacion == 'La fecha de desde no puede ser mayor o igual a la fecha hasta') {
       return 'rgb(238, 34, 207)';
-    } else if (arrayObservacion[1] + ' ' + arrayObservacion[2] == 'no registrado') {
+    }
+    else if (arrayObservacion[1] + ' ' + arrayObservacion[2] == 'no registrado') {
       return 'rgb(242, 21, 21)';
-    } else if (observacion == 'Regimen laboral no registrado' ||
-      observacion == 'Modalidad laboral no registrado'
-    ) {
+    }
+    else if (arrayObservacion[2] + ' ' + arrayObservacion[3] == 'no registrado') {
       return 'rgb(242, 21, 21)';
-    }else if(observacion == 'El control de asistencias es incorrecto' ||
-      'El control de vacaiones es incorrecto'
-    ){
+    }
+    else if (observacion == 'Control de asistencia es incorrecto' ||
+      'Control de vacaciones es incorrecto') {
       return 'rgb(222, 162, 73)';
-    } else {
+    }
+    else {
       return 'rgb(242, 21, 21)';
     }
   }
@@ -491,7 +499,7 @@ export class CargarPlantillaComponent {
     if (this.listaCargosCorrectas.length > 0) {
       this.restCa.subirArchivoExcelCargo(this.listaCargosCorrectas).subscribe(response => {
         console.log('respuesta: ', response);
-        this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
+        this.toastr.success('Operación exitosa.', 'Plantilla de Cargos importada.', {
           timeOut: 3000,
         });
         window.location.reload();

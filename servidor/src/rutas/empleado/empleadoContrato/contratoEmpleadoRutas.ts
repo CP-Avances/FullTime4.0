@@ -86,6 +86,8 @@ class DepartamentoRutas {
         this.router.get('/documentos/:docs/contrato/:id', CONTRATO_EMPLEADO_CONTROLADOR.ObtenerDocumento);
         // METODO PARA BUSCAR CONTRATOS POR ID DE EMPLEADO
         this.router.get('/contrato-empleado/:id_empleado', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.BuscarContratoEmpleado);
+        // METODO PARA BUSCAR CONTRATOS POR ID DE EMPLEADO EXCLUYENDO CONTRATO A EDITAR
+        this.router.post('/contrato-empleado-editar', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.BuscarContratoEmpleadoEditar);
         // EDITAR DATOS DE CONTRATO
         this.router.put('/:id/actualizar', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EditarContrato);
         // ELIMINAR DOCUMENTO DE CONTRATO BASE DE DATOS - SERVIDOR

@@ -78,8 +78,8 @@ export class ListarCiudadFeriadosComponent implements OnInit {
 
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 25
-    this.parametro.ListarDetalleParametros(25).subscribe(
+    // id_tipo_parametro Formato fecha = 1
+    this.parametro.ListarDetalleParametros(1).subscribe(
       res => {
         this.formato_fecha = res[0].descripcion;
         this.BuscarDatosFeriado(this.idFeriado, this.formato_fecha)
