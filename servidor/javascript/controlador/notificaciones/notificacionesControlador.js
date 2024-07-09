@@ -488,7 +488,7 @@ class NotificacionTiempoRealControlador {
               <b>Colaborador que envía:</b> ${USUARIO_ENVIA.rows[0].nombre} ${USUARIO_ENVIA.rows[0].apellido} <br>
               <b>Cargo:</b> ${USUARIO_ENVIA.rows[0].cargo} <br>
               <b>Departamento:</b> ${USUARIO_ENVIA.rows[0].departamento} <br>
-              <b>Generado mediante:</b> Sistema Web <br>
+              <b>Generado mediante:</b> Aplicación Web <br>
               <b>Fecha de envío:</b> ${fecha} <br> 
               <b>Hora de envío:</b> ${hora} <br><br>                  
               <b>Mensaje:</b> ${mensaje} <br><br>
@@ -535,15 +535,15 @@ class NotificacionTiempoRealControlador {
     EnviarNotificacionGeneral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip } = req.body;
+                let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip, descripcion } = req.body;
                 var tiempo = (0, settingsMail_1.fechaHora)();
                 let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-        INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
-        VALUES($1, $2, $3, $4, $5) RETURNING *
-        `, [create_at, id_empl_envia, id_empl_recive, mensaje, tipo]);
+        INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo, mensaje) 
+        VALUES($1, $2, $3, $4, $5, $6) RETURNING *
+        `, [create_at, id_empl_envia, id_empl_recive, descripcion, tipo, mensaje]);
                 const [notificiacion] = response.rows;
                 const fechaHoraN = yield (0, settingsMail_1.FormatearHora)(create_at.split(' ')[1]);
                 const fechaN = yield (0, settingsMail_1.FormatearFecha2)(create_at, 'ddd');
@@ -629,7 +629,7 @@ class NotificacionTiempoRealControlador {
               <b>Colaborador que envía:</b> ${USUARIO_ENVIA.rows[0].nombre} ${USUARIO_ENVIA.rows[0].apellido} <br>
               <b>Cargo:</b> ${USUARIO_ENVIA.rows[0].cargo} <br>
               <b>Departamento:</b> ${USUARIO_ENVIA.rows[0].departamento} <br>
-              <b>Generado mediante:</b> Sistema Web <br>
+              <b>Generado mediante:</b> Aplicación Web <br>
               <b>Fecha de envío:</b> ${fecha} <br> 
               <b>Hora de envío:</b> ${hora} <br><br>                  
               <b>Mensaje:</b> ${dispositivo} 

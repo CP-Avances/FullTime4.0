@@ -63,7 +63,7 @@ export class TimbresService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/timbres/aviso-individual/${id}`);
   }
 
-  PutVistaTimbre(id_noti_timbre: number, datos: any) {
+  ActualizarVistaAvisos(id_noti_timbre: number, datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/timbres/noti-timbres/vista/${id_noti_timbre}`, datos);
   }
 

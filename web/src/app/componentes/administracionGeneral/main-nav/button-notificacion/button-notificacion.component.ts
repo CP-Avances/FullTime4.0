@@ -5,13 +5,12 @@ import { Socket } from 'ngx-socket-io';
 import { Router } from '@angular/router';
 import * as moment from 'moment';
 
-
-import { SettingsComponent } from "src/app/componentes/administracionGeneral/configuracion-notificaciones/settings/settings.component";
-
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+
+import { SettingsComponent } from "src/app/componentes/administracionGeneral/configuracion-notificaciones/settings/settings.component";
 
 @Component({
   selector: 'app-button-notificacion',
@@ -41,13 +40,16 @@ export class ButtonNotificacionComponent implements OnInit {
     private socket: Socket,
     private router: Router,
   ) {
+    /** ********************************************************************************** **
+     ** **               METODO DE ESCUCHA A NOTIFICACIONES EN TIEMPO REAL              ** **
+     ** ********************************************************************************** **/
 
     // VERIFICAR QUE EL USUARIO TIENEN INICIO DE SESION
     if (this.loginService.loggedIn()) {
       // METODO DE ESCUCHA DE EVENTOS DE NOTIFICACIONES
-      this.socket.on('recibir_notificacion', (data) => {
+      this.socket.on('recibir_notificacion', (data: any) => {
         // VERIFICACION DE USUARIO QUE RECIBE NOTIFICACION
-        if (parseInt(data.id_empleado_recibe) === this.idEmpleadoIngresa) {
+        if (parseInt(data.id_receives_empl) === this.idEmpleadoIngresa) {
           // BUSQUEDA DE LOS DATOS DE LA NOTIFICACION RECIBIDA
           this.realTime.ObtenerUnaNotificacion(data.id).subscribe(res => {
             // TRATAMIENTO DE LOS DATOS DE LA NOTIFICACION
@@ -108,6 +110,7 @@ export class ButtonNotificacionComponent implements OnInit {
       });
   }
 
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
   BuscarHora(fecha: string) {
     // id_tipo_parametro Formato hora = 26
     this.parametro.ListarDetalleParametros(26).subscribe(
@@ -120,8 +123,9 @@ export class ButtonNotificacionComponent implements OnInit {
       });
   }
 
+  // METOD PARA MOSTRAR NUMERO DE NOTIFICACIONES
   estadoNotificacion: boolean = true;
-  numeroNotificacion() {
+  MostarNumeroNotificacion() {
     if (this.num_noti_false > 0) {
       this.num_noti_false = 0;
       this.estadoNotificacion = !this.estadoNotificacion;
@@ -179,13 +183,17 @@ export class ButtonNotificacionComponent implements OnInit {
     });
   }
 
-  CambiarVistaNotificacion(data: any) {
+  // METODO PARA ACTUALIZAR VISTA DE NOTIFICACIONES
+  ActualizarVista(data: any) {
     data.append('user_name', this.user_name);
     data.append('ip', this.ip);
-    this.realTime.PutVistaNotificacion(data.id, data).subscribe(res => {
+    this.realTime.ActualizarVistaNotificacion(data.id, data).subscribe(res => {
       this.LlamarNotificaciones(this.formato_fecha, this.formato_hora);
     });
 
+
+
+    // REVISAR NAVEGABILIDAD
     const rol = parseInt(localStorage.getItem('rol') as string);
     if (data.tipo != 3) {
       if (rol === 1) {
@@ -223,6 +231,7 @@ export class ButtonNotificacionComponent implements OnInit {
     }
   }
 
+  // METODO PARA CONFIGURAR NOTIFICACIONES
   ConfigurarNotificaciones() {
     const id_empleado = parseInt(localStorage.getItem('empleado') as string);
     this.ventana.open(SettingsComponent, { width: '350px', data: { id_empleado } });

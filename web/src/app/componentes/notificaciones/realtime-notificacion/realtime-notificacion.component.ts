@@ -133,7 +133,7 @@ export class RealtimeNotificacionComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip
     };
-    this.realtime.PutVistaNotificacion(id_realtime, datos).subscribe(res => {
+    this.realtime.ActualizarVistaNotificacion(id_realtime, datos).subscribe(res => {
     });
   }
 

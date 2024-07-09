@@ -10,10 +10,12 @@ export class RealTimeService {
   constructor(
     private http: HttpClient,
     private socket: Socket
-  ) { }
+  ) {
+  }
 
   // METODO PARA RECIBIR NOTIFICACION DE AVISOS EN TIEMPO REAL
   RecibirNuevosAvisos(data: any) {
+    //console.log('ingresa ', data)
     this.socket.emit('nuevo_aviso', data);
   }
 
@@ -36,7 +38,7 @@ export class RealTimeService {
   }
 
 
-  PutVistaNotificacion(id_realtime: number, data: any) {
+  ActualizarVistaNotificacion(id_realtime: number, data: any) {
     data.append('visto', true);
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/noti-real-time/vista/${id_realtime}`, data);
   }

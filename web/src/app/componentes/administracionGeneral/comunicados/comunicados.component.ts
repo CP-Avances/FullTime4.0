@@ -704,6 +704,7 @@ export class ComunicadosComponent implements OnInit {
               });
             }
             else {
+            //console.log('ingresa a ver correo')
               this.EnviarCorreo(this.info_correo, form);
             }
             this.LimpiarFormulario();
@@ -750,12 +751,14 @@ export class ComunicadosComponent implements OnInit {
     let mensaje = {
       id_empl_envia: empleado_envia,
       id_empl_recive: empleado_recive,
-      mensaje: form.tituloForm + '; ' + form.mensajeForm,
+      descripcion: form.tituloForm,
+      mensaje: form.mensajeForm,
       tipo: 6,  // ES EL TIPO DE NOTIFICACION - COMUNICADOS
       user_name: this.user_name,
       ip: this.ip
     }
     this.realTime.EnviarMensajeGeneral(mensaje).subscribe(res => {
+      //console.log('ver res noti ', res)
       this.realTime.RecibirNuevosAvisos(res.respuesta);
     })
   }

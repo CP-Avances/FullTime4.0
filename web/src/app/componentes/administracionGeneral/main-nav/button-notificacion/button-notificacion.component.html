@@ -1,4 +1,4 @@
-<button mat-mini-fab style="margin-right: 8px;" [matMenuTriggerFor]="menu" (click)="numeroNotificacion()">
+<button mat-mini-fab style="margin-right: 8px;" [matMenuTriggerFor]="menu" (click)="MostarNumeroNotificacion()">
     <mat-icon id="iconos-navegador" [matBadgeHidden]="estadoNotificacion" matBadge="{{num_noti_false}}"
         matBadgeColor="warn" style="margin-left: 8px;" matSuffix matTooltipPosition="right" matTooltip="Notificaciones"
         aria-hidden="false">
@@ -18,7 +18,7 @@
                 <!-- NOTIFICACIONES DE PERMISOS -->
                 <a *ngIf="n.id_vacaciones === null && n.id_hora_extra === null" mat-menu-item type="submit"
                     class="noti_menu">
-                    <ul style="list-style: none; margin-left: -15%;" (click)="CambiarVistaNotificacion(n)">
+                    <ul style="list-style: none; margin-left: -15%;" (click)="ActualizarVista(n)">
                         <li style="font-size: 12px; margin-top: 3%;">
                             <b>Colaborador:</b> {{n.nombre.split(' ')[0]}} {{n.apellido.split(' ')[0]}}
                         </li>
@@ -44,7 +44,7 @@
                 <!-- NOTIFICACIONES DE VACACIONES -->
                 <a *ngIf="n.id_permiso === null && n.id_hora_extra === null" mat-menu-item type="submit"
                     class="noti_menu">
-                    <ul style=" list-style: none; margin-left: -15%;" (click)="CambiarVistaNotificacion(n)">
+                    <ul style=" list-style: none; margin-left: -15%;" (click)="ActualizarVista(n)">
                         <li style="font-size: 12px; margin-top: 3%;">
                             <b>Colaborador:</b> {{n.nombre.split(' ')[0]}} {{n.apellido.split(' ')[0]}}
                         </li>
@@ -70,7 +70,7 @@
                 <!-- NOTIFICACIONES DE HORAS EXTRAS -->
                 <a *ngIf="n.id_permiso === null && n.id_vacaciones === null" mat-menu-item type="submit"
                     class="noti_menu">
-                    <ul style=" list-style: none; margin-left: -15%;" (click)="CambiarVistaNotificacion(n)">
+                    <ul style=" list-style: none; margin-left: -15%;" (click)="ActualizarVista(n)">
                         <li style="font-size: 12px; margin-top: 3%;">
                             <b>Colaborador:</b> {{n.nombre.split(' ')[0]}} {{n.apellido.split(' ')[0]}}
                         </li>
@@ -104,7 +104,7 @@
                 <!-- NOTIFICACIONES DE PERMISOS -->
                 <a style="background: rgb(250, 242, 138);" *ngIf="n.id_vacaciones === null && n.id_hora_extra === null"
                     mat-menu-item type="submit" class="noti_menu">
-                    <ul style=" list-style: none; margin-left: -15%;" (click)="CambiarVistaNotificacion(n)">
+                    <ul style=" list-style: none; margin-left: -15%;" (click)="ActualizarVista(n)">
                         <li style="font-size: 12px; margin-top: 3%;">
                             <b>Colaborador:</b> {{n.nombre.split(' ')[0]}} {{n.apellido.split(' ')[0]}}
                         </li>
@@ -130,7 +130,7 @@
                 <!-- NOTIFICACIONES DE VACACIONES -->
                 <a style="background: rgb(216, 249, 198);" *ngIf="n.id_permiso === null && n.id_hora_extra === null"
                     mat-menu-item type="submit" class="noti_menu">
-                    <ul style=" list-style: none; margin-left: -15%;" (click)="CambiarVistaNotificacion(n)">
+                    <ul style=" list-style: none; margin-left: -15%;" (click)="ActualizarVista(n)">
                         <li style="font-size: 12px; margin-top: 3%;">
                             <b>Colaborador:</b> {{n.nombre.split(' ')[0]}} {{n.apellido.split(' ')[0]}}
                         </li>
@@ -156,7 +156,7 @@
                 <!-- NOTIFICACIONES DE HORAS EXTRAS -->
                 <a style="background: rgb(210, 249, 242);" *ngIf="n.id_permiso === null && n.id_vacaciones === null"
                     mat-menu-item type="submit" class="noti_menu">
-                    <ul style=" list-style: none; margin-left: -15%;" (click)="CambiarVistaNotificacion(n)">
+                    <ul style=" list-style: none; margin-left: -15%;" (click)="ActualizarVista(n)">
                         <li style="font-size: 12px; margin-top: 3%;">
                             <b>Colaborador:</b> {{n.nombre.split(' ')[0]}} {{n.apellido.split(' ')[0]}}
                         </li>

@@ -341,8 +341,6 @@ import { EditarVacunasComponent } from './componentes/catalogos/catalogoVacuna/e
 import { VisualizarObservacionComponent } from './componentes/horarios/cargar-plantillas/visualizar-observacion/visualizar-observacion/visualizar-observacion.component';
 import { VisualizarAsignacionesComponent } from './componentes/empleado/sucursal-usuario/visualizar-asignaciones/visualizar-asignaciones.component';
 
-
-
 //Seteo de ruta por defecto al iniciar front
 let url: string | null = localStorage.getItem('empresaURL');
 if (!url) {
@@ -618,22 +616,22 @@ const config: SocketIoConfig = { url: String(url), options: {} };
   ],
 
   imports: [
-   BrowserModule,
-   AppRoutingModule,
-   HttpClientModule,
-   ReactiveFormsModule,
+    BrowserModule,
+    SocketIoModule.forRoot(config),
+    AppRoutingModule,
+    HttpClientModule,
+    ReactiveFormsModule,
     ToastrModule.forRoot(),
-   SocketIoModule.forRoot(config),
-   FontAwesomeModule,
-   FormsModule,
-   MatCardModule,
-   ScrollingModule,
-   FiltrosModule,
-   MaterialModule,
-   MatButtonModule,
-   MatPaginatorModule,
-   MatTableModule,
-   MatDatepickerModule,
+    FontAwesomeModule,
+    FormsModule,
+    MatCardModule,
+    ScrollingModule,
+    FiltrosModule,
+    MaterialModule,
+    MatButtonModule,
+    MatPaginatorModule,
+    MatTableModule,
+    MatDatepickerModule,
     MatNativeDateModule,
     ReportesModule,
     SpinnerModule,
