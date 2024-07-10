@@ -3,11 +3,11 @@
 
     <!-- PANTALLA CARGAR NIVELES DE DEPARTAMENTOS -->
      <mat-tab>
-        <ng-template mat-tab-label>
+        <ng-template mat-tab-label *ngIf="getCargarNivelDepartamentos()">
             <mat-icon class="example-tab-icon">file &nbsp;</mat-icon>
             <h6 id="items" (click)="LimpiarCampos()">Cargar Niveles Departamento</h6>
         </ng-template>
-        <div class="container" style="padding-top: 15px;">
+        <div class="container" style="padding-top: 15px;" *ngIf="getCargarNivelDepartamentos()">
             <div class="row m-auto">
                 <div class="col-md">
                     <div id="titulo">
@@ -82,7 +82,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let nt of DatosNivelesDep | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                                    *ngFor="let nt of DatosNivelesDep | paginate:tamanio_paginaDepaNivel: numero_paginaDepaNivel; let i = index">
                                     <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{nt.fila}}</td>
                                     <td style="font-size: 12px;">
                                         <div style="width: 270px; margin: auto;">
@@ -91,16 +91,16 @@
                                             {{nt.observacion}}
                                         </div>
                                     </td>
-                                    <td style="font-size: 12px;">{{nt.sucursal}}</td>
-                                    <td style="font-size: 12px;">{{nt.departamento}}</td>
-                                    <td style="font-size: 12px;">{{nt.nivel}}</td>
-                                    <td style="font-size: 12px;">{{nt.depa_superior}}</td>
-                                    <td style="font-size: 12px;">{{nt.sucursal_depa_superior}}</td>
+                                    <td [style.color]="stiloTextoCelda(nt.sucursal)" style="font-size: 12px;" style="font-size: 12px;">{{nt.sucursal}}</td>
+                                    <td [style.color]="stiloTextoCelda(nt.departamento)" style="font-size: 12px;">{{nt.departamento}}</td>
+                                    <td [style.color]="stiloTextoCelda(nt.nivel)" style="font-size: 12px;">{{nt.nivel}}</td>
+                                    <td [style.color]="stiloTextoCelda(nt.depa_superior)" style="font-size: 12px;">{{nt.depa_superior}}</td>
+                                    <td [style.color]="stiloTextoCelda(nt.sucursal_depa_superior)" style="font-size: 12px;">{{nt.sucursal_depa_superior}}</td>
                                 </tr>
                             </tbody>
                     </table>
                 </div>
-                <mat-paginator  [length]="DatosNivelesDep.length!" [pageSize]="tamanio_paginaMulCargo"
+                <mat-paginator  [length]="DatosNivelesDep.length!" [pageSize]="tamanio_paginaDepaNivel"
                         [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'depaNivel')"
                         showFirstLastButtons>
                 </mat-paginator>
@@ -111,11 +111,11 @@
 
     <!-- PANTALLA CARGAR CONTRATOS -->
     <mat-tab>
-            <ng-template mat-tab-label>
+            <ng-template mat-tab-label *ngIf="getCargarCargos()">
                 <mat-icon class="example-tab-icon">file &nbsp;</mat-icon>
                 <h6 id="items" (click)="LimpiarCampos()">Cargar Contratos</h6>
             </ng-template>
-            <div class="container" style="padding-top: 15px;">
+            <div class="container" style="padding-top: 15px;" *ngIf="getCargarCargos()">
                 <div class="row m-auto">
                     <div class="col-md">
                         <div id="titulo">
@@ -225,11 +225,11 @@
 
     <!--  PANTALLA CARGAR CARGOS -->
     <mat-tab>
-            <ng-template mat-tab-label>
+            <ng-template mat-tab-label *ngIf="getCargarCargos()">
                 <mat-icon class="example-tab-icon">file &nbsp;</mat-icon>
                 <h6 id="items" (click)="LimpiarCampos()">Cargar Cargos</h6>
             </ng-template>
-            <div class="container" style="padding-top: 15px;">
+            <div class="container" style="padding-top: 15px;" *ngIf="getCargarCargos()">
                 <div class="row m-auto">
                     <div class="col-md">
                         <div id="titulo">

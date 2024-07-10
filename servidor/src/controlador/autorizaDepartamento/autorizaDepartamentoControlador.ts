@@ -62,12 +62,14 @@ class AutorizaDepartamentoControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            await pool.query(
+            const respuesta = await pool.query(
                 `
                 INSERT INTO ed_autoriza_departamento (id_departamento, id_empleado_cargo, estado, id_empleado, autorizar, preautorizar)
-                VALUES ($1, $2, $3, $4, $5, $6)
+                VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
                 `
                 , [id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar]);
+
+            const [datosNuevos] = respuesta.rows;
 
             // INSERTAR REGISTRO DE AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -75,7 +77,7 @@ class AutorizaDepartamentoControlador {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{id_departamento: ${id_departamento}, id_empleado_cargo: ${id_empl_cargo}, estado: ${estado}, id_empleado: ${id_empleado}, autorizar: ${autorizar}, preautorizar: ${preautorizar}}`,
+                datosNuevos: JSON.stringify(datosNuevos),
                 ip,
                 observacion: null
             });
@@ -85,8 +87,7 @@ class AutorizaDepartamentoControlador {
             return res.jsonp({ message: 'Registro guardado.' });
 
         } catch (error) {
-            console.log('error ', error)
-            // CANCELAR TRANSACCION
+            // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'Error al guardar registro.' });
         }
@@ -120,12 +121,14 @@ class AutorizaDepartamentoControlador {
                 return res.status(404).jsonp({ message: 'Registro no encontrado.' });
             }
 
-            await pool.query(`
+            const actualizacion = await pool.query(`
                 UPDATE ed_autoriza_departamento SET id_departamento = $1, id_empleado_cargo = $2, estado = $3, autorizar = $5, 
                     preautorizar = $6
-                WHERE id = $4
+                WHERE id = $4 RETURNING *
                 `
                 , [id_departamento, id_empl_cargo, estado, id, autorizar, preautorizar]);
+
+            const [datosNuevos] = actualizacion.rows;
 
 
             // INSERTAR REGISTRO DE AUDITORIA
@@ -134,7 +137,7 @@ class AutorizaDepartamentoControlador {
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datos),
-                datosNuevos: `{id_departamento: ${id_departamento}, id_empl_cargo: ${id_empl_cargo}, estado: ${estado}, autorizar: ${autorizar}, preautorizar: ${preautorizar}}`,
+                datosNuevos: JSON.stringify(datosNuevos),
                 ip,
                 observacion: null
             });

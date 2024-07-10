@@ -157,8 +157,8 @@ export class ListarPlanificacionComponent implements OnInit {
 
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarFecha() {
-    // id_tipo_parametro Formato fecha = 25
-    this.parametro.ListarDetalleParametros(25).subscribe(
+    // id_tipo_parametro Formato fecha = 1
+    this.parametro.ListarDetalleParametros(1).subscribe(
       res => {
         this.formato_fecha = res[0].descripcion;
         this.BuscarHora(this.formato_fecha)
@@ -169,8 +169,8 @@ export class ListarPlanificacionComponent implements OnInit {
   }
 
   BuscarHora(fecha: string) {
-    // id_tipo_parametro Formato hora = 26
-    this.parametro.ListarDetalleParametros(26).subscribe(
+    // id_tipo_parametro Formato hora = 2
+    this.parametro.ListarDetalleParametros(2).subscribe(
       res => {
         this.formato_hora = res[0].descripcion;
         // LISTA DE PLANIFCACIONES DE SERVICIOS DE ALIMENTACIÓN
@@ -712,9 +712,9 @@ export class ListarPlanificacionComponent implements OnInit {
   // METODO PARA BUSCAR PARÁMETRO DE CORREOS
   correos: number;
   BuscarParametro() {
-    // id_tipo_parametro LIMITE DE CORREOS = 24
+    // id_tipo_parametro LIMITE DE CORREOS = 13
     let datos: any = [];
-    this.parametro.ListarDetalleParametros(24).subscribe(
+    this.parametro.ListarDetalleParametros(13).subscribe(
       res => {
         datos = res;
         if (datos.length != 0) {

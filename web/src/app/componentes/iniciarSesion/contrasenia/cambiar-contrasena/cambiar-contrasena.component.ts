@@ -57,11 +57,13 @@ export class CambiarContrasenaComponent implements OnInit {
     let datos = {
       "contrasena": pass
     };
+    console.log('pass_' + pass);
 
     this.restUser.getTextoEncriptado(datos).subscribe(
       {
         next: (v) => {
           passEncriptado = v.message;
+          console.log('passEncriptado_' + passEncriptado);
         },
         error: (e) => {
           this.toastr.error('Error al obtener datos', 'Error.', {

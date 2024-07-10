@@ -195,11 +195,12 @@ const FormatearHora = function (hora) {
     });
 };
 exports.FormatearHora = FormatearHora;
+// METODO PARA BUSCAR PARAMETRO FECHA (1)
 const BuscarFecha = function () {
     return __awaiter(this, void 0, void 0, function* () {
         return {
             fecha: yield database_1.default.query(`
-      SELECT descripcion FROM ep_detalle_parametro WHERE id_parametro = 25
+      SELECT descripcion FROM ep_detalle_parametro WHERE id_parametro = 1
       `).then(result => {
                 if (result.rowCount != 0) {
                     return result.rows[0].descripcion;
@@ -212,11 +213,12 @@ const BuscarFecha = function () {
     });
 };
 exports.BuscarFecha = BuscarFecha;
+// METODO PARA BUSCAR PARAMETRO HORA (2)
 const BuscarHora = function () {
     return __awaiter(this, void 0, void 0, function* () {
         return {
             hora: yield database_1.default.query(`
-      SELECT descripcion FROM ep_detalle_parametro WHERE id_parametro = 26
+      SELECT descripcion FROM ep_detalle_parametro WHERE id_parametro = 2
       `).then(result => {
                 if (result.rowCount != 0) {
                     return result.rows[0].descripcion;

@@ -186,6 +186,7 @@ class ParametrosControlador {
                 res.jsonp({ message: 'Registro exitoso.' });
             }
             catch (error) {
+                console.log('ver error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 res.status(500).jsonp({ message: 'error' });
@@ -255,7 +256,7 @@ class ParametrosControlador {
             }
             catch (error) {
                 return res.status(500)
-                    .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+                    .jsonp({ message: 'error_500' });
             }
         });
     }

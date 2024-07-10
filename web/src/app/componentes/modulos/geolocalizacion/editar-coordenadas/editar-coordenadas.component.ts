@@ -54,9 +54,9 @@ export class EditarCoordenadasComponent implements OnInit {
   // METODO PARA OBTENER RANGO DE PERIMETRO
   rango: any;
   BuscarParametro() {
-    // id_tipo_parametro PARA RANGO DE UBICACION = 22
+    // id_tipo_parametro PARA RANGO DE UBICACION = 4
     let datos: any = [];
-    this.restP.ListarDetalleParametros(22).subscribe(
+    this.restP.ListarDetalleParametros(4).subscribe(
       res => {
         datos = res;
         if (datos.length != 0) {

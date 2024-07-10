@@ -489,21 +489,41 @@ export class AsignarUsuarioComponent implements OnInit {
   }
 
   //CONTROL BOTONES
-  getAsignarEstablecimiento(){
+  getAsignarDatos(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Asignar Establecimiento');
+      return datos.some(item => item.accion === 'Asignar Datos');
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
   }
 
-  getEliminarAsignacionEstablecimiento(){
+  getEliminarDatosAsignados(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Eliminar Asignación Establecimiento');
+      return datos.some(item => item.accion === 'Eliminar datos asignados');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getVerDatosAsignados(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Ver datos asignados');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getVerUsuariosEstablecimiento(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Ver Usuarios Establecimiento');
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }

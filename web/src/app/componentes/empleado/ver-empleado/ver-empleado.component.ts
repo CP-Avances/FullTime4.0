@@ -409,8 +409,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
-    // id_tipo_parametro Formato fecha = 25
-    this.parametro.ListarDetalleParametros(25).subscribe(
+    // id_tipo_parametro Formato fecha = 1
+    this.parametro.ListarDetalleParametros(1).subscribe(
       res => {
         this.formato_fecha = res[0].descripcion;
         this.BuscarHora(this.formato_fecha);
@@ -421,8 +421,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   }
 
   BuscarHora(fecha: string) {
-    // id_tipo_parametro Formato hora = 26
-    this.parametro.ListarDetalleParametros(26).subscribe(
+    // id_tipo_parametro Formato hora = 2
+    this.parametro.ListarDetalleParametros(2).subscribe(
       res => {
         this.formato_hora = res[0].descripcion;
         // LLAMADO A PRESENTACION DE DATOS
@@ -2729,8 +2729,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.restEmpleadoProcesos.ObtenerProcesoUsuario(parseInt(this.idEmpleado)).subscribe(datos => {
       this.empleadoProcesos = datos;
       this.empleadoProcesos.forEach((data: any) => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
-        data.fec_final_ = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
+        data.fecha_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado);
+        data.fecha_final_ = this.validar.FormatearFecha(data.fecha_final, formato_fecha, this.validar.dia_abreviado);
       })
     })
   }

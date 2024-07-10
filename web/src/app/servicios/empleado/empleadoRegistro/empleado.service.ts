@@ -63,7 +63,7 @@ export class EmpleadoService {
   // BUSCAR LISTA DE EMPLEADOS
   BuscarListaEmpleados() {
     //Verificacion inicial de url por defecto y actualizacion del mismo, depende de empresaURL
-    this.url = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string: environment.url as string;
+    this.url = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
     return this.http.get<any>(`${( this.url as string)}/empleado/buscador/empleado`);
   }
 

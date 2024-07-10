@@ -212,7 +212,7 @@ class UbicacionControlador {
         catch {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: 'false' });
+            return res.jsonp({ message: 'false' });
         }
     }
 

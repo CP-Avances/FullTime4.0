@@ -359,6 +359,7 @@ class VacacionesControlador {
             try {
                 const id = req.params.id;
                 const { estado, user_name, ip } = req.body;
+                console.log('estado', id);
                 // INICIAR TRANSACCIÓN
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES

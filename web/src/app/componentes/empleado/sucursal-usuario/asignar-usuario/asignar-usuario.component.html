@@ -66,7 +66,7 @@
                                             <td>{{u.apellido}} {{u.nombre}} </td>
                                             <td>{{u.departamento}}</td>
                                             <td class="justify-content-center">
-                                                <i matSuffix matTooltipPosition="right" *ngIf="u.asignaciones !=null"
+                                                <i matSuffix matTooltipPosition="right" *ngIf="u.asignaciones !=null && getVerDatosAsignados()"
                                                     matTooltip="Ingresar a pantalla de información de asignaciones de este usuario."
                                                     class="fas fa-eye" id="t-ver" (click)="VisualizarAsignaciones(u)">
                                                     <p>Ver</p>
@@ -184,7 +184,7 @@
                                                         <i matSuffix matTooltipPosition="right"
                                                             matTooltip="Retirar de la lista"
                                                             class="fa fa-times-circle-o" id="t-eliminar"
-                                                            (click)="RetirarLista(d.id)">
+                                                            (click)="RetirarLista(d.id)" *ngIf="getEliminarDatosAsignados()">
                                                         </i>
                                                     </td>
                                                 </tr>
@@ -192,7 +192,7 @@
                                         </table>
                                     </div>
                                     <div class="container d-flex flex-wrap justify-content-center">
-                                        <button *ngIf="ver_guardar" id="btn-raised" class="btn btn-sm"
+                                        <button *ngIf="ver_guardar && getAsignarDatos()" id="btn-raised" class="btn btn-sm"
                                             (click)="IngresarUsuarioDepartamento()">
                                             Guardar
                                         </button>

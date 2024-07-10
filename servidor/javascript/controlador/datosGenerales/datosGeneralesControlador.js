@@ -1293,6 +1293,7 @@ class DatosGeneralesControlador {
             }
         });
     }
+    // TODO: ESTE METODO GENERA EL ERROR AL ELIMINAR VACACIONES
     // METODO PARA BUSCAR JEFES
     BuscarJefes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -1300,7 +1301,7 @@ class DatosGeneralesControlador {
             const permiso = objeto;
             const JefesDepartamentos = yield database_1.default.query(`
             SELECT da.id, da.estado, n.id_departamento as id_dep, n.id_departamento_nivel, n.departamento_nombre_nivel, 
-                n.nivel, n.id_establecimiento AS id_suc, n.departamento, s.nombre AS sucursal, da.id_empl_cargo as cargo, 
+                n.nivel, n.id_sucursal AS id_suc, n.departamento, s.nombre AS sucursal, da.id_empleado_cargo as cargo, 
                 dae.id_contrato as contrato, da.id_empleado AS empleado, (dae.nombre || ' ' || dae.apellido) as fullname,
                 dae.cedula, dae.correo, c.permiso_mail, c.permiso_notificacion, c.vacacion_mail, c.vacacion_notificacion, 
                 c.hora_extra_mail, c.hora_extra_notificacion, c.comida_mail, c.comida_notificacion 
@@ -1311,7 +1312,7 @@ class DatosGeneralesControlador {
                 AND dae.id_cargo = da.id_empleado_cargo
                 AND dae.id_contrato = c.id_empleado
                 AND cg.id = $1
-                AND s.id = n.id_establecimiento
+                AND s.id = n.id_sucursal
             ORDER BY nivel ASC
             `, [depa_user_loggin]).then((result) => { return result.rows; });
             if (JefesDepartamentos.length === 0)

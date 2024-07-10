@@ -200,7 +200,7 @@ export class LoginComponent implements OnInit {
       nombre_usuario: form.usuarioF,
       pass: clave,
     };
-
+    console.log('ingresa ', dataUsuario)
     if (this.latitud === undefined) {
       this.Geolocalizar();
       return this.toastr.error('Es necesario permitir el acceso a la ubicación del usuario.');

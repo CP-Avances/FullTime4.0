@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import * as L from 'leaflet';
+import { ToastrService } from 'ngx-toastr';
+
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-empl-leaflet',
@@ -25,15 +28,40 @@ export class EmplLeafletComponent implements OnInit {
   longitud: number;
 
   constructor(
-    private ventana: MatDialogRef<EmplLeafletComponent>
+    private ventana: MatDialogRef<EmplLeafletComponent>,
+    private toastr: ToastrService,
+    public restP: ParametrosService,
   ) { }
 
   ngOnInit(): void {
-    this.Geolocalizar()
+    this.BuscarParametroCertificado()
   }
 
-  // METODO PARA CAPTURAR LA UBICACION DEL USUARIO
+  // METODO PARA VERIFICAR USO DE CERTIFICADOS DE SEGURIDAD
+  BuscarParametroCertificado() {
+    // id_tipo_parametro PARA VERIFICAR USO SSL = 7
+    let datos: any = [];
+    this.restP.ListarDetalleParametros(7).subscribe(
+      res => {
+        datos = res;
+        if (datos.length != 0) {
+          if (datos[0].descripcion === 'Si') {
+            this.Geolocalizar();
+          }
+          else {
+            this.toastr.warning(
+              'Es necesario el uso de CERTIFICADO DE SEGURIDAD (SSL) para ver el mapa.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+            this.Salir();
+          }
+        }
+      });
+  }
+
+  // METODO PARA TOMAR COORDENAS DE UBICACION
   Geolocalizar() {
+    console.log('ingresa aqui')
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (objPosition) => {
@@ -43,21 +71,41 @@ export class EmplLeafletComponent implements OnInit {
         }, (objPositionError) => {
           switch (objPositionError.code) {
             case objPositionError.PERMISSION_DENIED:
-              console.log('ACCESO A LA POSICIÓN DEL USUARIO NO PERMITIDA.');
+              this.toastr.info(
+                'No se ha permitido el acceso a la posición del usuario.', '', {
+                timeOut: 6000,
+              })
+              this.Salir();
               break;
             case objPositionError.POSITION_UNAVAILABLE:
-              console.log('NO SE HA PODIDO ACCEDER A LA INFORMACIÓN DE SU POSICIÓN.');
+              this.toastr.info(
+                'No se ha podido acceder a la información de su posición.', '', {
+                timeOut: 6000,
+              })
+              this.Salir();
               break;
             case objPositionError.TIMEOUT:
-              console.log('EL SERVICIO HA TARDADO DEMASIADO TIEMPO EN RESPONDER.');
+              this.toastr.info(
+                'El servicio ha tardado demasiado tiempo en responder.', '', {
+                timeOut: 6000,
+              })
+              this.Salir();
               break;
             default:
-              console.log('ERROR DESCONOCIDO.');
+              this.toastr.warning(
+                'Ups!!! algo salio mal.', 'Volver a intentar.', {
+                timeOut: 6000,
+              })
+              this.Salir();
           }
         }, this.options);
     }
     else {
-      console.log('SU NAVEGADOR NO SOPORTA LA API DE GEOLOCALIZACIÓN.');
+      this.toastr.warning(
+        'Ups!!! algo salio mal.', 'Su navegador no soporta la API de geolocalización.', {
+        timeOut: 6000,
+      })
+      this.Salir();
     }
   }
 
@@ -76,7 +124,7 @@ export class EmplLeafletComponent implements OnInit {
       } else {
         marker.setLatLng(coords);
       }
-      marker.bindPopup('Ubicación domicilio.');
+      marker.bindPopup('COORDENADAS UBICACION');
       map.addLayer(marker)
       this.COORDS = e.latlng;
       this.MARKER = marker

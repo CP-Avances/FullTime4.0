@@ -78,7 +78,7 @@ export class MainNavComponent implements OnInit {
   childrenLocalizacion: any = [];
   vistaProvincia: boolean = false;
   vistaListarCiudades: boolean = false;
-  vistaSucursales: boolean = false;
+  vistaInformacion: boolean = false;
   vistaDepartamento: boolean = false;
 
   itemUsuarios: boolean = false;
@@ -87,7 +87,7 @@ export class MainNavComponent implements OnInit {
   vistaNivelTitulos: boolean = false;
   vistaTitulos: boolean = false;
   vistaEmpleados: boolean = false;
-  vistaAdministrarSucursales: boolean = false;
+  vistaAdministrarInformacion: boolean = false;
   vistaCargarPlantillas: boolean = false;
 
   itemHorarios: boolean = false;
@@ -197,6 +197,8 @@ export class MainNavComponent implements OnInit {
   subItemReportesAnalisisDatos: boolean = false;
   childrenReportesAnalisisDatos: any = [];
   vistaReportesAnalisisDatosAnalisisDatos: boolean = false;
+  childrenReportesAuditoria: any = [];
+  vistaReportesAuditoria: boolean = false;
   datosPaginaRol: any = [];
 
   constructor(
@@ -676,10 +678,10 @@ export class MainNavComponent implements OnInit {
                       this.subItemConfiguracionLocalizacion = true;
                       for (const parametrizacion of this.childrenLocalizacion) {
                         if(parametrizacion.url === '/sucursales'){
-                          this.vistaSucursales = true;
+                          this.vistaInformacion = true;
                         }
                       }
-                      if(!this.vistaSucursales){
+                      if(!this.vistaInformacion){
                         this.childrenLocalizacion.push({name: 'Establecimiento', url: '/sucursales', color: true, ver: true}); 
                       }
                       break;
@@ -739,15 +741,15 @@ export class MainNavComponent implements OnInit {
                         this.childrenUsuarios.push({name: 'Empleados', url: '/empleado', color: true, ver: true}); 
                       }
                       break;
-                    case 'administrarSucursales':
+                    case 'administrarInformacion':
                       this.itemUsuarios = true;
                       for (const parametrizacion of this.childrenUsuarios) {
-                        if(parametrizacion.url === '/administrarSucursales'){
-                          this.vistaAdministrarSucursales = true;
+                        if(parametrizacion.url === '/administrarInformacion'){
+                          this.vistaAdministrarInformacion = true;
                         }
                       }
-                      if(!this.vistaAdministrarSucursales){
-                        this.childrenUsuarios.push({name: 'Asignar Establecimientos', url: '/administrarSucursales', color: true, ver: true}); 
+                      if(!this.vistaAdministrarInformacion){
+                        this.childrenUsuarios.push({name: 'Administrar Información', url: '/administrarInformacion', color: true, ver: true}); 
                       }
                       break;
                     case 'cargarPlantilla':

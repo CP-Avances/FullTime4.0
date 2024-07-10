@@ -49,13 +49,13 @@ class EmpleadoProcesoControlador {
 
   public async ActualizarProcesoEmpleado(req: Request, res: Response): Promise<Response> {
     try {
-      const { id, id_empl_cargo, fec_inicio, fec_final, id_p, user_name, ip } = req.body;
+      const { id, id_empleado_cargo, fec_inicio, fec_final, id_proceso, user_name, ip } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const proceso = await pool.query('SELECT * FROM map_empleado_procesos WHERE id_p = $1', [id_p]);
+      const proceso = await pool.query('SELECT * FROM map_empleado_procesos WHERE id = $1', [id]);
       const [datosOriginales] = proceso.rows;
 
       if (!datosOriginales) {
@@ -66,7 +66,7 @@ class EmpleadoProcesoControlador {
           datosOriginales: '',
           datosNuevos: '',
           ip,
-          observacion: `Error al actualizar proceso con id_p: ${id_p}`
+          observacion: `Error al actualizar proceso con id: ${id}`
         });
 
         // FINALIZAR TRANSACCION
@@ -74,28 +74,32 @@ class EmpleadoProcesoControlador {
         return res.status(404).jsonp({ message: 'Error al actualizar proceso' });
       }
 
-      await pool.query(
+      const datosNuevos = await pool.query(
         `
-        UPDATE map_empleado_procesos SET id = $1, id_empleado_cargo = $2, fecha_inicio = $3, fecha_final = $4 
-        WHERE id = $5
+        UPDATE map_empleado_procesos SET id_proceso = $5, id_empleado_cargo = $2, fecha_inicio = $3, fecha_final = $4 
+        WHERE id = $1 RETURNING *
         `
-        , [id, id_empl_cargo, fec_inicio, fec_final, id_p]);
+        , [id, id_empleado_cargo, fec_inicio, fec_final, id_proceso]);
 
-      var fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');
-      var fechaFinalN = await FormatearFecha2(fec_final, 'ddd');
+      const fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');
+      const fechaFinalN = await FormatearFecha2(fec_final, 'ddd');
 
-      var fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
-      var fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
+      const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+      const fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
 
+      datosOriginales.fecha_inicio = fechaInicioO;
+      datosOriginales.fecha_final = fechaFinalO;
 
+      datosNuevos.rows[0].fecha_inicio = fechaInicioN;
+      datosNuevos.rows[0].fecha_final = fechaFinalN;
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'map_empleado_procesos',
         usuario: user_name,
         accion: 'U',
-        datosOriginales: `{id: ${datosOriginales.id}, id_empleado_cargo: ${datosOriginales.id_empl_cargo}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}}`,
-        datosNuevos: `{id: ${id}, id_empleado_cargo: ${id_empl_cargo}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}}`,
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: JSON.stringify(datosNuevos.rows[0]),
         ip,
         observacion: null
       });
@@ -105,6 +109,7 @@ class EmpleadoProcesoControlador {
       return res.jsonp({ message: 'Proceso actualizado exitosamente' });
     } catch (error) {
       // REVERTIR TRANSACCION
+      console.log('error ', error)
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'Error al actualizar proceso.' });
     }
@@ -159,14 +164,18 @@ class EmpleadoProcesoControlador {
         `
         DELETE FROM map_empleado_procesos WHERE id = $1
         `, [id]);
-      var fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
-      var fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
+      const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+      const fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
+
+      datosOriginales.fecha_inicio = fechaInicioO;
+      datosOriginales.fecha_final = fechaFinalO;
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'map_empleado_procesos',
         usuario: user_name,
         accion: 'D',
-        datosOriginales: `{id: ${datosOriginales.id}, id_empleado_cargo: ${datosOriginales.id_empl_cargo}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}}`,
+        datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
         ip,
         observacion: null

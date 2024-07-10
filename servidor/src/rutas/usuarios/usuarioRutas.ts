@@ -72,6 +72,8 @@ class UsuarioRutas {
         // METODO PARA ELIMINAR REGISTRO USUARIO - DEPARTAMENTO
         this.router.delete('/eliminar-usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.EliminarUsuarioDepartamento);
 
+        //METODO PARA DEVOLVER STRING ENCRIPTADO
+        this.router.post('/datos-usuario', TokenValidation, USUARIO_CONTROLADOR.ObtenerDatoEncriptado);
     }
 }
 

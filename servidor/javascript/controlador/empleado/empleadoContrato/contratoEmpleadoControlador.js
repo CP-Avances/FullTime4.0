@@ -813,69 +813,72 @@ class ContratoEmpleadoControlador {
             }
         });
     }
-    // TODO: revisar
     CargarPlantilla_contrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const plantilla = req.body;
-            console.log('datos contrato: ', plantilla);
-            var contador = 1;
-            plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                console.log('data: ', data);
-                // Datos que se guardaran de la plantilla ingresada
-                const { item, cedula, pais, regimen_la, modalida_la, fecha_desde, fecha_hasta, control_asis, control_vaca } = data;
-                const ID_EMPLEADO = yield database_1.default.query(`
+            const { plantilla, user_name, ip } = req.body;
+            let error = false;
+            for (const data of plantilla) {
+                try {
+                    const { item, cedula, pais, regimen_la, modalida_la, fecha_desde, fecha_hasta, control_asis, control_vaca } = data;
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const ID_EMPLEADO = yield database_1.default.query(`
                 SELECT id FROM eu_empleados WHERE UPPER(cedula) = $1
                 `, [cedula]);
-                const ID_REGIMEN = yield database_1.default.query(`
+                    const ID_REGIMEN = yield database_1.default.query(`
                 SELECT id FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
                 `, [regimen_la.toUpperCase()]);
-                const ID_TIPO_CONTRATO = yield database_1.default.query(`
+                    const ID_TIPO_CONTRATO = yield database_1.default.query(`
                 SELECT id FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
                 `, [modalida_la.toUpperCase()]);
-                //Transformar el string en booleano
-                var vaca_controla;
-                if (control_vaca.toUpperCase() === 'SI') {
-                    vaca_controla = true;
-                }
-                else {
-                    vaca_controla = false;
-                }
-                var asis_controla;
-                if (control_asis.toUpperCase() === 'SI') {
-                    asis_controla = true;
-                }
-                else {
-                    asis_controla = false;
-                }
-                var id_empleado = ID_EMPLEADO.rows[0].id;
-                var id_regimen = ID_REGIMEN.rows[0].id;
-                var id_tipo_contrato = ID_TIPO_CONTRATO.rows[0].id;
-                console.log('id_empleado: ', id_empleado);
-                console.log('id_regimen: ', id_regimen);
-                console.log('id_tipo_contrato: ', id_tipo_contrato);
-                console.log('fecha inicio: ', fecha_desde);
-                console.log('fecha final: ', fecha_hasta);
-                console.log('vacaciones: ', vaca_controla);
-                console.log('asistencias: ', asis_controla);
-                // Registro de los datos de contratos
-                const response = yield database_1.default.query(`
+                    //Transformar el string en booleano
+                    let vaca_controla;
+                    if (control_vaca.toUpperCase() === 'SI') {
+                        vaca_controla = true;
+                    }
+                    else {
+                        vaca_controla = false;
+                    }
+                    let asis_controla;
+                    if (control_asis.toUpperCase() === 'SI') {
+                        asis_controla = true;
+                    }
+                    else {
+                        asis_controla = false;
+                    }
+                    const id_empleado = ID_EMPLEADO.rows[0].id;
+                    const id_regimen = ID_REGIMEN.rows[0].id;
+                    const id_tipo_contrato = ID_TIPO_CONTRATO.rows[0].id;
+                    const response = yield database_1.default.query(`
                 INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
                     controlar_asistencia, id_regimen, id_modalidad_laboral) 
                 VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
                 `, [id_empleado, fecha_desde, fecha_hasta, vaca_controla, asis_controla, id_regimen,
-                    id_tipo_contrato]);
-                const [contrato] = response.rows;
-                console.log(contador, ' == ', plantilla.length);
-                if (contador === plantilla.length) {
-                    if (contrato) {
-                        return res.status(200).jsonp({ message: 'ok' });
-                    }
-                    else {
-                        return res.status(404).jsonp({ message: 'error' });
-                    }
+                        id_tipo_contrato]);
+                    const [contrato] = response.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_contratos',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(contrato),
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                 }
-                contador = contador + 1;
-            }));
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    error = true;
+                }
+            }
+            if (error) {
+                return res.status(500).jsonp({ message: 'error' });
+            }
+            return res.status(200).jsonp({ message: 'ok' });
         });
     }
 }

@@ -67,8 +67,9 @@ export class RegistrarTimbreComponent implements OnInit {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     this.VerificarFunciones();
-    this.BuscarParametro();
-    this.Geolocalizar();
+    this.BuscarParametroUbicacion();
+    this.BuscarParametroCertificado();
+    this.BuscarParametroDesconocida();
   }
 
   // METODO PARA CONSULTAR FUNCIONES ACTIVAS DEL SISTEMA
@@ -85,10 +86,10 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA OBTENER RANGO DE PERIMETRO
   rango: any;
-  BuscarParametro() {
-    // id_tipo_parametro PARA RANGO DE UBICACION = 22
+  BuscarParametroUbicacion() {
+    // id_tipo_parametro PARA RANGO DE UBICACION = 4
     let datos: any = [];
-    this.restP.ListarDetalleParametros(22).subscribe(
+    this.restP.ListarDetalleParametros(4).subscribe(
       res => {
         datos = res;
         if (datos.length != 0) {
@@ -100,7 +101,38 @@ export class RegistrarTimbreComponent implements OnInit {
       });
   }
 
-  // METODO PARA TOMAR CORDENAS DE UBICACION
+  // METODO PARA PERMITIR TIMBRE EN UBICACION DESCONOCIDA
+  desconocida: boolean = false;
+  BuscarParametroDesconocida() {
+    // id_tipo_parametro PARA TIMBRAR UBICACION DESCONOCIDA = 5
+    let datos: any = [];
+    this.restP.ListarDetalleParametros(5).subscribe(
+      res => {
+        datos = res;
+        if (datos.length != 0) {
+          if (datos[0].descripcion === 'Si') {
+            this.desconocida = true;
+          }
+        }
+      });
+  }
+
+  // METODO PARA VERIFICAR USO DE CERTIFICADOS DE SEGURIDAD
+  BuscarParametroCertificado() {
+    // id_tipo_parametro PARA VERIFICAR USO SSL = 7
+    let datos: any = [];
+    this.restP.ListarDetalleParametros(7).subscribe(
+      res => {
+        datos = res;
+        if (datos.length != 0) {
+          if (datos[0].descripcion === 'Si') {
+            this.Geolocalizar();
+          }
+        }
+      });
+  }
+
+  // METODO PARA TOMAR COORDENAS DE UBICACION
   Geolocalizar() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -110,21 +142,36 @@ export class RegistrarTimbreComponent implements OnInit {
         }, (objPositionError) => {
           switch (objPositionError.code) {
             case objPositionError.PERMISSION_DENIED:
-              console.log('NO SE HA PERMITIDO EL ACCESO A POSICIÓN DEL USUARIO.');
+              this.toastr.warning(
+                'No se ha permitido el acceso a la posición del usuario.', '', {
+                timeOut: 6000,
+              })
               break;
             case objPositionError.POSITION_UNAVAILABLE:
-              console.log('NO SE HA PODIDO ACCEDER A INFORMACIÓN DE SU POSICIÓN.');
+              this.toastr.warning(
+                'No se ha podido acceder a la información de su posición.', '', {
+                timeOut: 6000,
+              })
               break;
             case objPositionError.TIMEOUT:
-              console.log('EL SERVICIO HA TARDADO DEMASIADO TIEMPO EN RESPONDER.');
+              this.toastr.warning(
+                'El servicio ha tardado demasiado tiempo en responder.', '', {
+                timeOut: 6000,
+              })
               break;
             default:
-              console.log('ERROR DESCONOCIDO.');
+              this.toastr.warning(
+                'Ups!!! algo salio mal.', 'Volver a intentar.', {
+                timeOut: 6000,
+              })
           }
         }, this.options);
     }
     else {
-      console.log('SU NAVEGADOR NO SOPORTA API DE GEOLOCALIZACIÓN.');
+      this.toastr.warning(
+        'Ups!!! algo salio mal.', 'Su navegador no soporta la API de geolocalización.', {
+        timeOut: 6000,
+      })
     }
   }
 
@@ -217,7 +264,7 @@ export class RegistrarTimbreComponent implements OnInit {
       ip: this.ip,
       user_name: this.user_name
     }
-    console.log('ver data timbre ', dataTimbre)
+    //console.log('ver data timbre ', dataTimbre)
     this.ventana.close(dataTimbre);
   }
 
@@ -226,9 +273,10 @@ export class RegistrarTimbreComponent implements OnInit {
   ubicacion: string = '';
   sin_ubicacion: number = 0;
   CompararCoordenadas(informacion: any, form: any, descripcion: any, data: any) {
-
+    //console.log('verificar informacion ', informacion)
     this.restP.ObtenerCoordenadas(informacion).subscribe(
       res => {
+        //console.log('verificar res ', res)
         if (res[0].verificar === 'ok') {
           this.contar = this.contar + 1;
           this.ubicacion = descripcion;
@@ -242,7 +290,6 @@ export class RegistrarTimbreComponent implements OnInit {
         }
         else {
           this.sin_ubicacion = this.sin_ubicacion + 1;
-
           if (this.sin_ubicacion === data.length) {
             this.ValidarDomicilio(informacion, form);
           }
@@ -252,22 +299,45 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO QUE PERMITE VALIDACIONES DE UBICACION
   BuscarUbicacion(latitud: any, longitud: any, rango: any, form: any) {
+    //console.log('ver coordenadas ', longitud, latitud)
+    var longitud_ = '';
+    var latitud_ = '';
+
+    if (longitud && latitud) {
+      longitud_ = String(longitud);
+      latitud_ = String(latitud)
+    }
+
     var datosUbicacion: any = [];
     this.contar = 0;
     let informacion = {
-      lat1: String(latitud),
-      lng1: String(longitud),
+      lat1: latitud_,
+      lng1: longitud_,
       lat2: '',
       lng2: '',
       valor: rango
     }
     this.restU.ListarCoordenadasUsuario(this.id_empl).subscribe(
       res => {
+        //console.log(' res ', res)
         datosUbicacion = res;
         datosUbicacion.forEach((obj: any) => {
           informacion.lat2 = obj.latitud;
           informacion.lng2 = obj.longitud;
-          this.CompararCoordenadas(informacion, form, obj.descripcion, datosUbicacion);
+          //console.log(informacion.lat1, ' ---------- ', informacion.lng1)
+          if (informacion.lat1 && informacion.lng1) {
+            this.CompararCoordenadas(informacion, form, obj.descripcion, datosUbicacion);
+          }
+          else {
+            if (this.desconocida === true) {
+              this.RegistrarDatosTimbre(form, 'SIN UBICACION');
+            }
+            else {
+              this.toastr.warning('Es necesario el uso de Certificados de Seguridad para acceder a la ubicación del usuario.', '', {
+                timeOut: 6000,
+              })
+            }
+          }
         })
       }, error => {
         this.ValidarDomicilio(informacion, form);
@@ -292,31 +362,49 @@ export class RegistrarTimbreComponent implements OnInit {
         informacion.lat2 = res[0].latitud;
         informacion.lng2 = res[0].longitud;
 
-        this.restP.ObtenerCoordenadas(informacion).subscribe(resu => {
-          if (resu[0].verificar === 'ok') {
-            this.ubicacion = 'DOMICILIO';
-            this.RegistrarDatosTimbre(form, this.ubicacion);
-            this.toastr.info('Marcación realizada dentro del perímetro definido como ' + this.ubicacion + '.', '', {
-              timeOut: 6000,
-            })
-          }
-          else {
-            this.ubicacion = 'DESCONOCIDO';
-            this.RegistrarDatosTimbre(form, this.ubicacion);
-            this.toastr.info('Marcación realizada dentro de un perímetro DESCONOCIDO.', '', {
-              timeOut: 6000,
-            })
-          }
-        })
+        if (informacion.lat1 && informacion.lng1) {
+          this.restP.ObtenerCoordenadas(informacion).subscribe(resu => {
+            if (resu[0].verificar === 'ok') {
+              this.ubicacion = 'DOMICILIO';
+              this.RegistrarDatosTimbre(form, this.ubicacion);
+              this.toastr.info('Marcación realizada dentro del perímetro definido como ' + this.ubicacion + '.', '', {
+                timeOut: 6000,
+              })
+            }
+            else {
+              this.ProcesoPerimetroDesconocido(form);
+            }
+          })
+        }
+        else {
+          this.toastr.warning('Es necesario el uso de Certificados de Seguridad para acceder a la ubicación del usuario.', '', {
+            timeOut: 6000,
+          })
+        }
       }
       else {
-        this.ubicacion = 'DESCONOCIDO';
-        this.RegistrarDatosTimbre(form, this.ubicacion);
-        this.toastr.info('Marcación realizada dentro de un perímetro DESCONOCIDO.', '', {
-          timeOut: 6000,
-        })
+        this.ProcesoPerimetroDesconocido(form)
       }
     })
+  }
+
+
+  // METODO PARA REGISTRAR TIMBRE CON PERIMETRO DESCONOCIDO
+  ProcesoPerimetroDesconocido(form: any) {
+    // PUEDE TIMBRAR EN PERIMETROS DESCONOCIDOS
+    if (this.desconocida === true) {
+      this.ubicacion = 'DESCONOCIDO';
+      this.RegistrarDatosTimbre(form, this.ubicacion);
+      this.toastr.info('Marcación realizada dentro de un perímetro DESCONOCIDO.', '', {
+        timeOut: 6000,
+      })
+    }
+    else {
+      this.toastr.warning('No tiene permitido timbrar en perímetros desconocidos.', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
+      })
+    }
+
   }
 
 }

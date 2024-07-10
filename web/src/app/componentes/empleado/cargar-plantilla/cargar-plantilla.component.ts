@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { ThemePalette } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -17,7 +17,7 @@ import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartament
   templateUrl: './cargar-plantilla.component.html',
   styleUrls: ['./cargar-plantilla.component.css']
 })
-export class CargarPlantillaComponent {
+export class CargarPlantillaComponent implements OnInit{
 
   archivoForm = new FormControl('', Validators.required);
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
@@ -40,6 +40,10 @@ export class CargarPlantillaComponent {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  // VARIABLES PARA AUDITORIA
+  user_name: string | null;
+  ip: string | null;
+
   constructor(
     public restCa: EmplCargosService,
     public restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
@@ -51,6 +55,10 @@ export class CargarPlantillaComponent {
     this.DatosContrato = [];
     this.DatosCargos = [];
     this.DatosNivelesDep = [];
+  }
+  ngOnInit(): void {
+    this.user_name = localStorage.getItem('usuario');
+    this.ip = localStorage.getItem('ip');
   }
 
   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
@@ -151,14 +159,26 @@ export class CargarPlantillaComponent {
 
   RegistrarDepaNiveles() {
     if (this.listaNivelesCorrectas.length > 0) {
-      this.restDep.subirDepaNivel(this.listaNivelesCorrectas).subscribe(response => {
-        console.log('respuesta: ', response);
-        this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
-          timeOut: 3000,
-        });
-        window.location.reload();
-        this.archivoForm.reset();
-        this.nameFile = '';
+      const datos = {
+        plantilla: this.listaNivelesCorrectas,
+        user_name: this.user_name,
+        ip: this.ip
+      }
+      this.restDep.subirDepaNivel(datos).subscribe({
+        next: (response) => {
+          this.toastr.success('Plantilla de Nivel departamentos importada.', 'Operación exitosa.', {
+            timeOut: 3000,
+          });
+          window.location.reload();
+          this.archivoForm.reset();
+          this.nameFile = '';
+        },
+        error: (error) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+          this.progreso = false;
+        }
       });
     } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
@@ -284,15 +304,29 @@ export class CargarPlantillaComponent {
 
   registroContratos() {
     if (this.listaContratosCorrectas.length > 0) {
-      this.restE.subirArchivoExcelContrato(this.listaContratosCorrectas).subscribe(response => {
-        console.log('respuesta: ', response);
-        this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
-          timeOut: 3000,
-        });
-        window.location.reload();
-        this.archivoForm.reset();
-        this.nameFile = '';
+      const datos = {
+        plantilla: this.listaContratosCorrectas,
+        user_name: this.user_name,
+        ip: this.ip
+      }
+
+      this.restE.subirArchivoExcelContrato(datos).subscribe({
+        next: (response) => {
+          this.toastr.success('Plantilla de Contratos importada.', 'Operación exitosa.', {
+            timeOut: 3000,
+          });
+          window.location.reload();
+          this.archivoForm.reset();
+          this.nameFile = '';
+        },
+        error: (error) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+          this.progreso = false;
+        }
       });
+
     } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
@@ -320,7 +354,9 @@ export class CargarPlantillaComponent {
       return 'rgb(255, 192, 203)';
     } else if (observacion == 'Departamento no pertenece al establecimiento' ||
       observacion == 'Departamento no pertenece a la sucursal' ||
-      observacion == 'El nivel no puede ser mayor a 5'
+      observacion == 'El nivel no puede ser 0 ni mayor a 5' ||
+      observacion == 'faltan niveles por registrar' ||
+      observacion == 'Deparatemto superior ya se encuentra configurado'
     ) {
       return 'rgb(238, 34, 207)';
     } else if (observacion == 'Nivel incorrecto (solo números)') {
@@ -495,14 +531,27 @@ export class CargarPlantillaComponent {
 
   registroCargos() {
     if (this.listaCargosCorrectas.length > 0) {
-      this.restCa.subirArchivoExcelCargo(this.listaCargosCorrectas).subscribe(response => {
-        console.log('respuesta: ', response);
-        this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
-          timeOut: 3000,
-        });
-        window.location.reload();
-        this.archivoForm.reset();
-        this.nameFile = '';
+      const datos = {
+        plantilla: this.listaCargosCorrectas,
+        user_name: this.user_name,
+        ip: this.ip
+      }
+
+      this.restCa.subirArchivoExcelCargo(datos).subscribe({
+        next: (response) => {
+          this.toastr.success('Plantilla de Cargos importada.', 'Operación exitosa.', {
+            timeOut: 3000,
+          });
+          window.location.reload();
+          this.archivoForm.reset();
+          this.nameFile = '';
+        },
+        error: (error) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+          this.progreso = false;
+        }
       });
     } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
@@ -528,6 +577,16 @@ export class CargarPlantillaComponent {
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
       return datos.some(item => item.accion === 'Cargar Datos Cargos');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getCargarNivelDepartamentos(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Cargar Datos Nivel departamentos');
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }

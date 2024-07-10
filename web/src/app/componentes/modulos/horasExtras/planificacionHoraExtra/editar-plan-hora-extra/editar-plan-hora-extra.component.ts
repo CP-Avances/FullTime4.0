@@ -1,7 +1,7 @@
 import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Validators, FormGroup, FormControl } from '@angular/forms';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Optional, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import * as moment from 'moment';
 
@@ -13,6 +13,7 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 
 import { ListaPlanificacionesComponent } from '../lista-planificaciones/lista-planificaciones.component';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-editar-plan-hora-extra',
@@ -68,12 +69,18 @@ export class EditarPlanHoraExtraComponent implements OnInit {
     public parametro: ParametrosService,
     public validar: ValidacionesService,
     public aviso: RealTimeService,
+    public ventana: MatDialogRef<EditarPlanHoraExtraComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public datos: any
   ) { }
 
   ngOnInit(): void {
 
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+
+    if (this.datos) {
+      this.data = this.datos;
+    }
 
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
@@ -95,16 +102,16 @@ export class EditarPlanHoraExtraComponent implements OnInit {
 
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarFecha() {
-    // id_tipo_parametro Formato fecha = 25
-    this.parametro.ListarDetalleParametros(25).subscribe(
+    // id_tipo_parametro Formato fecha = 1
+    this.parametro.ListarDetalleParametros(1).subscribe(
       res => {
         this.formato_fecha = res[0].descripcion;
       });
   }
 
   BuscarHora() {
-    // id_tipo_parametro Formato hora = 26
-    this.parametro.ListarDetalleParametros(26).subscribe(
+    // id_tipo_parametro Formato hora = 2
+    this.parametro.ListarDetalleParametros(2).subscribe(
       res => {
         this.formato_hora = res[0].descripcion;
       });
@@ -395,9 +402,9 @@ export class EditarPlanHoraExtraComponent implements OnInit {
   // METODO DE BUSQUEDA DE NUMERO PERMITIDO DE CORREOS
   correos: number;
   BuscarParametro() {
-    // id_tipo_parametro LIMITE DE CORREOS = 24
+    // id_tipo_parametro LIMITE DE CORREOS = 13
     let datos: any = [];
-    this.restP.ListarDetalleParametros(24).subscribe(
+    this.restP.ListarDetalleParametros(13).subscribe(
       res => {
         datos = res;
         if (datos.length != 0) {
@@ -442,6 +449,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
       this.componentel.ver_listas = true;
       this.componentel.VerificarPlanificacion(id_plan, '1', true, false);
     }
+    this.ventana.close();
   }
 
   // METODO PARA INGRESAR SOLO LETRAS

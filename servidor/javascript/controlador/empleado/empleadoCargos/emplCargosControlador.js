@@ -402,7 +402,11 @@ class EmpleadoCargosControlador {
                                             data.observacion = 'El sueldo es incorrecto';
                                         }
                                         else {
-                                            if ((0, moment_1.default)(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) { }
+                                            if ((0, moment_1.default)(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) {
+                                                if (data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no') {
+                                                    data.observacion = 'Valor de Jefe incoreccto';
+                                                }
+                                            }
                                             else {
                                                 data.observacion = 'Formato horas invalido  (HH:mm:ss)';
                                             }
@@ -464,10 +468,11 @@ class EmpleadoCargosControlador {
                         }
                         if (HORA_TRABAJA == undefined) {
                             data.hora_trabaja = 'No registrado';
-                            data.observacion = 'Hora trabaja ' + data.observacion;
+                            data.observacion = 'Hora trabajo ' + data.observacion;
                         }
                         if (JEFE == undefined) {
                             data.admini_depa = 'No registrado';
+                            data.observacion = 'Jefe ' + data.observacion;
                         }
                         if (CEDULA == undefined) {
                             data.cedula = 'No registrado';
@@ -487,16 +492,25 @@ class EmpleadoCargosControlador {
                                             // Verificar si la variable tiene el formato de fecha correcto con moment
                                             if (data.fecha_hasta != 'No registrado') {
                                                 if ((0, moment_1.default)(FECHA_HASTA, 'YYYY-MM-DD', true).isValid()) {
-                                                    //Verifica el valor del suelo que sea solo numeros
-                                                    if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
-                                                        data.observacion = 'El sueldo es incorrecto';
-                                                    }
-                                                    else 
-                                                    //Verficar formato de horas
-                                                    if (data.hora_trabaja != 'No registrado') {
-                                                        if ((0, moment_1.default)(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) { }
+                                                    if (data.sueldo != 'No registrado') {
+                                                        //Verifica el valor del suelo que sea solo numeros
+                                                        if (typeof data.sueldo != 'number' && isNaN(data.sueldo)) {
+                                                            data.observacion = 'El sueldo es incorrecto';
+                                                        }
                                                         else {
-                                                            data.observacion = 'Formato horas invalido  (HH:mm:ss)';
+                                                            //Verficar formato de horas
+                                                            if (data.hora_trabaja != 'No registrado') {
+                                                                if ((0, moment_1.default)(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) {
+                                                                    if (data.admini_depa != 'No registrado') {
+                                                                        if (data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no') {
+                                                                            data.observacion = 'Valor de Jefe incoreccto';
+                                                                        }
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    data.observacion = 'Formato horas invalido  (HH:mm:ss)';
+                                                                }
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -543,8 +557,8 @@ class EmpleadoCargosControlador {
                                     if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
                                         var VERFICAR_CARGO = yield database_1.default.query(`SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1`, [valor.cargo.toUpperCase()]);
                                         if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                                            if ((0, moment_1.default)(valor.fecha_inicio).format('YYYY-MM-DD') >= (0, moment_1.default)(valor.fecha_final).format('YYYY-MM-DD')) {
-                                                valor.observacion = 'La fecha de inicio no puede ser mayor o igual a la fecha salida';
+                                            if ((0, moment_1.default)(valor.fecha_desde).format('YYYY-MM-DD') >= (0, moment_1.default)(valor.fecha_hasta).format('YYYY-MM-DD')) {
+                                                valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta';
                                             }
                                             else {
                                                 const fechaRango = yield database_1.default.query(`
@@ -639,73 +653,83 @@ class EmpleadoCargosControlador {
     }
     CargarPlantilla_cargos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const plantilla = req.body;
-            var contador = 1;
-            plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                // Datos que se guardaran de la plantilla ingresada
-                const { item, cedula, departamento, fecha_desde, fecha_hasta, sucursal, sueldo, cargo, hora_trabaja, admini_depa } = data;
-                const ID_EMPLEADO = yield database_1.default.query(`
-        SELECT id FROM eu_empleados WHERE cedula = $1
-        `, [cedula]);
-                const ID_CONTRATO = yield database_1.default.query(`
-        SELECT id_contrato FROM datos_contrato_actual WHERE cedula = $1
-        `, [cedula]);
-                const ID_DEPARTAMENTO = yield database_1.default.query(`
-        SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
-        `, [departamento.toUpperCase()]);
-                const ID_SUCURSAL = yield database_1.default.query(`
-        SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
-        `, [sucursal.toUpperCase()]);
-                const ID_TIPO_CARGO = yield database_1.default.query(`
-        SELECT id FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
-        `, [cargo.toUpperCase()]);
-                console.log('id_empleado: ', ID_EMPLEADO.rows[0]);
-                console.log('depa: ', departamento.toUpperCase());
-                var id_empleado = ID_EMPLEADO.rows[0].id;
-                var id_contrato = ID_CONTRATO.rows[0].id_contrato;
-                var id_departamento = ID_DEPARTAMENTO.rows[0].id;
-                var id_sucursal = ID_SUCURSAL.rows[0].id;
-                var id_cargo = ID_TIPO_CARGO.rows[0].id;
-                var admin_dep = false;
-                if (admini_depa.toLowerCase() == 'si') {
-                    admin_dep = true;
-                }
-                console.log('id_empleado: ', id_empleado);
-                console.log('departamento: ', id_departamento);
-                /*
-                console.log('id_empleado: ', id_empleado);
-                console.log('id_contrato: ', id_contrato);
-                console.log('fecha inicio: ', fecha_inicio);
-                console.log('fecha final: ', fecha_final);
-                console.log('departamento: ', id_departamento);
-                console.log('sucursal: ', id_sucursal);
-                console.log('sueldo: ', sueldo);
-                console.log('hora_trabaja: ', hora_trabaja);
-                console.log('tipo cargo: ', id_cargo);
-                */
-                // Registro de los datos de contratos
-                const response = yield database_1.default.query(`
-        INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal, 
-          sueldo, id_tipo_cargo, hora_trabaja, jefe) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
-        `, [id_contrato, id_departamento, fecha_desde, fecha_hasta, id_sucursal, sueldo, id_cargo,
-                    hora_trabaja, admin_dep]);
-                const [cargos] = response.rows;
-                yield database_1.default.query(`
-        INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
-        VALUES ($1, $2, $3, $4, $5)
-        `, [id_empleado, id_departamento, true, true, admin_dep]);
-                console.log(contador, ' == ', plantilla.length);
-                if (contador === plantilla.length) {
-                    if (cargos) {
-                        return res.status(200).jsonp({ message: 'ok' });
+            const { plantilla, user_name, ip } = req.body;
+            let error = false;
+            for (const data of plantilla) {
+                try {
+                    const { item, cedula, departamento, fecha_desde, fecha_hasta, sucursal, sueldo, cargo, hora_trabaja, admini_depa } = data;
+                    // INICIAR TRANSACCION
+                    yield database_1.default.query('BEGIN');
+                    const ID_EMPLEADO = yield database_1.default.query(`
+          SELECT id FROM eu_empleados WHERE cedula = $1
+          `, [cedula]);
+                    const ID_CONTRATO = yield database_1.default.query(`
+          SELECT id_contrato FROM datos_contrato_actual WHERE cedula = $1
+          `, [cedula]);
+                    const ID_DEPARTAMENTO = yield database_1.default.query(`
+          SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
+          `, [departamento.toUpperCase()]);
+                    const ID_SUCURSAL = yield database_1.default.query(`
+          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+          `, [sucursal.toUpperCase()]);
+                    const ID_TIPO_CARGO = yield database_1.default.query(`
+          SELECT id FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+          `, [cargo.toUpperCase()]);
+                    let id_empleado = ID_EMPLEADO.rows[0].id;
+                    let id_contrato = ID_CONTRATO.rows[0].id_contrato;
+                    let id_departamento = ID_DEPARTAMENTO.rows[0].id;
+                    let id_sucursal = ID_SUCURSAL.rows[0].id;
+                    let id_cargo = ID_TIPO_CARGO.rows[0].id;
+                    let admin_dep = false;
+                    if (admini_depa.toLowerCase() == 'si') {
+                        admin_dep = true;
                     }
-                    else {
-                        return res.status(404).jsonp({ message: 'error' });
-                    }
+                    console.log('id_empleado: ', id_empleado);
+                    console.log('departamento: ', id_departamento);
+                    const response = yield database_1.default.query(`
+          INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal, 
+            sueldo, id_tipo_cargo, hora_trabaja, jefe) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
+          `, [id_contrato, id_departamento, fecha_desde, fecha_hasta, id_sucursal, sueldo, id_cargo,
+                        hora_trabaja, admin_dep]);
+                    const [cargos] = response.rows;
+                    const response2 = yield database_1.default.query(`
+          INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
+          VALUES ($1, $2, $3, $4, $5) RETURNING *
+          `, [id_empleado, id_departamento, true, true, admin_dep]);
+                    const [usuarioDep] = response2.rows;
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_cargos',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(cargos),
+                        ip,
+                        observacion: null
+                    });
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_usuario_departamento',
+                        usuario: user_name,
+                        accion: 'I',
+                        datosOriginales: '',
+                        datosNuevos: JSON.stringify(usuarioDep),
+                        ip,
+                        observacion: null
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
                 }
-                contador = contador + 1;
-            }));
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    error = true;
+                }
+            }
+            if (error) {
+                return res.status(500).jsonp({ message: 'error' });
+            }
+            return res.status(200).jsonp({ message: 'ok' });
         });
     }
 }
