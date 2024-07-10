@@ -352,9 +352,15 @@ export class ListaEmpleadosComponent implements OnInit {
 
   // METODO PARA LISTAR USUARIOS
   async GetEmpleados() {
-    const res: any = await firstValueFrom(this.datosGenerales.ListarIdInformacionActual());
-    const idsEmpleadosActuales = new Set(res.map((empleado: any) => empleado.id));
-    //console.log('idsEmpleadosActuales', idsEmpleadosActuales);
+    let idsEmpleadosActuales: Set<unknown>;
+    try {
+      const res: any = await firstValueFrom(this.datosGenerales.ListarIdInformacionActual());
+      console.log('res', res);
+      idsEmpleadosActuales = new Set(res.map((empleado: any) => empleado.id));
+    } catch (error) {
+      idsEmpleadosActuales = new Set();
+    }
+
     const empleadosActivos$ = this.rest.ListarEmpleadosActivos().pipe(
       map((data: any) => data.filter((empleado: any) =>
         this.idUsuariosAcceso.has(empleado.id) || !idsEmpleadosActuales.has(empleado.id)
@@ -371,6 +377,10 @@ export class ListaEmpleadosComponent implements OnInit {
       this.desactivados = desactivados;
       this.OrdenarDatos(this.desactivados);
       this.mostarTabla = true;
+      console.log('empleados', empleados);
+      console.log('desactivados', desactivados);
+      console.log('Mostrar tabla', this.mostarTabla);
+      console.log('DatosEmpleado', this.DataEmpleados);
     });
   }
 

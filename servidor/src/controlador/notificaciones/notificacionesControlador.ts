@@ -276,16 +276,18 @@ class NotificacionTiempoRealControlador {
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
-      await pool.query(
+      const response = await pool.query(
         `
         INSERT INTO eu_configurar_alertas (id_empleado, vacacion_mail, vacacion_notificacion, permiso_mail,
           permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail, comida_notificacion, comunicado_mail,
         comunicado_notificacion)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *
         `
         , [id_empleado, vaca_mail, vaca_noti,
           permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti,
           comunicado_mail, comunicado_noti]);
+
+      const [datosNuevos] = response.rows;
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -293,7 +295,7 @@ class NotificacionTiempoRealControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{"id_empleado": "${id_empleado}", "vacacion_mail": "${vaca_mail}", "vacacion_notificacion": "${vaca_noti}", permiso_mail: "${permiso_mail}", permiso_notificacion: "${permiso_noti}", hora_extra_mail: "${hora_extra_mail}", hora_extra_notificacion: "${hora_extra_noti}", comida_mail: "${comida_mail}", comida_notificacion: "${comida_noti}", comunicado_mail: "${comunicado_mail}", comunicado_notificacion: "${comunicado_noti}"}`,
+        datosNuevos: JSON.stringify(datosNuevos),
         ip,
         observacion: null
       });
@@ -338,16 +340,18 @@ class NotificacionTiempoRealControlador {
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
 
-      await pool.query(
+      const actualizacion = await pool.query(
         `
         UPDATE eu_configurar_alertas SET vacacion_mail = $1, vacacion_notificacion = $2, permiso_mail = $3,
           permiso_notificacion = $4, hora_extra_mail = $5, hora_extra_notificacion = $6, comida_mail = $7, 
           comida_notificacion = $8, comunicado_mail = $9, comunicado_notificacion = $10 
-        WHERE id_empleado = $11
+        WHERE id_empleado = $11 RETURNING *
         `
         ,
         [vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti,
           comida_mail, comida_noti, comunicado_mail, comunicado_noti, id_empleado]);
+
+      const [datosNuevos] = actualizacion.rows;
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -355,7 +359,7 @@ class NotificacionTiempoRealControlador {
         usuario: user_name,
         accion: 'U',
         datosOriginales: JSON.stringify(datosOriginales),
-        datosNuevos: `{"vacacion_mail": "${vaca_mail}", "vacacion_notificacion": "${vaca_noti}", permiso_mail: "${permiso_mail}", permiso_notificacion: "${permiso_noti}", hora_extra_mail: "${hora_extra_mail}", hora_extra_notificacion: "${hora_extra_noti}", comida_mail: "${comida_mail}", comida_notificacion: "${comida_noti}", comunicado_mail: "${comunicado_mail}", comunicado_notificacion: "${comunicado_noti}"}`,
+        datosNuevos: JSON.stringify(datosNuevos),
         ip,
         observacion: null
       });
