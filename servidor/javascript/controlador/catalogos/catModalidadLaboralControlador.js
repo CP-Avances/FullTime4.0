@@ -92,9 +92,11 @@ class ModalidaLaboralControlador {
                 const { id, modalidad, user_name, ip } = req.body;
                 const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
                 const modalExiste = yield database_1.default.query(`
-                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
-                `, [modali.toUpperCase()]);
-                const consulta = yield database_1.default.query('SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1', [id]);
+                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1 AND NOT id = $2
+                `, [modali.toUpperCase(), id]);
+                const consulta = yield database_1.default.query(`
+                SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1
+                `, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({

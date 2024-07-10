@@ -129,11 +129,11 @@ export class CatTipoCargosComponent {
     }, error => {
       //console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       if (error.status == 400 || error.status == 404) {
-        this.toastr.info('Registro vacio', 'Cargos', {
+        this.toastr.info('No se han encontrado registros.', '', {
           timeOut: 3500,
         });
       } else {
-        this.toastr.error('Error al cargar los datos', 'Cargos', {
+        this.toastr.error('Error al cargar los datos.', 'Ups!!! algo salio mal.', {
           timeOut: 3500,
         });
       }

@@ -10,6 +10,7 @@ import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.s
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
 import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.component';
 import { use } from 'echarts';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-regimen',
@@ -94,6 +95,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
     private toastr: ToastrService,
     private formulario: FormBuilder,
     public cambio: ChangeDetectorRef,
+    public validar: ValidacionesService,
     public componentel: ListarRegimenComponent,
   ) { }
 
@@ -1448,7 +1450,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
       regimen.vacacion_dias_calendario = 0;
     }
     if (regimen.acumular === true) {
-      regimen.dias_maximo_acumulacion = parseFloat(form2.diasAcumulacionForm);
+      regimen.dias_max_acumulacion = parseFloat(form2.diasAcumulacionForm);
     }
 
     if (this.fija === true) {
@@ -1814,23 +1816,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
 
   // METODO PARA VALIDAR INGRESO DE NUMEROS
   IngresarSoloNumeros(evt: any) {
-    if (window.event) {
-      var keynum = evt.keyCode;
-    }
-    else {
-      keynum = evt.which;
-    }
-
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
-    if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6 || keynum == 46) {
-      return true;
-    }
-    else {
-      this.toastr.info('No se admite el ingreso de letras', 'Usar solo números', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
   // METODO PARA LIMPIAR CAMPOS DE FORMULARIO

@@ -339,15 +339,16 @@ export class PrincipalDepartamentoComponent implements OnInit {
       }
       this.rest.subirArchivoExcel(data).subscribe({
         next: (response) => {
-          this.toastr.success('Plantilla de Contratos importada.', 'Operación exitosa.', {
+          this.toastr.success('Plantilla de Departamentos importada.', 'Operación exitosa.', {
             timeOut: 3000,
           });
           this.LimpiarCampos();
           this.archivoForm.reset();
           this.nameFile = '';
         },
-        error: (error) => {;
-          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal',  {
+        error: (error) => {
+          ;
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
             timeOut: 4000,
           });
         }

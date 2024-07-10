@@ -26,6 +26,7 @@ export class CatModalidadLaboralService {
     return this.http.put(`${environment.url}/modalidadLaboral`, datos)
     .pipe(catchError(datos));
   }
+  
   Eliminar(id: any, datos: any){
     const url = `${environment.url}/modalidadLaboral/eliminar/${id}`;
     const httpOtions = {

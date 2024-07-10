@@ -88,13 +88,19 @@ class ModalidaLaboralControlador {
         try {
             const { id, modalidad, user_name, ip } = req.body;
             const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
+
             const modalExiste = await pool.query(
                 `
-                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1 AND NOT id = $2
                 `
-                , [modali.toUpperCase()]);
+                , [modali.toUpperCase(), id]);
 
-            const consulta = await pool.query('SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1', [id]);
+            const consulta = await pool.query(
+                `
+                SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1
+                `
+                , [id]);
+
             const [datosOriginales] = consulta.rows;
             if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -115,7 +121,9 @@ class ModalidaLaboralControlador {
 
             if (modalExiste.rows[0] != undefined && modalExiste.rows[0].descripcion != '' && modalExiste.rows[0].descripcion != null) {
                 return res.status(200).jsonp({ message: 'Modalidad Laboral ya esiste en el sistema.', status: '300' })
-            } else {
+
+            }
+            else {
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
 

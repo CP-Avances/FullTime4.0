@@ -108,12 +108,16 @@ class TiposCargosControlador {
             const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
             const tipoCargoExiste = await pool.query(
                 `
-                SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
+                SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1 AND NOT id = $2
                 `
-                , [cargo.toUpperCase()]);
+                , [cargo.toUpperCase(), id]);
 
 
-            const consulta = await pool.query('SELECT * FROM e_cat_tipo_cargo WHERE id = $1', [id]);
+            const consulta = await pool.query(
+                `
+                SELECT * FROM e_cat_tipo_cargo WHERE id = $1
+                `
+                , [id]);
             const [datosOriginales] = consulta.rows;
             if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({

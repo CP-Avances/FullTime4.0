@@ -108,9 +108,11 @@ class TiposCargosControlador {
                 // DAR FORMATO A LA PALABRA CARGO
                 const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
                 const tipoCargoExiste = yield database_1.default.query(`
-                SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
-                `, [cargo.toUpperCase()]);
-                const consulta = yield database_1.default.query('SELECT * FROM e_cat_tipo_cargo WHERE id = $1', [id]);
+                SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1 AND NOT id = $2
+                `, [cargo.toUpperCase(), id]);
+                const consulta = yield database_1.default.query(`
+                SELECT * FROM e_cat_tipo_cargo WHERE id = $1
+                `, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
