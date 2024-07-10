@@ -156,7 +156,7 @@ export class CargarPlantillaComponent {
         this.toastr.success('Operación exitosa.', 'Plantilla de Nivel departamentos importada.', {
           timeOut: 3000,
         });
-        window.location.reload();
+        this.LimpiarCampos();
         this.archivoForm.reset();
         this.nameFile = '';
       });
@@ -289,7 +289,7 @@ export class CargarPlantillaComponent {
         this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
           timeOut: 3000,
         });
-        window.location.reload();
+        this.LimpiarCampos();
         this.archivoForm.reset();
         this.nameFile = '';
       });
@@ -496,13 +496,13 @@ export class CargarPlantillaComponent {
   }
 
   registroCargos() {
-    if (this.listaCargosCorrectas.length > 0) {
+    if (this.listaCargosCorrectas?.length > 0) {
       this.restCa.subirArchivoExcelCargo(this.listaCargosCorrectas).subscribe(response => {
         console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de Cargos importada.', {
           timeOut: 3000,
         });
-        window.location.reload();
+        this.LimpiarCampos();
         this.archivoForm.reset();
         this.nameFile = '';
       });

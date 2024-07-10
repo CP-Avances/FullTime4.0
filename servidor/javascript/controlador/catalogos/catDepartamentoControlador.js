@@ -970,7 +970,7 @@ class DepartamentoControlador {
                                         valor.observacion = 'faltan niveles por registrar';
                                     }
                                     else if (objauxiliar.depa_superior == valor.depa_superior) {
-                                        valor.observacion = 'Deparatemto superior ya se encuentra configurado';
+                                        valor.observacion = 'Departamento superior ya esta configurado dentro de la plantilla';
                                     }
                                 }
                             }

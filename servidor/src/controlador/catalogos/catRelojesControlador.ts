@@ -661,7 +661,11 @@ class RelojesControlador {
                                 `SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1`
                                 , [item.departamento.toUpperCase()])
                             if (validDeparta.rows[0] != undefined && validDeparta.rows[0] != '') {
-                                if (validEstablecimiento.rows[0].id == validDeparta.rows[0].id_sucursal) {
+                                var VERIFICAR_DEP_SUC: any = await pool.query(
+                                    `SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2`
+                                    ,[validEstablecimiento.rows[0].id, item.departamento.toUpperCase()]
+                                )
+                                if (VERIFICAR_DEP_SUC.rows[0] != undefined && VERIFICAR_DEP_SUC.rows[0] != '') {
                                     var validCodigo = await pool.query(
                                         `SELECT * FROM ed_relojes WHERE UPPER(codigo) = $1`
                                         , [item.codigo.toString().toUpperCase()])
@@ -727,6 +731,7 @@ class RelojesControlador {
                                 } else {
                                     item.observacion = 'Departamento no pertenece al establecimiento';
                                 }
+                                
                             } else {
                                 item.observacion = 'Departamento no existe en el sistema';
                             }

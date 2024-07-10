@@ -555,34 +555,40 @@ class EmpleadoCargosControlador {
                                 if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
                                     var VERIFICAR_DEPARTAMENTO = yield database_1.default.query(`SELECT * FROM ed_departamentos WHERE UPPER(nombre) = $1`, [valor.departamento.toUpperCase()]);
                                     if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
-                                        var VERFICAR_CARGO = yield database_1.default.query(`SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1`, [valor.cargo.toUpperCase()]);
-                                        if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                                            if ((0, moment_1.default)(valor.fecha_desde).format('YYYY-MM-DD') >= (0, moment_1.default)(valor.fecha_hasta).format('YYYY-MM-DD')) {
-                                                valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta';
-                                            }
-                                            else {
-                                                const fechaRango = yield database_1.default.query(`
-                                  SELECT id FROM eu_empleado_cargos 
-                                  WHERE id_contrato = $1 AND 
-                                  ($2  BETWEEN fecha_inicio and fecha_final or $3 BETWEEN fecha_inicio and fecha_final or 
-                                  fecha_inicio BETWEEN $2 AND $3)
-                                  `, [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
-                                                if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
-                                                    valor.observacion = 'Existe un cargo vigente en esas fechas';
+                                        var VERIFICAR_DEP_SUC = yield database_1.default.query(`SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2`, [VERIFICAR_SUCURSALES.rows[0].id, valor.departamento.toUpperCase()]);
+                                        if (VERIFICAR_DEP_SUC.rows[0] != undefined && VERIFICAR_DEP_SUC.rows[0] != '') {
+                                            var VERFICAR_CARGO = yield database_1.default.query(`SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1`, [valor.cargo.toUpperCase()]);
+                                            if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+                                                if ((0, moment_1.default)(valor.fecha_desde).format('YYYY-MM-DD') >= (0, moment_1.default)(valor.fecha_hasta).format('YYYY-MM-DD')) {
+                                                    valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta';
                                                 }
                                                 else {
-                                                    // Discriminación de elementos iguales
-                                                    if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
-                                                        duplicados.push(valor);
+                                                    const fechaRango = yield database_1.default.query(`
+                                    SELECT id FROM eu_empleado_cargos 
+                                    WHERE id_contrato = $1 AND 
+                                    ($2  BETWEEN fecha_inicio and fecha_final or $3 BETWEEN fecha_inicio and fecha_final or 
+                                    fecha_inicio BETWEEN $2 AND $3)
+                                    `, [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
+                                                    if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
+                                                        valor.observacion = 'Existe un cargo vigente en esas fechas';
                                                     }
                                                     else {
-                                                        valor.observacion = '1';
+                                                        // Discriminación de elementos iguales
+                                                        if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
+                                                            duplicados.push(valor);
+                                                        }
+                                                        else {
+                                                            valor.observacion = '1';
+                                                        }
                                                     }
                                                 }
+                                            }
+                                            else {
+                                                valor.observacion = 'Cargo no existe en el sistema';
                                             }
                                         }
                                         else {
-                                            valor.observacion = 'Cargo no existe en el sistema';
+                                            valor.observacion = 'Departamento no pertenece a la sucursal';
                                         }
                                     }
                                     else {
@@ -686,17 +692,6 @@ class EmpleadoCargosControlador {
                 }
                 console.log('id_empleado: ', id_empleado);
                 console.log('departamento: ', id_departamento);
-                /*
-                console.log('id_empleado: ', id_empleado);
-                console.log('id_contrato: ', id_contrato);
-                console.log('fecha inicio: ', fecha_inicio);
-                console.log('fecha final: ', fecha_final);
-                console.log('departamento: ', id_departamento);
-                console.log('sucursal: ', id_sucursal);
-                console.log('sueldo: ', sueldo);
-                console.log('hora_trabaja: ', hora_trabaja);
-                console.log('tipo cargo: ', id_cargo);
-                */
                 // Registro de los datos de contratos
                 const response = yield database_1.default.query(`
         INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal, 

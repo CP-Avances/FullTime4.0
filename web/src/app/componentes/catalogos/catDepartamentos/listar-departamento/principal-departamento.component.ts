@@ -339,7 +339,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
       }
       this.rest.subirArchivoExcel(data).subscribe({
         next: (response) => {
-          this.toastr.success('Plantilla de Contratos importada.', 'Operación exitosa.', {
+          this.toastr.success('Plantilla de Departamentos importada.', 'Operación exitosa.', {
             timeOut: 3000,
           });
           this.LimpiarCampos();
