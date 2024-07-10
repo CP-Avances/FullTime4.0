@@ -197,6 +197,7 @@ export class MainNavComponent implements OnInit {
   subItemReportesAnalisisDatos: boolean = false;
   childrenReportesAnalisisDatos: any = [];
   vistaReportesAnalisisDatosAnalisisDatos: boolean = false;
+  subItemReportesAuditoria: boolean = false;
   childrenReportesAuditoria: any = [];
   vistaReportesAuditoria: boolean = false;
   datosPaginaRol: any = [];
@@ -542,11 +543,20 @@ export class MainNavComponent implements OnInit {
                     },
                     {
                       name: 'R. Análisis Datos.',
-                      accion: !this.HabilitarAlimentacion,
-                      estado: !this.HabilitarAlimentacion,
+                      accion: !this.subItemReportesAnalisisDatos,
+                      estado: !this.subItemReportesAnalisisDatos,
                       color: false,
                       activo: false,
                       icono: 'dashboard',
+                      url: '/home'
+                    },
+                    {
+                      name: 'R. Auditoria.',
+                      accion: !this.subItemReportesAuditoria,
+                      estado: !this.subItemReportesAuditoria,
+                      color: false,
+                      activo: false,
+                      icono: 'gavel',
                       url: '/home'
                     }
                     
@@ -1459,6 +1469,18 @@ export class MainNavComponent implements OnInit {
                         this.childrenReportesAnalisisDatos.push({name: 'Análisis Datos', url: '/analisisDatos', color: true, ver: true});
                       }
                       break;
+                    case 'reporte-auditoria':
+                      this.itemReportes = true;
+                      this.subItemReportesAuditoria = true;
+                      for(const parametrizacion of this.childrenReportesAuditoria){
+                        if(parametrizacion.url === '/reporte-auditoria'){
+                          this.vistaReportesAuditoria = true;
+                        }
+                      }
+                      if(!this.vistaReportesAuditoria){
+                        this.childrenReportesAuditoria.push({name: 'Auditoría', url: '/reporte-auditoria', color: true, ver: true});
+                      }
+                      break;
                   }
 
                   this.datosPaginaRol.push({accion: row.accion, id_funcion: row.id_funcion, link: row.link});
@@ -1876,10 +1898,27 @@ export class MainNavComponent implements OnInit {
                       activo: false,
                       icono: 'dashboard',
                       url: '/home'
+                    },
+                    {
+                      name: 'R. Auditoría',
+                      accion: this.subItemReportesAuditoria,
+                      estado: true,
+                      icono: 'gavel',
+                      subtitulo: true,
+                      color: true,
+                      children: this.childrenReportesAuditoria
+                    },
+                    {
+                      name: 'R. Auditoría.',
+                      accion: !this.subItemReportesAuditoria,
+                      estado: !this.subItemReportesAuditoria,
+                      color: false,
+                      activo: false,
+                      icono: 'gavel',
+                      url: '/home'
                     }
-                    
                   ]
-                },
+                }
               ]
               //Fin Armado de json con elementos de menu COMPLETE
 
@@ -2149,8 +2188,27 @@ export class MainNavComponent implements OnInit {
                   this.menuGeneralUsuarios[configuracionItem].children = this.menuGeneralUsuarios[configuracionItem].children.filter(child => child.name !== 'R. Análisis Datos.');
                 }
               }
-              //Fin Complemento de elementos
+              //Reportes-Auditoria
+              if(!this.subItemReportesAuditoria){
+                const configuracionItem = this.menuGeneralUsuarios.findIndex(item => item.name == 'Reportes');
+                if(configuracionItem !== -1 && this.menuGeneralUsuarios[configuracionItem].children){
+                  this.menuGeneralUsuarios[configuracionItem].children = this.menuGeneralUsuarios[configuracionItem].children.filter(child => child.name !== 'R. Auditoría');
+                }
+              }else{
+                const configuracionItem = this.menuGeneralUsuarios.findIndex(item => item.name == 'Reportes');
+                if(configuracionItem !== -1 && this.menuGeneralUsuarios[configuracionItem].children){
+                  this.menuGeneralUsuarios[configuracionItem].children = this.menuGeneralUsuarios[configuracionItem].children.filter(child => child.name !== 'R. Auditoría.');
+                }
+              }
+              //FIN COMPLEMENTO DE ELEMENTOS
               this.LlamarDatos();
+              console.log('DATOS_EMPRESA_', this.datosEmpresa);
+              //ACTUALIZACION DE NOMBRE DE EMPRESA EN PESTAÑA EMPRESA
+              
+              const indexNombreEmpresa = this.childrenParametrizacion.findIndex(item => item.name === 'Empresa');
+              if(indexNombreEmpresa !== -1){
+                this.childrenParametrizacion[indexNombreEmpresa].name = localStorage.getItem('name_empresa');
+              }
             }
         }
       );
