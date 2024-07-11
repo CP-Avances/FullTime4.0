@@ -35,6 +35,8 @@ export class EditarCargoComponent implements OnInit {
   idAsignacion: number;
 
   idEmpleadoAcceso: any;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+
   asignacionesAcceso: any;
   idSucursalesAcceso: any = [];
   idDepartamentosAcceso: any = [];
@@ -85,6 +87,7 @@ export class EditarCargoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
     this.idEmpleadoAcceso = localStorage.getItem('empleado');
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
@@ -102,7 +105,7 @@ export class EditarCargoComponent implements OnInit {
     let idEmpre = parseInt(localStorage.getItem('empresa') as string);
     this.sucursales = [];
     this.restSucursales.BuscarSucursalEmpresa(idEmpre).subscribe(datos => {
-      this.sucursales = this.FiltrarSucursalesAsignadas(datos);
+      this.sucursales = this.rolEmpleado === 1 ? datos : this.FiltrarSucursalesAsignadas(datos);
     }, error => {
       this.toastr.info('No se han encontrado registros de Sucursales.', '', {
         timeOut: 6000,
@@ -141,7 +144,7 @@ export class EditarCargoComponent implements OnInit {
     this.departamento = [];
     let idSucursal = form.idSucursalForm;
     this.restCatDepartamento.BuscarDepartamentoSucursal(idSucursal).subscribe(datos => {
-      this.departamento = this.FiltrarDepartamentosAsignados(datos);
+      this.departamento = this.rolEmpleado === 1 ? datos : this.FiltrarDepartamentosAsignados(datos);
     }, error => {
       this.toastr.info('Sucursal no cuenta con departamentos registrados.', '', {
         timeOut: 6000,

@@ -43,6 +43,8 @@ export class VerSucursalComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+
   constructor(
     public componentes: ListaSucursalesComponent,
     public componentee: VerEmpresaComponent,
@@ -56,6 +58,7 @@ export class VerSucursalComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.CargarDatosSucursal();
     this.ListaDepartamentos();
@@ -79,7 +82,7 @@ export class VerSucursalComponent implements OnInit {
   ListaDepartamentos() {
     this.datosDepartamentos = []
     this.restD.BuscarInformacionDepartamento(this.idSucursal).subscribe(datos => {
-      this.datosDepartamentos = this.FiltrarDepartamentosAsignados(datos);
+      this.datosDepartamentos = this.rolEmpleado === 1 ? datos : this.FiltrarDepartamentosAsignados(datos);
       this.OrdenarDatos(this.datosDepartamentos);
     })
   }
