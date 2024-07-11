@@ -438,6 +438,7 @@ class EmpleadoControlador {
       const mensajesError = verificaciones.map((verificacion, index) => verificacion === 1 ? errores[(index + 1).toString()] : null).filter(Boolean);
 
       if (mensajesError.length > 0) {
+        console.log('error empleado ', mensajesError)
         await pool.query('ROLLBACK');
         return res.status(500).jsonp({ message: `Ups!!! no fue posible modificar el directorio de ${mensajesError.join(', ')} del usuario.` });
       } else {
@@ -448,6 +449,7 @@ class EmpleadoControlador {
 
     }
     catch (error) {
+      console.log('error empleado 500', error)
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
@@ -1080,7 +1082,7 @@ class EmpleadoControlador {
         , [id_empleado]);
 
       const id_usuario = usuario.rows[0].id;
-      
+
 
       const datosNuevos = await pool.query(
         `
@@ -1913,7 +1915,7 @@ class EmpleadoControlador {
           let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
           nombreE = name1
         }
-        
+
 
         var apellidoE: any;
         let apellidos = data.apellido.split(' ');

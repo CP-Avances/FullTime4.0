@@ -186,7 +186,7 @@ class ReportesAsistenciaControlador {
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.departamentos = yield Promise.all(obj.departamentos.map((ele) => __awaiter(this, void 0, void 0, function* () {
                     ele.empleado = yield Promise.all(ele.empleado.map((o) => __awaiter(this, void 0, void 0, function* () {
-                        o.timbres = yield BuscarTimbresIncompletos(desde, hasta, o.codigo);
+                        o.timbres = yield BuscarTimbresIncompletos(desde, hasta, o.id);
                         console.log('Timbres: ', o);
                         return o;
                     })));
@@ -213,7 +213,7 @@ class ReportesAsistenciaControlador {
             let datos = req.body;
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    o.timbres = yield BuscarTimbresIncompletos(desde, hasta, o.codigo);
+                    o.timbres = yield BuscarTimbresIncompletos(desde, hasta, o.id);
                     console.log('Timbres: ', o);
                     return o;
                 })));
@@ -405,9 +405,9 @@ const BuscarTimbres = function (fec_inicio, fec_final, codigo) {
 const BuscarTimbresIncompletos = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
-        SELECT CAST(fecha_hora_horario AS VARCHAR), codigo, estado_timbre, tipo_accion AS accion, tipo_dia, estado_origen
+        SELECT CAST(fecha_hora_horario AS VARCHAR), id_empleado, estado_timbre, tipo_accion AS accion, tipo_dia, estado_origen
         FROM eu_asistencia_general WHERE CAST(fecha_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' 
-            AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 
+            AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 
             AND fecha_hora_timbre IS null AND estado_origen IN (\'N\',\'HL\', \'HFD\') 
         ORDER BY fecha_hora_horario ASC
         `, [fec_inicio, fec_final, codigo])

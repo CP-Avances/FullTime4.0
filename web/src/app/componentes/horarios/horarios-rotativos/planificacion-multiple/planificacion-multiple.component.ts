@@ -85,7 +85,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       obj.index = index;
       index = index + 1;
     })
-    //console.log('this.datosSeleccionados: ', this.datosSeleccionados.usuarios!);
+    console.log('this.datosSeleccionados: ', this.datosSeleccionados.usuarios!);
   }
 
   /** **************************************************************************************** **
@@ -455,9 +455,9 @@ export class PlanificacionMultipleComponent implements OnInit {
     }
 
     if (verificador === 0) {
-      //console.log('ver seleccionado ', this.datosSeleccionados.usuarios[index].asignado);
-      let codigo = this.datosSeleccionados.usuarios[index].codigo;
-      this.VerificarExistencias(dia, codigo, data, index);
+      //console.log('ver seleccionado *1', this.datosSeleccionados.usuarios[index].asignado);
+      let id_empleado = this.datosSeleccionados.usuarios[index].id;
+      this.VerificarExistencias(dia, id_empleado, data, index);
     }
     else if (verificador === 1) {
       this.toastr.warning('Horario ya se encuentra registrado.', 'Ups!!! VERIFICAR.', {
@@ -479,7 +479,7 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   // METODO PARA VERIFICAR SI EXISTEN HORARIOS
   eliminar_lista: any = [];
-  VerificarExistencias(dia: any, codigo: string, data: any, index: any) {
+  VerificarExistencias(dia: any, id_empleado: string, data: any, index: any) {
 
     let verificar = 0;
     let mes = moment(this.fechaInicialF.value).format('MM-YYYY');
@@ -491,7 +491,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       fechaFinal: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
     };
 
-    this.horario.VerificarHorariosExistentes(codigo, fechas).subscribe(existe => {
+    this.horario.VerificarHorariosExistentes(id_empleado, fechas).subscribe(existe => {
       //console.log('ver existencias ', existe, ' asignados ', asignados, ' data ', data)
       let existencias = {
         existe: existe,
@@ -501,7 +501,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       //console.log('ver datos de existencias ', this.datosSeleccionados.usuarios[index].existencias)
 
       for (var i = 0; i < existe.length; i++) {
-        this.horarios.forEach(o => {
+        this.horarios.forEach((o: any) => {
           if (o.codigo === existe[i].codigo) {
             existe[i].detalles = o;
           }
@@ -800,8 +800,8 @@ export class PlanificacionMultipleComponent implements OnInit {
       fechaFinal: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
     };
 
-    let codigo = this.datosSeleccionados.usuarios[index].codigo;
-    this.horario.VerificarHorariosExistentes(codigo, fechas).subscribe(existe => {
+    let id_empleado = this.datosSeleccionados.usuarios[index].id;
+    this.horario.VerificarHorariosExistentes(id_empleado, fechas).subscribe(existe => {
 
       let existencias = {
         existe: existe,
@@ -910,7 +910,7 @@ export class PlanificacionMultipleComponent implements OnInit {
 
       // PREPARAR DATA PARA ELIMINAR HORARIO
       let plan_fecha = {
-        codigo: usuario.codigo,
+        id_empleado: usuario.id,
         fec_final: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
         fec_inicio: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
         id_horario: datoHorario.id,
@@ -1078,7 +1078,7 @@ export class PlanificacionMultipleComponent implements OnInit {
               }
 
               let plan = {
-                codigo: li.codigo,
+                id_empleado: li.id,
                 tipo_dia: dia_tipo,
                 min_antes: element.minutos_antes,
                 tolerancia: accion,
@@ -1203,7 +1203,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       this.eliminar_lista.forEach((h: any) => {
         //console.log('ingresa a eliminar horarios')
         let plan_fecha = {
-          codigo: h.codigo,
+          id_empleado: h.id_empleado,
           fec_final: h.fec_final,
           fec_inicio: h.fec_inicio,
           id_horario: h.id_horario,

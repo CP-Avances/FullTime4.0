@@ -1259,7 +1259,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
     let datos = {
       lista_fechas: this.fechasHorario,
-      codigo: this.empleado.codigo
+      id_empleado: this.empleado.id
     }
 
     this.planificar.BuscarHorarioFechas(datos).subscribe(data => {

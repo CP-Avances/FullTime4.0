@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
 import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
+import { Request, Response } from 'express';
 import pool from '../../../database';
 import excel from 'xlsx';
 import fs from 'fs';
@@ -10,15 +10,15 @@ class EmpleadoHorariosControlador {
     // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA  --**VERIFICADO
     public async VerificarHorariosExistentes(req: Request, res: Response): Promise<any> {
         const { fechaInicio, fechaFinal } = req.body;
-        const { codigo } = req.params;
+        const { id_empleado } = req.params;
         const HORARIO = await pool.query(
             `
             SELECT DISTINCT pg.id_horario, ch.hora_trabajo, ch.codigo, ch.default_  
             FROM eu_asistencia_general AS pg, eh_cat_horarios AS ch
-            WHERE pg.codigo = $3 AND pg.id_horario = ch.id AND
+            WHERE pg.id_empleado = $3 AND pg.id_horario = ch.id AND
                 (fecha_horario BETWEEN $1 AND $2)
             `
-            , [fechaInicio, fechaFinal, codigo]);
+            , [fechaInicio, fechaFinal, id_empleado]);
         if (HORARIO.rowCount != 0) {
             return res.jsonp(HORARIO.rows)
         }
@@ -201,225 +201,20 @@ class EmpleadoHorariosControlador {
     // VERIFICAR EXISTENCIA DE PLANIFICACION   --**VERIFICADO
     public async VerificarFechasHorario(req: Request, res: Response): Promise<any> {
         const { fechaInicio, fechaFinal, id_horario } = req.body;
-        const { codigo } = req.params;
+        const { id_empleado } = req.params;
         const HORARIO = await pool.query(
             `
             SELECT id FROM eu_asistencia_general 
-            WHERE codigo = $3 AND id_horario = $4 AND
+            WHERE id_empleado = $3 AND id_horario = $4 AND
                 (fecha_horario BETWEEN $1 AND $2) LIMIT 4
             `
-            , [fechaInicio, fechaFinal, codigo, id_horario]);
+            , [fechaInicio, fechaFinal, id_empleado, id_horario]);
         if (HORARIO.rowCount != 0) {
             return res.jsonp(HORARIO.rows)
         }
         else {
             return res.status(404).jsonp({ text: 'Registros no encontrados' });
         }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /** Verificar que los datos de la plantilla no se encuentren duplicados */
-    public async VerificarPlantilla_HorarioEmpleado(req: Request, res: Response) {
-        let list: any = req.files;
-        let cadena = list.uploads[0].path;
-        let filename = cadena.split("\\")[1];
-        var filePath = `./plantillas/${filename}`
-        const workbook = excel.readFile(filePath);
-        const sheet_name_list = workbook.SheetNames;
-        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-        var contarDatosData = 0;
-        var contarFechas = 0;
-        var contador_arreglo = 1;
-        var arreglos_datos: any = [];
-        //Leer la plantilla para llenar un array con los datos cedula y usuario para verificar que no sean duplicados
-        plantilla.forEach(async (data: any) => {
-            // Datos que se leen de la plantilla ingresada
-            const { fecha_inicio, fecha_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, nombre_horario, estado } = data;
-            let datos_array = {
-                fec_inicio: fecha_inicio,
-                fec_final: fecha_final,
-                horario: nombre_horario
-            }
-            arreglos_datos.push(datos_array);
-        });
-        function compare(a: any, b: any) {
-            var inicio_1 = new Date(a.fec_inicio.split('/')[2] + '-' + a.fec_inicio.split('/')[1] + '-' + a.fec_inicio.split('/')[0] + 'T00:00:00');
-            var inicio_2 = new Date(b.fec_inicio.split('/')[2] + '-' + b.fec_inicio.split('/')[1] + '-' + b.fec_inicio.split('/')[0] + 'T00:00:00');
-            if (Date.parse(moment(inicio_1).format('YYYY-MM-DD')) < Date.parse(moment(inicio_2).format('YYYY-MM-DD'))) {
-                return -1;
-            }
-            if (Date.parse(moment(inicio_1).format('YYYY-MM-DD')) > Date.parse(moment(inicio_2).format('YYYY-MM-DD'))) {
-                return 1;
-            }
-            return 0;
-        }
-        arreglos_datos.sort(compare);
-
-        // Vamos a verificar dentro de arreglo_datos que no se encuentren datos duplicados
-        for (var i = 0; i <= arreglos_datos.length - 1; i++) {
-            for (var j = 0; j <= arreglos_datos.length - 1; j++) {
-
-                if (arreglos_datos[i].horario.toUpperCase() === arreglos_datos[j].horario.toUpperCase() &&
-                    arreglos_datos[i].fec_inicio === arreglos_datos[j].fec_inicio &&
-                    arreglos_datos[i].fec_final === arreglos_datos[j].fec_final) {
-                    contarDatosData = contarDatosData + 1;
-                }
-
-                if (j > i) {
-                    var inicio_1 = new Date(arreglos_datos[i].fec_inicio.split('/')[2] + '-' + arreglos_datos[i].fec_inicio.split('/')[1] + '-' + arreglos_datos[i].fec_inicio.split('/')[0] + 'T00:00:00');
-                    var inicio_2 = new Date(arreglos_datos[j].fec_inicio.split('/')[2] + '-' + arreglos_datos[j].fec_inicio.split('/')[1] + '-' + arreglos_datos[j].fec_inicio.split('/')[0] + 'T00:00:00');
-                    var final_1 = new Date(arreglos_datos[i].fec_final.split('/')[2] + '-' + arreglos_datos[i].fec_final.split('/')[1] + '-' + arreglos_datos[i].fec_final.split('/')[0] + 'T00:00:00');
-
-                    console.log('if', Date.parse(moment(inicio_1).format('YYYY-MM-DD')), Date.parse(moment(inicio_2).format('YYYY-MM-DD')),
-                        Date.parse(moment(final_1).format('YYYY-MM-DD')))
-                    if (Date.parse(moment(inicio_1).format('YYYY-MM-DD')) <= Date.parse(moment(inicio_2).format('YYYY-MM-DD')) &&
-                        Date.parse(moment(inicio_2).format('YYYY-MM-DD')) > Date.parse(moment(final_1).format('YYYY-MM-DD'))) {
-                    }
-                    else {
-                        if (arreglos_datos[i].horario.toUpperCase() === arreglos_datos[j].horario.toUpperCase()) {
-                            contarFechas = contarFechas + 1;
-                        }
-                    }
-                }
-            }
-            if (contarFechas != 0) {
-                // break;
-                console.log('conto 1')
-            }
-            contador_arreglo = contador_arreglo + 1;
-        }
-
-        if (contarFechas != 0) {
-            return res.jsonp({ message: 'error' });
-        }
-        else {
-            if (contarDatosData === plantilla.length) {
-                return res.jsonp({ message: 'correcto' });
-            } else {
-                return res.jsonp({ message: 'error' });
-            }
-
-        }
-        fs.unlinkSync(filePath);
-    }
-
-
-    /** Crear Planificacion General con los datos de la plantilla ingresada */
-    public async CrearPlanificacionGeneral(req: Request, res: Response) {
-        let list: any = req.files;
-        let cadena = list.uploads[0].path;
-        let filename = cadena.split("\\")[1];
-        var filePath = `./plantillas/${filename}`
-        const workbook = excel.readFile(filePath);
-        const sheet_name_list = workbook.SheetNames;
-        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-        var arrayDetalles: any = [];
-
-        const { user_name, ip } = req.body;
-
-        //Leer la plantilla para llenar un array con los datos cedula y usuario para verificar que no sean duplicados
-        plantilla.forEach(async (data: any) => {
-            const { id } = req.params;
-            const { codigo } = req.params;
-            // Datos que se leen de la plantilla ingresada
-            const { fecha_inicio, fecha_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, nombre_horario, estado } = data;
-
-            const HORARIO = await pool.query(
-                `
-                SELECT id FROM eh_cat_horarios WHERE UPPER(nombre) = $1
-                `
-                , [nombre_horario.toUpperCase()]);
-
-            const CARGO = await pool.query(
-                `
-                SELECT MAX(ec.id) FROM eu_empleado_cargos AS ec, eu_empleado_contratos AS ce, eu_empleados AS e 
-                WHERE ce.id_empleado = e.id AND ec.id_contrato = ce.id AND e.id = $1
-                `
-                , [id]);
-
-            // Detalle de horario
-            const DETALLES = await pool.query(
-                `
-                SELECT * FROM eh_detalle_horarios WHERE id_horario = $1
-                `
-                , [HORARIO.rows[0]['id']]);
-            arrayDetalles = DETALLES.rows;
-            var fechasHorario = []; // Array que contiene todas las fechas del mes indicado 
-
-            // Inicializar datos de fecha
-            var start = new Date(fecha_inicio.split('/')[2] + '-' + fecha_inicio.split('/')[1] + '-' + fecha_inicio.split('/')[0] + 'T00:00:00');
-            var end = new Date(fecha_final.split('/')[2] + '-' + fecha_final.split('/')[1] + '-' + fecha_final.split('/')[0] + 'T00:00:00');
-
-            // Lógica para obtener el nombre de cada uno de los día del periodo indicado
-            while (start <= end) {
-                fechasHorario.push(moment(start).format('YYYY-MM-DD'));
-                var newDate = start.setDate(start.getDate() + 1);
-                start = new Date(newDate);
-            }
-            fechasHorario.map((obj: any) => {
-                arrayDetalles.map(async (element: any) => {
-                    try {
-                        var accion = 0;
-                        if (element.tipo_accion === 'E') {
-                            accion = element.minu_espera;
-                        }
-                        var estado = null;
-    
-                        // INICIAR TRANSACCION
-                        await pool.query('BEGIN');
-                        
-                        await pool.query(
-                            `
-                            INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado, id_detalle_horario,
-                                fecha_horario, id_empleado_cargo, tipo_accion, codigo, id_horario) 
-                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-                            `
-                            ,
-                            [obj + ' ' + element.hora, accion, estado, element.id,
-                                obj, CARGO.rows[0]['max'], element.tipo_accion, codigo, HORARIO.rows[0]['id']]);
-                        
-                        // AUDITORIA
-                        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                            tabla: 'eu_asistencia_general',
-                            usuario: user_name,
-                            accion: 'I',
-                            datosOriginales: '',
-                            datosNuevos: `{fecha_hora_horario: ${obj + ' ' + element.hora}, tolerancia: ${accion}, estado: ${estado}, id_detalle_horario: ${element.id}, fecha_horario: ${obj}, id_empleado_cargo: ${CARGO.rows[0]['max']}, tipo_accion: ${element.tipo_accion}, codigo: ${codigo}, id_horario: ${HORARIO.rows[0]['id']}}`,
-                            ip,
-                            observacion: null
-                        });
-
-                        // FINALIZAR TRANSACCION
-                        await pool.query('COMMIT');
-                   } catch (error) {
-                        // REVERTIR TRANSACCION
-                        await pool.query('ROLLBACK');
-                   }
-                })
-            })
-            return res.jsonp({ message: 'correcto' });
-        });
-
-        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-        fs.access(filePath, fs.constants.F_OK, (err) => {
-            if (err) {
-            } else {
-                // ELIMINAR DEL SERVIDOR
-                fs.unlinkSync(filePath);
-            }
-        });
     }
 
 

@@ -235,7 +235,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       fechaFinal: form.fechaFinalForm,
       id_horario: form.horarioForm
     };
-    this.rest.VerificarDuplicidadHorarios(this.data_horario.codigo, fechas).subscribe(existe => {
+    this.rest.VerificarDuplicidadHorarios(this.data_horario.idEmpleado, fechas).subscribe(existe => {
       this.toastr.warning(
         'Fechas y horario seleccionado ya se encuentran registrados.',
         'Verificar la planificación.', {
@@ -315,7 +315,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         fechaFinal: form.fechaFinalForm,
       };
       // BUSQUEDA DE HORARIOS
-      this.rest.VerificarHorariosExistentes(this.data_horario.codigo, fechas).subscribe(existe => {
+      this.rest.VerificarHorariosExistentes(this.data_horario.idEmpleado, fechas).subscribe(existe => {
         this.horariosEmpleado = existe;
         // LEER HORARIOS EXISTENTES
         this.horariosEmpleado.map((h: any) => {
@@ -467,7 +467,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     })
     this.eliminar_horarios.forEach((h: any) => {
       let plan_fecha = {
-        codigo: this.data_horario.codigo,
+        id_empleado: this.data_horario.idEmpleado,
         fec_final: form.fechaFinalForm,
         fec_inicio: form.fechaInicioForm,
         id_horario: h.id,
@@ -687,7 +687,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       }
       // HORARIO DEFAULT FERIADO
       else if (tipo_dia === 'DFD') {
-        this.rest.VerificarHorariosExistentes(this.data_horario.codigo, fechas).subscribe(existe => {
+        this.rest.VerificarHorariosExistentes(this.data_horario.idEmpleado, fechas).subscribe(existe => {
           this.EliminarRegistrosH(existe, obj);
         });
         this.lista_descanso.forEach((desc: any) => {
@@ -701,7 +701,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       }
       // HORARIO LIBRE
       else if (tipo_dia === 'L' && origen === 'L') {
-        this.rest.VerificarHorariosExistentes(this.data_horario.codigo, fechas).subscribe(existe => {
+        this.rest.VerificarHorariosExistentes(this.data_horario.idEmpleado, fechas).subscribe(existe => {
           this.EliminarRegistrosH(existe, obj);
         });
         this.lista_descanso.forEach((desc: any) => {
@@ -740,7 +740,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         }
         // DATA DE PLANIFICACION HORARIA
         let plan = {
-          codigo: this.empleado[0].codigo,
+          id_empleado: this.empleado[0].id,
           tipo_dia: tipo_dia,
           min_antes: element.minutos_antes,
           tolerancia: accion,
@@ -778,7 +778,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       fechaInicio: form.fechaInicioForm,
       fechaFinal: form.fechaFinalForm,
     };
-    this.rest.VerificarHorariosExistentes(this.data_horario.codigo, fechas).subscribe(existe => {
+    this.rest.VerificarHorariosExistentes(this.data_horario.idEmpleado, fechas).subscribe(existe => {
       this.existencias = existe;
       this.EliminarPlanificacion(form);
     }, vacio => {
@@ -841,7 +841,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     // METODO PARA ELIMINAR HORARIOS
     this.eliminar_horarios.forEach((h: any) => {
       let plan_fecha = {
-        codigo: this.data_horario.codigo,
+        id_empleado: this.data_horario.idEmpleado,
         fec_final: form.fechaFinalForm,
         fec_inicio: form.fechaInicioForm,
         id_horario: h.id,
@@ -963,7 +963,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     existe.forEach((h: any) => {
       if (h.default_ === 'N' || h.default_ === 'DHA' || h.default_ === 'L' || h.default_ === 'FD') {
         let plan_fecha = {
-          codigo: this.data_horario.codigo,
+          id_empleado: this.data_horario.idEmpleado,
           fec_final: obj,
           fec_inicio: obj,
           id_horario: h.id_horario,

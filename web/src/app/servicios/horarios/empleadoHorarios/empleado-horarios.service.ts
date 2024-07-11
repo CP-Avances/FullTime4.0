@@ -13,12 +13,12 @@ export class EmpleadoHorariosService {
   ) { }
 
   // METODO PARA VERIFICAR HORARIOS DUPLICADOS  --**VERIFICADO
-  VerificarDuplicidadHorarios(codigo: string, datos: any) {
-    return this.http.post(`${environment.url}/empleadoHorario/validarFechas/${codigo}`, datos);
+  VerificarDuplicidadHorarios(id_empleado: string, datos: any) {
+    return this.http.post(`${environment.url}/empleadoHorario/validarFechas/${id_empleado}`, datos);
   }
   // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS  --**VERIFICADO
-  VerificarHorariosExistentes(codigo: string, datos: any) {
-    return this.http.post<any>(`${environment.url}/empleadoHorario/horarios-existentes/${codigo}`, datos);
+  VerificarHorariosExistentes(id_empleado: string, datos: any) {
+    return this.http.post<any>(`${environment.url}/empleadoHorario/horarios-existentes/${id_empleado}`, datos);
   }
   // METODO PARA BUSCAR HORARIO DEL USUARIO POR HORAS MISMO DIA (MD)
   BuscarHorarioHorasMD(datos: any) {

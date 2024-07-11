@@ -51,6 +51,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    console.log('informacion ', this.informacion)
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
@@ -151,13 +152,13 @@ export class RegistrarAsistenciaComponent implements OnInit {
     this.progreso = true;
     let datos = {
       id: this.informacion.detalle.id,
-      codigo: this.informacion.detalle.codigo,
       fecha: moment(seleccionado.fec_hora_timbre_servidor).format('YYYY-MM-DD HH:mm:ss'),
       accion: this.informacion.detalle.tipo_entr_salida,
       id_timbre: seleccionado.id,
+      id_empleado: this.informacion.detalle.id_empleado,
       user_name: this.user_name,
       ip: this.ip
-    }
+      }
     console.log('datos enviados ', datos)
     this.asistir.ActualizarAsistenciaManual(datos).subscribe(data => {
       console.log('ver datos ', data)

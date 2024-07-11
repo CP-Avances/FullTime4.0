@@ -25,7 +25,7 @@ class ReportesTiempoLaboradoControlador {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
                         car.cargos = yield Promise.all(car.cargos.map((empl) => __awaiter(this, void 0, void 0, function* () {
                             empl.empleado = yield Promise.all(empl.empleado.map((o) => __awaiter(this, void 0, void 0, function* () {
-                                const listaTimbres = yield BuscarTiempoLaborado(desde, hasta, o.codigo);
+                                const listaTimbres = yield BuscarTiempoLaborado(desde, hasta, o.id);
                                 o.timbres = yield agruparTimbres(listaTimbres);
                                 console.log('tiempo laborado: ', o);
                                 return o;
@@ -64,7 +64,7 @@ class ReportesTiempoLaboradoControlador {
             let datos = req.body;
             let n = yield Promise.all(datos.map((suc) => __awaiter(this, void 0, void 0, function* () {
                 suc.empleados = yield Promise.all(suc.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    const listaTimbres = yield BuscarTiempoLaborado(desde, hasta, o.codigo);
+                    const listaTimbres = yield BuscarTiempoLaborado(desde, hasta, o.id);
                     o.timbres = yield agruparTimbres(listaTimbres);
                     console.log('Timbres: ', o);
                     return o;
@@ -86,12 +86,12 @@ const BuscarTiempoLaborado = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
         SELECT CAST(fecha_horario AS VARCHAR), CAST(fecha_hora_horario AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR),
-            codigo, estado_timbre, tipo_accion AS accion, minutos_alimentacion, tipo_dia, id_horario, 
+            id_empleado, estado_timbre, tipo_accion AS accion, minutos_alimentacion, tipo_dia, id_horario, 
             estado_origen, tolerancia 
         FROM eu_asistencia_general WHERE CAST(fecha_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' 
-            AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 
+            AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 
             AND tipo_accion IN (\'E\',\'I/A\', \'F/A\', \'S\') 
-        ORDER BY codigo, fecha_hora_horario ASC
+        ORDER BY id_empleado, fecha_hora_horario ASC
         `, [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;

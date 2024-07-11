@@ -629,9 +629,8 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     let datos = {
       fecha_inicio: moment(this.info.fecha_inicio).format('YYYY-MM-DD'),
       fecha_final: moment(this.info.fecha_final).format('YYYY-MM-DD'),
-      codigo: this.empleado.codigo
+      id_empleado: this.empleado.id
     }
-
     this.planificar.BuscarHorarioFechas(datos).subscribe(data => {
       this.horario = data;
       this.ContarDiasSolicitados();
@@ -1368,7 +1367,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
     let datos = {
       lista_fechas: this.fechasHorario,
-      codigo: this.empleado.codigo
+      id_empleado: this.empleado.id
     }
 
     this.planificar.BuscarHorarioFechas(datos).subscribe(data => {

@@ -103,7 +103,7 @@ export class EliminarIndividualComponent implements OnInit {
 
   // METODO PARA BUSCAR PLANIFICACION
   lista_horarios: any = [];
-  codigo_usuario: string = '';
+  ids_usuario: string = '';
   ver_horarios: boolean = false;
   isChecked: boolean = false;
   horariosSeleccionados: any = [];
@@ -112,18 +112,18 @@ export class EliminarIndividualComponent implements OnInit {
     let busqueda = {
       fecha_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
       fecha_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
-      codigo: ''
+      id_empleado: ''
     }
     this.datosEliminar.usuario.forEach((obj: any) => {
-      if (this.codigo_usuario === '') {
-        this.codigo_usuario = '\'' + obj.codigo + '\''
+      if (this.ids_usuario === '') {
+        this.ids_usuario = '\'' + obj.id + '\''
       }
       else {
-        this.codigo_usuario = this.codigo_usuario + ', \'' + obj.codigo + '\''
+        this.ids_usuario = this.ids_usuario + ', \'' + obj.id + '\''
       }
     })
 
-    busqueda.codigo = this.codigo_usuario;
+    busqueda.id_empleado = this.ids_usuario;
 
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
       //console.log('ver datos horarios ', datos)
@@ -212,7 +212,7 @@ export class EliminarIndividualComponent implements OnInit {
     this.horariosSeleccionados.forEach((obj: any) => {
       this.datosEliminar.usuario.forEach((usu: any) => {
         let plan_fecha = {
-          codigo: usu.codigo,
+          id_empleado: usu.id,
           fec_final: final,
           fec_inicio: inicio,
           id_horario: obj.id_horario,

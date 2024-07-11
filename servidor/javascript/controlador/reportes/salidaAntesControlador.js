@@ -22,7 +22,7 @@ class SalidasAntesControlador {
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.departamentos = yield Promise.all(obj.departamentos.map((ele) => __awaiter(this, void 0, void 0, function* () {
                     ele.empleado = yield Promise.all(ele.empleado.map((o) => __awaiter(this, void 0, void 0, function* () {
-                        o.timbres = yield BuscarSalidasAnticipadas(desde, hasta, o.codigo);
+                        o.timbres = yield BuscarSalidasAnticipadas(desde, hasta, o.id);
                         console.log('timbres:-------------------- ', o);
                         return o;
                     })));
@@ -49,7 +49,7 @@ class SalidasAntesControlador {
             let datos = req.body;
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    o.timbres = yield BuscarSalidasAnticipadas(desde, hasta, o.codigo);
+                    o.timbres = yield BuscarSalidasAnticipadas(desde, hasta, o.id);
                     console.log('Timbres: ', o);
                     return o;
                 })));
@@ -72,10 +72,10 @@ const BuscarSalidasAnticipadas = function (fec_inicio, fec_final, codigo) {
         return yield database_1.default.query(`
         SELECT CAST(fecha_hora_horario AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR), 
             EXTRACT(epoch FROM (fecha_hora_horario - fecha_hora_timbre)) AS diferencia, 
-            codigo, estado_timbre, tipo_accion AS accion, tipo_dia 
+            id_empleado, estado_timbre, tipo_accion AS accion, tipo_dia 
         FROM eu_asistencia_general 
         WHERE CAST(fecha_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' 
-            AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 
+            AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 
             AND fecha_hora_timbre < fecha_hora_horario AND tipo_dia NOT IN (\'L\', \'FD\') 
             AND tipo_accion = \'S\'
         ORDER BY fecha_hora_horario ASC

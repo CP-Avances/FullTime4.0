@@ -285,7 +285,7 @@ export class EditarPlanComidasComponent implements OnInit {
   }
 
   // METODO PARA VERIFICAR SI EL EMPLEADO TIENE REGISTRADO UN HORARIO EN LAS FECHAS INGRESADAS
-  VerificarHorarioEmpleado(form, datosPlanComida) {
+  VerificarHorarioEmpleado(form: any, datosPlanComida: any) {
     let datosHorario = {
       fechaInicio: form.fechaInicioForm,
       fechaFinal: form.fechaFinForm

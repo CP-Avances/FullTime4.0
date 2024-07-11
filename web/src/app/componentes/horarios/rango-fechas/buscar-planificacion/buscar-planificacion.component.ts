@@ -116,30 +116,30 @@ export class BuscarPlanificacionComponent {
   }
 
   // METODO PARA VER PLANIFICACION
-  codigos: string = '';
+  ids_empleado: string = '';
   VerPlanificacion() {
-    this.codigos = '';
+    this.ids_empleado = '';
     console.log('resultados .... ', this.resultados)
     this.resultados.forEach((obj: any) => {
-      if (this.codigos === '') {
-        this.codigos = '\'' + obj.codigo + '\''
+      if (this.ids_empleado === '') {
+        this.ids_empleado = '\'' + obj.id + '\''
       }
       else {
-        this.codigos = this.codigos + ', \'' + obj.codigo + '\''
+        this.ids_empleado = this.ids_empleado + ', \'' + obj.id + '\''
       }
     })
-    this.BuscarHorarioPeriodo(this.codigos);
+    this.BuscarHorarioPeriodo(this.ids_empleado);
   }
 
   // METODO PARA SELECCIONAR TIPO DE BUSQUEDA
-  BuscarHorarioPeriodo(codigo: any) {
+  BuscarHorarioPeriodo(id_empleado: any) {
     if (this.fechaInicialF.value != null && this.fechaFinalF.value != null) {
-      this.ObtenerHorariosEmpleado(this.fechaInicialF.value, this.fechaFinalF.value, 1, codigo);
+      this.ObtenerHorariosEmpleado(this.fechaInicialF.value, this.fechaFinalF.value, 1, id_empleado);
     }
     else {
       let inicio = moment().format('YYYY/MM/01');
       let final = moment().format('YYYY/MM/') + moment().daysInMonth();
-      this.ObtenerHorariosEmpleado(inicio, final, 2, codigo);
+      this.ObtenerHorariosEmpleado(inicio, final, 2, id_empleado);
     }
   }
 
@@ -147,7 +147,7 @@ export class BuscarPlanificacionComponent {
   horariosEmpleado: any = [];
   mes_inicio: any = '';
   mes_fin: any = '';
-  ObtenerHorariosEmpleado(fec_inicio: any, fec_final: any, opcion: number, codigo: any) {
+  ObtenerHorariosEmpleado(fec_inicio: any, fec_final: any, opcion: number, id_empleado: any) {
     this.editar_activar = false;
     this.editar_horario = false;
     this.columnAccion = true;
@@ -164,14 +164,14 @@ export class BuscarPlanificacionComponent {
     let busqueda = {
       fecha_inicio: this.mes_inicio,
       fecha_final: this.mes_fin,
-      codigo: codigo
+      id_empleado: id_empleado
     }
     this.plan.BuscarPlanificacionHoraria(busqueda).subscribe(datos => {
       if (datos.message === 'OK') {
         this.horariosEmpleado = datos.data;
         let index = 0;
         this.horariosEmpleado.forEach((obj: any) => {
-          this.resultados.forEach(r => {
+          this.resultados.forEach((r: any) => {
             if (r.codigo === obj.codigo_e) {
               obj.id_empleado = r.id;
               obj.id_cargo = r.id_cargo;
@@ -344,7 +344,7 @@ export class BuscarPlanificacionComponent {
     let busqueda = {
       fecha_inicio: this.mes_inicio,
       fecha_final: this.mes_fin,
-      codigo: this.codigos
+      id_empleado: this.ids_empleado
     }
     let codigo_horario = '';
     let tipos: any = [];

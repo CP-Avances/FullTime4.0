@@ -388,6 +388,7 @@ class EmpleadoControlador {
                 const verificaciones = [verificar_permisos, verificar_imagen, verificar_vacunas, verificar_contrato];
                 const mensajesError = verificaciones.map((verificacion, index) => verificacion === 1 ? errores[(index + 1).toString()] : null).filter(Boolean);
                 if (mensajesError.length > 0) {
+                    console.log('error empleado ', mensajesError);
                     yield database_1.default.query('ROLLBACK');
                     return res.status(500).jsonp({ message: `Ups!!! no fue posible modificar el directorio de ${mensajesError.join(', ')} del usuario.` });
                 }
@@ -398,6 +399,7 @@ class EmpleadoControlador {
                 }
             }
             catch (error) {
+                console.log('error empleado 500', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });

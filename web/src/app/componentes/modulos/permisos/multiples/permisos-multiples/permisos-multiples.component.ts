@@ -829,10 +829,10 @@ export class PermisosMultiplesComponent implements OnInit {
     this.sin_horario = 0
     this.con_horario = [];
     let busqueda = {
-      codigo: '',
+      id_empleado: '',
       lista_fechas: this.fechasHorario
     }
-    data_usuarios.forEach(valor => {
+    data_usuarios.forEach((valor: any) => {
       valor.dias_libres = '';
       valor.dias_laborables = '';
       valor.tiempo_solicitado = '';
@@ -842,7 +842,7 @@ export class PermisosMultiplesComponent implements OnInit {
 
   // METODO PARA BUSCAR PLANIFICACION
   BuscarPlanificacionDias(valor: any, busqueda: any, tamaño: any, inicio: any, final: any, form: any) {
-    busqueda.codigo = valor.codigo;
+    busqueda.id_empleado = valor.id;
     this.planificar.BuscarHorarioFechas(busqueda).subscribe(horas => {
       let horario: any = horas;
       this.contar_horario = this.contar_horario + 1;

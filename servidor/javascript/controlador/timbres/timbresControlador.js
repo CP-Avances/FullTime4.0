@@ -223,7 +223,7 @@ class TimbresControlador {
                     }
                 });
                 //console.log('respuesta: ', timbresRows)
-                //generarTimbres('35', '2024-01-01', '2024-01-06');
+                //generarTimbres('1', '2024-01-01', '2024-01-06');
                 if (timbresRows == 0) {
                     return res.status(400).jsonp({ message: "No se encontraron registros." });
                 }
