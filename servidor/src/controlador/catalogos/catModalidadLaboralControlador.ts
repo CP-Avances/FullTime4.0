@@ -355,13 +355,11 @@ class ModalidaLaboralControlador {
 
     // REGISTRAR PLANTILLA MODALIDAD_LABORAL
     public async CargarPlantilla(req: Request, res: Response) {
-        try {
-            const { plantilla, user_name, ip } = req.body;
+        const { plantilla, user_name, ip } = req.body;
+        let error: boolean = false;
 
-            var contador = 1;
-            var respuesta: any
-
-            plantilla.forEach(async (data: any) => {
+        for ( const data of plantilla ) {
+            try {
                 // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                 const { modalida_laboral } = data;
                 const modalidad = modalida_laboral.charAt(0).toUpperCase() + modalida_laboral.slice(1).toLowerCase();
@@ -391,22 +389,19 @@ class ModalidaLaboralControlador {
 
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
-
-                if (contador === plantilla.length) {
-                    if (modalidad_la) {
-                        return respuesta = res.status(200).jsonp({ message: 'ok' })
-                    } else {
-                        return respuesta = res.status(404).jsonp({ message: 'error' })
-                    }
-                }
-                contador = contador + 1;
-            });
-
-        } catch (error) {
-            // ROLLBACK SI HAY ERROR
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: error });
+                
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                error = true;
+            }
         }
+        
+        if (error) {
+            return res.status(500).jsonp({ message: 'error' });
+        }
+    
+        return res.status(200).jsonp({ message: 'ok' });
     }
 
 }

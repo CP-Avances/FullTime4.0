@@ -317,14 +317,22 @@ export class CatModalidaLaboralComponent implements OnInit {
         user_name: this.user_name,
         ip: this.ip
       }
-      this._ModalidaLaboral.SubirArchivoExcel(data).subscribe(response => {
-        //console.log('respuesta: ', response);
-        this.toastr.success('Operación exitosa.', 'Plantilla de Modalidad laboral importada.', {
-          timeOut: 3000,
-        });
-        this.LimpiarCampos();
-        this.archivoForm.reset();
-        this.nameFile = '';
+      this._ModalidaLaboral.SubirArchivoExcel(data).subscribe({
+        next: (response: any) => {
+          this.toastr.success('Plantilla de Modalidad laboral importada.', 'Operación exitosa.', {
+            timeOut: 3000,
+          });
+          this.LimpiarCampos();
+          this.archivoForm.reset();
+          this.nameFile = '';
+        },
+        error: (error: any) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+          this.archivoForm.reset();
+          this.nameFile = '';
+        }
       });
     } else {
       //console.log('entro en salir')
