@@ -555,7 +555,7 @@ export class ListaEmpleadosComponent implements OnInit {
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
-    console.log('this.listUsuariosCorrectas: ', this.listUsuariosCorrectas.length);
+    console.log('this.listUsuariosCorrectas: ', this.listUsuariosCorrectas);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {

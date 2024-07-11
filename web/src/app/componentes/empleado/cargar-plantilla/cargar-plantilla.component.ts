@@ -154,7 +154,7 @@ export class CargarPlantillaComponent {
       this.restDep.subirDepaNivel(this.listaNivelesCorrectas).subscribe(response => {
         console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de Nivel departamentos importada.', {
-          timeOut: 3000,
+          timeOut: 4000,
         });
         this.LimpiarCampos();
         this.archivoForm.reset();
@@ -287,7 +287,7 @@ export class CargarPlantillaComponent {
       this.restE.subirArchivoExcelContrato(this.listaContratosCorrectas).subscribe(response => {
         console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
-          timeOut: 3000,
+          timeOut: 4000,
         });
         this.LimpiarCampos();
         this.archivoForm.reset();
@@ -318,11 +318,11 @@ export class CargarPlantillaComponent {
       observacion == 'Sucursal superior no existe en el sistema'
     ) {
       return 'rgb(255, 192, 203)';
-    } else if (observacion == 'Departamento no pertenece al establecimiento' ||
+    }else if (observacion == 'Departamento no pertenece al establecimiento' ||
       observacion == 'Departamento no pertenece a la sucursal' ||
       observacion == 'El nivel no puede ser 0 ni mayor a 5' ||
       observacion == 'faltan niveles por registrar' ||
-      observacion == 'Deparatemto superior ya se encuentra configurado'
+      observacion == 'Departamento superior ya se encuentra configurado'
     ) {
       return 'rgb(238, 34, 207)';
     } else if (observacion == 'Nivel incorrecto (solo números)') {
@@ -364,7 +364,8 @@ export class CargarPlantillaComponent {
       return 'rgb(239, 203, 106)';
     }
     else if (observacion == 'País no corresponde con el Régimen Laboral' ||
-      observacion == 'La fecha de desde no puede ser mayor o igual a la fecha hasta') {
+      observacion == 'La fecha de desde no puede ser mayor o igual a la fecha hasta' ||
+      observacion == 'Columna jefe formato incorrecto') {
       return 'rgb(238, 34, 207)';
     }
     else if (arrayObservacion[1] + ' ' + arrayObservacion[2] == 'no registrado') {
@@ -436,7 +437,7 @@ export class CargarPlantillaComponent {
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultipleCargos() {
     const mensaje = 'registro';
-    console.log('listaCargosCorrectas: ', this.listaCargosCorrectas.length);
+    console.log('listaCargosCorrectas: ', this.listaCargosCorrectas);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -500,7 +501,7 @@ export class CargarPlantillaComponent {
       this.restCa.subirArchivoExcelCargo(this.listaCargosCorrectas).subscribe(response => {
         console.log('respuesta: ', response);
         this.toastr.success('Operación exitosa.', 'Plantilla de Cargos importada.', {
-          timeOut: 3000,
+          timeOut: 4000,
         });
         this.LimpiarCampos();
         this.archivoForm.reset();

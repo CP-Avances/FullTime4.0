@@ -1731,16 +1731,16 @@ class EmpleadoControlador {
                     if (estado_civil.toUpperCase() === 'SOLTERO/A') {
                         id_estado_civil = 1;
                     }
-                    else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
+                    else if (estado_civil.toUpperCase() === 'CASADO/A') {
                         id_estado_civil = 2;
                     }
-                    else if (estado_civil.toUpperCase() === 'CASADO/A') {
+                    else if (estado_civil.toUpperCase() === 'VIUDO/A') {
                         id_estado_civil = 3;
                     }
                     else if (estado_civil.toUpperCase() === 'DIVORCIADO/A') {
                         id_estado_civil = 4;
                     }
-                    else if (estado_civil.toUpperCase() === 'VIUDO/A') {
+                    else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
                         id_estado_civil = 5;
                     }
                     //OBTENER ID DEL GENERO
@@ -1782,6 +1782,7 @@ class EmpleadoControlador {
                     else {
                         codigo = cedula;
                     }
+                    console.log('Estado civil: ', id_estado_civil);
                     /*console.log('codigo: ', codigo)
                     console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
                     console.log('nombre: ', nombreE, ' usuario: ', apellidoE, ' fecha nacimien: ', fec_nacimi, ' estado civil: ', id_estado_civil);
@@ -2375,19 +2376,19 @@ class EmpleadoControlador {
                     const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono, nacionalidad, usuario, rol } = data;
                     //OBTENER ID DEL ESTADO_CIVIL
                     var id_estado_civil = 0;
-                    if (estado_civil.toUpperCase() === 'SOLTERA/A') {
+                    if (estado_civil.toUpperCase() === 'SOLTERO/A') {
                         id_estado_civil = 1;
                     }
-                    else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
+                    else if (estado_civil.toUpperCase() === 'CASADO/A') {
                         id_estado_civil = 2;
                     }
-                    else if (estado_civil.toUpperCase() === 'CASADO/A') {
+                    else if (estado_civil.toUpperCase() === 'VIUDO/A') {
                         id_estado_civil = 3;
                     }
                     else if (estado_civil.toUpperCase() === 'DIVORCIADO/A') {
                         id_estado_civil = 4;
                     }
-                    else if (estado_civil.toUpperCase() === 'VIUDO/A') {
+                    else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
                         id_estado_civil = 5;
                     }
                     //OBTENER ID DEL GENERO
@@ -2422,6 +2423,7 @@ class EmpleadoControlador {
                     const id_rol = yield database_1.default.query(`
           SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
           `, [rol.toUpperCase()]);
+                    console.log('Estado civil manual: ', id_estado_civil);
                     /*console.log('codigo: ', codigo)
                     console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
                     console.log('nombre: ', nombreE, ' usuario: ', apellidoE, ' fecha nacimien: ', fec_nacimiento, ' estado civil: ', id_estado_civil);

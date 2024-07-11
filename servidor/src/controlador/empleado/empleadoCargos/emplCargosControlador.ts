@@ -453,7 +453,7 @@ class EmpleadoCargosControlador {
                   }else{
                       if (moment(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) { 
                         if(data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no'){
-                          data.observacion = 'Valor de Jefe incoreccto';
+                          data.observacion = 'Columna jefe formato incorrecto';
                         }
                       } else {
                         data.observacion = 'Formato horas invalido  (HH:mm:ss)';
@@ -551,7 +551,7 @@ class EmpleadoCargosControlador {
 
                                 if(data.admini_depa != 'No registrado'){
                                   if(data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no'){
-                                    data.observacion = 'Valor de Jefe incoreccto';
+                                    data.observacion = 'Columna jefe formato incorrecto';
                                   }
                                 }
 
