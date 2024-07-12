@@ -240,6 +240,17 @@ export class CatModalidaLaboralComponent implements OnInit {
     this._ModalidaLaboral.RevisarFormato(formData).subscribe(res => {
       this.Datos_modalidad_laboral = res.data;
       this.messajeExcel = res.message;
+
+      this.Datos_modalidad_laboral.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+
       //console.log('probando plantilla modalidad laboral', this.Datos_modalidad_laboral);
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {

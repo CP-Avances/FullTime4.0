@@ -404,7 +404,7 @@ class EmpleadoCargosControlador {
                                         else {
                                             if ((0, moment_1.default)(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) {
                                                 if (data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no') {
-                                                    data.observacion = 'Valor de Jefe incoreccto';
+                                                    data.observacion = 'Columna jefe formato incorrecto';
                                                 }
                                             }
                                             else {
@@ -503,7 +503,7 @@ class EmpleadoCargosControlador {
                                                                 if ((0, moment_1.default)(HORA_TRABAJA, 'HH:mm:ss', true).isValid()) {
                                                                     if (data.admini_depa != 'No registrado') {
                                                                         if (data.admini_depa.toLowerCase() != 'si' && data.admini_depa.toLowerCase() != 'no') {
-                                                                            data.observacion = 'Valor de Jefe incoreccto';
+                                                                            data.observacion = 'Columna jefe formato incorrecto';
                                                                         }
                                                                     }
                                                                 }

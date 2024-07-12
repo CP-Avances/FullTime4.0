@@ -124,6 +124,16 @@ export class CargarPlantillaComponent implements OnInit{
       this.DatosNivelesDep = res.data;
       this.messajeExcel = res.message;
 
+      this.DatosNivelesDep.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+
       if (this.messajeExcel == 'error') {
         this.DatosNivelesDep = [];
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -251,6 +261,16 @@ export class CargarPlantillaComponent implements OnInit{
       this.DatosContrato = res.data;
       this.messajeExcel = res.message;
 
+      this.DatosContrato.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+
       if (this.messajeExcel == 'error') {
         this.DatosContrato = [];
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -352,11 +372,11 @@ export class CargarPlantillaComponent implements OnInit{
       observacion == 'Sucursal superior no existe en el sistema'
     ) {
       return 'rgb(255, 192, 203)';
-    } else if (observacion == 'Departamento no pertenece al establecimiento' ||
+    }else if (observacion == 'Departamento no pertenece al establecimiento' ||
       observacion == 'Departamento no pertenece a la sucursal' ||
       observacion == 'El nivel no puede ser 0 ni mayor a 5' ||
       observacion == 'faltan niveles por registrar' ||
-      observacion == 'Deparatemto superior ya se encuentra configurado'
+      observacion == 'Departamento superior ya se encuentra configurado'
     ) {
       return 'rgb(238, 34, 207)';
     } else if (observacion == 'Nivel incorrecto (solo números)') {
@@ -398,7 +418,8 @@ export class CargarPlantillaComponent implements OnInit{
       return 'rgb(239, 203, 106)';
     }
     else if (observacion == 'País no corresponde con el Régimen Laboral' ||
-      observacion == 'La fecha de desde no puede ser mayor o igual a la fecha hasta') {
+      observacion == 'La fecha de desde no puede ser mayor o igual a la fecha hasta' ||
+      observacion == 'Columna jefe formato incorrecto') {
       return 'rgb(238, 34, 207)';
     }
     else if (arrayObservacion[1] + ' ' + arrayObservacion[2] == 'no registrado') {
@@ -470,7 +491,7 @@ export class CargarPlantillaComponent implements OnInit{
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultipleCargos() {
     const mensaje = 'registro';
-    console.log('listaCargosCorrectas: ', this.listaCargosCorrectas.length);
+    console.log('listaCargosCorrectas: ', this.listaCargosCorrectas);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -493,6 +514,16 @@ export class CargarPlantillaComponent implements OnInit{
       console.log('plantilla cargo', res);
       this.DatosCargos = res.data;
       this.messajeExcelCargos = res.message;
+
+      this.DatosCargos.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
 
       if (this.messajeExcelCargos == 'error') {
         this.DatosCargos = [];

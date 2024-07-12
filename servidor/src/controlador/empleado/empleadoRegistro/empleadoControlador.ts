@@ -1942,16 +1942,16 @@ class EmpleadoControlador {
         if (estado_civil.toUpperCase() === 'SOLTERO/A') {
           id_estado_civil = 1;
         }
-        else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
+        else if (estado_civil.toUpperCase() === 'CASADO/A' ) {
           id_estado_civil = 2;
         }
-        else if (estado_civil.toUpperCase() === 'CASADO/A') {
+        else if (estado_civil.toUpperCase() === 'VIUDO/A') {
           id_estado_civil = 3;
         }
         else if (estado_civil.toUpperCase() === 'DIVORCIADO/A') {
           id_estado_civil = 4;
         }
-        else if (estado_civil.toUpperCase() === 'VIUDO/A') {
+        else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
           id_estado_civil = 5;
         }
 
@@ -2004,6 +2004,8 @@ class EmpleadoControlador {
         } else {
           codigo = cedula;
         }
+
+        console.log('Estado civil: ', id_estado_civil);
 
         /*console.log('codigo: ', codigo)
         console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
@@ -2618,19 +2620,19 @@ class EmpleadoControlador {
 
         //OBTENER ID DEL ESTADO_CIVIL
         var id_estado_civil = 0;
-        if (estado_civil.toUpperCase() === 'SOLTERA/A') {
+        if (estado_civil.toUpperCase() === 'SOLTERO/A') {
           id_estado_civil = 1;
         }
-        else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
+        else if (estado_civil.toUpperCase() === 'CASADO/A' ) {
           id_estado_civil = 2;
         }
-        else if (estado_civil.toUpperCase() === 'CASADO/A') {
+        else if (estado_civil.toUpperCase() === 'VIUDO/A') {
           id_estado_civil = 3;
         }
         else if (estado_civil.toUpperCase() === 'DIVORCIADO/A') {
           id_estado_civil = 4;
         }
-        else if (estado_civil.toUpperCase() === 'VIUDO/A') {
+        else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
           id_estado_civil = 5;
         }
 
@@ -2676,6 +2678,8 @@ class EmpleadoControlador {
           SELECT * FROM ero_cat_roles WHERE UPPER(nombre) = $1
           `
           , [rol.toUpperCase()]);
+
+          console.log('Estado civil manual: ', id_estado_civil);
 
         /*console.log('codigo: ', codigo)
         console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);

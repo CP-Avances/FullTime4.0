@@ -287,6 +287,17 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataDepartamentos = res.data;
       this.messajeExcel = res.message;
+
+      this.DataDepartamentos.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+
       console.log('probando plantilla1 departamentos', this.DataDepartamentos);
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {

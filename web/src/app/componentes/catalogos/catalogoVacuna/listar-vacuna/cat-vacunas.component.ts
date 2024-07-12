@@ -238,6 +238,17 @@ export class CatVacunasComponent implements OnInit {
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.Datos_vacunas = res.data;
       this.messajeExcel = res.message;
+
+      this.Datos_vacunas.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+
       console.log('probando plantilla vacunas', this.Datos_vacunas, ' -  ', this.messajeExcel);
 
       if (this.messajeExcel == 'error') {
