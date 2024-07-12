@@ -301,4 +301,4 @@ RegistrarAsistenciaByTimbres();
 
 DesactivarFinContratoEmpleado();
 
-//generarTimbres('35', '2023-11-01', '2023-11-02');
+//generarTimbres('1', '2023-11-01', '2023-11-02');

@@ -51,6 +51,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    console.log('informacion ', this.informacion)
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
 
@@ -151,10 +152,10 @@ export class RegistrarAsistenciaComponent implements OnInit {
     this.progreso = true;
     let datos = {
       id: this.informacion.detalle.id,
-      codigo: this.informacion.detalle.codigo,
       fecha: moment(seleccionado.fec_hora_timbre_servidor).format('YYYY-MM-DD HH:mm:ss'),
       accion: this.informacion.detalle.tipo_entr_salida,
       id_timbre: seleccionado.id,
+      id_empleado: parseInt(this.informacion.detalle.id_empleado),
       user_name: this.user_name,
       ip: this.ip
     }
@@ -234,7 +235,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
         })
         //console.log('ver duracion ', diferencias)
         // ENCUENTRA EL VALOR MINIMO
-        var minValue = Math.min(...diferencias.map((x: any)  => x.duracion))
+        var minValue = Math.min(...diferencias.map((x: any) => x.duracion))
         // FILTRA EL OBJETO TAL QUE LOS VALORES SEAN IGUAL AL MINIMO
         var resultado = diferencias.filter(x => x.duracion == minValue)
         // IMPRIME EL RESULTADO

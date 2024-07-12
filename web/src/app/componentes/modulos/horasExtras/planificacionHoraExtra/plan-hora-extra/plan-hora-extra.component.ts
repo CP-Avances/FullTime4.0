@@ -195,7 +195,6 @@ export class PlanHoraExtraComponent implements OnInit {
         // DATOS DE ASIGNACIÓN DE PLANIFICACION A EMPLEADOS
         let planEmpleado = {
           estado: 1,
-          codigo: this.data.planifica.codigo,
           observacion: false,
           id_plan_hora: plan.id,
           id_empl_cargo: this.data.planifica.id_cargo,
@@ -237,7 +236,6 @@ export class PlanHoraExtraComponent implements OnInit {
       planEmpleado.id_empl_realiza = obj.id;
       planEmpleado.id_empl_cargo = obj.id_cargo;
       planEmpleado.id_plan_hora = plan.id;
-      planEmpleado.codigo = obj.codigo;
 
       // INSERTAR PLANIFICACIÓN POR EMPLEADO
       this.restPE.CrearPlanHoraExtraEmpleado(planEmpleado).subscribe(response => {

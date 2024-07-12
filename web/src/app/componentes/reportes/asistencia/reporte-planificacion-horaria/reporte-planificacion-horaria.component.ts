@@ -71,7 +71,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   origen: any = [];
 
   resultados: any = [];
-  codigos: string = '';
+  idsEmpleado: string = '';
   accion: any;
 
   // VARIABLES PARA MOSTRAR DETALLES
@@ -488,17 +488,17 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   // METODO PARA VER PLANIFICACION
   VerPlanificacion(data: any) {
     this.resultados = data;
-    this.codigos = '';
+    this.idsEmpleado = '';
     this.resultados.forEach((obj: any) => {
-      if (this.codigos === '') {
-        this.codigos = '\'' + obj.codigo + '\''
+      if (this.idsEmpleado === '') {
+        this.idsEmpleado = '\'' + obj.id + '\''
       }
       else {
-        this.codigos = this.codigos + ', \'' + obj.codigo + '\''
+        this.idsEmpleado = this.idsEmpleado + ', \'' + obj.id + '\''
       }
     })
 
-    this.ObtenerHorariosEmpleado(this.fechaInicialF.value, this.fechaFinalF.value, this.codigos);
+    this.ObtenerHorariosEmpleado(this.fechaInicialF.value, this.fechaFinalF.value, this.idsEmpleado);
 
   }
 
@@ -507,7 +507,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
   horariosEmpleado: any = [];
   mes_inicio: any = '';
   mes_fin: any = '';
-  ObtenerHorariosEmpleado(fec_inicio: any, fec_final: any, codigo: any) {
+  ObtenerHorariosEmpleado(fec_inicio: any, fec_final: any, id_empleado: any) {
     this.horariosEmpleado = [];
     this.mes_inicio = fec_inicio.format("YYYY-MM-DD");
     this.mes_fin = fec_final.format("YYYY-MM-DD");
@@ -515,7 +515,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
     let busqueda = {
       fecha_inicio: this.mes_inicio,
       fecha_final: this.mes_fin,
-      codigo: codigo
+      id_empleado: id_empleado
     }
 
     this.plan.BuscarPlanificacionHoraria(busqueda).subscribe((datos: any) => {
@@ -561,7 +561,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy {
     let busqueda = {
       fecha_inicio: this.mes_inicio,
       fecha_final: this.mes_fin,
-      codigo: this.codigos
+      id_empleado: this.idsEmpleado
     }
     let codigo_horario = '';
     let tipos: any = [];

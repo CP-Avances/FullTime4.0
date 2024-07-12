@@ -40,7 +40,7 @@ const RestarPeriodoVacacionAutorizada = function (id_vacacion, user_name, ip) {
             // INICIAR TRANSACCION
             yield database_1.default.query('BEGIN');
             // CONSULTAR DATOSORIGINALES
-            const consulta = yield database_1.default.query('SELECT * FROM mv_periodo_vacacion WHERE id = $1', [vacacion.id_peri_vacacion]);
+            const consulta = yield database_1.default.query(`SELECT * FROM mv_periodo_vacacion WHERE id = $1`, [vacacion.id_peri_vacacion]);
             const [datosOriginales] = consulta.rows;
             if (!datosOriginales) {
                 yield auditoriaControlador_1.default.InsertarAuditoria({

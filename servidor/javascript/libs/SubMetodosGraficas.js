@@ -48,13 +48,13 @@ const BuscarTimbresByCodigo_Fecha = function (codigo, horario) {
     });
 };
 exports.BuscarTimbresByCodigo_Fecha = BuscarTimbresByCodigo_Fecha;
-const BuscarPermisosJustificados = function (codigo, fecha) {
+const BuscarPermisosJustificados = function (id_empleado, fecha) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
         SELECT fecha_inicio, descripcion 
         FROM mp_solicitud_permiso 
-        WHERE codigo = $1 AND fecha_inicio::TIMESTAMP::DATE <= $2 AND fecha_final::TIMESTAMP::DATE >= $2 AND estado = 3
-        `, [codigo, fecha + ''])
+        WHERE id_empleado = $1 AND fecha_inicio::TIMESTAMP::DATE <= $2 AND fecha_final::TIMESTAMP::DATE >= $2 AND estado = 3
+        `, [id_empleado, fecha + ''])
             .then(result => {
             return result.rowCount;
         });
@@ -139,10 +139,10 @@ function HorasExtrasSolicitadasGrafica(fec_desde, fec_hasta) {
         // estado = 3 significa q las horas extras fueron autorizadas
         `
         SELECT CAST(h.fecha_inicio AS VARCHAR), CAST(h.fecha_final AS VARCHAR), h.descripcion, h.horas_solicitud, 
-            h.tiempo_autorizado, h.codigo, h.id_empleado_cargo 
-        FROM mhe_solicitud_hora_extra AS h 
+            h.tiempo_autorizado, e.codigo, h.id_empleado_cargo 
+        FROM mhe_solicitud_hora_extra AS h, eu_empleados AS e 
         WHERE h.fecha_inicio BETWEEN $1 and $2 AND h.estado = 3   
-            AND h.fecha_final BETWEEN $1 and $2 ORDER BY h.fecha_inicio
+            AND h.fecha_final BETWEEN $1 and $2 ORDER BY h.fecha_inicio AND e.id = h.id_empleado_solicita
         `, [fec_desde, fec_hasta])
             .then(result => {
             return Promise.all(result.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
@@ -255,10 +255,10 @@ const Empleado_HoraExtra_ModelarDatos = function (codigo, fec_desde, fec_hasta) 
     });
 };
 exports.Empleado_HoraExtra_ModelarDatos = Empleado_HoraExtra_ModelarDatos;
-function EmpleadoHorasExtrasGrafica(codigo, fec_desde, fec_hasta) {
+function EmpleadoHorasExtrasGrafica(id, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
-        let arrayUno = yield EmpleadoHorasExtrasSolicitadasGrafica(codigo, fec_desde, fec_hasta);
-        let arrayDos = yield EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(codigo, fec_desde, fec_hasta);
+        let arrayUno = yield EmpleadoHorasExtrasSolicitadasGrafica(id, fec_desde, fec_hasta);
+        let arrayDos = yield EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(id, fec_desde, fec_hasta);
         // let arrayUnido  = [...new Set(arrayUno.concat(arrayDos))];  
         let arrayUnido = arrayUno.concat(arrayDos);
         let set = new Set(arrayUnido.map((obj) => { return JSON.stringify(obj); }));
@@ -279,11 +279,11 @@ function EmpleadoHorasExtrasSolicitadasGrafica(codigo, fec_desde, fec_hasta) {
         return yield database_1.default.query(
         // estado = 3 significa q las horas extras fueron autorizadas
         `
-        SELECT h.fecha_inicio, h.fecha_final, h.descripcion, h.horas_solicitud, h.tiempo_autorizado, h.codigo,
+        SELECT h.fecha_inicio, h.fecha_final, h.descripcion, h.horas_solicitud, h.tiempo_autorizado, e.codigo,
             h.id_empleado_cargo 
-        FROM mhe_solicitud_hora_extra AS h 
+        FROM mhe_solicitud_hora_extra AS h, eu_empleados AS e 
         WHERE h.fecha_inicio between $1 and $2 AND h.estado = 3
-            AND h.fecha_final between $1 and $2 AND h.codigo = $3 
+            AND h.fecha_final between $1 and $2 AND h.id_empleado_solicita = $3 AND e.id = h.id_empleado_solicita
         ORDER BY h.fecha_inicio
         `, [fec_desde, fec_hasta, codigo])
             .then(result => {
@@ -311,18 +311,18 @@ function EmpleadoHorasExtrasSolicitadasGrafica(codigo, fec_desde, fec_hasta) {
         });
     });
 }
-function EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(codigo, fec_desde, fec_hasta) {
+function EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(id_empleado, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(
         //estado = 3 para horas extras autorizadas
         `
         SELECT h.fecha_desde, h.hora_inicio, h.fecha_hasta, h.hora_fin, h.descripcion, h.horas_totales, 
-            ph.tiempo_autorizado, ph.codigo, ph.id_empleado_cargo 
-        FROM mhe_empleado_plan_hora_extra AS ph, mhe_detalle_plan_hora_extra AS h 
+            ph.tiempo_autorizado, ph.codigo, ph.id_empleado_cargo, e.codigo 
+        FROM mhe_empleado_plan_hora_extra AS ph, mhe_detalle_plan_hora_extra AS h, eu_empleados AS e 
         WHERE ph.id_detalle_plan = h.id AND ph.estado = 3 AND h.fecha_desde BETWEEN $1 AND $2 
-            AND h.fecha_hasta BETWEEN $1 and $2 AND ph.codigo = $3
+            AND h.fecha_hasta BETWEEN $1 and $2 AND ph.id_empleado_realiza = $3 AND e.id = ph.id_empleado_realiza 
         ORDER BY h.fecha_desde
-        `, [fec_desde, fec_hasta, codigo])
+        `, [fec_desde, fec_hasta, id_empleado])
             .then(result => {
             return Promise.all(result.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 var f1 = new Date(obj.fecha_desde.toJSON().split('T')[0] + 'T' + obj.hora_inicio);
@@ -348,12 +348,12 @@ function EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(codigo, fec_desde, f
         });
     });
 }
-const Empleado_Vacaciones_ModelarDatos = function (codigo, fec_desde, fec_hasta) {
+const Empleado_Vacaciones_ModelarDatos = function (id_empleado, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
         let vacaciones = yield database_1.default.query(`
         SELECT CAST(fecha_inicio AS VARCHAR), CAST(fecha_final AS VARCHAR) 
-        FROM mv_solicitud_vacacion WHERE codigo = $1 AND fecha_inicio BETWEEN $2 AND $3 AND estado = 3
-        `, [codigo, fec_desde, fec_hasta]).then(result => { return result.rows; });
+        FROM mv_solicitud_vacacion WHERE id_empleado = $1 AND fecha_inicio BETWEEN $2 AND $3 AND estado = 3
+        `, [id_empleado, fec_desde, fec_hasta]).then(result => { return result.rows; });
         // console.log('Lista de vacaciones ===', vacaciones);
         let aux_array = [];
         vacaciones.forEach((obj) => {
@@ -375,12 +375,12 @@ const Empleado_Vacaciones_ModelarDatos = function (codigo, fec_desde, fec_hasta)
     });
 };
 exports.Empleado_Vacaciones_ModelarDatos = Empleado_Vacaciones_ModelarDatos;
-const Empleado_Permisos_ModelarDatos = function (codigo, fec_desde, fec_hasta) {
+const Empleado_Permisos_ModelarDatos = function (id_empleado, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
         let permisos = yield database_1.default.query(`
         SELECT CAST(fecha_inicio AS VARCHAR), CAST(fecha_final AS VARCHAR), horas_permiso, dias_permiso 
-        FROM mp_solicitud_permiso WHERE codigo = $1 AND fec_inicio BETWEEN $2 and $3 AND estado = 3
-        `, [codigo, fec_desde, fec_hasta]).then(result => { return result.rows; });
+        FROM mp_solicitud_permiso WHERE id_empleado = $1 AND fec_inicio BETWEEN $2 and $3 AND estado = 3
+        `, [id_empleado, fec_desde, fec_hasta]).then(result => { return result.rows; });
         // console.log('Lista de permisos ===', permisos);
         let aux_array = [];
         permisos.forEach((obj) => {

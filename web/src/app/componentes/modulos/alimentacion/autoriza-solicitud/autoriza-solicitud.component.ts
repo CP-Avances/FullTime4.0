@@ -165,7 +165,6 @@ export class AutorizaSolicitudComponent implements OnInit {
       hora_inicio: this.data.datosMultiple.hora_inicio,
       consumido: false,
       hora_fin: this.data.datosMultiple.hora_fin,
-      codigo: this.data.datosMultiple.codigo,
       fecha: this.data.datosMultiple.fec_comida,
       user_name: this.user_name,
       ip: this.ip,
@@ -192,7 +191,6 @@ export class AutorizaSolicitudComponent implements OnInit {
         if (estado === true) {
           nombre_estado = 'APROBADO';
           let datosPlanEmpleado = {
-            codigo: obj.codigo,
             id_empleado: obj.id_empleado,
             id_sol_comida: obj.id,
             fecha: obj.fecha,

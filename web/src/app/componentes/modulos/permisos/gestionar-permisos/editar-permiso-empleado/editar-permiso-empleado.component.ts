@@ -629,9 +629,8 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     let datos = {
       fecha_inicio: moment(this.info.fecha_inicio).format('YYYY-MM-DD'),
       fecha_final: moment(this.info.fecha_final).format('YYYY-MM-DD'),
-      codigo: this.empleado.codigo
+      id_empleado: this.empleado.id
     }
-
     this.planificar.BuscarHorarioFechas(datos).subscribe(data => {
       this.horario = data;
       this.ContarDiasSolicitados();
@@ -676,7 +675,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
           fec_final: fecha_final,
           hora_inicio: hora_inicio_,
           hora_final: hora_final_,
-          codigo: this.empleado.codigo,
+          id_empleado: this.empleado.id,
           id: this.info.id
         }
         this.restP.BuscarPermisosSolicitadosHorasEditar(solicitud).subscribe(solicitados => {
@@ -1098,7 +1097,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       fec_final: fecha_final,
       hora_inicio: form.horaSalidaForm,
       hora_final: form.horasIngresoForm,
-      codigo: this.empleado.codigo,
+      id_empleado: this.empleado.id,
       id: this.info.id
     }
     this.restP.BuscarPermisosSolicitadosHorasEditar(solicitud).subscribe(solicitados => {
@@ -1368,7 +1367,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
     let datos = {
       lista_fechas: this.fechasHorario,
-      codigo: this.empleado.codigo
+      id_empleado: this.empleado.id
     }
 
     this.planificar.BuscarHorarioFechas(datos).subscribe(data => {
@@ -1384,7 +1383,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
         let solicitud = {
           fec_inicio: inicio,
           fec_final: final,
-          codigo: this.empleado.codigo,
+          id_empleado: this.empleado.id,
           id: this.info.id
         }
 
@@ -1437,7 +1436,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     let solicitud = {
       fec_inicio: inicio,
       fec_final: final,
-      codigo: this.empleado.codigo,
+      id_empleado: this.empleado.id,
       id: this.info.id
     }
     this.restP.BuscarPermisosSolicitadosDiasEditar(solicitud).subscribe(solicitados => {

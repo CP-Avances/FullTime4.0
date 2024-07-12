@@ -207,10 +207,10 @@ class UbicacionControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empl } = req.params;
             const UBICACIONES = yield database_1.default.query(`
-            SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empleado, cu.latitud, cu.longitud, 
+            SELECT eu.id AS id_emplu, e.codigo, eu.id_ubicacion, eu.id_empleado, cu.latitud, cu.longitud, 
                 cu.descripcion 
-            FROM mg_empleado_ubicacion AS eu, mg_cat_ubicaciones AS cu 
-            WHERE eu.id_ubicacion = cu.id AND eu.id_empleado = $1
+            FROM mg_empleado_ubicacion AS eu, mg_cat_ubicaciones AS cu, eu_empleados AS e 
+            WHERE eu.id_ubicacion = cu.id AND eu.id_empleado = $1 AND e.id = eu.id_empleado
             `, [id_empl]);
             if (UBICACIONES.rowCount != 0) {
                 return res.jsonp(UBICACIONES.rows);
@@ -224,20 +224,20 @@ class UbicacionControlador {
     RegistrarCoordenadasUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { codigo, id_empl, id_ubicacion, user_name, ip } = req.body;
+                const { id_empl, id_ubicacion, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
-                INSERT INTO mg_empleado_ubicacion (codigo, id_empleado, id_ubicacion) 
-                VALUES ($1, $2, $3)
-                `, [codigo, id_empl, id_ubicacion]);
+                INSERT INTO mg_empleado_ubicacion (id_empleado, id_ubicacion) 
+                VALUES ($2, $3)
+                `, [id_empl, id_ubicacion]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mg_empleado_ubicacion',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{codigo: ${codigo}, id_empl: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
+                    datosNuevos: `id_empl: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
                     ip,
                     observacion: null
                 });
@@ -257,10 +257,10 @@ class UbicacionControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const id_ubicacion = req.params.id_ubicacion;
             const UBICACIONES = yield database_1.default.query(`
-            SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empleado, cu.latitud, cu.longitud, 
+            SELECT eu.id AS id_emplu, e.codigo, eu.id_ubicacion, eu.id_empleado, cu.latitud, cu.longitud, 
                 cu.descripcion, e.nombre, e.apellido 
             FROM mg_empleado_ubicacion AS eu, mg_cat_ubicaciones AS cu, eu_empleados AS e 
-            WHERE eu.id_ubicacion = cu.id AND e.codigo = eu.codigo AND cu.id = $1
+            WHERE eu.id_ubicacion = cu.id AND e.id = eu.id_empleado AND cu.id = $1
             `, [id_ubicacion]);
             if (UBICACIONES.rowCount != 0) {
                 return res.jsonp(UBICACIONES.rows);
@@ -279,7 +279,7 @@ class UbicacionControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const ubicacion = yield database_1.default.query('SELECT * FROM mg_empleado_ubicacion WHERE id = $1', [id]);
+                const ubicacion = yield database_1.default.query(`SELECT * FROM mg_empleado_ubicacion WHERE id = $1`, [id]);
                 const [datosOriginales] = ubicacion.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({

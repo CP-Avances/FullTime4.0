@@ -223,7 +223,7 @@ class TimbresControlador {
                     }
                 });
                 //console.log('respuesta: ', timbresRows)
-                //generarTimbres('35', '2024-01-01', '2024-01-06');
+                //generarTimbres('1', '2024-01-01', '2024-01-06');
                 if (timbresRows == 0) {
                     return res.status(400).jsonp({ message: "No se encontraron registros." });
                 }
@@ -315,9 +315,10 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj, tipo, ip, user_name } = req.body;
-                // Obtener la fecha y hora actual
+                var hora_fecha_timbre = (0, moment_1.default)(fec_hora_timbre).format('DD/MM/YYYY, h:mm:ss a');
+                // OBTENER LA FECHA Y HORA ACTUAL
                 var now = (0, moment_1.default)();
-                // Formatear la fecha y hora actual en el formato deseado
+                // FORMATEAR LA FECHA Y HORA ACTUAL EN EL FORMATO DESEADO
                 var fecha_hora = now.format('DD/MM/YYYY, h:mm:ss a');
                 let servidor;
                 if (tipo === 'administrar') {
@@ -331,18 +332,14 @@ class TimbresControlador {
                 `, [id_empleado]).then((result) => { return result.rows; });
                 if (code.length === 0)
                     return { mensaje: 'El usuario no tiene un código asignado.' };
-                // var codigo = parseInt(code[0].codigo);
                 var codigo = code[0].codigo;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
-                INSERT INTO eu_timbres (fecha_hora_timbre, accion, tecla_funcion, observacion, latitud, 
-                    longitud, codigo, id_reloj, dispositivo_timbre, fecha_hora_timbre_servidor) 
-                VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, 
-                to_timestamp($10, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone)
-                `, [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
-                    id_reloj, 'APP_WEB', servidor], (error, results) => __awaiter(this, void 0, void 0, function* () {
-                    console.log("ver fecha", fec_hora_timbre);
+                SELECT * FROM public.timbres_web ($1, $2, $3, 
+                    to_timestamp($4, 'DD/MM/YYYY, HH:MI:SS pm')::timestamp without time zone, $5, $6, $7, $8, $9, $10, $11)
+                `, [codigo, id_empleado, id_reloj, hora_fecha_timbre, servidor, accion, tecl_funcion, latitud, longitud,
+                    observacion, 'APP_WEB'], (error, results) => __awaiter(this, void 0, void 0, function* () {
                     const fechaHora = yield (0, settingsMail_1.FormatearHora)(fec_hora_timbre.split('T')[1]);
                     const fechaTimbre = yield (0, settingsMail_1.FormatearFecha2)(fec_hora_timbre, 'ddd');
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -350,7 +347,7 @@ class TimbresControlador {
                         usuario: user_name,
                         accion: 'I',
                         datosOriginales: '',
-                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}}`,
+                        datosNuevos: `{fecha_hora_timbre: ${fechaTimbre + ' ' + fechaHora}, accion: ${accion}, tecla_funcion: ${tecl_funcion}, observacion: ${observacion}, latitud: ${latitud}, longitud: ${longitud}, codigo: ${codigo}, id_reloj: ${id_reloj}, dispositivo_timbre: 'APP_WEB', fecha_hora_timbre_servidor: ${servidor}, id_empleado: ${id_empleado}}`,
                         ip,
                         observacion: null
                     });

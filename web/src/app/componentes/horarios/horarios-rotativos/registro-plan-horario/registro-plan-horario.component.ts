@@ -350,7 +350,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
         fechaInicio: obj.fecha,
         fechaFinal: obj.fecha,
       };
-      this.horario.VerificarHorariosExistentes(this.datoEmpleado.codigo, fechas).subscribe(existe => {
+      this.horario.VerificarHorariosExistentes(this.datoEmpleado.idEmpleado, fechas).subscribe(existe => {
         obj.horarios_existentes = '***';
         obj.registrados = existe;
         if (existe.length === 1) {
@@ -765,7 +765,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
         obj.supera_jornada = '';
         obj.horas_superadas = '';
         //---console.log('ver datos de horario ', fechas)
-        this.horario.VerificarDuplicidadHorarios(this.datoEmpleado.codigo, fechas).subscribe(existe => {
+        this.horario.VerificarDuplicidadHorarios(this.datoEmpleado.idEmpleado, fechas).subscribe(existe => {
           this.leer_horario = this.leer_horario + 1;
           this.contar_duplicado = 1;
           h.verificar = 'Horario ya existe.';
@@ -1127,9 +1127,9 @@ export class RegistroPlanHorarioComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     }
-    this.lista_eliminar.forEach(eliminar => {
+    this.lista_eliminar.forEach((eliminar: any) => {
       let plan_fecha = {
-        codigo: this.datoEmpleado.codigo,
+        id_empleado: this.datoEmpleado.idEmpleado,
         fec_final: eliminar.fecha,
         fec_inicio: eliminar.fecha,
         id_horario: eliminar.id_horarios,
@@ -1212,7 +1212,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
               }
 
               let plan = {
-                codigo: this.datoEmpleado.codigo,
+                id_empleado: this.datoEmpleado.idEmpleado,
                 tipo_dia: valor.tipo_dia,
                 min_antes: deta.minutos_antes,
                 tolerancia: accion,

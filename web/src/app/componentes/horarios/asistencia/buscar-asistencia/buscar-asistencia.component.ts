@@ -111,6 +111,7 @@ export class BuscarAsistenciaComponent implements OnInit {
       fin: form.fechaFinForm,
     }
     this.asistir.ConsultarAsistencia(datos).subscribe(async data => {
+      console.log('ver asistencia ', data)
 
       if (data.message === 'OK') {
 

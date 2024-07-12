@@ -306,7 +306,26 @@ export class ListarFeriadosComponent implements OnInit {
       this.DataFeriados = res.data;
       this.DataFerieados_ciudades = res.datafc;
 
-      console.log('Feriados ciudades: ', this.DataFerieados_ciudades);
+      this.DataFeriados.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+
+      this.DataFerieados_ciudades.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+
 
       this.messajeExcel = res.message;
       if (this.messajeExcel == 'error') {

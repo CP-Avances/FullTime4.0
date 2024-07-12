@@ -5,91 +5,91 @@ import { FormatearFecha, FormatearFecha2, FormatearHora } from '../../libs/setti
 
 class PlanGeneralControlador {
 
-// METODO PARA REGISTRAR PLAN GENERAL --**VERIFICADO
-public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
-    let errores: number = 0;
-    let ocurrioError = false;
-    let mensajeError = '';
-    let codigoError = 0;
+    // METODO PARA REGISTRAR PLAN GENERAL --**VERIFICADO
+    public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
+        let errores: number = 0;
+        let ocurrioError = false;
+        let mensajeError = '';
+        let codigoError = 0;
 
-    const { user_name, ip, plan_general } = req.body;
+        const { user_name, ip, plan_general } = req.body;
 
-    for (let i = 0; i < plan_general.length; i++) {
+        for (let i = 0; i < plan_general.length; i++) {
 
-        try {
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
+            try {
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
 
-            const result = await pool.query(
-                `
+                const result = await pool.query(
+                    `
                 INSERT INTO eu_asistencia_general (fecha_hora_horario, tolerancia, estado_timbre, id_detalle_horario,
-                    fecha_horario, id_empleado_cargo, tipo_accion, codigo, id_horario, tipo_dia, salida_otro_dia,
+                    fecha_horario, id_empleado_cargo, tipo_accion, id_empleado, id_horario, tipo_dia, salida_otro_dia,
                     minutos_antes, minutos_despues, estado_origen, minutos_alimentacion) 
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
                 `,
-                [
-                    plan_general[i].fec_hora_horario, plan_general[i].tolerancia, plan_general[i].estado_timbre,
-                    plan_general[i].id_det_horario, plan_general[i].fec_horario, plan_general[i].id_empl_cargo,
-                    plan_general[i].tipo_entr_salida, plan_general[i].codigo, plan_general[i].id_horario, plan_general[i].tipo_dia,
-                    plan_general[i].salida_otro_dia, plan_general[i].min_antes, plan_general[i].min_despues, plan_general[i].estado_origen,
-                    plan_general[i].min_alimentacion
-                ]
-            );
+                    [
+                        plan_general[i].fec_hora_horario, plan_general[i].tolerancia, plan_general[i].estado_timbre,
+                        plan_general[i].id_det_horario, plan_general[i].fec_horario, plan_general[i].id_empl_cargo,
+                        plan_general[i].tipo_entr_salida, plan_general[i].id_empleado, plan_general[i].id_horario, plan_general[i].tipo_dia,
+                        plan_general[i].salida_otro_dia, plan_general[i].min_antes, plan_general[i].min_despues, plan_general[i].estado_origen,
+                        plan_general[i].min_alimentacion
+                    ]
+                );
 
-            const [plan] = result.rows;
+                const [plan] = result.rows;
 
-            const fecha_hora_horario1 = await FormatearHora(plan_general[i].fec_hora_horario.split(' ')[1]);
-            const fecha_hora_horario = await FormatearFecha2(plan_general[i].fec_hora_horario, 'ddd');
-            const fecha_horario = await FormatearFecha2(plan_general[i].fec_horario, 'ddd');
+                const fecha_hora_horario1 = await FormatearHora(plan_general[i].fec_hora_horario.split(' ')[1]);
+                const fecha_hora_horario = await FormatearFecha2(plan_general[i].fec_hora_horario, 'ddd');
+                const fecha_horario = await FormatearFecha2(plan_general[i].fec_horario, 'ddd');
 
-            plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
-            plan.fecha_horario = fecha_horario;
+                plan.fecha_hora_horario = `${fecha_hora_horario} ${fecha_hora_horario1}`;
+                plan.fecha_horario = fecha_horario;
 
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'eu_asistencia_general',
-                usuario: user_name,
-                accion: 'I',
-                datosOriginales: '',
-                datosNuevos: JSON.stringify(plan),
-                ip,
-                observacion: null
-            });
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'eu_asistencia_general',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(plan),
+                    ip,
+                    observacion: null
+                });
 
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
-            
-        } catch (error) {
-            // REVERTIR TRANSACCION
-            await pool.query('ROLLBACK');
-            ocurrioError = true;
-            mensajeError = error.message;
-            codigoError = 500;
-            errores++;
-            break;
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                ocurrioError = true;
+                mensajeError = error.message;
+                codigoError = 500;
+                errores++;
+                break;
+            }
         }
-    }
 
-    if (ocurrioError) {
-        return res.status(codigoError).jsonp({ message: mensajeError });
-    } else {
-        if (errores > 0) {
-            return res.status(200).jsonp({ message: 'error' });
+        if (ocurrioError) {
+            return res.status(codigoError).jsonp({ message: mensajeError });
         } else {
-            return res.status(200).jsonp({ message: 'OK' });
+            if (errores > 0) {
+                return res.status(200).jsonp({ message: 'error' });
+            } else {
+                return res.status(200).jsonp({ message: 'OK' });
+            }
         }
     }
-}
 
     // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   --**VERIFICADO
     public async BuscarFechas(req: Request, res: Response) {
-        const { fec_inicio, fec_final, id_horario, codigo } = req.body;
+        const { fec_inicio, fec_final, id_horario, id_empleado } = req.body;
         const FECHAS = await pool.query(
             `
             SELECT id FROM eu_asistencia_general 
-            WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND codigo = $4
+            WHERE (fecha_horario BETWEEN $1 AND $2) AND id_horario = $3 AND id_empleado = $4
             `
-            , [fec_inicio, fec_final, id_horario, codigo]);
+            , [fec_inicio, fec_final, id_horario, id_empleado]);
         if (FECHAS.rowCount != 0) {
             return res.jsonp(FECHAS.rows)
         }
@@ -192,18 +192,18 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
     // METODO PARA BUSCAR PLANIFICACION EN UN RANGO DE FECHAS
     public async BuscarHorarioFechas(req: Request, res: Response) {
         try {
-            const { codigo, lista_fechas } = req.body;
+            const { id_empleado, lista_fechas } = req.body;
 
             const HORARIO = await pool.query(
                 `
-                SELECT DISTINCT (pg.fecha_horario), pg.tipo_dia, c.hora_trabaja, pg.tipo_accion, pg.codigo, pg.estado_origen 
+                SELECT DISTINCT (pg.fecha_horario), pg.tipo_dia, c.hora_trabaja, pg.tipo_accion, pg.id_empleado, pg.estado_origen 
                 FROM eu_asistencia_general AS pg, eu_empleado_cargos AS c 
                 WHERE pg.fecha_horario IN (${lista_fechas}) 
-                    AND pg.codigo = $1 AND c.id = pg.id_empleado_cargo 
+                    AND pg.id_empleado = $1 AND c.id = pg.id_empleado_cargo 
                     AND (pg.tipo_accion = 'E' OR pg.tipo_accion = 'S') 
                 ORDER BY pg.fecha_horario ASC
                 `
-                , [codigo]);
+                , [id_empleado]);
 
             if (HORARIO.rowCount != 0) {
                 return res.jsonp(HORARIO.rows)
@@ -220,10 +220,10 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
     // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
     public async ListarPlanificacionHoraria(req: Request, res: Response) {
         try {
-            const { fecha_inicio, fecha_final, codigo } = req.body;
-            console.log('ver datos ', fecha_inicio, ' ', fecha_final, ' ', codigo)
+            const { fecha_inicio, fecha_final, id_empleado } = req.body;
+            console.log('ver datos ', fecha_inicio, ' ', fecha_final, ' ', id_empleado)
             const HORARIO = await pool.query(
-                "SELECT codigo_e, nombre_e, anio, mes, " +
+                "SELECT id_e, codigo_e, nombre_e, anio, mes, " +
                 "CASE WHEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') ELSE '-' END AS dia1, " +
                 "CASE WHEN STRING_AGG(CASE WHEN dia = 2 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 2 THEN codigo_dia end,', ') ELSE '-' END AS dia2, " +
                 "CASE WHEN STRING_AGG(CASE WHEN dia = 3 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 3 THEN codigo_dia end,', ') ELSE '-' END AS dia3, " +
@@ -256,18 +256,18 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
                 "CASE WHEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 30 THEN codigo_dia end,', ') ELSE '-' END AS dia30, " +
                 "CASE WHEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') ELSE '-' END AS dia31 " +
                 "FROM ( " +
-                "SELECT p_g.codigo AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fecha_horario) AS anio, EXTRACT('month' FROM fecha_horario) AS mes, " +
+                "SELECT p_g.id_empleado AS id_e, empleado.codigo AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fecha_horario) AS anio, EXTRACT('month' FROM fecha_horario) AS mes, " +
                 "EXTRACT('day' FROM fecha_horario) AS dia, " +
                 "CASE WHEN ((tipo_dia = 'L' OR tipo_dia = 'FD') AND (NOT estado_origen = 'HL' AND NOT estado_origen = 'HFD')) THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
                 "FROM eu_asistencia_general p_g " +
-                "INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
+                "INNER JOIN eu_empleados empleado ON empleado.id = p_g.id_empleado AND p_g.id_empleado IN (" + id_empleado + ") " +
                 "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
                 "WHERE fecha_horario BETWEEN $1 AND $2 " +
-                "GROUP BY codigo_e, nombre_e, anio, mes, dia, codigo_dia, p_g.id_horario " +
-                "ORDER BY p_g.codigo,anio, mes , dia, p_g.id_horario " +
+                "GROUP BY id_e, codigo_e, nombre_e, anio, mes, dia, codigo_dia, p_g.id_horario " +
+                "ORDER BY p_g.id_empleado, anio, mes , dia, p_g.id_horario " +
                 ") AS datos " +
-                "GROUP BY codigo_e, nombre_e, anio, mes " +
-                "ORDER BY 3,4,1"
+                "GROUP BY id_e, codigo_e, nombre_e, anio, mes " +
+                "ORDER BY 4,5,1"
                 , [fecha_inicio, fecha_final]);
 
             if (HORARIO.rowCount != 0) {
@@ -286,13 +286,13 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
     // METODO PARA LISTAR DETALLE DE HORARIOS POR USUARIOS              --**VERIFICADO
     public async ListarDetalleHorarios(req: Request, res: Response) {
         try {
-            const { fecha_inicio, fecha_final, codigo } = req.body;
+            const { fecha_inicio, fecha_final, id_empleado } = req.body;
 
             const HORARIO = await pool.query(
                 "SELECT horario.codigo AS codigo_dia, horario.nombre AS nombre, " +
                 "dh.hora, dh.tipo_accion, dh.id_horario, dh.id AS detalle " +
                 "FROM eu_asistencia_general p_g " +
-                "INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
+                "INNER JOIN eu_empleados empleado ON empleado.id = p_g.id_empleado AND p_g.id_empleado IN (" + id_empleado + ") " +
                 "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
                 "INNER JOIN eh_detalle_horarios dh ON dh.id = p_g.id_detalle_horario " +
                 "WHERE fecha_horario BETWEEN $1 AND $2 " +
@@ -316,11 +316,11 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
     // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
     public async ListarHorariosUsuario(req: Request, res: Response) {
         try {
-            const { fecha_inicio, fecha_final, codigo } = req.body;
+            const { fecha_inicio, fecha_final, id_empleado } = req.body;
             const HORARIO = await pool.query(
                 "SELECT p_g.id_horario, horario.codigo  AS codigo_horario " +
                 "FROM eu_asistencia_general p_g " +
-                "INNER JOIN eu_empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
+                "INNER JOIN eu_empleados empleado ON empleado.id = p_g.id_empleado AND p_g.id_empleado IN (" + id_empleado + ") " +
                 "INNER JOIN eh_cat_horarios horario ON horario.id = p_g.id_horario " +
                 "WHERE fecha_horario BETWEEN $1 AND $2 " +
                 "GROUP BY codigo_horario, p_g.id_horario"
@@ -345,33 +345,33 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
     public async BuscarAsistencia(req: Request, res: Response) {
 
         var verificador = 0;
-        var codigos = '';
+        var ids = '';
 
         var EMPLEADO: any;
 
         const { cedula, codigo, inicio, fin, nombre, apellido } = req.body;
 
         if (codigo === '') {
-            // BUSCAR CODIGO POR CEDULA DEL USUARIO
+            // BUSCAR ID POR CEDULA DEL USUARIO
             EMPLEADO = await pool.query(
                 `
-                SELECT codigo FROM eu_empleados WHERE cedula = $1
+                SELECT id FROM eu_empleados WHERE cedula = $1
                 `
                 , [cedula]);
 
             if (EMPLEADO.rowCount === 0) {
-                // BUSCAR CODIGO POR NOMBRE DEL USUARIO
+                // BUSCAR ID POR NOMBRE DEL USUARIO
                 EMPLEADO = await pool.query(
                     `
-                    SELECT codigo FROM eu_empleados WHERE UPPER(nombre) ilike '%${nombre}%'
+                    SELECT id FROM eu_empleados WHERE UPPER(nombre) ilike '%${nombre}%'
                     `
                 );
 
                 if (EMPLEADO.rowCount === 0) {
-                    // BUSCAR CODIGO POR APELLIDO DEL USUARIO
+                    // BUSCAR ID POR APELLIDO DEL USUARIO
                     EMPLEADO = await pool.query(
                         `
-                        SELECT codigo FROM eu_empleados WHERE UPPER(apellido) ilike '%${apellido}%'
+                        SELECT id FROM eu_empleados WHERE UPPER(apellido) ilike '%${apellido}%'
                         `
                     );
 
@@ -382,11 +382,11 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
 
                         datos.forEach((obj: any) => {
                             //console.log('ver codigos ', obj.codigo)
-                            if (codigos === '') {
-                                codigos = '\'' + obj.codigo + '\''
+                            if (ids === '') {
+                                ids = '\'' + obj.id + '\''
                             }
                             else {
-                                codigos = codigos + ', \'' + obj.codigo + '\''
+                                ids = ids + ', \'' + obj.id + '\''
                             }
                         })
                     }
@@ -397,7 +397,31 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
             }
         }
         else {
-            codigos = '\'' + codigo + '\''
+            // BUSCAR ID POR APELLIDO DEL USUARIO
+            EMPLEADO = await pool.query(
+                `
+                SELECT id FROM eu_empleados WHERE codigo = $1
+                `
+                , [codigo]);
+
+            if (EMPLEADO.rowCount != 0) {
+                // TRATAMIENTO DE CODIGOS
+                var datos: any = [];
+                datos = EMPLEADO.rows;
+
+                datos.forEach((obj: any) => {
+                    //console.log('ver codigos ', obj.codigo)
+                    if (ids === '') {
+                        ids = '\'' + obj.id + '\''
+                    }
+                    else {
+                        ids = ids + ', \'' + obj.id + '\''
+                    }
+                })
+            }
+            else {
+                verificador = 1;
+            }
         }
 
         if (verificador === 0) {
@@ -407,7 +431,7 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
                 p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre,
                 empleado.cedula, empleado.nombre, empleado.apellido, empleado.id AS id_empleado
                 FROM eu_asistencia_general p_g
-                INNER JOIN eu_empleados empleado on empleado.codigo = p_g.codigo AND p_g.codigo IN (${codigos})
+                INNER JOIN eu_empleados empleado on empleado.id = p_g.id_empleado AND p_g.id_empleado IN (${ids})
                 WHERE p_g.fecha_horario BETWEEN $1 AND $2
                 ORDER BY p_g.fecha_hora_horario ASC`,
                 [inicio, fin]);
@@ -429,13 +453,13 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
     // METODO PARA ACTUALIZAR ASISTENCIA MANUAL
     public async ActualizarManual(req: Request, res: Response) {
         try {
-            const { codigo, fecha, id, accion, id_timbre, user_name, ip } = req.body;
-            console.log('ver datos ', codigo, ' ', fecha, ' ', id)
+            const { id_empleado, fecha, id, accion, id_timbre, user_name, ip } = req.body;
+            console.log('ver datos ', id_empleado, ' ', fecha, ' ', id)
             const ASIGNADO = await pool.query(
                 `
-                SELECT * FROM fnbuscarregistroasignado ($1, $2::character varying);
+                SELECT * FROM fnbuscarregistroasignado ($1, $2);
                 `
-                , [fecha, codigo]);
+                , [fecha, id_empleado]);
             //console.log('ver asignado ', ASIGNADO)
 
             // INICIAR TRANSACCION
@@ -476,9 +500,9 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: `id: ${datosOriginales.id}
-                            , codigo: ${datosOriginales.codigo}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${datosOriginales.fecha_hora_timbre}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`,
+                            , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${datosOriginales.fecha_hora_timbre}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`,
                 datosNuevos: `id: ${datosOriginales.id}
-                            , codigo: ${datosOriginales.codigo}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`, ip,
+                            , id_empleado: ${datosOriginales.id_empleado}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_horario: ${datosOriginales.id_horario}, id_detalle_horario: ${datosOriginales.id_detalle_horario}, fecha_horario: ${fecha_horario}, fecha_hora_horario: ${fecha_hora_horario + ' ' + fecha_hora_horario1}, fecha_hora_timbre: ${fecha}, estado_timbre: ${datosOriginales.estado_timbre}, tipo_accion: ${datosOriginales.tipo_accion}, tipo_dia: ${datosOriginales.tipo_dia}, salida_otro_dia: ${datosOriginales.salida_otro_dia}, tolerancia: ${datosOriginales.tolerancia}, minutos_antes: ${datosOriginales.minutos_antes}, minutos_despues: ${datosOriginales.minutos_despues}, estado_origen: ${datosOriginales.estado_origen}, minutos_alimentacion: ${datosOriginales.minutos_alimentacion}`, ip,
                 observacion: null
             });
 
@@ -521,13 +545,13 @@ public async CrearPlanificacion(req: Request, res: Response): Promise<any> {
     }
 
     public async BuscarFecha(req: Request, res: Response) {
-        const { fec_inicio, id_horario, codigo } = req.body;
+        const { fec_inicio, id_horario, id_empleado } = req.body;
         const FECHAS = await pool.query(
             `
             SELECT id FROM eu_asistencia_general 
-            WHERE fecha_horario = $1 AND id_horario = $2 AND codigo = $3
+            WHERE fecha_horario = $1 AND id_horario = $2 AND id_empleado = $3
             `
-            , [fec_inicio, id_horario, codigo]);
+            , [fec_inicio, id_horario, id_empleado]);
         if (FECHAS.rowCount != 0) {
             return res.jsonp(FECHAS.rows)
         }

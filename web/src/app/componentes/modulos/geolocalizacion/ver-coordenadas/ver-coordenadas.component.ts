@@ -786,7 +786,6 @@ export class VerCoordenadasComponent implements OnInit {
       data.forEach((obj: any) => {
         var datos = {
           id_empl: obj.id,
-          codigo: obj.codigo,
           id_ubicacion: this.idUbicacion,
           user_name: this.user_name,
           ip: this.ip

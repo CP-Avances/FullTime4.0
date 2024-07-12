@@ -37,7 +37,7 @@ export const RestarPeriodoVacacionAutorizada = async function (id_vacacion: numb
         await pool.query('BEGIN');
 
         // CONSULTAR DATOSORIGINALES
-        const consulta = await pool.query('SELECT * FROM mv_periodo_vacacion WHERE id = $1', [vacacion.id_peri_vacacion]);
+        const consulta = await pool.query(`SELECT * FROM mv_periodo_vacacion WHERE id = $1`, [vacacion.id_peri_vacacion]);
         const [datosOriginales] = consulta.rows;
 
         if (!datosOriginales) {

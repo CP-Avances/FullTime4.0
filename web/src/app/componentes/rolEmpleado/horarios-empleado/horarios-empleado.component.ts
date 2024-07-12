@@ -206,7 +206,7 @@ export class HorariosEmpleadoComponent implements OnInit {
     let busqueda = {
       fecha_inicio: this.mes_inicio,
       fecha_final: this.mes_fin,
-      codigo: '\'' + this.datoActual.codigo + '\''
+      id_empleado: '\'' + this.idEmpleado + '\''
     }
     this.restPlanGeneral.BuscarPlanificacionHoraria(busqueda).subscribe(datos => {
       if (datos.message === 'OK') {
@@ -249,7 +249,7 @@ export class HorariosEmpleadoComponent implements OnInit {
     let busqueda = {
       fecha_inicio: this.mes_inicio,
       fecha_final: this.mes_fin,
-      codigo: '\'' + this.datoActual.codigo + '\''
+      id_empleado: '\'' + this.idEmpleado + '\''
     }
     let codigo_horario = '';
     let tipos: any = [];

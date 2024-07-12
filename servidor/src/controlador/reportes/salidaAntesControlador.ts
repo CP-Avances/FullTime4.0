@@ -12,7 +12,7 @@ class SalidasAntesControlador {
         let n: Array<any> = await Promise.all(datos.map(async (obj: ReporteSalidaAntes) => {
             obj.departamentos = await Promise.all(obj.departamentos.map(async (ele) => {
                 ele.empleado = await Promise.all(ele.empleado.map(async (o) => {
-                    o.timbres = await BuscarSalidasAnticipadas(desde, hasta, o.codigo);
+                    o.timbres = await BuscarSalidasAnticipadas(desde, hasta, o.id);
                     console.log('timbres:-------------------- ', o);
                     return o
                 })
@@ -45,7 +45,7 @@ class SalidasAntesControlador {
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
-                o.timbres = await BuscarSalidasAnticipadas(desde, hasta, o.codigo);
+                o.timbres = await BuscarSalidasAnticipadas(desde, hasta, o.id);
                 console.log('Timbres: ', o);
                 return o;
             }));
@@ -75,10 +75,10 @@ const BuscarSalidasAnticipadas = async function (fec_inicio: string, fec_final: 
         `
         SELECT CAST(fecha_hora_horario AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR), 
             EXTRACT(epoch FROM (fecha_hora_horario - fecha_hora_timbre)) AS diferencia, 
-            codigo, estado_timbre, tipo_accion AS accion, tipo_dia 
+            id_empleado, estado_timbre, tipo_accion AS accion, tipo_dia 
         FROM eu_asistencia_general 
         WHERE CAST(fecha_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' 
-            AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 
+            AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 
             AND fecha_hora_timbre < fecha_hora_horario AND tipo_dia NOT IN (\'L\', \'FD\') 
             AND tipo_accion = \'S\'
         ORDER BY fecha_hora_horario ASC

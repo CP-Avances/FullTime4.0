@@ -53,7 +53,9 @@ export class EmplLeafletComponent implements OnInit {
               'Es necesario el uso de CERTIFICADO DE SEGURIDAD (SSL) para ver el mapa.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-            this.Salir();
+            //this.Salir();
+            // SOLO PARA DESARROLLO
+            this.Geolocalizar();
           }
         }
       });
