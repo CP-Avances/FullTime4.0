@@ -375,12 +375,11 @@ class TiposCargosControlador {
 
     // REGISTRAR PLANTILLA TIPO CARGO 
     public async CargarPlantilla(req: Request, res: Response) {
-        try {
-            const { plantilla, user_name, ip } = req.body;
-            var contador = 1;
-            var respuesta: any
+        const { plantilla, user_name, ip } = req.body;
+        let error: boolean = false;
 
-            plantilla.forEach(async (data: any) => {
+        for (const data of plantilla) {
+            try {
                 // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                 const { tipo_cargo } = data;
                 const cargo = tipo_cargo.charAt(0).toUpperCase() + tipo_cargo.slice(1).toLowerCase();
@@ -410,21 +409,20 @@ class TiposCargosControlador {
 
                 // FIN DE TRANSACCION
                 await pool.query('COMMIT');
-
-                if (contador === plantilla.length) {
-                    if (cargos) {
-                        return respuesta = res.status(200).jsonp({ message: 'ok' })
-                    } else {
-                        return respuesta = res.status(404).jsonp({ message: 'error' })
-                    }
-                }
-                contador = contador + 1;
-            });
-        } catch (error) {
-            // ROLLBACK
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: error });
+                
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                error = true;
+            }
         }
+
+        if (error) {
+            return res.status(500).jsonp({ message: 'error' });
+        }
+    
+        return res.status(200).jsonp({ message: 'ok' });
+
     }
 }
 
