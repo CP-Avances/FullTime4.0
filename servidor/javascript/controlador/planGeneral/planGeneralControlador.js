@@ -406,7 +406,7 @@ class PlanGeneralControlador {
                 const { id_empleado, fecha, id, accion, id_timbre, user_name, ip } = req.body;
                 console.log('ver datos ', id_empleado, ' ', fecha, ' ', id);
                 const ASIGNADO = yield database_1.default.query(`
-                SELECT * FROM fnbuscarregistroasignado ($1, $2::character varying);
+                SELECT * FROM fnbuscarregistroasignado ($1, $2);
                 `, [fecha, id_empleado]);
                 //console.log('ver asignado ', ASIGNADO)
                 // INICIAR TRANSACCION

@@ -24,7 +24,7 @@ class UbicacionControlador {
                 `
                 ,
                 [latitud, longitud, descripcion]);
-    
+
             const [coordenadas] = response.rows;
 
             // AUDITORIA
@@ -40,7 +40,7 @@ class UbicacionControlador {
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-    
+
             if (coordenadas) {
                 return res.status(200).jsonp({ message: 'OK', respuesta: coordenadas })
             }
@@ -89,7 +89,7 @@ class UbicacionControlador {
                 `
                 ,
                 [latitud, longitud, descripcion, id]);
-            
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'mg_cat_ubicaciones',
@@ -189,10 +189,10 @@ class UbicacionControlador {
             }
 
             await pool.query(
-            `
+                `
             DELETE FROM mg_cat_ubicaciones WHERE id = $1
             `
-            , [id]);
+                , [id]);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -225,10 +225,10 @@ class UbicacionControlador {
         const { id_empl } = req.params;
         const UBICACIONES = await pool.query(
             `
-            SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empleado, cu.latitud, cu.longitud, 
+            SELECT eu.id AS id_emplu, e.codigo, eu.id_ubicacion, eu.id_empleado, cu.latitud, cu.longitud, 
                 cu.descripcion 
-            FROM mg_empleado_ubicacion AS eu, mg_cat_ubicaciones AS cu 
-            WHERE eu.id_ubicacion = cu.id AND eu.id_empleado = $1
+            FROM mg_empleado_ubicacion AS eu, mg_cat_ubicaciones AS cu, eu_empleados AS e 
+            WHERE eu.id_ubicacion = cu.id AND eu.id_empleado = $1 AND e.id = eu.id_empleado
             `
             , [id_empl]);
         if (UBICACIONES.rowCount != 0) {
@@ -242,18 +242,18 @@ class UbicacionControlador {
     // ASIGNAR COORDENADAS GENERALES DE UBICACIÓN A LOS USUARIOS
     public async RegistrarCoordenadasUsuario(req: Request, res: Response): Promise<void> {
         try {
-            const { codigo, id_empl, id_ubicacion, user_name, ip } = req.body;
+            const { id_empl, id_ubicacion, user_name, ip } = req.body;
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
             await pool.query(
                 `
-                INSERT INTO mg_empleado_ubicacion (codigo, id_empleado, id_ubicacion) 
-                VALUES ($1, $2, $3)
+                INSERT INTO mg_empleado_ubicacion (id_empleado, id_ubicacion) 
+                VALUES ($2, $3)
                 `
                 ,
-                [codigo, id_empl, id_ubicacion]);
+                [id_empl, id_ubicacion]);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -261,7 +261,7 @@ class UbicacionControlador {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{codigo: ${codigo}, id_empl: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
+                datosNuevos: `id_empl: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
                 ip,
                 observacion: null
             });
@@ -281,10 +281,10 @@ class UbicacionControlador {
         const id_ubicacion = req.params.id_ubicacion;
         const UBICACIONES = await pool.query(
             `
-            SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empleado, cu.latitud, cu.longitud, 
+            SELECT eu.id AS id_emplu, e.codigo, eu.id_ubicacion, eu.id_empleado, cu.latitud, cu.longitud, 
                 cu.descripcion, e.nombre, e.apellido 
             FROM mg_empleado_ubicacion AS eu, mg_cat_ubicaciones AS cu, eu_empleados AS e 
-            WHERE eu.id_ubicacion = cu.id AND e.codigo = eu.codigo AND cu.id = $1
+            WHERE eu.id_ubicacion = cu.id AND e.id = eu.id_empleado AND cu.id = $1
             `
             , [id_ubicacion]);
         if (UBICACIONES.rowCount != 0) {
@@ -305,7 +305,7 @@ class UbicacionControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const ubicacion = await pool.query('SELECT * FROM mg_empleado_ubicacion WHERE id = $1', [id]);
+            const ubicacion = await pool.query(`SELECT * FROM mg_empleado_ubicacion WHERE id = $1`, [id]);
             const [datosOriginales] = ubicacion.rows;
 
             if (!datosOriginales) {

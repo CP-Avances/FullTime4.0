@@ -675,7 +675,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
           fec_final: fecha_final,
           hora_inicio: hora_inicio_,
           hora_final: hora_final_,
-          codigo: this.empleado.codigo,
+          id_empleado: this.empleado.id,
           id: this.info.id
         }
         this.restP.BuscarPermisosSolicitadosHorasEditar(solicitud).subscribe(solicitados => {
@@ -1097,7 +1097,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       fec_final: fecha_final,
       hora_inicio: form.horaSalidaForm,
       hora_final: form.horasIngresoForm,
-      codigo: this.empleado.codigo,
+      id_empleado: this.empleado.id,
       id: this.info.id
     }
     this.restP.BuscarPermisosSolicitadosHorasEditar(solicitud).subscribe(solicitados => {
@@ -1383,7 +1383,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
         let solicitud = {
           fec_inicio: inicio,
           fec_final: final,
-          codigo: this.empleado.codigo,
+          id_empleado: this.empleado.id,
           id: this.info.id
         }
 
@@ -1436,7 +1436,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     let solicitud = {
       fec_inicio: inicio,
       fec_final: final,
-      codigo: this.empleado.codigo,
+      id_empleado: this.empleado.id,
       id: this.info.id
     }
     this.restP.BuscarPermisosSolicitadosDiasEditar(solicitud).subscribe(solicitados => {

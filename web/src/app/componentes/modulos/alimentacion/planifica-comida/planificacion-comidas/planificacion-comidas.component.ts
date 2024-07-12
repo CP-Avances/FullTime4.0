@@ -301,7 +301,6 @@ export class PlanificacionComidasComponent implements OnInit {
 
         // DATOS DE PLANIFICACION DE SERVICIO DE ALIMENTACION AL USUARIO
         let planEmpleado = {
-          codigo: this.data.codigo,
           id_empleado: this.data.id,
           id_plan_comida: plan.id,
           fecha: '',
@@ -524,7 +523,6 @@ export class PlanificacionComidasComponent implements OnInit {
           // INDICAMOS A QUE EMPLEADO SE LE REALIZA UNA PLANIFICACION
           this.contador = 0;
           let planEmpleado = {
-            codigo: '',
             id_empleado: '',
             id_plan_comida: plan.id,
             fecha: '',
@@ -536,7 +534,6 @@ export class PlanificacionComidasComponent implements OnInit {
           }
           // LEER DATOS DE CADA USUARIOS
           empleados_planificados.map((obj: any) => {
-            planEmpleado.codigo = obj.codigo;
             planEmpleado.id_empleado = obj.id;
 
             // LECTURA DE NOMBRES DE USUARIOS
@@ -545,7 +542,7 @@ export class PlanificacionComidasComponent implements OnInit {
             this.contadorFechas = 0;
 
             // LEER DATOS POR CADA FECHA
-            this.fechasHorario.map(fec => {
+            this.fechasHorario.map((fec: any) => {
               planEmpleado.fecha = fec;
               this.restPlan.CrearPlanComidasEmpleado(planEmpleado).subscribe(res => {
                 this.contadorFechas = this.contadorFechas + 1;

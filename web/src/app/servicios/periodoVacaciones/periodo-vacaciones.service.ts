@@ -20,8 +20,8 @@ export class PeriodoVacacionesService {
     return this.http.post(`${environment.url}/perVacacion`, datos);
   }
 
-  ObtenerPeriodoVacaciones(codigo: string | number) {
-    return this.http.get<any>(`${environment.url}/perVacacion/infoPeriodo/${codigo}`);
+  ObtenerPeriodoVacaciones(id_empleado: string | number) {
+    return this.http.get<any>(`${environment.url}/perVacacion/infoPeriodo/${id_empleado}`);
   }
   ActualizarPeriodoV(datos: any) {
     return this.http.put(`${environment.url}/perVacacion`, datos);

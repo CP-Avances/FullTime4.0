@@ -205,10 +205,9 @@ export class EditarPlanHoraExtraComponent implements OnInit {
             let h_inicio = this.validar.FormatearHora(plan.hora_inicio, this.formato_hora)
             let h_fin = this.validar.FormatearHora(plan.hora_fin, this.formato_hora);
 
-            // DATOS DE ASIGNACIÓN DE PLANIFICACIÓN A EMPLEADOS
+            // DATOS DE ASIGNACION DE PLANIFICACION A EMPLEADOS
             let planEmpleado = {
               estado: 1,
-              codigo: this.leer_datos.codigo,
               observacion: false,
               id_plan_hora: plan.id,
               id_empl_cargo: this.leer_datos.id_cargo,
@@ -251,7 +250,6 @@ export class EditarPlanHoraExtraComponent implements OnInit {
       planEmpleado.id_empl_realiza = obj.id_empleado;
       planEmpleado.id_empl_cargo = obj.id_cargo;
       planEmpleado.id_plan_hora = plan.id;
-      planEmpleado.codigo = obj.codigo;
 
       // INSERTAR PLANIFICACIÓN POR EMPLEADO
       this.restPE.CrearPlanHoraExtraEmpleado(planEmpleado).subscribe(response => {

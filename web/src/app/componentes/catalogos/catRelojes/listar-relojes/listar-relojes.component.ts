@@ -182,6 +182,7 @@ export class ListarRelojesComponent implements OnInit {
     this.DataDispositivos = null;
     this.archivoSubido = [];
     this.nameFile = '';
+    this.ObtenerReloj();
     this.formulario.setValue({
       nombreForm: '',
       ipForm: '',
@@ -189,7 +190,6 @@ export class ListarRelojesComponent implements OnInit {
       sucursalForm: '',
       departamentoForm: ''
     });
-    this.ObtenerReloj();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
     this.messajeExcel = '';
@@ -378,7 +378,7 @@ export class ListarRelojesComponent implements OnInit {
   }
 
   registrarDispositivos() {
-    if (this.listaDispositivosCorrectos.length > 0) {
+    if (this.listaDispositivosCorrectos?.length > 0) {
       const data = {
         plantilla: this.listaDispositivosCorrectos,
         user_name: this.user_name,

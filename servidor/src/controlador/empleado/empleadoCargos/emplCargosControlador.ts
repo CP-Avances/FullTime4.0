@@ -628,41 +628,49 @@ class EmpleadoCargosControlador {
                         , [valor.departamento.toUpperCase()])
                         if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
                         
-                          var VERFICAR_CARGO = await pool.query(
-                            `SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1`
-                            , [valor.cargo.toUpperCase()])
-                            if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-
-                              if(moment(valor.fecha_desde).format('YYYY-MM-DD') >= moment(valor.fecha_hasta).format('YYYY-MM-DD')){
-                                valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta'
-                              }else{
-                                  const fechaRango: any = await pool.query(
-                                  `
-                                  SELECT id FROM eu_empleado_cargos 
-                                  WHERE id_contrato = $1 AND 
-                                  ($2  BETWEEN fecha_inicio and fecha_final or $3 BETWEEN fecha_inicio and fecha_final or 
-                                  fecha_inicio BETWEEN $2 AND $3)
-                                  `
-                                  , [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta])
-                  
-                                  if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
-                                    valor.observacion = 'Existe un cargo vigente en esas fechas'
-                                  } else {
-
-                                    // Discriminación de elementos iguales
-                                    if (duplicados.find((p: any) => p.cedula === valor.cedula) == undefined) {
-                                      duplicados.push(valor);
+                          var VERIFICAR_DEP_SUC: any = await pool.query(
+                            `SELECT * FROM ed_departamentos WHERE id_sucursal = $1 and UPPER(nombre) = $2`
+                            ,[VERIFICAR_SUCURSALES.rows[0].id, valor.departamento.toUpperCase()]
+                          )
+                          if(VERIFICAR_DEP_SUC.rows[0] != undefined && VERIFICAR_DEP_SUC.rows[0] != ''){
+                            var VERFICAR_CARGO = await pool.query(
+                              `SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1`
+                              , [valor.cargo.toUpperCase()])
+                              if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+  
+                                if(moment(valor.fecha_desde).format('YYYY-MM-DD') >= moment(valor.fecha_hasta).format('YYYY-MM-DD')){
+                                  valor.observacion = 'La fecha desde no puede ser mayor o igual a la fecha hasta'
+                                }else{
+                                    const fechaRango: any = await pool.query(
+                                    `
+                                    SELECT id FROM eu_empleado_cargos 
+                                    WHERE id_contrato = $1 AND 
+                                    ($2  BETWEEN fecha_inicio and fecha_final or $3 BETWEEN fecha_inicio and fecha_final or 
+                                    fecha_inicio BETWEEN $2 AND $3)
+                                    `
+                                    , [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta])
+                    
+                                    if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
+                                      valor.observacion = 'Existe un cargo vigente en esas fechas'
                                     } else {
-                                      valor.observacion = '1';
+  
+                                      // Discriminación de elementos iguales
+                                      if (duplicados.find((p: any) => p.cedula === valor.cedula) == undefined) {
+                                        duplicados.push(valor);
+                                      } else {
+                                        valor.observacion = '1';
+                                      }
+  
                                     }
-
-                                  }
-
+  
+                                }
+  
+                              }else{
+                                valor.observacion = 'Cargo no existe en el sistema'
                               }
-
-                            }else{
-                              valor.observacion = 'Cargo no existe en el sistema'
-                            }
+                          }else{
+                            valor.observacion = 'Departamento no pertenece a la sucursal'
+                          }
 
                         }else{
                           valor.observacion = 'Departamento no existe en el sistema'

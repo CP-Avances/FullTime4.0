@@ -26,7 +26,7 @@ class PlanHoraExtraControlador {
       FROM eu_empleados AS e, (SELECT * FROM timbres_entrada_plan_hora_extra AS tehe 
         FULL JOIN timbres_salida_plan_hora_extra AS tshe 
         ON tehe.fecha_timbre_e = tshe.fecha_timbre AND tehe.id_empl = tshe.id_empleado) AS t
-      WHERE t.observacion = false AND (e.codigo = t.id_empleado OR e.codigo = t.id_empl) AND (t.estado = 1 OR t.estado = 2)
+      WHERE t.observacion = false AND (e.id = t.id_empleado OR e.id = t.id_empl) AND (t.estado = 1 OR t.estado = 2)
       `
     );
     if (PLAN.rowCount != 0) {
@@ -49,7 +49,7 @@ class PlanHoraExtraControlador {
       FROM eu_empleados AS e, (SELECT * FROM timbres_entrada_plan_hora_extra AS tehe 
         FULL JOIN timbres_salida_plan_hora_extra AS tshe 
         ON tehe.fecha_timbre_e = tshe.fecha_timbre AND tehe.id_empl = tshe.id_empleado) AS t 
-      WHERE t.observacion = true AND (e.codigo = t.id_empleado OR e.codigo = t.id_empl) AND (t.estado = 1 OR t.estado = 2)
+      WHERE t.observacion = true AND (e.id = t.id_empleado OR e.id = t.id_empl) AND (t.estado = 1 OR t.estado = 2)
       `
     );
     if (PLAN.rowCount != 0) {
@@ -72,7 +72,7 @@ class PlanHoraExtraControlador {
       FROM eu_empleados AS e, (SELECT * FROM timbres_entrada_plan_hora_extra AS tehe 
         FULL JOIN timbres_salida_plan_hora_extra AS tshe 
         ON tehe.fecha_timbre_e = tshe.fecha_timbre AND tehe.id_empl = tshe.id_empleado) AS t 
-      WHERE (e.codigo = t.id_empleado OR e.codigo = t.id_empl) AND (t.estado = 3 OR t.estado = 4)
+      WHERE (e.id = t.id_empleado OR e.id = t.id_empl) AND (t.estado = 3 OR t.estado = 4)
       `
     );
     if (PLAN.rowCount != 0) {
@@ -112,7 +112,7 @@ class PlanHoraExtraControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query('SELECT tiempo_autorizado FROM mhe_empleado_plan_hora_extra WHERE id = $1', [id]);
+      const consulta = await pool.query(`SELECT tiempo_autorizado FROM mhe_empleado_plan_hora_extra WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
@@ -169,7 +169,7 @@ class PlanHoraExtraControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query('SELECT estado FROM mhe_empleado_plan_hora_extra WHERE id = $1', [id]);
+      const consulta = await pool.query(`SELECT estado FROM mhe_empleado_plan_hora_extra WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
@@ -288,7 +288,7 @@ class PlanHoraExtraControlador {
     try {
 
       const { id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, id_empl_contrato, estado,
-        codigo, user_name, ip } = req.body;
+        user_name, ip } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -296,10 +296,10 @@ class PlanHoraExtraControlador {
       const response: QueryResult = await pool.query(
         `
         INSERT INTO mhe_empleado_plan_hora_extra (id_detalle_plan, id_empleado_realiza, observacion, 
-          id_empleado_cargo, id_empleado_contrato, estado, codigo)
-        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+          id_empleado_cargo, id_empleado_contrato, estado)
+        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
         `
-        , [id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, id_empl_contrato, estado, codigo]);
+        , [id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, id_empl_contrato, estado]);
 
       const [planEmpleado] = response.rows;
 
@@ -401,12 +401,12 @@ class PlanHoraExtraControlador {
         DELETE FROM mhe_detalle_plan_hora_extra WHERE id = $1
         `
         , [id]);
-        var fecha_DesdeO = await FormatearFecha2(datosOriginales.fecha_desde, 'ddd');
-        var fecha_HastaO = await FormatearFecha2(datosOriginales.fecha_hasta, 'ddd');
-  
-        const horaInicioO = await FormatearHora(datosOriginales.hora_inicio)
-        const horaFinO = await FormatearHora(datosOriginales.hora_fin)
-  
+      var fecha_DesdeO = await FormatearFecha2(datosOriginales.fecha_desde, 'ddd');
+      var fecha_HastaO = await FormatearFecha2(datosOriginales.fecha_hasta, 'ddd');
+
+      const horaInicioO = await FormatearHora(datosOriginales.hora_inicio)
+      const horaFinO = await FormatearHora(datosOriginales.hora_fin)
+
 
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -441,7 +441,7 @@ class PlanHoraExtraControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM mhe_empleado_plan_hora_extra WHERE id_detalle_plan = $1', [id]);
+      const consulta = await pool.query(`SELECT * FROM mhe_empleado_plan_hora_extra WHERE id_detalle_plan = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {

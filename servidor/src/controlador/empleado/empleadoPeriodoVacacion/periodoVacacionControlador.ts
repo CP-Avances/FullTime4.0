@@ -15,8 +15,8 @@ class PeriodoVacacionControlador {
         SELECT pv.id, pv.id_empleado_contrato
         FROM mv_periodo_vacacion AS pv
         WHERE pv.id = (SELECT MAX(pv.id) AS id 
-                       FROM mv_periodo_vacacion AS pv, eu_empleados AS e 
-                       WHERE pv.codigo = e.codigo AND e.id = $1 )
+                       FROM mv_periodo_vacacion AS pv 
+                       WHERE pv.id_empleado = $1 )
         `
       , [id_empleado]);
     if (VACACIONES.rowCount != 0) {
@@ -29,7 +29,7 @@ class PeriodoVacacionControlador {
     try {
       const {
         id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio, fec_final,
-        dia_perdido, horas_vacaciones, min_vacaciones, codigo, user_name, ip,
+        dia_perdido, horas_vacaciones, min_vacaciones, id_empleado, user_name, ip,
       } = req.body;
 
       // INICIAR TRANSACCION
@@ -38,12 +38,12 @@ class PeriodoVacacionControlador {
       const datosNuevos = await pool.query(
         `
           INSERT INTO mv_periodo_vacacion (id_empleado_contrato, descripcion, dia_vacacion,
-              dia_antiguedad, estado, fecha_inicio, fecha_final, dia_perdido, horas_vacaciones, minutos_vacaciones, codigo)
+              dia_antiguedad, estado, fecha_inicio, fecha_final, dia_perdido, horas_vacaciones, minutos_vacaciones, id_empleado)
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *
         `,
         [id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
           fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones,
-          codigo,]
+          id_empleado,]
       );
 
       const [periodo] = datosNuevos.rows;
@@ -76,12 +76,12 @@ class PeriodoVacacionControlador {
   }
 
   public async EncontrarPerVacaciones(req: Request, res: Response): Promise<any> {
-    const { codigo } = req.params;
+    const { id_empleado } = req.params;
     const PERIODO_VACACIONES = await pool.query(
       `
-        SELECT * FROM mv_periodo_vacacion AS p WHERE p.codigo = $1
+        SELECT * FROM mv_periodo_vacacion AS p WHERE p.id_empleado = $1
         `
-      , [codigo]);
+      , [id_empleado]);
     if (PERIODO_VACACIONES.rowCount != 0) {
       return res.jsonp(PERIODO_VACACIONES.rows)
     }
@@ -100,7 +100,7 @@ class PeriodoVacacionControlador {
 
       // CONSULTAR DATOSORIGINALES
       const periodo = await pool.query(
-        "SELECT * FROM mv_periodo_vacacion WHERE id = $1",
+        `SELECT * FROM mv_periodo_vacacion WHERE id = $1`,
         [id]
       );
       const [datosOriginales] = periodo.rows;

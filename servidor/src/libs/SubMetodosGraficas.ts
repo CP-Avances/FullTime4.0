@@ -36,14 +36,14 @@ export const BuscarTimbresByCodigo_Fecha = async function (codigo: number, horar
     }))
 }
 
-export const BuscarPermisosJustificados = async function (codigo: number, fecha: string) {
+export const BuscarPermisosJustificados = async function (id_empleado: number, fecha: string) {
     return await pool.query(
         `
         SELECT fecha_inicio, descripcion 
         FROM mp_solicitud_permiso 
-        WHERE codigo = $1 AND fecha_inicio::TIMESTAMP::DATE <= $2 AND fecha_final::TIMESTAMP::DATE >= $2 AND estado = 3
+        WHERE id_empleado = $1 AND fecha_inicio::TIMESTAMP::DATE <= $2 AND fecha_final::TIMESTAMP::DATE >= $2 AND estado = 3
         `
-        , [codigo, fecha + ''])
+        , [id_empleado, fecha + ''])
         .then(result => {
             return result.rowCount
         })
@@ -131,10 +131,10 @@ async function HorasExtrasSolicitadasGrafica(fec_desde: Date, fec_hasta: Date) {
         // estado = 3 significa q las horas extras fueron autorizadas
         `
         SELECT CAST(h.fecha_inicio AS VARCHAR), CAST(h.fecha_final AS VARCHAR), h.descripcion, h.horas_solicitud, 
-            h.tiempo_autorizado, h.codigo, h.id_empleado_cargo 
-        FROM mhe_solicitud_hora_extra AS h 
+            h.tiempo_autorizado, e.codigo, h.id_empleado_cargo 
+        FROM mhe_solicitud_hora_extra AS h, eu_empleados AS e 
         WHERE h.fecha_inicio BETWEEN $1 and $2 AND h.estado = 3   
-            AND h.fecha_final BETWEEN $1 and $2 ORDER BY h.fecha_inicio
+            AND h.fecha_final BETWEEN $1 and $2 ORDER BY h.fecha_inicio AND e.id = h.id_empleado_solicita
         `
         , [fec_desde, fec_hasta])
         .then(result => {
@@ -248,9 +248,9 @@ export const Empleado_HoraExtra_ModelarDatos = async function (codigo: string | 
     return nuevo
 }
 
-async function EmpleadoHorasExtrasGrafica(codigo: string | number, fec_desde: Date, fec_hasta: Date) {
-    let arrayUno = await EmpleadoHorasExtrasSolicitadasGrafica(codigo, fec_desde, fec_hasta)
-    let arrayDos = await EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(codigo, fec_desde, fec_hasta)
+async function EmpleadoHorasExtrasGrafica(id: string | number, fec_desde: Date, fec_hasta: Date) {
+    let arrayUno = await EmpleadoHorasExtrasSolicitadasGrafica(id, fec_desde, fec_hasta)
+    let arrayDos = await EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(id, fec_desde, fec_hasta)
     // let arrayUnido  = [...new Set(arrayUno.concat(arrayDos))];  
     let arrayUnido = arrayUno.concat(arrayDos)
     let set = new Set(arrayUnido.map((obj: any) => { return JSON.stringify(obj) }))
@@ -272,11 +272,11 @@ async function EmpleadoHorasExtrasSolicitadasGrafica(codigo: string | number, fe
     return await pool.query(
         // estado = 3 significa q las horas extras fueron autorizadas
         `
-        SELECT h.fecha_inicio, h.fecha_final, h.descripcion, h.horas_solicitud, h.tiempo_autorizado, h.codigo,
+        SELECT h.fecha_inicio, h.fecha_final, h.descripcion, h.horas_solicitud, h.tiempo_autorizado, e.codigo,
             h.id_empleado_cargo 
-        FROM mhe_solicitud_hora_extra AS h 
+        FROM mhe_solicitud_hora_extra AS h, eu_empleados AS e 
         WHERE h.fecha_inicio between $1 and $2 AND h.estado = 3
-            AND h.fecha_final between $1 and $2 AND h.codigo = $3 
+            AND h.fecha_final between $1 and $2 AND h.id_empleado_solicita = $3 AND e.id = h.id_empleado_solicita
         ORDER BY h.fecha_inicio
         `
         , [fec_desde, fec_hasta, codigo])
@@ -305,18 +305,18 @@ async function EmpleadoHorasExtrasSolicitadasGrafica(codigo: string | number, fe
         });
 }
 
-async function EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(codigo: string | number, fec_desde: Date, fec_hasta: Date) {
+async function EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(id_empleado: any | number, fec_desde: Date, fec_hasta: Date) {
     return await pool.query(
         //estado = 3 para horas extras autorizadas
         `
         SELECT h.fecha_desde, h.hora_inicio, h.fecha_hasta, h.hora_fin, h.descripcion, h.horas_totales, 
-            ph.tiempo_autorizado, ph.codigo, ph.id_empleado_cargo 
-        FROM mhe_empleado_plan_hora_extra AS ph, mhe_detalle_plan_hora_extra AS h 
+            ph.tiempo_autorizado, ph.codigo, ph.id_empleado_cargo, e.codigo 
+        FROM mhe_empleado_plan_hora_extra AS ph, mhe_detalle_plan_hora_extra AS h, eu_empleados AS e 
         WHERE ph.id_detalle_plan = h.id AND ph.estado = 3 AND h.fecha_desde BETWEEN $1 AND $2 
-            AND h.fecha_hasta BETWEEN $1 and $2 AND ph.codigo = $3
+            AND h.fecha_hasta BETWEEN $1 and $2 AND ph.id_empleado_realiza = $3 AND e.id = ph.id_empleado_realiza 
         ORDER BY h.fecha_desde
         `
-        , [fec_desde, fec_hasta, codigo])
+        , [fec_desde, fec_hasta, id_empleado])
         .then(result => {
             return Promise.all(result.rows.map(async (obj) => {
                 var f1 = new Date(obj.fecha_desde.toJSON().split('T')[0] + 'T' + obj.hora_inicio);
@@ -342,13 +342,13 @@ async function EmpleadoPlanificacionHorasExtrasSolicitadasGrafica(codigo: string
         })
 }
 
-export const Empleado_Vacaciones_ModelarDatos = async function (codigo: string | number, fec_desde: Date, fec_hasta: Date) {
+export const Empleado_Vacaciones_ModelarDatos = async function (id_empleado: string | number, fec_desde: Date, fec_hasta: Date) {
     let vacaciones = await pool.query(
         `
         SELECT CAST(fecha_inicio AS VARCHAR), CAST(fecha_final AS VARCHAR) 
-        FROM mv_solicitud_vacacion WHERE codigo = $1 AND fecha_inicio BETWEEN $2 AND $3 AND estado = 3
+        FROM mv_solicitud_vacacion WHERE id_empleado = $1 AND fecha_inicio BETWEEN $2 AND $3 AND estado = 3
         `
-        , [codigo, fec_desde, fec_hasta]).then(result => { return result.rows })
+        , [id_empleado, fec_desde, fec_hasta]).then(result => { return result.rows })
     // console.log('Lista de vacaciones ===', vacaciones);
     let aux_array: any = [];
     vacaciones.forEach((obj: any) => {
@@ -370,13 +370,13 @@ export const Empleado_Vacaciones_ModelarDatos = async function (codigo: string |
     return aux_array
 }
 
-export const Empleado_Permisos_ModelarDatos = async function (codigo: string | number, fec_desde: Date, fec_hasta: Date) {
+export const Empleado_Permisos_ModelarDatos = async function (id_empleado: string | number, fec_desde: Date, fec_hasta: Date) {
     let permisos = await pool.query(
         `
         SELECT CAST(fecha_inicio AS VARCHAR), CAST(fecha_final AS VARCHAR), horas_permiso, dias_permiso 
-        FROM mp_solicitud_permiso WHERE codigo = $1 AND fec_inicio BETWEEN $2 and $3 AND estado = 3
+        FROM mp_solicitud_permiso WHERE id_empleado = $1 AND fec_inicio BETWEEN $2 and $3 AND estado = 3
         `
-        , [codigo, fec_desde, fec_hasta]).then(result => { return result.rows })
+        , [id_empleado, fec_desde, fec_hasta]).then(result => { return result.rows })
     // console.log('Lista de permisos ===', permisos);
     let aux_array: any = [];
     permisos.forEach((obj: any) => {

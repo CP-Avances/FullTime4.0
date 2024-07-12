@@ -331,7 +331,6 @@ export class EditarPlanComidasComponent implements OnInit {
           let planEmpleado = {
             id_empleado: this.data.solicitud.id_empleado,
             hora_inicio: form.horaInicioForm,
-            codigo: this.empleados[0].codigo,
             id_plan_comida: plan.id,
             hora_fin: form.horaFinForm,
             consumido: false,
@@ -554,7 +553,6 @@ export class EditarPlanComidasComponent implements OnInit {
       this.contador = 0;
 
       let planEmpleado = {
-        codigo: '',
         id_empleado: '',
         id_plan_comida: plan.id,
         fecha: '',
@@ -567,7 +565,6 @@ export class EditarPlanComidasComponent implements OnInit {
 
       // LEER DATOS DE CADA USUARIOS
       empleados_planificados.map((obj: any) => {
-        planEmpleado.codigo = obj.codigo;
         planEmpleado.id_empleado = obj.id;
 
         // LECTURA DE NOMBRES DE USUARIOS
@@ -576,7 +573,7 @@ export class EditarPlanComidasComponent implements OnInit {
         this.contadorFechas = 0;
 
         // LEER DATOS POR CADA FECHA
-        this.fechasHorario.map(fec => {
+        this.fechasHorario.map((fec: any) => {
           planEmpleado.fecha = fec;
           this.restPlan.CrearPlanComidasEmpleado(planEmpleado).subscribe(res => {
             this.contadorFechas = this.contadorFechas + 1;

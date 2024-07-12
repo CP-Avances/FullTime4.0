@@ -136,7 +136,7 @@ class VacacionesControlador {
   public async CrearVacaciones(req: Request, res: Response): Promise<Response> {
     try {
       const { fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado,
-        id_peri_vacacion, depa_user_loggin, id_empl_cargo, codigo, user_name, ip } = req.body;
+        id_peri_vacacion, depa_user_loggin, id_empl_cargo, id_empleado, user_name, ip } = req.body;
 
       // INICIAR TRANSACCIÓN
       await pool.query('BEGIN');
@@ -144,11 +144,11 @@ class VacacionesControlador {
       const response: QueryResult = await pool.query(
         `
         INSERT INTO mv_solicitud_vacacion (fecha_inicio, fecha_final, fecha_ingreso, estado, dia_libre, dia_laborable, 
-          legalizado, id_periodo_vacacion, id_empleado_cargo, codigo)
+          legalizado, id_periodo_vacacion, id_empleado_cargo, id_empleado)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
         `
         , [fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado, id_peri_vacacion,
-          id_empl_cargo, codigo]);
+          id_empl_cargo, id_empleado]);
 
       const [objetoVacacion] = response.rows;
 
@@ -193,7 +193,7 @@ class VacacionesControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM mv_solicitud_vacacion WHERE id = $1', [id]);
+      const consulta = await pool.query(`SELECT * FROM mv_solicitud_vacacion WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows; 
 
       if (!datosOriginales){
@@ -332,7 +332,7 @@ class VacacionesControlador {
       });
 
       // CONSULTAR DATOSORIGINALESVACACIONES
-      const consultaVacaciones = await pool.query('SELECT * FROM mv_solicitud_vacacion WHERE id = $1', [id_vacacion]);
+      const consultaVacaciones = await pool.query(`SELECT * FROM mv_solicitud_vacacion WHERE id = $1`, [id_vacacion]);
       const [datosOriginalesVacaciones] = consultaVacaciones.rows;
 
       if (!datosOriginalesVacaciones) {
@@ -392,7 +392,7 @@ class VacacionesControlador {
       SELECT v.id, v.fecha_inicio, v.fecha_final, fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, 
         v.legalizado, v.id, v.id_periodo_vacacion, e.id AS id_empleado, de.id_contrato
       FROM mv_solicitud_vacacion AS v, eu_empleados AS e, datos_actuales_empleado AS de
-	    WHERE v.id = $1 AND e.codigo = v.codigo AND e.id = de.id AND de.estado = $2
+	    WHERE v.id = $1 AND e.id = v.id_empleado AND e.id = de.id AND de.estado = $2
       `
       , [id, estado]);
     if (VACACIONES.rowCount != 0) {
@@ -415,7 +415,7 @@ class VacacionesControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const consulta = await pool.query('SELECT * FROM mv_solicitud_vacacion WHERE id = $1', [id]);
+      const consulta = await pool.query(`SELECT * FROM mv_solicitud_vacacion WHERE id = $1`, [id]);
       const [datosOriginales] = consulta.rows;
 
       if (!datosOriginales) {
@@ -473,7 +473,7 @@ class VacacionesControlador {
         v.legalizado, v.id, v.id_periodo_vacacion, v.id_empleado_cargo, e.id AS id_empleado,
         (e.nombre || ' ' || e.apellido) AS fullname, e.cedula
       FROM mv_solicitud_vacacion AS v, eu_empleados AS e 
-      WHERE v.id = $1 AND e.codigo = v.codigo::varchar
+      WHERE v.id = $1 AND e.id = v.id_empleado
       `
       , [id]);
     if (VACACIONES.rowCount != 0) {

@@ -356,7 +356,7 @@ exports.MetricaHorasExtraEmpleado = MetricaHorasExtraEmpleado;
 const MetricaVacacionesEmpleado = function (codigo, id_empleado, fec_inicio, fec_final) {
     return __awaiter(this, void 0, void 0, function* () {
         // console.log(codigo, id_empleado, fec_inicio, fec_final);
-        let vacaciones = yield M_graficas.Empleado_Vacaciones_ModelarDatos(codigo, fec_inicio, fec_final);
+        let vacaciones = yield M_graficas.Empleado_Vacaciones_ModelarDatos(id_empleado, fec_inicio, fec_final);
         // let ids = await IdsEmpleados(id_empresa);
         let modelarAnio = {
             enero: [],
@@ -464,7 +464,7 @@ exports.MetricaVacacionesEmpleado = MetricaVacacionesEmpleado;
 const MetricaPermisosEmpleado = function (codigo, id_empleado, fec_inicio, fec_final) {
     return __awaiter(this, void 0, void 0, function* () {
         // console.log(codigo, id_empleado, fec_inicio, fec_final);
-        let permisos = yield M_graficas.Empleado_Permisos_ModelarDatos(codigo, fec_inicio, fec_final);
+        let permisos = yield M_graficas.Empleado_Permisos_ModelarDatos(id_empleado, fec_inicio, fec_final);
         let modelarAnio = {
             enero: [],
             febrero: [],

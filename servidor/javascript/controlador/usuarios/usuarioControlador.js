@@ -1181,14 +1181,14 @@ class UsuarioControlador {
     /** ******************************************************************************************** **
      ** **            METODO PARA MANEJAR DATOS DE REGISTRO DE DISPOSITIVOS MOVILES               ** **
      ** ******************************************************************************************** **/
-    // LISTADO DE DISPOSITIVOS REGISTRADOS POR EL CODIGO DE USUARIO
+    // LISTADO DE DISPOSITIVOS REGISTRADOS POR EL ID DE USUARIO
     ListarDispositivosMoviles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const DISPOSITIVOS = yield database_1.default.query(`
         SELECT e.codigo, (e.nombre || \' \' || e.apellido) AS nombre, e.cedula, d.id_dispositivo, d.modelo_dispositivo
         FROM mrv_dispositivos AS d 
-        INNER JOIN eu_empleados AS e ON d.codigo_empleado = e.codigo
+        INNER JOIN eu_empleados AS e ON d.id_empleado = e.id
         ORDER BY nombre
         `).then((result) => { return result.rows; });
                 if (DISPOSITIVOS.length === 0)

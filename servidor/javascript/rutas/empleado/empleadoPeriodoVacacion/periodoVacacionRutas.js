@@ -6,10 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const verificarToken_1 = require("../../../libs/verificarToken");
 const periodoVacacionControlador_1 = __importDefault(require("../../../controlador/empleado/empleadoPeriodoVacacion/periodoVacacionControlador"));
-const multipart = require('connect-multiparty');
-const multipartMiddleware = multipart({
-    uploadDir: './plantillas',
-});
 class DepartamentoRutas {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -18,7 +14,7 @@ class DepartamentoRutas {
     configuracion() {
         // METODO PARA BUSCAR PERIODO DE VACACIONES
         this.router.get('/buscar/:id_empleado', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.EncontrarIdPerVacaciones);
-        this.router.get('/infoPeriodo/:codigo', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.EncontrarPerVacaciones);
+        this.router.get('/infoPeriodo/:id_empleado', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.EncontrarPerVacaciones);
         this.router.post('/', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.CrearPerVacaciones);
         this.router.put('/', verificarToken_1.TokenValidation, periodoVacacionControlador_1.default.ActualizarPeriodo);
     }

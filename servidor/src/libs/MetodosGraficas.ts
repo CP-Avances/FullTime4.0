@@ -306,7 +306,7 @@ export const MetricaHorasExtraEmpleado = async function (codigo: number | string
 
 export const MetricaVacacionesEmpleado = async function (codigo: number | string, id_empleado: number, fec_inicio: Date, fec_final: Date) {
     // console.log(codigo, id_empleado, fec_inicio, fec_final);
-    let vacaciones = await M_graficas.Empleado_Vacaciones_ModelarDatos(codigo, fec_inicio, fec_final)
+    let vacaciones = await M_graficas.Empleado_Vacaciones_ModelarDatos(id_empleado, fec_inicio, fec_final)
     // let ids = await IdsEmpleados(id_empresa);
     let modelarAnio = {
         enero: [],
@@ -405,7 +405,7 @@ export const MetricaVacacionesEmpleado = async function (codigo: number | string
 export const MetricaPermisosEmpleado = async function (codigo: number | string, id_empleado: number, fec_inicio: Date, fec_final: Date) {
     // console.log(codigo, id_empleado, fec_inicio, fec_final);
 
-    let permisos = await M_graficas.Empleado_Permisos_ModelarDatos(codigo, fec_inicio, fec_final)
+    let permisos = await M_graficas.Empleado_Permisos_ModelarDatos(id_empleado, fec_inicio, fec_final)
 
     let modelarAnio = {
         enero: [],

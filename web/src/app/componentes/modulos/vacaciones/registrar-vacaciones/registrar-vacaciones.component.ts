@@ -306,7 +306,7 @@ export class RegistrarVacacionesComponent implements OnInit {
       fec_inicio: form.fecInicioForm,
       dia_libre: form.diaLibreForm + form.diasTForm,
       fec_final: form.fecFinalForm,
-      codigo: this.empleados[0].codigo,
+      id_empleado: this.empleados[0].id,
       estado: 1,
       user_name: this.user_name,
       ip: this.ip,

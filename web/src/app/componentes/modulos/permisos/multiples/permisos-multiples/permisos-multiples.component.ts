@@ -900,11 +900,11 @@ export class PermisosMultiplesComponent implements OnInit {
     this.con_permisos = 0;
     this.sin_permisos = [];
     let busqueda = {
-      codigo: '',
+      id_empleado: '',
       fec_inicio: inicio,
       fec_final: final
     }
-    data_usuarios.forEach(valor => {
+    data_usuarios.forEach((valor: any) => {
       this.BuscarPermisosSolicitados(valor, busqueda, data_usuarios.length, form);
     })
   }
@@ -913,7 +913,7 @@ export class PermisosMultiplesComponent implements OnInit {
   ciclo_final: number = 0;
   verificar_: boolean = false;
   BuscarPermisosSolicitados(valor: any, busqueda: any, tamaño: any, form: any) {
-    busqueda.codigo = valor.codigo
+    busqueda.id_empleado = valor.id
     this.restP.BuscarPermisosSolicitadosTotales(busqueda).subscribe(solicitados => {
       this.contar_permisos = this.contar_permisos + 1;
       // EXISTEN REGISTROS DE PERMISOS POR DIAS
@@ -1161,7 +1161,7 @@ export class PermisosMultiplesComponent implements OnInit {
     this.contar_permisos_dias = 0;
     this.sin_permisos_dias = [];
     let busqueda = {
-      codigo: '',
+      id_empleado: '',
       fec_inicio: inicio,
       fec_final: final,
     }
@@ -1175,7 +1175,7 @@ export class PermisosMultiplesComponent implements OnInit {
 
   // METODO PARA BUSCAR SOLICITUDES DE PERMISOS POR DIAS
   BuscarPermisosDias(valor: any, busqueda: any, form: any, tamaño: any, inicio: any, final: any) {
-    busqueda.codigo = valor.codigo;
+    busqueda.id_empleado = valor.id;
     this.restP.BuscarPermisosSolicitadosDias(busqueda).subscribe(solicitados => {
       //console.log('ver solicitados horas ', solicitados)
       this.contar_permisos_dias = this.contar_permisos_dias + 1;
@@ -1211,7 +1211,7 @@ export class PermisosMultiplesComponent implements OnInit {
     var hora_inicio = moment(form.horaSalidaForm, "HH:mm:ss").format('HH:mm:ss');
     var hora_final = moment(form.horasIngresoForm, "HH:mm:ss").format('HH:mm:ss');
     let busqueda = {
-      codigo: '',
+      id_empleado: '',
       fec_inicio: inicio,
       fec_final: final,
       hora_inicio: hora_inicio,
@@ -1229,7 +1229,7 @@ export class PermisosMultiplesComponent implements OnInit {
 
   // METODO PARA BUSCAR SOLICITUDES DE PERMISOS POR HORAS
   BuscarPermisosHoras(valor: any, busqueda: any, tamaño: any, fecha_inicio: any, fecha_final: any, hora_inicio: any, hora_final: any, form: any) {
-    busqueda.codigo = valor.codigo;
+    busqueda.id_empleado = valor.id;
     this.restP.BuscarPermisosSolicitadosHoras(busqueda).subscribe(solicitados => {
       // EXISTEN REGISTROS DE PERMISOS POR HORAS
       if (solicitados.length != 0) {

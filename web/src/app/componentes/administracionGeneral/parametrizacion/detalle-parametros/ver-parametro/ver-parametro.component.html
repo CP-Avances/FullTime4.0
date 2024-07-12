@@ -200,6 +200,11 @@
                         NOTA: De los timbres realizados por los usuarios considerar o no los segundos para realizar
                         cálculos referentes a la asistencia.
                     </span>
+
+                    <!-- CONTENIDO USAR CONECTIVIDAD INTERNET (13) -->
+                    <span *ngIf="conectividad_internet">
+                        NOTA: Permitir realizar timbres desde la aplicación móvil sin conectividad a internet.
+                    </span>
                 </div>
                 <form [formGroup]="formulario">
                     <mat-radio-group aria-label="Select an option" [formControl]="descripcionF">

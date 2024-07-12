@@ -457,7 +457,7 @@ class PlanGeneralControlador {
             console.log('ver datos ', id_empleado, ' ', fecha, ' ', id)
             const ASIGNADO = await pool.query(
                 `
-                SELECT * FROM fnbuscarregistroasignado ($1, $2::character varying);
+                SELECT * FROM fnbuscarregistroasignado ($1, $2);
                 `
                 , [fecha, id_empleado]);
             //console.log('ver asignado ', ASIGNADO)

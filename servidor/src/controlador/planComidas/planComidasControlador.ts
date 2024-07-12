@@ -592,18 +592,18 @@ class PlanComidasControlador {
   public async CrearComidaAprobada(req: Request, res: Response): Promise<Response> {
 
     try {
-      const { codigo, id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
+      const { id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
         `
-        INSERT INTO ma_empleado_plan_comida_general (codigo, id_empleado, id_solicitud_comida, fecha,
+        INSERT INTO ma_empleado_plan_comida_general (id_empleado, id_solicitud_comida, fecha,
           hora_inicio, hora_fin, consumido) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
         `
-        , [codigo, id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido]);
+        , [id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido]);
 
       const [objetoAlimento] = response.rows;
 
@@ -619,7 +619,7 @@ class PlanComidasControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{codigo: ${codigo}, id_empleado: ${id_empleado}, id_detalle_plan: null, id_solicitud_comida: ${id_sol_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
+        datosNuevos: `id_empleado: ${id_empleado}, id_detalle_plan: null, id_solicitud_comida: ${id_sol_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
         ip,
         observacion: null
       });
@@ -866,18 +866,18 @@ class PlanComidasControlador {
   public async CrearPlanEmpleado(req: Request, res: Response): Promise<void> {
 
     try {
-      const { codigo, id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
+      const { id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
 
       // INICIAR TRANSACCION
       await pool.query('COMMIT');
 
       const response = await pool.query(
         `
-        INSERT INTO ma_empleado_plan_comida_general (codigo, id_empleado, id_detalle_plan, fecha, 
+        INSERT INTO ma_empleado_plan_comida_general (id_empleado, id_detalle_plan, fecha, 
           hora_inicio, hora_fin, consumido) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
         `
-        , [codigo, id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido]);
+        , [id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido]);
 
       const [planAlimentacion] = response.rows;
       var fechaN = await FormatearFecha2(fecha, 'ddd');
@@ -890,7 +890,7 @@ class PlanComidasControlador {
         usuario: user_name,
         accion: 'I',
         datosOriginales: '',
-        datosNuevos: `{codigo: ${codigo}, id_empleado: ${id_empleado}, id_detalle_plan: ${id_plan_comida}, id_solicitud_comida: null, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
+        datosNuevos: `id_empleado: ${id_empleado}, id_detalle_plan: ${id_plan_comida}, id_solicitud_comida: null, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
         ip,
         observacion: null
       });

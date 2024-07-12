@@ -30,7 +30,7 @@ class PlanHoraExtraControlador {
       FROM eu_empleados AS e, (SELECT * FROM timbres_entrada_plan_hora_extra AS tehe 
         FULL JOIN timbres_salida_plan_hora_extra AS tshe 
         ON tehe.fecha_timbre_e = tshe.fecha_timbre AND tehe.id_empl = tshe.id_empleado) AS t
-      WHERE t.observacion = false AND (e.codigo = t.id_empleado OR e.codigo = t.id_empl) AND (t.estado = 1 OR t.estado = 2)
+      WHERE t.observacion = false AND (e.id = t.id_empleado OR e.id = t.id_empl) AND (t.estado = 1 OR t.estado = 2)
       `);
             if (PLAN.rowCount != 0) {
                 res.jsonp(PLAN.rows);
@@ -52,7 +52,7 @@ class PlanHoraExtraControlador {
       FROM eu_empleados AS e, (SELECT * FROM timbres_entrada_plan_hora_extra AS tehe 
         FULL JOIN timbres_salida_plan_hora_extra AS tshe 
         ON tehe.fecha_timbre_e = tshe.fecha_timbre AND tehe.id_empl = tshe.id_empleado) AS t 
-      WHERE t.observacion = true AND (e.codigo = t.id_empleado OR e.codigo = t.id_empl) AND (t.estado = 1 OR t.estado = 2)
+      WHERE t.observacion = true AND (e.id = t.id_empleado OR e.id = t.id_empl) AND (t.estado = 1 OR t.estado = 2)
       `);
             if (PLAN.rowCount != 0) {
                 res.jsonp(PLAN.rows);
@@ -74,7 +74,7 @@ class PlanHoraExtraControlador {
       FROM eu_empleados AS e, (SELECT * FROM timbres_entrada_plan_hora_extra AS tehe 
         FULL JOIN timbres_salida_plan_hora_extra AS tshe 
         ON tehe.fecha_timbre_e = tshe.fecha_timbre AND tehe.id_empl = tshe.id_empleado) AS t 
-      WHERE (e.codigo = t.id_empleado OR e.codigo = t.id_empl) AND (t.estado = 3 OR t.estado = 4)
+      WHERE (e.id = t.id_empleado OR e.id = t.id_empl) AND (t.estado = 3 OR t.estado = 4)
       `);
             if (PLAN.rowCount != 0) {
                 res.jsonp(PLAN.rows);
@@ -110,7 +110,7 @@ class PlanHoraExtraControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const consulta = yield database_1.default.query('SELECT tiempo_autorizado FROM mhe_empleado_plan_hora_extra WHERE id = $1', [id]);
+                const consulta = yield database_1.default.query(`SELECT tiempo_autorizado FROM mhe_empleado_plan_hora_extra WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -158,7 +158,7 @@ class PlanHoraExtraControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const consulta = yield database_1.default.query('SELECT estado FROM mhe_empleado_plan_hora_extra WHERE id = $1', [id]);
+                const consulta = yield database_1.default.query(`SELECT estado FROM mhe_empleado_plan_hora_extra WHERE id = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -255,14 +255,14 @@ class PlanHoraExtraControlador {
     CrearPlanHoraExtraEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, id_empl_contrato, estado, codigo, user_name, ip } = req.body;
+                const { id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, id_empl_contrato, estado, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
         INSERT INTO mhe_empleado_plan_hora_extra (id_detalle_plan, id_empleado_realiza, observacion, 
-          id_empleado_cargo, id_empleado_contrato, estado, codigo)
-        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-        `, [id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, id_empl_contrato, estado, codigo]);
+          id_empleado_cargo, id_empleado_contrato, estado)
+        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
+        `, [id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, id_empl_contrato, estado]);
                 const [planEmpleado] = response.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -387,7 +387,7 @@ class PlanHoraExtraControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const consulta = yield database_1.default.query('SELECT * FROM mhe_empleado_plan_hora_extra WHERE id_detalle_plan = $1', [id]);
+                const consulta = yield database_1.default.query(`SELECT * FROM mhe_empleado_plan_hora_extra WHERE id_detalle_plan = $1`, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({

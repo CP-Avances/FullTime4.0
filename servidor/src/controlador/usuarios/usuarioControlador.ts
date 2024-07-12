@@ -1380,14 +1380,14 @@ class UsuarioControlador {
    ** **            METODO PARA MANEJAR DATOS DE REGISTRO DE DISPOSITIVOS MOVILES               ** **
    ** ******************************************************************************************** **/
 
-  // LISTADO DE DISPOSITIVOS REGISTRADOS POR EL CODIGO DE USUARIO
+  // LISTADO DE DISPOSITIVOS REGISTRADOS POR EL ID DE USUARIO
   public async ListarDispositivosMoviles(req: Request, res: Response) {
     try {
       const DISPOSITIVOS = await pool.query(
         `
         SELECT e.codigo, (e.nombre || \' \' || e.apellido) AS nombre, e.cedula, d.id_dispositivo, d.modelo_dispositivo
         FROM mrv_dispositivos AS d 
-        INNER JOIN eu_empleados AS e ON d.codigo_empleado = e.codigo
+        INNER JOIN eu_empleados AS e ON d.id_empleado = e.id
         ORDER BY nombre
         `
       ).then((result: any) => { return result.rows });
