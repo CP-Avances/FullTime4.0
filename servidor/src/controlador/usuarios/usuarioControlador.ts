@@ -1856,7 +1856,7 @@ class UsuarioControlador {
     let error: boolean = false;
 
     for (const usuario of usuarios_seleccionados) {
-      let datos = {
+      let datos: Datos = {
         id: '',
         id_empleado: usuario.id,
         id_departamento: '',
@@ -2004,6 +2004,17 @@ async function EditarUsuarioDepartamento(datos: any): Promise<boolean> {
   } catch (error) {
     return true;
   }
+}
+
+interface Datos {
+  id: string;
+  id_empleado: string;
+  id_departamento: string;
+  principal: boolean;
+  personal: boolean;
+  administra: boolean;
+  user_name: string;
+  ip: string;
 }
 
 export const USUARIO_CONTROLADOR = new UsuarioControlador();
