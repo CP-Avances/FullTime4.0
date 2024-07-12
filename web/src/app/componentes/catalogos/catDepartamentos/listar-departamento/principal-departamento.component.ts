@@ -45,6 +45,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   depainfo: any = [];
   empleado: any = [];
   idEmpleado: number;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
 
   idDepartamentosAcceso: Set<any> = new Set();
 
@@ -103,6 +104,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.idDepartamentosAcceso = this.asignacionesService.idDepartamentosAcceso;
 
@@ -153,7 +155,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   ListaDepartamentos() {
     this.departamentos = []
     this.rest.ConsultarDepartamentos().subscribe(datos => {
-      this.departamentos = this.FiltrarDepartamentosAsignados(datos);
+      this.departamentos = this.rolEmpleado === 1 ? datos : this.FiltrarDepartamentosAsignados(datos);
       this.OrdenarDatos(this.departamentos);
     })
   }

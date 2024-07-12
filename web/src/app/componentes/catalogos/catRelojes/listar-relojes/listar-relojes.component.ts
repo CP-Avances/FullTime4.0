@@ -43,6 +43,7 @@ export class ListarRelojesComponent implements OnInit {
 
   empleado: any = [];
   idEmpleado: number;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
 
   idDepartamentosAcceso: Set<any> = new Set();
 
@@ -101,6 +102,8 @@ export class ListarRelojesComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
+
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
 
     this.ObtenerEmpleados(this.idEmpleado);
@@ -147,8 +150,7 @@ export class ListarRelojesComponent implements OnInit {
   ObtenerReloj() {
     this.relojes = [];
     this.rest.ConsultarRelojes().subscribe(datos => {
-      this.relojes = this.FiltrarRelojesAsignados(datos);
-      
+      this.relojes = this.rolEmpleado === 1 ? datos : this.FiltrarRelojesAsignados(datos);
     })
   }
 
@@ -341,7 +343,7 @@ export class ListarRelojesComponent implements OnInit {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Ya existe en el sistema' || 
+    } else if (observacion == 'Ya existe en el sistema' ||
       observacion == 'Número de serie ya existe en el sistema' ||
       observacion == 'Dirección MAC ya existe en el sistema'
     ) {

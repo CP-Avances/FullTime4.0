@@ -52,7 +52,7 @@ class EmpleadoControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const datos = yield database_1.default.query(`
-        INSERT INTO e_codigo (id, valor, automatico, manual) VALUES ($1, $2, $3, $4)
+        INSERT INTO e_codigo (id, valor, automatico, manual) VALUES ($1, $2, $3, $4) RETURNING *
         `, [id, valor, automatico, manual]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({

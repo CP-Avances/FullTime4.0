@@ -17,7 +17,6 @@ import { EmpresaService } from "src/app/servicios/catalogos/catEmpresa/empresa.s
 import { ProcesoService } from "src/app/servicios/catalogos/catProcesos/proceso.service";
 import { MainNavService } from "src/app/componentes/administracionGeneral/main-nav/main-nav.service";
 import { CiudadService } from "src/app/servicios/ciudad/ciudad.service";
-import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
 import { AsignacionesService } from "src/app/servicios/asignaciones/asignaciones.service";
 
 @Component({
@@ -141,6 +140,8 @@ export class CrearPedidoAccionComponent implements OnInit {
 
   // INICIACION DE VARIABLES
   idEmpleadoLogueado: any;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+
   idUsuariosAcceso: Set<any> = new Set();
 
   empleados: any = [];
@@ -171,6 +172,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem("usuario");
     this.ip = localStorage.getItem("ip");
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     if (this.habilitarAccion === false) {
       let mensaje = {
@@ -337,7 +339,7 @@ export class CrearPedidoAccionComponent implements OnInit {
   ObtenerEmpleados() {
     this.empleados = [];
     this.restE.BuscarListaEmpleados().subscribe((data) => {
-      this.empleados = this.FiltrarEmpleadosAsignados(data);
+      this.empleados = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
 
       // METODO PARA AUTOCOMPLETADO EN BUSQUEDA DE NOMBRES
 

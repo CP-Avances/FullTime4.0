@@ -45,6 +45,7 @@ export class BuscarTimbreComponent implements OnInit {
 
   timbres: any = [];
   idEmpleadoLogueado: any;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
 
   idUsuariosAcceso: Set<any> = new Set();
 
@@ -61,6 +62,8 @@ export class BuscarTimbreComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
+
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
 
     this.BuscarParametro();
@@ -142,7 +145,7 @@ export class BuscarTimbreComponent implements OnInit {
         if (timbres.timbres.length > 0) {
           this.existenTimbres = true;
         }
-        this.timbres = await this.FiltrarEmpleadosAsignados(timbres.timbres);
+        this.timbres = this.rolEmpleado === 1 ? timbres.timbres : await this.FiltrarEmpleadosAsignados(timbres.timbres);
         if (this.timbres.length === 0 && this.existenTimbres) {
           this.mostrarTabla = false;
           return this.toastr.error('No tiene acceso a los datos de este usuario.', 'Notificación', {

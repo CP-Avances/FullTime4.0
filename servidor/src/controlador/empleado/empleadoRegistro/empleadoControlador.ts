@@ -46,7 +46,7 @@ class EmpleadoControlador {
 
       const datos = await pool.query(
         `
-        INSERT INTO e_codigo (id, valor, automatico, manual) VALUES ($1, $2, $3, $4)
+        INSERT INTO e_codigo (id, valor, automatico, manual) VALUES ($1, $2, $3, $4) RETURNING *
         `
         , [id, valor, automatico, manual]);
 

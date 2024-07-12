@@ -68,6 +68,8 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
   habilitado: any;
 
   idEmpleadoLogueado: any;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+
   // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
   departamentos: any = [];
   sucursales: any = [];
@@ -141,6 +143,8 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
+      this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
+
       this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 'r' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
       this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
       this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
@@ -310,19 +314,21 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     this.OmitirDuplicados();
 
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
+    // SI ES SUPERADMINISTRADOR NO FILTRAR
+    if (this.rolEmpleado !== 1) {
+      this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+      this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
+      this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
+      this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
 
-    this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
-    this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
-    this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
-    this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
+      this.empleados.forEach((empleado: any) => {
+        this.idCargosAcceso.add(empleado.id_cargo_);
+      });
 
-    this.empleados.forEach((empleado: any) => {
-      this.idCargosAcceso.add(empleado.id_cargo_);
-    });
-
-    this.cargos = this.cargos.filter((cargo: any) =>
-      this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
-    );
+      this.cargos = this.cargos.filter((cargo: any) =>
+        this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
+      );
+    }
 
     this.mostrarTablas = true;
   }
