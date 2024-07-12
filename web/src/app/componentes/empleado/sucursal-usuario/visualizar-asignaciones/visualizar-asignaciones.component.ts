@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { config } from 'rxjs';
@@ -10,13 +10,15 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
   templateUrl: './visualizar-asignaciones.component.html',
   styleUrls: ['./visualizar-asignaciones.component.css']
 })
-export class VisualizarAsignacionesComponent {
+export class VisualizarAsignacionesComponent implements OnInit{
 
   asignaciones: any = [];
   nombre: string;
   id: number;
   user_name: string;
   ip: string;
+
+  verTabla: boolean = false;
 
   // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
@@ -29,12 +31,29 @@ export class VisualizarAsignacionesComponent {
     public ventana: MatDialogRef<VisualizarAsignacionesComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    console.log('ver data ', this.data);
-    this.asignaciones = this.data.asignaciones;
+
+  }
+
+  ngOnInit(): void {
     this.user_name = this.data.user_name;
     this.nombre = this.data.nombre;
     this.ip = this.data.ip;
     this.id = this.data.id;
+
+    this.ObtenerAsignaciones();
+
+  }
+
+  // METODO PARA OBTENER ASIGNACIONES
+  ObtenerAsignaciones() {
+    const data = {
+      id_empleado: this.id,
+    }
+    this.usuario.BuscarUsuarioDepartamento(data).subscribe(data => {
+      this.asignaciones = data;
+      this.verTabla = true;
+    });
+
   }
 
   // METODO PARA CONFIRMAR SI SE ELIMINA UN REGISTRO

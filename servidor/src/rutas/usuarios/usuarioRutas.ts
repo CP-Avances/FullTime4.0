@@ -71,6 +71,8 @@ class UsuarioRutas {
         this.router.put('/actualizar-usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.ActualizarUsuarioDepartamento);
         // METODO PARA ELIMINAR REGISTRO USUARIO - DEPARTAMENTO
         this.router.delete('/eliminar-usuario-departamento', TokenValidation, USUARIO_CONTROLADOR.EliminarUsuarioDepartamento);
+        // METODO PARA REGISTRAR MULTIPLES USUARIOS - DEPARTAMENTOS
+        this.router.post('/usuario-departamento/multiple', TokenValidation, USUARIO_CONTROLADOR.RegistrarUsuarioDepartamentoMultiple);
 
     }
 }

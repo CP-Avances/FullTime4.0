@@ -161,26 +161,6 @@ export class UsuarioService {
       catchError(data));
   }
 
-  // METODO DE BUSQUEDA DE DATOS DE USUARIO - SUCURSAL
-  // BuscarUsuarioSucursalPrincipal(id_empleado: any) {
-  //   return this.http.post(`${environment.url}/usuarios/principal-usuario-sucursal`, id_empleado);
-  // }
-
-  // METODO PARA ACTUALIZAR REGISTRO DE USUARIO - SUCURSAL
-  // ActualizarUsuarioSucursalPrincipal(data: any) {
-  //   return this.http.put(`${environment.url}/usuarios/actualizar-usuario-sucursal`, data).pipe(
-  //     catchError(data));
-  // }
-
-  // METODO PARA ELIMINAR REGISTROS DE USUARIO - SUCURSAL
-  // EliminarUsuarioSucursal(id_usucursal: any, datos: any) {
-  //   const url = `${environment.url}/usuarios/eliminar-usuario-sucursal/${id_usucursal}`;
-  //   const httpOptions = {
-  //     body: datos
-  //   };
-  //   return this.http.request('delete', url, httpOptions);
-  // }
-
   // METODO PARA ELIMINAR REGISTROS DE USUARIO - DEPARTAMENTO
   EliminarUsuarioDepartamento(datos: any) {
     const url = `${environment.url}/usuarios/eliminar-usuario-departamento`;
@@ -188,6 +168,11 @@ export class UsuarioService {
       body: datos
     };
     return this.http.request('delete', url, httpOptions);
+  }
+
+  // METODO PARA REGISTRAR MULTIPLES USUARIOS - DEPARTAMENTOS
+  RegistrarUsuarioDepartamentoMultiple(data: any) {
+    return this.http.post(`${environment.url}/usuarios/usuario-departamento/multiple`, data);
   }
 
 }

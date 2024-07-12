@@ -121,16 +121,16 @@ export class AsignarUsuarioComponent implements OnInit {
     this.asignados = [];
     this.general.ObtenerUsuariosSucursal(data).subscribe(res => {
       this.usuarios = res;
-      if (this.usuarios.length != 0) {
-        this.usuarios.forEach((elemento: any) => {
-          const data = {
-            id_empleado: elemento.id,
-          }
-          this.usuario.BuscarUsuarioDepartamento(data).subscribe(datos => {
-            elemento.asignaciones = datos;
-          });
-        });
-      }
+      // if (this.usuarios.length != 0) {
+      //   this.usuarios.forEach((elemento: any) => {
+      //     const data = {
+      //       id_empleado: elemento.id,
+      //     }
+      //     this.usuario.BuscarUsuarioDepartamento(data).subscribe(datos => {
+      //       elemento.asignaciones = datos;
+      //     });
+      //   });
+      // }
       this.ver_principal = true;
     });
   }
@@ -292,54 +292,30 @@ export class AsignarUsuarioComponent implements OnInit {
       return;
     }
 
-    const requests: Promise<any>[] = [];
-
-    for (const objeto of this.usuariosSeleccionados.selected) {
-      let datos: Datos = {
-        id: '',
-        id_empleado: objeto.id,
-        id_departamento: '',
-        principal: false,
-        personal: false,
-        administra: false,
-        user_name: this.user_name,
-        ip: this.ip,
-      };
-
-      if (this.isPersonal) {
-        datos.id_departamento = objeto.id_departamento;
-        const verificacion = await this.VerificarAsignaciones(datos, true);
-        if (verificacion === 2) {
-          requests.push(firstValueFrom(this.usuario.ActualizarUsuarioDepartamento(datos)));
-        }
-      }
-
-      for (const departamento of this.departamentosSeleccionados) {
-        datos.id_departamento = departamento.id;
-        datos.administra = true;
-        datos.principal = false;
-        datos.personal = false;
-        const verificacion = await this.VerificarAsignaciones(datos, false);
-        if (verificacion === 1 || verificacion === 2) {
-          const accion = verificacion === 1 ? this.usuario.RegistrarUsuarioDepartamento.bind(this.usuario) : this.usuario.ActualizarUsuarioDepartamento.bind(this.usuario);
-          requests.push(firstValueFrom(accion(datos)));
-        }
-      };
+    const datos = {
+      usuarios_seleccionados: this.usuariosSeleccionados.selected,
+      departamentos_seleccionados: this.departamentosSeleccionados,
+      isPersonal: this.isPersonal,
+      user_name: this.user_name,
+      ip: this.ip,
     };
 
-    Promise.allSettled(requests).then(async () => {
-      this.toastr.success('Registros guardados exitosamente.', 'PROCESO EXITOSO.', {
-        timeOut: 6000,
-      });
-      // LIMPIAR DATOS Y REFRESCAR LAS CONSULTAS
-      this.LimpiarDatos();
-      this.BuscarUsuariosSucursal();
-      await this.asignacionesService.ObtenerAsignacionesUsuario(this.idEmpleado);
-    }).catch(() => {
-      this.toastr.error('Error al guardar registros.', 'Ups!!! algo salio mal.', {
-        timeOut: 6000,
-      });
+    this.usuario.RegistrarUsuarioDepartamentoMultiple(datos).subscribe({
+      next: async () => {
+        this.toastr.success('Registros guardados exitosamente.', 'PROCESO EXITOSO.', {
+          timeOut: 6000,
+        });
+        this.LimpiarDatos();
+        this.BuscarUsuariosSucursal();
+        await this.asignacionesService.ObtenerAsignacionesUsuario(this.idEmpleado);
+      },
+      error: () => {
+        this.toastr.error('Error al guardar registros.', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        });
+      }
     });
+
   }
 
   // METODO PARA OMITIR ASIGNACIONES EXISTENTES
@@ -460,7 +436,6 @@ export class AsignarUsuarioComponent implements OnInit {
   VisualizarAsignaciones(usuario: any) {
     const datos = {
       nombre: `${usuario.nombre} ${usuario.apellido}`,
-      asignaciones: usuario.asignaciones,
       user_name: this.user_name,
       ip: this.ip,
       id: usuario.id
@@ -469,13 +444,13 @@ export class AsignarUsuarioComponent implements OnInit {
       data: datos,
       width: '700px',
       height: 'auto',
-    }).afterClosed().subscribe(async (datos: any) => {
-      if (datos) {
-        const usuarioIndex = this.usuarios.findIndex((u: any) => u.id === datos.id);
-        if (usuarioIndex !== -1) {
-          this.usuarios[usuarioIndex].asignaciones = datos.asignaciones;
-        }
-      }
+    }).afterClosed().subscribe(async () => {
+      // if (datos) {
+      //   const usuarioIndex = this.usuarios.findIndex((u: any) => u.id === datos.id);
+      //   if (usuarioIndex !== -1) {
+      //     this.usuarios[usuarioIndex].asignaciones = datos.asignaciones;
+      //   }
+      // }
       await this.asignacionesService.ObtenerAsignacionesUsuario(this.idEmpleado);
     });
   }
@@ -496,6 +471,7 @@ interface Datos {
   principal: boolean;
   personal: boolean;
   administra: boolean;
+  isPersonal: boolean;
   user_name: string | null;
   ip: string | null;
 }
