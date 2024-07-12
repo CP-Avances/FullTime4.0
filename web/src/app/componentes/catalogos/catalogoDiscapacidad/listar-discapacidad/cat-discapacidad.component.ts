@@ -244,6 +244,17 @@ export class CatDiscapacidadComponent implements OnInit {
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.Datos_discapacidad = res.data;
       this.messajeExcel = res.message;
+
+      this.Datos_discapacidad.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+
       //console.log('probando plantilla discapacidad', this.Datos_discapacidad);
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {

@@ -116,6 +116,16 @@ export class CargarPlantillaComponent {
       this.DatosNivelesDep = res.data;
       this.messajeExcel = res.message;
 
+      this.DatosNivelesDep.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+
       if (this.messajeExcel == 'error') {
         this.DatosNivelesDep = [];
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -230,6 +240,16 @@ export class CargarPlantillaComponent {
       console.log('plantilla contrato', res);
       this.DatosContrato = res.data;
       this.messajeExcel = res.message;
+
+      this.DatosContrato.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
 
       if (this.messajeExcel == 'error') {
         this.DatosContrato = [];
@@ -460,6 +480,16 @@ export class CargarPlantillaComponent {
       console.log('plantilla cargo', res);
       this.DatosCargos = res.data;
       this.messajeExcelCargos = res.message;
+
+      this.DatosCargos.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
 
       if (this.messajeExcelCargos == 'error') {
         this.DatosCargos = [];

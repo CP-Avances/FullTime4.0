@@ -287,7 +287,16 @@ export class ListarRelojesComponent implements OnInit {
     this.rest.VerificarArchivoExcel(formData).subscribe(res => {
       this.DataDispositivos = res.data;
       this.messajeExcel = res.message;
-      console.log('probando plantilla1 dispositivos', this.DataDispositivos);
+
+      this.DataDispositivos.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {

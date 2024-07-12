@@ -273,7 +273,16 @@ export class CatTipoCargosComponent {
     this._TipoCargos.RevisarFormato(formData).subscribe(res => {
       this.Datos_tipo_cargos = res.data;
       this.messajeExcel = res.message;
-      //console.log('probando plantilla tipo cargos', this.Datos_tipo_cargos);
+
+      this.Datos_tipo_cargos.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
