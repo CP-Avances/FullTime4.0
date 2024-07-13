@@ -376,7 +376,8 @@ export class CargarPlantillaComponent implements OnInit {
       observacion == 'Departamento no pertenece a la sucursal' ||
       observacion == 'El nivel no puede ser 0 ni mayor a 5' ||
       observacion == 'faltan niveles por registrar' ||
-      observacion == 'Departamento superior ya se encuentra configurado'
+      observacion == 'Departamento superior ya se encuentra configurado' ||
+      observacion == 'Departamento superior no pertenece a la sucursal'
     ) {
       return 'rgb(238, 34, 207)';
     } else if (observacion == 'Nivel incorrecto (solo números)') {
