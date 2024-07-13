@@ -1904,12 +1904,12 @@ class EmpleadoControlador {
                         rol: '',
                         observacion: '',
                     };
-                    const estadoCivilArray = ['Soltero/a', 'Union de Hecho', 'Casado/a', 'Divorciado/a', 'Viudo/a'];
+                    const estadoCivilArray = ['Soltero/a', 'Casado/a', 'Viudo/a', 'Divorciado/a', 'Union de Hecho'];
                     const tipogenero = ['masculino', 'femenino'];
                     // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
                     const regex = /^[0-9]+$/;
                     const valiContra = /\s/;
-                    // Expresión regular para validar la latitud y longitud
+                    // EXPRESION REGULAR PARA VALIDAR LA LATITUD Y LONGITUD
                     const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
                     const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
                     var listEmpleadosManual = [];
@@ -2337,7 +2337,7 @@ class EmpleadoControlador {
     CargarPlantilla_Manual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { plantilla, user_name, ip } = req.body;
-            // Expresión regular para validar la latitud y longitud
+            // EXPRESION REGULAR PARA VALIDAR LA LATITUD Y LONGITUD
             const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
             const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
             var contador = 1;
@@ -2376,7 +2376,7 @@ class EmpleadoControlador {
                     const contrasena = md5.appendStr(data.contrasena).end();
                     // DATOS QUE SE LEEN DE LA PLANTILLA INGRESADA
                     const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono, nacionalidad, usuario, rol } = data;
-                    //OBTENER ID DEL ESTADO_CIVIL
+                    // OBTENER ID DEL ESTADO_CIVIL
                     var id_estado_civil = 0;
                     if (estado_civil.toUpperCase() === 'SOLTERO/A') {
                         id_estado_civil = 1;

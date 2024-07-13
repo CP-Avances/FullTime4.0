@@ -654,7 +654,7 @@ export class ListaEmpleadosComponent implements OnInit {
     }
     else if ((arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Cédula ya' ||
       (arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Usuario ya' ||
-      (arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Codigo ya') {
+      (arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Código ya') {
       return 'rgb(239, 203, 106)';
     }
     else if (arrayObservacion[0] == 'Cédula' || arrayObservacion[0] == 'Usuario') {

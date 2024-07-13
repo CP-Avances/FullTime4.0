@@ -1942,7 +1942,7 @@ class EmpleadoControlador {
         if (estado_civil.toUpperCase() === 'SOLTERO/A') {
           id_estado_civil = 1;
         }
-        else if (estado_civil.toUpperCase() === 'CASADO/A' ) {
+        else if (estado_civil.toUpperCase() === 'CASADO/A') {
           id_estado_civil = 2;
         }
         else if (estado_civil.toUpperCase() === 'VIUDO/A') {
@@ -2140,13 +2140,13 @@ class EmpleadoControlador {
           observacion: '',
         };
 
-        const estadoCivilArray: string[] = ['Soltero/a', 'Union de Hecho', 'Casado/a', 'Divorciado/a', 'Viudo/a']
+        const estadoCivilArray: string[] = ['Soltero/a', 'Casado/a', 'Viudo/a', 'Divorciado/a', 'Union de Hecho']
         const tipogenero: string[] = ['masculino', 'femenino'];
 
         // VALIDA SI LOS DATOS DE LA COLUMNA CEDULA SON NUMEROS.
         const regex = /^[0-9]+$/;
         const valiContra = /\s/;
-        // Expresión regular para validar la latitud y longitud
+        // EXPRESION REGULAR PARA VALIDAR LA LATITUD Y LONGITUD
         const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
         const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
 
@@ -2573,7 +2573,7 @@ class EmpleadoControlador {
 
   public async CargarPlantilla_Manual(req: Request, res: Response): Promise<any> {
     const { plantilla, user_name, ip } = req.body
-    // Expresión regular para validar la latitud y longitud
+    // EXPRESION REGULAR PARA VALIDAR LA LATITUD Y LONGITUD
     const regexLatitud = /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)$/;
     const regexLongitud = /^-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
 
@@ -2618,12 +2618,12 @@ class EmpleadoControlador {
         const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud,
           telefono, nacionalidad, usuario, rol } = data;
 
-        //OBTENER ID DEL ESTADO_CIVIL
+        // OBTENER ID DEL ESTADO_CIVIL
         var id_estado_civil = 0;
         if (estado_civil.toUpperCase() === 'SOLTERO/A') {
           id_estado_civil = 1;
         }
-        else if (estado_civil.toUpperCase() === 'CASADO/A' ) {
+        else if (estado_civil.toUpperCase() === 'CASADO/A') {
           id_estado_civil = 2;
         }
         else if (estado_civil.toUpperCase() === 'VIUDO/A') {
@@ -2679,7 +2679,7 @@ class EmpleadoControlador {
           `
           , [rol.toUpperCase()]);
 
-          console.log('Estado civil manual: ', id_estado_civil);
+        console.log('Estado civil manual: ', id_estado_civil);
 
         /*console.log('codigo: ', codigo)
         console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);

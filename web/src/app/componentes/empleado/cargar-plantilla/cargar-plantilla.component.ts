@@ -17,7 +17,7 @@ import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartament
   templateUrl: './cargar-plantilla.component.html',
   styleUrls: ['./cargar-plantilla.component.css']
 })
-export class CargarPlantillaComponent implements OnInit{
+export class CargarPlantillaComponent implements OnInit {
 
   archivoForm = new FormControl('', Validators.required);
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
@@ -372,7 +372,7 @@ export class CargarPlantillaComponent implements OnInit{
       observacion == 'Sucursal superior no existe en el sistema'
     ) {
       return 'rgb(255, 192, 203)';
-    }else if (observacion == 'Departamento no pertenece al establecimiento' ||
+    } else if (observacion == 'Departamento no pertenece al establecimiento' ||
       observacion == 'Departamento no pertenece a la sucursal' ||
       observacion == 'El nivel no puede ser 0 ni mayor a 5' ||
       observacion == 'faltan niveles por registrar' ||
@@ -418,8 +418,8 @@ export class CargarPlantillaComponent implements OnInit{
       return 'rgb(239, 203, 106)';
     }
     else if (observacion == 'País no corresponde con el Régimen Laboral' ||
-      observacion == 'La fecha de desde no puede ser mayor o igual a la fecha hasta' ||
-      observacion == 'Columna jefe formato incorrecto') {
+      observacion == 'La fecha desde no puede ser mayor o igual a la fecha hasta' ||
+      observacion == 'Departamento no pertenece a la sucursal') {
       return 'rgb(238, 34, 207)';
     }
     else if (arrayObservacion[1] + ' ' + arrayObservacion[2] == 'no registrado') {
@@ -429,7 +429,8 @@ export class CargarPlantillaComponent implements OnInit{
       return 'rgb(242, 21, 21)';
     }
     else if (observacion == 'Control de asistencia es incorrecto' ||
-      'Control de vacaciones es incorrecto') {
+      'Control de vacaciones es incorrecto' ||
+      observacion == 'Columna jefe formato incorrecto') {
       return 'rgb(222, 162, 73)';
     }
     else {
