@@ -61,6 +61,8 @@ class UsuarioRutas {
         this.router.put('/actualizar-usuario-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ActualizarUsuarioDepartamento);
         // METODO PARA ELIMINAR REGISTRO USUARIO - DEPARTAMENTO
         this.router.delete('/eliminar-usuario-departamento', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.EliminarUsuarioDepartamento);
+        // METODO PARA REGISTRAR MULTIPLES USUARIOS - DEPARTAMENTOS
+        this.router.post('/usuario-departamento/multiple', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.RegistrarUsuarioDepartamentoMultiple);
     }
 }
 const USUARIO_RUTA = new UsuarioRutas();

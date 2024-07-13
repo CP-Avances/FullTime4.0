@@ -222,8 +222,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
       this.planificacionesHorarias = data.planificacionHoraria;
 
-        console.log(this.planificacionesHorarias);
-
     }
   }
 

@@ -92,8 +92,8 @@
               <table id="table_horario" class="table table-hover table-sm">
                 <thead class="thead-light">
                   <tr style="text-align: center;">
-                      <th class="sticky colum_1 td_horarios" scope="col" rowspan="2">CÓDIGO</th>
-                      <th class="sticky-2 colum_1 td_horarios" scope="col"  rowspan="2">USUARIO</th>
+                      <th class="sticky colum_1 td_horarios" scope="col" rowspan="2">CÉDULA</th>
+                      <th class="sticky-2 colum_1 td_horarios" scope="col"  rowspan="2">EMPLEADO</th>
 
                       <th scope="col" class="td_horarios" colspan="31">DÍAS DEL MES DE {{ mes }}</th>
                   </tr>
@@ -103,10 +103,10 @@
               </thead>
 
               <tbody>
-                  <tr *ngFor="let usuario of planificacionesHorarias | paginate:tamanio_pagina_planificacion:numero_pagina_planificacion">
-                      <td class="sticky colum_1 td_horarios">{{usuario.codigo_usuario}}</td>
-                      <td class="sticky-2 colum_1 td_horarios" [style.color]="ObtenerColorUsuario(usuario.observacion)">{{ObtenerNombreUsuario(usuario.nombre_usuario, usuario.usuario)}}</td>
-                      <td *ngFor="let dia of usuario.dias" class="td_observaciones">
+                  <tr *ngFor="let empleado of planificacionesHorarias | paginate:tamanio_pagina_planificacion:numero_pagina_planificacion">
+                      <td class="sticky colum_1 td_horarios">{{empleado.cedula_empleado}}</td>
+                      <td class="sticky-2 colum_1 td_horarios" [style.color]="ObtenerColorUsuario(empleado.observacion)">{{ObtenerNombreUsuario(empleado.nombre_usuario, empleado.usuario)}}</td>
+                      <td *ngFor="let dia of empleado.dias" class="td_observaciones">
                         <div *ngFor="let horario of dia.horarios">
                             {{horario.codigo}}
                         </div>

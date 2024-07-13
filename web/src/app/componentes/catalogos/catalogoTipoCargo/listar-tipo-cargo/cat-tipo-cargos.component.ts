@@ -224,7 +224,7 @@ export class CatTipoCargosComponent {
   nameFile: string;
   archivoSubido: Array<File>;
   mostrarbtnsubir: boolean = false;
-  // METODO PARA SELECCIONAR PLANTILLA DE DATOS 
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS
   FileChange(element: any) {
     this.archivoSubido = [];
     this.nameFile = '';
@@ -359,14 +359,20 @@ export class CatTipoCargosComponent {
         user_name: this.user_name,
         ip: this.ip,
       }
-      this._TipoCargos.SubirArchivoExcel(data).subscribe(response => {
-        //console.log('respuesta: ', response);
-        this.toastr.success('Operación exitosa.', 'Plantilla de Tipo Cargos importada.', {
-          timeOut: 3000,
-        });
-        this.LimpiarCampos();
-        this.archivoForm.reset();
-        this.nameFile = '';
+      this._TipoCargos.SubirArchivoExcel(data).subscribe({
+        next: (response) => {
+          this.toastr.success('Plantilla de Tipo Cargos importada.', 'Operación exitosa.', {
+            timeOut: 3000,
+          });
+          this.LimpiarCampos();
+          this.archivoForm.reset();
+          this.nameFile = '';
+        },
+        error: (error) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 3500,
+          });
+        }
       });
     } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
