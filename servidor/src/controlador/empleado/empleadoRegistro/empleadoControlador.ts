@@ -1546,25 +1546,22 @@ class EmpleadoControlador {
                       if (tipogenero.includes(data.genero.toLowerCase())) {
                         // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
                         if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+
+                          // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
+                          if(LONGITUD != undefined || LATITUD != undefined){
+                            if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                              data.observacion = 'Verificar ubicación';
+                            }                                  
+                          }
+
                           // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS
                           if (TELEFONO != undefined) {
                             //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
                             if (regex.test(data.telefono.toString())) {
                               if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                                 data.observacion = 'El teléfono ingresado no es válido';
-                              } else {
-
-                                if (!regexLatitud.test(data.latitud) && !regexLongitud.test(data.longitud)) {
-                                  data.observacion = '3';
-                                } else if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                  data.observacion = 'Verificar ubicacion';
-                                } else {
-                                  if (duplicados.find((p: any) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
-                                    data.observacion = 'ok';
-                                    duplicados.push(dato);
-                                  }
-                                }
-                              }
+                              } 
+                              
                             } else {
                               data.observacion = 'El teléfono ingresado no es válido';
                             }
@@ -1693,22 +1690,23 @@ class EmpleadoControlador {
                                   // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
                                   if (data.fec_nacimiento != 'No registrado') {
                                     if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+                                      
+                                      // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
+                                      if(LONGITUD != undefined || LATITUD != undefined){
+                                        if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                          data.observacion = 'Verificar ubicación';
+                                        }                                  
+                                      }
+                                      
                                       // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                                       if (TELEFONO != undefined) {
-
                                         //console.log(data.telefono, ' entro ', regex.test(TELEFONO));
                                         if (regex.test(data.telefono.toString())) {
                                           if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                                             //console.log('ent: ', data.telefono);
                                             data.observacion = 'El teléfono ingresado no es válido';
-                                          } else {
-                                            if (!regexLatitud.test(data.latitud) && !regexLongitud.test(data.longitud)) {
-                                              data.observacion = '3';
-                                            } else if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                              data.observacion = 'Verificar ubicación';
-                                            }
-                                          }
-                                          //console.log(data.telefono);
+                                          } 
+                                          
                                         } else {
                                           data.observacion = 'El teléfono ingresado no es válido';
                                         }
@@ -2211,24 +2209,21 @@ class EmpleadoControlador {
                           if (tipogenero.includes(data.genero.toLowerCase())) {
                             // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
                             if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+
+                               // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
+                               if(LONGITUD != undefined || LATITUD != undefined){
+                                if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                  data.observacion = 'Verificar ubicación';
+                                }
+                              }
+
                               // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                               if (TELEFONO != undefined) {
                                 if (regex.test(data.telefono)) {
                                   if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                                     data.observacion = 'El teléfono ingresado no es válido';
-                                  } else {
-                                    if (!regexLatitud.test(data.latitud) && !regexLongitud.test(data.longitud)) {
-                                      data.observacion = '3';
-                                    } else if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                      data.observacion = 'Verificar ubicación';
-                                    } else {
-                                      if (duplicados.find((p: any) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
-                                        data.observacion = 'ok';
-                                        duplicados.push(dato);
-                                      }
-                                    }
+                                  } 
 
-                                  }
                                 } else {
                                   data.observacion = 'El teléfono ingresado no es válido';
                                 }
@@ -2366,23 +2361,27 @@ class EmpleadoControlador {
                                   // VERIFICAR SI LA VARIABLE TIENE EL FORMATO DE FECHA CORRECTO CON moment
                                   if (data.fec_nacimiento != 'No registrado') {
                                     if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
+
+                                      // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
+                                      if(LONGITUD != undefined || LATITUD != undefined){
+                                        if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
+                                          data.observacion = 'Verificar ubicación';
+                                        }                                  
+                                      }
+                                      
                                       // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
                                       if (TELEFONO != undefined) {
                                         const regex = /^[0-9]+$/;
                                         if (regex.test(data.telefono)) {
                                           if (data.telefono.toString().length > 10 || data.telefono.toString().length < 7) {
                                             data.observacion = 'El teléfono ingresado no es válido';
-                                          } else {
-                                            if (!regexLatitud.test(data.latitud) && !regexLongitud.test(data.longitud)) {
-                                              data.observacion = '4';
-                                            } else if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
-                                              data.observacion = 'Verificar ubicación';
-                                            }
-                                          }
+                                          } 
                                         } else {
                                           data.observacion = 'El teléfono ingresado no es válido';
                                         }
                                       }
+
+
                                     } else {
                                       data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                                     }
@@ -2437,14 +2436,15 @@ class EmpleadoControlador {
         });
 
         listEmpleadosManual.forEach(async (valor: any) => {
-          var VERIFICAR_CEDULA = await pool.query(
+         if(valor.observacion == 'no registrado'){
+            var VERIFICAR_CEDULA = await pool.query(
             `
               SELECT * FROM eu_empleados WHERE cedula = $1
             `
-            , [valor.cedula]);
-          if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+              , [valor.cedula]);
+            if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
             valor.observacion = 'Cédula ya existe en el sistema'
-          } else {
+            } else {
 
             var VERIFICAR_CODIGO = await pool.query(
               `
@@ -2506,7 +2506,9 @@ class EmpleadoControlador {
                 }
               }
             }
-          }
+            }
+         }
+      
         })
 
         var tiempo = 2000;

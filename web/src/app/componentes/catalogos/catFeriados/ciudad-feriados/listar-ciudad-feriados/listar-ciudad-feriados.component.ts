@@ -98,6 +98,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
   // METODO PARA BUSCAR INFORMACION DE UN FERIADO
   BuscarDatosFeriado(idFeriado: any, formato_fecha: string) {
     this.datosFeriado = [];
+    this.numero_pagina = 1;
     this.rest.ConsultarUnFeriado(idFeriado).subscribe(data => {
       this.datosFeriado = data;
       this.datosFeriado.forEach((data: any) => {

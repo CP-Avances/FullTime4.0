@@ -108,8 +108,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
     this.idDepartamentosAcceso = this.asignacionesService.idDepartamentosAcceso;
 
-    this.ListaDepartamentos();
     this.ObtenerEmpleados(this.idEmpleado);
+    this.ListaDepartamentos();
     this.ObtenerColores();
     this.ObtenerLogo();
   }
