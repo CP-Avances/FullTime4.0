@@ -158,21 +158,23 @@ export class RegistroHorarioComponent implements OnInit {
 
   // METODO PARA REGISTRAR DATOS DEL HORARIO
   GuardarDatos(datos: any, form: any) {
-    this.rest.RegistrarHorario(datos).subscribe(response => {
-      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
-        timeOut: 6000,
-      });
-      if (this.isChecked === true && form.documentoForm != '') {
-        this.SubirRespaldo(response.id, response.codigo);
+    this.rest.RegistrarHorario(datos).subscribe({
+      next: (response) => {
+        this.toastr.success('Registro guardado.', 'Operación exitosa.', {
+          timeOut: 6000,
+        });
+        if (this.isChecked === true && form.documentoForm != '') {
+          this.SubirRespaldo(response.id, response.codigo);
+        }
+        this.LimpiarCampos();
+        this.ventana.close(response.id);
+      },
+      error: (error) => {
+        this.habilitarprogress = false;
+        this.toastr.error('Limite de horas superado.', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        })
       }
-      this.LimpiarCampos();
-      // VER PANTALLA DE DETALLE
-      this.ventana.close(response.id);
-    }, error => {
-      this.habilitarprogress = false;
-      this.toastr.error('Limite de horas superado.', 'Ups!!! algo salio mal.', {
-        timeOut: 6000,
-      })
     });
   }
 
