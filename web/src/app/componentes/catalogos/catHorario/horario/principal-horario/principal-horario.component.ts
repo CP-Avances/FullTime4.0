@@ -229,7 +229,9 @@ export class PrincipalHorarioComponent implements OnInit {
     this.numero_paginaD = 1;
     this.tamanio_paginaH = 5;
     this.tamanio_paginaD = 5;
-    this.paginator.firstPage();
+    if(this.paginator) {
+      this.paginator.firstPage();
+    }
     if (this.paginatorH) {
       this.paginatorH.firstPage();
     }

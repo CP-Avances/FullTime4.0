@@ -441,7 +441,7 @@ class HorarioControlador {
                 yield database_1.default.query('COMMIT');
                 if (datosNuevos.length === 0)
                     return res.status(400).jsonp({ message: 'No actualizado.' });
-                return res.status(200).jsonp(respuesta);
+                return res.status(200).jsonp(respuesta.rows);
             }
             catch (error) {
                 // REVERTIR TRANSACCION
