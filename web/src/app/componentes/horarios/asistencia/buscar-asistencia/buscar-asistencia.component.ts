@@ -111,6 +111,7 @@ export class BuscarAsistenciaComponent implements OnInit {
       fin: form.fechaFinForm,
     }
 
+
     if (!datos.codigo && !datos.cedula && !datos.nombre && !datos.apellido) {
       return this.toastr.warning('Debe ingresar al menos un criterio de búsqueda.', 'Notificación', {
         timeOut: 6000,

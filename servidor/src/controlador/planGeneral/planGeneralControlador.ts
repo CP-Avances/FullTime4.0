@@ -345,24 +345,27 @@ class PlanGeneralControlador {
     public async BuscarAsistencia(req: Request, res: Response) {
         try {
             const { cedula, codigo, inicio, fin, nombre, apellido } = req.body;
+            console.log('ver datos ', cedula, ' ', codigo, ' ', inicio, ' ', fin, ' ', nombre, ' ', apellido)
             let ids = [];
     
-            if (codigo !== '') {
+            if (codigo !== '' && codigo !== null) {
+                console.log('ver codigo ', codigo)
                 const empleado = await BuscarEmpleadoPorParametro('codigo', codigo);
                 if (empleado.rowCount! > 0) {
                     ids = empleado.rows.map(row => row.id);
                 }
             } else {
                 let empleado;
-                if (cedula !== '') {
+                if (cedula !== '' && cedula !== null) {
                     empleado = await BuscarEmpleadoPorParametro('cedula', cedula);
-                } else if (nombre !== '' && apellido !== '') {
+                } else if (nombre !== '' && apellido !== '' && nombre !== null && apellido !== null) {
                     empleado = await BuscarEmpleadoPorParametro('nombre_apellido', { nombre, apellido });
-                } else if (apellido !== '') {
+                } else if (apellido !== '' && apellido !== null) {
                     empleado = await BuscarEmpleadoPorParametro('apellido', apellido);
-                } else if (nombre !== '') {
+                } else if (nombre !== '' && nombre !== null) {
                     empleado = await BuscarEmpleadoPorParametro('nombre', nombre);
                 }
+                console.log('ver empleado ', empleado)
     
                 if (empleado && empleado.rowCount! > 0) {
                     ids = empleado.rows.map(row => row.id);
