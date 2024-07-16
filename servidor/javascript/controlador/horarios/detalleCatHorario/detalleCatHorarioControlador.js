@@ -93,15 +93,16 @@ class DetalleCatalogoHorarioControlador {
                 DELETE FROM eh_detalle_horarios WHERE id = $1
                 `, [id]);
                 const horadetalle = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora);
+                datosOriginales.hora = horadetalle;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eh_detalle_horarios',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: `{orden: ${datosOriginales.orden}, hora: ${horadetalle}, tolerancia: ${datosOriginales.tolerancia}, id_horario: ${datosOriginales.id_horario}, tipo_accion: ${datosOriginales.tipo_accion}, segundo_dia: ${datosOriginales.segundo_dia}, tercer_dia: ${datosOriginales.tercer_dia}, min_antes: ${datosOriginales.minutos_antes}, min_despues: ${datosOriginales.minutos_despues}}`,
+                    datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
                     ip,
-                    observacion: ''
+                    observacion: null
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
@@ -121,21 +122,23 @@ class DetalleCatalogoHorarioControlador {
                 const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                yield database_1.default.query(`
+                const registro = yield database_1.default.query(`
                 INSERT INTO eh_detalle_horarios (orden, hora, tolerancia, id_horario, tipo_accion, segundo_dia, tercer_dia, 
                     minutos_antes, minutos_despues) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
                 `, [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues]);
-                // AUDITORIA
+                const [datosNuevos] = registro.rows;
                 const horadetalle = yield (0, settingsMail_1.FormatearHora)(hora);
+                datosNuevos.hora = horadetalle;
+                // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eh_detalle_horarios',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{orden: ${orden}, hora: ${horadetalle}, tolerancia: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
+                    datosNuevos: JSON.stringify(datosNuevos),
                     ip,
-                    observacion: ''
+                    observacion: null
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
@@ -172,22 +175,25 @@ class DetalleCatalogoHorarioControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
                 }
-                yield database_1.default.query(`
+                const actualizacion = yield database_1.default.query(`
                 UPDATE eh_detalle_horarios SET orden = $1, hora = $2, tolerancia = $3, id_horario = $4,
                     tipo_accion = $5, segundo_dia = $6, tercer_dia = $7, minutos_antes = $8, minutos_despues= $9 
-                WHERE id = $10
+                WHERE id = $10 RETURNING *
                 `, [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id]);
+                const [datosNuevos] = actualizacion.rows;
                 const horadetalle = yield (0, settingsMail_1.FormatearHora)(hora);
                 const horadetalleO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora);
+                datosNuevos.hora = horadetalle;
+                datosOriginales.hora = horadetalleO;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eh_detalle_horarios',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: `{orden: ${datosOriginales.orden}, hora: ${horadetalleO}, tolerancia: ${datosOriginales.tolerancia}, id_horario: ${datosOriginales.id_horario}, tipo_accion: ${datosOriginales.tipo_accion}, segundo_dia: ${datosOriginales.segundo_dia}, tercer_dia: ${datosOriginales.tercer_dia}, min_antes: ${datosOriginales.minutos_antes}, min_despues: ${datosOriginales.minutos_despues}}`,
-                    datosNuevos: `{orden: ${orden}, hora: ${horadetalle}, tolerancia: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(datosNuevos),
                     ip,
-                    observacion: ''
+                    observacion: null
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');

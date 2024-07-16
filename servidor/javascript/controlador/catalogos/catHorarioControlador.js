@@ -39,7 +39,7 @@ class HorarioControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{codigo=${codigo}, nombre=${nombre}, minutos_comida=${min_almuerzo}, hora_trabajo=${hora_trabajo}, nocturno=${nocturno}, documento=${''}, default_=${default_} } `,
+                    datosNuevos: JSON.stringify(horario),
                     ip,
                     observacion: null
                 });
@@ -114,16 +114,17 @@ class HorarioControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'error' });
                 }
-                yield database_1.default.query(`
-        UPDATE eh_cat_horarios SET documento = $2 WHERE id = $1
+                const actualizacion = yield database_1.default.query(`
+        UPDATE eh_cat_horarios SET documento = $2 WHERE id = $1 RETURNING *
         `, [id, documento]);
+                const [datosNuevos] = actualizacion.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eh_cat_horarios',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: JSON.stringify({ documento }),
+                    datosNuevos: JSON.stringify(datosNuevos),
                     ip,
                     observacion: null
                 });
@@ -184,21 +185,21 @@ class HorarioControlador {
         UPDATE eh_cat_horarios SET nombre = $1, minutos_comida = $2, hora_trabajo = $3,  
           nocturno = $4, codigo = $5, default_ = $6
         WHERE id = $7 RETURNING *
-        `, [nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, id,])
-                    .then((result) => { return result.rows; });
+        `, [nombre, min_almuerzo, hora_trabajo, nocturno, codigo, default_, id,]);
+                const [datosNuevos] = respuesta.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eh_cat_horarios',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{nombre: ${nombre}, minutos_comida: ${min_almuerzo}, hora_trabajo: ${hora_trabajo}, nocturno: ${nocturno}, codigo: ${codigo}, documento: ${datosOriginales.documento}, default_: ${default_}}`,
+                    datosNuevos: datosNuevos,
                     ip,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                if (respuesta.length === 0)
+                if (datosNuevos.length === 0)
                     return res.status(400).jsonp({ message: 'error' });
                 return res.status(200).jsonp(respuesta);
             }
@@ -249,16 +250,17 @@ class HorarioControlador {
                     yield database_1.default.query('COMMIT');
                     return res.status(404).jsonp({ message: 'error' });
                 }
-                yield database_1.default.query(`
+                const actualizacion = yield database_1.default.query(`
               UPDATE eh_cat_horarios SET documento = null WHERE id = $1
               `, [id]);
+                const [datosNuevos] = actualizacion.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eh_cat_horarios',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{documento: null}`,
+                    datosNuevos: JSON.stringify(datosNuevos),
                     ip,
                     observacion: null
                 });
@@ -423,23 +425,23 @@ class HorarioControlador {
                 }
                 const respuesta = yield database_1.default.query(`
         UPDATE eh_cat_horarios SET hora_trabajo = $1 WHERE id = $2 RETURNING *
-        `, [hora_trabajo, id])
-                    .then((result) => { return result.rows; });
+        `, [hora_trabajo, id]);
+                const [datosNuevos] = respuesta.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eh_cat_horarios',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{codigo=${datosOriginales.codigo}, nombre=${datosOriginales.nombre}, minutos_comida=${datosOriginales.nombre}, hora_trabajo=${hora_trabajo}, nocturno=${datosOriginales.nocturno}, documento=${datosOriginales.documento}, default_=${datosOriginales.default_} } `,
+                    datosNuevos: JSON.stringify(datosNuevos),
                     ip,
                     observacion: null
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
-                if (respuesta.length === 0)
+                if (datosNuevos.length === 0)
                     return res.status(400).jsonp({ message: 'No actualizado.' });
-                return res.status(200).jsonp(respuesta);
+                return res.status(200).jsonp(respuesta.rows);
             }
             catch (error) {
                 // REVERTIR TRANSACCION

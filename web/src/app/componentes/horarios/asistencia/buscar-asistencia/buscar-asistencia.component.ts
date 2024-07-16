@@ -110,6 +110,14 @@ export class BuscarAsistenciaComponent implements OnInit {
       inicio: form.fechaInicioForm,
       fin: form.fechaFinForm,
     }
+
+
+    if (!datos.codigo && !datos.cedula && !datos.nombre && !datos.apellido) {
+      return this.toastr.warning('Debe ingresar al menos un criterio de búsqueda.', 'Notificación', {
+        timeOut: 6000,
+      });
+    }
+
     this.asistir.ConsultarAsistencia(datos).subscribe(async data => {
       console.log('ver asistencia ', data)
 

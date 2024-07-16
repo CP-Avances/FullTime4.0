@@ -47,16 +47,14 @@ class FeriadosControlador {
             const [feriado] = datosOriginales.rows;
 
 
-            var fecha_formatoO = await FormatearFechaBase(feriado.fecha, 'ddd');
-            console.log("ver fecha formateada", fecha_formatoO)
-            var fec_recuperacion_formatoO = '';
+            const fecha_formatoO = await FormatearFechaBase(feriado.fecha, 'ddd');
+            feriado.fecha = fecha_formatoO;
+            
+            let fec_recuperacion_formatoO = '';
             if (feriado.fec_recuperacion) {
-                var fec_recuperacion_formatoO = await FormatearFechaBase(feriado.fecha_recuperacion, 'ddd');
+                fec_recuperacion_formatoO = await FormatearFechaBase(feriado.fecha_recuperacion, 'ddd');
+                feriado.fecha_recuperacion = fec_recuperacion_formatoO;
             }
-
-
-
-
 
             if (!feriado) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -87,8 +85,7 @@ class FeriadosControlador {
                 tabla: 'ef_cat_feriados',
                 usuario: user_name,
                 accion: 'D',
-                datosOriginales: `{fecha: ${fecha_formatoO}, 
-                            descripcion: ${feriado.descripcion}, fecha_recuperacion: ${fec_recuperacion_formatoO}} `,
+                datosOriginales: JSON.stringify(feriado),
                 datosNuevos: '',
                 ip,
                 observacion: null
@@ -107,9 +104,6 @@ class FeriadosControlador {
     }
 
     // METODO PARA CREAR REGISTRO DE FERIADO
-
-
-
     public async CrearFeriados(req: Request, res: Response): Promise<Response> {
         try {
             const { fecha, descripcion, fec_recuperacion, user_name, ip } = req.body;
@@ -141,12 +135,15 @@ class FeriadosControlador {
 
                 const [feriado] = response.rows;
 
-                var fecha_formato = await FormatearFecha2(fecha.toLocaleString(), 'ddd');
+                const fecha_formato = await FormatearFecha2(fecha.toLocaleString(), 'ddd');
+
+                feriado.fecha = fecha_formato;
 
 
-                var fec_recuperacion_formato = '';
+                let fec_recuperacion_formato = '';
                 if (fec_recuperacion) {
-                    var fec_recuperacion_formato = await FormatearFecha2(fec_recuperacion, 'ddd');
+                    fec_recuperacion_formato = await FormatearFecha2(fec_recuperacion, 'ddd');
+                    feriado.fecha_recuperacion = fec_recuperacion_formato;
                 }
 
                 // AUDITORIA
@@ -155,8 +152,7 @@ class FeriadosControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{fecha: ${fecha_formato}, 
-                            descripcion: ${descripcion}, fecha_recuperacion: ${fec_recuperacion_formato} `,
+                    datosNuevos: JSON.stringify(feriado),
                     ip,
                     observacion: null
                 });
@@ -239,26 +235,32 @@ class FeriadosControlador {
                     return res.status(404).jsonp({ text: 'Registro no encontrado.' });
                 }
 
-                           await pool.query(
+                const actualizacion = await pool.query(
                 `
                 UPDATE ef_cat_feriados SET fecha = $1, descripcion = $2, fecha_recuperacion = $3
-                WHERE id = $4
+                WHERE id = $4 RETURNING *
                 `
                 , [fecha, descripcion, fec_recuperacion, id]);
 
+            const [datosNuevos] = actualizacion.rows;
 
-            var fecha_formato = await FormatearFecha2(fecha.toLocaleString(), 'ddd');
+
+            const fecha_formato = await FormatearFecha2(fecha.toLocaleString(), 'ddd');
+            datosNuevos.fecha = fecha_formato;
 
 
-            var fec_recuperacion_formato = '';
+            let fec_recuperacion_formato = '';
             if (fec_recuperacion) {
-                var fec_recuperacion_formato = await FormatearFecha2(fec_recuperacion, 'ddd');
+                fec_recuperacion_formato = await FormatearFecha2(fec_recuperacion, 'ddd');
+                datosNuevos.fecha_recuperacion = fec_recuperacion_formato;
             }
-            var fecha_formatoO = await FormatearFecha2(feriado.fecha, 'ddd');
-            console.log("ver fecha formateada", fecha_formatoO)
-            var fec_recuperacion_formatoO = '';
+            const fecha_formatoO = await FormatearFecha2(feriado.fecha, 'ddd');
+            feriado.fecha = fecha_formatoO;
+
+            let fec_recuperacion_formatoO = '';
             if (feriado.fecha_recuperacion) {
-                var fec_recuperacion_formatoO = await FormatearFechaBase(feriado.fecha_recuperacion, 'ddd');
+                fec_recuperacion_formatoO = await FormatearFechaBase(feriado.fecha_recuperacion, 'ddd');
+                feriado.fecha_recuperacion = fec_recuperacion_formatoO;
             }
 
             // AUDITORIA
@@ -266,10 +268,9 @@ class FeriadosControlador {
                 tabla: 'ef_cat_feriados',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: `{fecha: ${fecha_formatoO}, 
-                            descripcion: ${feriado.descripcion}, fecha_recuperacion: ${fec_recuperacion_formatoO}} `,
-                datosNuevos: `{fecha: ${fecha_formato}, 
-                            descripcion: ${descripcion}, fecha_recuperacion: ${fec_recuperacion_formato}} `, ip,
+                datosOriginales: JSON.stringify(feriado),
+                datosNuevos: JSON.stringify(datosNuevos),
+                ip,
                 observacion: null
             });
 
@@ -775,17 +776,18 @@ class FeriadosControlador {
     }
 
     public async RegistrarFeriado(req: Request, res: Response) {
-        try {
-            const plantilla = req.body
+        const {plantilla, user_name, ip} = req.body
+        let error: boolean = false;
 
-            var contador = 1;
-            var respuesta: any
-
-            plantilla.forEach(async (data: any) => {
-                var { fecha, descripcion, fec_recuperacion} = data;
-
+         for ( const data of plantilla) {
+            try {
+                let { fecha, descripcion, fec_recuperacion} = data;
                 if(fec_recuperacion == '-'){fec_recuperacion = null;}
-
+    
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+                
+    
                 const response: QueryResult = await pool.query(
                     `
                     INSERT INTO ef_cat_feriados (fecha, descripcion, fecha_recuperacion) 
@@ -793,40 +795,51 @@ class FeriadosControlador {
                     `,
                     [fecha, descripcion, fec_recuperacion]
                 );
-
+    
                 const [feriado] = response.rows;
 
-                if (contador === plantilla.length) {
-                    if (feriado) {
-                        return respuesta = res.status(200).jsonp({ message: 'ok' })
-                    } else {
-                        return respuesta = res.status(404).jsonp({ message: 'error' })
-                    }
-                }
+                 // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'ef_cat_feriados',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(feriado),
+                    ip,
+                    observacion: null
+                });
 
-                contador = contador + 1;
-
-            });
-
-        } catch (error) {
-            
-            return res.status(500).jsonp({ message: error });
+                 // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                error = true;
+            }
         }
+
+         if (error) {
+            return res.status(500).jsonp({ message: 'error' });
+          }
+          
+          
+          return res.status(200).jsonp({ message: 'ok' });
     }
 
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
     public async RegistrarFeriado_Ciudad(req: Request, res: Response) {
-        try {
-            const plantilla = req.body
-            console.log('datos manual: ', plantilla);
+        const {plantilla, user_name, ip} = req.body
+        let error: boolean = false;
 
-            var contador = 1;
-            var respuesta: any
-
-            plantilla.forEach(async (data: any) => {
-                // Datos que se leen de la plantilla ingresada
+        for ( const data of plantilla) {
+            try {
                 const { provincia, ciudad, feriado, observacion } = data;
-                //Obtener id de la ciudad
+
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
+                //OBTENER ID DE LA CIUDAD
                 const id_ciudad = await pool.query(
                     `
                     SELECT id FROM e_ciudades WHERE UPPER(descripcion) = $1
@@ -839,13 +852,6 @@ class FeriadosControlador {
                     `
                     , [feriado.toUpperCase()]);
 
-                console.log('id_ciudad: ', id_ciudad.rows[0].id);
-                console.log('id_feriado: ', id_feriado.rows[0].id);
-
-                //Registro primero de feriados
-
-
-                // Registro de los datos
                 const response: QueryResult = await pool.query(
                     `
                     INSERT INTO ef_ciudad_feriado (id_feriado, id_ciudad) VALUES ($1, $2) RETURNING *
@@ -854,19 +860,31 @@ class FeriadosControlador {
 
                 const [ciudad_feria] = response.rows;
 
-                if (contador === plantilla.length) {
-                    if (ciudad_feria) {
-                        return respuesta = res.status(200).jsonp({ message: 'ok' })
-                    } else {
-                        return respuesta = res.status(404).jsonp({ message: 'error' })
-                    }
-                }
-                contador = contador + 1;
-            });
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'ef_ciudad_feriado',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(ciudad_feria),
+                    ip,
+                    observacion: null
+                });
 
-        } catch (error) {
-            return res.status(500).jsonp({ message: error });
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                error = true;
+            }
         }
+        if (error) {
+            return res.status(500).jsonp({ message: 'error' });
+          }
+    
+        return res.status(200).jsonp({ message: 'ok' });
     }
 
 

@@ -38,12 +38,12 @@
                                 <label for="file1" matSuffix matTooltipPosition="right"
                                     *ngIf="mostrarbtnsubir" style="height: 65px;  padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
-                                    Subir nueva <br> plantilla
+                                    Subir nueva plantilla
                                 </label>
                             </form>
                         </div>
                         <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                            <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <div *ngIf="!dataHorarios" class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
                                 <a type="submit" id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                     matTooltip="Dar click para ver o descargar el documento."
                                     href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">

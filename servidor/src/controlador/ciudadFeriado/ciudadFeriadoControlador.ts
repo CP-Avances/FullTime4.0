@@ -137,7 +137,7 @@ class CiudadFeriadoControlador {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{id_feriado: ${id_feriado}, id_ciudad: ${id_ciudad}}`,
+                datosNuevos: JSON.stringify(feriado),
                 ip,
                 observacion: null
             });
@@ -188,11 +188,12 @@ class CiudadFeriadoControlador {
                 return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
             }
     
-            await pool.query(
+            const actualizacion = await pool.query(
                 `
-                UPDATE ef_ciudad_feriado SET id_feriado = $1, id_ciudad = $2 WHERE id = $3
+                UPDATE ef_ciudad_feriado SET id_feriado = $1, id_ciudad = $2 WHERE id = $3 RETURNING *
                 `
                 , [id_feriado, id_ciudad, id]);
+            const [datosNuevos] = actualizacion.rows;
     
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -200,7 +201,7 @@ class CiudadFeriadoControlador {
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: `{id_feriado: ${id_feriado}, id_ciudad: ${id_ciudad}}`,
+                datosNuevos: JSON.stringify(datosNuevos),
                 ip,
                 observacion: null
             });
