@@ -343,111 +343,53 @@ class PlanGeneralControlador {
 
     // METODO PARA BUSCAR ASISTENCIAS
     public async BuscarAsistencia(req: Request, res: Response) {
-
-        var verificador = 0;
-        var ids = '';
-
-        var EMPLEADO: any;
-
-        const { cedula, codigo, inicio, fin, nombre, apellido } = req.body;
-
-        if (codigo === '') {
-            // BUSCAR ID POR CEDULA DEL USUARIO
-            EMPLEADO = await pool.query(
-                `
-                SELECT id FROM eu_empleados WHERE cedula = $1
-                `
-                , [cedula]);
-
-            if (EMPLEADO.rowCount === 0) {
-                // BUSCAR ID POR NOMBRE DEL USUARIO
-                EMPLEADO = await pool.query(
-                    `
-                    SELECT id FROM eu_empleados WHERE UPPER(nombre) ilike '%${nombre}%'
-                    `
-                );
-
-                if (EMPLEADO.rowCount === 0) {
-                    // BUSCAR ID POR APELLIDO DEL USUARIO
-                    EMPLEADO = await pool.query(
-                        `
-                        SELECT id FROM eu_empleados WHERE UPPER(apellido) ilike '%${apellido}%'
-                        `
-                    );
-
-                    if (EMPLEADO.rowCount != 0) {
-                        // TRATAMIENTO DE CODIGOS
-                        var datos: any = [];
-                        datos = EMPLEADO.rows;
-
-                        datos.forEach((obj: any) => {
-                            //console.log('ver codigos ', obj.codigo)
-                            if (ids === '') {
-                                ids = '\'' + obj.id + '\''
-                            }
-                            else {
-                                ids = ids + ', \'' + obj.id + '\''
-                            }
-                        })
-                    }
-                    else {
-                        verificador = 1;
-                    }
+        try {
+            const { cedula, codigo, inicio, fin, nombre, apellido } = req.body;
+            let ids = [];
+    
+            if (codigo !== '') {
+                const empleado = await BuscarEmpleadoPorParametro('codigo', codigo);
+                if (empleado.rowCount! > 0) {
+                    ids = empleado.rows.map(row => row.id);
+                }
+            } else {
+                let empleado;
+                if (cedula !== '') {
+                    empleado = await BuscarEmpleadoPorParametro('cedula', cedula);
+                } else if (nombre !== '' && apellido !== '') {
+                    empleado = await BuscarEmpleadoPorParametro('nombre_apellido', { nombre, apellido });
+                } else if (apellido !== '') {
+                    empleado = await BuscarEmpleadoPorParametro('apellido', apellido);
+                } else if (nombre !== '') {
+                    empleado = await BuscarEmpleadoPorParametro('nombre', nombre);
+                }
+    
+                if (empleado && empleado.rowCount! > 0) {
+                    ids = empleado.rows.map(row => row.id);
                 }
             }
-        }
-        else {
-            // BUSCAR ID POR APELLIDO DEL USUARIO
-            EMPLEADO = await pool.query(
-                `
-                SELECT id FROM eu_empleados WHERE codigo = $1
-                `
-                , [codigo]);
-
-            if (EMPLEADO.rowCount != 0) {
-                // TRATAMIENTO DE CODIGOS
-                var datos: any = [];
-                datos = EMPLEADO.rows;
-
-                datos.forEach((obj: any) => {
-                    //console.log('ver codigos ', obj.codigo)
-                    if (ids === '') {
-                        ids = '\'' + obj.id + '\''
-                    }
-                    else {
-                        ids = ids + ', \'' + obj.id + '\''
-                    }
-                })
-            }
-            else {
-                verificador = 1;
-            }
-        }
-
-        if (verificador === 0) {
-            const ASISTENCIA = await pool.query(
-                `
-                SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios,
-                p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre,
-                empleado.cedula, empleado.nombre, empleado.apellido, empleado.id AS id_empleado
-                FROM eu_asistencia_general p_g
-                INNER JOIN eu_empleados empleado on empleado.id = p_g.id_empleado AND p_g.id_empleado IN (${ids})
-                WHERE p_g.fecha_horario BETWEEN $1 AND $2
-                ORDER BY p_g.fecha_hora_horario ASC`,
-                [inicio, fin]);
-
-            if (ASISTENCIA.rowCount === 0) {
+    
+            if (ids.length > 0) {
+                const ASISTENCIA = await pool.query(`
+                    SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios,
+                    p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre,
+                    empleado.cedula, empleado.nombre, empleado.apellido, empleado.id AS id_empleado
+                    FROM eu_asistencia_general p_g
+                    INNER JOIN eu_empleados empleado on empleado.id = p_g.id_empleado AND p_g.id_empleado = ANY($3)
+                    WHERE p_g.fecha_horario BETWEEN $1 AND $2
+                    ORDER BY p_g.fecha_hora_horario ASC`, [inicio, fin, ids]);
+    
+                if (ASISTENCIA.rowCount === 0) {
+                    return res.status(404).jsonp({ message: 'vacio' });
+                } else {
+                    return res.jsonp({ message: 'OK', respuesta: ASISTENCIA.rows });
+                }
+            } else {
                 return res.status(404).jsonp({ message: 'vacio' });
             }
-            else {
-                return res.jsonp({ message: 'OK', respuesta: ASISTENCIA.rows })
-            }
-
+        } catch (error) {
+            return res.status(500).jsonp({ message: 'Error interno del servidor' });
         }
-        else {
-            return res.status(404).jsonp({ message: 'vacio' });
-        }
-
     }
 
     // METODO PARA ACTUALIZAR ASISTENCIA MANUAL
@@ -560,6 +502,37 @@ class PlanGeneralControlador {
         }
     }
 
+}
+
+async function BuscarEmpleadoPorParametro(parametro: string, valor: string | { nombre: string; apellido: string }) {
+    let query = '';
+    let queryParams: any[] | undefined = [];
+
+    switch (parametro) {
+        case 'cedula':
+            query = 'SELECT id FROM eu_empleados WHERE cedula = $1';
+            queryParams = [valor];
+            break;
+        case 'nombre':
+        case 'apellido':
+            if (typeof valor === 'string') {
+                query = `SELECT id FROM eu_empleados WHERE UPPER(${parametro}) ilike $1`;
+                queryParams = [`%${valor.toUpperCase()}%`];
+            }
+            break;
+        case 'codigo':
+            query = 'SELECT id FROM eu_empleados WHERE codigo = $1';
+            queryParams = [valor];
+            break;
+        case 'nombre_apellido':
+            if (typeof valor !== 'string' && valor.nombre && valor.apellido) {
+                query = `SELECT id FROM eu_empleados WHERE UPPER(nombre) ilike $1 AND UPPER(apellido) ilike $2`;
+                queryParams = [`%${valor.nombre.toUpperCase()}%`, `%${valor.apellido.toUpperCase()}%`];
+            }
+            break;
+    }
+
+    return await pool.query(query, queryParams);
 }
 
 export const PLAN_GENERAL_CONTROLADOR = new PlanGeneralControlador();
