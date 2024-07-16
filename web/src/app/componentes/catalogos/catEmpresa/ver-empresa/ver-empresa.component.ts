@@ -165,6 +165,7 @@ export class VerEmpresaComponent implements OnInit {
   // METODO PARA MOSTRAR LISTA DE SUCURSALES
   ObtenerSucursal() {
     this.datosSucursales = [];
+    this.numero_pagina = 0;
     this.restS.BuscarSucursal().subscribe(data => {
       this.datosSucursales = this.rolEmpleado === 1 ? data : this.FiltrarSucursalesAsignadas(data);
     });

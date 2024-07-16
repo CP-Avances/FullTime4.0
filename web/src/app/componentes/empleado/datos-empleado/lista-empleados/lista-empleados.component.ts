@@ -770,7 +770,7 @@ export class ListaEmpleadosComponent implements OnInit {
     };
   }
 
-  EstadoCivilSelect: any = ['Soltero/a', 'Unión de Hecho', 'Casado/a', 'Divorciado/a', 'Viudo/a'];
+  EstadoCivilSelect: any = ['Soltero/a', 'Casado/a', 'Viudo/a', 'Divorciado/a' , 'Unión de Hecho', ];
   GeneroSelect: any = ['Masculino', 'Femenino'];
   EstadoSelect: any = ['Activo', 'Inactivo'];
   PresentarDataPDFEmpleados(numero: any) {

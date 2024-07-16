@@ -160,6 +160,7 @@ export class ListaSucursalesComponent implements OnInit {
   // METODO PARA BUSCAR SUCURSALES
   ObtenerSucursal() {
     this.sucursales = [];
+    this.numero_pagina = 1;
     this.rest.BuscarSucursal().subscribe(data => {
       this.sucursales = this.rolEmpleado === 1 ? data : this.FiltrarSucursalesAsignadas(data);
     });
@@ -202,6 +203,7 @@ export class ListaSucursalesComponent implements OnInit {
           }
         }
       });
+      this.ObtenerSucursal();
   }
 
   // METODO PARA LIMPIAR FORMULARIO

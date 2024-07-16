@@ -139,6 +139,7 @@ export class ListarFeriadosComponent implements OnInit {
   // LECTURA DE DATOS
   ObtenerFeriados(formato: string) {
     this.feriados = [];
+    this.numero_pagina = 1;
     this.rest.ConsultarFeriado().subscribe(datos => {
       this.feriados = datos;
       this.feriados.forEach((data: any) => {

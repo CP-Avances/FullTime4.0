@@ -149,6 +149,7 @@ export class ListarRelojesComponent implements OnInit {
   // METODO PARA BUSCAR RELOJES
   ObtenerReloj() {
     this.relojes = [];
+    this.numero_pagina = 1;
     this.rest.ConsultarRelojes().subscribe(datos => {
       this.relojes = this.rolEmpleado === 1 ? datos : this.FiltrarRelojesAsignados(datos);
     })
