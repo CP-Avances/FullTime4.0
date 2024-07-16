@@ -128,7 +128,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
   LimpiarCamposPlantilla() {
     this.archivo1Form.reset();
     this.textoBoton = 'Cargar nueva plantilla';
-    this.deshabilitarRegistro = false;
     this.numero_pagina_planificacion = 1;
     this.tamanio_pagina_planificacion = 5;
     if (this.paginator) {
@@ -152,8 +151,9 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
       let itemName = arrayItems[0];
 
       if (itemExtencion === 'xlsx' || itemExtencion === 'xls') {
-        if (itemName.startsWith('plantillaPlanificacionMultiple')) {
+        if (itemName.toLowerCase() == 'plantillaplanificacionmultiple') {
           this.VerificarPlantilla();
+          this.deshabilitarRegistro = false;
         } else {
           this.toastr.error('Solo se acepta plantillaPlanificacionMultiple', 'Plantilla seleccionada incorrecta', {
             timeOut: 6000,
@@ -304,7 +304,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     const filas: any[] = [];
 
     // CREAR LA FILA DE ENCABEZADOS
-    const encabezados = ['USUARIO'];
+    const encabezados = ['EMPLEADO'];
     for (let fecha = new Date(fechaInicio); fecha <= fechaFin; fecha.setDate(fecha.getDate() + 1)) {
       // CONVERTIR FECHA A ESTE FORMATO VIERNES 26/01/2024
       const opciones: Intl.DateTimeFormatOptions = {

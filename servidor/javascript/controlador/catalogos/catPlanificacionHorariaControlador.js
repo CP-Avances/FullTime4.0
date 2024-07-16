@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PLANIFICACION_HORARIA_CONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const settingsMail_1 = require("../../libs/settingsMail");
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const path_1 = __importDefault(require("path"));
 const xlsx_1 = __importDefault(require("xlsx"));
@@ -150,10 +151,10 @@ class PlanificacionHorariaControlador {
                                     tipo_entr_salida: 'E',
                                     tipo_dia: horario.tipo,
                                     salida_otro_dia: horario.entrada.segundo_dia ? 1 : (horario.entrada.tercer_dia ? 2 : 0),
-                                    min_antes: horario.entrada.min_antes,
-                                    min_despues: horario.entrada.min_despues,
+                                    minutos_antes: horario.entrada.minutos_antes,
+                                    minutos_despues: horario.entrada.minutos_despues,
                                     estado_origen: origen,
-                                    min_alimentacion: horario.min_alimentacion
+                                    minutos_alimentacion: horario.minutos_alimentacion
                                 };
                                 if (horario.inicioAlimentacion) {
                                     inicioAlimentacion = {
@@ -167,10 +168,10 @@ class PlanificacionHorariaControlador {
                                         tipo_entr_salida: 'I/A',
                                         tipo_dia: horario.tipo,
                                         salida_otro_dia: horario.inicioAlimentacion.segundo_dia ? 1 : (horario.inicioAlimentacion.tercer_dia ? 2 : 0),
-                                        min_antes: horario.inicioAlimentacion.min_antes,
-                                        min_despues: horario.inicioAlimentacion.min_despues,
+                                        minutos_antes: horario.inicioAlimentacion.minutos_antes,
+                                        minutos_despues: horario.inicioAlimentacion.minutos_despues,
                                         estado_origen: origen,
-                                        min_alimentacion: horario.min_alimentacion
+                                        minutos_alimentacion: horario.minutos_alimentacion
                                     };
                                 }
                                 if (horario.finAlimentacion) {
@@ -185,10 +186,10 @@ class PlanificacionHorariaControlador {
                                         tipo_entr_salida: 'F/A',
                                         tipo_dia: horario.tipo,
                                         salida_otro_dia: horario.finAlimentacion.segundo_dia ? 1 : (horario.finAlimentacion.tercer_dia ? 2 : 0),
-                                        min_antes: horario.finAlimentacion.min_antes,
-                                        min_despues: horario.finAlimentacion.min_despues,
+                                        minutos_antes: horario.finAlimentacion.minutos_antes,
+                                        minutos_despues: horario.finAlimentacion.minutos_despues,
                                         estado_origen: origen,
-                                        min_alimentacion: horario.min_alimentacion
+                                        minutos_alimentacion: horario.minutos_alimentacion
                                     };
                                 }
                                 salida = {
@@ -202,10 +203,10 @@ class PlanificacionHorariaControlador {
                                     tipo_entr_salida: 'S',
                                     tipo_dia: horario.tipo,
                                     salida_otro_dia: horario.salida.segundo_dia ? 1 : (horario.salida.tercer_dia ? 2 : 0),
-                                    min_antes: horario.salida.min_antes,
-                                    min_despues: horario.salida.min_despues,
+                                    minutos_antes: horario.salida.minutos_antes,
+                                    minutos_despues: horario.salida.minutos_despues,
                                     estado_origen: origen,
-                                    min_alimentacion: horario.min_alimentacion
+                                    minutos_alimentacion: horario.minutos_alimentacion
                                 };
                                 planificacion = {
                                     entrada,
@@ -237,10 +238,10 @@ class PlanificacionHorariaControlador {
                                     tipo_entr_salida: 'E',
                                     tipo_dia: horarioDefaultLibre.entrada.default_,
                                     salida_otro_dia: horarioDefaultLibre.entrada.segundo_dia ? 1 : (horarioDefaultLibre.entrada.tercer_dia ? 2 : 0),
-                                    min_antes: horarioDefaultLibre.entrada.min_antes,
-                                    min_despues: horarioDefaultLibre.entrada.min_despues,
+                                    minutos_antes: horarioDefaultLibre.entrada.minutos_antes,
+                                    minutos_despues: horarioDefaultLibre.entrada.minutos_despues,
                                     estado_origen: 'DL',
-                                    min_alimentacion: horarioDefaultLibre.entrada.min_almuerzo
+                                    minutos_alimentacion: horarioDefaultLibre.entrada.minutos_comida
                                 };
                                 salida = {
                                     id_empleado: data.id_empleado,
@@ -253,10 +254,10 @@ class PlanificacionHorariaControlador {
                                     tipo_entr_salida: 'S',
                                     tipo_dia: horarioDefaultLibre.salida.default_,
                                     salida_otro_dia: horarioDefaultLibre.salida.segundo_dia ? 1 : (horarioDefaultLibre.salida.tercer_dia ? 2 : 0),
-                                    min_antes: horarioDefaultLibre.salida.min_antes,
-                                    min_despues: horarioDefaultLibre.salida.min_despues,
+                                    minutos_antes: horarioDefaultLibre.salida.minutos_antes,
+                                    minutos_despues: horarioDefaultLibre.salida.minutos_despues,
                                     estado_origen: 'DL',
-                                    min_alimentacion: horarioDefaultLibre.salida.min_almuerzo
+                                    minutos_alimentacion: horarioDefaultLibre.salida.minutos_comida
                                 };
                                 planificacion = {
                                     entrada,
@@ -288,10 +289,10 @@ class PlanificacionHorariaControlador {
                                     tipo_entr_salida: 'E',
                                     tipo_dia: horarioDefaultFeriado.entrada.default_,
                                     salida_otro_dia: horarioDefaultFeriado.entrada.segundo_dia ? 1 : (horarioDefaultFeriado.entrada.tercer_dia ? 2 : 0),
-                                    min_antes: horarioDefaultFeriado.entrada.min_antes,
-                                    min_despues: horarioDefaultFeriado.entrada.min_despues,
+                                    minutos_antes: horarioDefaultFeriado.entrada.minutos_antes,
+                                    minutos_despues: horarioDefaultFeriado.entrada.minutos_despues,
                                     estado_origen: 'DFD',
-                                    min_alimentacion: horarioDefaultFeriado.entrada.min_almuerzo
+                                    minutos_alimentacion: horarioDefaultFeriado.entrada.minutos_comida
                                 };
                                 salida = {
                                     id_empleado: data.id_empleado,
@@ -304,10 +305,10 @@ class PlanificacionHorariaControlador {
                                     tipo_entr_salida: 'S',
                                     tipo_dia: horarioDefaultFeriado.salida.default_,
                                     salida_otro_dia: horarioDefaultFeriado.salida.segundo_dia ? 1 : (horarioDefaultFeriado.salida.tercer_dia ? 2 : 0),
-                                    min_antes: horarioDefaultFeriado.salida.min_antes,
-                                    min_despues: horarioDefaultFeriado.salida.min_despues,
+                                    minutos_antes: horarioDefaultFeriado.salida.minutos_antes,
+                                    minutos_despues: horarioDefaultFeriado.salida.minutos_despues,
                                     estado_origen: 'DFD',
-                                    min_alimentacion: horarioDefaultFeriado.salida.min_almuerzo
+                                    minutos_alimentacion: horarioDefaultFeriado.salida.minutos_comida
                                 };
                                 planificacion = {
                                     entrada,
@@ -395,7 +396,7 @@ function VerificarHorarios(datos) {
                         dias[dia].horarios[i].dia = dia;
                         dias[dia].horarios[i].hora_trabaja = horarioVerificado[1].hora_trabajo;
                         dias[dia].horarios[i].tipo = horarioVerificado[1].default_;
-                        dias[dia].horarios[i].min_alimentacion = horarioVerificado[1].min_almuerzo;
+                        dias[dia].horarios[i].minutos_alimentacion = horarioVerificado[1].minutos_comida;
                         // SI ES FERIADO Y TIPO DE HORARIO ES LABORABLE AÑADIR OBSERVACION
                         if (esFeriado && dias[dia].horarios[i].tipo === 'N') {
                             dias[dia].horarios[i].observacion = `Horario no valido para día feriado`;
@@ -654,17 +655,24 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
             INSERT INTO eu_asistencia_general (id_empleado, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
                 tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
                 estado_origen, minutos_alimentacion)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
             `, [entrada.id_empleado, entrada.id_empl_cargo, entrada.id_horario, entrada.fec_horario, entrada.fec_hora_horario, entrada.tolerancia,
-                entrada.id_det_horario, entrada.tipo_entr_salida, entrada.tipo_dia, entrada.salida_otro_dia, entrada.min_antes, entrada.min_despues,
-                entrada.estado_origen, entrada.min_alimentacion]);
+                entrada.id_det_horario, entrada.tipo_entr_salida, entrada.tipo_dia, entrada.salida_otro_dia, entrada.minutos_antes, entrada.minutos_despues,
+                entrada.estado_origen, entrada.minutos_alimentacion]);
+            const [datosNuevosEntrada] = registroEntrada.rows;
+            const horaEntrada = yield (0, settingsMail_1.FormatearHora)(entrada.fec_hora_horario.split(' ')[1]);
+            const fechaEntrada = yield (0, settingsMail_1.FormatearFecha2)(entrada.fec_hora_horario, 'ddd');
+            const fechaHoraEntrada = `${fechaEntrada} ${horaEntrada}`;
+            const fechaHorarioEntrada = yield (0, settingsMail_1.FormatearFecha2)(entrada.fec_horario, 'ddd');
+            datosNuevosEntrada.fecha_hora_horario = fechaHoraEntrada;
+            datosNuevosEntrada.fecha_horario = fechaHorarioEntrada;
             // AUDITORIA
             yield auditoriaControlador_1.default.InsertarAuditoria({
                 tabla: 'eu_asistencia_general',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: JSON.stringify(registroEntrada.rows),
+                datosNuevos: JSON.stringify(datosNuevosEntrada),
                 ip,
                 observacion: null
             });
@@ -674,17 +682,24 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
                 INSERT INTO eu_asistencia_general (id_empleado, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
                     tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
                     estado_origen, minutos_alimentacion)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
                 `, [inicioAlimentacion.id_empleado, inicioAlimentacion.id_empl_cargo, inicioAlimentacion.id_horario, inicioAlimentacion.fec_horario, inicioAlimentacion.fec_hora_horario, inicioAlimentacion.tolerancia,
-                    inicioAlimentacion.id_det_horario, inicioAlimentacion.tipo_entr_salida, inicioAlimentacion.tipo_dia, inicioAlimentacion.salida_otro_dia, inicioAlimentacion.min_antes, inicioAlimentacion.min_despues,
-                    inicioAlimentacion.estado_origen, inicioAlimentacion.min_alimentacion]);
+                    inicioAlimentacion.id_det_horario, inicioAlimentacion.tipo_entr_salida, inicioAlimentacion.tipo_dia, inicioAlimentacion.salida_otro_dia, inicioAlimentacion.minutos_antes, inicioAlimentacion.minutos_despues,
+                    inicioAlimentacion.estado_origen, inicioAlimentacion.minutos_alimentacion]);
+                const [datosNuevosInicioAlimentacion] = registroInicioAlimentacion.rows;
+                const horaInicioAlimentacion = yield (0, settingsMail_1.FormatearHora)(inicioAlimentacion.fec_hora_horario.split(' ')[1]);
+                const fechaInicioAlimentacion = yield (0, settingsMail_1.FormatearFecha2)(inicioAlimentacion.fec_hora_horario, 'ddd');
+                const fechaHoraInicioAlimentacion = `${fechaInicioAlimentacion} ${horaInicioAlimentacion}`;
+                const fechaHorarioInicioAlimentacion = yield (0, settingsMail_1.FormatearFecha2)(inicioAlimentacion.fec_horario, 'ddd');
+                datosNuevosInicioAlimentacion.fecha_hora_horario = fechaHoraInicioAlimentacion;
+                datosNuevosInicioAlimentacion.fecha_horario = fechaHorarioInicioAlimentacion;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_asistencia_general',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(registroInicioAlimentacion.rows),
+                    datosNuevos: JSON.stringify(datosNuevosInicioAlimentacion),
                     ip,
                     observacion: null
                 });
@@ -695,17 +710,24 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
                 INSERT INTO eu_asistencia_general (id_empleado, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
                     tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
                     estado_origen, minutos_alimentacion)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
                 `, [finAlimentacion.id_empleado, finAlimentacion.id_empl_cargo, finAlimentacion.id_horario, finAlimentacion.fec_horario, finAlimentacion.fec_hora_horario, finAlimentacion.tolerancia,
-                    finAlimentacion.id_det_horario, finAlimentacion.tipo_entr_salida, finAlimentacion.tipo_dia, finAlimentacion.salida_otro_dia, finAlimentacion.min_antes, finAlimentacion.min_despues,
-                    finAlimentacion.estado_origen, finAlimentacion.min_alimentacion]);
+                    finAlimentacion.id_det_horario, finAlimentacion.tipo_entr_salida, finAlimentacion.tipo_dia, finAlimentacion.salida_otro_dia, finAlimentacion.minutos_antes, finAlimentacion.minutos_despues,
+                    finAlimentacion.estado_origen, finAlimentacion.minutos_alimentacion]);
+                const [datosNuevosFinAlimentacion] = registroFinAlimentacion.rows;
+                const horaFinAlimentacion = yield (0, settingsMail_1.FormatearHora)(finAlimentacion.fec_hora_horario.split(' ')[1]);
+                const fechaFinAlimentacion = yield (0, settingsMail_1.FormatearFecha2)(finAlimentacion.fec_hora_horario, 'ddd');
+                const fechaHoraFinAlimentacion = `${fechaFinAlimentacion} ${horaFinAlimentacion}`;
+                const fechaHorarioFinAlimentacion = yield (0, settingsMail_1.FormatearFecha2)(finAlimentacion.fec_horario, 'ddd');
+                datosNuevosFinAlimentacion.fecha_hora_horario = fechaHoraFinAlimentacion;
+                datosNuevosFinAlimentacion.fecha_horario = fechaHorarioFinAlimentacion;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'eu_asistencia_general',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: JSON.stringify(registroFinAlimentacion.rows),
+                    datosNuevos: JSON.stringify(datosNuevosFinAlimentacion),
                     ip,
                     observacion: null
                 });
@@ -715,17 +737,24 @@ function CrearPlanificacionHoraria(planificacionHoraria, datosUsuario) {
             INSERT INTO eu_asistencia_general (id_empleado, id_empleado_cargo, id_horario, fecha_horario, fecha_hora_horario, 
                 tolerancia, id_detalle_horario, tipo_accion, tipo_dia, salida_otro_dia, minutos_antes, minutos_despues, 
                 estado_origen, minutos_alimentacion)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
             `, [salida.id_empleado, salida.id_empl_cargo, salida.id_horario, salida.fec_horario, salida.fec_hora_horario, salida.tolerancia,
-                salida.id_det_horario, salida.tipo_entr_salida, salida.tipo_dia, salida.salida_otro_dia, salida.min_antes, salida.min_despues,
-                salida.estado_origen, salida.min_alimentacion]);
+                salida.id_det_horario, salida.tipo_entr_salida, salida.tipo_dia, salida.salida_otro_dia, salida.minutos_antes, salida.minutos_despues,
+                salida.estado_origen, salida.minutos_alimentacion]);
+            const [datosNuevosSalida] = registroSalida.rows;
+            const horaSalida = yield (0, settingsMail_1.FormatearHora)(salida.fec_hora_horario.split(' ')[1]);
+            const fechaSalida = yield (0, settingsMail_1.FormatearFecha2)(salida.fec_hora_horario, 'ddd');
+            const fechaHoraSalida = `${fechaSalida} ${horaSalida}`;
+            const fechaHorarioSalida = yield (0, settingsMail_1.FormatearFecha2)(salida.fec_horario, 'ddd');
+            datosNuevosSalida.fecha_hora_horario = fechaHoraSalida;
+            datosNuevosSalida.fecha_horario = fechaHorarioSalida;
             // AUDITORIA
             yield auditoriaControlador_1.default.InsertarAuditoria({
                 tabla: 'eu_asistencia_general',
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: JSON.stringify(registroSalida.rows),
+                datosNuevos: JSON.stringify(datosNuevosSalida),
                 ip,
                 observacion: null
             });
