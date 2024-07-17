@@ -179,6 +179,7 @@ export class EditarEmpleadoComponent implements OnInit {
         timeOut: 6000,
       });
       this.router.navigate(['/codigo/']);
+      this.Cancelar();
     });
   }
 
