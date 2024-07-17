@@ -169,6 +169,11 @@ export class UsuarioService {
     return this.http.request('delete', url, httpOptions);
   }
 
+  // METODO PARA REGISTRAR MULTIPLES USUARIOS - DEPARTAMENTOS
+  RegistrarUsuarioDepartamentoMultiple(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/usuario-departamento/multiple`, data);
+  }
+
   //OBTENER TEXTO ENCRIPTADO
   getTextoEncriptado(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/datos-usuario`, data)

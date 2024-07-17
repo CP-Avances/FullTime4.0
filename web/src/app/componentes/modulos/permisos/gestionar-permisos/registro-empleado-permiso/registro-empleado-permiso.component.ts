@@ -557,7 +557,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
           fec_final: fecha_final,
           hora_inicio: hora_inicio_,
           hora_final: hora_final_,
-          codigo: this.empleado.codigo
+          id_empleado: this.empleado.id
         }
         console.log('ver data ', solicitud)
         this.restP.BuscarPermisosSolicitadosHoras(solicitud).subscribe(solicitados => {
@@ -988,7 +988,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       fec_final: fecha_final,
       hora_inicio: form.horaSalidaForm,
       hora_final: form.horasIngresoForm,
-      codigo: this.empleado.codigo
+      id_empleado: this.empleado.id
     }
     this.restP.BuscarPermisosSolicitadosHoras(solicitud).subscribe(solicitados => {
       if (solicitados.message != 'error') {
@@ -1259,7 +1259,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
     let datos = {
       lista_fechas: this.fechasHorario,
-      codigo: this.empleado.codigo
+      id_empleado: this.empleado.id
     }
 
     this.planificar.BuscarHorarioFechas(datos).subscribe(data => {
@@ -1275,7 +1275,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
         let solicitud = {
           fec_inicio: inicio,
           fec_final: final,
-          codigo: this.empleado.codigo
+          id_empleado: this.empleado.id
         }
 
         this.restP.BuscarPermisosSolicitadosTotales(solicitud).subscribe(solicitados => {
@@ -1327,7 +1327,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
     let solicitud = {
       fec_inicio: inicio,
       fec_final: final,
-      codigo: this.empleado.codigo
+      id_empleado: this.empleado.id
     }
     this.restP.BuscarPermisosSolicitadosDias(solicitud).subscribe(solicitados => {
       // EXISTEN REGISTROS DE PERMISOS POR DIAS
@@ -1469,7 +1469,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       fec_inicio: form.fechaInicioForm,
       fec_final: form.fechaFinalForm,
       dia_libre: form.diaLibreForm,
-      codigo: this.empleado.codigo,
+      id_empleado: this.empleado.id,
       estado: 1,
       dia: parseInt(form.diasForm),
       user_name: this.user_name,

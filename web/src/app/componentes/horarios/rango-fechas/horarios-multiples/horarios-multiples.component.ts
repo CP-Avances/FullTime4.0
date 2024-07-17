@@ -345,7 +345,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
     this.datos.map((dh: any) => {
       // METODO PARA BUSCAR DATOS DUPLICADOS DE HORARIOS
-      this.rest.VerificarDuplicidadHorarios(dh.codigo, fechas).subscribe(response => {
+      this.rest.VerificarDuplicidadHorarios(dh.id, fechas).subscribe(response => {
         this.contador = this.contador + 1;
 
         dh.observacion = 'En las fechas ingresadas ya existe una planificación horaria.'
@@ -445,7 +445,7 @@ export class HorariosMultiplesComponent implements OnInit {
     this.cont3 = 0;
 
     correctos.map((dh: any) => {
-      //--console.log('dh ************************* ', dh)
+      //console.log('dh ************************* ', dh)
       // METODO PARA LECTURA DE HORARIOS DE EMPLEADO
       this.horariosEmpleado = [];
       let fechas = {
@@ -453,7 +453,7 @@ export class HorariosMultiplesComponent implements OnInit {
         fechaFinal: form.fechaFinalForm,
       };
 
-      this.rest.VerificarHorariosExistentes(dh.codigo, fechas).subscribe(existe => {
+      this.rest.VerificarHorariosExistentes(dh.id, fechas).subscribe(existe => {
         //console.log('existe ', existe)
         this.suma = '00:00:00';
         this.sumHoras = '00:00:00';
@@ -851,7 +851,7 @@ export class HorariosMultiplesComponent implements OnInit {
       }
       // EN HORARIOS DE DESCANSO SE ELIMINA LOS REGISTROS PARA ACTUALIZARLOS
       else if (tipo_dia === 'DFD') {
-        this.rest.VerificarHorariosExistentes(dh.codigo, fechas).subscribe(existe => {
+        this.rest.VerificarHorariosExistentes(dh.id, fechas).subscribe(existe => {
           //console.log('ver existe ----------------------------- ', existe)
           this.EliminarRegistrosH(existe, obj, dh);
         });
@@ -865,7 +865,7 @@ export class HorariosMultiplesComponent implements OnInit {
         })
       }
       else if (tipo_dia === 'L' && origen === 'L') {
-        this.rest.VerificarHorariosExistentes(dh.codigo, fechas).subscribe(existe => {
+        this.rest.VerificarHorariosExistentes(dh.id, fechas).subscribe(existe => {
           //console.log('ver existe ----------------------------- ', existe)
           this.EliminarRegistrosH(existe, obj, dh);
         });
@@ -896,7 +896,7 @@ export class HorariosMultiplesComponent implements OnInit {
       //console.log(' ver valor h ..... ', h)
       if (h.default_ === 'N' || h.default_ === 'DHA' || h.default_ === 'L' || h.default_ === 'FD') {
         let plan_fecha = {
-          codigo: dh.codigo,
+          id_empleado: dh.id,
           fec_final: obj,
           fec_inicio: obj,
           id_horario: h.id_horario,
@@ -955,7 +955,7 @@ export class HorariosMultiplesComponent implements OnInit {
         }
 
         let plan = {
-          codigo: dh.codigo,
+          id_empleado: dh.id,
           tipo_dia: tipo_dia,
           min_antes: element.minutos_antes,
           tolerancia: accion,
@@ -1012,7 +1012,7 @@ export class HorariosMultiplesComponent implements OnInit {
     this.usuarios_validos.forEach((obj: any) => {
       this.eliminar_horarios.forEach((eh: any) => {
         let plan_fecha = {
-          codigo: obj.codigo,
+          id_empleado: obj.id,
           fec_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
           fec_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
           id_horario: eh.id,
@@ -1258,7 +1258,7 @@ export class HorariosMultiplesComponent implements OnInit {
     datos.forEach((obj: any) => {
       obj.eliminar.forEach((eh: any) => {
         let plan_fecha = {
-          codigo: obj.codigo,
+          id_empleado: obj.id,
           fec_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
           fec_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
           id_horario: eh.id,
@@ -1359,7 +1359,7 @@ export class HorariosMultiplesComponent implements OnInit {
     datos.forEach((d: any) => {
       //console.log('datos d ----------------------------- ', d)
       //console.log('datos d ----------------------------- ', fechas)
-      this.rest.VerificarHorariosExistentes(d.codigo, fechas).subscribe(existe => {
+      this.rest.VerificarHorariosExistentes(d.id, fechas).subscribe(existe => {
         contador = contador + 1;
         //console.log('ver existe ----------------------------- ', existe)
         d.horarios_existentes = existe;

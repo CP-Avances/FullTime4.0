@@ -1184,14 +1184,14 @@ class UsuarioControlador {
     /** ******************************************************************************************** **
      ** **            METODO PARA MANEJAR DATOS DE REGISTRO DE DISPOSITIVOS MOVILES               ** **
      ** ******************************************************************************************** **/
-    // LISTADO DE DISPOSITIVOS REGISTRADOS POR EL CODIGO DE USUARIO
+    // LISTADO DE DISPOSITIVOS REGISTRADOS POR EL ID DE USUARIO
     ListarDispositivosMoviles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const DISPOSITIVOS = yield database_1.default.query(`
         SELECT e.codigo, (e.nombre || \' \' || e.apellido) AS nombre, e.cedula, d.id_dispositivo, d.modelo_dispositivo
         FROM mrv_dispositivos AS d 
-        INNER JOIN eu_empleados AS e ON d.codigo_empleado = e.codigo
+        INNER JOIN eu_empleados AS e ON d.id_empleado = e.id
         ORDER BY nombre
         `).then((result) => { return result.rows; });
                 if (DISPOSITIVOS.length === 0)
@@ -1593,7 +1593,6 @@ class UsuarioControlador {
             }
         });
     }
-    //METODO PARA OBTENER TEXTO ENCRIPTADO
     ObtenerDatoEncriptado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -1605,6 +1604,151 @@ class UsuarioControlador {
             }
         });
     }
+    // METODO PARA REGISTRAR MULTIPLES ASIGNACIONES DE USUARIO - DEPARTAMENTO
+    RegistrarUsuarioDepartamentoMultiple(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { usuarios_seleccionados, departamentos_seleccionados, isPersonal, user_name, ip } = req.body;
+            let error = false;
+            for (const usuario of usuarios_seleccionados) {
+                let datos = {
+                    id: '',
+                    id_empleado: usuario.id,
+                    id_departamento: '',
+                    principal: false,
+                    personal: false,
+                    administra: false,
+                    user_name: user_name,
+                    ip: ip,
+                };
+                if (isPersonal) {
+                    datos.id_departamento = usuario.id_departamento;
+                    const verificacion = yield VerificarAsignaciones(datos, true, isPersonal);
+                    if (verificacion === 2) {
+                        error = yield EditarUsuarioDepartamento(datos);
+                    }
+                }
+                for (const departamento of departamentos_seleccionados) {
+                    datos.id_departamento = departamento.id;
+                    datos.administra = true;
+                    datos.principal = false;
+                    datos.personal = false;
+                    const verificacion = yield VerificarAsignaciones(datos, false, isPersonal);
+                    switch (verificacion) {
+                        case 1:
+                            // INSERTAR NUEVA ASIGNACIÓN
+                            error = yield RegistrarUsuarioDepartamento(datos);
+                            break;
+                        case 2:
+                            // ACTUALIZAR ASIGNACIÓN EXISTENTE
+                            error = yield EditarUsuarioDepartamento(datos);
+                            break;
+                    }
+                }
+            }
+            if (error)
+                return res.status(500).jsonp({ message: 'error' });
+            return res.json({ message: 'Proceso completado' });
+        });
+    }
+}
+/* @return
+    CASOS DE RETORNO
+    0: USUARIO NO EXISTE => NO SE EJECUTA NINGUNA ACCION
+    1: NO EXISTE LA ASIGNACION => SE PUEDE ASIGNAR (INSERTAR)
+    2: EXISTE LA ASIGNACION Y ES PRINCIPAL => SE ACTUALIZA LA ASIGNACION (PRINCIPAL)
+    3: EXISTE LA ASIGNACION Y NO ES PRINCIPAL => NO SE EJECUTA NINGUNA ACCION  */ function VerificarAsignaciones(datos, personal, isPersonal) {
+    return __awaiter(this, void 0, void 0, function* () { const { id_empleado, id_departamento } = datos; const consulta = yield database_1.default.query(`      SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 AND id_departamento = $2      `, [id_empleado, id_departamento]); if (consulta.rowCount === 0)
+        return 1; const asignacion = consulta.rows[0]; if (asignacion.principal) {
+        datos.principal = true;
+        datos.id = asignacion.id;
+        datos.personal = asignacion.personal;
+        if (isPersonal) {
+            datos.personal = true;
+        }
+        if (personal) {
+            datos.administra = asignacion.administra;
+        }
+        return 2;
+    } return 3; });
+}
+function RegistrarUsuarioDepartamento(datos) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = datos;
+            // INICIA TRANSACCION
+            yield database_1.default.query('BEGIN');
+            const registro = yield database_1.default.query(`
+      INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
+      VALUES ($1, $2, $3, $4, $5) RETURNING *
+      `, [id_empleado, id_departamento, principal, personal, administra]);
+            const [datosNuevos] = registro.rows;
+            // AUDITORIA
+            yield auditoriaControlador_1.default.InsertarAuditoria({
+                tabla: 'eu_usuario_departamento',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(datosNuevos),
+                ip,
+                observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            yield database_1.default.query('COMMIT');
+            return false;
+        }
+        catch (error) {
+            return true;
+        }
+    });
+}
+function EditarUsuarioDepartamento(datos) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = datos;
+            // INICIAR TRANSACCION
+            yield database_1.default.query('BEGIN');
+            // CONSULTA DATOSORIGINALES
+            const consulta = yield database_1.default.query(`
+      SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 AND id_departamento = $2
+      `, [id_empleado, id_departamento]);
+            const [datosOriginales] = consulta.rows;
+            if (!datosOriginales) {
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_usuario_departamento',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar registro con id_empleado: ${id_empleado} y id_departamento: ${id_departamento}. Registro no encontrado.`
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return true;
+            }
+            const actualizacion = yield database_1.default.query(`
+      UPDATE eu_usuario_departamento SET principal = $3, personal = $4, administra = $5
+      WHERE id_empleado = $1 AND id_departamento = $2 RETURNING *
+      `, [id_empleado, id_departamento, principal, personal, administra]);
+            const [datosNuevos] = actualizacion.rows;
+            // AUDITORIA
+            yield auditoriaControlador_1.default.InsertarAuditoria({
+                tabla: 'eu_usuario_departamento',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: JSON.stringify(datosNuevos),
+                ip,
+                observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            yield database_1.default.query('COMMIT');
+            return false;
+        }
+        catch (error) {
+            return true;
+        }
+    });
 }
 exports.USUARIO_CONTROLADOR = new UsuarioControlador();
 exports.default = exports.USUARIO_CONTROLADOR;

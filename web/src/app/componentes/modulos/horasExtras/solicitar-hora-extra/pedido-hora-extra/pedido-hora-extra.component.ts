@@ -242,7 +242,6 @@ export class PedidoHoraExtraComponent implements OnInit {
       observacion: false,
       tipo_funcion: 0,
       depa_user_loggin: parseInt(localStorage.getItem('departamento') as string),
-      codigo: this.empleados[0].codigo,
       user_name: this.user_name,
       ip: this.ip,
     }
@@ -250,12 +249,12 @@ export class PedidoHoraExtraComponent implements OnInit {
   }
 
   // METODO PARA VALIDAR EL INGRESO DE LETRAS
-  IngresarSoloLetras(e) {
+  IngresarSoloLetras(e: any) {
     return this.validar.IngresarSoloLetras(e)
   }
 
   // METODO PARA VALIDAR EL INGRESO DE NÚMEROS
-  IngresarSoloNumeros(evt) {
+  IngresarSoloNumeros(evt: any) {
     return this.validar.IngresarSoloNumeros(evt)
   }
 

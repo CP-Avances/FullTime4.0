@@ -88,13 +88,19 @@ class ModalidaLaboralControlador {
         try {
             const { id, modalidad, user_name, ip } = req.body;
             const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
+
             const modalExiste = await pool.query(
                 `
-                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1 AND NOT id = $2
                 `
-                , [modali.toUpperCase()]);
+                , [modali.toUpperCase(), id]);
 
-            const consulta = await pool.query('SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1', [id]);
+            const consulta = await pool.query(
+                `
+                SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1
+                `
+                , [id]);
+
             const [datosOriginales] = consulta.rows;
             if (!datosOriginales) {
                 await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -115,7 +121,9 @@ class ModalidaLaboralControlador {
 
             if (modalExiste.rows[0] != undefined && modalExiste.rows[0].descripcion != '' && modalExiste.rows[0].descripcion != null) {
                 return res.status(200).jsonp({ message: 'Modalidad Laboral ya esiste en el sistema.', status: '300' })
-            } else {
+
+            }
+            else {
                 // INICIAR TRANSACCION
                 await pool.query('BEGIN');
 
@@ -347,13 +355,11 @@ class ModalidaLaboralControlador {
 
     // REGISTRAR PLANTILLA MODALIDAD_LABORAL
     public async CargarPlantilla(req: Request, res: Response) {
-        try {
-            const { plantilla, user_name, ip } = req.body;
+        const { plantilla, user_name, ip } = req.body;
+        let error: boolean = false;
 
-            var contador = 1;
-            var respuesta: any
-
-            plantilla.forEach(async (data: any) => {
+        for ( const data of plantilla ) {
+            try {
                 // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                 const { modalida_laboral } = data;
                 const modalidad = modalida_laboral.charAt(0).toUpperCase() + modalida_laboral.slice(1).toLowerCase();
@@ -383,22 +389,19 @@ class ModalidaLaboralControlador {
 
                 // FINALIZAR TRANSACCION
                 await pool.query('COMMIT');
-
-                if (contador === plantilla.length) {
-                    if (modalidad_la) {
-                        return respuesta = res.status(200).jsonp({ message: 'ok' });
-                    } else {
-                        return respuesta = res.status(404).jsonp({ message: 'error' });
-                    }
-                }
-                contador = contador + 1;
-            });
-
-        } catch (error) {
-            // ROLLBACK SI HAY ERROR
-            await pool.query('ROLLBACK');
-            return res.status(500).jsonp({ message: error });
+                
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                error = true;
+            }
         }
+        
+        if (error) {
+            return res.status(500).jsonp({ message: 'error' });
+        }
+    
+        return res.status(200).jsonp({ message: 'ok' });
     }
 
 }

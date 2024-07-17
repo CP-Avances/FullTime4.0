@@ -1,5 +1,5 @@
 // IMPORTACION DE LIBRERIAS
-import { firstValueFrom, forkJoin, map } from 'rxjs';
+import { firstValueFrom, forkJoin, map, Observable } from 'rxjs';
 import { Validators, FormControl } from '@angular/forms';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit } from '@angular/core';
@@ -79,6 +79,7 @@ export class ListaEmpleadosComponent implements OnInit {
   numero_paginaMul: number = 1;
 
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
 
   // VARAIBLES DE SELECCION DE DATOS DE UNA TABLA
   selectionUno = new SelectionModel<EmpleadoElemento>(true, []);
@@ -117,6 +118,8 @@ export class ListaEmpleadosComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
+
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
 
     this.GetEmpleados();
@@ -352,26 +355,43 @@ export class ListaEmpleadosComponent implements OnInit {
 
   // METODO PARA LISTAR USUARIOS
   async GetEmpleados() {
-    const res: any = await firstValueFrom(this.datosGenerales.ListarIdInformacionActual());
-    const idsEmpleadosActuales = new Set(res.map((empleado: any) => empleado.id));
-    //console.log('idsEmpleadosActuales', idsEmpleadosActuales);
-    const empleadosActivos$ = this.rest.ListarEmpleadosActivos().pipe(
-      map((data: any) => data.filter((empleado: any) =>
-        this.idUsuariosAcceso.has(empleado.id) || !idsEmpleadosActuales.has(empleado.id)
-      ))
-    );
-    const empleadosDesactivados$ = this.rest.ListaEmpleadosDesactivados().pipe(
-      map((data: any) => data.filter((empleado: any) =>
-        this.idUsuariosAcceso.has(empleado.id) || !idsEmpleadosActuales.has(empleado.id)
-      ))
-    );
+    let empleadosActivos$ = this.rest.ListarEmpleadosActivos();
+    let empleadosDesactivados$ = this.rest.ListaEmpleadosDesactivados();
+
+    if (this.rolEmpleado !== 1) {
+      const idsEmpleadosActuales = await this.ObtenerIdsEmpleadosActuales();
+      empleadosActivos$ = this.FiltrarEmpleados(empleadosActivos$, idsEmpleadosActuales);
+      empleadosDesactivados$ = this.FiltrarEmpleados(empleadosDesactivados$, idsEmpleadosActuales);
+    }
+
     forkJoin([empleadosActivos$, empleadosDesactivados$]).subscribe(([empleados, desactivados]) => {
-      this.empleado = empleados;
-      this.OrdenarDatos(this.empleado);
-      this.desactivados = desactivados;
-      this.OrdenarDatos(this.desactivados);
-      this.mostarTabla = true;
+      this.ProcesarEmpleados(empleados, desactivados);
     });
+  }
+
+  async ObtenerIdsEmpleadosActuales(): Promise<Set<unknown>> {
+    try {
+      const res: any = await firstValueFrom(this.datosGenerales.ListarIdInformacionActual());
+      return new Set(res.map((empleado: any) => empleado.id));
+    } catch (error) {
+      return new Set();
+    }
+  }
+
+  FiltrarEmpleados(empleados$: Observable<any>, idsEmpleadosActuales: Set<unknown>): Observable<any> {
+    return empleados$.pipe(
+      map((data: any) => data.filter((empleado: any) =>
+        this.idUsuariosAcceso.has(empleado.id) || !idsEmpleadosActuales.has(empleado.id)
+      ))
+    );
+  }
+
+  ProcesarEmpleados(empleados: any, desactivados: any) {
+    this.empleado = empleados;
+    this.OrdenarDatos(this.empleado);
+    this.desactivados = desactivados;
+    this.OrdenarDatos(this.desactivados);
+    this.mostarTabla = true;
   }
 
   // ORDENAR LOS DATOS SEGUN EL CODIGO
@@ -488,6 +508,16 @@ export class ListaEmpleadosComponent implements OnInit {
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
 
+      this.DataEmpleados.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -526,6 +556,17 @@ export class ListaEmpleadosComponent implements OnInit {
       //console.log('plantilla manual', res);
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
+
+      this.DataEmpleados.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
@@ -555,7 +596,7 @@ export class ListaEmpleadosComponent implements OnInit {
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
-    console.log('this.listUsuariosCorrectas: ', this.listUsuariosCorrectas.length);
+    console.log('this.listUsuariosCorrectas: ', this.listUsuariosCorrectas);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -613,7 +654,7 @@ export class ListaEmpleadosComponent implements OnInit {
     }
     else if ((arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Cédula ya' ||
       (arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Usuario ya' ||
-      (arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Codigo ya') {
+      (arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Código ya') {
       return 'rgb(239, 203, 106)';
     }
     else if (arrayObservacion[0] == 'Cédula' || arrayObservacion[0] == 'Usuario') {
@@ -729,7 +770,7 @@ export class ListaEmpleadosComponent implements OnInit {
     };
   }
 
-  EstadoCivilSelect: any = ['Soltero/a', 'Unión de Hecho', 'Casado/a', 'Divorciado/a', 'Viudo/a'];
+  EstadoCivilSelect: any = ['Soltero/a', 'Casado/a', 'Viudo/a', 'Divorciado/a' , 'Unión de Hecho', ];
   GeneroSelect: any = ['Masculino', 'Femenino'];
   EstadoSelect: any = ['Activo', 'Inactivo'];
   PresentarDataPDFEmpleados(numero: any) {

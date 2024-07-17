@@ -25,6 +25,8 @@ export class TimbreAdminComponent implements OnInit {
   datosEmpleado: any = [];
 
   idEmpleadoLogueado: any;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+
   idUsuariosAcceso: Set<any> = new Set();
 
   // DATOS DEL FORMULARIO DE BUSQUEDA
@@ -63,6 +65,8 @@ export class TimbreAdminComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
+
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
 
     this.VerDatosEmpleado();
@@ -104,7 +108,7 @@ export class TimbreAdminComponent implements OnInit {
   VerDatosEmpleado() {
     this.datosEmpleado = [];
     this.restD.ListarInformacionActual().subscribe(data => {
-      this.datosEmpleado = this.FiltrarEmpleadosAsignados(data);
+      this.datosEmpleado = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
     });
   }
 

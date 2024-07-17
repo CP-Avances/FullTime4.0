@@ -69,6 +69,8 @@ export class VerParametroComponent implements OnInit {
   kardex: boolean = false;
   // PARAMETRO FORMATO LABORAL - CALENDARIO
   laboral_calendario: boolean = false;
+  // PARAMETRO FORMATO CONECTIVIDAD A INTERNET
+  conectividad_internet: boolean = false;
   // PARAMETRO LIMITE CORREO
   limite_correo: boolean = false;
 
@@ -156,8 +158,13 @@ export class VerParametroComponent implements OnInit {
     if (this.idParametro === '12') {
       this.laboral_calendario = true;
     }
-    // LIMITE CORREO
+    // FORMATO CONECTIVIDAD INTERNET
     if (this.idParametro === '13') {
+      this.conectividad_internet = true;
+      this.ver_formulario = true;
+    }
+    // LIMITE CORREO
+    if (this.idParametro === '33') {
       this.ver_editar = true;
       this.ver_detalles = true;
       this.limite_correo = true;
@@ -227,7 +234,8 @@ export class VerParametroComponent implements OnInit {
       }
 
       // PARAMETROS CON DETALLES
-      if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8' || this.idParametro === '9') {
+      if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8' || this.idParametro === '9' ||
+        this.idParametro === '13') {
         this.VerConfiguracionRegistro();
       }
     }, vacio => {

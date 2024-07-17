@@ -1,9 +1,10 @@
 .btn {
+  background-color: rgb(80, 87, 97);
   color: white;
-  height: 64px;
 }
 
-#descargar, #cargar, #registrar {
+#descargar, #registrar {
+  background-color: #93a3c7;
   margin-top: 15px;
   padding-bottom: 6px;
   border-radius: 5px;
@@ -14,33 +15,39 @@
   overflow: hidden;
   height: 65px;
   width: 220px;
-}
-
-
-#descargar {
-  background-color: #93a3c7;
-  color: white;
+  cursor: pointer;
 }
 
 #descargar:hover {
   background-color: rgb(0, 76, 255);
-}
-
-#cargar {
-  background-color: rgb(150, 243, 141);
-}
-
-#cargar:hover {
-  background-color: rgb(21, 130, 1);
-}
-
-#registrar {
-  background-color: #868b98;
-  margin-bottom: 10px;
+  font-weight: bold;
 }
 
 #registrar:hover {
-  background-color: rgb(80, 87, 97);
+  background-color: rgb(0, 76, 255);
+  font-weight: bold;
+}
+
+#cargar {
+  margin-top: 15px;
+  padding-bottom: 6px;
+  border-radius: 5px;
+  font-family: "Poppins", sans-serif;
+  font-weight: bold;
+  padding-top: 10px;
+  font-size: 14px;
+  overflow: hidden;
+  height: 65px;
+  width: 220px;
+  cursor: pointer;
+}
+
+#cargar {
+  background-color: rgb(79, 145, 73);
+}
+
+#cargar:hover {
+  background-color: rgb(19, 111, 2);
 }
 
 

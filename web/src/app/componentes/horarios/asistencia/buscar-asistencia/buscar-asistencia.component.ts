@@ -33,6 +33,8 @@ export class BuscarAsistenciaComponent implements OnInit {
   pageSizeOptions = [5, 10, 20, 50];
 
   idEmpleadoLogueado: any;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+
   idUsuariosAcceso: Set<any> = new Set();
 
   existenAsistencias: boolean = false;
@@ -57,6 +59,7 @@ export class BuscarAsistenciaComponent implements OnInit {
   ngOnInit(): void {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.BuscarFecha();
     this.BuscarHora();
@@ -107,7 +110,16 @@ export class BuscarAsistenciaComponent implements OnInit {
       inicio: form.fechaInicioForm,
       fin: form.fechaFinForm,
     }
+
+
+    if (!datos.codigo && !datos.cedula && !datos.nombre && !datos.apellido) {
+      return this.toastr.warning('Debe ingresar al menos un criterio de búsqueda.', 'Notificación', {
+        timeOut: 6000,
+      });
+    }
+
     this.asistir.ConsultarAsistencia(datos).subscribe(async data => {
+      console.log('ver asistencia ', data)
 
       if (data.message === 'OK') {
 
@@ -115,7 +127,7 @@ export class BuscarAsistenciaComponent implements OnInit {
           this.existenAsistencias = true;
         }
 
-        this.asistencia = await this.FiltrarEmpleadosAsignados(data.respuesta);
+        this.asistencia = this. rolEmpleado === 1 ? data.respuesta : await this.FiltrarEmpleadosAsignados(data.respuesta);
 
         if (this.asistencia.length === 0 && this.existenAsistencias) {
           return this.toastr.error('No tiene acceso a los datos de este usuario.', 'Notificación', {

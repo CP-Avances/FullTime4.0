@@ -129,11 +129,11 @@ export class CatTipoCargosComponent {
     }, error => {
       //console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       if (error.status == 400 || error.status == 404) {
-        this.toastr.info('Registro vacio', 'Cargos', {
+        this.toastr.info('No se han encontrado registros.', '', {
           timeOut: 3500,
         });
       } else {
-        this.toastr.error('Error al cargar los datos', 'Cargos', {
+        this.toastr.error('Error al cargar los datos.', 'Ups!!! algo salio mal.', {
           timeOut: 3500,
         });
       }
@@ -224,7 +224,7 @@ export class CatTipoCargosComponent {
   nameFile: string;
   archivoSubido: Array<File>;
   mostrarbtnsubir: boolean = false;
-  // METODO PARA SELECCIONAR PLANTILLA DE DATOS 
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS
   FileChange(element: any) {
     this.archivoSubido = [];
     this.nameFile = '';
@@ -273,7 +273,16 @@ export class CatTipoCargosComponent {
     this._TipoCargos.RevisarFormato(formData).subscribe(res => {
       this.Datos_tipo_cargos = res.data;
       this.messajeExcel = res.message;
-      //console.log('probando plantilla tipo cargos', this.Datos_tipo_cargos);
+
+      this.Datos_tipo_cargos.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -350,14 +359,20 @@ export class CatTipoCargosComponent {
         user_name: this.user_name,
         ip: this.ip,
       }
-      this._TipoCargos.SubirArchivoExcel(data).subscribe(response => {
-        //console.log('respuesta: ', response);
-        this.toastr.success('Operación exitosa.', 'Plantilla de Tipo Cargos importada.', {
-          timeOut: 3000,
-        });
-        this.LimpiarCampos();
-        this.archivoForm.reset();
-        this.nameFile = '';
+      this._TipoCargos.SubirArchivoExcel(data).subscribe({
+        next: (response) => {
+          this.toastr.success('Plantilla de Tipo Cargos importada.', 'Operación exitosa.', {
+            timeOut: 3000,
+          });
+          this.LimpiarCampos();
+          this.archivoForm.reset();
+          this.nameFile = '';
+        },
+        error: (error) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 3500,
+          });
+        }
       });
     } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {

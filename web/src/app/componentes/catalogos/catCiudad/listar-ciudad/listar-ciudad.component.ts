@@ -118,6 +118,7 @@ export class ListarCiudadComponent implements OnInit {
   // METODO PARA LISTAR CIUDADES
   ListarCiudades() {
     this.datosCiudades = [];
+    this.numero_pagina = 1;
     this.rest.ListarNombreCiudadProvincia().subscribe(datos => {
       this.datosCiudades = datos;
       //console.log('ciudades ', this.datosCiudades)

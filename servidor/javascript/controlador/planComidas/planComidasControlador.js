@@ -511,14 +511,14 @@ class PlanComidasControlador {
     CrearComidaAprobada(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { codigo, id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
+                const { id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-        INSERT INTO ma_empleado_plan_comida_general (codigo, id_empleado, id_solicitud_comida, fecha,
+        INSERT INTO ma_empleado_plan_comida_general (id_empleado, id_solicitud_comida, fecha,
           hora_inicio, hora_fin, consumido) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-        `, [codigo, id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido]);
+        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
+        `, [id_empleado, id_sol_comida, fecha, hora_inicio, hora_fin, consumido]);
                 const [objetoAlimento] = response.rows;
                 var fechaN = yield (0, settingsMail_1.FormatearFecha2)(fecha, 'ddd');
                 var horaInicio = yield (0, settingsMail_1.FormatearHora)(hora_inicio);
@@ -529,7 +529,7 @@ class PlanComidasControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{codigo: ${codigo}, id_empleado: ${id_empleado}, id_detalle_plan: null, id_solicitud_comida: ${id_sol_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
+                    datosNuevos: `id_empleado: ${id_empleado}, id_detalle_plan: null, id_solicitud_comida: ${id_sol_comida}, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
                     ip,
                     observacion: null
                 });
@@ -742,14 +742,14 @@ class PlanComidasControlador {
     CrearPlanEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { codigo, id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
+                const { id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 const response = yield database_1.default.query(`
-        INSERT INTO ma_empleado_plan_comida_general (codigo, id_empleado, id_detalle_plan, fecha, 
+        INSERT INTO ma_empleado_plan_comida_general (id_empleado, id_detalle_plan, fecha, 
           hora_inicio, hora_fin, consumido) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-        `, [codigo, id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido]);
+        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
+        `, [id_empleado, id_plan_comida, fecha, hora_inicio, hora_fin, consumido]);
                 const [planAlimentacion] = response.rows;
                 var fechaN = yield (0, settingsMail_1.FormatearFecha2)(fecha, 'ddd');
                 var horaInicio = yield (0, settingsMail_1.FormatearHora)(hora_inicio);
@@ -760,7 +760,7 @@ class PlanComidasControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{codigo: ${codigo}, id_empleado: ${id_empleado}, id_detalle_plan: ${id_plan_comida}, id_solicitud_comida: null, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
+                    datosNuevos: `id_empleado: ${id_empleado}, id_detalle_plan: ${id_plan_comida}, id_solicitud_comida: null, fecha: ${fechaN}, hora_inicio: ${horaInicio}, hora_fin: ${horaFin}, ticket: null, consumido: ${consumido}}`,
                     ip,
                     observacion: null
                 });

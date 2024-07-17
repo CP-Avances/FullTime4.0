@@ -11,7 +11,7 @@ class SolicitudVacacionesControlador {
         let n: Array<any> = await Promise.all(datos.map(async (obj: ReporteVacacion) => {
             obj.departamentos = await Promise.all(obj.departamentos.map(async (ele) => {
                 ele.empleado = await Promise.all(ele.empleado.map(async (o) => {
-                    o.vacaciones = await BuscarVacaciones(o.codigo, desde, hasta);
+                    o.vacaciones = await BuscarVacaciones(o.id, desde, hasta);
                     console.log('Vacaciones: ', o);
                     return o
                 })
@@ -53,7 +53,7 @@ const BuscarVacaciones = async function (id: string | number, desde: string, has
         `
         SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso,v.id AS id_vacacion, a.id_autoriza_estado, a.estado 
         FROM mv_solicitud_vacacion AS v, ecm_autorizaciones AS a 
-        WHERE v.id = a.id_vacacion AND v.codigo = $1 AND fecha_inicio BETWEEN $2 AND $3
+        WHERE v.id = a.id_vacacion AND v.id_empleado = $1 AND fecha_inicio BETWEEN $2 AND $3
         `
         , [id, desde, hasta])
         .then((res: any) => {

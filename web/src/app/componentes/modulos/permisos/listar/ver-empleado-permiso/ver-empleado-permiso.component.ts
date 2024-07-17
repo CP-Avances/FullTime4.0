@@ -206,7 +206,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
               this.listadoDepaAutoriza = res;
               this.listadoDepaAutoriza.forEach((item: any) => {
                 if((this.idEmpleado == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
-                  this.obtenerPlanificacionHoraria(this.InfoPermiso[0].fec_inicio, this.InfoPermiso[0].fec_final, this.InfoPermiso[0].codigo);
+                  this.obtenerPlanificacionHoraria(this.InfoPermiso[0].fec_inicio, this.InfoPermiso[0].fec_final, this.InfoPermiso[0].id_empleado);
                 }else{
                   return this.ocultar = true;
                 }
@@ -228,7 +228,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
             this.listadoDepaAutoriza = res;
             this.listadoDepaAutoriza.forEach((item: any) => {
               if((this.idEmpleado == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
-                this.obtenerPlanificacionHoraria(this.InfoPermiso[0].fec_inicio, this.InfoPermiso[0].fec_final, this.InfoPermiso[0].codigo);
+                this.obtenerPlanificacionHoraria(this.InfoPermiso[0].fec_inicio, this.InfoPermiso[0].fec_final, this.InfoPermiso[0].id_empleado);
               }else{
                 return this.ocultar = true;
               }
@@ -250,12 +250,12 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   listahorario: any = [];
   mensaje: string = '';
   dia: any;
-  obtenerPlanificacionHoraria(fecha_i: any, fehca_f: any, codigo: any){
+  obtenerPlanificacionHoraria(fecha_i: any, fehca_f: any, id_empleado: any){
     this.mensaje = '';
     var datos = {
       fecha_inicio: fecha_i, 
       fecha_final: fehca_f, 
-      codigo: '\''+codigo+'\''
+      id_empleado: '\''+id_empleado+'\''
     }
 
     this.plangeneral.BuscarPlanificacionHoraria(datos).subscribe(res => {

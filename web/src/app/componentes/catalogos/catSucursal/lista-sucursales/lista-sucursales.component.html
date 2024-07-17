@@ -126,7 +126,7 @@
                             </td>
                         </tr>
                         <tr
-                            *ngFor="let s of sucursales | sucCiudad: buscarCiudad.value | sucNombre: buscarNombre.value | paginate:tamanio_pagina:numero_pagina">
+                            *ngFor="let s of sucursales | sucCiudad: buscarCiudad.value | sucNombre: buscarNombre.value | paginate: tamanio_pagina: numero_pagina">
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionSucursales.toggle(s) : null"
@@ -155,8 +155,8 @@
                     </tbody>
                 </table>
             </div>
-            <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina"
-                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions" 
+                id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
             <!--  *************************  DESCARGAR REPORTES  *****************************  -->
             <div>

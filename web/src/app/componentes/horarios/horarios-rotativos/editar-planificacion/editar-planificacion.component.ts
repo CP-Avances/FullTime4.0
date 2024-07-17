@@ -258,7 +258,7 @@ export class EditarPlanificacionComponent implements OnInit {
     let busqueda = {
       fecha_inicio: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
       fecha_final: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
-      codigo: '\'' + this.datos_horarios.codigo + '\''
+      id_empleado: '\'' + this.datos_horarios.idEmpleado + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
       //console.log('ver datos horarios ', datos.data)
@@ -301,7 +301,7 @@ export class EditarPlanificacionComponent implements OnInit {
     let busqueda = {
       fecha_inicio: fecha,
       fecha_final: fecha,
-      codigo: '\'' + this.datos_horarios.codigo + '\''
+      id_empleado: '\'' + this.datos_horarios.idEmpleado + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
       console.log('ver datos horarios antes', datos)
@@ -339,7 +339,7 @@ export class EditarPlanificacionComponent implements OnInit {
     let busqueda = {
       fecha_inicio: fecha,
       fecha_final: fecha,
-      codigo: '\'' + this.datos_horarios.codigo + '\''
+      id_empleado: '\'' + this.datos_horarios.idEmpleado + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
       //console.log('ver datos horarios despues', datos)
@@ -810,7 +810,7 @@ export class EditarPlanificacionComponent implements OnInit {
       let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;
       //console.log('fecha ', moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
       let plan_fecha = {
-        codigo: this.datos_horarios.codigo,
+        id_empleado: this.datos_horarios.idEmpleado,
         fec_final: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
         fec_inicio: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
         id_horario: horario.horarios.id,
@@ -940,7 +940,7 @@ export class EditarPlanificacionComponent implements OnInit {
                 }
 
                 let plan = {
-                  codigo: this.datos_horarios.codigo,
+                  id_empleado: this.datos_horarios.idEmpleado,
                   tipo_dia: dia_tipo,
                   min_antes: deta.minutos_antes,
                   tolerancia: accion,
@@ -1105,11 +1105,11 @@ export class EditarPlanificacionComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     }
-    lista.forEach(horario => {
+    lista.forEach((horario: any) => {
       let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;
       //console.log('fecha ', moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
       let plan_fecha = {
-        codigo: this.datos_horarios.codigo,
+        id_empleado: this.datos_horarios.idEmpleado,
         fec_final: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
         fec_inicio: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
         id_horario: horario.horarios.id,

@@ -109,6 +109,7 @@ export class ListarRegimenComponent implements OnInit {
   // LECTURA DE DATOS
   ObtenerRegimen() {
     this.regimen = [];
+    this.numero_pagina = 1;
     this.rest.ConsultarRegimen().subscribe((datos) => {
       this.regimen = datos;
     });

@@ -27,10 +27,8 @@ import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones
 
 import { environment } from 'src/environments/environment';
 
-
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableSucursales } from 'src/app/model/reportes.model';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-lista-sucursales',
@@ -66,6 +64,7 @@ export class ListaSucursalesComponent implements OnInit {
 
   empleado: any = [];
   idEmpleado: number;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
 
   idSucursalesAcceso: Set<any> = new Set();
   idDepartamentosAcceso: Set<any> = new Set();
@@ -103,6 +102,8 @@ export class ListaSucursalesComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
+
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
 
@@ -158,10 +159,10 @@ export class ListaSucursalesComponent implements OnInit {
 
   // METODO PARA BUSCAR SUCURSALES
   ObtenerSucursal() {
-
     this.sucursales = [];
+    this.numero_pagina = 1;
     this.rest.BuscarSucursal().subscribe(data => {
-      this.sucursales = this.FiltrarSucursalesAsignadas(data);
+      this.sucursales = this.rolEmpleado === 1 ? data : this.FiltrarSucursalesAsignadas(data);
     });
   }
 
@@ -202,6 +203,7 @@ export class ListaSucursalesComponent implements OnInit {
           }
         }
       });
+      this.ObtenerSucursal();
   }
 
   // METODO PARA LIMPIAR FORMULARIO

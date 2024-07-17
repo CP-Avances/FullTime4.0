@@ -137,7 +137,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
       dia_perdido: form.diaPerdidoForm,
       horas_vacaciones: form.horaVacacionForm,
       min_vacaciones: form.minVacacionForm,
-      codigo: this.empleados[0].codigo,
+      id_empleado: this.empleados[0].id,
       user_name: this.user_name,
       ip: this.ip,
     };

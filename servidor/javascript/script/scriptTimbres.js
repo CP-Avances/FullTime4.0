@@ -22,7 +22,7 @@ const generarTimbres = function (codigo, inicio, fin) {
         SELECT pg.fecha_hora_horario::date AS fecha, pg.fecha_hora_horario::time AS hora, pg.tipo_dia, pg.tipo_accion,
             pg.minutos_alimentacion
         FROM eu_asistencia_general AS pg
-        WHERE pg.fecha_horario BETWEEN $1 AND $2 AND pg.codigo = $3 AND (tipo_dia = 'N' OR estado_origen = 'HFD' OR estado_origen = 'HL')
+        WHERE pg.fecha_horario BETWEEN $1 AND $2 AND pg.id_empleado = $3 AND (tipo_dia = 'N' OR estado_origen = 'HFD' OR estado_origen = 'HL')
         ORDER BY pg.fecha_hora_horario ASC
         `, [inicio, fin, codigo])
             .then(result => {

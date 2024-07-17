@@ -22,7 +22,7 @@ class SolicitudVacacionesControlador {
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.departamentos = yield Promise.all(obj.departamentos.map((ele) => __awaiter(this, void 0, void 0, function* () {
                     ele.empleado = yield Promise.all(ele.empleado.map((o) => __awaiter(this, void 0, void 0, function* () {
-                        o.vacaciones = yield BuscarVacaciones(o.codigo, desde, hasta);
+                        o.vacaciones = yield BuscarVacaciones(o.id, desde, hasta);
                         console.log('Vacaciones: ', o);
                         return o;
                     })));
@@ -50,7 +50,7 @@ const BuscarVacaciones = function (id, desde, hasta) {
         return yield database_1.default.query(`
         SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso,v.id AS id_vacacion, a.id_autoriza_estado, a.estado 
         FROM mv_solicitud_vacacion AS v, ecm_autorizaciones AS a 
-        WHERE v.id = a.id_vacacion AND v.codigo = $1 AND fecha_inicio BETWEEN $2 AND $3
+        WHERE v.id = a.id_vacacion AND v.id_empleado = $1 AND fecha_inicio BETWEEN $2 AND $3
         `, [id, desde, hasta])
             .then((res) => {
             if (res.rowCount != 0) {

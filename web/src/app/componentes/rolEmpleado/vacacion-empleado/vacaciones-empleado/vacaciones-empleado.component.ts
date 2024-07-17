@@ -145,7 +145,7 @@ export class VacacionesEmpleadoComponent implements OnInit {
   peridoVacaciones: any;
   ObtenerPeriodoVacaciones(formato_fecha: string) {
     this.peridoVacaciones = [];
-    this.restPerV.ObtenerPeriodoVacaciones(this.empleadoUno[0].codigo).subscribe(datos => {
+    this.restPerV.ObtenerPeriodoVacaciones(this.empleadoUno[0].id).subscribe(datos => {
       this.peridoVacaciones = datos;
 
       this.peridoVacaciones.forEach(v => {

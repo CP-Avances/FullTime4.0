@@ -92,9 +92,11 @@ class ModalidaLaboralControlador {
                 const { id, modalidad, user_name, ip } = req.body;
                 const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
                 const modalExiste = yield database_1.default.query(`
-                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
-                `, [modali.toUpperCase()]);
-                const consulta = yield database_1.default.query('SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1', [id]);
+                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1 AND NOT id = $2
+                `, [modali.toUpperCase(), id]);
+                const consulta = yield database_1.default.query(`
+                SELECT * FROM e_cat_modalidad_trabajo WHERE id = $1
+                `, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -322,11 +324,10 @@ class ModalidaLaboralControlador {
     // REGISTRAR PLANTILLA MODALIDAD_LABORAL
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { plantilla, user_name, ip } = req.body;
-                var contador = 1;
-                var respuesta;
-                plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
+            const { plantilla, user_name, ip } = req.body;
+            let error = false;
+            for (const data of plantilla) {
+                try {
                     // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                     const { modalida_laboral } = data;
                     const modalidad = modalida_laboral.charAt(0).toUpperCase() + modalida_laboral.slice(1).toLowerCase();
@@ -349,22 +350,17 @@ class ModalidaLaboralControlador {
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    if (contador === plantilla.length) {
-                        if (modalidad_la) {
-                            return respuesta = res.status(200).jsonp({ message: 'ok' });
-                        }
-                        else {
-                            return respuesta = res.status(404).jsonp({ message: 'error' });
-                        }
-                    }
-                    contador = contador + 1;
-                }));
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    error = true;
+                }
             }
-            catch (error) {
-                // ROLLBACK SI HAY ERROR
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: error });
+            if (error) {
+                return res.status(500).jsonp({ message: 'error' });
             }
+            return res.status(200).jsonp({ message: 'ok' });
         });
     }
 }

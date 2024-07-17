@@ -114,7 +114,7 @@ class LoginControlador {
           `
           SELECT e.id as id_contrato, c.hora_trabaja, c.id_departamento, c.id_sucursal, s.id_empresa, 
             c.id AS id_cargo, cg_e.acciones_timbres, cg_e.public_key, 
-            (SELECT id FROM mv_periodo_vacacion pv WHERE pv.codigo = empl.codigo 
+            (SELECT id FROM mv_periodo_vacacion pv WHERE pv.id_empleado = empl.id 
             ORDER BY pv.fecha_inicio DESC LIMIT 1 ) as id_peri_vacacion, 
             (SELECT nombre FROM ed_departamentos cd WHERE cd.id = c.id_departamento ) AS ndepartamento 
           FROM eu_empleado_contratos AS e, eu_empleado_cargos AS c, e_sucursales AS s, e_empresa AS cg_e, 

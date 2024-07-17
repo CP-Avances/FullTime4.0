@@ -19,8 +19,8 @@ export class PeriodoVacacionesService {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/perVacacion`, datos);
   }
 
-  ObtenerPeriodoVacaciones(codigo: string | number) {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/infoPeriodo/${codigo}`);
+  ObtenerPeriodoVacaciones(id_empleado: string | number) {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/infoPeriodo/${id_empleado}`);
   }
   
   ActualizarPeriodoV(datos: any) {

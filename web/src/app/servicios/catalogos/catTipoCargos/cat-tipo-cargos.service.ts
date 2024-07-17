@@ -25,10 +25,12 @@ export class CatTipoCargosService {
       .pipe(catchError(cargo));
   }
 
+  // METODO PARA ACTUALIZAR REGISTRO DE TIPO DE CARGO
   ActualizarCargo(datos: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/tipoCargos`, datos)
       .pipe(catchError(datos));
   }
+
   Eliminar(id: any, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/tipoCargos/eliminar/${id}`;
     const httpOtions = {

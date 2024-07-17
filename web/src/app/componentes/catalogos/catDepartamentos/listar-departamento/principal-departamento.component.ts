@@ -45,6 +45,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   depainfo: any = [];
   empleado: any = [];
   idEmpleado: number;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
 
   idDepartamentosAcceso: Set<any> = new Set();
 
@@ -103,11 +104,12 @@ export class PrincipalDepartamentoComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
 
     this.idDepartamentosAcceso = this.asignacionesService.idDepartamentosAcceso;
 
-    this.ListaDepartamentos();
     this.ObtenerEmpleados(this.idEmpleado);
+    this.ListaDepartamentos();
     this.ObtenerColores();
     this.ObtenerLogo();
   }
@@ -153,7 +155,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   ListaDepartamentos() {
     this.departamentos = []
     this.rest.ConsultarDepartamentos().subscribe(datos => {
-      this.departamentos = this.FiltrarDepartamentosAsignados(datos);
+      this.departamentos = this.rolEmpleado === 1 ? datos : this.FiltrarDepartamentosAsignados(datos);
       this.OrdenarDatos(this.departamentos);
     })
   }
@@ -287,6 +289,17 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataDepartamentos = res.data;
       this.messajeExcel = res.message;
+
+      this.DataDepartamentos.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+
       console.log('probando plantilla1 departamentos', this.DataDepartamentos);
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -339,15 +352,16 @@ export class PrincipalDepartamentoComponent implements OnInit {
       }
       this.rest.subirArchivoExcel(data).subscribe({
         next: (response) => {
-          this.toastr.success('Plantilla de Contratos importada.', 'Operación exitosa.', {
+          this.toastr.success('Plantilla de Departamentos importada.', 'Operación exitosa.', {
             timeOut: 3000,
           });
           this.LimpiarCampos();
           this.archivoForm.reset();
           this.nameFile = '';
         },
-        error: (error) => {;
-          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal',  {
+        error: (error) => {
+          ;
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
             timeOut: 4000,
           });
         }

@@ -25,6 +25,7 @@ export class CatModalidadLaboralService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/modalidadLaboral`, datos)
     .pipe(catchError(datos));
   }
+  
   Eliminar(id: any, datos: any){
     const url = `${(localStorage.getItem('empresaURL') as string)}/modalidadLaboral/eliminar/${id}`;
     const httpOtions = {

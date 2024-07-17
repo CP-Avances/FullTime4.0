@@ -78,7 +78,7 @@ class GraficasControlador {
         fec_final.setUTCMinutes(0);
         fec_final.setUTCSeconds(0);
 
-        let resultado = await MetricaHorasExtraEmpleado(codigo, id_empleado, fec_inicio, fec_final)
+        let resultado = await MetricaHorasExtraEmpleado(id_empleado, id_empleado, fec_inicio, fec_final)
         res.status(200).jsonp(resultado);
     }
 
@@ -88,7 +88,7 @@ class GraficasControlador {
         const fec_final = req.params.hasta;
         const codigo = req.userCodigo;
 
-        let resultado = await MetricaHorasExtraEmpleado(codigo, id_empleado, new Date(fec_inicio), new Date(fec_final))
+        let resultado = await MetricaHorasExtraEmpleado(id_empleado, id_empleado, new Date(fec_inicio), new Date(fec_final))
         res.status(200).jsonp(resultado);
     }
 

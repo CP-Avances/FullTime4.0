@@ -48,6 +48,8 @@ export class ListarPedidoAccionComponent implements OnInit {
   // ALMACENAMIENTO DE DATOS CONSULTADOS
   empleado: any = [];
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+
   decreto: string[];
   tipoAccion: string[];
 
@@ -98,6 +100,8 @@ export class ListarPedidoAccionComponent implements OnInit {
       };
       return this.validar.RedireccionarHomeAdmin(mensaje);
     } else {
+      this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
+
       this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
 
       this.ObtenerLogo();
@@ -179,7 +183,7 @@ export class ListarPedidoAccionComponent implements OnInit {
   VerDatosAcciones() {
     this.listaPedidos = [];
     this.restAccion.BuscarDatosPedido().subscribe((data) => {
-      this.listaPedidos = this.FiltrarEmpleadosAsignados(data);
+      this.listaPedidos = this.rolEmpleado === 1 ? data : this.FiltrarEmpleadosAsignados(data);
       this.FormatearDatos(
         this.listaPedidos,
         this.formato_fecha,

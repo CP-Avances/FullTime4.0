@@ -139,6 +139,7 @@ export class ListarFeriadosComponent implements OnInit {
   // LECTURA DE DATOS
   ObtenerFeriados(formato: string) {
     this.feriados = [];
+    this.numero_pagina = 1;
     this.rest.ConsultarFeriado().subscribe(datos => {
       this.feriados = datos;
       this.feriados.forEach((data: any) => {
@@ -306,7 +307,26 @@ export class ListarFeriadosComponent implements OnInit {
       this.DataFeriados = res.data;
       this.DataFerieados_ciudades = res.datafc;
 
-      console.log('Feriados ciudades: ', this.DataFerieados_ciudades);
+      this.DataFeriados.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+
+      this.DataFerieados_ciudades.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
+
 
       this.messajeExcel = res.message;
       if (this.messajeExcel == 'error') {
@@ -355,9 +375,12 @@ export class ListarFeriadosComponent implements OnInit {
   DataFerieados_ciudades: any = [];
   messajeExcel2: string = '';
   Crear_feriado_ciudad() {
-    this.rest.Crear_feriados_ciudad(this.listaFerediadCiudadCorrectos).subscribe(res => {
-      console.log('respuesta: ', res);
-    });
+    const data = {
+      plantilla: this.listaFerediadCiudadCorrectos,
+      user_name: this.user_name,
+      ip: this.ip
+    }
+    this.rest.Crear_feriados_ciudad(data).subscribe();
   }
 
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
@@ -374,36 +397,32 @@ export class ListarFeriadosComponent implements OnInit {
   listFeriadosCorrectos: any = [];
   listaFerediadCiudadCorrectos: any = [];
   registrarFeriados() {
-    var data = {
-      fecha: '',
-      descripcion: '',
-      fec_recuperacion: '',
-      user_name: this.user_name,
-      ip: this.ip
-    }
-
-    console.log('lista sucursales correctas: ', this.listFeriadosCorrectos);
     if (this.listFeriadosCorrectos?.length > 0) {
-      this.rest.Crear_feriados(this.listFeriadosCorrectos).subscribe(response => {
-        this.toastr.success('Operación exitosa.', 'Plantilla de Feriados importada.', {
-          timeOut: 5000,
-        });
+      const data = {
+        plantilla: this.listFeriadosCorrectos,
+        user_name: this.user_name,
+        ip: this.ip
+      }
 
-        if (this.listaFerediadCiudadCorrectos?.length > 0) {
-          setTimeout(() => {
-            this.Crear_feriado_ciudad();
-          }, 500);
+      this.rest.Crear_feriados(data).subscribe({
+        next: (response) => {
+          this.toastr.success('Plantilla de Feriados importada.', 'Operación exitosa.', {
+            timeOut: 5000,
+          });
+          if (this.listaFerediadCiudadCorrectos?.length > 0) {
+            setTimeout(() => {
+              this.Crear_feriado_ciudad();
+            }, 500);
+          }
+          this.LimpiarCampos();
+        },
+        error: (error) => {
+          this.toastr.error('No se pudo cargar la plantilla', 'Ups !!! algo salio mal', {
+            timeOut: 4000,
+          });
+          this.archivoForm.reset();
         }
-        console.log('prueba entro')
-        this.LimpiarCampos();
-
-      }, (error) => {
-        this.toastr.error(error, 'Plantilla procesada.', {
-          timeOut: 4000,
-        });
-        this.archivoForm.reset();
       });
-
     } else {
       this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
@@ -911,5 +930,5 @@ export class ListarFeriadosComponent implements OnInit {
   }
 
 
-  
+
 }

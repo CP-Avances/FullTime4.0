@@ -231,7 +231,7 @@ class AlimentacionControlador {
         let n: Array<any> = await Promise.all(datos.map(async (obj: ReporteAlimentacion) => {
             obj.departamentos = await Promise.all(obj.departamentos.map(async (ele) => {
                 ele.empleado = await Promise.all(ele.empleado.map(async (o) => {
-                    const listaTimbres = await BuscarAlimentacion(desde, hasta, o.codigo);
+                    const listaTimbres = await BuscarAlimentacion(desde, hasta, o.id);
                     o.timbres = await agruparTimbres(listaTimbres);
                     console.log('timbres:-------------------- ', o);
                     return o
@@ -265,7 +265,7 @@ class AlimentacionControlador {
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
-                const listaTimbres = await BuscarAlimentacion(desde, hasta, o.codigo);
+                const listaTimbres = await BuscarAlimentacion(desde, hasta, o.id);
                 o.timbres = await agruparTimbres(listaTimbres);
                 console.log('Timbres: ', o);
                 return o;
@@ -296,12 +296,12 @@ const BuscarAlimentacion = async function (fec_inicio: string, fec_final: string
     return await pool.query(
         `
         SELECT CAST(fecha_horario AS VARCHAR), CAST(fecha_hora_horario AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR),
-            codigo, estado_timbre, tipo_accion AS accion, minutos_alimentacion 
+            id_empleado, estado_timbre, tipo_accion AS accion, minutos_alimentacion 
         FROM eu_asistencia_general 
         WHERE CAST(fecha_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' 
-            AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 
+            AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 
             AND tipo_accion IN (\'I/A\', \'F/A\') 
-        ORDER BY codigo, fecha_hora_horario ASC
+        ORDER BY id_empleado, fecha_hora_horario ASC
         `
         , [fec_inicio, fec_final, codigo])
         .then(res => {

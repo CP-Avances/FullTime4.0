@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { CatModalidadLaboralService } from 'src/app/servicios/catalogos/catModalidadLaboral/cat-modalidad-laboral.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-editar-modalidad',
@@ -25,8 +26,9 @@ export class EditarModalidadComponent implements OnInit {
     private _ModalidaLaboral: CatModalidadLaboralService,
     public ventana: MatDialogRef<EditarModalidadComponent>, // VARIABLE DE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any,
-  ){}
+  ) { }
 
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
@@ -40,7 +42,7 @@ export class EditarModalidadComponent implements OnInit {
     this.formulario.reset();
   }
 
-     // METODO PARA MOSTRAR DATOS EN FORMULARIO
+  // METODO PARA MOSTRAR DATOS EN FORMULARIO
   ImprimirDatos() {
     this.formulario.setValue({
       modalidad: this.data.descripcion
@@ -56,17 +58,17 @@ export class EditarModalidadComponent implements OnInit {
       ip: this.ip,
     };
     this._ModalidaLaboral.ActualizarModalidadLab(modalidad).subscribe(response => {
-      console.log('response: ',response);
-      if(response.status == '200'){
+      console.log('response: ', response);
+      if (response.status == '200') {
         this.toastr.success(response.message, 'Operación exitosa.', {
           timeOut: 4000,
         });
         this.CerrarVentana();
-      }else if(response.status == '300'){
+      } else if (response.status == '300') {
         this.toastr.warning(response.message, 'Operación fallida.', {
           timeOut: 4000,
         });
-      }else{
+      } else {
         this.toastr.error(response.message, 'Error.', {
           timeOut: 4000,
         });
@@ -79,33 +81,15 @@ export class EditarModalidadComponent implements OnInit {
     });
   }
 
-    // METODO PARA VALIDAR INGRESO DE LETRAS
-    IngresarSoloLetras(e: any) {
-      let key = e.keyCode || e.which;
-      let tecla = String.fromCharCode(key).toString();
-      // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-      let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-      // ES LA VALIDACIÓN DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
-      let especiales = [8, 37, 39, 46, 6, 13];
-      let tecla_especial = false
-      for (var i in especiales) {
-        if (key == especiales[i]) {
-          tecla_especial = true;
-          break;
-        }
-      }
-      if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-        this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-          timeOut: 6000,
-        })
-        return false;
-      }
-    }
+  // METODO PARA VALIDAR INGRESO DE LETRAS
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
+  }
 
-    // METODO PARA CERRAR VENTANA DE REGISTRO
-    CerrarVentana() {
-      this.LimpiarCampos();
-      this.ventana.close();
-    }
+  // METODO PARA CERRAR VENTANA DE REGISTRO
+  CerrarVentana() {
+    this.LimpiarCampos();
+    this.ventana.close();
+  }
 
 }

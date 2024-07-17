@@ -43,6 +43,7 @@ export class ListarRelojesComponent implements OnInit {
 
   empleado: any = [];
   idEmpleado: number;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
 
   idDepartamentosAcceso: Set<any> = new Set();
 
@@ -101,6 +102,8 @@ export class ListarRelojesComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
+
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
 
     this.ObtenerEmpleados(this.idEmpleado);
@@ -146,9 +149,9 @@ export class ListarRelojesComponent implements OnInit {
   // METODO PARA BUSCAR RELOJES
   ObtenerReloj() {
     this.relojes = [];
+    this.numero_pagina = 1;
     this.rest.ConsultarRelojes().subscribe(datos => {
-      this.relojes = this.FiltrarRelojesAsignados(datos);
-      
+      this.relojes = this.rolEmpleado === 1 ? datos : this.FiltrarRelojesAsignados(datos);
     })
   }
 
@@ -182,6 +185,7 @@ export class ListarRelojesComponent implements OnInit {
     this.DataDispositivos = null;
     this.archivoSubido = [];
     this.nameFile = '';
+    this.ObtenerReloj();
     this.formulario.setValue({
       nombreForm: '',
       ipForm: '',
@@ -189,7 +193,6 @@ export class ListarRelojesComponent implements OnInit {
       sucursalForm: '',
       departamentoForm: ''
     });
-    this.ObtenerReloj();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
     this.messajeExcel = '';
@@ -287,7 +290,16 @@ export class ListarRelojesComponent implements OnInit {
     this.rest.VerificarArchivoExcel(formData).subscribe(res => {
       this.DataDispositivos = res.data;
       this.messajeExcel = res.message;
-      console.log('probando plantilla1 dispositivos', this.DataDispositivos);
+
+      this.DataDispositivos.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -332,7 +344,7 @@ export class ListarRelojesComponent implements OnInit {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Ya existe en el sistema' || 
+    } else if (observacion == 'Ya existe en el sistema' ||
       observacion == 'Número de serie ya existe en el sistema' ||
       observacion == 'Dirección MAC ya existe en el sistema'
     ) {
@@ -341,13 +353,15 @@ export class ListarRelojesComponent implements OnInit {
       observacion == 'Departamento no existe en el sistema') {
       return 'rgb(255, 192, 203)';
     } else if (observacion == 'Departamento no pertenece al establecimiento' ||
-      observacion == 'El puerto debe ser de 6 dígitos'
+      observacion == 'El puerto debe ser de 6 dígitos' ||
+      observacion == 'Debe ingresar acciones' ||
+      observacion == 'El número de acciones debe ser mayor a 0 y menor a 8'
     ) {
       return 'rgb(238, 34, 207)';
     } else if (observacion == 'Dirección IP incorrecta' ||
       observacion == 'Puerto incorrecto (solo números)' ||
       observacion == 'Acción incorrecta ingrese (SI / NO)' ||
-      observacion == 'Número de acciones incorrecta ingrese (solo números)' ||
+      observacion == 'Número de acciones incorrecta (solo números)' ||
       observacion == 'Formato de dirección MAC incorrecta (numeración hexadecimal)'
     ) {
       return 'rgb(222, 162, 73)';
@@ -378,7 +392,7 @@ export class ListarRelojesComponent implements OnInit {
   }
 
   registrarDispositivos() {
-    if (this.listaDispositivosCorrectos.length > 0) {
+    if (this.listaDispositivosCorrectos?.length > 0) {
       const data = {
         plantilla: this.listaDispositivosCorrectos,
         user_name: this.user_name,

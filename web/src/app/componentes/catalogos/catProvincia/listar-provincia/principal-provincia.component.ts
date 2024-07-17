@@ -119,6 +119,7 @@ export class PrincipalProvinciaComponent implements OnInit {
   // METODO PARA BUSCAR PROVINCIAS
   ListarProvincias() {
     this.provincias = [];
+    this.numero_pagina = 1;
     this.rest.BuscarProvincias().subscribe(datos => {
       this.provincias = datos;
     })

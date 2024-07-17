@@ -108,9 +108,11 @@ class TiposCargosControlador {
                 // DAR FORMATO A LA PALABRA CARGO
                 const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
                 const tipoCargoExiste = yield database_1.default.query(`
-                SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
-                `, [cargo.toUpperCase()]);
-                const consulta = yield database_1.default.query('SELECT * FROM e_cat_tipo_cargo WHERE id = $1', [id]);
+                SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1 AND NOT id = $2
+                `, [cargo.toUpperCase(), id]);
+                const consulta = yield database_1.default.query(`
+                SELECT * FROM e_cat_tipo_cargo WHERE id = $1
+                `, [id]);
                 const [datosOriginales] = consulta.rows;
                 if (!datosOriginales) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -338,11 +340,10 @@ class TiposCargosControlador {
     // REGISTRAR PLANTILLA TIPO CARGO 
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { plantilla, user_name, ip } = req.body;
-                var contador = 1;
-                var respuesta;
-                plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
+            const { plantilla, user_name, ip } = req.body;
+            let error = false;
+            for (const data of plantilla) {
+                try {
                     // DATOS QUE SE GUARDARAN DE LA PLANTILLA INGRESADA
                     const { tipo_cargo } = data;
                     const cargo = tipo_cargo.charAt(0).toUpperCase() + tipo_cargo.slice(1).toLowerCase();
@@ -365,22 +366,17 @@ class TiposCargosControlador {
                     });
                     // FIN DE TRANSACCION
                     yield database_1.default.query('COMMIT');
-                    if (contador === plantilla.length) {
-                        if (cargos) {
-                            return respuesta = res.status(200).jsonp({ message: 'ok' });
-                        }
-                        else {
-                            return respuesta = res.status(404).jsonp({ message: 'error' });
-                        }
-                    }
-                    contador = contador + 1;
-                }));
+                }
+                catch (error) {
+                    // REVERTIR TRANSACCION
+                    yield database_1.default.query('ROLLBACK');
+                    error = true;
+                }
             }
-            catch (error) {
-                // ROLLBACK
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: error });
+            if (error) {
+                return res.status(500).jsonp({ message: 'error' });
             }
+            return res.status(200).jsonp({ message: 'ok' });
         });
     }
 }

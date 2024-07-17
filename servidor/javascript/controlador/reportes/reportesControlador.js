@@ -87,12 +87,13 @@ class ReportesControlador {
             const { codigo } = req.params;
             const DATOS = yield database_1.default.query(`
             SELECT cp.descripcion AS tipo, p.id, p.descripcion, p.fecha_creacion, p.fecha_inicio, p.fecha_final, 
-                p.dias_permiso, p.horas_permiso, p.numero_permiso, p.codigo, a.estado, a.id_autoriza_estado, 
+                p.dias_permiso, p.horas_permiso, p.numero_permiso, p.id_empleado, a.estado, a.id_autoriza_estado, 
                 ec.hora_trabaja, ec.id AS id_cargo 
-            FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS cp, ecm_autorizaciones AS a, eu_empleado_cargos AS ec 
+            FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS cp, ecm_autorizaciones AS a, 
+                eu_empleado_cargos AS ec, eu_empleados AS e
             WHERE cp.id = p.id_tipo_permiso AND a.id_permiso = p.id 
                 AND ec.id = (SELECT MAX(cargo_id) FROM datos_empleado_cargo WHERE codigo = $1) 
-                AND p.codigo = $1 
+                AND p.id_empleado = e.id AND e.codigo = $1
             ORDER BY p.numero_permiso ASC
             `, [codigo]);
             if (DATOS.rowCount != 0) {

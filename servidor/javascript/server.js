@@ -274,4 +274,4 @@ const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
 (0, ContarHoras_1.RegistrarAsistenciaByTimbres)();
 // ----------// conteoPermisos();
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
-//generarTimbres('35', '2023-11-01', '2023-11-02');
+//generarTimbres('1', '2023-11-01', '2023-11-02');

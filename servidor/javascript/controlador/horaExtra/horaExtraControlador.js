@@ -207,7 +207,7 @@ class HorasExtrasPedidasControlador {
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.departamentos = yield Promise.all(obj.departamentos.map((ele) => __awaiter(this, void 0, void 0, function* () {
                     ele.empleado = yield Promise.all(ele.empleado.map((o) => __awaiter(this, void 0, void 0, function* () {
-                        o.horaE = yield BuscarHorasExtras(o.codigo, desde, hasta);
+                        o.horaE = yield BuscarHorasExtras(o.id, desde, hasta);
                         console.log('Vacaciones: ', o);
                         return o;
                     })));
@@ -234,15 +234,15 @@ class HorasExtrasPedidasControlador {
     CrearHoraExtraPedida(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl_cargo, id_usua_solicita, fec_inicio, fec_final, fec_solicita, num_hora, descripcion, estado, observacion, tipo_funcion, depa_user_loggin, codigo, user_name, ip } = req.body;
+                const { id_empl_cargo, id_usua_solicita, fec_inicio, fec_final, fec_solicita, num_hora, descripcion, estado, observacion, tipo_funcion, depa_user_loggin, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
-        INSERT INTO mhe_solicitud_hora_extra ( id_empleado_cargo, id_empleado_solicita, fecha_inicio, fecha_final, 
-          fecha_solicita, horas_solicitud, descripcion, estado, observacion, tipo_funcion, codigo ) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *
+        INSERT INTO mhe_solicitud_hora_extra (id_empleado_cargo, id_empleado_solicita, fecha_inicio, fecha_final, 
+          fecha_solicita, horas_solicitud, descripcion, estado, observacion, tipo_funcion) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
         `, [id_empl_cargo, id_usua_solicita, fec_inicio, fec_final, fec_solicita, num_hora, descripcion,
-                    estado, observacion, tipo_funcion, codigo]);
+                    estado, observacion, tipo_funcion]);
                 const [objetoHoraExtra] = response.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -278,7 +278,7 @@ class HorasExtrasPedidasControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const datosOriginales = yield database_1.default.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id]);
+                const datosOriginales = yield database_1.default.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id]);
                 const [objetoHoraExtraOriginal] = datosOriginales.rows;
                 if (!objetoHoraExtraOriginal) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -390,7 +390,7 @@ class HorasExtrasPedidasControlador {
                     observacion: null
                 });
                 // CONSULTAR DATOS ORIGINALES SOLICITUD DE HORA EXTRA
-                const datosOriginalesHoraExtra = yield database_1.default.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id_hora_extra]);
+                const datosOriginalesHoraExtra = yield database_1.default.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id_hora_extra]);
                 const [objetoHoraExtraOriginal] = datosOriginalesHoraExtra.rows;
                 if (!objetoHoraExtraOriginal) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -473,7 +473,7 @@ class HorasExtrasPedidasControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const datosOriginales = yield database_1.default.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id_hora]);
+                const datosOriginales = yield database_1.default.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id_hora]);
                 const [objetoHoraExtraOriginal] = datosOriginales.rows;
                 if (!objetoHoraExtraOriginal) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -530,7 +530,7 @@ class HorasExtrasPedidasControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const datosOriginales = yield database_1.default.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id]);
+                const datosOriginales = yield database_1.default.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id]);
                 const [objetoHoraExtraOriginal] = datosOriginales.rows;
                 if (!objetoHoraExtraOriginal) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -587,7 +587,7 @@ class HorasExtrasPedidasControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const datosOriginales = yield database_1.default.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id]);
+                const datosOriginales = yield database_1.default.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id]);
                 const [objetoHoraExtraOriginal] = datosOriginales.rows;
                 if (!objetoHoraExtraOriginal) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -666,7 +666,7 @@ class HorasExtrasPedidasControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const datosOriginales = yield database_1.default.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id]);
+                const datosOriginales = yield database_1.default.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id]);
                 const [objetoHoraExtraOriginal] = datosOriginales.rows;
                 if (!objetoHoraExtraOriginal) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -714,7 +714,7 @@ class HorasExtrasPedidasControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const datosOriginales = yield database_1.default.query('SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1', [id]);
+                const datosOriginales = yield database_1.default.query(`SELECT * FROM mhe_solicitud_hora_extra WHERE id = $1`, [id]);
                 const [objetoHoraExtraOriginal] = datosOriginales.rows;
                 if (!objetoHoraExtraOriginal) {
                     yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -1004,7 +1004,7 @@ const BuscarHorasExtras = function (id, desde, hasta) {
     SELECT p.fecha_desde, p.fecha_hasta, p.hora_inicio, p.hora_fin, p.descripcion, 
       p.horas_totales, e.nombre AS planifica_nombre, e.apellido AS planifica_apellido 
     FROM mhe_detalle_plan_hora_extra AS p, mhe_empleado_plan_hora_extra AS pe, eu_empleados AS e 
-    WHERE p.id = pe.id_detalle_plan AND e.id = p.id_empleado_planifica AND pe.codigo = $1 AND 
+    WHERE p.id = pe.id_detalle_plan AND e.id = p.id_empleado_planifica AND pe.id_empleado_realiza = $1 AND 
       p.fecha_desde BETWEEN $2 AND $3
     `, [id, desde, hasta])
             .then(res => {

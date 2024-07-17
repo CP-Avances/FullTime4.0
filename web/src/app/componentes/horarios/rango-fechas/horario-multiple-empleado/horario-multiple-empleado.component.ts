@@ -37,6 +37,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   ventana_busqueda: boolean = false;
 
   idEmpleadoLogueado: any;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
 
   idCargosAcceso: Set<any> = new Set();
   idUsuariosAcceso: Set<any> = new Set();
@@ -129,6 +130,8 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
+
     this.check = this.restR.checkOptions([{ opcion: 'r' }, { opcion: 'd' }, { opcion: 'c' }, { opcion: 'e' }]);
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
@@ -299,19 +302,21 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     this.OmitirDuplicados();
 
     // FILTRO POR ASIGNACION USUARIO - DEPARTAMENTO
+    // SI ES SUPERADMINISTRADOR NO FILTRAR
+    if (this.rolEmpleado !== 1) {
+      this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
+      this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
+      this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
+      this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
 
-    this.empleados = this.empleados.filter((empleado: any) => this.idUsuariosAcceso.has(empleado.id));
-    this.departamentos = this.departamentos.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
-    this.sucursales = this.sucursales.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
-    this.regimen = this.regimen.filter((regimen: any) => this.idSucursalesAcceso.has(regimen.id_suc));
+      this.empleados.forEach((empleado: any) => {
+        this.idCargosAcceso.add(empleado.id_cargo_);
+      });
 
-    this.empleados.forEach((empleado: any) => {
-      this.idCargosAcceso.add(empleado.id_cargo_);
-    });
-
-    this.cargos = this.cargos.filter((cargo: any) =>
-      this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
-    );
+      this.cargos = this.cargos.filter((cargo: any) =>
+        this.idSucursalesAcceso.has(cargo.id_suc) && this.idCargosAcceso.has(cargo.id)
+      );
+    }
 
     this.mostrarTablas = true;
   }

@@ -62,6 +62,8 @@ export class VerEmpresaComponent implements OnInit {
   });
 
   idEmpleado: number;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+
   public empleado: any = [];
   p_color: any;
   s_color: any;
@@ -90,6 +92,8 @@ export class VerEmpresaComponent implements OnInit {
   ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
+    this.rolEmpleado = parseInt(localStorage.getItem('rol') as string);
+
     this.asignaciones.ObtenerEstado();
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
@@ -161,8 +165,9 @@ export class VerEmpresaComponent implements OnInit {
   // METODO PARA MOSTRAR LISTA DE SUCURSALES
   ObtenerSucursal() {
     this.datosSucursales = [];
+    this.numero_pagina = 0;
     this.restS.BuscarSucursal().subscribe(data => {
-      this.datosSucursales = this.FiltrarSucursalesAsignadas(data);
+      this.datosSucursales = this.rolEmpleado === 1 ? data : this.FiltrarSucursalesAsignadas(data);
     });
   }
 

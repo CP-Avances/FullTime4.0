@@ -1148,7 +1148,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     let busqueda = {
       fecha_inicio: this.mes_inicio,
       fecha_final: this.mes_fin,
-      codigo: '\'' + this.datoActual.codigo + '\''
+      id_empleado: '\'' + this.idEmpleado + '\''
     }
     this.restPlanGeneral.BuscarPlanificacionHoraria(busqueda).subscribe(datos => {
       if (datos.message === 'OK') {
@@ -1194,7 +1194,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     let busqueda = {
       fecha_inicio: this.mes_inicio,
       fecha_final: this.mes_fin,
-      codigo: '\'' + this.datoActual.codigo + '\''
+      id_empleado: '\'' + this.idEmpleado + '\''
     }
     let codigo_horario = '';
     let tipos: any = [];
@@ -1508,13 +1508,13 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
   // BUSCAR FECHAS DE HORARIO y ELIMINAR PLANIFICACION GENERAL
   id_planificacion_general: any = [];
-  EliminarPlanGeneral(fec_inicio: string, fec_final: string, horario: number, codigo: string) {
+  EliminarPlanGeneral(fec_inicio: string, fec_final: string, horario: number, id_empleado: string) {
     this.id_planificacion_general = [];
     let plan_fecha = {
       fec_inicio: fec_inicio.split('T')[0],
       fec_final: fec_final.split('T')[0],
       id_horario: horario,
-      codigo: codigo
+      id_empleado: id_empleado
     };
     this.restPlanGeneral.BuscarFechas(plan_fecha).subscribe(res => {
       this.id_planificacion_general = res;
@@ -1533,12 +1533,12 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
 
 
   // ELIMINAR REGISTROS DE PLANIFICACION GENERAL
-  EliminarPlanificacionGeneral(fecha: string, horario: number, codigo: string) {
+  EliminarPlanificacionGeneral(fecha: string, horario: number, id_empleado: string) {
     this.id_planificacion_general = [];
     let plan_fecha = {
       fec_inicio: fecha.split('T')[0],
       id_horario: horario,
-      codigo: codigo
+      id_empleado: id_empleado
     };
     this.restPlanGeneral.BuscarFecha(plan_fecha).subscribe(res => {
       this.id_planificacion_general = res;
@@ -2116,7 +2116,7 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   peridoVacaciones: any;
   ObtenerPeriodoVacaciones(formato_fecha: string) {
     this.peridoVacaciones = [];
-    this.restPerV.ObtenerPeriodoVacaciones(this.empleadoUno[0].codigo).subscribe(datos => {
+    this.restPerV.ObtenerPeriodoVacaciones(this.empleadoUno[0].id).subscribe(datos => {
       this.peridoVacaciones = datos;
 
       this.peridoVacaciones.forEach((v: any) => {

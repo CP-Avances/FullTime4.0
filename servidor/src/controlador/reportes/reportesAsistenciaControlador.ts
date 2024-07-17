@@ -204,7 +204,7 @@ class ReportesAsistenciaControlador {
         let n: Array<any> = await Promise.all(datos.map(async (obj: IReporteTimbres) => {
             obj.departamentos = await Promise.all(obj.departamentos.map(async (ele) => {
                 ele.empleado = await Promise.all(ele.empleado.map(async (o) => {
-                    o.timbres = await BuscarTimbresIncompletos(desde, hasta, o.codigo);
+                    o.timbres = await BuscarTimbresIncompletos(desde, hasta, o.id);
                     console.log('Timbres: ', o);
                     return o
                 })
@@ -236,7 +236,7 @@ class ReportesAsistenciaControlador {
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {
             obj.empleados = await Promise.all(obj.empleados.map(async (o: any) => {
-                o.timbres = await BuscarTimbresIncompletos(desde, hasta, o.codigo);
+                o.timbres = await BuscarTimbresIncompletos(desde, hasta, o.id);
                 console.log('Timbres: ', o);
                 return o;
             }));
@@ -469,9 +469,9 @@ const BuscarTimbres = async function (fec_inicio: string, fec_final: string, cod
 const BuscarTimbresIncompletos = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
     return await pool.query(
         `
-        SELECT CAST(fecha_hora_horario AS VARCHAR), codigo, estado_timbre, tipo_accion AS accion, tipo_dia, estado_origen
+        SELECT CAST(fecha_hora_horario AS VARCHAR), id_empleado, estado_timbre, tipo_accion AS accion, tipo_dia, estado_origen
         FROM eu_asistencia_general WHERE CAST(fecha_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' 
-            AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 
+            AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 
             AND fecha_hora_timbre IS null AND estado_origen IN (\'N\',\'HL\', \'HFD\') 
         ORDER BY fecha_hora_horario ASC
         `

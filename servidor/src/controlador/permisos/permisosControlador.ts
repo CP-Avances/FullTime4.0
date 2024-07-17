@@ -20,8 +20,8 @@ class PermisosControlador {
         const { id_empleado } = req.params;
         const NUMERO_PERMISO = await pool.query(
             `
-            SELECT MAX(p.numero_permiso) FROM mp_solicitud_permiso AS p, eu_empleados AS e 
-            WHERE p.codigo = e.codigo AND e.id = $1
+            SELECT MAX(p.numero_permiso) FROM mp_solicitud_permiso AS p
+            WHERE p.id_empleado = $1
             `
             , [id_empleado]);
         if (NUMERO_PERMISO.rowCount != 0) {
@@ -36,19 +36,19 @@ class PermisosControlador {
     public async BuscarPermisosTotales(req: Request, res: Response) {
 
         try {
-            const { fec_inicio, fec_final, codigo } = req.body;
+            const { fec_inicio, fec_final, id_empleado } = req.body;
 
-            console.log('ingresa ', fec_inicio, ' ', fec_final, ' ', codigo)
+            console.log('ingresa ', fec_inicio, ' ', fec_final, ' ', id_empleado)
 
 
             const PERMISO = await pool.query(
                 `
                 SELECT id FROM mp_solicitud_permiso 
                 WHERE ((fecha_inicio::date BETWEEN $1 AND $2) OR (fecha_final::date BETWEEN $1 AND $2)) 
-                    AND codigo = $3
+                    AND id_empleado = $3
                     AND (estado = 2 OR estado = 3 OR estado = 1)
                 `
-                , [fec_inicio, fec_final, codigo]);
+                , [fec_inicio, fec_final, id_empleado]);
             return res.jsonp(PERMISO.rows)
         } catch (error) {
             return res.jsonp({ message: 'error' });
@@ -58,15 +58,15 @@ class PermisosControlador {
     // CONSULTA DE PERMISOS SOLICITADOS POR DIAS
     public async BuscarPermisosDias(req: Request, res: Response) {
         try {
-            const { fec_inicio, fec_final, codigo } = req.body;
+            const { fec_inicio, fec_final, id_empleado } = req.body;
             const PERMISO = await pool.query(
                 `
                 SELECT id FROM mp_solicitud_permiso 
                 WHERE ((fecha_inicio::date BETWEEN $1 AND $2) OR (fecha_final::date BETWEEN $1 AND $2)) 
-                    AND codigo = $3 AND dias_permiso != 0
+                    AND id_empleado = $3 AND dias_permiso != 0
                     AND (estado = 2 OR estado = 3 OR estado = 1)
                 `
-                , [fec_inicio, fec_final, codigo]);
+                , [fec_inicio, fec_final, id_empleado]);
             return res.jsonp(PERMISO.rows)
         } catch (error) {
             return res.jsonp({ message: 'error' });
@@ -76,19 +76,19 @@ class PermisosControlador {
     // CONSULTA DE PERMISOS SOLICITADOS POR DIAS
     public async BuscarPermisosHoras(req: Request, res: Response) {
         try {
-            const { fec_inicio, fec_final, hora_inicio, hora_final, codigo } = req.body;
-            console.log('ver data ', fec_inicio, fec_final, hora_inicio, hora_final, codigo)
+            const { fec_inicio, fec_final, hora_inicio, hora_final, id_empleado } = req.body;
+            console.log('ver data ', fec_inicio, fec_final, hora_inicio, hora_final, id_empleado)
             const PERMISO = await pool.query(
                 `
                 SELECT id FROM mp_solicitud_permiso 
                 WHERE (($1 BETWEEN fecha_inicio::date AND fecha_final::date) 
                     OR ($2 BETWEEN fecha_inicio::date AND fecha_final::date)) 
-                    AND codigo = $5 
+                    AND id_empleado = $5 
                     AND dias_permiso = 0
                     AND (($3 BETWEEN hora_salida AND hora_ingreso) OR ($4 BETWEEN hora_salida AND hora_ingreso)) 
                     AND (estado = 2 OR estado = 3 OR estado = 1)
                 `
-                , [fec_inicio, fec_final, hora_inicio, hora_final, codigo]);
+                , [fec_inicio, fec_final, hora_inicio, hora_final, id_empleado]);
             return res.jsonp(PERMISO.rows)
         } catch (error) {
             return res.jsonp({ message: 'error' });
@@ -98,15 +98,15 @@ class PermisosControlador {
     // CONSULTA DE PERMISOS SOLICITADOS POR DIAS - ACTUALIZACION
     public async BuscarPermisosTotalesEditar(req: Request, res: Response) {
         try {
-            const { fec_inicio, fec_final, codigo, id } = req.body;
+            const { fec_inicio, fec_final, id_empleado, id } = req.body;
             const PERMISO = await pool.query(
                 `
                 SELECT id FROM mp_solicitud_permiso 
                 WHERE ((fecha_inicio::date BETWEEN $1 AND $2) OR (fecha_final::date BETWEEN $1 AND $2)) 
-                    AND codigo = $3
+                    AND id_empleado = $3
                     AND (estado = 2 OR estado = 3 OR estado = 1) AND NOT id = $4
                 `
-                , [fec_inicio, fec_final, codigo, id]);
+                , [fec_inicio, fec_final, id_empleado, id]);
             return res.jsonp(PERMISO.rows)
         } catch (error) {
             return res.jsonp({ message: 'error' });
@@ -116,15 +116,15 @@ class PermisosControlador {
     // CONSULTA DE PERMISOS SOLICITADOS POR DIAS - ACTUALIZACION
     public async BuscarPermisosDiasEditar(req: Request, res: Response) {
         try {
-            const { fec_inicio, fec_final, codigo, id } = req.body;
+            const { fec_inicio, fec_final, id_empleado, id } = req.body;
             const PERMISO = await pool.query(
                 `
                 SELECT id FROM mp_solicitud_permiso 
                 WHERE ((fecha_inicio::date BETWEEN $1 AND $2) OR (fecha_final::date BETWEEN $1 AND $2)) 
-                    AND codigo = $3 AND dias_permiso != 0
+                    AND id_empleado = $3 AND dias_permiso != 0
                     AND (estado = 2 OR estado = 3 OR estado = 1) AND NOT id = $4
                 `
-                , [fec_inicio, fec_final, codigo, id]);
+                , [fec_inicio, fec_final, id_empleado, id]);
             return res.jsonp(PERMISO.rows)
         } catch (error) {
             return res.jsonp({ message: 'error' });
@@ -135,18 +135,18 @@ class PermisosControlador {
     // CONSULTA DE PERMISOS SOLICITADOS POR DIAS
     public async BuscarPermisosHorasEditar(req: Request, res: Response) {
         try {
-            const { fec_inicio, fec_final, hora_inicio, hora_final, codigo, id } = req.body;
+            const { fec_inicio, fec_final, hora_inicio, hora_final, id_empleado, id } = req.body;
             const PERMISO = await pool.query(
                 `
                 SELECT id FROM mp_solicitud_permiso 
                 WHERE (($1 BETWEEN fecha_inicio::date AND fecha_final::date) 
                     OR ($2 BETWEEN fecha_inicio::date AND fecha_final::date )) 
-                    AND codigo = $5 
+                    AND id_empleado = $5 
                     AND dias_permiso = 0
                     AND (($3 BETWEEN hora_salida AND hora_ingreso) OR ($4 BETWEEN hora_salida AND hora_ingreso)) 
                     AND (estado = 2 OR estado = 3 OR estado = 1) AND NOT id = $6
                 `
-                , [fec_inicio, fec_final, hora_inicio, hora_final, codigo, id]);
+                , [fec_inicio, fec_final, hora_inicio, hora_final, id_empleado, id]);
             return res.jsonp(PERMISO.rows)
         } catch (error) {
             return res.jsonp({ message: 'error' });
@@ -159,7 +159,7 @@ class PermisosControlador {
         try {
             const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
                 id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
-                estado, id_empl_cargo, hora_salida, hora_ingreso, codigo,
+                estado, id_empl_cargo, hora_salida, hora_ingreso, id_empl,
                 depa_user_loggin, user_name, ip } = req.body;
 
             // INICIAR TRANSACCION
@@ -169,13 +169,13 @@ class PermisosControlador {
                 `
                 INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, 
                     legalizado, dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, 
-                    numero_permiso, estado, id_empleado_cargo, hora_salida, hora_ingreso, codigo) 
+                    numero_permiso, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado) 
                 VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17 ) 
                     RETURNING * 
                 `,
                 [fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
                     id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
-                    estado, id_empl_cargo, hora_salida, hora_ingreso, codigo]);
+                    estado, id_empl_cargo, hora_salida, hora_ingreso, id_empl]);
 
             const [objetoPermiso] = response.rows;
             var fechaCreacionN = await FormatearFecha2(fec_creacion, 'ddd');
@@ -191,7 +191,7 @@ class PermisosControlador {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{codigo: ${codigo}, id_empleado_contrato: ${id_empl_contrato}, id_empleado_cargo: ${id_empl_cargo}, id_periodo_vacacion: ${id_peri_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: null, numero_permiso: ${num_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dia}, dia_libre: ${dia_libre}, horas_permiso: ${hora_numero}, documento: null, legalizado: ${legalizado}, estado: ${estado}}`,
+                datosNuevos: `{id_empleado: ${id_empl}, id_empleado_contrato: ${id_empl_contrato}, id_empleado_cargo: ${id_empl_cargo}, id_periodo_vacacion: ${id_peri_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: null, numero_permiso: ${num_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dia}, dia_libre: ${dia_libre}, horas_permiso: ${hora_numero}, documento: null, legalizado: ${legalizado}, estado: ${estado}}`,
                 ip, observacion: null
             });
 
@@ -298,8 +298,8 @@ class PermisosControlador {
                 tabla: 'mp_solicitud_permiso',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
-                datosNuevos: `{codigo: , id_empleado_contrato: , id_empleado_cargo: , id_periodo_vacacion: ${id_peri_vacacion}, fecha_creacion: , fecha_edicion: ${fechaEdicionN}, numero_permiso: ${num_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dia}, dia_libre: ${dia_libre}, horas_permiso: ${hora_numero}, documento: null, legalizado: , estado: }`,
+                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                datosNuevos: `{id_empleado: , id_empleado_contrato: , id_empleado_cargo: , id_periodo_vacacion: ${id_peri_vacacion}, fecha_creacion: , fecha_edicion: ${fechaEdicionN}, numero_permiso: ${num_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dia}, dia_libre: ${dia_libre}, horas_permiso: ${hora_numero}, documento: null, legalizado: , estado: }`,
                 ip, observacion: null
             });
 
@@ -414,8 +414,8 @@ class PermisosControlador {
                 tabla: 'mp_solicitud_permiso',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
-                datosNuevos: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
                 ip,
                 observacion: null
             });
@@ -495,8 +495,8 @@ class PermisosControlador {
                 tabla: 'mp_solicitud_permiso',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
-                datosNuevos: `{codigo: ${datosOriginales.codigo}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: null, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: null, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
                 ip,
                 observacion: null
             });
@@ -532,10 +532,10 @@ class PermisosControlador {
                 `
                 SELECT p.id, p.fecha_creacion, p.descripcion, p.fecha_inicio, p.fecha_final, p.dias_permiso, 
                     p.horas_permiso, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso, p.id_empleado_contrato, 
-                    p.id_periodo_vacacion, p.numero_permiso, p.documento, p.hora_salida, p.hora_ingreso, p.codigo, 
+                    p.id_periodo_vacacion, p.numero_permiso, p.documento, p.hora_salida, p.hora_ingreso, e.codigo, 
                     t.descripcion AS nom_permiso, t.tipo_descuento 
                 FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS t, eu_empleados AS e
-                WHERE p.id_tipo_permiso = t.id AND p.codigo = e.codigo AND e.id = $1 
+                WHERE p.id_tipo_permiso = t.id AND p.id_empleado = e.id AND e.id = $1 
                 ORDER BY p.numero_permiso DESC
                 `
                 , [id_empleado]);
@@ -556,7 +556,7 @@ class PermisosControlador {
                 ere_cat_regimenes AS cr, datos_actuales_empleado AS da, eu_empleado_cargos AS ce, e_sucursales AS s,
                 e_ciudades AS c, e_empresa AS e, e_cat_tipo_cargo AS tc
             WHERE p.id_tipo_permiso = tp.id AND ec.id = p.id_empleado_contrato AND cr.id = ec.id_regimen
-                AND da.codigo = p.codigo AND ce.id_contrato = p.id_empleado_contrato
+                AND da.id = p.id_empleado AND ce.id_contrato = p.id_empleado_contrato
                 AND s.id = ce.id_sucursal AND s.id_ciudad = c.id AND s.id_empresa = e.id AND tc.id = ce.id_tipo_cargo
                 AND p.id = $1
             `
@@ -680,19 +680,19 @@ class PermisosControlador {
                 `
                 , [id_permiso]);
 
-                var fechaCreacionN = await FormatearFecha2(datosOriginalesPermisos.fecha_creacion, 'ddd');
-                var fechaInicioO = await FormatearFecha2(datosOriginalesPermisos.fecha_inicio, 'ddd');
-                var fechaFinalO = await FormatearFecha2(datosOriginalesPermisos.fecha_final, 'ddd');
-                var fechaEdicionO = await FormatearFecha2(datosOriginalesPermisos.fecha_edicion, 'ddd');
-                const horaSalidaO = await FormatearHora(datosOriginalesPermisos.hora_salida);
-                const horaIngresoO = await FormatearHora(datosOriginalesPermisos.hora_ingreso);
+            var fechaCreacionN = await FormatearFecha2(datosOriginalesPermisos.fecha_creacion, 'ddd');
+            var fechaInicioO = await FormatearFecha2(datosOriginalesPermisos.fecha_inicio, 'ddd');
+            var fechaFinalO = await FormatearFecha2(datosOriginalesPermisos.fecha_final, 'ddd');
+            var fechaEdicionO = await FormatearFecha2(datosOriginalesPermisos.fecha_edicion, 'ddd');
+            const horaSalidaO = await FormatearHora(datosOriginalesPermisos.hora_salida);
+            const horaIngresoO = await FormatearHora(datosOriginalesPermisos.hora_ingreso);
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'mp_solicitud_permiso',
                 usuario: user_name,
                 accion: 'D',
-                datosOriginales: `{codigo: ${datosOriginalesPermisos.codigo}, id_empleado_contrato: ${datosOriginalesPermisos.id_empleado_contrato}, id_empleado_cargo: ${datosOriginalesPermisos.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginalesPermisos.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginalesPermisos.numero_permiso}, descripcion: ${datosOriginalesPermisos.descripcion}, id_tipo_permiso: ${datosOriginalesPermisos.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginalesPermisos.dias_permiso}, dia_libre: ${datosOriginalesPermisos.dia_libre}, horas_permiso: ${datosOriginalesPermisos.horas_permiso}, documento: ${datosOriginalesPermisos.documento}, legalizado: ${datosOriginalesPermisos.legalizado}, estado: ${datosOriginalesPermisos.estado}}`,
+                datosOriginales: `{id_empleado: ${datosOriginalesPermisos.id_empleado}, id_empleado_contrato: ${datosOriginalesPermisos.id_empleado_contrato}, id_empleado_cargo: ${datosOriginalesPermisos.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginalesPermisos.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginalesPermisos.numero_permiso}, descripcion: ${datosOriginalesPermisos.descripcion}, id_tipo_permiso: ${datosOriginalesPermisos.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginalesPermisos.dias_permiso}, dia_libre: ${datosOriginalesPermisos.dia_libre}, horas_permiso: ${datosOriginalesPermisos.horas_permiso}, documento: ${datosOriginalesPermisos.documento}, legalizado: ${datosOriginalesPermisos.legalizado}, estado: ${datosOriginalesPermisos.estado}}`,
                 datosNuevos: '',
                 ip,
                 observacion: null
@@ -1218,9 +1218,9 @@ class PermisosControlador {
                 `
                 SELECT p.id, p.fecha_creacion, p.descripcion, p.fecha_inicio, p.fecha_final, p.dias_permiso, 
                     p.horas_permiso, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso, p.id_empleado_contrato, 
-                    p.id_periodo_vacacion, p.numero_permiso, p.documento, p.hora_salida, p.hora_ingreso, p.codigo, 
-                    t.descripcion AS nom_permiso 
-                FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS t 
+                    p.id_periodo_vacacion, p.numero_permiso, p.documento, p.hora_salida, p.hora_ingreso, p.id_empleado, 
+                    t.descripcion AS nom_permiso
+                FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS t
                 WHERE p.id_tipo_permiso = t.id AND p.id = $1 
                 ORDER BY p.numero_permiso DESC
                 `
@@ -1302,7 +1302,7 @@ class PermisosControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOSORIGINALES
-            const consulta = await pool.query('SELECT estado FROM mp_solicitud_permiso WHERE id = $1', [id]);
+            const consulta = await pool.query(`SELECT estado FROM mp_solicitud_permiso WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
 
             if (!datosOriginales) {

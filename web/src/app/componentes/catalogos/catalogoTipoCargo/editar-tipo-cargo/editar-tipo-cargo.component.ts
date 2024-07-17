@@ -9,6 +9,7 @@ import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/
   templateUrl: './editar-tipo-cargo.component.html',
   styleUrls: ['./editar-tipo-cargo.component.css']
 })
+
 export class EditarTipoCargoComponent implements OnInit{
 
   // VARIABLES PARA AUDITORIA

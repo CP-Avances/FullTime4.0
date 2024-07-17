@@ -97,6 +97,7 @@ export class VistaRolesComponent implements OnInit {
   // METODO PARA OBTENER ROLES
   ObtenerRoles() {
     this.roles = [];
+    this.numero_pagina = 1;
     this.rest.BuscarRoles().subscribe(res => {
       this.roles = res;
     });

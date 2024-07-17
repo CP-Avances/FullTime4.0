@@ -1384,14 +1384,14 @@ class UsuarioControlador {
    ** **            METODO PARA MANEJAR DATOS DE REGISTRO DE DISPOSITIVOS MOVILES               ** **
    ** ******************************************************************************************** **/
 
-  // LISTADO DE DISPOSITIVOS REGISTRADOS POR EL CODIGO DE USUARIO
+  // LISTADO DE DISPOSITIVOS REGISTRADOS POR EL ID DE USUARIO
   public async ListarDispositivosMoviles(req: Request, res: Response) {
     try {
       const DISPOSITIVOS = await pool.query(
         `
         SELECT e.codigo, (e.nombre || \' \' || e.apellido) AS nombre, e.cedula, d.id_dispositivo, d.modelo_dispositivo
         FROM mrv_dispositivos AS d 
-        INNER JOIN eu_empleados AS e ON d.codigo_empleado = e.codigo
+        INNER JOIN eu_empleados AS e ON d.id_empleado = e.id
         ORDER BY nombre
         `
       ).then((result: any) => { return result.rows });
@@ -1855,7 +1855,6 @@ class UsuarioControlador {
     }
   }
 
-  //METODO PARA OBTENER TEXTO ENCRIPTADO
   public async ObtenerDatoEncriptado(req: Request, res: Response) {
     try {
       const { contrasena } = req.body;
@@ -1866,6 +1865,171 @@ class UsuarioControlador {
     }
   }
 
+  // METODO PARA REGISTRAR MULTIPLES ASIGNACIONES DE USUARIO - DEPARTAMENTO
+  public async RegistrarUsuarioDepartamentoMultiple(req: Request, res: Response) {
+    const { usuarios_seleccionados, departamentos_seleccionados, isPersonal, user_name, ip } = req.body;
+    let error: boolean = false;
+
+    for (const usuario of usuarios_seleccionados) {
+      let datos: Datos = {
+        id: '',
+        id_empleado: usuario.id,
+        id_departamento: '',
+        principal: false,
+        personal: false,
+        administra: false,
+        user_name: user_name,
+        ip: ip,
+      };
+
+      if (isPersonal) {
+        datos.id_departamento = usuario.id_departamento;
+        const verificacion = await VerificarAsignaciones(datos, true, isPersonal);
+        if (verificacion === 2) {
+          error = await EditarUsuarioDepartamento(datos);
+        }
+      }
+
+
+      for (const departamento of departamentos_seleccionados) {
+
+        datos.id_departamento = departamento.id;
+        datos.administra = true;
+        datos.principal = false;
+        datos.personal = false;
+        const verificacion = await VerificarAsignaciones(datos, false, isPersonal);
+
+        switch (verificacion) {
+          case 1:
+            // INSERTAR NUEVA ASIGNACIÓN
+            error = await RegistrarUsuarioDepartamento(datos);
+            break;
+          case 2:
+            // ACTUALIZAR ASIGNACIÓN EXISTENTE
+            error = await EditarUsuarioDepartamento(datos);
+            break;
+        }
+      }
+    }
+
+    if (error) return res.status(500).jsonp({ message: 'error' });
+
+    return res.json({ message: 'Proceso completado'});
+    
+  }
+
+}
+
+/* @return
+    CASOS DE RETORNO
+    0: USUARIO NO EXISTE => NO SE EJECUTA NINGUNA ACCION
+    1: NO EXISTE LA ASIGNACION => SE PUEDE ASIGNAR (INSERTAR)
+    2: EXISTE LA ASIGNACION Y ES PRINCIPAL => SE ACTUALIZA LA ASIGNACION (PRINCIPAL) 
+    3: EXISTE LA ASIGNACION Y NO ES PRINCIPAL => NO SE EJECUTA NINGUNA ACCION  */  async function VerificarAsignaciones(datos: any, personal: boolean, isPersonal: boolean): Promise<number> {    const { id_empleado, id_departamento } = datos;      const consulta = await pool.query(      `      SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 AND id_departamento = $2      `      , [id_empleado, id_departamento]);           if (consulta.rowCount === 0) return 1;              const asignacion = consulta.rows[0];        if (asignacion.principal) {        datos.principal = true;        datos.id = asignacion.id;        datos.personal = asignacion.personal;            if (isPersonal) {          datos.personal = true;        }            if (personal) {          datos.administra = asignacion.administra;        }        return 2;      }    return 3;   }
+  
+async function RegistrarUsuarioDepartamento(datos: any): Promise<boolean> {
+  try {
+    const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = datos;
+  
+    // INICIA TRANSACCION
+    await pool.query('BEGIN');
+  
+    const registro = await pool.query(
+      `
+      INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
+      VALUES ($1, $2, $3, $4, $5) RETURNING *
+      `
+      , [id_empleado, id_departamento, principal, personal, administra]);
+        
+     const [datosNuevos] = registro.rows;
+
+    // AUDITORIA
+    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+      tabla: 'eu_usuario_departamento',
+      usuario: user_name,
+      accion: 'I',
+      datosOriginales: '',
+      datosNuevos: JSON.stringify(datosNuevos),
+      ip,
+      observacion: null
+    });
+  
+    // FINALIZAR TRANSACCION
+    await pool.query('COMMIT');
+    return false;
+  } catch (error) {
+    return true;
+  }
+}
+  
+async function EditarUsuarioDepartamento(datos: any): Promise<boolean> {
+  try {
+    const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = datos;
+
+    // INICIAR TRANSACCION
+    await pool.query('BEGIN');
+
+    // CONSULTA DATOSORIGINALES
+    const consulta = await pool.query(
+      `
+      SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 AND id_departamento = $2
+      `
+      , [id_empleado, id_departamento]);
+    const [datosOriginales] = consulta.rows;
+
+    if (!datosOriginales) {
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'eu_usuario_departamento',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: '',
+        datosNuevos: '',
+        ip,
+        observacion: `Error al actualizar registro con id_empleado: ${id_empleado} y id_departamento: ${id_departamento}. Registro no encontrado.`
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return true;
+    }
+
+    const actualizacion = await pool.query(
+      `
+      UPDATE eu_usuario_departamento SET principal = $3, personal = $4, administra = $5
+      WHERE id_empleado = $1 AND id_departamento = $2 RETURNING *
+      `
+      , [id_empleado, id_departamento, principal, personal, administra]);
+
+    const [datosNuevos] = actualizacion.rows;
+
+    // AUDITORIA
+    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+      tabla: 'eu_usuario_departamento',
+      usuario: user_name,
+      accion: 'U',
+      datosOriginales: JSON.stringify(datosOriginales),
+      datosNuevos: JSON.stringify(datosNuevos),
+      ip,
+      observacion: null
+    });
+
+    // FINALIZAR TRANSACCION
+    await pool.query('COMMIT');
+    return false;
+  } catch (error) {
+    return true;
+  }
+}
+
+interface Datos {
+  id: string;
+  id_empleado: string;
+  id_departamento: string;
+  principal: boolean;
+  personal: boolean;
+  administra: boolean;
+  user_name: string;
+  ip: string;
 }
 
 export const USUARIO_CONTROLADOR = new UsuarioControlador();

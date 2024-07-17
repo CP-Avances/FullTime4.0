@@ -105,7 +105,9 @@ export class ListarParametroComponent implements OnInit {
   parametros: any = [];
   ObtenerParametros() {
     this.parametros = [];
+    this.numero_pagina = 1;
     this.restP.ListarParametros().subscribe(datos => {
+      datos.sort((a, b) => a.id - b.id);
       this.parametros = datos;
     });
   }
