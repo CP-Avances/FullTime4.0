@@ -28,7 +28,7 @@ mat-card {
     width: 300px;
     margin: auto;
     text-align: center;
-    padding-top: 25px;
+    padding-top: 10px;
     border-style: groove;
     border-radius: 25px;
     padding-bottom: 25px;
@@ -58,8 +58,8 @@ mat-card {
 .caja1 {
     font-size: 13px;
     text-align: right;
-    margin-right: 16px;
-    margin-bottom: 25px;
+    margin-right: 32px;
+    margin-bottom: 15px;
 }
 
 .caja2 {
