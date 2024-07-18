@@ -63,15 +63,15 @@ class TipoPermisosControlador {
                 const fechaHoraO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.horas_maximo_permiso);
                 const fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
                 const fechaFinO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_fin, 'ddd');
+                datosOriginales.horas_maximo_permiso = fechaHoraO;
+                datosOriginales.fecha_inicio = fechaInicioO;
+                datosOriginales.fecha_fin = fechaFinO;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mp_cat_tipo_permisos',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: `{descripcion: ${datosOriginales.descripcion}, tipo_descuento: ${datosOriginales.tipo_descuento}, dias_maximo_permiso: ${datosOriginales.dias_maximo_permiso}, dias_anticipar_permiso: ${datosOriginales.dias_anticipar_permiso}, 
-        justificar: ${datosOriginales.justificar}, fecha_restriccion: ${datosOriginales.fecha_restriccion}, solicita_empleado: ${datosOriginales.solicita_empleado}, legalizar: ${datosOriginales.legalizar}, incluir_minutos_comida: ${datosOriginales.incluir_minutos_comida}, dias_justificar: ${datosOriginales.dias_justificar}, 
-        horas_maximo_permiso: ${fechaHoraO}, fecha_inicio: ${fechaInicioO}, documento: ${datosOriginales.documento}, contar_feriados: ${datosOriginales.contar_feriados}, correo_crear: ${datosOriginales.correo_crear}, correo_editar: ${datosOriginales.correo_editar}, correo_eliminar: ${datosOriginales.correo_eliminar}, 
-        correo_preautorizar: ${datosOriginales.correo_preautorizar}, correo_autorizar: ${datosOriginales.correo_autorizar}, correo_negar: ${datosOriginales.correo_negar}, correo_legalizar: ${datosOriginales.correo_legalizar}, fecha_fin: ${fechaFinO}, crear_dias_anteriores: ${datosOriginales.crear_dias_anteriores}}`,
+                    datosOriginales: JSON.stringify(datosOriginales),
                     datosNuevos: '',
                     ip,
                     observacion: null
@@ -144,19 +144,19 @@ class TipoPermisosControlador {
                 const fechaHora = yield (0, settingsMail_1.FormatearHora)(num_hora_maximo);
                 const fechaInicio = yield (0, settingsMail_1.FormatearFecha2)(fecha_inicio, 'ddd');
                 const fechaFin = yield (0, settingsMail_1.FormatearFecha2)(fecha_fin, 'ddd');
+                datosOriginales.horas_maximo_permiso = fechaHoraO;
+                datosOriginales.fecha_inicio = fechaInicioO;
+                datosOriginales.fecha_fin = fechaFinO;
+                tipoPermiso.horas_maximo_permiso = fechaHora;
+                tipoPermiso.fecha_inicio = fechaInicio;
+                tipoPermiso.fecha_fin = fechaFin;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mp_cat_tipo_permisos',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: `{descripcion: ${datosOriginales.descripcion}, tipo_descuento: ${datosOriginales.tipo_descuento}, dias_maximo_permiso: ${datosOriginales.dias_maximo_permiso}, dias_anticipar_permiso: ${datosOriginales.dias_anticipar_permiso}, 
-        justificar: ${datosOriginales.justificar}, fecha_restriccion: ${datosOriginales.fecha_restriccion}, solicita_empleado: ${datosOriginales.solicita_empleado}, legalizar: ${datosOriginales.legalizar}, incluir_minutos_comida: ${datosOriginales.incluir_minutos_comida}, dias_justificar: ${datosOriginales.dias_justificar}, 
-        horas_maximo_permiso: ${fechaHoraO}, fecha_inicio: ${fechaInicioO}, documento: ${datosOriginales.documento}, contar_feriados: ${datosOriginales.contar_feriados}, correo_crear: ${datosOriginales.correo_crear}, correo_editar: ${datosOriginales.correo_editar}, correo_eliminar: ${datosOriginales.correo_eliminar}, 
-        correo_preautorizar: ${datosOriginales.correo_preautorizar}, correo_autorizar: ${datosOriginales.correo_autorizar}, correo_negar: ${datosOriginales.correo_negar}, correo_legalizar: ${datosOriginales.correo_legalizar}, fecha_fin: ${fechaFinO}, crear_dias_anteriores: ${datosOriginales.crear_dias_anteriores}}`,
-                    datosNuevos: `{descripcion: ${descripcion}, tipo_descuento: ${tipo_descuento}, dias_maximo_permiso: ${num_dia_maximo}, dias_anticipar_permiso: ${num_dia_anticipo}, 
-        justificar: ${gene_justificacion}, fecha_restriccion: ${fec_validar}, solicita_empleado: ${acce_empleado}, legalizar: ${legalizar}, incluir_minutos_comida: ${almu_incluir}, dias_justificar: ${num_dia_justifica}, 
-        horas_maximo_permiso: ${fechaHora}, fecha_inicio: ${fechaInicio}, documento: ${documento}, contar_feriados: ${contar_feriados}, correo_crear: ${correo_crear}, correo_editar: ${correo_editar}, correo_eliminar: ${correo_eliminar}, 
-        correo_preautorizar: ${correo_preautorizar}, correo_autorizar: ${correo_autorizar}, correo_negar: ${correo_negar}, correo_legalizar: ${correo_legalizar}, fecha_fin: ${fechaFin}, crear_dias_anteriores: ${num_dia_anterior}}`,
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(tipoPermiso),
                     ip,
                     observacion: null
                 });
@@ -194,16 +194,16 @@ class TipoPermisosControlador {
                 const fechaHora = yield (0, settingsMail_1.FormatearHora)(num_hora_maximo);
                 const fechaInicio = yield (0, settingsMail_1.FormatearFecha2)(fecha_inicio, 'ddd');
                 const fechaFin = yield (0, settingsMail_1.FormatearFecha2)(fecha_fin, 'ddd');
+                tipo.horas_maximo_permiso = fechaHora;
+                tipo.fecha_inicio = fechaInicio;
+                tipo.fecha_fin = fechaFin;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mp_cat_tipo_permisos',
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `{descripcion: ${descripcion}, tipo_descuento: ${tipo_descuento}, dias_maximo_permiso: ${num_dia_maximo}, dias_anticipar_permiso: ${num_dia_anticipo}, 
-          justificar: ${gene_justificacion}, fecha_restriccion: ${fec_validar}, solicita_empleado: ${acce_empleado}, legalizar: ${legalizar}, incluir_minutos_comida: ${almu_incluir}, dias_justificar: ${num_dia_justifica}, 
-          horas_maximo_permiso: ${fechaHora}, fecha_inicio: ${fechaInicio}, documento: ${documento}, contar_feriados: ${contar_feriados}, correo_crear: ${correo_crear}, correo_editar: ${correo_editar}, correo_eliminar: ${correo_eliminar}, 
-          correo_preautorizar: ${correo_preautorizar}, correo_autorizar: ${correo_autorizar}, correo_negar: ${correo_negar}, correo_legalizar: ${correo_legalizar}, fecha_fin: ${fechaFin}, crear_dias_anteriores: ${num_dia_anterior}}`,
+                    datosNuevos: JSON.stringify(tipo),
                     ip,
                     observacion: null
                 });

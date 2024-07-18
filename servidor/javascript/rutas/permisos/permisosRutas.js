@@ -41,7 +41,7 @@ const storage = multer_1.default.diskStorage({
             const permiso = yield database_1.default.query(`
             SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1
             `, [id]);
-            let documento = permiso.rows[0].num_permiso + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
+            let documento = permiso.rows[0].numero_permiso + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
             cb(null, documento);
         });
     }

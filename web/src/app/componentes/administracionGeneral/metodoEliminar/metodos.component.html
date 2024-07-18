@@ -102,6 +102,19 @@
     </mat-card-content>
 </ng-container>
 
+<ng-container *ngIf="mensaje == 'asistencia'">
+  <div id="resultados" >
+      <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+          VERIFICAR ASISTENCIA
+      </span>
+  </div>
+  <mat-card-content *ngIf="!eliminar">
+      <div style="padding: 2%;">
+          <p> <b>La asistencia se colocará de acuerdo a los timbres encontrados en el sistema.</b></p>
+      </div>
+  </mat-card-content>
+</ng-container>
+
 <div style="text-align: center; margin-bottom: 3%;">
     <button mat-raised-button id="aceptar" class="btn-sm" color="primary" (click)="Confirmar()">
         Aceptar

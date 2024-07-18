@@ -94,9 +94,9 @@ export class EditarCargoComponent implements OnInit {
 
     this.ObtenerAsignacionesUsuario(this.idEmpleadoAcceso);
     this.BuscarUsuarioDepartamento();
-    this.ObtenerCargoEmpleado();
     this.FiltrarSucursales();
     this.BuscarTiposCargos();
+    this.ObtenerCargoEmpleado();
     this.tipoCargo[this.tipoCargo.length] = { cargo: "OTRO" };
   }
 
@@ -161,7 +161,7 @@ export class EditarCargoComponent implements OnInit {
   ObtenerDepartamentosImprimir(id: number) {
     this.departamento = [];
     this.restCatDepartamento.BuscarDepartamentoSucursal(id).subscribe(datos => {
-      this.departamento = this.FiltrarDepartamentosAsignados(datos);
+      this.departamento = this.rolEmpleado === 1 ? datos : this.FiltrarDepartamentosAsignados(datos);
     }, error => {
       this.toastr.info('Sucursal no cuenta con departamentos registrados.', '', {
         timeOut: 6000,
@@ -176,7 +176,7 @@ export class EditarCargoComponent implements OnInit {
       this.cargo = res;
       this.id_empl_contrato = this.cargo[0].id_contrato;
       this.cargo.forEach((obj: any) => {
-        console.log('ver obj ', obj)
+        console.log('ver obj ', obj.id_departamento)
         this.ObtenerDepartamentosImprimir(obj.id_sucursal);
         // FORMATEAR HORAS
         if (obj.hora_trabaja.split(':').length === 3) {

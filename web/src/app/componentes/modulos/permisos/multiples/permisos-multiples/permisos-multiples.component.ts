@@ -220,29 +220,29 @@ export class PermisosMultiplesComponent implements OnInit {
       this.legalizar = this.datosPermiso.legalizar;
 
       // PERMISO POR HORAS
-      if (this.datosPermiso.num_dia_maximo === 0) {
+      if (this.datosPermiso.dias_maximo_permiso === 0) {
         this.LimpiarFormulario('');
         this.informacion2 = '';
-        this.informacion1 = `Horas máximas de permiso: ${this.datosPermiso.num_hora_maximo}`;
+        this.informacion1 = `Horas máximas de permiso: ${this.datosPermiso.horas_maximo_permiso}`;
         this.activar_hora = true;
         this.habilitarDias = false;
         this.formulario.patchValue({
           solicitarForm: 'Horas',
         });
-        this.Thoras = this.datosPermiso.num_hora_maximo;
+        this.Thoras = this.datosPermiso.horas_maximo_permiso;
         this.configuracion_permiso = 'Horas';
       }
       // PERMISO POR DIAS
-      else if (this.datosPermiso.num_hora_maximo === '00:00:00') {
+      else if (this.datosPermiso.horas_maximo_permiso === '00:00:00') {
         this.LimpiarFormulario('00:00');
         this.informacion2 = '';
-        this.informacion1 = `Días máximos de permiso: ${this.datosPermiso.num_dia_maximo}`;
+        this.informacion1 = `Días máximos de permiso: ${this.datosPermiso.dias_maximo_permiso}`;
         this.activar_hora = false;
         this.habilitarDias = true;
         this.formulario.patchValue({
           solicitarForm: 'Dias',
         });
-        this.Tdias = this.datosPermiso.num_dia_maximo;
+        this.Tdias = this.datosPermiso.dias_maximo_permiso;
         this.configuracion_permiso = 'Dias';
       }
 
@@ -256,7 +256,7 @@ export class PermisosMultiplesComponent implements OnInit {
       }
 
       // MENSAJE DESCUENTO ALIMENTACION
-      if (this.datosPermiso.almu_incluir === true) {
+      if (this.datosPermiso.incluir_minutos_comida === true) {
         this.informacion3 = `Aplica descuento de minutos de alimentación si el permiso es solicitado por horas y se encuentra dentro del horario de alimentación.`;
       }
       else {
@@ -264,7 +264,7 @@ export class PermisosMultiplesComponent implements OnInit {
       }
 
       // MENSAJE DIAS PREVIOS DE SOLICITUD
-      this.informacion4 = `Número de días previos para cargar solicitud: ${this.datosPermiso.num_dia_anticipo} días.`;
+      this.informacion4 = `Número de días previos para cargar solicitud: ${this.datosPermiso.dias_anticipar_permiso} días.`;
     })
   }
 
@@ -304,7 +304,7 @@ export class PermisosMultiplesComponent implements OnInit {
       var salida = String(moment(fecha, "YYYY/MM/DD").format("YYYY-MM-DD"));
 
       // VALIDAR SI EXISTE RESTRICCION DE FECHAS
-      if (this.datosPermiso.fec_validar === true) {
+      if (this.datosPermiso.fecha_restrinccion === true) {
         var fecha_negada_inicio = this.datosPermiso.fecha_inicio.split('T')[0];
         var fecha_negada_fin = this.datosPermiso.fecha_fin.split('T')[0];
 
@@ -345,7 +345,7 @@ export class PermisosMultiplesComponent implements OnInit {
   // METODO PARA VALIDAR FECHAS DE AÑOS PASADOS
   ValidarAñosAnteriores(inicio: any, form: any) {
     var mes_inicial = moment().format('YYYY/01/01');
-    var dias = this.datosPermiso.num_dia_anterior;
+    var dias = this.datosPermiso.crear_dias_anteriores;
     if (dias > 0) {
       var restar = moment(mes_inicial, 'YYYY/MM/DD').subtract(dias, 'days').format('YYYY/MM/DD');
 
@@ -363,14 +363,14 @@ export class PermisosMultiplesComponent implements OnInit {
 
   // METODO PARA VALIDAR DIAS PREVIOS DE PERMISO
   ValidarDiasPrevios(inicio: any, form: any) {
-    var dias = this.datosPermiso.num_dia_anticipo;
+    var dias = this.datosPermiso.dias_anticipar_permiso;
     var restar = moment(inicio, 'YYYY/MM/DD').subtract(dias, 'days').format('YYYY/MM/DD');
     if (dias > 0) {
       if (Date.parse(this.FechaActual) <= Date.parse(restar)) {
         this.ImprimirFecha(form);
       }
       else {
-        this.toastr.warning('Ups!!! el permiso debio ser solicitado con ' + this.datosPermiso.num_dia_anticipo + ' días previos.',
+        this.toastr.warning('Ups!!! el permiso debio ser solicitado con ' + this.datosPermiso.dias_anticipar_permiso + ' días previos.',
           '', {
           timeOut: 4000,
         });
@@ -418,7 +418,7 @@ export class PermisosMultiplesComponent implements OnInit {
         // VERIFICAR QUE LA FECHA INGRESADA SEA CORRECTA
         if (Date.parse(inicio) <= Date.parse(fin)) {
 
-          if (this.datosPermiso.fec_validar === true) {
+          if (this.datosPermiso.fecha_restrinccion === true) {
             var fecha_negada_inicio = this.datosPermiso.fecha_inicio.split('T')[0];
             var fecha_negada_fin = this.datosPermiso.fecha_fin.split('T')[0];
 
@@ -1270,7 +1270,7 @@ export class PermisosMultiplesComponent implements OnInit {
               this.EnviarNovedadesLibres(valor);
             }
             else {
-              if (this.datosPermiso.almu_incluir === true) {
+              if (this.datosPermiso.incluir_minutos_comida === true) {
                 //console.log('entra almuerzo ')
                 this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i], valor, tamaño);
               }
@@ -1308,7 +1308,7 @@ export class PermisosMultiplesComponent implements OnInit {
               else {
                 // LA HORA FINAL ES <= '23:59:00' Y LA HORA FINAL ES > QUE LA HORA DE INICIO
                 if (hora_final_ <= '23:59:00' && hora_final_ > datos[i].hora_inicio) {
-                  if (this.datosPermiso.almu_incluir === true) {
+                  if (this.datosPermiso.incluir_minutos_comida === true) {
                     this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i], valor, tamaño);
                   }
                   else {
@@ -1336,7 +1336,7 @@ export class PermisosMultiplesComponent implements OnInit {
                 // CONDICIONES QUE SE DEBE CUMPLIR
                 // SI LA HORA DE INICIO ES 00:00:00 (INICIO DE UN NUEVO DIA)
                 if (hora_inicio_ === '00:00:00') {
-                  if (this.datosPermiso.almu_incluir === true) {
+                  if (this.datosPermiso.incluir_minutos_comida === true) {
                     this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i], valor, tamaño);
                   }
                   else {
@@ -1348,7 +1348,7 @@ export class PermisosMultiplesComponent implements OnInit {
                 else {
                   // LA HORA DE INICIO DEBE SER >= 00:01:00 Y LA HORA DE INICIO DEBE SER < QUE LA HORA DE SALIDA DEL USUARIO
                   if (hora_inicio_ >= '00:01:00' && hora_inicio_ < datos[i].hora_final) {
-                    if (this.datosPermiso.almu_incluir === true) {
+                    if (this.datosPermiso.incluir_minutos_comida === true) {
                       this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i], valor, tamaño);
                     }
                     else {
@@ -1539,7 +1539,7 @@ export class PermisosMultiplesComponent implements OnInit {
         // RECORRER TODOS LOS DATOS DE HORARIOS EXISTENTES
         for (let i = 0; i < datos.length; i++) {
           if (hora_inicio_ >= datos[i].hora_inicio && hora_final_ <= datos[i].hora_final) {
-            if (this.datosPermiso.almu_incluir === true) {
+            if (this.datosPermiso.incluir_minutos_comida === true) {
               this.VerificarFechasDiferentesComida(fecha_inicio, fecha_final, hora_inicio_, hora_final_, valor, tamaño);
             }
             else {
@@ -1848,6 +1848,7 @@ export class PermisosMultiplesComponent implements OnInit {
         id_peri_vacacion: 0,
         user_name: this.user_name,
         ip: this.ip,
+        subir_documento: this.archivoSubido.length != 0,
       }
 
       this.CambiarValoresDiasHoras(form, datosPermiso);

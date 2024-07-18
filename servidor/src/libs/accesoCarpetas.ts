@@ -49,6 +49,20 @@ export const ObtenerRutaPermisos = async function (codigo: any) {
     return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula;
 }
 
+export const ObtenerRutaPermisosIdEmpleado = async function (id_empleado: any) {
+    let ruta = '';
+    let separador = path.sep;
+    const usuario = await pool.query(
+        `
+        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
+        `
+        , [id_empleado]);
+    ruta = path.join(__dirname, `..${separador}..`);
+    const codigo = usuario.rows[0].codigo;
+    const carpetaPermisos = `${ruta}${separador}permisos${separador}${codigo}_${usuario.rows[0].cedula}`;
+    return { carpetaPermisos, codigo };
+}
+
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE CONTRATOS DEL USUARIO
 export const ObtenerRutaContrato = async function (id: any) {
     let ruta = '';
