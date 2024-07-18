@@ -157,70 +157,12 @@ class PermisosControlador {
     // METODO PARA CREAR PERMISOS
     CrearPermisos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre, id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso, estado, id_empl_cargo, hora_salida, hora_ingreso, id_empl, depa_user_loggin, user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const response = yield database_1.default.query(`
-                INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, 
-                    legalizado, dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, 
-                    numero_permiso, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado) 
-                VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17 ) 
-                    RETURNING * 
-                `, [fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
-                    id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
-                    estado, id_empl_cargo, hora_salida, hora_ingreso, id_empl]);
-                const [objetoPermiso] = response.rows;
-                var fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(fec_creacion, 'ddd');
-                var fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
-                var fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
-                const horaSalidaN = yield (0, settingsMail_1.FormatearHora)(hora_salida);
-                const horaIngresoN = yield (0, settingsMail_1.FormatearHora)(hora_ingreso);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'mp_solicitud_permiso',
-                    usuario: user_name,
-                    accion: 'I',
-                    datosOriginales: '',
-                    datosNuevos: `{id_empleado: ${id_empl}, id_empleado_contrato: ${id_empl_contrato}, id_empleado_cargo: ${id_empl_cargo}, id_periodo_vacacion: ${id_peri_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: null, numero_permiso: ${num_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dia}, dia_libre: ${dia_libre}, horas_permiso: ${hora_numero}, documento: null, legalizado: ${legalizado}, estado: ${estado}}`,
-                    ip, observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                if (!objetoPermiso)
-                    return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
-                const permiso = objetoPermiso;
-                const JefesDepartamentos = yield database_1.default.query(`
-                SELECT n.id_departamento, cg.nombre, n.id_departamento_nivel, n.departamento_nombre_nivel, n.nivel,
-                    da.estado, dae.id_contrato, da.id_empleado_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
-                    dae.cedula, dae.correo, c.permiso_mail, c.permiso_notificacion, dae.id AS id_aprueba 
-                FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, datos_actuales_empleado AS dae,
-                    eu_configurar_alertas AS c, ed_departamentos AS cg
-                WHERE n.id_departamento = $1
-                    AND da.id_departamento = n.id_departamento_nivel
-                    AND dae.id_cargo = da.id_empleado_cargo
-                    AND dae.id = c.id_empleado
-                    AND cg.id = n.id_departamento
-                ORDER BY nivel ASC
-                `, [depa_user_loggin]).then((result) => { return result.rows; });
-                if (JefesDepartamentos.length === 0) {
-                    return res.status(400)
-                        .jsonp({
-                        message: `Ups!!! algo salio mal. 
-                Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`,
-                        permiso: permiso
-                    });
-                }
-                else {
-                    permiso.EmpleadosSendNotiEmail = JefesDepartamentos;
-                    return res.status(200).jsonp(permiso);
-                }
+            const data = req.body;
+            const { message, error, permiso } = yield CrearPermiso(data);
+            if (error) {
+                return res.status(400).jsonp({ message });
             }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
+            return res.status(200).jsonp({ message, permiso });
         });
     }
     // METODO PARA EDITAR SOLICITUD DE PERMISOS
@@ -256,24 +198,36 @@ class PermisosControlador {
                 `, [descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso,
                     hora_salida, hora_ingreso, id_peri_vacacion, fec_edicion, id]);
                 const [objetoPermiso] = response.rows;
-                var fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
-                var fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
-                var fechaEdicionN = yield (0, settingsMail_1.FormatearFecha2)(fec_edicion, 'ddd');
+                const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
+                const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
+                const fechaEdicionN = yield (0, settingsMail_1.FormatearFecha2)(fec_edicion, 'ddd');
                 const horaSalidaN = yield (0, settingsMail_1.FormatearHora)(hora_salida);
                 const horaIngresoN = yield (0, settingsMail_1.FormatearHora)(hora_ingreso);
-                var fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_creacion, 'ddd');
-                var fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
-                var fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
-                var fechaEdicionO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_edicion, 'ddd');
+                const fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_creacion, 'ddd');
+                const fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
+                const fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
+                const fechaEdicionO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_edicion, 'ddd');
                 const horaSalidaO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_salida);
                 const horaIngresoO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_ingreso);
+                datosOriginales.fecha_edicion = fechaEdicionO;
+                datosOriginales.fecha_creacion = fechaCreacionN;
+                datosOriginales.fecha_inicio = fechaInicioO;
+                datosOriginales.fecha_final = fechaFinalO;
+                datosOriginales.hora_salida = horaSalidaO;
+                datosOriginales.hora_ingreso = horaIngresoO;
+                objetoPermiso.fecha_creacion = fechaCreacionN;
+                objetoPermiso.fecha_edicion = fechaEdicionN;
+                objetoPermiso.fecha_inicio = fechaInicioN;
+                objetoPermiso.fecha_final = fechaFinalN;
+                objetoPermiso.hora_salida = horaSalidaN;
+                objetoPermiso.hora_ingreso = horaIngresoN;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mp_solicitud_permiso',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
-                    datosNuevos: `{id_empleado: , id_empleado_contrato: , id_empleado_cargo: , id_periodo_vacacion: ${id_peri_vacacion}, fecha_creacion: , fecha_edicion: ${fechaEdicionN}, numero_permiso: ${num_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dia}, dia_libre: ${dia_libre}, horas_permiso: ${hora_numero}, documento: null, legalizado: , estado: }`,
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(objetoPermiso),
                     ip, observacion: null
                 });
                 // FINALIZAR TRANSACCION
@@ -318,83 +272,14 @@ class PermisosControlador {
     GuardarDocumentoPermiso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            try {
-                // FECHA DEL SISTEMA
-                var fecha = (0, moment_1.default)();
-                var anio = fecha.format('YYYY');
-                var mes = fecha.format('MM');
-                var dia = fecha.format('DD');
-                // LEER DATOS DE IMAGEN
-                let id = req.params.id;
-                let { archivo, codigo } = req.params;
-                const { user_name, ip } = req.body;
-                // INICIAR TRANSACCION
-                yield database_1.default.query('BEGIN');
-                const permiso = yield database_1.default.query(`
-                SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1
-                `, [id]);
-                let documento = permiso.rows[0].num_permiso + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
-                let separador = path_1.default.sep;
-                // CONSULTAR DATOSORIGINALES
-                const consulta = yield database_1.default.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id]);
-                const [datosOriginales] = consulta.rows;
-                if (!datosOriginales) {
-                    yield auditoriaControlador_1.default.InsertarAuditoria({
-                        tabla: 'mp_solicitud_permiso',
-                        usuario: user_name,
-                        accion: 'U',
-                        datosOriginales: '',
-                        datosNuevos: '',
-                        ip,
-                        observacion: `Error al intentar actualizar permiso con id: ${id}`
-                    });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
-                }
-                // ACTUALIZAR REGISTRO
-                yield database_1.default.query(`
-                UPDATE mp_solicitud_permiso SET documento = $2 WHERE id = $1
-                `, [id, documento]);
-                var fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_creacion, 'ddd');
-                var fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
-                var fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
-                var fechaEdicionO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_edicion, 'ddd');
-                const horaSalidaO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_salida);
-                const horaIngresoO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_ingreso);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'mp_solicitud_permiso',
-                    usuario: user_name,
-                    accion: 'U',
-                    datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
-                    datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
-                    ip,
-                    observacion: null
-                });
-                // FINALIZAR TRANSACCION
-                yield database_1.default.query('COMMIT');
-                res.jsonp({ message: 'Documento actualizado.' });
-                if (archivo != 'null' && archivo != '' && archivo != null) {
-                    if (archivo != documento) {
-                        let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo)) + separador + archivo;
-                        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                        fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                            if (err) {
-                            }
-                            else {
-                                // ELIMINAR DEL SERVIDOR
-                                fs_1.default.unlinkSync(ruta);
-                            }
-                        });
-                    }
-                }
+            let datos = req.body;
+            const nombreArchivo = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            datos.nombreArchivo = nombreArchivo;
+            const { message, error } = yield RegistrarDocumentoPermiso(datos);
+            if (error) {
+                return res.status(400).jsonp({ message });
             }
-            catch (error) {
-                // REVERTIR TRANSACCION
-                yield database_1.default.query('ROLLBACK');
-                return res.status(500).jsonp({ message: 'error' });
-            }
+            return res.status(200).jsonp({ message });
         });
     }
     // ELIMINAR DOCUMENTO DE RESPALDO DE PERMISO  
@@ -423,23 +308,36 @@ class PermisosControlador {
                     return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
                 }
                 // ACTUALIZAR REGISTRO
-                yield database_1.default.query(`
-                UPDATE mp_solicitud_permiso SET documento = null WHERE id = $1
+                const actualizacion = yield database_1.default.query(`
+                UPDATE mp_solicitud_permiso SET documento = null WHERE id = $1 RETURNING *
                 `, [id]);
+                const [datosNuevos] = actualizacion.rows;
                 // AUDITORIA
-                var fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_creacion, 'ddd');
-                var fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
-                var fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
-                var fechaEdicionO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_edicion, 'ddd');
+                const fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_creacion, 'ddd');
+                const fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
+                const fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
+                const fechaEdicionO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_edicion, 'ddd');
                 const horaSalidaO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_salida);
                 const horaIngresoO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_ingreso);
+                datosOriginales.fecha_creacion = fechaCreacionN;
+                datosOriginales.fecha_edicion = fechaEdicionO;
+                datosOriginales.fecha_inicio = fechaInicioO;
+                datosOriginales.fecha_final = fechaFinalO;
+                datosOriginales.hora_salida = horaSalidaO;
+                datosOriginales.hora_ingreso = horaIngresoO;
+                datosNuevos.fecha_creacion = fechaCreacionN;
+                datosNuevos.fecha_edicion = fechaEdicionO;
+                datosNuevos.fecha_inicio = fechaInicioO;
+                datosNuevos.fecha_final = fechaFinalO;
+                datosNuevos.hora_salida = horaSalidaO;
+                datosNuevos.hora_ingreso = horaIngresoO;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mp_solicitud_permiso',
                     usuario: user_name,
                     accion: 'U',
-                    datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
-                    datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: null, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(datosNuevos),
                     ip,
                     observacion: null
                 });
@@ -599,18 +497,24 @@ class PermisosControlador {
                 const response = yield database_1.default.query(`
                 DELETE FROM mp_solicitud_permiso WHERE id = $1 RETURNING *
                 `, [id_permiso]);
-                var fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(datosOriginalesPermisos.fecha_creacion, 'ddd');
-                var fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginalesPermisos.fecha_inicio, 'ddd');
-                var fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginalesPermisos.fecha_final, 'ddd');
-                var fechaEdicionO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginalesPermisos.fecha_edicion, 'ddd');
+                const fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(datosOriginalesPermisos.fecha_creacion, 'ddd');
+                const fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginalesPermisos.fecha_inicio, 'ddd');
+                const fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginalesPermisos.fecha_final, 'ddd');
+                const fechaEdicionO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginalesPermisos.fecha_edicion, 'ddd');
                 const horaSalidaO = yield (0, settingsMail_1.FormatearHora)(datosOriginalesPermisos.hora_salida);
                 const horaIngresoO = yield (0, settingsMail_1.FormatearHora)(datosOriginalesPermisos.hora_ingreso);
+                datosOriginalesPermisos.fecha_creacion = fechaCreacionN;
+                datosOriginalesPermisos.fecha_edicion = fechaEdicionO;
+                datosOriginalesPermisos.fecha_inicio = fechaInicioO;
+                datosOriginalesPermisos.fecha_final = fechaFinalO;
+                datosOriginalesPermisos.hora_salida = horaSalidaO;
+                datosOriginalesPermisos.hora_ingreso = horaIngresoO;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mp_solicitud_permiso',
                     usuario: user_name,
                     accion: 'D',
-                    datosOriginales: `{id_empleado: ${datosOriginalesPermisos.id_empleado}, id_empleado_contrato: ${datosOriginalesPermisos.id_empleado_contrato}, id_empleado_cargo: ${datosOriginalesPermisos.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginalesPermisos.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginalesPermisos.numero_permiso}, descripcion: ${datosOriginalesPermisos.descripcion}, id_tipo_permiso: ${datosOriginalesPermisos.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginalesPermisos.dias_permiso}, dia_libre: ${datosOriginalesPermisos.dia_libre}, horas_permiso: ${datosOriginalesPermisos.horas_permiso}, documento: ${datosOriginalesPermisos.documento}, legalizado: ${datosOriginalesPermisos.legalizado}, estado: ${datosOriginalesPermisos.estado}}`,
+                    datosOriginales: JSON.stringify(datosOriginalesPermisos),
                     datosNuevos: '',
                     ip,
                     observacion: null
@@ -660,6 +564,19 @@ class PermisosControlador {
                     res.sendFile(path_1.default.resolve(ruta));
                 }
             });
+        });
+    }
+    // METODO PARA CREAR MULTIPLES PERMISOS
+    CrearPermisosMultiples(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { permisos, user_name, ip } = req.body;
+                let error = false;
+                for (const permiso of permisos) {
+                }
+            }
+            catch (error) {
+            }
         });
     }
     /** ********************************************************************************************* **
@@ -1183,16 +1100,17 @@ class PermisosControlador {
                     yield database_1.default.query('ROLLBACK');
                     return res.status(404).jsonp({ message: 'No se encuentran registros' });
                 }
-                yield database_1.default.query(`
-                UPDATE mp_solicitud_permiso SET estado = $1 WHERE id = $2
+                const actualizacion = yield database_1.default.query(`
+                UPDATE mp_solicitud_permiso SET estado = $1 WHERE id = $2 RETURNING *
                 `, [estado, id]);
+                const [datosNuevos] = actualizacion.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
                     tabla: 'mp_solicitud_permiso',
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: JSON.stringify(datosOriginales),
-                    datosNuevos: `{"estado": ${estado}}`,
+                    datosNuevos: JSON.stringify(datosNuevos),
                     ip,
                     observacion: null
                 });
@@ -1545,5 +1463,166 @@ const generarTablaHTMLWeb = function (datos, tipo) {
         return tablaHtml;
     });
 };
+function CrearPermiso(datos) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre, id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso, estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado, depa_user_loggin, user_name, ip, subir_documento } = datos;
+            let codigoEmpleado = '';
+            if (subir_documento) {
+                try {
+                    const { carpetaPermisos, codigo } = yield (0, accesoCarpetas_1.ObtenerRutaPermisosIdEmpleado)(id_empleado);
+                    codigoEmpleado = codigo;
+                    fs_1.default.access(carpetaPermisos, fs_1.default.constants.F_OK, (err) => {
+                        if (err) {
+                            // METODO MKDIR PARA CREAR LA CARPETA
+                            fs_1.default.mkdir(carpetaPermisos, { recursive: true }, (err2) => {
+                                if (err2) {
+                                    console.log('Error al intentar crear carpeta de permisos.', err2);
+                                    throw new Error('Error al intentar crear carpeta de permisos.');
+                                }
+                            });
+                        }
+                    });
+                }
+                catch (error) {
+                    throw new Error('Error al intentar acceder a la carpeta de permisos.');
+                }
+            }
+            // INICIAR TRANSACCION
+            yield database_1.default.query('BEGIN');
+            const response = yield database_1.default.query(`
+            INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, 
+                legalizado, dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, 
+                numero_permiso, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado) 
+            VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17 ) 
+                RETURNING * 
+            `, [fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
+                id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
+                estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado]);
+            const [objetoPermiso] = response.rows;
+            const fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(fec_creacion, 'ddd');
+            const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
+            const fechaFinalN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
+            const horaSalidaN = yield (0, settingsMail_1.FormatearHora)(hora_salida);
+            const horaIngresoN = yield (0, settingsMail_1.FormatearHora)(hora_ingreso);
+            objetoPermiso.fecha_creacion = fechaCreacionN;
+            objetoPermiso.fecha_inicio = fechaInicioN;
+            objetoPermiso.fecha_final = fechaFinalN;
+            objetoPermiso.hora_salida = horaSalidaN;
+            objetoPermiso.hora_ingreso = horaIngresoN;
+            objetoPermiso.codigo = codigoEmpleado;
+            // AUDITORIA
+            yield auditoriaControlador_1.default.InsertarAuditoria({
+                tabla: 'mp_solicitud_permiso',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(objetoPermiso),
+                ip, observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            yield database_1.default.query('COMMIT');
+            if (!objetoPermiso)
+                return { message: 'Solicitud no registrada.', error: true };
+            const permiso = objetoPermiso;
+            const JefesDepartamentos = yield database_1.default.query(`
+            SELECT n.id_departamento, cg.nombre, n.id_departamento_nivel, n.departamento_nombre_nivel, n.nivel,
+                da.estado, dae.id_contrato, da.id_empleado_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
+                dae.cedula, dae.correo, c.permiso_mail, c.permiso_notificacion, dae.id AS id_aprueba 
+            FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, datos_actuales_empleado AS dae,
+                eu_configurar_alertas AS c, ed_departamentos AS cg
+            WHERE n.id_departamento = $1
+                AND da.id_departamento = n.id_departamento_nivel
+                AND dae.id_cargo = da.id_empleado_cargo
+                AND dae.id = c.id_empleado
+                AND cg.id = n.id_departamento
+            ORDER BY nivel ASC
+            `, [depa_user_loggin]).then((result) => { return result.rows; });
+            if (JefesDepartamentos.length === 0) {
+                return { message: 'Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.', error: false, permiso };
+            }
+            else {
+                permiso.EmpleadosSendNotiEmail = JefesDepartamentos;
+                return { message: 'ok', error: false, permiso };
+            }
+        }
+        catch (error) {
+            // REVERTIR TRANSACCION
+            yield database_1.default.query('ROLLBACK');
+            return { message: 'Error al crear permiso.', error: true };
+        }
+    });
+}
+function RegistrarDocumentoPermiso(datos) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { id_permiso, codigo, nombreArchivo, user_name, ip } = datos;
+            const fecha = (0, moment_1.default)();
+            const anio = fecha.format('YYYY');
+            const mes = fecha.format('MM');
+            const dia = fecha.format('DD');
+            // INICIAR TRANSACCION
+            yield database_1.default.query('BEGIN');
+            // CONSULTAR DATOSORIGINALES
+            const consulta = yield database_1.default.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id_permiso]);
+            const [datosOriginales] = consulta.rows;
+            if (!datosOriginales) {
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'mp_solicitud_permiso',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al intentar actualizar permiso con id: ${id_permiso}`
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return { message: 'Solicitud no registrada.', error: true };
+            }
+            const numeroPermiso = consulta.rows[0].numero_permiso;
+            const documento = `${numeroPermiso}_${codigo}_${anio}_${mes}_${dia}_${nombreArchivo}`;
+            const response = yield database_1.default.query(`
+            UPDATE mp_solicitud_permiso SET documento = $1 WHERE id = $2 RETURNING *
+            `, [documento, id_permiso]);
+            const [datosNuevos] = response.rows;
+            const fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_creacion, 'ddd');
+            const fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
+            const fechaFinalO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
+            const fechaEdicionO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_edicion, 'ddd');
+            const horaSalidaO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_salida);
+            const horaIngresoO = yield (0, settingsMail_1.FormatearHora)(datosOriginales.hora_ingreso);
+            datosOriginales.fecha_creacion = fechaCreacionN;
+            datosOriginales.fecha_edicion = fechaEdicionO;
+            datosOriginales.fecha_inicio = fechaInicioO;
+            datosOriginales.fecha_final = fechaFinalO;
+            datosOriginales.hora_salida = horaSalidaO;
+            datosOriginales.hora_ingreso = horaIngresoO;
+            datosNuevos.fecha_creacion = fechaCreacionN;
+            datosNuevos.fecha_edicion = fechaEdicionO;
+            datosNuevos.fecha_inicio = fechaInicioO;
+            datosNuevos.fecha_final = fechaFinalO;
+            datosNuevos.hora_salida = horaSalidaO;
+            datosNuevos.hora_ingreso = horaIngresoO;
+            // AUDITORIA
+            yield auditoriaControlador_1.default.InsertarAuditoria({
+                tabla: 'mp_solicitud_permiso',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(datosNuevos),
+                ip, observacion: null
+            });
+            // FINALIZAR TRANSACCION
+            yield database_1.default.query('COMMIT');
+            return { message: 'Documento actualizado.', error: false };
+        }
+        catch (error) {
+            // REVERTIR TRANSACCION
+            yield database_1.default.query('ROLLBACK');
+            return { message: 'Error al registrar documento del permiso.', error: true };
+        }
+    });
+}
 exports.PERMISOS_CONTROLADOR = new PermisosControlador();
 exports.default = exports.PERMISOS_CONTROLADOR;

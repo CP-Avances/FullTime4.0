@@ -234,27 +234,27 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       this.certificado = this.datosPermiso.documento;
 
       // SOLICITUD POR HORAS
-      if (this.datosPermiso.num_dia_maximo === 0) {
+      if (this.datosPermiso.dias_maximo_permiso === 0) {
         this.LimpiarFormulario('');
-        this.informacion1 = `Horas máximas de permiso: ${this.datosPermiso.num_hora_maximo} horas.`;
+        this.informacion1 = `Horas máximas de permiso: ${this.datosPermiso.horas_maximo_permiso} horas.`;
         this.habilitarDias = false;
         this.activar_hora = true;
         this.formulario.patchValue({
           solicitarForm: 'Horas',
         });
-        this.Thoras = this.datosPermiso.num_hora_maximo;
+        this.Thoras = this.datosPermiso.horas_maximo_permiso;
         this.configuracion_permiso = 'Horas';
       }
       // SOLICITUD POR DIAS
-      else if (this.datosPermiso.num_hora_maximo === '00:00:00') {
+      else if (this.datosPermiso.horas_maximo_permiso === '00:00:00') {
         this.LimpiarFormulario('00:00');
-        this.informacion1 = `Días máximos de permiso: ${this.datosPermiso.num_dia_maximo} días.`;
+        this.informacion1 = `Días máximos de permiso: ${this.datosPermiso.dias_maximo_permiso} días.`;
         this.habilitarDias = true;
         this.activar_hora = false;
         this.formulario.patchValue({
           solicitarForm: 'Dias',
         });
-        this.Tdias = this.datosPermiso.num_dia_maximo;
+        this.Tdias = this.datosPermiso.dias_maximo_permiso;
         this.configuracion_permiso = 'Dias';
       }
 
@@ -267,7 +267,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       }
 
       // MENSAJE DESCUENTO ALIMENTACION
-      if (this.datosPermiso.almu_incluir === true) {
+      if (this.datosPermiso.incluir_minutos_comida === true) {
         this.informacion3 = `Aplica descuento de minutos de alimentación si el permiso es solicitado por horas y se encuentra dentro del horario de alimentación.`;
       }
       else {
@@ -275,7 +275,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       }
 
       // MENSAJE DIAS PREVIOS DE SOLICITUD
-      this.informacion4 = `Número de días previos para cargar solicitud: ${this.datosPermiso.num_dia_anticipo} días.`;
+      this.informacion4 = `Número de días previos para cargar solicitud: ${this.datosPermiso.dias_anticipar_permiso} días.`;
     })
   }
 
@@ -346,7 +346,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       var inicio = String(moment(fecha, "YYYY/MM/DD").format("YYYY-MM-DD"));
 
       // VERIFICACION DE RESTRICCION DE FECHAS
-      if (this.datosPermiso.fec_validar === true) {
+      if (this.datosPermiso.fecha_restrinccion === true) {
         var fecha_negada_inicio = this.datosPermiso.fecha_inicio.split('T')[0];
         var fecha_negada_fin = this.datosPermiso.fecha_fin.split('T')[0];
 
@@ -386,7 +386,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
   // METODO PARA VALIDAR FECHAS DE AÑOS PASADOS
   ValidarAñosAnteriores(inicio: any) {
     var mes_inicial = moment().format('YYYY/01/01');
-    var dias = this.datosPermiso.num_dia_anterior;
+    var dias = this.datosPermiso.crear_dias_anteriores;
     if (dias > 0) {
       var restar = moment(mes_inicial, 'YYYY/MM/DD').subtract(dias, 'days').format('YYYY/MM/DD');
 
@@ -403,13 +403,13 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
   // METODO PARA VALIDAR DIAS PREVIOS DE PERMISO
   ValidarDiasPrevios(inicio: any) {
-    var dias = this.datosPermiso.num_dia_anticipo;
+    var dias = this.datosPermiso.dias_anticipar_permiso;
     var restar = moment(inicio, 'YYYY/MM/DD').subtract(dias, 'days').format('YYYY/MM/DD');
     if (dias > 0) {
       if (Date.parse(this.FechaActual) <= Date.parse(restar)) {
       }
       else {
-        this.toastr.warning('Ups!!! el permiso debio ser solicitado con ' + this.datosPermiso.num_dia_anticipo + ' días previos.',
+        this.toastr.warning('Ups!!! el permiso debio ser solicitado con ' + this.datosPermiso.dias_anticipar_permiso + ' días previos.',
           '', {
           timeOut: 4000,
         });
@@ -458,7 +458,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       else {
 
         // VERIFICACION DE RESTRICCION DE FECHAS
-        if (this.datosPermiso.fec_validar === true) {
+        if (this.datosPermiso.fecha_restrinccion === true) {
           var fecha_negada_inicio = this.datosPermiso.fecha_inicio.split('T')[0];
           var fecha_negada_fin = this.datosPermiso.fecha_fin.split('T')[0];
 
@@ -613,7 +613,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
           else {
             if (hora_inicio_ >= datos[i].hora_inicio && hora_final_ <= datos[i].hora_final) {
               verificador = 1;
-              if (this.datosPermiso.almu_incluir === true) {
+              if (this.datosPermiso.incluir_minutos_comida === true) {
                 this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i]);
               }
               else {
@@ -649,7 +649,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
                 if (hora_final_ <= '23:59:00' && hora_final_ > datos[i].hora_inicio) {
                   // EN EL CASO DE SER NECESARIO VERIFICAR DIA LIBRE * COLOCAR AQUI
                   verificador = 1;
-                  if (this.datosPermiso.almu_incluir === true) {
+                  if (this.datosPermiso.incluir_minutos_comida === true) {
                     this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i]);
                   }
                   else {
@@ -675,7 +675,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
                 // SI LA HORA DE INICIO ES 00:00:00 (INICIO DE UN NUEVO DIA)
                 if (hora_inicio_ === '00:00:00') {
                   verificador = 1;
-                  if (this.datosPermiso.almu_incluir === true) {
+                  if (this.datosPermiso.incluir_minutos_comida === true) {
                     this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i]);
                   }
                   else {
@@ -688,7 +688,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
                   if (hora_inicio_ >= '00:01:00' && hora_inicio_ < datos[i].hora_final) {
                     // EN EL CASO DE SER NECESARIO VERIFICAR DIA LIBRE * COLOCAR AQUI
                     verificador = 1;
-                    if (this.datosPermiso.almu_incluir === true) {
+                    if (this.datosPermiso.incluir_minutos_comida === true) {
                       this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i]);
                     }
                     else {
@@ -817,7 +817,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
         for (let i = 0; i < datos.length; i++) {
           if (hora_inicio_ >= datos[i].hora_inicio && hora_final_ <= datos[i].hora_final) {
             verificador = 1;
-            if (this.datosPermiso.almu_incluir === true) {
+            if (this.datosPermiso.incluir_minutos_comida === true) {
               this.VerificarFechasDiferentesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_);
             }
             else {
@@ -1474,6 +1474,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       dia: parseInt(form.diasForm),
       user_name: this.user_name,
       ip: this.ip,
+      subir_documento: this.archivoSubido.length != 0,
     }
     this.CambiarValoresDiasHoras(form, datosPermiso);
     this.CambiarValorDiaLibre(datosPermiso, form);
@@ -1505,27 +1506,38 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
   // VALIDACIONES DE DATOS DE SOLICITUD
   GuardarDatos(datos: any, form: any) {
-    this.restP.IngresarEmpleadoPermisos(datos).subscribe(permiso => {
-      console.log('ver datos permiso ', permiso)
-      this.toastr.success('Operación exitosa.', 'Permiso registrado.', {
-        timeOut: 6000,
-      });
-      permiso.EmpleadosSendNotiEmail.push(this.solInfo);
-      this.ImprimirNumeroPermiso();
-      if (this.datosPermiso.documento === true) {
-        this.SubirRespaldo(permiso, permiso.codigo);
-      }
-      else {
-        if (this.archivoSubido != undefined) {
-          this.SubirRespaldo(permiso, permiso.codigo);
+
+    this.restP.IngresarEmpleadoPermisos(datos).subscribe({
+      next: (res) => {
+
+        if (res.message == 'ok') {
+          this.toastr.success('Operación exitosa.', 'Permiso registrado.', {
+            timeOut: 6000,
+          });
+        } else {
+          this.toastr.warning(res.message, 'Ups!!! algo salio mal.', {
+            timeOut: 6000,
+          });
         }
+
+        //TODO: genera error push
+        // res.permiso.EmpleadosSendNotiEmail.push(this.solInfo);
+        this.ImprimirNumeroPermiso();
+        if (this.archivoSubido.length != 0) {
+          this.SubirRespaldo(res.permiso, res.permiso.codigo);
+        }
+        this.IngresarAutorizacion(res.permiso);
+        if (form.correoForm === true) {
+          this.EnviarCorreoPermiso(res.permiso);
+          this.EnviarNotificacion(res.permiso);
+        }
+        this.CerrarVentana();
+      },
+      error: (error) => {
+        this.toastr.error('No se pudo registrar la solicitud de permiso', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        });
       }
-      this.IngresarAutorizacion(permiso);
-      if (this.datosPermiso.correo_crear === true) {
-        this.EnviarCorreoPermiso(permiso);
-        this.EnviarNotificacion(permiso);
-      }
-      this.CerrarVentana();
     });
 
   }
@@ -1566,6 +1578,8 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('id_permiso', id as string);
+    formData.append('codigo', codigo as string);
 
     this.restP.SubirArchivoRespaldo(formData, id, codigo, null).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Documento registrado.', {

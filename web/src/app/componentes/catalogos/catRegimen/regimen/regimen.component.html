@@ -1,12 +1,11 @@
-<div class="container" style="padding-top: 15px;">
+<div class="container" style="padding-top: 15px; padding-bottom: 25px;">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
             <span>REGISTRAR REGIMEN LABORAL</span>
             <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1, 0)">highlight_off</mat-icon>
         </div>
-
-        <!-- ****************************** PRIMER FORMULARIO ******************************************* -->
         <mat-horizontal-stepper [linear]="isLinear" #stepper>
+            <!-- ****************************** PRIMER FORMULARIO ******************************************* -->
             <mat-step [stepControl]="primerFormulario">
                 <ng-template matStepLabel>
                     <mat-icon id="icono" matSuffix matTooltipPosition="right"
