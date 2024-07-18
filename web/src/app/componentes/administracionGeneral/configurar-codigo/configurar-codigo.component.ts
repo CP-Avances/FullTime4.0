@@ -272,7 +272,7 @@ export class ConfigurarCodigoComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Configurar Código');
+      return datos.some(item => item.accion === 'Guardar Configuración Código');
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
@@ -282,7 +282,7 @@ export class ConfigurarCodigoComponent implements OnInit {
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
       var datos = JSON.parse(datosRecuperados);
-      return datos.some(item => item.accion === 'Ver Configuración');
+      return datos.some(item => item.accion === 'Ver Configuración Código');
     }else{
       return !(parseInt(localStorage.getItem('rol') as string) !== 1);
     }
