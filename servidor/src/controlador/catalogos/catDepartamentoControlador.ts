@@ -1125,7 +1125,7 @@ class DepartamentoControlador {
                         objauxiliar.depa_superior = valor.depa_superior;
                       }else{
                         if(objauxiliar.nivel + 1 < valor.nivel && objauxiliar.depa_superior != valor.depa_superior){
-                          valor.observacion = 'faltan niveles por registrar';
+                          valor.observacion = 'Faltan niveles por registrar';
                         }else if(objauxiliar.depa_superior == valor.depa_superior){
                            valor.observacion = 'Departamento superior ya esta configurado dentro de la plantilla';
                         }

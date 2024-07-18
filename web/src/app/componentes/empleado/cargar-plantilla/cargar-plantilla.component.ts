@@ -362,27 +362,34 @@ export class CargarPlantillaComponent implements OnInit {
     let arrayObservacion = observacion.split(" ");
     if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
-    } else if (observacion == 'ok') {
+    }
+    else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Ya existe en el sistema') {
+    }
+    else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
-    } else if (observacion == 'Sucursal no existe en el sistema' ||
+    }
+    else if (observacion == 'Departamento superior ya esta configurado dentro de la plantilla') {
+      return 'rgb(170, 129, 236)';
+    }
+    else if (observacion == 'Sucursal no existe en el sistema' ||
       observacion == 'Departamento no existe en el sistema' ||
       observacion == 'Departamento superior no existe en el sistema' ||
-      observacion == 'Sucursal superior no existe en el sistema'
-    ) {
+      observacion == 'Sucursal superior no existe en el sistema') {
       return 'rgb(255, 192, 203)';
-    } else if (observacion == 'Departamento no pertenece al establecimiento' ||
+    }
+    else if (observacion == 'Departamento no pertenece al establecimiento' ||
       observacion == 'Departamento no pertenece a la sucursal' ||
       observacion == 'El nivel no puede ser 0 ni mayor a 5' ||
-      observacion == 'faltan niveles por registrar' ||
+      observacion == 'Faltan niveles por registrar' ||
       observacion == 'Departamento superior ya se encuentra configurado' ||
-      observacion == 'Departamento superior no pertenece a la sucursal'
-    ) {
+      observacion == 'Departamento superior no pertenece a la sucursal') {
       return 'rgb(238, 34, 207)';
-    } else if (observacion == 'Nivel incorrecto (solo números)') {
+    }
+    else if (observacion == 'Nivel incorrecto (solo números)') {
       return 'rgb(222, 162, 73)';
-    } else {
+    }
+    else {
       return 'rgb(242, 21, 21)';
     }
   }

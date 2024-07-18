@@ -484,33 +484,39 @@ export class ListarFeriadosComponent implements OnInit {
     let arrayObservacion = observacion.split(" ");
     if (observacion == 'Fecha duplicada') {
       return 'rgb(170, 129, 236)';
-    } else if (observacion == 'ok') {
+    }
+    else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Fecha ya existe en el sistema' ||
+    }
+    else if (observacion == 'Fecha ya existe en el sistema' ||
       observacion == 'Fecha recuperación ya existe en el sistema' ||
       observacion == 'Descripción ya existe en el sistema' ||
-      observacion == 'Feriando ya asignado a una ciudad'
-    ) {
+      observacion == 'Feriando ya asignado a una ciudad') {
       return 'rgb(239, 203, 106)';
-    } else if (observacion == 'Fecha como valor de otra columna') {
+    }
+    else if (observacion == 'Fecha como valor de otra columna') {
       return 'rgb(170, 129, 236)';
-    } else if (observacion == 'Registro duplicado') {
+    }
+    else if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
-    } else if (observacion == 'Formato de fecha incorrecto (YYYY-MM-DD)' ||
+    }
+    else if (observacion == 'Formato de fecha incorrecto (YYYY-MM-DD)' ||
       observacion == 'Formato de fecha recuperación incorrecto (YYYY-MM-DD)') {
       return 'rgb(230, 176, 96)';
-    } else if (arrayObservacion[0] == 'Fecha' || arrayObservacion[0] == 'Descripción'
-      || arrayObservacion[0] == 'Provincia' || arrayObservacion[0] == 'Ciudad'
-      || arrayObservacion[0] == 'Feriado'
-    ) {
-      return 'rgb(242, 21, 21)';
-    } else if (observacion == 'La ciudad no existe en el sistema' ||
-      observacion == 'La provincia no existe en el sistema'
-    ) {
-      return 'rgb(255, 192, 203';
-    } else if (observacion == 'Feriado no válido (Debe existir previamente)') {
+    }
+    else if (observacion == 'Feriado no válido (Debe existir previamente)') {
       return 'rgb(238, 34, 207)';
-    } else {
+    }
+    else if (arrayObservacion[0] == 'Fecha' || arrayObservacion[0] == 'Descripción'
+      || arrayObservacion[0] == 'Provincia' || arrayObservacion[0] == 'Ciudad'
+      || arrayObservacion[0] == 'Feriado') {
+      return 'rgb(242, 21, 21)';
+    }
+    else if (observacion == 'La ciudad no existe en el sistema' ||
+      observacion == 'La provincia no existe en el sistema') {
+      return 'rgb(255, 192, 203';
+    }
+    else {
       return 'white'
     }
   }
