@@ -2,7 +2,7 @@ import {
     enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, Credenciales, fechaHora,
     FormatearFecha, FormatearHora, dia_completo, FormatearFecha2
 } from '../../libs/settingsMail';
-import { ObtenerRutaPermisos } from '../../libs/accesoCarpetas';
+import { ObtenerRutaPermisos, ObtenerRutaPermisosIdEmpleado } from '../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
@@ -159,8 +159,36 @@ class PermisosControlador {
         try {
             const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
                 id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
-                estado, id_empl_cargo, hora_salida, hora_ingreso, id_empl,
-                depa_user_loggin, user_name, ip } = req.body;
+                estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado,
+                depa_user_loggin, user_name, ip, subir_documento } = req.body;
+
+            console.log('documento', subir_documento);
+
+            let codigoEmpleado = '';
+
+            if (subir_documento) {
+                console.log('subir documento')
+                try {
+                    const {carpetaPermisos, codigo} = await ObtenerRutaPermisosIdEmpleado(id_empleado);
+                    codigoEmpleado = codigo;
+                    console.log('carpetaPermisos', carpetaPermisos);
+                    fs.access(carpetaPermisos, fs.constants.F_OK, (err) => {
+                        if (err) {
+                            // METODO MKDIR PARA CREAR LA CARPETA
+                            fs.mkdir(carpetaPermisos, { recursive: true }, (err2: any) => {
+                                if (err2) {
+                                    console.log('Error al intentar crear carpeta de permisos.', err2);
+                                    throw new Error('Error al intentar crear carpeta de permisos.');
+                                } 
+                            });
+                        } else {
+                           
+                        }
+                    });
+                } catch (error) {
+                    
+                }
+            }
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -175,14 +203,21 @@ class PermisosControlador {
                 `,
                 [fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
                     id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
-                    estado, id_empl_cargo, hora_salida, hora_ingreso, id_empl]);
+                    estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado]);
 
             const [objetoPermiso] = response.rows;
-            var fechaCreacionN = await FormatearFecha2(fec_creacion, 'ddd');
-            var fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');
-            var fechaFinalN = await FormatearFecha2(fec_final, 'ddd');
+            const fechaCreacionN = await FormatearFecha2(fec_creacion, 'ddd');
+            const fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');
+            const fechaFinalN = await FormatearFecha2(fec_final, 'ddd');
             const horaSalidaN = await FormatearHora(hora_salida);
             const horaIngresoN = await FormatearHora(hora_ingreso);
+
+            objetoPermiso.fecha_creacion = fechaCreacionN;
+            objetoPermiso.fecha_inicio = fechaInicioN;
+            objetoPermiso.fecha_final = fechaFinalN;
+            objetoPermiso.hora_salida = horaSalidaN;
+            objetoPermiso.hora_ingreso = horaIngresoN;
+            objetoPermiso.codigo = codigoEmpleado;
 
 
             // AUDITORIA
@@ -191,7 +226,7 @@ class PermisosControlador {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `{id_empleado: ${id_empl}, id_empleado_contrato: ${id_empl_contrato}, id_empleado_cargo: ${id_empl_cargo}, id_periodo_vacacion: ${id_peri_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: null, numero_permiso: ${num_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dia}, dia_libre: ${dia_libre}, horas_permiso: ${hora_numero}, documento: null, legalizado: ${legalizado}, estado: ${estado}}`,
+                datosNuevos: JSON.stringify(objetoPermiso),
                 ip, observacion: null
             });
 
@@ -200,7 +235,7 @@ class PermisosControlador {
 
             if (!objetoPermiso) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
 
-            const permiso = objetoPermiso
+            const permiso = objetoPermiso;
             const JefesDepartamentos = await pool.query(
                 `
                 SELECT n.id_departamento, cg.nombre, n.id_departamento_nivel, n.departamento_nombre_nivel, n.nivel,
@@ -219,16 +254,15 @@ class PermisosControlador {
                 [depa_user_loggin]).then((result: any) => { return result.rows });
 
             if (JefesDepartamentos.length === 0) {
-                return res.status(400)
+                return res.status(200)
                     .jsonp({
-                        message: `Ups!!! algo salio mal. 
-                Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`,
+                        message: `Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`,
                         permiso: permiso
                     });
             }
             else {
                 permiso.EmpleadosSendNotiEmail = JefesDepartamentos
-                return res.status(200).jsonp(permiso);
+                return res.status(200).jsonp({message: 'ok',permiso});
             }
         } catch (error) {
             // REVERTIR TRANSACCION
@@ -280,26 +314,42 @@ class PermisosControlador {
                     hora_salida, hora_ingreso, id_peri_vacacion, fec_edicion, id]);
 
             const [objetoPermiso] = response.rows;
-            var fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');
-            var fechaFinalN = await FormatearFecha2(fec_final, 'ddd');
-            var fechaEdicionN = await FormatearFecha2(fec_edicion, 'ddd');
+            const fechaInicioN = await FormatearFecha2(fec_inicio, 'ddd');
+            const fechaFinalN = await FormatearFecha2(fec_final, 'ddd');
+            const fechaEdicionN = await FormatearFecha2(fec_edicion, 'ddd');
             const horaSalidaN = await FormatearHora(hora_salida);
             const horaIngresoN = await FormatearHora(hora_ingreso);
 
-            var fechaCreacionN = await FormatearFecha2(datosOriginales.fecha_creacion, 'ddd');
-            var fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
-            var fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
-            var fechaEdicionO = await FormatearFecha2(datosOriginales.fecha_edicion, 'ddd');
+            const fechaCreacionN = await FormatearFecha2(datosOriginales.fecha_creacion, 'ddd');
+            const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+            const fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
+            const fechaEdicionO = await FormatearFecha2(datosOriginales.fecha_edicion, 'ddd');
             const horaSalidaO = await FormatearHora(datosOriginales.hora_salida);
             const horaIngresoO = await FormatearHora(datosOriginales.hora_ingreso);
+
+            datosOriginales.fecha_edicion = fechaEdicionO;
+            datosOriginales.fecha_creacion = fechaCreacionN;
+            datosOriginales.fecha_inicio = fechaInicioO;
+            datosOriginales.fecha_final = fechaFinalO;
+            datosOriginales.hora_salida = horaSalidaO;
+            datosOriginales.hora_ingreso = horaIngresoO;
+
+
+            objetoPermiso.fecha_creacion = fechaCreacionN;
+            objetoPermiso.fecha_edicion = fechaEdicionN;
+            objetoPermiso.fecha_inicio = fechaInicioN;
+            objetoPermiso.fecha_final = fechaFinalN;
+            objetoPermiso.hora_salida = horaSalidaN;
+            objetoPermiso.hora_ingreso = horaIngresoN;
+
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'mp_solicitud_permiso',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
-                datosNuevos: `{id_empleado: , id_empleado_contrato: , id_empleado_cargo: , id_periodo_vacacion: ${id_peri_vacacion}, fecha_creacion: , fecha_edicion: ${fechaEdicionN}, numero_permiso: ${num_permiso}, descripcion: ${descripcion}, id_tipo_permiso: ${id_tipo_permiso}, fecha_inicio: ${fechaInicioN}, fecha_final: ${fechaFinalN}, hora_salida: ${horaSalidaN}, hora_ingreso: ${horaIngresoN}, dias_permiso: ${dia}, dia_libre: ${dia_libre}, horas_permiso: ${hora_numero}, documento: null, legalizado: , estado: }`,
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: JSON.stringify(objetoPermiso),
                 ip, observacion: null
             });
 
@@ -373,8 +423,8 @@ class PermisosControlador {
                 `
                 , [id]);
 
-            let documento = permiso.rows[0].num_permiso + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
-            let separador = path.sep;
+            let documento = permiso.rows[0].numero_permiso + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
+            // let separador = path.sep;
 
             // CONSULTAR DATOSORIGINALES
             const consulta = await pool.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id]);
@@ -397,25 +447,43 @@ class PermisosControlador {
             }
 
             // ACTUALIZAR REGISTRO
-            await pool.query(
+            const actualizacion = await pool.query(
                 `
-                UPDATE mp_solicitud_permiso SET documento = $2 WHERE id = $1
+                UPDATE mp_solicitud_permiso SET documento = $2 WHERE id = $1 RETURNING *
                 `
                 , [id, documento]);
-            var fechaCreacionN = await FormatearFecha2(datosOriginales.fecha_creacion, 'ddd');
-            var fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
-            var fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
-            var fechaEdicionO = await FormatearFecha2(datosOriginales.fecha_edicion, 'ddd');
+
+            const [datosNuevos] = actualizacion.rows;
+
+            const fechaCreacionN = await FormatearFecha2(datosOriginales.fecha_creacion, 'ddd');
+            const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+            const fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
+            const fechaEdicionO = await FormatearFecha2(datosOriginales.fecha_edicion, 'ddd');
             const horaSalidaO = await FormatearHora(datosOriginales.hora_salida);
             const horaIngresoO = await FormatearHora(datosOriginales.hora_ingreso);
+
+            datosOriginales.fecha_creacion = fechaCreacionN;
+            datosOriginales.fecha_edicion = fechaEdicionO;
+            datosOriginales.fecha_inicio = fechaInicioO;
+            datosOriginales.fecha_final = fechaFinalO;
+            datosOriginales.hora_salida = horaSalidaO;
+            datosOriginales.hora_ingreso = horaIngresoO;
+
+            datosNuevos.fecha_creacion = fechaCreacionN;
+            datosNuevos.fecha_edicion = fechaEdicionO;
+            datosNuevos.fecha_inicio = fechaInicioO;
+            datosNuevos.fecha_final = fechaFinalO;
+            datosNuevos.hora_salida = horaSalidaO;
+            datosNuevos.hora_ingreso = horaIngresoO;
+
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'mp_solicitud_permiso',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
-                datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: JSON.stringify(datosNuevos),
                 ip,
                 observacion: null
             });
@@ -425,19 +493,19 @@ class PermisosControlador {
 
             res.jsonp({ message: 'Documento actualizado.' });
 
-            if (archivo != 'null' && archivo != '' && archivo != null) {
-                if (archivo != documento) {
-                    let ruta = await ObtenerRutaPermisos(codigo) + separador + archivo;
-                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-                    fs.access(ruta, fs.constants.F_OK, (err) => {
-                        if (err) {
-                        } else {
-                            // ELIMINAR DEL SERVIDOR
-                            fs.unlinkSync(ruta);
-                        }
-                    });
-                }
-            }
+            // if (archivo != 'null' && archivo != '' && archivo != null) {
+                // if (archivo != documento) {
+                //     let ruta = await ObtenerRutaPermisos(codigo) + separador + archivo;
+                //     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                //     fs.access(ruta, fs.constants.F_OK, (err) => {
+                //         if (err) {
+                //         } else {
+                //             // ELIMINAR DEL SERVIDOR
+                //             fs.unlinkSync(ruta);
+                //         }
+                //     });
+                // }
+            // }
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
@@ -476,27 +544,43 @@ class PermisosControlador {
             }
 
             // ACTUALIZAR REGISTRO
-            await pool.query(
+            const actualizacion = await pool.query(
                 `
-                UPDATE mp_solicitud_permiso SET documento = null WHERE id = $1
+                UPDATE mp_solicitud_permiso SET documento = null WHERE id = $1 RETURNING *
                 `
                 , [id]);
+            
+            const [datosNuevos] = actualizacion.rows;
 
             // AUDITORIA
-            var fechaCreacionN = await FormatearFecha2(datosOriginales.fecha_creacion, 'ddd');
-            var fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
-            var fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
-            var fechaEdicionO = await FormatearFecha2(datosOriginales.fecha_edicion, 'ddd');
+            const fechaCreacionN = await FormatearFecha2(datosOriginales.fecha_creacion, 'ddd');
+            const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+            const fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
+            const fechaEdicionO = await FormatearFecha2(datosOriginales.fecha_edicion, 'ddd');
             const horaSalidaO = await FormatearHora(datosOriginales.hora_salida);
             const horaIngresoO = await FormatearHora(datosOriginales.hora_ingreso);
+
+            datosOriginales.fecha_creacion = fechaCreacionN;
+            datosOriginales.fecha_edicion = fechaEdicionO;
+            datosOriginales.fecha_inicio = fechaInicioO;
+            datosOriginales.fecha_final = fechaFinalO;
+            datosOriginales.hora_salida = horaSalidaO;
+            datosOriginales.hora_ingreso = horaIngresoO;
+
+            datosNuevos.fecha_creacion = fechaCreacionN;
+            datosNuevos.fecha_edicion = fechaEdicionO;
+            datosNuevos.fecha_inicio = fechaInicioO;
+            datosNuevos.fecha_final = fechaFinalO;
+            datosNuevos.hora_salida = horaSalidaO;
+            datosNuevos.hora_ingreso = horaIngresoO;
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'mp_solicitud_permiso',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: `{id_empleado: ${datosOriginales.id_empleado}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: ${datosOriginales.documento}, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
-                datosNuevos: `{id_empleado: ${datosOriginales.id_empleado}, id_empleado_contrato: ${datosOriginales.id_empleado_contrato}, id_empleado_cargo: ${datosOriginales.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginales.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginales.numero_permiso}, descripcion: ${datosOriginales.descripcion}, id_tipo_permiso: ${datosOriginales.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginales.dias_permiso}, dia_libre: ${datosOriginales.dia_libre}, horas_permiso: ${datosOriginales.horas_permiso}, documento: null, legalizado: ${datosOriginales.legalizado}, estado: ${datosOriginales.estado}}`,
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: JSON.stringify(datosNuevos),
                 ip,
                 observacion: null
             });
@@ -680,19 +764,26 @@ class PermisosControlador {
                 `
                 , [id_permiso]);
 
-            var fechaCreacionN = await FormatearFecha2(datosOriginalesPermisos.fecha_creacion, 'ddd');
-            var fechaInicioO = await FormatearFecha2(datosOriginalesPermisos.fecha_inicio, 'ddd');
-            var fechaFinalO = await FormatearFecha2(datosOriginalesPermisos.fecha_final, 'ddd');
-            var fechaEdicionO = await FormatearFecha2(datosOriginalesPermisos.fecha_edicion, 'ddd');
+            const fechaCreacionN = await FormatearFecha2(datosOriginalesPermisos.fecha_creacion, 'ddd');
+            const fechaInicioO = await FormatearFecha2(datosOriginalesPermisos.fecha_inicio, 'ddd');
+            const fechaFinalO = await FormatearFecha2(datosOriginalesPermisos.fecha_final, 'ddd');
+            const fechaEdicionO = await FormatearFecha2(datosOriginalesPermisos.fecha_edicion, 'ddd');
             const horaSalidaO = await FormatearHora(datosOriginalesPermisos.hora_salida);
             const horaIngresoO = await FormatearHora(datosOriginalesPermisos.hora_ingreso);
+
+            datosOriginalesPermisos.fecha_creacion = fechaCreacionN;
+            datosOriginalesPermisos.fecha_edicion = fechaEdicionO;
+            datosOriginalesPermisos.fecha_inicio = fechaInicioO;
+            datosOriginalesPermisos.fecha_final = fechaFinalO;
+            datosOriginalesPermisos.hora_salida = horaSalidaO;
+            datosOriginalesPermisos.hora_ingreso = horaIngresoO;
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'mp_solicitud_permiso',
                 usuario: user_name,
                 accion: 'D',
-                datosOriginales: `{id_empleado: ${datosOriginalesPermisos.id_empleado}, id_empleado_contrato: ${datosOriginalesPermisos.id_empleado_contrato}, id_empleado_cargo: ${datosOriginalesPermisos.id_empleado_cargo}, id_periodo_vacacion: ${datosOriginalesPermisos.id_periodo_vacacion}, fecha_creacion: ${fechaCreacionN}, fecha_edicion: ${fechaEdicionO}, numero_permiso: ${datosOriginalesPermisos.numero_permiso}, descripcion: ${datosOriginalesPermisos.descripcion}, id_tipo_permiso: ${datosOriginalesPermisos.id_tipo_permiso}, fecha_inicio: ${fechaInicioO}, fecha_final: ${fechaFinalO}, hora_salida: ${horaSalidaO}, hora_ingreso: ${horaIngresoO}, dias_permiso: ${datosOriginalesPermisos.dias_permiso}, dia_libre: ${datosOriginalesPermisos.dia_libre}, horas_permiso: ${datosOriginalesPermisos.horas_permiso}, documento: ${datosOriginalesPermisos.documento}, legalizado: ${datosOriginalesPermisos.legalizado}, estado: ${datosOriginalesPermisos.estado}}`,
+                datosOriginales: JSON.stringify(datosOriginalesPermisos),
                 datosNuevos: '',
                 ip,
                 observacion: null
@@ -1319,11 +1410,13 @@ class PermisosControlador {
                 return res.status(404).jsonp({ message: 'No se encuentran registros' });
             }
 
-            await pool.query(
+            const actualizacion = await pool.query(
                 `
-                UPDATE mp_solicitud_permiso SET estado = $1 WHERE id = $2
+                UPDATE mp_solicitud_permiso SET estado = $1 WHERE id = $2 RETURNING *
                 `
                 , [estado, id]);
+            
+            const [datosNuevos] = actualizacion.rows;
 
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -1331,7 +1424,7 @@ class PermisosControlador {
                 usuario: user_name,
                 accion: 'U',
                 datosOriginales: JSON.stringify(datosOriginales),
-                datosNuevos: `{"estado": ${estado}}`,
+                datosNuevos: JSON.stringify(datosNuevos),
                 ip,
                 observacion: null
             });

@@ -32,7 +32,7 @@ const storage = multer.diskStorage({
             `
             , [id]);
 
-        let documento = permiso.rows[0].num_permiso + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
+        let documento = permiso.rows[0].numero_permiso + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
 
         cb(null, documento)
     }

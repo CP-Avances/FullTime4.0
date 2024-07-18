@@ -1474,6 +1474,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       dia: parseInt(form.diasForm),
       user_name: this.user_name,
       ip: this.ip,
+      subir_documento: this.archivoSubido.length != 0,
     }
     this.CambiarValoresDiasHoras(form, datosPermiso);
     this.CambiarValorDiaLibre(datosPermiso, form);
@@ -1505,27 +1506,38 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
   // VALIDACIONES DE DATOS DE SOLICITUD
   GuardarDatos(datos: any, form: any) {
-    this.restP.IngresarEmpleadoPermisos(datos).subscribe(permiso => {
-      console.log('ver datos permiso ', permiso)
-      this.toastr.success('Operación exitosa.', 'Permiso registrado.', {
-        timeOut: 6000,
-      });
-      permiso.EmpleadosSendNotiEmail.push(this.solInfo);
-      this.ImprimirNumeroPermiso();
-      if (this.datosPermiso.documento === true) {
-        this.SubirRespaldo(permiso, permiso.codigo);
-      }
-      else {
-        if (this.archivoSubido != undefined) {
-          this.SubirRespaldo(permiso, permiso.codigo);
+
+    this.restP.IngresarEmpleadoPermisos(datos).subscribe({
+      next: (res) => {
+
+        if (res.message == 'ok') {
+          this.toastr.success('Operación exitosa.', 'Permiso registrado.', {
+            timeOut: 6000,
+          });
+        } else {
+          this.toastr.warning(res.message, 'Ups!!! algo salio mal.', {
+            timeOut: 6000,
+          });
         }
+
+        //TODO: genera error push
+        // res.permiso.EmpleadosSendNotiEmail.push(this.solInfo);
+        this.ImprimirNumeroPermiso();
+        if (this.archivoSubido.length != 0) {
+          this.SubirRespaldo(res.permiso, res.permiso.codigo);
+        }
+        this.IngresarAutorizacion(res.permiso);
+        if (form.correoForm === true) {
+          this.EnviarCorreoPermiso(res.permiso);
+          this.EnviarNotificacion(res.permiso);
+        }
+        this.CerrarVentana();
+      },
+      error: (error) => {
+        this.toastr.error('No se pudo registrar la solicitud de permiso', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        });
       }
-      this.IngresarAutorizacion(permiso);
-      if (this.datosPermiso.correo_crear === true) {
-        this.EnviarCorreoPermiso(permiso);
-        this.EnviarNotificacion(permiso);
-      }
-      this.CerrarVentana();
     });
 
   }
