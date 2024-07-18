@@ -59,14 +59,16 @@ class AutorizacionesControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            await pool.query(
+            const autorizacion = await pool.query(
                 `
                 INSERT INTO ecm_autorizaciones (orden, estado, id_departamento, 
                     id_permiso, id_vacacion, id_hora_extra, id_plan_hora_extra, id_autoriza_estado) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *
                 `,
                 [orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra,
                     id_plan_hora_extra, id_documento]);
+            
+            const [datosNuevos] = autorizacion.rows;
 
             // REGISTRAR AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -74,7 +76,7 @@ class AutorizacionesControlador {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `Orden: ${orden}, Estado: ${estado}, Departamento: ${id_departamento}, Permiso: ${id_permiso}, Vacacion: ${id_vacacion}, Hora Extra: ${id_hora_extra}, Plan Hora Extra: ${id_plan_hora_extra}, Documento: ${id_documento}`,
+                datosNuevos: JSON.stringify(datosNuevos),
                 ip: ip,
                 observacion: null
             });
@@ -88,11 +90,6 @@ class AutorizacionesControlador {
             return res.status(500).jsonp({ text: 'error' });
         }
     }
-
-
-
-
-
 
     public async ActualizarEstadoAutorizacionPermiso(req: Request, res: Response): Promise<Response> {
         try {
@@ -111,26 +108,28 @@ class AutorizacionesControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
-                    datosNuevos: `Estado: ${estado}, Documento: ${id_documento}`,
+                    datosNuevos: '',
                     ip: ip,
                     observacion: `Error al actualizar el registro de autorizaciones con id_permiso: ${id_permiso}`
                 });
             }
     
-            await pool.query(
+            const actualizacion = await pool.query(
                 `
-                UPDATE ecm_autorizaciones SET estado = $1, id_autoriza_estado = $2 WHERE id_permiso = $3
+                UPDATE ecm_autorizaciones SET estado = $1, id_autoriza_estado = $2 WHERE id_permiso = $3 RETURNING *
                 `
                 ,
                 [estado, id_documento, id_permiso]);
+
+            const [datosNuevos] = actualizacion.rows;
 
             // REGISTRAR AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'ecm_autorizaciones',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: `Estado: ${datos.estado}, Documento: ${datos.id_documento}`,
-                datosNuevos: `Estado: ${estado}, Documento: ${id_documento}`,
+                datosOriginales: JSON.stringify(datos),
+                datosNuevos: JSON.stringify(datosNuevos),
                 ip: ip,
                 observacion: null
             });
@@ -169,7 +168,7 @@ class AutorizacionesControlador {
                     usuario: user_name,
                     accion: 'U',
                     datosOriginales: '',
-                    datosNuevos: `Estado: ${estado}, Documento: ${id_documento}`,
+                    datosNuevos: '',
                     ip: ip,
                     observacion: `Error al actualizar el registro de autorizaciones con id: ${id}`
                 });
@@ -179,20 +178,22 @@ class AutorizacionesControlador {
                 res.status(404).jsonp({ text: 'error' });
             }
     
-            await pool.query(
+            const actualizacion = await pool.query(
                 `
                 UPDATE ecm_autorizaciones SET estado = $1, id_autoriza_estado = $2 
                 WHERE id = $3
                 `
                 , [estado, id_documento, id]);
+            
+            const [datosNuevos] = actualizacion.rows;
 
             // REGISTRAR AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'ecm_autorizaciones',
                 usuario: user_name,
                 accion: 'U',
-                datosOriginales: `Estado: ${datos.estado}, Documento: ${datos.id_documento}`,
-                datosNuevos: `Estado: ${estado}, Documento: ${id_documento}`,
+                datosOriginales: JSON.stringify(datos),
+                datosNuevos: JSON.stringify(datosNuevos),
                 ip: ip,
                 observacion: null
             });
