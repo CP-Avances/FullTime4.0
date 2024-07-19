@@ -27,22 +27,24 @@
                     <div class="row m-auto">
                         <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                             <form method="post" class="btn-2" enctype="multipart/form-data">
-                                <input (change)="CargarPlantillaGeneral($event)" type="file" [formControl]="archivo1Form" id="file1"
-                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file1" matSuffix matTooltipPosition="right"
-                                    *ngIf="!mostrarbtnsubir" style="height: 65px; padding-top: 25px;"
+                                <input (change)="CargarPlantillaGeneral($event)" type="file"
+                                    [formControl]="archivo1Form" id="file1"
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                <label for="file1" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                    style="height: 65px; padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
                                     Subir plantilla
                                 </label>
-                                <label for="file1" matSuffix matTooltipPosition="right"
-                                    *ngIf="mostrarbtnsubir" style="height: 65px;  padding-top: 25px;"
+                                <label for="file1" matSuffix matTooltipPosition="right" *ngIf="mostrarbtnsubir"
+                                    style="height: 65px;  padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre plantillaConfiguracionGeneral.">
                                     Subir nueva plantilla
                                 </label>
                             </form>
                         </div>
                         <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
-                            <div *ngIf="!dataHorarios" class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <div *ngIf="!dataHorarios" class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
                                 <a type="submit" id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                     matTooltip="Dar click para ver o descargar el documento."
                                     href="{{hipervinculo}}/plantillaD/documento/plantillaConfiguracionGeneral.xlsx">
@@ -51,9 +53,8 @@
                             </div>
                             <div *ngIf="dataHorarios" class="d-flex flex-wrap justify-content-around"
                                 style="text-align: center; justify-content: center;">
-                                <button id="registrar" class="btn btn-sm" matSuffix
-                                    matTooltipPosition="right" matTooltip="Guardar registro multiple."
-                                    (click)="ConfirmarRegistroMultiple()">
+                                <button id="registrar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                    matTooltip="Guardar registro multiple." (click)="ConfirmarRegistroMultiple()">
                                     Registrar
                                 </button>
                             </div>
@@ -223,24 +224,18 @@
                 <thead class="thead-light">
                     <tr style="text-align: center;">
                         <th scope="col">Item</th>
+                        <th scope="col">Observación</th>
                         <th scope="col">Descripción</th>
                         <th scope="col">Código Horario</th>
                         <th scope="col">Horas Totales</th>
                         <th scope="col">Minutos Alimentación</th>
                         <th scope="col">Tipo Horario</th>
                         <th scope="col">Horario Nocturno</th>
-                        <th scope="col">Observación</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let h of dataHorarios.plantillaHorarios | paginate:tamanio_paginaH:numero_paginaH ">
                         <td>{{h.ITEM}}</td>
-                        <td [style.color]="ObtenerColorDatoRegistrado(h.DESCRIPCION)">{{h.DESCRIPCION}}</td>
-                        <td [style.color]="ObtenerColorDatoRegistrado(h.CODIGO_HORARIO)">{{h.CODIGO_HORARIO}}</td>
-                        <td [style.color]="ObtenerColorDatoRegistrado(h.HORAS_TOTALES)">{{h.HORAS_TOTALES}}</td>
-                        <td>{{h.MINUTOS_ALIMENTACION}}</td>
-                        <td [style.color]="ObtenerColorDatoRegistrado(h.TIPO_HORARIO)">{{h.TIPO_HORARIO}}</td>
-                        <td [style.color]="ObtenerColorDatoRegistrado(h.HORARIO_NOCTURNO)">{{h.HORARIO_NOCTURNO}}</td>
                         <td>
                             <div style="width: 270px; margin: auto;">
                                 <div id="t-editar" class="circulo"
@@ -249,6 +244,12 @@
                                 <span *ngIf="!h.DETALLE && h.OBSERVACION === 'Ok'">Registro sin detalles.</span>
                             </div>
                         </td>
+                        <td [style.color]="ObtenerColorDatoRegistrado(h.DESCRIPCION)">{{h.DESCRIPCION}}</td>
+                        <td [style.color]="ObtenerColorDatoRegistrado(h.CODIGO_HORARIO)">{{h.CODIGO_HORARIO}}</td>
+                        <td [style.color]="ObtenerColorDatoRegistrado(h.HORAS_TOTALES)">{{h.HORAS_TOTALES}}</td>
+                        <td>{{h.MINUTOS_ALIMENTACION}}</td>
+                        <td [style.color]="ObtenerColorDatoRegistrado(h.TIPO_HORARIO)">{{h.TIPO_HORARIO}}</td>
+                        <td [style.color]="ObtenerColorDatoRegistrado(h.HORARIO_NOCTURNO)">{{h.HORARIO_NOCTURNO}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -268,6 +269,7 @@
                 <thead class="thead-light">
                     <tr style="text-align: center;">
                         <th scope="col">Item</th>
+                        <th scope="col">Observación</th>
                         <th scope="col">Código Horario</th>
                         <th scope="col">Tipo Acción</th>
                         <th scope="col">Hora</th>
@@ -276,12 +278,18 @@
                         <th scope="col">Salida Siguiente Día</th>
                         <th scope="col">Minutos Antes</th>
                         <th scope="col">Minutos Después</th>
-                        <th scope="col">Observación</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let d of dataHorarios.plantillaDetalles | paginate:tamanio_paginaD:numero_paginaD ">
                         <td>{{d.ITEM}}</td>
+                        <td>
+                            <div style="width: 270px; margin: auto;">
+                                <div id="t-editar" class="circulo"
+                                    [style.background-color]="ObtenerColorValidacion(d.OBSERVACION)"></div>
+                                {{d.OBSERVACION}}.
+                            </div>
+                        </td>
                         <td [style.color]="ObtenerColorDatoRegistrado(d.CODIGO_HORARIO)">{{d.CODIGO_HORARIO}}</td>
                         <td [style.color]="ObtenerColorDatoRegistrado(d.TIPO_ACCION)">{{d.TIPO_ACCION}}</td>
                         <td [style.color]="ObtenerColorDatoRegistrado(d.HORA)">{{d.HORA}}</td>
@@ -290,13 +298,6 @@
                         <td>{{d.SALIDA_SIGUIENTE_DIA}}</td>
                         <td>{{d.MINUTOS_ANTES}}</td>
                         <td>{{d.MINUTOS_DESPUES}}</td>
-                        <td>
-                            <div style="width: 270px; margin: auto;">
-                                <div id="t-editar" class="circulo"
-                                    [style.background-color]="ObtenerColorValidacion(d.OBSERVACION)"></div>
-                                {{d.OBSERVACION}}.
-                            </div>
-                        </td>
                     </tr>
                 </tbody>
             </table>
