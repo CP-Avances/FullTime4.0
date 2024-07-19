@@ -361,8 +361,7 @@ export class RegistrarTimbreComponent implements OnInit {
   ValidarDomicilio(informacion: any, form: any) {
     console.log('ingresa a domicilio')
     this.restE.BuscarUbicacion(this.id_empl).subscribe(res => {
-      console.log('domicilio ', res)
-      if (res[0].longitud != null) {
+      if (res[0].longitud != null || res[0].latitud != null) {
 
         informacion.lat2 = res[0].latitud;
         informacion.lng2 = res[0].longitud;
