@@ -96,7 +96,7 @@ export class EditarTimbreComponent implements OnInit {
   LeerDatosTimbre() {
     this.datosTimbre = [];
     this.datosTimbre = this.data.timbre;
-    //--console.log('ver timbre ', this.datosTimbre)
+    console.log('ver timbre ', this.datosTimbre)
     this.datosTimbre.fecha_ = this.validar.FormatearFecha(this.datosTimbre.fecha_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
     this.datosTimbre.hora_ = this.validar.FormatearHora(this.datosTimbre.fecha_hora_timbre_servidor.split(' ')[1], this.formato_hora);
     this.ValidarObservacion();
@@ -160,7 +160,7 @@ export class EditarTimbreComponent implements OnInit {
   EnviarDatosTimbre(formTimbre: any) {
     let data = {
       id: this.datosTimbre.id,
-      codigo: this.datosTimbre.codigo,
+      id_empleado: this.datosTimbre.id_empleado,
       accion: formTimbre.accionTimbre,
       tecla: formTimbre.teclaFunTimbre,
       observacion: this.simbolo_ + formTimbre.ObservacionForm,
