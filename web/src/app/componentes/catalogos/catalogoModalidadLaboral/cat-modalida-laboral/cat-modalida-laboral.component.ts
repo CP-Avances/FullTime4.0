@@ -1,9 +1,9 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ThemePalette } from '@angular/material/core';
 
@@ -34,6 +34,8 @@ import { RegistroModalidadComponent } from '../registro-modalidad/registro-modal
 })
 
 export class CatModalidaLaboralComponent implements OnInit {
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   modalidadesEliminar: any = [];
 
@@ -193,6 +195,9 @@ export class CatModalidaLaboralComponent implements OnInit {
   mostrarbtnsubir: boolean = false;
   // METODO PARA SELECCIONAR PLANTILLA DE DATOS
   FileChange(element: any) {
+    this.numero_paginaMul = 1;
+    this.tamanio_paginaMul = 5;
+    this.paginator.firstPage();
     this.archivoSubido = [];
     this.nameFile = '';
     this.archivoSubido = element.target.files;

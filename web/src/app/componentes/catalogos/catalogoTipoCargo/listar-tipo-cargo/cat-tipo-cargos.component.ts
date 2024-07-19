@@ -4,8 +4,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
-import { PageEvent } from '@angular/material/paginator';
-import { Component } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
 import * as xlsx from 'xlsx';
@@ -34,6 +34,8 @@ import { EditarTipoCargoComponent } from '../editar-tipo-cargo/editar-tipo-cargo
 })
 
 export class CatTipoCargosComponent {
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   tiposCargoEliminar: any = [];
   archivoForm = new FormControl('', Validators.required);
@@ -226,6 +228,9 @@ export class CatTipoCargosComponent {
   mostrarbtnsubir: boolean = false;
   // METODO PARA SELECCIONAR PLANTILLA DE DATOS
   FileChange(element: any) {
+    this.numero_paginaMul = 1;
+    this.tamanio_paginaMul = 5;
+    this.paginator.firstPage();
     this.archivoSubido = [];
     this.nameFile = '';
     this.archivoSubido = element.target.files;
