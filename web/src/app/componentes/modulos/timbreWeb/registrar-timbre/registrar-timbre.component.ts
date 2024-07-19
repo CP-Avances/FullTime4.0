@@ -353,7 +353,7 @@ export class RegistrarTimbreComponent implements OnInit {
   // METODO PARA VALIDAR UBICACION DOMICILIO
   ValidarDomicilio(informacion: any, form: any) {
     this.restE.BuscarUbicacion(this.id_empl).subscribe(res => {
-      if (res[0].longitud != null) {
+      if (res[0].longitud != null || res[0].latitud != null) {
 
         informacion.lat2 = res[0].latitud;
         informacion.lng2 = res[0].longitud;
