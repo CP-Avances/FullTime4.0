@@ -229,7 +229,7 @@ class UbicacionControlador {
                 yield database_1.default.query('BEGIN');
                 yield database_1.default.query(`
                 INSERT INTO mg_empleado_ubicacion (id_empleado, id_ubicacion) 
-                VALUES ($2, $3)
+                VALUES ($1, $2)
                 `, [id_empl, id_ubicacion]);
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -237,7 +237,7 @@ class UbicacionControlador {
                     usuario: user_name,
                     accion: 'I',
                     datosOriginales: '',
-                    datosNuevos: `id_empl: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
+                    datosNuevos: `id_empleado: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
                     ip,
                     observacion: null
                 });
@@ -246,6 +246,7 @@ class UbicacionControlador {
                 res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
+                console.log('error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 res.status(500).jsonp({ message: 'Error al guardar registro.' });
