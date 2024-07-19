@@ -555,9 +555,9 @@ export class ListaPlanificacionesComponent implements OnInit {
   // METODO DE BUSQUEDA DE NUMERO PERMITIDO DE CORREOS
   correos: number;
   BuscarParametro() {
-    // id_tipo_parametro LIMITE DE CORREOS = 13
+    // id_tipo_parametro LIMITE DE CORREOS = 33
     let datos: any = [];
-    this.parametro.ListarDetalleParametros(13).subscribe(
+    this.parametro.ListarDetalleParametros(33).subscribe(
       res => {
         datos = res;
         if (datos.length != 0) {

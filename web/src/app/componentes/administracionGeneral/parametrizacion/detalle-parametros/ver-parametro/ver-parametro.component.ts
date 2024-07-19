@@ -71,6 +71,8 @@ export class VerParametroComponent implements OnInit {
   laboral_calendario: boolean = false;
   // PARAMETRO FORMATO CONECTIVIDAD A INTERNET
   conectividad_internet: boolean = false;
+  // PARAMETRO TOMAR FOTO MOVIL
+  foto_movil: boolean = false;
   // PARAMETRO LIMITE CORREO
   limite_correo: boolean = false;
 
@@ -163,6 +165,11 @@ export class VerParametroComponent implements OnInit {
       this.conectividad_internet = true;
       this.ver_formulario = true;
     }
+    // FORMATO PERMITIR TIMBRE UBICACION DESCONOCIDA
+    if (this.idParametro === '14') {
+      this.ver_formulario = true;
+      this.foto_movil = true;
+    }
     // LIMITE CORREO
     if (this.idParametro === '33') {
       this.ver_editar = true;
@@ -235,7 +242,7 @@ export class VerParametroComponent implements OnInit {
 
       // PARAMETROS CON DETALLES
       if (this.idParametro === '5' || this.idParametro === '7' || this.idParametro === '8' || this.idParametro === '9' ||
-        this.idParametro === '13') {
+        this.idParametro === '13' || this.idParametro === '14') {
         this.VerConfiguracionRegistro();
       }
     }, vacio => {
