@@ -1,11 +1,11 @@
 // IMPORTACION DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 
@@ -39,6 +39,8 @@ import { environment } from 'src/environments/environment';
 })
 
 export class ListarTitulosComponent implements OnInit {
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   // VARIABLES USADAS PARA ALMACENAMIENTO DE DATOS
   titulosEliminar: any = [];
@@ -196,6 +198,9 @@ export class ListarTitulosComponent implements OnInit {
   mostrarbtnsubir: boolean = false;
   // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE TITULOS
   FileChange(element: any) {
+    this.numero_paginaMul = 1;
+    this.tamanio_paginaMul = 5;
+    this.paginator.firstPage();
     this.archivoSubido = [];
     this.nameFile = '';
     this.archivoSubido = element.target.files;
@@ -205,8 +210,6 @@ export class ListarTitulosComponent implements OnInit {
     let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
-        this.numero_paginaMul = 1;
-        this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
         this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {

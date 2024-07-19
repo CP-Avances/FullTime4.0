@@ -1,9 +1,9 @@
 // IMPORTACION DE LIBRERIAS
 import { FormControl, Validators, FormGroup } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
@@ -37,6 +37,8 @@ import { ITableSucursales } from 'src/app/model/reportes.model';
 })
 
 export class ListaSucursalesComponent implements OnInit {
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   sucursalesEliminar: any = [];
 
@@ -437,6 +439,9 @@ export class ListaSucursalesComponent implements OnInit {
   mostrarbtnsubir: boolean = false;
   // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE SUCURSALES
   FileChange(element: any) {
+    this.numero_paginaMul = 1;
+    this.tamanio_paginaMul = 5;
+    this.paginator.firstPage();
     this.archivoSubido = [];
     this.nameFile = '';
     this.archivoSubido = element.target.files;
@@ -446,8 +451,6 @@ export class ListaSucursalesComponent implements OnInit {
     let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
-        this.numero_paginaMul = 1;
-        this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
         this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
@@ -483,6 +486,16 @@ export class ListaSucursalesComponent implements OnInit {
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.Datasucursales = res.data;
       this.messajeExcel = res.message;
+
+      this.Datasucursales.sort((a, b) => {
+        if (a.observacion !== 'ok' && b.observacion === 'ok') {
+          return -1;
+        }
+        if (a.observacion === 'ok' && b.observacion !== 'ok') {
+          return 1;
+        }
+        return 0;
+      });
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {

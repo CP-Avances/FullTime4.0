@@ -1,11 +1,11 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 import * as xlsx from 'xlsx';
 import * as xml2js from 'xml2js';
@@ -33,6 +33,8 @@ import { MetodosComponent } from '../../../administracionGeneral/metodoEliminar/
 })
 
 export class CatVacunasComponent implements OnInit {
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   vacunasEliminar: any = [];
 
@@ -191,6 +193,9 @@ export class CatVacunasComponent implements OnInit {
   mostrarbtnsubir: boolean = false;
   // METODO PARA SELECCIONAR PLANTILLA DE DATOS
   FileChange(element: any) {
+    this.numero_paginaMul = 1;
+    this.tamanio_paginaMul = 5;
+    this.paginator.firstPage();
     this.archivoSubido = [];
     this.nameFile = '';
     this.archivoSubido = element.target.files;

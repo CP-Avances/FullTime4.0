@@ -225,7 +225,7 @@
                 </tbody>
             </table>
         </div>
-        <mat-paginator id="pagina" [length]="DataTitulosProfesionales.length" [pageSize]="tamanio_paginaMul"
+        <mat-paginator [length]="DataTitulosProfesionales.length" [pageSize]="tamanio_paginaMul"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
         </mat-paginator>
     </div>
