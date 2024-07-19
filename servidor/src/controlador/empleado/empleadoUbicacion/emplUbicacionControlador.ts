@@ -250,7 +250,7 @@ class UbicacionControlador {
             await pool.query(
                 `
                 INSERT INTO mg_empleado_ubicacion (id_empleado, id_ubicacion) 
-                VALUES ($2, $3)
+                VALUES ($1, $2)
                 `
                 ,
                 [id_empl, id_ubicacion]);
@@ -261,7 +261,7 @@ class UbicacionControlador {
                 usuario: user_name,
                 accion: 'I',
                 datosOriginales: '',
-                datosNuevos: `id_empl: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
+                datosNuevos: `id_empleado: ${id_empl}, id_ubicacion: ${id_ubicacion}}`,
                 ip,
                 observacion: null
             });
@@ -270,6 +270,7 @@ class UbicacionControlador {
             await pool.query('COMMIT');
             res.jsonp({ message: 'Registro guardado.' });
         } catch (error) {
+            console.log('error ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             res.status(500).jsonp({ message: 'Error al guardar registro.' });
