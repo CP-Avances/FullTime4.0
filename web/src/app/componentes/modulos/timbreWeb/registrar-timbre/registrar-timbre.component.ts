@@ -89,10 +89,10 @@ export class RegistrarTimbreComponent implements OnInit {
       res => {
         datos = res;
         if (datos.length != 0) {
-          this.rango = ((parseInt(datos[0].descripcion) * (0.0048)) / 500)
+          this.rango = (parseInt(datos[0].descripcion))
         }
         else {
-          this.rango = 0.00
+          this.rango = 0
         }
       });
   }
