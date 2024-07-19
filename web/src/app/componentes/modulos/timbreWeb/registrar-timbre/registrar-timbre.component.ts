@@ -275,10 +275,10 @@ export class RegistrarTimbreComponent implements OnInit {
   ubicacion: string = '';
   sin_ubicacion: number = 0;
   CompararCoordenadas(informacion: any, form: any, descripcion: any, data: any) {
-    //console.log('verificar informacion ', informacion)
+    console.log('verificar informacion ', informacion)
     this.restP.ObtenerCoordenadas(informacion).subscribe(
       res => {
-        //console.log('verificar res ', res)
+        console.log('verificar res ', res)
         if (res[0].verificar === 'ok') {
           this.contar = this.contar + 1;
           this.ubicacion = descripcion;
