@@ -266,14 +266,21 @@ class ParametrosControlador {
     public async CompararCoordenadas(req: Request, res: Response): Promise<Response> {
         try {
             const { lat1, lng1, lat2, lng2, valor } = req.body;
-            const VALIDACION = await pool.query(
-                `
-                SELECT CASE ( SELECT 1 WHERE 
-                ($1::DOUBLE PRECISION  BETWEEN $3::DOUBLE PRECISION - $5 AND $3::DOUBLE PRECISION + $5) AND 
-                ($2::DOUBLE PRECISION  BETWEEN $4::DOUBLE PRECISION - $5 AND $4::DOUBLE PRECISION + $5)) 
-                IS null WHEN true THEN \'vacio\' ELSE \'ok\' END AS verificar
-                `
-                , [lat1, lng1, lat2, lng2, valor]);
+            const RADIO_TIERRA = 6371; // Radio de la Tierra en kilómetros
+
+        const VALIDACION = await pool.query(
+            `
+            SELECT CASE 
+                WHEN (
+                    ${RADIO_TIERRA} * ACOS(
+                        COS(RADIANS($1)) * COS(RADIANS($3)) * COS(RADIANS($4) - RADIANS($2)) + 
+                        SIN(RADIANS($1)) * SIN(RADIANS($3))
+                    ) * 1000 -- Convertir a metros
+                ) <= $5 THEN 'ok'
+                ELSE 'vacio'
+            END AS verificar
+            `,
+            [lat1, lng1, lat2, lng2, valor]);
 
             return res.jsonp(VALIDACION.rows);
         } catch (error) {
