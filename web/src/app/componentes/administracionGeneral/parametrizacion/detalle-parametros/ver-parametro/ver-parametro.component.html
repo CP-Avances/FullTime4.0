@@ -205,6 +205,11 @@
                     <span *ngIf="conectividad_internet">
                         NOTA: Permitir realizar timbres desde la aplicación móvil sin conectividad a internet.
                     </span>
+
+                    <!-- CONTENIDO USAR CONECTIVIDAD INTERNET (14) -->
+                    <span *ngIf="foto_movil">
+                        NOTA: Tomar fotografía para ser enviada junto al timbre en aplicación móvil.
+                    </span>
                 </div>
                 <form [formGroup]="formulario">
                     <mat-radio-group aria-label="Select an option" [formControl]="descripcionF">
