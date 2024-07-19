@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { ThemePalette } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -18,6 +18,8 @@ import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartament
   styleUrls: ['./cargar-plantilla.component.css']
 })
 export class CargarPlantillaComponent implements OnInit {
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   archivoForm = new FormControl('', Validators.required);
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
@@ -208,6 +210,11 @@ export class CargarPlantillaComponent implements OnInit {
 
   // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE CONTRATOS EMPLEADOS
   FileChange(element: any, tipo: string) {
+    this.numero_paginaMul = 1;
+    this.tamanio_paginaMul = 5;
+    this.numero_paginaDepaNivel = 1;
+    this.tamanio_paginaDepaNivel = 5;
+    //this.paginator.firstPage();
     this.archivoSubido = [];
     this.nameFile = '';
     this.archivoSubido = element.target.files;
@@ -466,6 +473,9 @@ export class CargarPlantillaComponent implements OnInit {
   listaCargosCorrectas: any = [];
   messajeExcelCargos: string = '';
   FileChangeCargo(element: any) {
+    this.numero_paginaMulCargo = 1;
+    this.tamanio_paginaMulCargo = 5;
+    //this.paginator.firstPage();
     this.archivoSubidoCargo = [];
     this.nameFileCargo = '';
     this.archivoSubidoCargo = element.target.files;

@@ -2,12 +2,12 @@
 import { firstValueFrom, forkJoin, map, Observable } from 'rxjs';
 import { Validators, FormControl } from '@angular/forms';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { environment } from 'src/environments/environment';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import * as xlsx from 'xlsx';
@@ -41,6 +41,8 @@ import { EmpleadoElemento } from '../../../../model/empleado.model';
 })
 
 export class ListaEmpleadosComponent implements OnInit {
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   empleadosEliminarActivos: any = [];
   empleadosEliminarInactivos: any = [];
@@ -439,6 +441,9 @@ export class ListaEmpleadosComponent implements OnInit {
   archivoForm = new FormControl('', Validators.required);
   mostrarbtnsubir: boolean = false;
   FileChange(element: any) {
+    this.numero_paginaMul = 1;
+    this.tamanio_paginaMul = 5;
+    this.paginator.firstPage();
     this.archivoSubido = [];
     this.nameFile = '';
     this.archivoSubido = element.target.files;

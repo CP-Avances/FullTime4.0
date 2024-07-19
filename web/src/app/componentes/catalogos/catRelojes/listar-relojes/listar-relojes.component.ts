@@ -1,10 +1,10 @@
 // IMPORTACION DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
 import * as xlsx from 'xlsx';
@@ -37,6 +37,8 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 })
 
 export class ListarRelojesComponent implements OnInit {
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   // ALMACENAMIENTO DE DATOS
   relojes: any = [];
@@ -248,6 +250,9 @@ export class ListarRelojesComponent implements OnInit {
   archivoForm = new FormControl('', Validators.required);
   mostrarbtnsubir: boolean = false;
   fileChange(element: any) {
+    this.numero_paginaMul = 1;
+    this.tamanio_paginaMul = 5;
+    this.paginator.firstPage();
     this.archivoSubido = [];
     this.nameFile = '';
     this.archivoSubido = element.target.files;
