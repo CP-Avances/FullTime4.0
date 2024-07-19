@@ -350,7 +350,7 @@ class PlanGeneralControlador {
                     const ASISTENCIA = yield database_1.default.query(`
                     SELECT p_g.*, p_g.fecha_hora_horario::time AS hora_horario, p_g.fecha_hora_horario::date AS fecha_horarios,
                     p_g.fecha_hora_timbre::date AS fecha_timbre, p_g.fecha_hora_timbre::time AS hora_timbre,
-                    empleado.cedula, empleado.nombre, empleado.apellido, empleado.id AS id_empleado
+                    empleado.cedula, empleado.nombre, empleado.apellido, empleado.id AS id_empleado, empleado.codigo
                     FROM eu_asistencia_general p_g
                     INNER JOIN eu_empleados empleado on empleado.id = p_g.id_empleado AND p_g.id_empleado = ANY($3)
                     WHERE p_g.fecha_horario BETWEEN $1 AND $2

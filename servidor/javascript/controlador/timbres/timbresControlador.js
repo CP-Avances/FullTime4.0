@@ -238,17 +238,17 @@ class TimbresControlador {
     EditarTimbreEmpleadoFecha(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let { id, codigo, accion, tecla, observacion, fecha } = req.body;
+                let { id, id_empleado, accion, tecla, observacion, fecha } = req.body;
                 console.log('id: ', id);
-                console.log('codigo: ', codigo);
+                console.log('codigo: ', id_empleado);
                 console.log('accion: ', accion);
                 console.log('tecla: ', tecla);
                 console.log('observacion: ', observacion);
                 console.log('fecha: ', fecha);
                 yield database_1.default.query(`
-                SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, 
+                SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::integer, 
                         $3::character varying, $4::integer, $5::character varying) 
-                `, [fecha, codigo, tecla, id, observacion])
+                `, [fecha, id_empleado, tecla, id, observacion])
                     .then((result) => {
                     return res.status(200).jsonp({ message: 'Registro actualizado.' });
                 });
@@ -385,9 +385,9 @@ class TimbresControlador {
                     contador = contador + 1;
                     // fecha_hora_servidor, codigo, tecla_funcion, id_timbre, observcaion
                     yield database_1.default.query(`
-                    SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, 
+                    SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::integer, 
                             $3::character varying, $4::integer, $5::character varying)  
-                    `, [obj.fecha_hora_timbre_servidor, obj.codigo, obj.tecla_funcion, obj.id, obj.observacion]);
+                    `, [obj.fecha_hora_timbre_servidor, obj.id_empleado, obj.tecla_funcion, obj.id, obj.observacion]);
                 }));
                 if (contador === TIMBRES.rowCount) {
                     return res.jsonp({ message: 'OK', respuesta: TIMBRES.rows });
