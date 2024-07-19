@@ -1578,7 +1578,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
-    formData.append('id_permiso', id as string);
+    formData.append('id', id as string);
     formData.append('codigo', codigo as string);
 
     this.restP.SubirArchivoRespaldo(formData, id, codigo, null).subscribe(res => {

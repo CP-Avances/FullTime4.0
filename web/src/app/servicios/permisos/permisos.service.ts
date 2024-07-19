@@ -73,8 +73,15 @@ export class PermisosService {
     return this.http.put(`${environment.url}/empleadoPermiso/${id}/archivo/${archivo}/validar/${codigo}`, formData)
   }
 
+  // METODO PARA CREAR PERMISOS MULTIPLES
+  CrearPermisosMultiples(datos: any) {
+    return this.http.put<any>(`${environment.url}/empleadoPermiso/permisos-multiples`, datos);
+  }
 
-
+  // METODO PARA GUARDAR DOCUMENTOS MULTIPLES
+  GuardarDocumentosPermisosMultiples(datos: any) {
+    return this.http.put<any>(`${environment.url}/empleadoPermiso/documentos-multiples/`, datos);
+  }
 
   // METODO DE BUSQUEDA DE PERMISOS POR ID DE EMPLEADO
   BuscarPermisoEmpleado(id_empleado: any) {

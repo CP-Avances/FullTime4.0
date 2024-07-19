@@ -2,7 +2,7 @@ import {
     enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, Credenciales, fechaHora,
     FormatearFecha, FormatearHora, dia_completo, FormatearFecha2
 } from '../../libs/settingsMail';
-import { ObtenerRutaPermisos, ObtenerRutaPermisosIdEmpleado } from '../../libs/accesoCarpetas';
+import { ObtenerRutaPermisos, ObtenerRutaPermisosGeneral, ObtenerRutaPermisosIdEmpleado } from '../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
@@ -635,13 +635,77 @@ class PermisosControlador {
 
     // METODO PARA CREAR MULTIPLES PERMISOS
     public async CrearPermisosMultiples(req: Request, res: Response): Promise<any> {
-        try {
-           const { permisos, user_name, ip } = req.body;
-           let error: boolean = false;
+        const { permisos } = req.body;
 
-           for ( const permiso of permisos ) {
-            
-           }
+        // copnvertir permisos que esta en json a array
+        const permisosArray = JSON.parse(permisos);
+
+
+        const fecha = moment();
+        const anio = fecha.format('YYYY');
+        const mes = fecha.format('MM');
+        const dia = fecha.format('DD');
+
+        let errorPermisos: boolean = false;
+
+        const separador = path.sep;
+        const nombreArchivo = req.file?.originalname;
+        const carpetaPermisos = await ObtenerRutaPermisosGeneral();
+        const documentoTemporal = `${carpetaPermisos}${separador}${anio}_${mes}_${dia}_${nombreArchivo}`;
+
+        for ( const datos of permisosArray ) {
+            console.log('datos', datos);
+             const { message, error, permiso } = await CrearPermiso(datos);
+
+             if (error) {
+                console.error('Error al crear permiso:', message);
+                 errorPermisos = true;
+                 continue;
+                }
+                
+            try {
+                const carpetaEmpleado = await ObtenerRutaPermisos(permiso.codigo);
+
+                const consulta = await pool.query(`SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1`, [permiso.id]);
+                const numeroPermiso = consulta.rows[0].numero_permiso;
+    
+                const documento = `${carpetaEmpleado}${separador}${numeroPermiso}_${permiso.codigo}_${anio}_${mes}_${dia}_${nombreArchivo}`;
+
+
+                fs.copyFileSync(documentoTemporal, documento);
+                
+                const { message: messageDoc, error: errorDoc } = await RegistrarDocumentoPermiso(permiso);
+
+                if (errorDoc) {
+                    console.error('Error al registrar documento:', messageDoc);
+                    errorPermisos = true;
+                    continue;
+                }
+                
+            } catch (error) {
+                console.error('Error al copiar el archivo:', error);
+                errorPermisos = true;
+                continue;
+            }
+        }
+
+        try {
+            fs.unlinkSync(documentoTemporal);
+        } catch (error) {
+            console.error('Error al eliminar el archivo temporal:', error);
+        }
+
+        if (errorPermisos) {
+            return res.status(500).jsonp({ message: 'Error al crear permisos.' });
+        }
+
+        return res.status(200).jsonp({ message: 'Permisos creados.' });
+
+    }
+
+    // METODO PARA GUARDAR DOCUMENTOS DE PERMISOS MULTIPLES
+    public async GuardarDocumentosPermisosMultiples(req: Request, res: Response): Promise<any> {
+        try {
             
         } catch (error) {
             
@@ -1723,6 +1787,7 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
         }
     } catch (error) {
         // REVERTIR TRANSACCION
+        console.log('Error al crear permiso: ', error);
         await pool.query('ROLLBACK');
         return {message: 'Error al crear permiso.', error: true};
     }
@@ -1731,7 +1796,9 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
 async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> {
     try {
 
-        const {id_permiso, codigo, nombreArchivo, user_name, ip} = datos;
+        const {id, codigo, nombreArchivo, user_name, ip} = datos;
+
+        console.log('datos: ', datos);
 
         const fecha = moment();
         const anio = fecha.format('YYYY');
@@ -1742,7 +1809,7 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
         await pool.query('BEGIN');
 
         // CONSULTAR DATOSORIGINALES
-        const consulta = await pool.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id_permiso]);
+        const consulta = await pool.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id]);
         const [datosOriginales] = consulta.rows;
 
         if (!datosOriginales) {
@@ -1753,7 +1820,7 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
                 datosOriginales: '',
                 datosNuevos: '',
                 ip,
-                observacion: `Error al intentar actualizar permiso con id: ${id_permiso}`
+                observacion: `Error al intentar actualizar permiso con id: ${id}`
             });
 
             // FINALIZAR TRANSACCION
@@ -1768,7 +1835,7 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
             `
             UPDATE mp_solicitud_permiso SET documento = $1 WHERE id = $2 RETURNING *
             `
-            , [documento, id_permiso]);
+            , [documento, id]);
 
         const [datosNuevos] = response.rows;
 

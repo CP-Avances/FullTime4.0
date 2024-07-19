@@ -1813,10 +1813,12 @@ export class PermisosMultiplesComponent implements OnInit {
   contador: number = 0;
   InsertarPermiso(form: any) {
 
+    let permisos: any = [];
+
     this.contador = 0;
 
     // LECTURA DE DATOS DE USUARIOS SELECCIONADOS
-    this.valido.forEach(valor => {
+    this.valido.forEach((valor: any) => {
 
       // DATOS DE PERMISO
       let datosPermiso = {
@@ -1836,7 +1838,7 @@ export class PermisosMultiplesComponent implements OnInit {
 
         // VALORES SEGUN USUARIO
         codigo: valor.codigo,
-        id_empl: valor.id,
+        id_empleado: valor.id,
         num_permiso: valor.numero_permiso,
         id_empl_cargo: valor.id_cargo,
         id_empl_contrato: valor.id_contrato,
@@ -1871,10 +1873,28 @@ export class PermisosMultiplesComponent implements OnInit {
         datosPermiso.hora_numero = valor.tiempo_solicitado;
       }
 
-      this.GuardarDatos(datosPermiso, form, valor);
+      permisos.push(datosPermiso);
+
+      // this.GuardarDatos(datosPermiso, form, valor);
 
     });
 
+    console.log('ver permisos ', permisos);
+    this.GuardarPermiosMultiples(permisos);
+
+
+  }
+
+  GuardarPermiosMultiples(permisos: any) {
+    let formData = new FormData();
+    for (var i = 0; i < this.archivoSubido.length; i++) {
+      console.log('ver archivo subido ', this.archivoSubido[i].name)
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+    }
+    formData.append('permisos', JSON.stringify(permisos));
+    this.restP.CrearPermisosMultiples(formData).subscribe(response => {
+      console.log('ver permisos multiples ', response)
+    })
   }
 
   // METODO PARA GUARDAR DATOS DE SOLICITUD DE PERMISO

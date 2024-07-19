@@ -569,11 +569,62 @@ class PermisosControlador {
     // METODO PARA CREAR MULTIPLES PERMISOS
     CrearPermisosMultiples(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { permisos, user_name, ip } = req.body;
-                let error = false;
-                for (const permiso of permisos) {
+            var _a;
+            const { permisos } = req.body;
+            // copnvertir permisos que esta en json a array
+            const permisosArray = JSON.parse(permisos);
+            const fecha = (0, moment_1.default)();
+            const anio = fecha.format('YYYY');
+            const mes = fecha.format('MM');
+            const dia = fecha.format('DD');
+            let errorPermisos = false;
+            const separador = path_1.default.sep;
+            const nombreArchivo = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisosGeneral)();
+            const documentoTemporal = `${carpetaPermisos}${separador}${anio}_${mes}_${dia}_${nombreArchivo}`;
+            for (const datos of permisosArray) {
+                console.log('datos', datos);
+                const { message, error, permiso } = yield CrearPermiso(datos);
+                if (error) {
+                    console.error('Error al crear permiso:', message);
+                    errorPermisos = true;
+                    continue;
                 }
+                try {
+                    const carpetaEmpleado = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(permiso.codigo);
+                    const consulta = yield database_1.default.query(`SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1`, [permiso.id]);
+                    const numeroPermiso = consulta.rows[0].numero_permiso;
+                    const documento = `${carpetaEmpleado}${separador}${numeroPermiso}_${permiso.codigo}_${anio}_${mes}_${dia}_${nombreArchivo}`;
+                    fs_1.default.copyFileSync(documentoTemporal, documento);
+                    const { message: messageDoc, error: errorDoc } = yield RegistrarDocumentoPermiso(permiso);
+                    if (errorDoc) {
+                        console.error('Error al registrar documento:', messageDoc);
+                        errorPermisos = true;
+                        continue;
+                    }
+                }
+                catch (error) {
+                    console.error('Error al copiar el archivo:', error);
+                    errorPermisos = true;
+                    continue;
+                }
+            }
+            try {
+                fs_1.default.unlinkSync(documentoTemporal);
+            }
+            catch (error) {
+                console.error('Error al eliminar el archivo temporal:', error);
+            }
+            if (errorPermisos) {
+                return res.status(500).jsonp({ message: 'Error al crear permisos.' });
+            }
+            return res.status(200).jsonp({ message: 'Permisos creados.' });
+        });
+    }
+    // METODO PARA GUARDAR DOCUMENTOS DE PERMISOS MULTIPLES
+    GuardarDocumentosPermisosMultiples(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
             }
             catch (error) {
             }
@@ -1548,6 +1599,7 @@ function CrearPermiso(datos) {
         }
         catch (error) {
             // REVERTIR TRANSACCION
+            console.log('Error al crear permiso: ', error);
             yield database_1.default.query('ROLLBACK');
             return { message: 'Error al crear permiso.', error: true };
         }
@@ -1556,7 +1608,8 @@ function CrearPermiso(datos) {
 function RegistrarDocumentoPermiso(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { id_permiso, codigo, nombreArchivo, user_name, ip } = datos;
+            const { id, codigo, nombreArchivo, user_name, ip } = datos;
+            console.log('datos: ', datos);
             const fecha = (0, moment_1.default)();
             const anio = fecha.format('YYYY');
             const mes = fecha.format('MM');
@@ -1564,7 +1617,7 @@ function RegistrarDocumentoPermiso(datos) {
             // INICIAR TRANSACCION
             yield database_1.default.query('BEGIN');
             // CONSULTAR DATOSORIGINALES
-            const consulta = yield database_1.default.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id_permiso]);
+            const consulta = yield database_1.default.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id]);
             const [datosOriginales] = consulta.rows;
             if (!datosOriginales) {
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -1574,7 +1627,7 @@ function RegistrarDocumentoPermiso(datos) {
                     datosOriginales: '',
                     datosNuevos: '',
                     ip,
-                    observacion: `Error al intentar actualizar permiso con id: ${id_permiso}`
+                    observacion: `Error al intentar actualizar permiso con id: ${id}`
                 });
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
@@ -1584,7 +1637,7 @@ function RegistrarDocumentoPermiso(datos) {
             const documento = `${numeroPermiso}_${codigo}_${anio}_${mes}_${dia}_${nombreArchivo}`;
             const response = yield database_1.default.query(`
             UPDATE mp_solicitud_permiso SET documento = $1 WHERE id = $2 RETURNING *
-            `, [documento, id_permiso]);
+            `, [documento, id]);
             const [datosNuevos] = response.rows;
             const fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_creacion, 'ddd');
             const fechaInicioO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
