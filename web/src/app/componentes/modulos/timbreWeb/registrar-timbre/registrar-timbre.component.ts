@@ -124,6 +124,7 @@ export class RegistrarTimbreComponent implements OnInit {
     this.restP.ListarDetalleParametros(7).subscribe(
       res => {
         datos = res;
+        console.log('ingresa aqui res', res)
         if (datos.length != 0) {
           if (datos[0].descripcion === 'Si') {
             this.Geolocalizar();
@@ -139,6 +140,7 @@ export class RegistrarTimbreComponent implements OnInit {
         (objPosition) => {
           this.latitud = objPosition.coords.latitude;
           this.longitud = objPosition.coords.longitude;
+          console.log('ingresa aqui ', this.latitud, ' - ', this.longitud)
         }, (objPositionError) => {
           switch (objPositionError.code) {
             case objPositionError.PERMISSION_DENIED:
@@ -299,7 +301,7 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO QUE PERMITE VALIDACIONES DE UBICACION
   BuscarUbicacion(latitud: any, longitud: any, rango: any, form: any) {
-    //console.log('ver coordenadas ', longitud, latitud)
+    console.log('ver coordenadas ', longitud, latitud)
     var longitud_ = '';
     var latitud_ = '';
 
@@ -319,12 +321,12 @@ export class RegistrarTimbreComponent implements OnInit {
     }
     this.restU.ListarCoordenadasUsuario(this.id_empl).subscribe(
       res => {
-        //console.log(' res ', res)
+        console.log(' res ', res)
         datosUbicacion = res;
         datosUbicacion.forEach((obj: any) => {
           informacion.lat2 = obj.latitud;
           informacion.lng2 = obj.longitud;
-          //console.log(informacion.lat1, ' ---------- ', informacion.lng1)
+          console.log(informacion.lat1, ' ---------- ', informacion.lng1)
           if (informacion.lat1 && informacion.lng1) {
             this.CompararCoordenadas(informacion, form, obj.descripcion, datosUbicacion);
           }
@@ -346,6 +348,7 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA VERIFICAR ACTIVACION DE MODULO DE GEOLOCALIZACION
   ValidarModulo(latitud: any, longitud: any, rango: any, form: any) {
+    console.log('ver ubicacion ', this.funciones[0].geolocalizacion)
     if (this.funciones[0].geolocalizacion === true) {
       this.BuscarUbicacion(latitud, longitud, rango, form);
     }
@@ -356,7 +359,9 @@ export class RegistrarTimbreComponent implements OnInit {
 
   // METODO PARA VALIDAR UBICACION DOMICILIO
   ValidarDomicilio(informacion: any, form: any) {
+    console.log('ingresa a domicilio')
     this.restE.BuscarUbicacion(this.id_empl).subscribe(res => {
+      console.log('domicilio ', res)
       if (res[0].longitud != null) {
 
         informacion.lat2 = res[0].latitud;
