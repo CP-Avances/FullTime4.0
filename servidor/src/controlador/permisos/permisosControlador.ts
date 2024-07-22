@@ -652,45 +652,58 @@ class PermisosControlador {
         const nombreArchivo = req.file?.originalname;
         const carpetaPermisos = await ObtenerRutaPermisosGeneral();
         const documentoTemporal = `${carpetaPermisos}${separador}${anio}_${mes}_${dia}_${nombreArchivo}`;
+        let permisosCorrectos: any = [];
+        let mensaje: string = '';
 
         for ( const datos of permisosArray ) {
-            console.log('datos', datos);
-             const { message, error, permiso } = await CrearPermiso(datos);
+            const { message, error, permiso } = await CrearPermiso(datos);
+            mensaje = message;
 
-             if (error) {
+            if (error) {
                 console.error('Error al crear permiso:', message);
-                 errorPermisos = true;
-                 continue;
-                }
-                
-            try {
-                const carpetaEmpleado = await ObtenerRutaPermisos(permiso.codigo);
-
-                const consulta = await pool.query(`SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1`, [permiso.id]);
-                const numeroPermiso = consulta.rows[0].numero_permiso;
-    
-                const documento = `${carpetaEmpleado}${separador}${numeroPermiso}_${permiso.codigo}_${anio}_${mes}_${dia}_${nombreArchivo}`;
-
-
-                fs.copyFileSync(documentoTemporal, documento);
-                
-                const { message: messageDoc, error: errorDoc } = await RegistrarDocumentoPermiso(permiso);
-
-                if (errorDoc) {
-                    console.error('Error al registrar documento:', messageDoc);
-                    errorPermisos = true;
-                    continue;
-                }
-                
-            } catch (error) {
-                console.error('Error al copiar el archivo:', error);
                 errorPermisos = true;
                 continue;
             }
+
+            if (datos.subir_documento) {
+                try {
+                    const carpetaEmpleado = await ObtenerRutaPermisos(permiso.codigo);
+    
+                    const consulta = await pool.query(`SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1`, [permiso.id]);
+                    const numeroPermiso = consulta.rows[0].numero_permiso;
+        
+                    const documento = `${carpetaEmpleado}${separador}${numeroPermiso}_${permiso.codigo}_${anio}_${mes}_${dia}_${nombreArchivo}`;
+                    permiso.nombreArchivo = nombreArchivo;
+    
+                    fs.copyFileSync(documentoTemporal, documento);
+                    
+                    const { message: messageDoc, error: errorDoc, documento: nombreDocumento } = await RegistrarDocumentoPermiso(permiso);
+    
+                    if (errorDoc) {
+                        console.error('Error al registrar documento:', messageDoc);
+                        errorPermisos = true;
+                        continue;
+                    }
+
+                    permiso.documento = nombreDocumento;
+    
+                    
+                } catch (error) {
+                    console.error('Error al copiar el archivo:', error);
+                    errorPermisos = true;
+                    continue;
+                }
+            }
+
+            const permisoCreado = {datos, permiso};
+                
+            permisosCorrectos.push(permisoCreado);
         }
 
         try {
-            fs.unlinkSync(documentoTemporal);
+            if (fs.existsSync(documentoTemporal)) {
+                fs.unlinkSync(documentoTemporal);
+            }
         } catch (error) {
             console.error('Error al eliminar el archivo temporal:', error);
         }
@@ -699,7 +712,7 @@ class PermisosControlador {
             return res.status(500).jsonp({ message: 'Error al crear permisos.' });
         }
 
-        return res.status(200).jsonp({ message: 'Permisos creados.' });
+        return res.status(200).jsonp({ message: mensaje, permisos: permisosCorrectos });
 
     }
 
@@ -1691,9 +1704,9 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
         const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
             id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
             estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado,
-            depa_user_loggin, user_name, ip, subir_documento } = datos;
+            depa_user_loggin, user_name, ip, subir_documento, codigo } = datos;
 
-        let codigoEmpleado = '';
+        let codigoEmpleado = codigo || '';
 
         if (subir_documento) {
             try {
@@ -1779,7 +1792,7 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
             [depa_user_loggin]).then((result: any) => { return result.rows });
 
         if (JefesDepartamentos.length === 0) {
-            return {message: 'Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.', error: false, permiso};
+            return {message: 'Revisar configuración de departamento y autorización de solicitudes.', error: false, permiso};
         }
         else {
             permiso.EmpleadosSendNotiEmail = JefesDepartamentos
@@ -1797,8 +1810,6 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
     try {
 
         const {id, codigo, nombreArchivo, user_name, ip} = datos;
-
-        console.log('datos: ', datos);
 
         const fecha = moment();
         const anio = fecha.format('YYYY');
@@ -1873,7 +1884,7 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
-        return {message: 'Documento actualizado.', error: false};
+        return {message: 'Documento actualizado.', error: false, documento};
     } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
@@ -1885,6 +1896,7 @@ interface RespuestaPermiso {
     message: string;
     error: boolean;
     permiso?: any;
+    documento?: any;
 }
 
 export const PERMISOS_CONTROLADOR = new PermisosControlador();

@@ -582,35 +582,45 @@ class PermisosControlador {
             const nombreArchivo = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisosGeneral)();
             const documentoTemporal = `${carpetaPermisos}${separador}${anio}_${mes}_${dia}_${nombreArchivo}`;
+            let permisosCorrectos = [];
+            let mensaje = '';
             for (const datos of permisosArray) {
-                console.log('datos', datos);
                 const { message, error, permiso } = yield CrearPermiso(datos);
+                mensaje = message;
                 if (error) {
                     console.error('Error al crear permiso:', message);
                     errorPermisos = true;
                     continue;
                 }
-                try {
-                    const carpetaEmpleado = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(permiso.codigo);
-                    const consulta = yield database_1.default.query(`SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1`, [permiso.id]);
-                    const numeroPermiso = consulta.rows[0].numero_permiso;
-                    const documento = `${carpetaEmpleado}${separador}${numeroPermiso}_${permiso.codigo}_${anio}_${mes}_${dia}_${nombreArchivo}`;
-                    fs_1.default.copyFileSync(documentoTemporal, documento);
-                    const { message: messageDoc, error: errorDoc } = yield RegistrarDocumentoPermiso(permiso);
-                    if (errorDoc) {
-                        console.error('Error al registrar documento:', messageDoc);
+                if (datos.subir_documento) {
+                    try {
+                        const carpetaEmpleado = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(permiso.codigo);
+                        const consulta = yield database_1.default.query(`SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1`, [permiso.id]);
+                        const numeroPermiso = consulta.rows[0].numero_permiso;
+                        const documento = `${carpetaEmpleado}${separador}${numeroPermiso}_${permiso.codigo}_${anio}_${mes}_${dia}_${nombreArchivo}`;
+                        permiso.nombreArchivo = nombreArchivo;
+                        fs_1.default.copyFileSync(documentoTemporal, documento);
+                        const { message: messageDoc, error: errorDoc, documento: nombreDocumento } = yield RegistrarDocumentoPermiso(permiso);
+                        if (errorDoc) {
+                            console.error('Error al registrar documento:', messageDoc);
+                            errorPermisos = true;
+                            continue;
+                        }
+                        permiso.documento = nombreDocumento;
+                    }
+                    catch (error) {
+                        console.error('Error al copiar el archivo:', error);
                         errorPermisos = true;
                         continue;
                     }
                 }
-                catch (error) {
-                    console.error('Error al copiar el archivo:', error);
-                    errorPermisos = true;
-                    continue;
-                }
+                const permisoCreado = { datos, permiso };
+                permisosCorrectos.push(permisoCreado);
             }
             try {
-                fs_1.default.unlinkSync(documentoTemporal);
+                if (fs_1.default.existsSync(documentoTemporal)) {
+                    fs_1.default.unlinkSync(documentoTemporal);
+                }
             }
             catch (error) {
                 console.error('Error al eliminar el archivo temporal:', error);
@@ -618,7 +628,7 @@ class PermisosControlador {
             if (errorPermisos) {
                 return res.status(500).jsonp({ message: 'Error al crear permisos.' });
             }
-            return res.status(200).jsonp({ message: 'Permisos creados.' });
+            return res.status(200).jsonp({ message: mensaje, permisos: permisosCorrectos });
         });
     }
     // METODO PARA GUARDAR DOCUMENTOS DE PERMISOS MULTIPLES
@@ -1517,8 +1527,8 @@ const generarTablaHTMLWeb = function (datos, tipo) {
 function CrearPermiso(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre, id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso, estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado, depa_user_loggin, user_name, ip, subir_documento } = datos;
-            let codigoEmpleado = '';
+            const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre, id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso, estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado, depa_user_loggin, user_name, ip, subir_documento, codigo } = datos;
+            let codigoEmpleado = codigo || '';
             if (subir_documento) {
                 try {
                     const { carpetaPermisos, codigo } = yield (0, accesoCarpetas_1.ObtenerRutaPermisosIdEmpleado)(id_empleado);
@@ -1590,7 +1600,7 @@ function CrearPermiso(datos) {
             ORDER BY nivel ASC
             `, [depa_user_loggin]).then((result) => { return result.rows; });
             if (JefesDepartamentos.length === 0) {
-                return { message: 'Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.', error: false, permiso };
+                return { message: 'Revisar configuración de departamento y autorización de solicitudes.', error: false, permiso };
             }
             else {
                 permiso.EmpleadosSendNotiEmail = JefesDepartamentos;
@@ -1609,7 +1619,6 @@ function RegistrarDocumentoPermiso(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { id, codigo, nombreArchivo, user_name, ip } = datos;
-            console.log('datos: ', datos);
             const fecha = (0, moment_1.default)();
             const anio = fecha.format('YYYY');
             const mes = fecha.format('MM');
@@ -1668,7 +1677,7 @@ function RegistrarDocumentoPermiso(datos) {
             });
             // FINALIZAR TRANSACCION
             yield database_1.default.query('COMMIT');
-            return { message: 'Documento actualizado.', error: false };
+            return { message: 'Documento actualizado.', error: false, documento };
         }
         catch (error) {
             // REVERTIR TRANSACCION

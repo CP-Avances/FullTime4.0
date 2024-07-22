@@ -1510,26 +1510,33 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
     this.restP.IngresarEmpleadoPermisos(datos).subscribe({
       next: (res) => {
 
+        let advertencia: boolean = false;
+
         if (res.message == 'ok') {
           this.toastr.success('Operación exitosa.', 'Permiso registrado.', {
             timeOut: 6000,
           });
         } else {
-          this.toastr.warning(res.message, 'Ups!!! algo salio mal.', {
+
+          this.toastr.warning(res.message, 'Revisar configuración de departamento y autorización de solicitudes', {
             timeOut: 6000,
           });
         }
 
         //TODO: genera error push
-        // res.permiso.EmpleadosSendNotiEmail.push(this.solInfo);
+        if (advertencia) {
+          res.permiso.EmpleadosSendNotiEmail.push(this.solInfo);
+        }
         this.ImprimirNumeroPermiso();
         if (this.archivoSubido.length != 0) {
           this.SubirRespaldo(res.permiso, res.permiso.codigo);
         }
         this.IngresarAutorizacion(res.permiso);
         if (form.correoForm === true) {
-          this.EnviarCorreoPermiso(res.permiso);
-          this.EnviarNotificacion(res.permiso);
+          if (advertencia) {
+            this.EnviarCorreoPermiso(res.permiso);
+            this.EnviarNotificacion(res.permiso);
+          }
         }
         this.CerrarVentana();
       },
