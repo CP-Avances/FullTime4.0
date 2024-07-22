@@ -211,8 +211,15 @@
                 </tbody>
             </table>
         </div>
-        <mat-paginator [length]="Datos_modalidad_laboral.length" [pageSize]="tamanio_paginaMul"
-            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
-        </mat-paginator>
+        <div>
+            <div *ngIf="listaModalidadCorrectas.length > 0" class="item" style="float: left; margin: 5px;" >
+                <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
+                <div class="text">items 'OK' - {{listaModalidadCorrectas.length}}</div>
+            </div>
+            <mat-paginator [length]="Datos_modalidad_laboral.length" [pageSize]="tamanio_paginaMul"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
+            </mat-paginator>
+        </div>
+        
     </div>
 </div>

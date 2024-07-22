@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment'
 import { catchError } from 'rxjs';
+import { throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -45,8 +46,14 @@ export class RolesService {
     return this.http.put(`${environment.url}/rol`, data);
   }
 
-
-
+  listaUsuariosRoles(){
+    return this.http.get(`${environment.url}/rol/listausuariosroles`).pipe(
+      catchError(error => {
+        console.error('Error occurred:', error);
+        return throwError(error);
+      })
+    );
+  }
 
 
 }

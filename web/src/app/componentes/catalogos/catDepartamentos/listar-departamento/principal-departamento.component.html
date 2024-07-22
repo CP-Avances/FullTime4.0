@@ -242,10 +242,17 @@
                     </tbody>
                 </table>
             </div>
-            <mat-paginator [length]="DataDepartamentos.length" [pageSize]="tamanio_paginaMul"
-                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
-                showFirstLastButtons>
-            </mat-paginator>
+            <div>
+                <div *ngIf="listDepartamentosCorrectos.length > 0" class="item" style="float: left; margin: 5px;" >
+                    <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
+                    <div class="text">items 'OK' - {{listDepartamentosCorrectos.length}}</div>
+                </div>
+                <mat-paginator [length]="DataDepartamentos.length" [pageSize]="tamanio_paginaMul"
+                    [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                    showFirstLastButtons>
+                </mat-paginator>
+            </div>
+            
         </div>
     </div>
 </div>

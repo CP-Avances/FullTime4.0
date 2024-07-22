@@ -344,6 +344,7 @@ export interface FormCriteriosBusqueda {
     bool_tab?: boolean;
     bool_inc?: boolean;
     bool_cargo?: boolean;
+    bool_rol?: boolean;
 }
 
 // REPORTE DE VACUNAS

@@ -292,10 +292,17 @@
                     </tbody>
                 </table>
             </div>
-            <mat-paginator [length]="DataDispositivos.length" [pageSize]="tamanio_paginaMul"
-                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
-                showFirstLastButtons>
-            </mat-paginator>
+            <div>
+                <div *ngIf="listaDispositivosCorrectos.length > 0" class="item" style="float: left; margin: 5px;" >
+                    <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
+                    <div class="text">items 'OK' - {{listaDispositivosCorrectos.length}}</div>
+                </div>
+                <mat-paginator [length]="DataDispositivos.length" [pageSize]="tamanio_paginaMul"
+                    [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                    showFirstLastButtons>
+                </mat-paginator>
+            </div>
+            
         </div>
     </div>
 </div>
