@@ -413,9 +413,9 @@ class PermisosControlador {
     EliminarPermiso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { user_name, ip } = req.body;
-                let { id_permiso, doc, codigo } = req.params;
+                const { user_name, ip, id_permiso, doc, codigo } = req.body;
                 let separador = path_1.default.sep;
+                console.log('ver data ', user_name, ' ', ip, ' ', id_permiso, ' ', doc, ' ', codigo);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -429,25 +429,24 @@ class PermisosControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al intentar eliminar permiso con id: ${id_permiso}`
+                        observacion: `Error al intentar eliminar notificación con id_permiso: ${id_permiso}`
                     });
-                    // FINALIZAR TRANSACCION
-                    yield database_1.default.query('COMMIT');
-                    return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
                 }
-                yield database_1.default.query(`
-                DELETE FROM ecm_realtime_notificacion where id_permiso = $1
-                `, [id_permiso]);
-                // AUDITORIA
-                yield auditoriaControlador_1.default.InsertarAuditoria({
-                    tabla: 'ecm_realtime_notificacion',
-                    usuario: user_name,
-                    accion: 'D',
-                    datosOriginales: JSON.stringify(datosOriginalesRealTime),
-                    datosNuevos: '',
-                    ip,
-                    observacion: null
-                });
+                else {
+                    yield database_1.default.query(`
+                    DELETE FROM ecm_realtime_notificacion where id_permiso = $1
+                    `, [id_permiso]);
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'ecm_realtime_notificacion',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: JSON.stringify(datosOriginalesRealTime),
+                        datosNuevos: '',
+                        ip,
+                        observacion: null
+                    });
+                }
                 // CONSULTAR DATOSORIGINALESAUTORIZACIONES
                 const consultaAutorizaciones = yield database_1.default.query(`SELECT * FROM ecm_autorizaciones WHERE id_permiso = $1`, [id_permiso]);
                 const [datosOriginalesAutorizaciones] = consultaAutorizaciones.rows;
@@ -459,7 +458,7 @@ class PermisosControlador {
                         datosOriginales: '',
                         datosNuevos: '',
                         ip,
-                        observacion: `Error al intentar eliminar permiso con id: ${id_permiso}`
+                        observacion: `Error al intentar eliminar autorización con id_permiso: ${id_permiso}`
                     });
                     // FINALIZAR TRANSACCION
                     yield database_1.default.query('COMMIT');

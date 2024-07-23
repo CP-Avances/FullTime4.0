@@ -457,9 +457,10 @@ class PermisosControlador {
     // METODO PARA ELIMINAR PERMISO
     public async EliminarPermiso(req: Request, res: Response): Promise<Response> {
         try {
-            const { user_name, ip } = req.body;
-            let { id_permiso, doc, codigo } = req.params;
+            const { user_name, ip, id_permiso, doc, codigo } = req.body;
             let separador = path.sep;
+
+            console.log('ver data ', user_name, ' ', ip, ' ', id_permiso, ' ', doc, ' ', codigo)
 
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
@@ -476,30 +477,26 @@ class PermisosControlador {
                     datosOriginales: '',
                     datosNuevos: '',
                     ip,
-                    observacion: `Error al intentar eliminar permiso con id: ${id_permiso}`
+                    observacion: `Error al intentar eliminar notificación con id_permiso: ${id_permiso}`
                 });
-
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-                return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
+            } else {
+                await pool.query(
+                    `
+                    DELETE FROM ecm_realtime_notificacion where id_permiso = $1
+                    `
+                    , [id_permiso]);
+    
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'ecm_realtime_notificacion',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginalesRealTime),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
             }
-
-            await pool.query(
-                `
-                DELETE FROM ecm_realtime_notificacion where id_permiso = $1
-                `
-                , [id_permiso]);
-
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'ecm_realtime_notificacion',
-                usuario: user_name,
-                accion: 'D',
-                datosOriginales: JSON.stringify(datosOriginalesRealTime),
-                datosNuevos: '',
-                ip,
-                observacion: null
-            });
 
             // CONSULTAR DATOSORIGINALESAUTORIZACIONES
             const consultaAutorizaciones = await pool.query(`SELECT * FROM ecm_autorizaciones WHERE id_permiso = $1`, [id_permiso]);
@@ -513,7 +510,7 @@ class PermisosControlador {
                     datosOriginales: '',
                     datosNuevos: '',
                     ip,
-                    observacion: `Error al intentar eliminar permiso con id: ${id_permiso}`
+                    observacion: `Error al intentar eliminar autorización con id_permiso: ${id_permiso}`
                 });
 
                 // FINALIZAR TRANSACCION

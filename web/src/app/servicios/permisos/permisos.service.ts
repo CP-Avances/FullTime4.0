@@ -95,11 +95,9 @@ export class PermisosService {
 
   // METODO PARA ELIMINAR PERMISOS
   EliminarPermiso(datos: any) {
-    const { id_permiso, doc, codigo, user_name, ip } = datos;
-    const data = { user_name, ip };
-    const url = `${environment.url}/empleadoPermiso/eliminar/${id_permiso}/${doc}/verificar/${codigo}`;
+    const url = `${environment.url}/empleadoPermiso/eliminar`;
     const httpOtions = {
-      body: data
+      body: datos
     };
     return this.http.request('delete', url, httpOtions);
   }
