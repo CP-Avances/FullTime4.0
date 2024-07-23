@@ -460,8 +460,6 @@ class PermisosControlador {
             const { user_name, ip, id_permiso, doc, codigo } = req.body;
             let separador = path.sep;
 
-            console.log('ver data ', user_name, ' ', ip, ' ', id_permiso, ' ', doc, ' ', codigo)
-
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
@@ -590,7 +588,6 @@ class PermisosControlador {
             await pool.query('COMMIT');
 
             if (doc != 'null' && doc != '' && doc != null) {
-                console.log(id_permiso, doc, ' entra ');
                 let ruta = await ObtenerRutaPermisos(codigo) + separador + doc;
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs.access(ruta, fs.constants.F_OK, (err) => {
@@ -612,6 +609,7 @@ class PermisosControlador {
             }
         } catch (error) {
             // REVERTIR TRANSACCION
+            console.log('error ', error)
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error' });
         }
