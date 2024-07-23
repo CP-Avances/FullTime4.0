@@ -1579,8 +1579,7 @@ class DatosGeneralesControlador {
 
         if (JefesDepartamentos.length === 0) return res.status(400)
             .jsonp({
-                message: `Ups!!! algo salio mal. 
-            Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.` });
+                message: `Revisar configuración de departamento y autorización de solicitudes.` });
 
         const obj = JefesDepartamentos[JefesDepartamentos.length - 1];
         let depa_padre = obj.id_departamento_nivel;

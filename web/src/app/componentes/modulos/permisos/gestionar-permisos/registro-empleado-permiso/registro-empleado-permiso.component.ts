@@ -1453,6 +1453,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
   // GUARDAR DATOS DE PERMISO
   InsertarPermiso(form: any) {
+    const subirDocumento: boolean = form.nombreCertificadoForm != '' && form.nombreCertificadoForm != null;
     let datosPermiso = {
       id_empl_contrato: this.datos.id_contrato,
       id_peri_vacacion: this.periodo_vacaciones,
@@ -1474,7 +1475,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       dia: parseInt(form.diasForm),
       user_name: this.user_name,
       ip: this.ip,
-      subir_documento: this.archivoSubido.length != 0,
+      subir_documento: subirDocumento,
     }
     this.CambiarValoresDiasHoras(form, datosPermiso);
     this.CambiarValorDiaLibre(datosPermiso, form);
@@ -1507,29 +1508,37 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
   // VALIDACIONES DE DATOS DE SOLICITUD
   GuardarDatos(datos: any, form: any) {
 
+    const subirDocumento: boolean = form.nombreCertificadoForm != '' && form.nombreCertificadoForm != null;
+
     this.restP.IngresarEmpleadoPermisos(datos).subscribe({
       next: (res) => {
+
+        let advertencia: boolean = false;
 
         if (res.message == 'ok') {
           this.toastr.success('Operación exitosa.', 'Permiso registrado.', {
             timeOut: 6000,
           });
         } else {
-          this.toastr.warning(res.message, 'Ups!!! algo salio mal.', {
+          advertencia = true;
+          this.toastr.warning(res.message, 'Permisos registrados.', {
             timeOut: 6000,
           });
         }
 
-        //TODO: genera error push
-        // res.permiso.EmpleadosSendNotiEmail.push(this.solInfo);
+        if (!advertencia) {
+          res.permiso.EmpleadosSendNotiEmail.push(this.solInfo);
+        }
         this.ImprimirNumeroPermiso();
-        if (this.archivoSubido.length != 0) {
+        if (subirDocumento) {
           this.SubirRespaldo(res.permiso, res.permiso.codigo);
         }
         this.IngresarAutorizacion(res.permiso);
         if (form.correoForm === true) {
-          this.EnviarCorreoPermiso(res.permiso);
-          this.EnviarNotificacion(res.permiso);
+          if (advertencia) {
+            this.EnviarCorreoPermiso(res.permiso);
+            this.EnviarNotificacion(res.permiso);
+          }
         }
         this.CerrarVentana();
       },
@@ -1578,7 +1587,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
-    formData.append('id_permiso', id as string);
+    formData.append('id', id as string);
     formData.append('codigo', codigo as string);
 
     this.restP.SubirArchivoRespaldo(formData, id, codigo, null).subscribe(res => {

@@ -1690,14 +1690,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.permisosTotales = datos;
       this.permisosTotales.forEach((p: any) => {
         // TRATAMIENTO DE FECHAS Y HORAS
-        p.fec_creacion_ = this.validar.FormatearFecha(p.fec_creacion, formato_fecha, this.validar.dia_completo);
-        p.fec_inicio_ = this.validar.FormatearFecha(p.fec_inicio, formato_fecha, this.validar.dia_completo);
-        p.fec_final_ = this.validar.FormatearFecha(p.fec_final, formato_fecha, this.validar.dia_completo);
+        p.fec_creacion_ = this.validar.FormatearFecha(p.fecha_creacion, formato_fecha, this.validar.dia_completo);
+        p.fec_inicio_ = this.validar.FormatearFecha(p.fecha_inicio, formato_fecha, this.validar.dia_completo);
+        p.fec_final_ = this.validar.FormatearFecha(p.fecha_final, formato_fecha, this.validar.dia_completo);
 
         p.hora_ingreso_ = this.validar.FormatearHora(p.hora_ingreso, formato_hora);
         p.hora_salida_ = this.validar.FormatearHora(p.hora_salida, formato_hora);
 
       })
+      console.log('permisos', this.permisosTotales)
     })
   }
 

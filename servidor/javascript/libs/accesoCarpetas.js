@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ObtenerIndicePlantilla = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaContrato = exports.ObtenerRutaPermisosIdEmpleado = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = exports.ObtenerRuta = void 0;
+exports.ObtenerIndicePlantilla = exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaContrato = exports.ObtenerRutaPermisosGeneral = exports.ObtenerRutaPermisosIdEmpleado = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = exports.ObtenerRuta = void 0;
 const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
 // METODO PARA OBTENER RUTAS ORIGINALES
@@ -78,6 +78,16 @@ const ObtenerRutaPermisosIdEmpleado = function (id_empleado) {
     });
 };
 exports.ObtenerRutaPermisosIdEmpleado = ObtenerRutaPermisosIdEmpleado;
+// METODO PARA OBTENER RUTA CARPETA DE PERMISOS GENERAL
+const ObtenerRutaPermisosGeneral = function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        let ruta = '';
+        let separador = path_1.default.sep;
+        ruta = path_1.default.join(__dirname, `..${separador}..`);
+        return ruta + separador + 'permisos';
+    });
+};
+exports.ObtenerRutaPermisosGeneral = ObtenerRutaPermisosGeneral;
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE CONTRATOS DEL USUARIO
 const ObtenerRutaContrato = function (id) {
     return __awaiter(this, void 0, void 0, function* () {

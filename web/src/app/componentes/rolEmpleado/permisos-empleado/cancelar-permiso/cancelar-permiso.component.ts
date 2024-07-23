@@ -112,8 +112,8 @@ export class CancelarPermisoComponent implements OnInit {
   }
 
   AceptarAdvertencia() {
-    var correo = 0;
-    // id_permiso, doc, codigo
+    let correo = 0;
+
     const datos = {
       id_permiso: this.data.info.id,
       doc: this.data.info.documento,
@@ -121,8 +121,8 @@ export class CancelarPermisoComponent implements OnInit {
       user_name: this.user_name,
       ip: this.ip,
     }
+
     this.restP.EliminarPermiso(datos).subscribe((res: any) => {
-      console.log(res);
 
       // VALIDAR ENVIO DE CORREO SEGUN CONFIGURACION
       this.tipoPermisos.filter((o: any) => {
@@ -142,15 +142,25 @@ export class CancelarPermisoComponent implements OnInit {
           depa_user_loggin: parseInt(this.solInfo.id_dep),
           objeto: res,
         }
-        this.informacion.BuscarJefes(datos).subscribe(permiso => {
-          console.log(permiso);
-          permiso.EmpleadosSendNotiEmail.push(this.solInfo);
-          this.EnviarCorreo(permiso);
-          this.EnviarNotificacion(permiso);
-          this.toastr.error('Solicitud de permiso eliminada.', '', {
-            timeOut: 6000,
-          });
-          this.ventana.close(true);
+        this.informacion.BuscarJefes(datos).subscribe({
+          next: (permiso: any) => {
+            console.log(permiso);
+            permiso.EmpleadosSendNotiEmail.push(this.solInfo);
+            this.EnviarCorreo(permiso);
+            this.EnviarNotificacion(permiso);
+            this.toastr.error('Solicitud de permiso eliminada.', '', {
+              timeOut: 6000,
+            });
+            this.ventana.close(true);
+          },
+          error: (err) => {
+            if (err.status === 400) {
+              this.toastr.warning(err.error.message, 'Solicitud de permiso eliminada.', {
+                timeOut: 6000,
+              });
+              this.ventana.close(true);
+            }
+          }
         });
       }
       // SI NO CUMPLE LA CONDICION 2 NO SE ENVIA CORREOS
