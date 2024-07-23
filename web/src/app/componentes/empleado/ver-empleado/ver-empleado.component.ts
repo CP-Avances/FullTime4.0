@@ -89,6 +89,7 @@ import { EmplLeafletComponent } from '../../modulos/geolocalizacion/empl-leaflet
 import { CrearVacunaComponent } from '../vacunacion/crear-vacuna/crear-vacuna.component';
 import { EmplCargosComponent } from 'src/app/componentes/empleado/cargo/empl-cargos/empl-cargos.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { MatRadioChange } from '@angular/material/radio';
 
 @Component({
   selector: 'app-ver-empleado',
@@ -968,9 +969,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.btnActualizarCargo = true;
   }
 
-
-
-
   /** ** ***************************************************************************************** **
    ** ** **                  METODOS PARA MANEJO DE DATOS DE CARGO                              ** **
    ** ******************************************************************************************** **/
@@ -979,8 +977,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   // METODO PARA OBTENER LOS DATOS DEL CARGO DEL EMPLEADO
   cargoEmpleado: any = [];
   ObtenerCargoEmpleado(id_cargo: number, formato_fecha: string) {
-    this.cargoEmpleado = [];
     this.restCargo.BuscarCargoID(id_cargo).subscribe(datos => {
+      this.cargoEmpleado = [];
       this.cargoEmpleado = datos;
       this.cargoEmpleado.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado);
@@ -1003,8 +1001,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   });
   cargoSeleccionado: any = [];
   ObtenerCargoSeleccionado(form: any) {
-    this.cargoSeleccionado = [];
     this.restCargo.BuscarCargoID(form.fechaICargoForm).subscribe(datos => {
+      this.cargoSeleccionado = [];
       this.cargoSeleccionado = datos;
       this.cargoSeleccionado.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
@@ -1042,6 +1040,73 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       });
     }
   }
+
+  // METODO PARA CAMBIAR ESTADO
+  CambiarEstadoCargo(event: MatRadioChange, datos: any, opcion: number) {
+    if ((datos.estado === true && event.value === true) || (datos.estado === false && event.value === false)) {
+    }
+    else if (event.value = true) {
+      this.BuscarDatosCargo(opcion);
+      this.CambiarEstado(datos.id, event.value, opcion);
+    }
+    else if (event.value = false) {
+      this.CambiarEstado(datos.id, event.value, opcion);
+    }
+  }
+
+  // METODO PARA BUSCAR CARGOS ACTIVOS
+  BuscarDatosCargo(opcion: number) {
+    let valores = {
+      id_empleado: this.idEmpleado,
+    }
+    this.restCargo.BuscarCargoActivo(valores).subscribe(data => {
+      if (data.message === 'contrato_cargo') {
+        this.CambiarEstado(data.datos.id_cargo, false, opcion);
+      }
+    });
+  }
+
+  // METODO PARA EDITAR ESTADO DEL CARGO
+  CambiarEstado(id_cargo: any, estado: any, opcion: number) {
+    let valores = {
+      user_name: this.user_name,
+      id_cargo: id_cargo,
+      estado: estado,
+      ip: this.ip,
+    }
+    this.restCargo.EditarEstadoCargo(valores).subscribe(data => {
+      if (opcion === 2) {
+        this.cargoSeleccionado = [];
+        this.cargoEmpleado = [];
+        this.ObtenerCargoEmpleado(this.datoActual.id_cargo, this.formato_fecha);
+        this.ActualizarDatosCargoSeleccionado(this.fechaICargo.value)
+        //this.cargoSeleccionado = [];
+        //this.cargoForm.reset();
+      }
+      else {
+        this.cargoEmpleado = [];
+        this.ObtenerCargoEmpleado(this.datoActual.id_cargo, this.formato_fecha);
+        if (this.fechaICargo.value) {
+          // this.cargoSeleccionado = [];
+          // this.cargoForm.reset();
+          this.ActualizarDatosCargoSeleccionado(this.fechaICargo.value)
+        }
+      }
+    });
+  }
+
+  // ACTUALIZAR DATOS SELECCIONADO
+  ActualizarDatosCargoSeleccionado(id: any) {
+    this.restCargo.BuscarCargoID(id).subscribe(datos => {
+      this.cargoSeleccionado = [];
+      this.cargoSeleccionado = datos;
+      this.cargoSeleccionado.forEach((data: any) => {
+        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, this.formato_fecha, this.validar.dia_abreviado);
+      })
+    });
+  }
+
 
   /** ***************************************************************************************** **
    ** **                VENTANA PARA VER HORARIOS ASIGNADOS AL USUARIO                       ** **

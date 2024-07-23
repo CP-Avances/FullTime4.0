@@ -95,6 +95,7 @@ export class EmplCargosComponent implements OnInit {
 
     this.FiltrarSucursales();
     this.BuscarTiposCargos();
+    this.BuscarDatosCargo();
     this.tipoCargo[this.tipoCargo.length] = { cargo: "OTRO" };
   }
 
@@ -255,6 +256,7 @@ export class EmplCargosComponent implements OnInit {
         timeOut: 6000,
       });
       this.BuscarUsuarioDepartamento(form);
+      this.CambiarEstado();
       this.CerrarVentana();
     });
   }
@@ -385,6 +387,37 @@ export class EmplCargosComponent implements OnInit {
     }
     this.usuario.ActualizarUsuarioDepartamento(datos).subscribe(res => {
     });
+  }
+
+  /** ***************************************************************************************** **
+ ** **                     METODO PARA ACTUALIZAR ESTADO DEL CARGOS                        ** **
+ ** ***************************************************************************************** **/
+
+  // METODO PARA BUSCAR CARGOS ACTIVOS
+  cargo_id: number = 0;
+  BuscarDatosCargo() {
+    let valores = {
+      id_empleado: this.idEmpleado,
+    }
+    this.cargos.BuscarCargoActivo(valores).subscribe(data => {
+      if (data.message === 'contrato_cargo') {
+        this.cargo_id = data.datos.id_cargo
+      }
+    });
+  }
+
+  // METODO PARA EDITAR ESTADO DEL CARGO
+  CambiarEstado() {
+    let valores = {
+      user_name: this.user_name,
+      id_cargo: this.cargo_id,
+      estado: false,
+      ip: this.ip,
+    }
+    if (this.cargo_id != 0) {
+      this.cargos.EditarEstadoCargo(valores).subscribe(data => {
+      });
+    }
   }
 
 }

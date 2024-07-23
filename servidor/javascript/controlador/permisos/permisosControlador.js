@@ -371,7 +371,7 @@ class PermisosControlador {
                 const { id_empleado } = req.params;
                 const PERMISO = yield database_1.default.query(`
                 SELECT p.id, p.fecha_creacion, p.descripcion, p.fecha_inicio, p.fecha_final, p.dias_permiso, 
-                    p.horas_permiso, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso, p.id_empleado_contrato, 
+                    p.horas_permiso, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso,  
                     p.id_periodo_vacacion, p.numero_permiso, p.documento, p.hora_salida, p.hora_ingreso, e.codigo, 
                     t.descripcion AS nom_permiso, t.tipo_descuento 
                 FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS t, eu_empleados AS e
@@ -395,8 +395,8 @@ class PermisosControlador {
             FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS tp, eu_empleado_contratos AS ec, 
                 ere_cat_regimenes AS cr, datos_actuales_empleado AS da, eu_empleado_cargos AS ce, e_sucursales AS s,
                 e_ciudades AS c, e_empresa AS e, e_cat_tipo_cargo AS tc
-            WHERE p.id_tipo_permiso = tp.id AND ec.id = p.id_empleado_contrato AND cr.id = ec.id_regimen
-                AND da.id = p.id_empleado AND ce.id_contrato = p.id_empleado_contrato
+            WHERE p.id_tipo_permiso = tp.id AND ec.id = ce.id_contrato AND cr.id = ec.id_regimen
+                AND da.id = p.id_empleado AND ce.id = p.id_empleado_cargo
                 AND s.id = ce.id_sucursal AND s.id_ciudad = c.id AND s.id_empresa = e.id AND tc.id = ce.id_tipo_cargo
                 AND p.id = $1
             `, [id]);
@@ -966,9 +966,10 @@ class PermisosControlador {
                 (e.nombre || \' \' || e.apellido) AS fullname, e.cedula, da.correo, cp.descripcion AS nom_permiso, 
                 ec.id AS id_contrato, da.id_departamento AS id_depa, da.codigo, depa.nombre AS depa_nombre 
             FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp, 
-                datos_actuales_empleado AS da, ed_departamentos AS depa
-            WHERE p.id_empleado_contrato = ec.id AND ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id 
-                AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 1 OR p.estado = 2)
+                datos_actuales_empleado AS da, ed_departamentos AS depa, eu_empleado_cargos AS ce
+            WHERE p.id_empleado_cargo = ce.id AND ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id 
+                AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 1 OR p.estado = 2) 
+                AND ce.id_contrato = ec.id
             ORDER BY estado DESC, fecha_creacion DESC
             `);
             if (PERMISOS.rowCount != 0) {
@@ -988,9 +989,10 @@ class PermisosControlador {
                 (e.nombre || \' \' || e.apellido) AS fullname, e.cedula, cp.descripcion AS nom_permiso, 
                 ec.id AS id_contrato, da.id_departamento AS id_depa, da.codigo, depa.nombre AS depa_nombre 
             FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp, 
-                datos_actuales_empleado AS da, ed_departamentos AS depa
-            WHERE p.id_empleado_contrato = ec.id AND ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id 
+                datos_actuales_empleado AS da, ed_departamentos AS depa, eu_empleado_cargos AS ce
+            WHERE p.id_empleado_cargo = ce.id AND ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id 
                 AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 3 OR p.estado = 4)
+                AND ce.id_contrato = ec.id
             ORDER BY estado ASC, fecha_creacion DESC
             `);
             if (PERMISOS.rowCount != 0) {
@@ -1007,7 +1009,7 @@ class PermisosControlador {
                 const { id } = req.params;
                 const PERMISO = yield database_1.default.query(`
                 SELECT p.id, p.fecha_creacion, p.descripcion, p.fecha_inicio, p.fecha_final, p.dias_permiso, 
-                    p.horas_permiso, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso, p.id_empleado_contrato, 
+                    p.horas_permiso, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso, p.id_empleado_cargo, 
                     p.id_periodo_vacacion, p.numero_permiso, p.documento, p.hora_salida, p.hora_ingreso, p.id_empleado, 
                     t.descripcion AS nom_permiso
                 FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS t
@@ -1134,9 +1136,10 @@ class PermisosControlador {
                 p.horas_permiso, p.documento, p.fecha_final, p.estado, p.id_empleado_cargo, e.nombre, 
                 e.apellido, e.cedula, e.id AS id_empleado, e.codigo, cp.id AS id_tipo_permiso, 
                 cp.descripcion AS nom_permiso, ec.id AS id_contrato 
-            FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp 
-            WHERE p.id = $1 AND p.id_empleado_contrato = ec.id AND ec.id_empleado = e.id 
-                AND p.id_tipo_permiso = cp.id
+            FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp,
+                eu_empleado_cargos AS ce
+            WHERE p.id = $1 AND p.id_empleado_cargo = ce.id AND ec.id_empleado = e.id 
+                AND p.id_tipo_permiso = cp.id AND ce.id_contrato = ec.id
             `, [id]);
             if (PERMISOS.rowCount != 0) {
                 return res.json(PERMISOS.rows);
@@ -1466,7 +1469,7 @@ const generarTablaHTMLWeb = function (datos, tipo) {
 function CrearPermiso(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre, id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso, estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado, depa_user_loggin, user_name, ip, subir_documento } = datos;
+            const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre, id_tipo_permiso, id_peri_vacacion, hora_numero, num_permiso, estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado, depa_user_loggin, user_name, ip, subir_documento } = datos;
             let codigoEmpleado = '';
             if (subir_documento) {
                 try {
@@ -1492,12 +1495,12 @@ function CrearPermiso(datos) {
             yield database_1.default.query('BEGIN');
             const response = yield database_1.default.query(`
             INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, 
-                legalizado, dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, 
+                legalizado, dia_libre, id_tipo_permiso, id_periodo_vacacion, horas_permiso, 
                 numero_permiso, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado) 
-            VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17 ) 
+            VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16 ) 
                 RETURNING * 
             `, [fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
-                id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
+                id_tipo_permiso, id_peri_vacacion, hora_numero, num_permiso,
                 estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado]);
             const [objetoPermiso] = response.rows;
             const fechaCreacionN = yield (0, settingsMail_1.FormatearFecha2)(fec_creacion, 'ddd');

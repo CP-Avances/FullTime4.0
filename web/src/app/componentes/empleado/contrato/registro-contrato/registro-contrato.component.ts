@@ -9,6 +9,7 @@ import * as moment from 'moment';
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
+import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 
 @Component({
   selector: 'app-registro-contrato',
@@ -63,6 +64,7 @@ export class RegistroContratoComponent implements OnInit {
     private rest: EmpleadoService,
     private restR: RegimenService,
     private toastr: ToastrService,
+    public restCargo: EmplCargosService,
     public ventana: MatDialogRef<RegistroContratoComponent>,
     public pais: ProvinciaService,
     @Inject(MAT_DIALOG_DATA) public datoEmpleado: any
@@ -76,13 +78,14 @@ export class RegistroContratoComponent implements OnInit {
     this.ObtenerEmpleados();
     this.ObtenerTipoContratos();
     this.tipoContrato[this.tipoContrato.length] = { descripcion: "OTRO" };
+    this.BuscarDatosCargo();
   }
 
   // APLICAR FILTROS DE BUSQUEDA DE PAISES
   private _filter(value: string): any {
     if (value != null) {
       const filterValue = value.toLowerCase();
-      return this.paises.filter(pais => pais.nombre.toLowerCase().includes(filterValue));
+      return this.paises.filter((pais: any) => pais.nombre.toLowerCase().includes(filterValue));
     }
   }
 
@@ -239,6 +242,7 @@ export class RegistroContratoComponent implements OnInit {
         })
       }
       else {
+        this.CambiarEstado();
         this.toastr.success('Operación exitosa.', 'Registro guardado.', {
           timeOut: 6000,
         })
@@ -286,6 +290,39 @@ export class RegistroContratoComponent implements OnInit {
     });
   }
 
+  /** ***************************************************************************************** **
+   ** **                     METODO PARA ACTUALIZAR ESTADO DEL CARGOS                        ** **
+   ** ***************************************************************************************** **/
+
+  // METODO PARA BUSCAR CARGOS ACTIVOS
+  cargo_id: number = 0;
+  BuscarDatosCargo() {
+    let valores = {
+      id_empleado: this.datoEmpleado,
+    }
+    this.restCargo.BuscarCargoActivo(valores).subscribe(data => {
+      if (data.message === 'contrato_cargo') {
+        this.cargo_id = data.datos.id_cargo
+      }
+    });
+  }
+
+  // METODO PARA EDITAR ESTADO DEL CARGO
+  CambiarEstado() {
+    let valores = {
+      user_name: this.user_name,
+      id_cargo: this.cargo_id,
+      estado: false,
+      ip: this.ip,
+    }
+    if (this.cargo_id != 0) {
+      this.restCargo.EditarEstadoCargo(valores).subscribe(data => {
+        this.toastr.info('Se inactivo cargo del usuario.', 'Requerido registrar cargo del usuario.', {
+          timeOut: 6000,
+        })
+      });
+    }
+  }
 
   /** ***************************************************************************************** **
    ** **                   METODO PARA INGRESAR ARCHIVO CONTRATO                             ** **

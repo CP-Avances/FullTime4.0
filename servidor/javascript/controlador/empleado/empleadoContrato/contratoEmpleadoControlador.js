@@ -12,15 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
-const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
+const settingsMail_1 = require("../../../libs/settingsMail");
 const moment_1 = __importDefault(require("moment"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const settingsMail_1 = require("../../../libs/settingsMail");
 class ContratoEmpleadoControlador {
     // REGISTRAR CONTRATOS
     CrearContrato(req, res) {
@@ -407,7 +407,7 @@ class ContratoEmpleadoControlador {
             const { id } = req.params;
             const CONTRATO = yield database_1.default.query(`
             SELECT ec.id, ec.id_empleado, ec.id_regimen, ec.fecha_ingreso, ec.fecha_salida, ec.controlar_vacacion,
-                ec.controlar_asistencia, ec.documento, ec.id_modalidad_laboral, cr.descripcion, 
+                ec.controlar_asistencia, ec.documento, ec.id_modalidad_laboral, cr.descripcion,
                 cr.mes_periodo, mt.descripcion AS nombre_contrato 
             FROM eu_empleado_contratos AS ec, ere_cat_regimenes AS cr, e_cat_modalidad_trabajo AS mt 
             WHERE ec.id = $1 AND ec.id_regimen = cr.id AND mt.id = ec.id_modalidad_laboral

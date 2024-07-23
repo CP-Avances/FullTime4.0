@@ -77,7 +77,6 @@ class DepartamentoRutas {
         /** ******************************************************************************************** **
          ** **                      MANEJO DE DATOS DE CONTRATO DEL USUARIO                           ** ** 
          ** ******************************************************************************************** **/
-
         // REGISTRAR DATOS DE CONTRATO
         this.router.post('/', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.CrearContrato);
         // GUARDAR DOCUMENTO 

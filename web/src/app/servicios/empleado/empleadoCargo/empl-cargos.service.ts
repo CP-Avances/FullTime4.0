@@ -29,6 +29,18 @@ export class EmplCargosService {
    ** **                METODO DE CONSULTA DE CARGOS DEL USUARIO                             ** ** 
    ** ***************************************************************************************** **/
 
+  // METODO PARA EDITAR ESTADO DEL CARGO
+  EditarEstadoCargo(data: any) {
+    return this.http.post(`${environment.url}/empleadoCargos/estado-cargo`, data);
+  }
+
+  // METODO PARA BUSCAR CARGOS ACTIVOS
+  BuscarCargoActivo(data: any) {
+    return this.http.post<any>(`${environment.url}/empleadoCargos/cargo-activo`, data);
+  }
+
+
+
   // METODO PARA REGISTRAR CARGO
   RegistrarCargo(data: any) {
     return this.http.post(`${environment.url}/empleadoCargos`, data);

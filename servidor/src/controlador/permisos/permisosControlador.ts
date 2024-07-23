@@ -164,7 +164,7 @@ class PermisosControlador {
         }
 
         return res.status(200).jsonp({ message, permiso });
-        
+
     }
 
     // METODO PARA EDITAR SOLICITUD DE PERMISOS
@@ -308,7 +308,7 @@ class PermisosControlador {
         }
 
         return res.status(200).jsonp({ message });
-       
+
     }
 
     // ELIMINAR DOCUMENTO DE RESPALDO DE PERMISO  
@@ -347,7 +347,7 @@ class PermisosControlador {
                 UPDATE mp_solicitud_permiso SET documento = null WHERE id = $1 RETURNING *
                 `
                 , [id]);
-            
+
             const [datosNuevos] = actualizacion.rows;
 
             // AUDITORIA
@@ -413,7 +413,7 @@ class PermisosControlador {
             const PERMISO = await pool.query(
                 `
                 SELECT p.id, p.fecha_creacion, p.descripcion, p.fecha_inicio, p.fecha_final, p.dias_permiso, 
-                    p.horas_permiso, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso, p.id_empleado_contrato, 
+                    p.horas_permiso, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso,  
                     p.id_periodo_vacacion, p.numero_permiso, p.documento, p.hora_salida, p.hora_ingreso, e.codigo, 
                     t.descripcion AS nom_permiso, t.tipo_descuento 
                 FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS t, eu_empleados AS e
@@ -437,8 +437,8 @@ class PermisosControlador {
             FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS tp, eu_empleado_contratos AS ec, 
                 ere_cat_regimenes AS cr, datos_actuales_empleado AS da, eu_empleado_cargos AS ce, e_sucursales AS s,
                 e_ciudades AS c, e_empresa AS e, e_cat_tipo_cargo AS tc
-            WHERE p.id_tipo_permiso = tp.id AND ec.id = p.id_empleado_contrato AND cr.id = ec.id_regimen
-                AND da.id = p.id_empleado AND ce.id_contrato = p.id_empleado_contrato
+            WHERE p.id_tipo_permiso = tp.id AND ec.id = ce.id_contrato AND cr.id = ec.id_regimen
+                AND da.id = p.id_empleado AND ce.id = p.id_empleado_cargo
                 AND s.id = ce.id_sucursal AND s.id_ciudad = c.id AND s.id_empresa = e.id AND tc.id = ce.id_tipo_cargo
                 AND p.id = $1
             `
@@ -636,15 +636,15 @@ class PermisosControlador {
     // METODO PARA CREAR MULTIPLES PERMISOS
     public async CrearPermisosMultiples(req: Request, res: Response): Promise<any> {
         try {
-           const { permisos, user_name, ip } = req.body;
-           let error: boolean = false;
+            const { permisos, user_name, ip } = req.body;
+            let error: boolean = false;
 
-           for ( const permiso of permisos ) {
-            
-           }
-            
+            for (const permiso of permisos) {
+
+            }
+
         } catch (error) {
-            
+
         }
     }
 
@@ -1076,9 +1076,10 @@ class PermisosControlador {
                 (e.nombre || \' \' || e.apellido) AS fullname, e.cedula, da.correo, cp.descripcion AS nom_permiso, 
                 ec.id AS id_contrato, da.id_departamento AS id_depa, da.codigo, depa.nombre AS depa_nombre 
             FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp, 
-                datos_actuales_empleado AS da, ed_departamentos AS depa
-            WHERE p.id_empleado_contrato = ec.id AND ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id 
-                AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 1 OR p.estado = 2)
+                datos_actuales_empleado AS da, ed_departamentos AS depa, eu_empleado_cargos AS ce
+            WHERE p.id_empleado_cargo = ce.id AND ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id 
+                AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 1 OR p.estado = 2) 
+                AND ce.id_contrato = ec.id
             ORDER BY estado DESC, fecha_creacion DESC
             `
         );
@@ -1100,9 +1101,10 @@ class PermisosControlador {
                 (e.nombre || \' \' || e.apellido) AS fullname, e.cedula, cp.descripcion AS nom_permiso, 
                 ec.id AS id_contrato, da.id_departamento AS id_depa, da.codigo, depa.nombre AS depa_nombre 
             FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp, 
-                datos_actuales_empleado AS da, ed_departamentos AS depa
-            WHERE p.id_empleado_contrato = ec.id AND ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id 
+                datos_actuales_empleado AS da, ed_departamentos AS depa, eu_empleado_cargos AS ce
+            WHERE p.id_empleado_cargo = ce.id AND ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id 
                 AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 3 OR p.estado = 4)
+                AND ce.id_contrato = ec.id
             ORDER BY estado ASC, fecha_creacion DESC
             `
         );
@@ -1121,7 +1123,7 @@ class PermisosControlador {
             const PERMISO = await pool.query(
                 `
                 SELECT p.id, p.fecha_creacion, p.descripcion, p.fecha_inicio, p.fecha_final, p.dias_permiso, 
-                    p.horas_permiso, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso, p.id_empleado_contrato, 
+                    p.horas_permiso, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso, p.id_empleado_cargo, 
                     p.id_periodo_vacacion, p.numero_permiso, p.documento, p.hora_salida, p.hora_ingreso, p.id_empleado, 
                     t.descripcion AS nom_permiso
                 FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS t
@@ -1228,7 +1230,7 @@ class PermisosControlador {
                 UPDATE mp_solicitud_permiso SET estado = $1 WHERE id = $2 RETURNING *
                 `
                 , [estado, id]);
-            
+
             const [datosNuevos] = actualizacion.rows;
 
             // AUDITORIA
@@ -1262,9 +1264,10 @@ class PermisosControlador {
                 p.horas_permiso, p.documento, p.fecha_final, p.estado, p.id_empleado_cargo, e.nombre, 
                 e.apellido, e.cedula, e.id AS id_empleado, e.codigo, cp.id AS id_tipo_permiso, 
                 cp.descripcion AS nom_permiso, ec.id AS id_contrato 
-            FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp 
-            WHERE p.id = $1 AND p.id_empleado_contrato = ec.id AND ec.id_empleado = e.id 
-                AND p.id_tipo_permiso = cp.id
+            FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp,
+                eu_empleado_cargos AS ce
+            WHERE p.id = $1 AND p.id_empleado_cargo = ce.id AND ec.id_empleado = e.id 
+                AND p.id_tipo_permiso = cp.id AND ce.id_contrato = ec.id
             `
             , [id]);
         if (PERMISOS.rowCount != 0) {
@@ -1623,9 +1626,9 @@ const generarTablaHTMLWeb = async function (datos: any[], tipo: any): Promise<st
 };
 
 async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
-    try { 
+    try {
         const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
-            id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
+            id_tipo_permiso, id_peri_vacacion, hora_numero, num_permiso,
             estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado,
             depa_user_loggin, user_name, ip, subir_documento } = datos;
 
@@ -1633,7 +1636,7 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
 
         if (subir_documento) {
             try {
-                const {carpetaPermisos, codigo} = await ObtenerRutaPermisosIdEmpleado(id_empleado);
+                const { carpetaPermisos, codigo } = await ObtenerRutaPermisosIdEmpleado(id_empleado);
                 codigoEmpleado = codigo;
                 fs.access(carpetaPermisos, fs.constants.F_OK, (err) => {
                     if (err) {
@@ -1642,9 +1645,9 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
                             if (err2) {
                                 console.log('Error al intentar crear carpeta de permisos.', err2);
                                 throw new Error('Error al intentar crear carpeta de permisos.');
-                            } 
+                            }
                         });
-                    } 
+                    }
                 });
             } catch (error) {
                 throw new Error('Error al intentar acceder a la carpeta de permisos.');
@@ -1657,13 +1660,13 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
         const response: QueryResult = await pool.query(
             `
             INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, 
-                legalizado, dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, 
+                legalizado, dia_libre, id_tipo_permiso, id_periodo_vacacion, horas_permiso, 
                 numero_permiso, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado) 
-            VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17 ) 
+            VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16 ) 
                 RETURNING * 
             `,
             [fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
-                id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
+                id_tipo_permiso, id_peri_vacacion, hora_numero, num_permiso,
                 estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado]);
 
         const [objetoPermiso] = response.rows;
@@ -1694,7 +1697,7 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
-        if (!objetoPermiso) return {message: 'Solicitud no registrada.', error: true};
+        if (!objetoPermiso) return { message: 'Solicitud no registrada.', error: true };
 
         const permiso = objetoPermiso;
         const JefesDepartamentos = await pool.query(
@@ -1715,23 +1718,23 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
             [depa_user_loggin]).then((result: any) => { return result.rows });
 
         if (JefesDepartamentos.length === 0) {
-            return {message: 'Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.', error: false, permiso};
+            return { message: 'Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.', error: false, permiso };
         }
         else {
             permiso.EmpleadosSendNotiEmail = JefesDepartamentos
-            return {message: 'ok', error: false, permiso};
+            return { message: 'ok', error: false, permiso };
         }
     } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
-        return {message: 'Error al crear permiso.', error: true};
+        return { message: 'Error al crear permiso.', error: true };
     }
 }
 
 async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> {
     try {
 
-        const {id_permiso, codigo, nombreArchivo, user_name, ip} = datos;
+        const { id_permiso, codigo, nombreArchivo, user_name, ip } = datos;
 
         const fecha = moment();
         const anio = fecha.format('YYYY');
@@ -1758,7 +1761,7 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-            return {message: 'Solicitud no registrada.', error: true};
+            return { message: 'Solicitud no registrada.', error: true };
         }
 
         const numeroPermiso = consulta.rows[0].numero_permiso;
@@ -1773,25 +1776,25 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
         const [datosNuevos] = response.rows;
 
         const fechaCreacionN = await FormatearFecha2(datosOriginales.fecha_creacion, 'ddd');
-            const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
-            const fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
-            const fechaEdicionO = await FormatearFecha2(datosOriginales.fecha_edicion, 'ddd');
-            const horaSalidaO = await FormatearHora(datosOriginales.hora_salida);
-            const horaIngresoO = await FormatearHora(datosOriginales.hora_ingreso);
+        const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+        const fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
+        const fechaEdicionO = await FormatearFecha2(datosOriginales.fecha_edicion, 'ddd');
+        const horaSalidaO = await FormatearHora(datosOriginales.hora_salida);
+        const horaIngresoO = await FormatearHora(datosOriginales.hora_ingreso);
 
-            datosOriginales.fecha_creacion = fechaCreacionN;
-            datosOriginales.fecha_edicion = fechaEdicionO;
-            datosOriginales.fecha_inicio = fechaInicioO;
-            datosOriginales.fecha_final = fechaFinalO;
-            datosOriginales.hora_salida = horaSalidaO;
-            datosOriginales.hora_ingreso = horaIngresoO;
+        datosOriginales.fecha_creacion = fechaCreacionN;
+        datosOriginales.fecha_edicion = fechaEdicionO;
+        datosOriginales.fecha_inicio = fechaInicioO;
+        datosOriginales.fecha_final = fechaFinalO;
+        datosOriginales.hora_salida = horaSalidaO;
+        datosOriginales.hora_ingreso = horaIngresoO;
 
-            datosNuevos.fecha_creacion = fechaCreacionN;
-            datosNuevos.fecha_edicion = fechaEdicionO;
-            datosNuevos.fecha_inicio = fechaInicioO;
-            datosNuevos.fecha_final = fechaFinalO;
-            datosNuevos.hora_salida = horaSalidaO;
-            datosNuevos.hora_ingreso = horaIngresoO;
+        datosNuevos.fecha_creacion = fechaCreacionN;
+        datosNuevos.fecha_edicion = fechaEdicionO;
+        datosNuevos.fecha_inicio = fechaInicioO;
+        datosNuevos.fecha_final = fechaFinalO;
+        datosNuevos.hora_salida = horaSalidaO;
+        datosNuevos.hora_ingreso = horaIngresoO;
 
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -1806,11 +1809,11 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
-        return {message: 'Documento actualizado.', error: false};
+        return { message: 'Documento actualizado.', error: false };
     } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
-        return {message: 'Error al registrar documento del permiso.', error: true};
+        return { message: 'Error al registrar documento del permiso.', error: true };
     }
 }
 
