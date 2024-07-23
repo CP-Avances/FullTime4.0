@@ -1453,6 +1453,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
   // GUARDAR DATOS DE PERMISO
   InsertarPermiso(form: any) {
+    const subirDocumento: boolean = form.nombreCertificadoForm != '' && form.nombreCertificadoForm != null;
     let datosPermiso = {
       id_empl_contrato: this.datos.id_contrato,
       id_peri_vacacion: this.periodo_vacaciones,
@@ -1474,7 +1475,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       dia: parseInt(form.diasForm),
       user_name: this.user_name,
       ip: this.ip,
-      subir_documento: this.archivoSubido.length != 0,
+      subir_documento: subirDocumento,
     }
     this.CambiarValoresDiasHoras(form, datosPermiso);
     this.CambiarValorDiaLibre(datosPermiso, form);
@@ -1507,6 +1508,8 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
   // VALIDACIONES DE DATOS DE SOLICITUD
   GuardarDatos(datos: any, form: any) {
 
+    const subirDocumento: boolean = form.nombreCertificadoForm != '' && form.nombreCertificadoForm != null;
+
     this.restP.IngresarEmpleadoPermisos(datos).subscribe({
       next: (res) => {
 
@@ -1517,18 +1520,17 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
             timeOut: 6000,
           });
         } else {
-
-          this.toastr.warning(res.message, 'Revisar configuración de departamento y autorización de solicitudes', {
+          advertencia = true;
+          this.toastr.warning(res.message, 'Permisos registrados.', {
             timeOut: 6000,
           });
         }
 
-        //TODO: genera error push
-        if (advertencia) {
+        if (!advertencia) {
           res.permiso.EmpleadosSendNotiEmail.push(this.solInfo);
         }
         this.ImprimirNumeroPermiso();
-        if (this.archivoSubido.length != 0) {
+        if (subirDocumento) {
           this.SubirRespaldo(res.permiso, res.permiso.codigo);
         }
         this.IngresarAutorizacion(res.permiso);

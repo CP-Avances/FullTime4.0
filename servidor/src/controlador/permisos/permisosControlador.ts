@@ -10,6 +10,7 @@ import fs from 'fs';
 import pool from '../../database';
 import path from 'path';
 import moment from 'moment';
+import { carpeta } from '../documentos/documentosControlador';
 moment.locale('es');
 
 class PermisosControlador {
@@ -202,7 +203,7 @@ class PermisosControlador {
             const response: QueryResult = await pool.query(
                 `
                 UPDATE mp_solicitud_permiso SET descripcion = $1, fecha_inicio = $2, fecha_final = $3, dias_permiso = $4, 
-                    dia_libre = $5, id_tipo_permiso = $6, hora_numero = $7, numero_permiso = $8, hora_salida = $9, 
+                    dia_libre = $5, id_tipo_permiso = $6, horas_permiso = $7, numero_permiso = $8, hora_salida = $9, 
                     hora_ingreso = $10, id_periodo_vacacion = $11, fecha_edicion = $12
                 WHERE id = $13 RETURNING *
                 `
@@ -265,7 +266,7 @@ class PermisosControlador {
                     eu_configurar_alertas AS c, ed_departamentos AS cg 
                 WHERE n.id_departamento = $1
                     AND da.id_departamento = n.id_departamento_nivel
-                    AND dae.id_cargo = da.id_empl_cargo
+                    AND dae.id_cargo = da.id_empleado_cargo
                     AND dae.id = c.id_empleado
                     AND cg.id = n.id_departamento
                 ORDER BY nivel ASC
@@ -274,19 +275,19 @@ class PermisosControlador {
                 [depa_user_loggin]).then((result: any) => { return result.rows });
 
             if (JefesDepartamentos.length === 0) {
-                return res.status(400)
+                return res.status(200)
                     .jsonp({
-                        message: `Ups!!! algo salio mal. 
-                    Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`,
+                        message: `Revisar configuración de departamento y autorización de solicitudes.`,
                         permiso: permiso
                     });
             }
             else {
                 permiso.EmpleadosSendNotiEmail = JefesDepartamentos
-                return res.status(200).jsonp(permiso);
+                return res.status(200).jsonp({message: 'ok', permiso});
             }
         } catch (error) {
             // REVERTIR TRANSACCION
+            console.log('error ', error)
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error' });
         }
@@ -316,6 +317,7 @@ class PermisosControlador {
 
         try {
             const { id, archivo, codigo, user_name, ip } = req.body
+            console.log('ver data ', id, ' ', archivo, ' ', codigo, ' ', user_name, ' ', ip)
             let separador = path.sep;
 
             // INICIAR TRANSACCION
@@ -1809,7 +1811,7 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
 async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> {
     try {
 
-        const {id, codigo, nombreArchivo, user_name, ip} = datos;
+        const {id, codigo, nombreArchivo, user_name, ip, eliminar} = datos;
 
         const fecha = moment();
         const anio = fecha.format('YYYY');
@@ -1876,7 +1878,7 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
             tabla: 'mp_solicitud_permiso',
             usuario: user_name,
             accion: 'U',
-            datosOriginales: '',
+            datosOriginales: JSON.stringify(datosOriginales),
             datosNuevos: JSON.stringify(datosNuevos),
             ip, observacion: null
         });
@@ -1884,12 +1886,32 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
+        if (eliminar === 'true') {
+            await EliminarDocumentoServidor(codigo, datosOriginales.documento);
+        }
+
         return {message: 'Documento actualizado.', error: false, documento};
     } catch (error) {
         // REVERTIR TRANSACCION
+        console.log('Error al registrar documento del permiso: ', error);
         await pool.query('ROLLBACK');
         return {message: 'Error al registrar documento del permiso.', error: true};
     }
+}
+
+async function EliminarDocumentoServidor(codigo: string, nombreDocumento: string){
+
+    const carpetaPermisos = await ObtenerRutaPermisos(codigo);
+    const separador = path.sep;
+
+    const ruta = `${carpetaPermisos}${separador}${nombreDocumento}`;
+
+    fs.access(ruta, fs.constants.F_OK, (err) => {
+        if (err) {
+        } else {
+            fs.unlinkSync(ruta);
+        }
+    });
 }
 
 interface RespuestaPermiso {

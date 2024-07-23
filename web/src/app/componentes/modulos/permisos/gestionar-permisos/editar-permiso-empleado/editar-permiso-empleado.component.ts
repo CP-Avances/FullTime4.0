@@ -230,20 +230,20 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       this.legalizado = this.datosPermiso.legalizar;
 
       // SOLICITUD POR HORAS
-      if (this.datosPermiso.num_dia_maximo === 0) {
-        this.informacion1 = `Horas máximas de permiso: ${this.datosPermiso.num_hora_maximo}`;
-        this.Thoras = this.datosPermiso.num_hora_maximo;
+      if (this.datosPermiso.dias_maximo_permiso === 0) {
+        this.informacion1 = `Horas máximas de permiso: ${this.datosPermiso.horas_maximo_permiso}`;
+        this.Thoras = this.datosPermiso.horas_maximo_permiso;
         this.configuracion_permiso = 'Horas';
       }
       // SOLICITUD POR DIAS
-      else if (this.datosPermiso.num_hora_maximo === '00:00:00') {
-        this.informacion1 = `Días máximos de permiso: ${this.datosPermiso.num_dia_maximo}`;
-        this.Tdias = this.datosPermiso.num_dia_maximo;
+      else if (this.datosPermiso.horas_maximo_permiso === '00:00:00') {
+        this.informacion1 = `Días máximos de permiso: ${this.datosPermiso.dias_maximo_permiso}`;
+        this.Tdias = this.datosPermiso.dias_maximo_permiso;
         this.configuracion_permiso = 'Dias';
       }
 
       // MENSAJE DESCUENTO ALIMENTACION
-      if (this.datosPermiso.almu_incluir === true) {
+      if (this.datosPermiso.incluir_minutos_comida === true) {
         this.informacion3 = `Aplica descuento de minutos de alimentación si el permisos solicitado se encuentra dentro del horario de alimentación.`;
       }
       else {
@@ -251,7 +251,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       }
 
       // MENSAJE DIAS PREVIOS DE SOLICITUD
-      this.informacion4 = `Número de días previos para cargar solicitud: ${this.datosPermiso.num_dia_anticipo} días.`;
+      this.informacion4 = `Número de días previos para cargar solicitud: ${this.datosPermiso.dias_anticipar_permiso} días.`;
 
       // DOCUMENTO REQUERIDO
       this.certificado = this.datosPermiso.documento;
@@ -342,27 +342,27 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       this.certificado = this.datosPermiso.documento;
 
       // SOLICITUD POR HORAS
-      if (this.datosPermiso.num_dia_maximo === 0) {
+      if (this.datosPermiso.dias_maximo_permiso === 0) {
         this.LimpiarFormulario('');
-        this.informacion1 = `Horas máximas de permiso: ${this.datosPermiso.num_hora_maximo}`;
+        this.informacion1 = `Horas máximas de permiso: ${this.datosPermiso.horas_maximo_permiso}`;
         this.habilitarDias = false;
         this.activar_hora = true;
         this.formulario.patchValue({
           solicitarForm: 'Horas',
         });
-        this.Thoras = this.datosPermiso.num_hora_maximo;
+        this.Thoras = this.datosPermiso.horas_maximo_permiso;
         this.configuracion_permiso = 'Horas';
       }
       // SOLICITUD POR DIAS
-      else if (this.datosPermiso.num_hora_maximo === '00:00:00') {
+      else if (this.datosPermiso.horas_maximo_permiso === '00:00:00') {
         this.LimpiarFormulario('00:00');
-        this.informacion1 = `Días máximos de permiso: ${this.datosPermiso.num_dia_maximo}`;
+        this.informacion1 = `Días máximos de permiso: ${this.datosPermiso.dias_maximo_permiso}`;
         this.habilitarDias = true;
         this.activar_hora = false;
         this.formulario.patchValue({
           solicitarForm: 'Dias',
         });
-        this.Tdias = this.datosPermiso.num_dia_maximo;
+        this.Tdias = this.datosPermiso.dias_maximo_permiso;
         this.configuracion_permiso = 'Dias';
       }
 
@@ -375,7 +375,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       }
 
       // MENSAJE DESCUENTO ALIMENTACION
-      if (this.datosPermiso.almu_incluir === true) {
+      if (this.datosPermiso.incluir_minutos_comida === true) {
         this.informacion3 = `Aplica descuento de minutos de alimentación si el permisos solicitado se encuentra dentro del horario de alimentación.`;
       }
       else {
@@ -383,7 +383,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       }
 
       // MENSAJE DIAS PREVIOS DE SOLICITUD
-      this.informacion4 = `Número de días previos para cargar solicitud: ${this.datosPermiso.num_dia_anticipo} días.`;
+      this.informacion4 = `Número de días previos para cargar solicitud: ${this.datosPermiso.dias_anticipar_permiso} días.`;
     })
   }
 
@@ -731,7 +731,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
           else {
             if (hora_inicio_ >= datos[i].hora_inicio && hora_final_ <= datos[i].hora_final) {
               verificador = 1;
-              if (this.datosPermiso.almu_incluir === true) {
+              if (this.datosPermiso.incluir_minutos_comida === true) {
                 this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i]);
               }
               else {
@@ -766,7 +766,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
                 // LA HORA FINAL ES <= '23:59:00' Y LA HORA FINAL ES > QUE LA HORA DE INICIO
                 if (hora_final_ <= '23:59:00' && hora_final_ > datos[i].hora_inicio) {
                   verificador = 1;
-                  if (this.datosPermiso.almu_incluir === true) {
+                  if (this.datosPermiso.incluir_minutos_comida === true) {
                     this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i]);
                   }
                   else {
@@ -792,7 +792,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
                 // SI LA HORA DE INICIO ES 00:00:00 (INICIO DE UN NUEVO DIA)
                 if (hora_inicio_ === '00:00:00') {
                   verificador = 1;
-                  if (this.datosPermiso.almu_incluir === true) {
+                  if (this.datosPermiso.incluir_minutos_comida === true) {
                     this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i]);
                   }
                   else {
@@ -804,7 +804,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
                   // LA HORA DE INICIO DEBE SER >= 00:01:00 Y LA HORA DE INICIO DEBE SER < QUE LA HORA DE SALIDA DEL USUARIO
                   if (hora_inicio_ >= '00:01:00' && hora_inicio_ < datos[i].hora_final) {
                     verificador = 1;
-                    if (this.datosPermiso.almu_incluir === true) {
+                    if (this.datosPermiso.incluir_minutos_comida === true) {
                       this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i]);
                     }
                     else {
@@ -928,7 +928,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
         for (let i = 0; i < datos.length; i++) {
           if (hora_inicio_ >= datos[i].hora_inicio && hora_final_ <= datos[i].hora_final) {
             verificador = 1;
-            if (this.datosPermiso.almu_incluir === true) {
+            if (this.datosPermiso.incluir_minutos_comida === true) {
               this.VerificarFechasDiferentesComida(form, datos[i], fecha_inicio, fecha_final, hora_inicio_, hora_final_);
             }
             else {
@@ -1640,6 +1640,15 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     else if (this.archivoSubido != undefined && this.archivoSubido.length != 0) {
       console.log('ingresa archivo ', this.archivoSubido, ' ', this.archivoSubido.length)
       this.InsertarPermiso(form, datosPermiso);
+    } else if (this.eliminar){
+      if (this.certificado === false) {
+        this.EliminarDocumentoBDD();
+        this.CerrarVentana();
+      } else {
+        this.toastr.warning('Documento de respaldo es requerido, no es posible eliminarlo.', 'Ups!!! no fue posible actualizar el registro.', {
+          timeOut: 6000,
+        });
+      }
     }
     else {
       this.CerrarVentana();
@@ -1649,7 +1658,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
   // METODO PARA CAPTURAR DATOS DE PERMISO
   InsertarPermiso(form: any, datosPermiso: any) {
-
+    console.log('eñiminara ', this.eliminar, 'editar ', this.editar, 'documento ', this.documento, 'certificado ', this.certificado)
     this.CambiarValoresDiasHoras(form, datosPermiso);
     if (this.documento_editar === true && this.eliminar === false && this.editar === false) {
       console.log('ingresa todo false')
@@ -1706,14 +1715,31 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
   // METODO PARA ACTUALIZAR REGISTRO
   ActualizarRegistro(datos: any) {
-    this.restP.EditarPermiso(this.info.id, datos).subscribe(permiso => {
-      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
-        timeOut: 6000,
-      });
-      if (this.datosPermiso.correo_editar === true) {
-        permiso.EmpleadosSendNotiEmail.push(this.solInfo);
-        this.EnviarCorreo(permiso);
-        this.EnviarNotificacion(permiso);
+    this.restP.EditarPermiso(this.info.id, datos).subscribe({
+      next: res => {
+        let advertencia: boolean = false;
+
+        if (res.message == 'ok') {
+          this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
+            timeOut: 6000,
+          });
+
+        } else {
+          advertencia = true;
+          this.toastr.warning(res.message, 'Permisos registrados.', {
+            timeOut: 6000,
+          });
+        }
+
+        if (this.datosPermiso.correo_editar === true && advertencia === false) {
+          this.EnviarCorreo(res.permiso);
+          this.EnviarNotificacion(res.permiso);
+        }
+      },
+      error: error => {
+        this.toastr.error('Verifica los datos ingresados y vuelve a intentar.', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        })
       }
     });
   }
@@ -1745,7 +1771,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   }
 
   // CARGAR DOCUMENTO
-  SubirRespaldo(id: number, codigo: any) {
+  SubirRespaldo(id: any, codigo: any) {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
@@ -1753,6 +1779,9 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
     formData.append('user_name', this.user_name as string);
     formData.append('ip', this.ip as string);
+    formData.append('id', id as string);
+    formData.append('codigo', codigo as string);
+    formData.append('eliminar', true as any);
 
     this.restP.SubirArchivoRespaldo(formData, id, codigo, this.info.documento).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Documento registrado.', {
@@ -1808,6 +1837,9 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       ip: this.ip,
     }
     this.restP.EliminarDocumentoPermiso(datos).subscribe(res => {
+      this.toastr.error('Operación exitosa.', 'Documento eliminado.', {
+        timeOut: 6000,
+      });
     });
   }
 
