@@ -331,7 +331,7 @@ export class PrincipalHorarioComponent implements OnInit {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
 
     }
-    //--console.log("formdata", formData);
+
     this.rest.VerificarDatosHorario(formData).subscribe(res => {
       this.dataHorarios = res;
       this.dataHorarios.plantillaHorarios.forEach((obj: any) => {
@@ -635,7 +635,8 @@ export class PrincipalHorarioComponent implements OnInit {
       return 'rgb(222, 162, 73)';
     }
 
-    if (observacion.startsWith('Requerido') || observacion.startsWith('No cumple') || observacion.startsWith('Minutos de alimentación no')) {
+    if (observacion.startsWith('Requerido') || observacion.startsWith('No cumple')
+        || (observacion.startsWith('Horas')) || observacion.startsWith('Minutos de alimentación no')) {
       return 'rgb(238, 34, 207)';
     }
 

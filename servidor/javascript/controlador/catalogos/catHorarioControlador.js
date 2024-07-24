@@ -818,14 +818,16 @@ function VerificarFormatoDatos(data) {
     let error = true;
     const { HORAS_TOTALES, MINUTOS_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = data;
     const horasTotalesFormatoCorrecto = /^(\d+)$|^(\d{1,2}:\d{2})$|^(\d{1,2}:\d{2}:\d{2})$/.test(HORAS_TOTALES);
+    const horasTotalesMayorCero = horasTotalesFormatoCorrecto ? parseInt(HORAS_TOTALES) > 0 : false;
     const minAlimentacionFormatoCorrecto = /^\d+$/.test(MINUTOS_ALIMENTACION);
     const tipoHorarioValido = ['Laborable', 'Libre', 'Feriado'].includes(TIPO_HORARIO);
     const tipoHorarioNocturnoValido = ['Si', 'No'].includes(HORARIO_NOCTURNO);
-    horasTotalesFormatoCorrecto ? null : observacion = 'Formato de horas totales incorrecto (HH:mm)';
+    horasTotalesFormatoCorrecto ? (horasTotalesMayorCero ? null : observacion = 'Horas totales debe ser mayor a 0')
+        : observacion = 'Formato de horas totales incorrecto (HH:mm)';
     minAlimentacionFormatoCorrecto ? null : observacion = 'Formato de minutos de alimentación incorrecto';
     tipoHorarioValido ? null : observacion = 'Tipo de horario incorrecto';
     tipoHorarioNocturnoValido ? null : observacion = 'Tipo de horario nocturno incorrecto';
-    error = horasTotalesFormatoCorrecto && minAlimentacionFormatoCorrecto && tipoHorarioValido && tipoHorarioNocturnoValido ? false : true;
+    error = horasTotalesFormatoCorrecto && horasTotalesMayorCero && minAlimentacionFormatoCorrecto && tipoHorarioValido && tipoHorarioNocturnoValido ? false : true;
     return [error, observacion];
 }
 // FUNCION PARA VERIFICAR SI EXISTEN DATOS DUPLICADOS EN LA BASE DE DATOS
