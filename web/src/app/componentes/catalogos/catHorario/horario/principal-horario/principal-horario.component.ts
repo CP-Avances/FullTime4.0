@@ -300,7 +300,7 @@ export class PrincipalHorarioComponent implements OnInit {
       let itemName = arrayItems[0];
 
       if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-        if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
+        if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
           this.VerificarPlantilla();
         } else {
           this.toastr.error('Solo se acepta plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
@@ -339,6 +339,42 @@ export class PrincipalHorarioComponent implements OnInit {
           this.listaDetalleCorrectos.push(obj);
         }
       });
+      this.OrdenarHorarios();
+      this.OrdenarDetalles();
+    });
+  }
+
+  // METODO PARA ORDENAR HORARIOS POR OBSERVACION
+  OrdenarHorarios() {
+    this.dataHorarios.plantillaHorarios.sort((a: any, b: any) => {
+      if (a.OBSERVACION !== 'Ok' && b.OBSERVACION === 'Ok') {
+        return -1;
+      }
+      if (a.OBSERVACION === 'Ok' && b.OBSERVACION !== 'Ok') {
+        return 1;
+      }
+      if (a.OBSERVACION === 'Ok' && b.OBSERVACION === 'Ok') {
+        if (!a.DETALLE && b.DETALLE) {
+          return -1;
+        }
+        if (a.DETALLE && !b.DETALLE) {
+          return 1;
+        }
+      }
+      return 0;
+    });
+  }
+
+  //METODO PARA ORDENAR DETALLES POR OBSERVACION
+  OrdenarDetalles() {
+    this.dataHorarios.plantillaDetalles.sort((a: any, b: any) => {
+      if (a.OBSERVACION !== 'Ok' && b.OBSERVACION === 'Ok') {
+        return -1;
+      }
+      if (a.OBSERVACION === 'Ok' && b.OBSERVACION !== 'Ok') {
+        return 1;
+      }
+      return 0;
     });
   }
 

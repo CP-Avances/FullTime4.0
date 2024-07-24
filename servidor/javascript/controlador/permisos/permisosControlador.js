@@ -415,7 +415,6 @@ class PermisosControlador {
             try {
                 const { user_name, ip, id_permiso, doc, codigo } = req.body;
                 let separador = path_1.default.sep;
-                console.log('ver data ', user_name, ' ', ip, ' ', id_permiso, ' ', doc, ' ', codigo);
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -522,7 +521,6 @@ class PermisosControlador {
                 // FINALIZAR TRANSACCION
                 yield database_1.default.query('COMMIT');
                 if (doc != 'null' && doc != '' && doc != null) {
-                    console.log(id_permiso, doc, ' entra ');
                     let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo)) + separador + doc;
                     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                     fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
@@ -544,6 +542,7 @@ class PermisosControlador {
             }
             catch (error) {
                 // REVERTIR TRANSACCION
+                console.log('error ', error);
                 yield database_1.default.query('ROLLBACK');
                 return res.status(500).jsonp({ message: 'error' });
             }
