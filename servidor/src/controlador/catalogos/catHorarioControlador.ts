@@ -930,7 +930,7 @@ function VerificarFormatoDatos(data: any): [boolean, string] {
   const tipoHorarioNocturnoValido = ['Si', 'No'].includes(HORARIO_NOCTURNO);
   horasTotalesFormatoCorrecto ? (horasTotalesMayorCero ? null : observacion = 'Horas totales debe ser mayor a 0') 
                               : observacion = 'Formato de horas totales incorrecto (HH:mm)';
-                              
+
   minAlimentacionFormatoCorrecto ? null : observacion = 'Formato de minutos de alimentación incorrecto';
   tipoHorarioValido ? null : observacion = 'Tipo de horario incorrecto';
   tipoHorarioNocturnoValido ? null : observacion = 'Tipo de horario nocturno incorrecto';
@@ -966,10 +966,10 @@ function VerificarFormatoDetalleHorario(data: any): [boolean, string] {
   if (TIPO_ACCION.toLowerCase() === 'entrada') {
     toleranciaFormatoCorrecto = /^\d+$/.test(TOLERANCIA);
   }
-  horaFormatoCorrecto ? null : observacion = observacion.concat('Formato de hora incorrecto (HH:mm)');
-  toleranciaFormatoCorrecto ? null : observacion = observacion.concat('Formato de tolerancia incorrecto');
-  minAntesFormatoCorrecto ? null : observacion = observacion.concat('Formato de minutos antes incorrecto');
-  minDespuesFormatoCorrecto ? null : observacion = observacion.concat('Formato de minutos después incorrecto');
+  horaFormatoCorrecto ? null : observacion = 'Formato de hora incorrecto (HH:mm)';
+  toleranciaFormatoCorrecto ? null : 'Formato de tolerancia incorrecto';
+  minAntesFormatoCorrecto  ? null : observacion = 'Formato de minutos antes incorrecto';
+  minDespuesFormatoCorrecto ? null : observacion = 'Formato de minutos después incorrecto';
   error = horaFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto && toleranciaFormatoCorrecto ? false : true;
   return [error, observacion];
 }

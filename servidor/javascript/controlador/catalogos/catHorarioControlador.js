@@ -856,10 +856,10 @@ function VerificarFormatoDetalleHorario(data) {
     if (TIPO_ACCION.toLowerCase() === 'entrada') {
         toleranciaFormatoCorrecto = /^\d+$/.test(TOLERANCIA);
     }
-    horaFormatoCorrecto ? null : observacion = observacion.concat('Formato de hora incorrecto (HH:mm)');
-    toleranciaFormatoCorrecto ? null : observacion = observacion.concat('Formato de tolerancia incorrecto');
-    minAntesFormatoCorrecto ? null : observacion = observacion.concat('Formato de minutos antes incorrecto');
-    minDespuesFormatoCorrecto ? null : observacion = observacion.concat('Formato de minutos después incorrecto');
+    horaFormatoCorrecto ? null : observacion = 'Formato de hora incorrecto (HH:mm)';
+    toleranciaFormatoCorrecto ? null : 'Formato de tolerancia incorrecto';
+    minAntesFormatoCorrecto ? null : observacion = 'Formato de minutos antes incorrecto';
+    minDespuesFormatoCorrecto ? null : observacion = 'Formato de minutos después incorrecto';
     error = horaFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto && toleranciaFormatoCorrecto ? false : true;
     return [error, observacion];
 }
