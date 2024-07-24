@@ -94,6 +94,8 @@ export class PrincipalHorarioComponent implements OnInit {
   mostrarbtnsubir: boolean = false;
   listaHorariosCorrectos: any = [];
   listaDetalleCorrectos: any = [];
+  horariosCorrectos: number = 0;
+  detallesCorrectos: number = 0;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -321,8 +323,11 @@ export class PrincipalHorarioComponent implements OnInit {
   }
 
   VerificarPlantilla() {
+    this.listaHorariosCorrectos = [];
+    this.listaDetalleCorrectos = [];
+
     let formData = new FormData();
-    for (var i = 0; i < this.archivoSubido.length; i++) {
+    for (let i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
 
     }
@@ -341,6 +346,9 @@ export class PrincipalHorarioComponent implements OnInit {
       });
       this.OrdenarHorarios();
       this.OrdenarDetalles();
+
+      this.horariosCorrectos = this.listaHorariosCorrectos.length;
+      this.detallesCorrectos = this.listaDetalleCorrectos.length;
     });
   }
 
