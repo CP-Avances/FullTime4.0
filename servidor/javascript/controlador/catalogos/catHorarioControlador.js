@@ -567,17 +567,18 @@ class HorarioControlador {
                                     break;
                             }
                             // CAMBIAR SALIDA_SIGUIENTE_DIA
-                            switch (SALIDA_SIGUIENTE_DIA) {
-                                case 'Si':
+                            switch (SALIDA_SIGUIENTE_DIA.toLowerCase()) {
+                                case 'si':
                                     SALIDA_SIGUIENTE_DIA = true;
                                     break;
-                                case 'No':
+                                case 'no':
                                     SALIDA_SIGUIENTE_DIA = false;
                                     break;
                                 default:
                                     SALIDA_SIGUIENTE_DIA = false;
                                     break;
                             }
+                            //TODO NO SE ESTA USANDO ANALIZAR SI MANTENER O ELIMINAR
                             // CAMBIAR SALIDA_TERCER_DIA
                             switch (SALIDA_TERCER_DIA) {
                                 case 'Si':
@@ -848,8 +849,9 @@ function VerificarCodigoHorarioDetalleHorario(codigo, plantillaHorarios) {
 function VerificarFormatoDetalleHorario(data) {
     let observacion = '';
     let error = true;
-    const { TIPO_ACCION, HORA, TOLERANCIA, MINUTOS_ANTES, MINUTOS_DESPUES } = data;
+    const { TIPO_ACCION, HORA, TOLERANCIA, SALIDA_SIGUIENTE_DIA, MINUTOS_ANTES, MINUTOS_DESPUES } = data;
     const horaFormatoCorrecto = /^(\d{1,2}:\d{2})$|^(\d{1,2}:\d{2}:\d{2})$/.test(HORA);
+    const salidaSiguienteDiaFormatoCorrecto = ['si', 'no'].includes(SALIDA_SIGUIENTE_DIA.toLowerCase());
     const minAntesFormatoCorrecto = /^\d+$/.test(MINUTOS_ANTES);
     const minDespuesFormatoCorrecto = /^\d+$/.test(MINUTOS_DESPUES);
     let toleranciaFormatoCorrecto = true;
@@ -858,9 +860,10 @@ function VerificarFormatoDetalleHorario(data) {
     }
     horaFormatoCorrecto ? null : observacion = 'Formato de hora incorrecto (HH:mm)';
     toleranciaFormatoCorrecto ? null : 'Formato de tolerancia incorrecto';
+    salidaSiguienteDiaFormatoCorrecto ? null : observacion = 'Formato de salida siguiente día incorrecto';
     minAntesFormatoCorrecto ? null : observacion = 'Formato de minutos antes incorrecto';
     minDespuesFormatoCorrecto ? null : observacion = 'Formato de minutos después incorrecto';
-    error = horaFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto && toleranciaFormatoCorrecto ? false : true;
+    error = horaFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto && toleranciaFormatoCorrecto && salidaSiguienteDiaFormatoCorrecto ? false : true;
     return [error, observacion];
 }
 // FUNCION PARA AGRUPAR LOS DETALLES QUE PERTENEZCAN A UN MISMO HORARIO
