@@ -18,6 +18,8 @@ class PruebasRutas {
         // METODO PARA REGISTRAR ROL
         this.router.post('/', TokenValidation, ROLES_CONTROLADOR.CrearRol);
 
+        this.router.post('/updateUsers', TokenValidation, ROLES_CONTROLADOR.UpdateRoles);
+
         this.router.get('/listausuariosroles', TokenValidation, ROLES_CONTROLADOR.ListarRolesUsuario);
 
         

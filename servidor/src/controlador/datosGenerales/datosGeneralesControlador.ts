@@ -109,9 +109,16 @@ class DatosGeneralesControlador {
                     car.cargos = await Promise.all(car.cargos.map(async (empl: any) => {
                         empl.empleado = await pool.query(
                             `
-                            SELECT * FROM informacion_general 
+                            SELECT info_g.* 
+                            FROM informacion_general as info_g, 
+                                eu_usuario_departamento as usua_dep, 
+                                eu_empleado_cargos as empl_car
                             WHERE id_cargo_= $1 AND id_suc = $2 AND estado = $3
-                                AND id_depa = $4 AND id_regimen = $5
+                                AND id_depa = $4 AND id_regimen = $5 AND 
+                                info_g.id = usua_dep.id_empleado AND
+	                            usua_dep.administra = false AND 
+	                            empl_car.id = info_g.id_cargo AND 
+	                            empl_car.jefe = false
                             `,
                             [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen])
                             .then((result: any) => { return result.rows });
@@ -147,7 +154,6 @@ class DatosGeneralesControlador {
 
         return res.status(200).jsonp(empleados);
     }
-
 
     // METODO PARA LEER DATOS PERFIL ADMINISTRADOR
     public async BuscarDataGeneral_ADMIN(req: Request, res: Response) {
@@ -256,9 +262,16 @@ class DatosGeneralesControlador {
                     car.cargos = await Promise.all(car.cargos.map(async (empl: any) => {
                         empl.empleado = await pool.query(
                             `
-                            SELECT * FROM informacion_general 
+                            SELECT info_g.* 
+                            FROM informacion_general as info_g, 
+                                eu_usuario_departamento as usua_dep, 
+                                eu_empleado_cargos as empl_car
                             WHERE id_cargo_= $1 AND id_suc = $2 AND estado = $3
-                                AND id_depa = $4 AND id_regimen = $5
+                                AND id_depa = $4 AND id_regimen = $5 AND 
+                                info_g.id = usua_dep.id_empleado AND
+	                            usua_dep.administra = false AND 
+	                            empl_car.id = info_g.id_cargo AND 
+	                            empl_car.jefe = false
                             `,
                             [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen])
                             .then((result: any) => { return result.rows });
@@ -294,7 +307,6 @@ class DatosGeneralesControlador {
 
         return res.status(200).jsonp(empleados);
     }
-
 
     // METODO PARA LEER DATOS PERFIL ADMINISTRADOR JEFE
     public async BuscarDataGeneral_JEFE(req: Request, res: Response) {
@@ -401,9 +413,16 @@ class DatosGeneralesControlador {
                     car.cargos = await Promise.all(car.cargos.map(async (empl: any) => {
                         empl.empleado = await pool.query(
                             `
-                            SELECT * FROM informacion_general 
+                            SELECT info_g.* 
+                            FROM informacion_general as info_g, 
+                                eu_usuario_departamento as usua_dep, 
+                                eu_empleado_cargos as empl_car
                             WHERE id_cargo_= $1 AND id_suc = $2 AND estado = $3
-                                AND id_depa = $4 AND id_regimen = $5
+                                AND id_depa = $4 AND id_regimen = $5 AND 
+                                info_g.id = usua_dep.id_empleado AND
+	                            usua_dep.administra = false AND 
+	                            empl_car.id = info_g.id_cargo AND 
+	                            empl_car.jefe = false
                             `,
                             [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen])
                             .then((result: any) => { return result.rows });
@@ -439,6 +458,7 @@ class DatosGeneralesControlador {
 
         return res.status(200).jsonp(empleados);
     }
+
 
 
     // METODO PARA BUSCAR USUARIOS ADMINISTRADORES Y JEFES DE UNA SUCURSAL

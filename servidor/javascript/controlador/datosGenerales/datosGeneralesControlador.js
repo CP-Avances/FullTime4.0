@@ -101,9 +101,16 @@ class DatosGeneralesControlador {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
                         car.cargos = yield Promise.all(car.cargos.map((empl) => __awaiter(this, void 0, void 0, function* () {
                             empl.empleado = yield database_1.default.query(`
-                            SELECT * FROM informacion_general 
+                            SELECT info_g.* 
+                            FROM informacion_general as info_g, 
+                                eu_usuario_departamento as usua_dep, 
+                                eu_empleado_cargos as empl_car
                             WHERE id_cargo_= $1 AND id_suc = $2 AND estado = $3
-                                AND id_depa = $4 AND id_regimen = $5
+                                AND id_depa = $4 AND id_regimen = $5 AND 
+                                info_g.id = usua_dep.id_empleado AND
+	                            usua_dep.administra = false AND 
+	                            empl_car.id = info_g.id_cargo AND 
+	                            empl_car.jefe = false
                             `, [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen])
                                 .then((result) => { return result.rows; });
                             return empl;
@@ -226,9 +233,16 @@ class DatosGeneralesControlador {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
                         car.cargos = yield Promise.all(car.cargos.map((empl) => __awaiter(this, void 0, void 0, function* () {
                             empl.empleado = yield database_1.default.query(`
-                            SELECT * FROM informacion_general 
+                            SELECT info_g.* 
+                            FROM informacion_general as info_g, 
+                                eu_usuario_departamento as usua_dep, 
+                                eu_empleado_cargos as empl_car
                             WHERE id_cargo_= $1 AND id_suc = $2 AND estado = $3
-                                AND id_depa = $4 AND id_regimen = $5
+                                AND id_depa = $4 AND id_regimen = $5 AND 
+                                info_g.id = usua_dep.id_empleado AND
+	                            usua_dep.administra = false AND 
+	                            empl_car.id = info_g.id_cargo AND 
+	                            empl_car.jefe = false
                             `, [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen])
                                 .then((result) => { return result.rows; });
                             return empl;
@@ -349,9 +363,16 @@ class DatosGeneralesControlador {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
                         car.cargos = yield Promise.all(car.cargos.map((empl) => __awaiter(this, void 0, void 0, function* () {
                             empl.empleado = yield database_1.default.query(`
-                            SELECT * FROM informacion_general 
+                            SELECT info_g.* 
+                            FROM informacion_general as info_g, 
+                                eu_usuario_departamento as usua_dep, 
+                                eu_empleado_cargos as empl_car
                             WHERE id_cargo_= $1 AND id_suc = $2 AND estado = $3
-                                AND id_depa = $4 AND id_regimen = $5
+                                AND id_depa = $4 AND id_regimen = $5 AND 
+                                info_g.id = usua_dep.id_empleado AND
+	                            usua_dep.administra = false AND 
+	                            empl_car.id = info_g.id_cargo AND 
+	                            empl_car.jefe = false
                             `, [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen])
                                 .then((result) => { return result.rows; });
                             return empl;
