@@ -960,7 +960,7 @@ function VerificarFormatoDetalleHorario(data: any): [boolean, string] {
   let observacion = '';
   let error = true
   const { TIPO_ACCION, HORA, TOLERANCIA, SALIDA_SIGUIENTE_DIA, MINUTOS_ANTES, MINUTOS_DESPUES } = data;
-  const horaFormatoCorrecto = /^(\d{1,2}:\d{2})$|^(\d{1,2}:\d{2}:\d{2})$/.test(HORA);
+  const horaFormatoCorrecto = /^(\d{1,2}:\d{2})$/.test(HORA);
   const salidaSiguienteDiaFormatoCorrecto = ['si', 'no'].includes(SALIDA_SIGUIENTE_DIA.toLowerCase());
   const minAntesFormatoCorrecto = /^\d+$/.test(MINUTOS_ANTES);
   const minDespuesFormatoCorrecto = /^\d+$/.test(MINUTOS_DESPUES);
