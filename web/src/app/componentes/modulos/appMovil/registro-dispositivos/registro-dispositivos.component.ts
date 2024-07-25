@@ -463,7 +463,7 @@ export class RegistroDispositivosComponent implements OnInit {
     });
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getEliminarDispositivos(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

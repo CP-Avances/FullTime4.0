@@ -433,7 +433,7 @@ class DatosGeneralesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { empleado_id } = req.params;
             const DATOS = yield database_1.default.query(`
-            SELECT * FROM datos_actuales_empleado WHERE id = $1
+            SELECT * FROM contrato_cargo_vigente WHERE id_empleado = $1
             `, [empleado_id]);
             if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);

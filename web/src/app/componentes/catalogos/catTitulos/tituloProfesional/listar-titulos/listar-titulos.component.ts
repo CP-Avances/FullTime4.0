@@ -545,7 +545,7 @@ export class ListarTitulosComponent implements OnInit {
     this.ObtenerTitulos();
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getCrearTituloProfesional(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

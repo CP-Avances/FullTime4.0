@@ -203,7 +203,7 @@ export class BuscarAsistenciaComponent implements OnInit {
     this.asistencia = [];
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getRevisarRegistro(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

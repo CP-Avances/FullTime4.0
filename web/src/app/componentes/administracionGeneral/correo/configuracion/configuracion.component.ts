@@ -108,7 +108,7 @@ export class ConfiguracionComponent implements OnInit {
       })
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getConfigurarImagenes(){
     var datosRecuperados = sessionStorage.getItem('paginaRol');
     if(datosRecuperados){

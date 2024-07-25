@@ -690,7 +690,7 @@ export class ListarVacacionesComponent implements OnInit {
     });
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getAprobarMultipleVacacion(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

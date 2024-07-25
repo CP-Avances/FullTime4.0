@@ -673,7 +673,7 @@ export class CrearPedidoAccionComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getRegistrarPedido(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

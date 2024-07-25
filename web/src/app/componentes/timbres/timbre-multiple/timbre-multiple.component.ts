@@ -903,7 +903,7 @@ export class TimbreMultipleComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getRegistrarTimbres(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

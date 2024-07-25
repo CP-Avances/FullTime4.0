@@ -1600,7 +1600,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
   VerificarActualizacion(form: any) {
     let datosPermiso = {
-      depa_user_loggin: parseInt(this.actuales.id_departamento),
+      depa_user_loggin: parseInt(this.actuales.id_departamento),// verificar este dato en la consulta no se encuentra
       id_tipo_permiso: form.idPermisoForm,
       hora_ingreso: form.horasIngresoForm,
       descripcion: form.descripcionForm,

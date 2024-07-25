@@ -804,7 +804,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getPlanificacionMultiple(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

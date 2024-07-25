@@ -834,7 +834,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getRegistrarPermisosMultiples(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

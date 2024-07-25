@@ -947,7 +947,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     }
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getAsignarTimbres(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

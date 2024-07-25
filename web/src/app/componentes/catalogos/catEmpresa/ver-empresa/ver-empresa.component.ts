@@ -391,7 +391,7 @@ export class VerEmpresaComponent implements OnInit {
     };
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getEditarInformacionGeneral() {
     var datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

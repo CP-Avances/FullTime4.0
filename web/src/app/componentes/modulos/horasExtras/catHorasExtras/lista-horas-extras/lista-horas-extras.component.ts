@@ -431,7 +431,7 @@ export class ListaHorasExtrasComponent implements OnInit {
     }
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getConfigurar(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

@@ -690,7 +690,7 @@ export class ListarSolicitudComponent implements OnInit {
     });
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getAprobar(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

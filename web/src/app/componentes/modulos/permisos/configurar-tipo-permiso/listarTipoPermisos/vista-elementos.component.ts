@@ -384,7 +384,7 @@ export class VistaElementosComponent implements OnInit {
     });
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getCrearTipoPermiso(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

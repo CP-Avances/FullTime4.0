@@ -614,7 +614,7 @@ export class PrincipalHorarioComponent implements OnInit {
     }
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getCrearHorario(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

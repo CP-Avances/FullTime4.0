@@ -930,7 +930,7 @@ export class ComunicadosComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getEnviarComunicado(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

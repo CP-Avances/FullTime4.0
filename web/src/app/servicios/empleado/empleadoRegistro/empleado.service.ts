@@ -318,6 +318,4 @@ export class EmpleadoService {
     );
   }
 
-
-
 }

@@ -17,7 +17,6 @@ import { HorarioMultipleEmpleadoComponent } from '../rango-fechas/horario-multip
 import { BuscarPlanificacionComponent } from '../rango-fechas/buscar-planificacion/buscar-planificacion.component';
 import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { HorariosEmpleadoComponent } from '../../rolEmpleado/horarios-empleado/horarios-empleado.component';
 
 @Component({
   selector: 'app-eliminar-individual',
@@ -62,7 +61,6 @@ export class EliminarIndividualComponent implements OnInit {
     public busqueda: BuscarPlanificacionComponent,
     public componente: HorarioMultipleEmpleadoComponent,
     public componentem: HorarioMultipleEmpleadoComponent,
-    public componentep: HorariosEmpleadoComponent,
     private toastr: ToastrService,
   ) { }
 
@@ -294,10 +292,6 @@ export class EliminarIndividualComponent implements OnInit {
     else if (this.datosEliminar.pagina === 'planificar') {
       this.componentem.eliminar_plan = false;
       this.componentem.seleccionar = true;
-    }
-    else if (this.datosEliminar.pagina === 'perfil-empleado') {
-      this.componentep.eliminar_plan = false;
-      this.componentep.ver_tabla_horarios = true;
     }
   }
 

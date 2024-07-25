@@ -302,7 +302,7 @@ export class ListarParametroComponent implements OnInit {
     a.click();
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getCrearParametro(){
     var datosRecuperados = sessionStorage.getItem('paginaRol');
     if(datosRecuperados){

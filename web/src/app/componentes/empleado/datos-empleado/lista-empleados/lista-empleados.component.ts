@@ -998,7 +998,7 @@ export class ListaEmpleadosComponent implements OnInit {
     FileSaver.saveAs(data, "EmpleadosCSV" + '.csv');
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getCrearUsuarios(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

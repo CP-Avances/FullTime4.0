@@ -19,7 +19,6 @@ import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCat
 
 // IMPORTAR COMPONENTES
 import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
-import { HorariosEmpleadoComponent } from 'src/app/componentes/rolEmpleado/horarios-empleado/horarios-empleado.component';
 import { BuscarPlanificacionComponent } from '../buscar-planificacion/buscar-planificacion.component';
 import { HorarioMultipleEmpleadoComponent } from '../horario-multiple-empleado/horario-multiple-empleado.component';
 
@@ -93,7 +92,6 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     public timbrar: TimbresService,
     public busqueda: BuscarPlanificacionComponent,
     public componente: HorarioMultipleEmpleadoComponent,
-    public componentep: HorariosEmpleadoComponent,
     private toastr: ToastrService,
   ) { }
 
@@ -1032,10 +1030,6 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       this.busqueda.buscar_fechas = true;
       this.busqueda.auto_individual = true;
       this.busqueda.multiple = true;
-    }
-    else if (this.data_horario.pagina === 'perfil-empleado') {
-      this.componentep.ventana_horario = false;
-      this.componentep.ver_tabla_horarios = true;
     }
   }
 

@@ -112,7 +112,7 @@ export class VerRegimenComponent implements OnInit {
     this.componentl.regimen_id = id;
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getEditarRegimenLaboral(){
     var datosRecuperados = sessionStorage.getItem('paginaRol');
     if(datosRecuperados){

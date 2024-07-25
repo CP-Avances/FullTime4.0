@@ -358,7 +358,7 @@ export class VerSucursalComponent implements OnInit {
       });
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getVerDepartamentoCrearDepartamento() {
     var datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

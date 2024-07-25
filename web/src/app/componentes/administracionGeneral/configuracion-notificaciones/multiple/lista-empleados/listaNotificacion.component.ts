@@ -787,7 +787,7 @@ export class ListaNotificacionComponent implements OnInit {
         return this.validar.IngresarSoloNumeros(evt);
     }
 
-    //Control Botones
+    //CONTROL BOTONES
     getConfigurarNotificaciones(){
         const datosRecuperados = sessionStorage.getItem('paginaRol');
         if (datosRecuperados) {

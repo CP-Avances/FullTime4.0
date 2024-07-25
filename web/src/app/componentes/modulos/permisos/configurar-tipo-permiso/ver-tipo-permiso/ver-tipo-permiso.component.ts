@@ -77,7 +77,7 @@ export class VerTipoPermisoComponent implements OnInit {
     this.componentl.pagina = 'ver-datos';
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getEditarCumpleanos(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

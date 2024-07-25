@@ -749,7 +749,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     });
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getAprobar(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

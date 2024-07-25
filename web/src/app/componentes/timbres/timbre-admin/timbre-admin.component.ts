@@ -203,7 +203,7 @@ export class TimbreAdminComponent implements OnInit {
     this.timbres = [];
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getVerTimbres(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

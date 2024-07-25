@@ -404,7 +404,7 @@ export class ListarTipoComidasComponent implements OnInit {
     });
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getCrearNuevoMenu(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

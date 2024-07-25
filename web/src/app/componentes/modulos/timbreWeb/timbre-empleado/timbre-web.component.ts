@@ -206,7 +206,7 @@ export class TimbreWebComponent implements OnInit {
       });
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getTimbreVirtual(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

@@ -521,7 +521,7 @@ class DatosGeneralesControlador {
         const { empleado_id } = req.params;
         const DATOS = await pool.query(
             `
-            SELECT * FROM datos_actuales_empleado WHERE id = $1
+            SELECT * FROM contrato_cargo_vigente WHERE id_empleado = $1
             `
             , [empleado_id]);
         if (DATOS.rowCount != 0) {

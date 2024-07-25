@@ -942,7 +942,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     });
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getAprobar(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

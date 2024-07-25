@@ -509,7 +509,7 @@ export class VerHorarioDetalleComponent implements OnInit {
 
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getEditarHorario(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

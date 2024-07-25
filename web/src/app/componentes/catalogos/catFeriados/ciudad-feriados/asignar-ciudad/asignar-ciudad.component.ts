@@ -328,7 +328,7 @@ export class AsignarCiudadComponent implements OnInit {
     }
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getAsignarCiudadFeriado(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {
