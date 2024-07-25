@@ -11,6 +11,13 @@ const pool = new pg_pool_1.default({
     port: 5432,
     database: 'fulltime_empresa_4.0',
     password: 'fulltime'
+    /*
+      user: 'fulltime',
+      host: '192.168.0.156',
+      password: 'fulltime',
+      database: 'fulltime4_empresa1',
+      port: 5432
+    */
 });
 pool.query('SELECT NOW()', (err, res) => {
     if (err) {

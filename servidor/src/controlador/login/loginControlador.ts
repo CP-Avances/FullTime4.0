@@ -153,6 +153,7 @@ class LoginControlador {
                 modulos: modulos, id_contrato: id_contrato
               },
                 process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
+
               return res.status(200).jsonp({
                 caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
                 departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
@@ -340,8 +341,8 @@ class LoginControlador {
           await pool.query('COMMIT');
           return res.status(404).jsonp({ message: 'error' });
         }
-        
-        
+
+
         await pool.query(
           `
           UPDATE eu_usuarios SET contrasena = $2 WHERE id_empleado = $1

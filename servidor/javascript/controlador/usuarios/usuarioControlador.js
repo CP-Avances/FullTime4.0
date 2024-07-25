@@ -1635,6 +1635,60 @@ class UsuarioControlador {
             return res.json({ message: 'Proceso completado' });
         });
     }
+    // METODOS PARA APP_MOVIL
+    getidDispositivo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const id_empleado = req.params.id_empleado;
+                const response = yield database_1.default.query(`SELECT * FROM mrv_dispositivos WHERE id_empleado = ${id_empleado} ORDER BY id ASC `);
+                const IdDispositivos = response.rows;
+                return res.jsonp(IdDispositivos);
+            }
+            catch (error) {
+                console.log("error", error);
+                return res.status(500).jsonp({
+                    message: 'Ups! Problemas para conectar con el servidor' +
+                        '(593) 2 – 252-7663 o https://casapazmino.com.ec'
+                });
+            }
+        });
+    }
+    ;
+    ingresarIDdispositivo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_empleado, id_celular, modelo_dispositivo, user_name, ip } = req.body;
+                yield database_1.default.query('BEGIN');
+                const response = yield database_1.default.query('INSERT INTO mrv_dispositivos(id_empleado, id_dispositivo, modelo_dispositivo)' +
+                    'VALUES ($1, $2, $3) RETURNING *', [id_empleado, id_celular, modelo_dispositivo]);
+                const [objetoDispositivos] = response.rows;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: "mrv_dispositivos",
+                    usuario: user_name,
+                    accion: "I",
+                    datosOriginales: "",
+                    datosNuevos: JSON.stringify(objetoDispositivos),
+                    ip: ip,
+                    observacion: null,
+                });
+                yield database_1.default.query('COMMIT');
+                if (!Response)
+                    return res.status(400).jsonp({ message: "El dispositivo no se Registro" });
+                return res.status(200).jsonp({
+                    body: {
+                        mensaje: "Celular Registrado ",
+                        response: response.rowCount
+                    }
+                });
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).jsonp({ message: 'Error para registrar el celular, Revise su conexion a la red.' });
+            }
+        });
+    }
+    ;
 }
 /* @return
     CASOS DE RETORNO
