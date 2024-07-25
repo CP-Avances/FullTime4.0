@@ -104,7 +104,7 @@ class RolPermisosControlador {
             }
         });
     }
-    //FIXME ARREGLAR SQL
+    //FIXME SQL
     // METODO PARA BUSCAR ID DE PAGINAS Y MENU LATERAL
     ObtenerPaginasMenuRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

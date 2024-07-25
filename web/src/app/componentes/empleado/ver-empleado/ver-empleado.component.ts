@@ -5,7 +5,6 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { MatDatepicker } from '@angular/material/datepicker';
-import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { switchMap } from 'rxjs/operators';
@@ -61,7 +60,6 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 // IMPORTAR COMPONENTES
 import { EditarVacacionesEmpleadoComponent } from 'src/app/componentes/modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
 import { RegistroAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/registro-autorizacion-depa/registro-autorizacion-depa.component';
-import { EditarPeriodoVacacionesComponent } from '../../modulos/vacaciones/periodoVacaciones/editar-periodo-vacaciones/editar-periodo-vacaciones.component';
 import { EditarAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/editar-autorizacion-depa/editar-autorizacion-depa.component';
 import { RegistrarEmpleProcesoComponent } from '../../modulos/accionesPersonal/procesos/registrar-emple-proceso/registrar-emple-proceso.component';
 import { EditarEmpleadoProcesoComponent } from '../../modulos/accionesPersonal/procesos/editar-empleado-proceso/editar-empleado-proceso.component';
@@ -70,7 +68,6 @@ import { PlanificacionComidasComponent } from '../../modulos/alimentacion/planif
 import { EditarPlanHoraExtraComponent } from '../../modulos/horasExtras/planificacionHoraExtra/editar-plan-hora-extra/editar-plan-hora-extra.component';
 import { RegistrarVacacionesComponent } from '../../modulos/vacaciones/registrar-vacaciones/registrar-vacaciones.component';
 import { CancelarVacacionesComponent } from 'src/app/componentes/rolEmpleado/vacacion-empleado/cancelar-vacaciones/cancelar-vacaciones.component';
-import { RegistrarPeriodoVComponent } from '../../modulos/vacaciones/periodoVacaciones/registrar-periodo-v/registrar-periodo-v.component';
 import { EditarPlanComidasComponent } from '../../modulos/alimentacion/planifica-comida/editar-plan-comidas/editar-plan-comidas.component';
 import { CancelarHoraExtraComponent } from 'src/app/componentes/rolEmpleado/horasExtras-empleado/cancelar-hora-extra/cancelar-hora-extra.component';
 import { CambiarContrasenaComponent } from '../../iniciarSesion/contrasenia/cambiar-contrasena/cambiar-contrasena.component';
@@ -89,6 +86,7 @@ import { EmplLeafletComponent } from '../../modulos/geolocalizacion/empl-leaflet
 import { CrearVacunaComponent } from '../vacunacion/crear-vacuna/crear-vacuna.component';
 import { EmplCargosComponent } from 'src/app/componentes/empleado/cargo/empl-cargos/empl-cargos.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { MatRadioChange } from '@angular/material/radio';
 
 @Component({
   selector: 'app-ver-empleado',
@@ -985,9 +983,6 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
     this.btnActualizarCargo = true;
   }
 
-
-
-
   /** ** ***************************************************************************************** **
    ** ** **                  METODOS PARA MANEJO DE DATOS DE CARGO                              ** **
    ** ******************************************************************************************** **/
@@ -996,8 +991,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   // METODO PARA OBTENER LOS DATOS DEL CARGO DEL EMPLEADO
   cargoEmpleado: any = [];
   ObtenerCargoEmpleado(id_cargo: number, formato_fecha: string) {
-    this.cargoEmpleado = [];
     this.restCargo.BuscarCargoID(id_cargo).subscribe(datos => {
+      this.cargoEmpleado = [];
       this.cargoEmpleado = datos;
       this.cargoEmpleado.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, formato_fecha, this.validar.dia_abreviado);
@@ -1020,8 +1015,8 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   });
   cargoSeleccionado: any = [];
   ObtenerCargoSeleccionado(form: any) {
-    this.cargoSeleccionado = [];
     this.restCargo.BuscarCargoID(form.fechaICargoForm).subscribe(datos => {
+      this.cargoSeleccionado = [];
       this.cargoSeleccionado = datos;
       this.cargoSeleccionado.forEach((data: any) => {
         data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
@@ -1059,6 +1054,69 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       });
     }
   }
+
+  // METODO PARA CAMBIAR ESTADO
+  CambiarEstadoCargo(event: MatRadioChange, datos: any, opcion: number) {
+    if ((datos.estado === true && event.value === true) || (datos.estado === false && event.value === false)) {
+    }
+    else if (event.value = true) {
+      this.BuscarDatosCargo(opcion);
+      this.CambiarEstado(datos.id, event.value, opcion);
+    }
+    else if (event.value = false) {
+      this.CambiarEstado(datos.id, event.value, opcion);
+    }
+  }
+
+  // METODO PARA BUSCAR CARGOS ACTIVOS
+  BuscarDatosCargo(opcion: number) {
+    let valores = {
+      id_empleado: this.idEmpleado,
+    }
+    this.restCargo.BuscarCargoActivo(valores).subscribe(data => {
+      if (data.message === 'contrato_cargo') {
+        this.CambiarEstado(data.datos.id_cargo, false, opcion);
+      }
+    });
+  }
+
+  // METODO PARA EDITAR ESTADO DEL CARGO
+  CambiarEstado(id_cargo: any, estado: any, opcion: number) {
+    let valores = {
+      user_name: this.user_name,
+      id_cargo: id_cargo,
+      estado: estado,
+      ip: this.ip,
+    }
+    this.restCargo.EditarEstadoCargo(valores).subscribe(data => {
+      if (opcion === 2) {
+        this.cargoSeleccionado = [];
+        this.cargoEmpleado = [];
+        this.ObtenerCargoEmpleado(this.datoActual.id_cargo, this.formato_fecha);
+        this.ActualizarDatosCargoSeleccionado(this.fechaICargo.value)
+      }
+      else {
+        this.cargoEmpleado = [];
+        this.ObtenerCargoEmpleado(this.datoActual.id_cargo, this.formato_fecha);
+        if (this.fechaICargo.value) {
+          this.ActualizarDatosCargoSeleccionado(this.fechaICargo.value)
+        }
+      }
+    });
+  }
+
+  // ACTUALIZAR DATOS SELECCIONADO
+  ActualizarDatosCargoSeleccionado(id: any) {
+    this.restCargo.BuscarCargoID(id).subscribe(datos => {
+      this.cargoSeleccionado = [];
+      this.cargoSeleccionado = datos;
+      this.cargoSeleccionado.forEach((data: any) => {
+        data.fec_inicio_ = this.validar.FormatearFecha(data.fecha_inicio, this.formato_fecha, this.validar.dia_abreviado);
+        data.fec_final_ = this.validar.FormatearFecha(data.fecha_final, this.formato_fecha, this.validar.dia_abreviado);
+      })
+    });
+  }
+
 
   /** ***************************************************************************************** **
    ** **                VENTANA PARA VER HORARIOS ASIGNADOS AL USUARIO                       ** **
@@ -1642,14 +1700,15 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       this.permisosTotales = datos;
       this.permisosTotales.forEach((p: any) => {
         // TRATAMIENTO DE FECHAS Y HORAS
-        p.fec_creacion_ = this.validar.FormatearFecha(p.fec_creacion, formato_fecha, this.validar.dia_completo);
-        p.fec_inicio_ = this.validar.FormatearFecha(p.fec_inicio, formato_fecha, this.validar.dia_completo);
-        p.fec_final_ = this.validar.FormatearFecha(p.fec_final, formato_fecha, this.validar.dia_completo);
+        p.fec_creacion_ = this.validar.FormatearFecha(p.fecha_creacion, formato_fecha, this.validar.dia_completo);
+        p.fec_inicio_ = this.validar.FormatearFecha(p.fecha_inicio, formato_fecha, this.validar.dia_completo);
+        p.fec_final_ = this.validar.FormatearFecha(p.fecha_final, formato_fecha, this.validar.dia_completo);
 
         p.hora_ingreso_ = this.validar.FormatearHora(p.hora_ingreso, formato_hora);
         p.hora_salida_ = this.validar.FormatearHora(p.hora_salida, formato_hora);
 
       })
+      console.log('permisos', this.permisosTotales)
     })
   }
 

@@ -10,7 +10,6 @@ import { ValidacionesService } from '../../../../servicios/validaciones/validaci
 import { PedidoHoraExtraComponent } from 'src/app/componentes/modulos/horasExtras/solicitar-hora-extra/pedido-hora-extra/pedido-hora-extra.component';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { environment } from 'src/environments/environment';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 
 @Component({

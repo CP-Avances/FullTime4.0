@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { environment } from '../../../../../environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 
 import { RegistrarBirthdayComponent } from '../registrar-birthday/registrar-birthday.component';
@@ -55,7 +54,7 @@ export class VerBirthdayComponent implements OnInit {
       })
   }
 
-  //Control Botones
+  //CONTROL BOTONES
   getEditarCumpleanos(){
     const datosRecuperados = sessionStorage.getItem('paginaRol');
     if (datosRecuperados) {

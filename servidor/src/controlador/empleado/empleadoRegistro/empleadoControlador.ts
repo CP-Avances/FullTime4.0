@@ -1551,7 +1551,7 @@ class EmpleadoControlador {
                           if(LONGITUD != undefined || LATITUD != undefined){
                             if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                               data.observacion = 'Verificar ubicación';
-                            }                                  
+                            }                               
                           }
 
                           // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS
@@ -1692,10 +1692,10 @@ class EmpleadoControlador {
                                     if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
                                       
                                       // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                                      if(LONGITUD != undefined || LATITUD != undefined){
+                                      if(LONGITUD != undefined && LATITUD != undefined){
                                         if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                                           data.observacion = 'Verificar ubicación';
-                                        }                                  
+                                        }                              
                                       }
                                       
                                       // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
@@ -1711,6 +1711,7 @@ class EmpleadoControlador {
                                           data.observacion = 'El teléfono ingresado no es válido';
                                         }
                                       }
+
                                     } else {
                                       data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                                     }
@@ -1962,16 +1963,12 @@ class EmpleadoControlador {
 
         var _longitud = null;
         if (longitud != 'No registrado') {
-          if (regexLongitud.test(data.longitud)) {
             _longitud = longitud;
-          }
         }
 
         var _latitud = null
         if (latitud != 'No registrado') {
-          if (regexLatitud.test(data.latitud)) {
             _latitud = latitud;
-          }
         }
 
         //OBTENER ID DEL ESTADO
@@ -2212,7 +2209,7 @@ class EmpleadoControlador {
                                if(LONGITUD != undefined || LATITUD != undefined){
                                 if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                                   data.observacion = 'Verificar ubicación';
-                                }
+                                } 
                               }
 
                               // VALIDA SI LOS DATOS DE LA COLUMNA TELEFONO SON NUMEROS.
@@ -2361,7 +2358,7 @@ class EmpleadoControlador {
                                     if (moment(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
 
                                       // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                                      if(LONGITUD != undefined || LATITUD != undefined){
+                                      if(LONGITUD != undefined && LATITUD != undefined){
                                         if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                                           data.observacion = 'Verificar ubicación';
                                         }                                  
@@ -2646,16 +2643,12 @@ class EmpleadoControlador {
 
         var _longitud = null;
         if (longitud != 'No registrado') {
-          if (regexLongitud.test(data.longitud)) {
             _longitud = longitud;
-          }
         }
 
         var _latitud = null
         if (latitud != 'No registrado') {
-          if (!regexLatitud.test(data.latitud)) {
             _latitud = latitud;
-          }
         }
 
         // OBTENER ID DEL ESTADO

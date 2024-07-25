@@ -1488,7 +1488,7 @@ class EmpleadoControlador {
                                                                         if (data.fec_nacimiento != 'No registrado') {
                                                                             if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
                                                                                 // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                                                                                if (LONGITUD != undefined || LATITUD != undefined) {
+                                                                                if (LONGITUD != undefined && LATITUD != undefined) {
                                                                                     if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                                                                                         data.observacion = 'Verificar ubicación';
                                                                                     }
@@ -1742,15 +1742,11 @@ class EmpleadoControlador {
                     }
                     var _longitud = null;
                     if (longitud != 'No registrado') {
-                        if (regexLongitud.test(data.longitud)) {
-                            _longitud = longitud;
-                        }
+                        _longitud = longitud;
                     }
                     var _latitud = null;
                     if (latitud != 'No registrado') {
-                        if (regexLatitud.test(data.latitud)) {
-                            _latitud = latitud;
-                        }
+                        _latitud = latitud;
                     }
                     //OBTENER ID DEL ESTADO
                     var id_estado = 1;
@@ -2110,7 +2106,7 @@ class EmpleadoControlador {
                                                                         if (data.fec_nacimiento != 'No registrado') {
                                                                             if ((0, moment_1.default)(FECHA_NACIMIENTO, 'YYYY-MM-DD', true).isValid()) {
                                                                                 // VALIDA SI LOS DATOS DE LAS COLUMNAS LONGITUD Y LATITUD SON CORRECTAS.
-                                                                                if (LONGITUD != undefined || LATITUD != undefined) {
+                                                                                if (LONGITUD != undefined && LATITUD != undefined) {
                                                                                     if (!regexLatitud.test(data.latitud) || !regexLongitud.test(data.longitud)) {
                                                                                         data.observacion = 'Verificar ubicación';
                                                                                     }
@@ -2381,15 +2377,11 @@ class EmpleadoControlador {
                     }
                     var _longitud = null;
                     if (longitud != 'No registrado') {
-                        if (regexLongitud.test(data.longitud)) {
-                            _longitud = longitud;
-                        }
+                        _longitud = longitud;
                     }
                     var _latitud = null;
                     if (latitud != 'No registrado') {
-                        if (!regexLatitud.test(data.latitud)) {
-                            _latitud = latitud;
-                        }
+                        _latitud = latitud;
                     }
                     // OBTENER ID DEL ESTADO
                     var id_estado = 1;

@@ -25,8 +25,6 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
 import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 
-import { environment } from 'src/environments/environment';
-
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableSucursales } from 'src/app/model/reportes.model';
 
@@ -74,7 +72,7 @@ export class ListaSucursalesComponent implements OnInit {
   expansion: boolean = false;
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
-  hipervinculo: string = environment.url
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;

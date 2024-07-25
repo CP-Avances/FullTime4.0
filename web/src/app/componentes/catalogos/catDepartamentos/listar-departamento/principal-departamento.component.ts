@@ -5,7 +5,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { ScriptService } from 'src/app/servicios/empleado/script.service';
 import { ThemePalette } from '@angular/material/core';
-import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
@@ -77,7 +76,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   archivoForm = new FormControl('', Validators.required);
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
-  hipervinculo: string = environment.url
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
 
   // VARIABLES PROGRESS SPINNER
   progreso: boolean = false;

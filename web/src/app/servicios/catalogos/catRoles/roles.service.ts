@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { catchError } from 'rxjs';
+import { throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -42,5 +44,15 @@ export class RolesService {
   ActualizarRol(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/rol`, data);
   }
+
+  listaUsuariosRoles(){
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rol/listausuariosroles`).pipe(
+      catchError(error => {
+        console.error('Error occurred:', error);
+        return throwError(error);
+      })
+    );
+  }
+
 
 }

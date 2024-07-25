@@ -86,6 +86,15 @@ export class PermisosMultiplesComponent implements OnInit {
   user_name: string | null;
   ip: string | null;
 
+
+  // VARIABLES PARA NOTIFICACIONES Y CORREOS
+  registrados: any = [];
+  correctos: number = 0;
+  errores: number = 0;
+  notifica_registros: any = []
+  correos_destino: string = '';
+  totalCorreos: any = [];
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreCertificadoF = new FormControl('');
   descripcionF = new FormControl('');
@@ -1813,10 +1822,14 @@ export class PermisosMultiplesComponent implements OnInit {
   contador: number = 0;
   InsertarPermiso(form: any) {
 
+    let permisos: any = [];
+
     this.contador = 0;
 
+    const subirDocumento: boolean = form.nombreCertificadoForm != '' && form.nombreCertificadoForm != null;
+
     // LECTURA DE DATOS DE USUARIOS SELECCIONADOS
-    this.valido.forEach(valor => {
+    this.valido.forEach((valor: any) => {
 
       // DATOS DE PERMISO
       let datosPermiso = {
@@ -1836,7 +1849,7 @@ export class PermisosMultiplesComponent implements OnInit {
 
         // VALORES SEGUN USUARIO
         codigo: valor.codigo,
-        id_empl: valor.id,
+        id_empleado: valor.id,
         num_permiso: valor.numero_permiso,
         id_empl_cargo: valor.id_cargo,
         id_empl_contrato: valor.id_contrato,
@@ -1848,7 +1861,7 @@ export class PermisosMultiplesComponent implements OnInit {
         id_peri_vacacion: 0,
         user_name: this.user_name,
         ip: this.ip,
-        subir_documento: this.archivoSubido.length != 0,
+        subir_documento: subirDocumento,
       }
 
       this.CambiarValoresDiasHoras(form, datosPermiso);
@@ -1871,167 +1884,112 @@ export class PermisosMultiplesComponent implements OnInit {
         datosPermiso.hora_numero = valor.tiempo_solicitado;
       }
 
-      this.GuardarDatos(datosPermiso, form, valor);
+      permisos.push(datosPermiso);
+
+      // this.GuardarDatos(datosPermiso, form, valor);
 
     });
 
+    this.GuardarPermiosMultiples(permisos, subirDocumento, form);
+
+
   }
 
-  // METODO PARA GUARDAR DATOS DE SOLICITUD DE PERMISO
-  GuardarDatos(datos: any, form: any, valor: any) {
-    // VALIDAR QUE SE HA SUBIDO UN DOCUMENTO AL SISTEMA
-    if (form.nombreCertificadoForm != '' && form.nombreCertificadoForm != null) {
-      this.RegistrarPermiso_Documento(datos, form, valor);
+  GuardarPermiosMultiples(permisos: any, subirDocumento: boolean, form: any) {
+    let formData = new FormData();
 
-    } else {
-      this.RegistrarPermiso(datos, valor, form);
+    if (subirDocumento) {
+      formData.append("uploads", this.archivoSubido[0], this.archivoSubido[0].name);
     }
-  }
 
-  // METODO PARA REGISTRAR PERMISO CON DOCUMENTO
-  RegistrarPermiso_Documento(datos: any, form: any, valor: any) {
+    formData.append('permisos', JSON.stringify(permisos));
 
-    this.restP.IngresarEmpleadoPermisos(datos).subscribe(response => {
-      //console.log('ver permiso registrado ', response)
-      var usuarios: any = [];
-      this.contador = this.contador + 1;
-      this.correctos = this.correctos + 1;
+    this.restP.CrearPermisosMultiples(formData).subscribe( {
 
-      // METODO PARA SUBIR DOCUMENTO
-      this.SubirRespaldo(response.id, response.codigo);
+      next: (res: any) => {
+        let advertencia: boolean = false;
 
-      // METODO PARA REGISTRO DE AUTORIZACION
-      this.IngresarAutorizacion(response.id);
-
-      // LECTURA DE CORREOS
-      this.LeerCorreos(response.EmpleadosSendNotiEmail);
-      // LECTURA DE NOTIFICACIONES
-      this.LeerNotificacion(response.EmpleadosSendNotiEmail, valor.id);
-      if (valor.configurado === true) {
-        if (valor.permiso_mail === true) {
-          this.totalCorreos = this.totalCorreos.concat(valor.correo);
-        }
-        if (valor.permiso_noti === true) {
-          let aprobar = {
-            id_empl_recive: valor.id,
-            envia_usuario: valor.id,
-          }
-          this.notifica_registros = this.notifica_registros.concat(aprobar);
-        }
-      }
-
-      // DATOS DE USUARIOS REGISTRADOS PERMISO
-      usuarios = {
-        estado: 'Pendiente',
-        codigo: valor.codigo,
-        cedula: valor.cedula,
-        empleado: valor.nombre,
-        dias_libres: valor.dias_libres,
-        departamento: valor.name_departamento,
-        dias_laborables: valor.dias_laborables,
-        tiempo_solicitado: valor.tiempo_solicitado,
-        id_permiso: response.num_permiso,
-      }
-
-      this.registrados = this.registrados.concat(usuarios);
-
-      // FINALIZACION DE CICLO
-      if (this.contador === this.valido.length) {
-        this.ProcesarFunciones(datos, form);
-      }
-
-    }, error => {
-      this.contador = this.contador + 1;
-      this.errores = this.errores + 1;
-      // FINALIZACION DE CICLO
-      if (this.contador === this.valido.length) {
-        if (this.errores === this.valido.length) {
-          this.toastr.warning('Ups!!! algo salio mal.', 'No fue posible registrar solicitudes de permiso.', {
+        if (res.message == 'ok') {
+          this.toastr.success('Operación exitosa.', 'Permisos registrados.', {
+            timeOut: 6000,
+          });
+        } else {
+          advertencia = true;
+          this.toastr.warning(res.message, 'Permisos registrados.', {
             timeOut: 6000,
           });
         }
-        else {
-          this.ProcesarFunciones(datos, form);
-        }
-      }
-    });
-  }
 
-  // METODO PARA INGRESAR SOLICITUD DE PERMISO
-  registrados: any = [];
-  correctos: number = 0;
-  errores: number = 0;
-  notifica_registros: any = []
-  RegistrarPermiso(datos: any, valor: any, form: any) {
+        const permisosCorrectos =  res.permisos;
 
-    this.restP.IngresarEmpleadoPermisos(datos).subscribe(response => {
-      //console.log('ver permiso registrado ', response)
-      // METODO PARA REGISTRO DE AUTORIZACION
-      this.IngresarAutorizacion(response.id);
+        if (permisosCorrectos.length > 0) {
+          for (const permisoCorrecto of permisosCorrectos) {
 
-      var usuarios: any = [];
-      this.contador = this.contador + 1;
-      this.correctos = this.correctos + 1;
+            const { datos, permiso } = permisoCorrecto;
 
-      // LECTURA DE CORREOS
-      this.LeerCorreos(response.EmpleadosSendNotiEmail);
-      // LECTURA DE NOTIFICACIONES
-      this.LeerNotificacion(response.EmpleadosSendNotiEmail, valor.id);
-      if (valor.configurado === true) {
-        if (valor.permiso_mail === true) {
-          this.totalCorreos = this.totalCorreos.concat(valor.correo);
-        }
-        if (valor.permiso_noti === true) {
-          let aprobar = {
-            id_empl_recive: valor.id,
-            envia_usuario: valor.id,
+            const empleadoValido = this.valido.find((empleado: any) => empleado.id === permiso.id_empleado);
+
+            this.IngresarAutorizacion(permiso.id);
+            let usuarios: any = [];
+
+           if (!advertencia) {
+             // LECTURA DE CORREOS
+             this.LeerCorreos(permiso.EmpleadosSendNotiEmail);
+
+             // LECTURA DE NOTIFICACIONES
+             this.LeerNotificacion(permiso.EmpleadosSendNotiEmail, permiso.id_empleado);
+             if (empleadoValido.configurado === true) {
+               if (empleadoValido.permiso_mail === true) {
+                 this.totalCorreos = this.totalCorreos.concat(empleadoValido.correo);
+               }
+               if (empleadoValido.permiso_noti === true) {
+                 let aprobar = {
+                   id_empl_recive: empleadoValido.id,
+                   envia_usuario: empleadoValido.id,
+                 }
+                 this.notifica_registros = this.notifica_registros.concat(aprobar);
+               }
+             }
+
+             // DATOS DE USUARIOS REGISTRADOS PERMISO
+             usuarios = {
+               estado: 'Pendiente',
+               codigo: empleadoValido.codigo,
+               cedula: empleadoValido.cedula,
+               empleado: empleadoValido.nombre,
+               dias_libres: empleadoValido.dias_libres,
+               departamento: empleadoValido.name_departamento,
+               dias_laborables: empleadoValido.dias_laborables,
+               tiempo_solicitado: empleadoValido.tiempo_solicitado,
+               id_permiso: permiso.numero_permiso,
+             }
+
+             this.registrados = this.registrados.concat(usuarios);
+
+
+             // FINALIZACION DE CICLO
+             if (permisosCorrectos[permisosCorrectos.length - 1] === permisoCorrecto) {
+               this.ProcesarFunciones(datos, form);
+             }
+           }
           }
-          this.notifica_registros = this.notifica_registros.concat(aprobar);
+
         }
+
+        this.CerrarVentana();
+
+      },
+      error: (error: any) => {
+        this.toastr.error('No se pudo registrar las solicitudes de permiso.', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        });
       }
 
-      //console.log('ver notifica usua ', this.notifica_registros)
 
-      // DATOS DE USUARIOS REGISTRADOS PERMISO
-      usuarios = {
-        estado: 'Pendiente',
-        codigo: valor.codigo,
-        cedula: valor.cedula,
-        empleado: valor.nombre,
-        dias_libres: valor.dias_libres,
-        departamento: valor.name_departamento,
-        dias_laborables: valor.dias_laborables,
-        tiempo_solicitado: valor.tiempo_solicitado,
-        id_permiso: response.num_permiso
-      }
-
-      this.registrados = this.registrados.concat(usuarios);
-
-      // FINALIZACION DE CICLO
-      if (this.contador === this.valido.length) {
-        this.ProcesarFunciones(datos, form);
-      }
-
-    }, err => {
-      this.contador = this.contador + 1;
-      this.errores = this.errores + 1;
-      // FINALIZACION DE CICLO
-      if (this.contador === this.valido.length) {
-        if (this.errores === this.valido.length) {
-          this.toastr.warning('Ups!!! algo salio mal.', 'No fue posible registrar solicitudes de permiso.', {
-            timeOut: 6000,
-          });
-        }
-        else {
-          this.ProcesarFunciones(datos, form);
-        }
-      }
-    });
+    })
   }
 
   // METODO PARA LEER CORREOS DESTINOS
-  correos_destino: string = '';
-  totalCorreos: any = [];
   LeerCorreos(datos_usuario: any) {
     datos_usuario.forEach(valor => {
       if (valor.permiso_mail === true) {
@@ -2165,8 +2123,6 @@ export class PermisosMultiplesComponent implements OnInit {
     this.totalNotifica_aprueba = this.totalNotifica_aprueba.filter((obj, index, self) =>
       index === self.findIndex((o) => o.id_empl_recive === obj.id_empl_recive)
     );
-    // LECTURA DE DATOS Y ENVIO DE NOTIFICACION SISTEMA
-    this.EnviarNotificaciones(this.totalNotifica_aprueba);
   }
 
   // METODO PARA LEER DATOS DE NOTIIFCACION SISTEMA

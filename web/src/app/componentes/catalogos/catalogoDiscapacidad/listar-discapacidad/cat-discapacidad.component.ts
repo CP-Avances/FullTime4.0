@@ -4,7 +4,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
-import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
@@ -53,7 +52,7 @@ export class CatDiscapacidadComponent implements OnInit {
   archivoForm = new FormControl('', Validators.required);
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
-  hipervinculo: string = environment.url
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
 
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
@@ -663,6 +662,57 @@ export class CatDiscapacidadComponent implements OnInit {
           }
         }
       });
+  }
+
+  //CONTROL BOTONES
+  getCrearTipoDiscapacidad(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Crear Tipo Discapacidad');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getEditarTipoDiscapacidad(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Editar Tipo Discapacidad');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getEliminarTipoDiscapacidad(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Eliminar Tipo Discapacidad');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getCargarPlantillaTipoDiscapacidad(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Cargar Plantilla Tipo Discapacidad');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
+  }
+
+  getDescargarReportesTipoDiscapacidad(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Descargar Reportes Tipo Discapacidad');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 1);
+    }
   }
 
 }

@@ -110,3 +110,15 @@ td {
     border-radius: 50px;
     float: left;
 }
+
+.item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: small;
+  }
+
+  .icon {
+    margin-right: 10px;
+  }

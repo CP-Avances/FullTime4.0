@@ -6,7 +6,7 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button *ngIf="!Datos_vacunas" id="btn-raised" class="btn btn-sm"
+                    <button *ngIf="!Datos_vacunas && getCrearTipoVacuna()" id="btn-raised" class="btn btn-sm"
                         (click)="AbrirVentanaRegistrarVacuna()">
                         Crear Vacunas
                     </button>
@@ -27,7 +27,7 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="row m-auto">
-                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
+                    <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;" *ngIf="getCargarPlantillaTipoVacuna()">
                         <form method="post" class="btn-2" enctype="multipart/form-data">
                             <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                 accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
@@ -128,11 +128,11 @@
                         <td>{{v.nombre}}</td>
                         <td class="justify-content-center">
                             <i id="t-editar" (click)="AbrirEditar(v)" matSuffix matTooltipPosition="right"
-                                matTooltip="Modificar datos de este registro" class="fas fa-edit">
+                                matTooltip="Modificar datos de este registro" class="fas fa-edit" *ngIf="getEditarTipoVacuna()">
                                 <p>Editar</p>
                             </i>
                             <i (click)="ConfirmarDelete(v)" class="far fa-trash-alt" id="t-eliminar" matSuffix
-                                matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                matTooltipPosition="right" matTooltip="Eliminar este registro." *ngIf="getEliminarTipoVacuna()">
                                 <p>Eliminar</p>
                             </i>
                         </td>
@@ -144,7 +144,7 @@
             [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
         <!--  **********************  DESCARGAR REPORTES  ***********************  -->
-        <div>
+        <div *ngIf="getDescargarReportesTipoVacuna()">
             <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
                 <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
                     matTooltipPosition="right" matTooltip="Descargar Lista de Vacunas en formato PDF.">
@@ -208,8 +208,15 @@
                 </tbody>
             </table>
         </div>
-        <mat-paginator [length]="Datos_vacunas.length" [pageSize]="tamanio_paginaMul"
-            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
-        </mat-paginator>
+        <div>
+            <div *ngIf="listaVacunasCorrectas.length > 0" class="item" style="float: left; margin: 5px;" >
+                <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
+                <div class="text">items 'OK' - {{listaVacunasCorrectas.length}}</div>
+            </div>
+            <mat-paginator [length]="Datos_vacunas.length" [pageSize]="tamanio_paginaMul"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
+            </mat-paginator>
+        </div>
+        
     </div>
 </div>

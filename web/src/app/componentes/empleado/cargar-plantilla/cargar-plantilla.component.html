@@ -100,10 +100,17 @@
                             </tbody>
                     </table>
                 </div>
-                <mat-paginator  [length]="DatosNivelesDep.length!" [pageSize]="tamanio_paginaDepaNivel"
+                <div>
+                    <div *ngIf="listaNivelesCorrectas.length > 0" class="item" style="float: left; margin: 5px;" >
+                        <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
+                        <div class="text">items 'OK' - {{listaNivelesCorrectas.length}}</div>
+                    </div>
+                    <mat-paginator  [length]="DatosNivelesDep.length!" [pageSize]="tamanio_paginaDepaNivel"
                         [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'depaNivel')"
                         showFirstLastButtons>
-                </mat-paginator>
+                    </mat-paginator>
+                </div>
+                
             </div>
         </div>
         
@@ -215,10 +222,16 @@
                             </tbody>
                         </table>
                     </div>
-                    <mat-paginator  [length]="DatosContrato.length!" [pageSize]="tamanio_paginaMul"
-                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'contrato')"
-                        showFirstLastButtons>
-                    </mat-paginator>
+                    <div>
+                        <div *ngIf="listaContratosCorrectas.length > 0" class="item" style="float: left; margin: 5px;" >
+                            <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
+                            <div class="text">items 'OK' - {{listaContratosCorrectas.length}}</div>
+                        </div>
+                        <mat-paginator  [length]="DatosContrato.length!" [pageSize]="tamanio_paginaMul"
+                            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'contrato')"
+                            showFirstLastButtons>
+                        </mat-paginator>
+                    </div>
                 </div>
             </div>
     </mat-tab>
@@ -328,10 +341,16 @@
                             </tbody>
                         </table>
                     </div>
-                    <mat-paginator [length]="DatosCargos.length!" [pageSize]="tamanio_paginaMulCargo"
-                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'cargo')"
-                        showFirstLastButtons>
-                    </mat-paginator>
+                    <div>
+                        <div *ngIf="listaCargosCorrectas.length > 0" class="item" style="float: left; margin: 5px;" >
+                            <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
+                            <div class="text">items 'OK' - {{listaCargosCorrectas.length}}</div>
+                        </div>
+                        <mat-paginator [length]="DatosCargos.length!" [pageSize]="tamanio_paginaMulCargo"
+                            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event, 'cargo')"
+                            showFirstLastButtons>
+                        </mat-paginator>
+                    </div>
                 </div>
             </div>
     </mat-tab>

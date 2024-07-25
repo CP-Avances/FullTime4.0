@@ -142,6 +142,7 @@ import { PrincipalSucursalUsuarioComponent } from './componentes/empleado/sucurs
 import { CargarPlantillaComponent } from './componentes/empleado/cargar-plantilla/cargar-plantilla.component';
 import { CatModalidaLaboralComponent } from './componentes/catalogos/catalogoModalidadLaboral/cat-modalida-laboral/cat-modalida-laboral.component';
 import { CatDiscapacidadComponent } from './componentes/catalogos/catalogoDiscapacidad/listar-discapacidad/cat-discapacidad.component';
+import { ActualizacionInformacionComponent } from './componentes/catalogos/catActualizacion/actualizacion-informacion.component';
 import { CatTipoCargosComponent } from './componentes/catalogos/catalogoTipoCargo/listar-tipo-cargo/cat-tipo-cargos.component';
 import { CatVacunasComponent } from './componentes/catalogos/catalogoVacuna/listar-vacuna/cat-vacunas.component';
 import { CommonModule } from '@angular/common';
@@ -293,6 +294,7 @@ const routes: Routes = [
   { path: 'titulos', component: ListarTitulosComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
 
   // ACCESO A RUTAS DE EMPLEADO
+  { path: 'actualizarInformacion', component: ActualizacionInformacionComponent, canActivate: [AuthGuard], data: {roles: 'otros'} },
   { path: 'cargarPlantilla', component: CargarPlantillaComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
   { path: 'modalidaLaboral', component: CatModalidaLaboralComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },
   { path: 'tipoCargos', component: CatTipoCargosComponent, canActivate: [AuthGuard], data: { roles: 'otros' } },

@@ -29,7 +29,6 @@ import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableNivelesEducacion } from 'src/app/model/reportes.model';
-import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-listar-nivel-titulos',
@@ -73,7 +72,7 @@ export class ListarNivelTitulosComponent implements OnInit {
   get logo(): string { return this.plantillaPDF.logoBase64 }
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
-  hipervinculo: string = environment.url;
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;

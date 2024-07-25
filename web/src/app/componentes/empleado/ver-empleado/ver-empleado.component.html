@@ -674,6 +674,37 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start">
+                                            <label id="datosF">Estado cargo:
+                                                <mat-icon id="refrescar" matTooltip="Actualizar información."
+                                                    (click)="ObtenerCargoEmpleado(c.id, formato_fecha)">
+                                                    autorenew
+                                                </mat-icon></label>
+                                        </div>
+                                        <mat-radio-group aria-label="Select an option" [(ngModel)]="c.estado">
+                                            <div class="row">
+                                                <div class="col-md">
+                                                    <div class="d-flex flex-wrap justify-content-start">
+                                                        <mat-radio-button [value]="true"
+                                                            (change)="CambiarEstadoCargo($event, c, 1)">
+                                                            Activo
+                                                        </mat-radio-button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md">
+                                                    <div class="d-flex flex-wrap justify-content-start">
+                                                        <mat-radio-button [value]="false"
+                                                            (change)="CambiarEstadoCargo($event, c, 1)">
+                                                            Inactivo
+                                                        </mat-radio-button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </mat-radio-group>
+                                    </div>
+                                </div>
                                 <div style="text-align: right;">
                                     <i type="submit" id="edit" style="margin-right: 20px;" *ngIf="btnActualizarCargo && getEditarDatos()"
                                         (click)="VerCargoEdicion(false); ObtenerIdCargoSeleccionado(c.id)" matSuffix
@@ -781,6 +812,37 @@
                                             <label id="datosF">Horas de Trabajo:</label>
                                             <label>{{c.hora_trabaja}}</label>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start">
+                                            <label id="datosF">Estado cargo:
+                                                <mat-icon id="refrescar" matTooltip="Actualizar información."
+                                                    (click)="ActualizarDatosCargoSeleccionado(fechaICargo.value)">
+                                                    autorenew
+                                                </mat-icon></label>
+                                        </div>
+                                        <mat-radio-group aria-label="Select an option" [(ngModel)]="c.estado">
+                                            <div class="row">
+                                                <div class="col-md">
+                                                    <div class="d-flex flex-wrap justify-content-start">
+                                                        <mat-radio-button [value]="true"
+                                                            (change)="CambiarEstadoCargo($event, c, 2)">
+                                                            Activo
+                                                        </mat-radio-button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md">
+                                                    <div class="d-flex flex-wrap justify-content-start">
+                                                        <mat-radio-button [value]="false"
+                                                            (change)="CambiarEstadoCargo($event, c, 2)">
+                                                            Inactivo
+                                                        </mat-radio-button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </mat-radio-group>
                                     </div>
                                 </div>
                             </div>
@@ -1547,7 +1609,7 @@
                             <div class="col-md">
                                 <div class="espacio d-flex justify-content-start">
                                     <label id="datosF">N° Permiso:</label>
-                                    <label>{{pt.num_permiso}}</label>
+                                    <label>{{pt.numero_permiso}}</label>
                                 </div>
                                 <div class="espacio d-flex justify-content-start">
                                     <label id="datosF">Motivo:</label>
@@ -1595,11 +1657,11 @@
                                 </div>
                                 <div class="espacio d-flex justify-content-start">
                                     <label id="datosF">Días permiso:</label>
-                                    <label>{{pt.dia}}</label>
+                                    <label>{{pt.dias_permiso}}</label>
                                 </div>
                                 <div class="espacio d-flex justify-content-start">
                                     <label id="datosF">Horas permiso:</label>
-                                    <label>{{pt.hora_numero}}</label>
+                                    <label>{{pt.horas_permiso}}</label>
                                 </div>
                                 <div class="espacio d-flex justify-content-start"
                                     *ngIf="pt.documento != null && pt.documento != ''">

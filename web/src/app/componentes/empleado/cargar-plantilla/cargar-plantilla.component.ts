@@ -7,7 +7,6 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { environment } from 'src/environments/environment';
 import { MetodosComponent } from '../../administracionGeneral/metodoEliminar/metodos.component';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
@@ -23,7 +22,7 @@ export class CargarPlantillaComponent implements OnInit {
 
   archivoForm = new FormControl('', Validators.required);
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
-  hipervinculo: string = environment.url
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
 
   // ITEMS DE PAGINACION DE LA TABLA
   pageSizeOptions = [5, 10, 20, 50];

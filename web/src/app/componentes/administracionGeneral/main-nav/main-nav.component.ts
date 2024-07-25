@@ -89,6 +89,9 @@ export class MainNavComponent implements OnInit {
   vistaEmpleados: boolean = false;
   vistaAdministrarInformacion: boolean = false;
   vistaCargarPlantillas: boolean = false;
+  vistaDiscapacidades: boolean = false;
+  vistaVacunas: boolean = false;
+  vistaActualizarInformacion: boolean = false;
 
   itemHorarios: boolean = false;
   childrenHorarios: any = [];
@@ -740,6 +743,39 @@ export class MainNavComponent implements OnInit {
                         this.childrenUsuarios.push({name: 'Título Profesional', url: '/titulos', color: true, ver: true}); 
                       }
                       break;
+                    case 'discapacidades':
+                      this.itemUsuarios = true;
+                      for (const parametrizacion of this.childrenUsuarios) {
+                        if(parametrizacion.url === '/discapacidades'){
+                          this.vistaDiscapacidades = true;
+                        }
+                      }
+                      if(!this.vistaDiscapacidades){
+                        this.childrenUsuarios.push({name: 'Tipo Discapacidad', url: '/discapacidades', color: true, ver: true}); 
+                      }
+                    break;
+                    case 'vacunas':
+                      this.itemUsuarios = true;
+                      for (const parametrizacion of this.childrenUsuarios) {
+                        if(parametrizacion.url === '/vacunas'){
+                          this.vistaVacunas = true;
+                        }
+                      }
+                      if(!this.vistaVacunas){
+                        this.childrenUsuarios.push({name: 'Tipo Vacunas', url: '/vacunas', color: true, ver: true}); 
+                      }
+                    break;
+                    case 'actualizarInformacion':
+                      this.itemUsuarios = true;
+                      for (const parametrizacion of this.childrenUsuarios) {
+                        if(parametrizacion.url === '/actualizarInformacion'){
+                          this.vistaActualizarInformacion = true;
+                        }
+                      }
+                      if(!this.vistaActualizarInformacion){
+                        this.childrenUsuarios.push({name: 'Actualizar Información', url: '/actualizarInformacion', color: true, ver: true}); 
+                      }
+                    break;
                     case 'empleado':
                       this.itemUsuarios = true;
                       for (const parametrizacion of this.childrenUsuarios) {
@@ -2202,11 +2238,10 @@ export class MainNavComponent implements OnInit {
               }
               //FIN COMPLEMENTO DE ELEMENTOS
               this.LlamarDatos();
-              console.log('DATOS_EMPRESA_', this.datosEmpresa);
               //ACTUALIZACION DE NOMBRE DE EMPRESA EN PESTAÑA EMPRESA
               
               const indexNombreEmpresa = this.childrenParametrizacion.findIndex(item => item.name === 'Empresa');
-              if(indexNombreEmpresa !== -1){
+              if(indexNombreEmpresa !== -1 && localStorage.getItem('name_empresa')){
                 this.childrenParametrizacion[indexNombreEmpresa].name = localStorage.getItem('name_empresa');
               }
             }

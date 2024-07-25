@@ -3,7 +3,6 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
-import { environment } from 'src/environments/environment';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -41,7 +40,7 @@ export class CatTipoCargosComponent {
   archivoForm = new FormControl('', Validators.required);
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
-  hipervinculo: string = environment.url
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
 
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;

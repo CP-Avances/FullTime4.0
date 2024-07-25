@@ -19,9 +19,9 @@ export const conteoPermisos = function () {
                 `
                 SELECT p.descripcion, p.fecha_inicio, p.fecha_final, p.hora_numero, p.id_periodo_vacacion, 
                     e.id AS id_empleado 
-                FROM mp_solicitud_permiso p, eu_empleado_contratos con, eu_empleados e 
+                FROM mp_solicitud_permiso p, eu_empleado_contratos con, eu_empleados e, eu_empleado_cargos AS ce 
                 WHERE CAST(p.fec_final AS VARCHAR) LIKE $1 || \'%\' AND p.estado like \'Aceptado\' 
-                    AND con.id = p.id_empleado_contrato AND con.id_empleado = e.id 
+                    AND ce.id = p.id_empleado_cargo AND con.id_empleado = e.id AND con.id = ce.id_contrato
                 ORDER BY p.fecha_final DESC
                 `
                 , [fecha]);

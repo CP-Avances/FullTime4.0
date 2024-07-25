@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DocumentosService } from 'src/app/servicios/documentos/documentos.service';
-import { environment } from '../../../../environments/environment';
 import { SubirDocumentoComponent } from '../../documentos/subir-documento/subir-documento.component';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 

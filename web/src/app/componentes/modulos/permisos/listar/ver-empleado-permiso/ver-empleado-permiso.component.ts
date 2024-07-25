@@ -1,6 +1,5 @@
 // IMPORTAR LIBRERIAS
 import { Component, OnInit } from '@angular/core';
-import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';

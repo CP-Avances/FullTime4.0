@@ -2,7 +2,6 @@ import { TooltipComponent, LegendComponent, GridComponent } from 'echarts/compon
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { CanvasRenderer } from 'echarts/renderers';
-import { environment } from 'src/environments/environment';
 import { ToastrService } from 'ngx-toastr';
 import { BarChart } from 'echarts/charts';
 import * as echarts_hora from 'echarts/core';

@@ -275,6 +275,18 @@ mat-progress-spinner {
     z-index: 100;
 }
 
+.item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: small;
+  }
+
+  .icon {
+    margin-right: 10px;
+  }
+
 /* ESTILLO PARA CENTRAR LOS TITULOS DE LAS TABLAS DE FORMA VERTICAL */
 #cabecera {
     vertical-align: middle;

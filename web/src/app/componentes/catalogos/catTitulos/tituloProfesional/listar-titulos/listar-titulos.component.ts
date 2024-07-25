@@ -30,7 +30,6 @@ import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.ser
 import { ITableProvincias } from 'src/app/model/reportes.model';
 import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-listar-titulos',
@@ -75,7 +74,7 @@ export class ListarTitulosComponent implements OnInit {
   get logo(): string { return this.plantillaPDF.logoBase64 }
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
-  hipervinculo: string = environment.url;
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;

@@ -99,7 +99,7 @@ class RolPermisosControlador {
     }
   }
 
-  //FIXME ARREGLAR SQL
+  //FIXME SQL
   // METODO PARA BUSCAR ID DE PAGINAS Y MENU LATERAL
   public async ObtenerPaginasMenuRol(req: Request, res: Response): Promise<any> {
     const { id_rol } = req.body;

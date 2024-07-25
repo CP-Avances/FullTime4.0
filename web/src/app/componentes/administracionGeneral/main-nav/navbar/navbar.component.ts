@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 
-import { environment } from 'src/environments/environment';
-
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',

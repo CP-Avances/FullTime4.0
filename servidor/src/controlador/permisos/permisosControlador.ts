@@ -2,7 +2,7 @@ import {
     enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, Credenciales, fechaHora,
     FormatearFecha, FormatearHora, dia_completo, FormatearFecha2
 } from '../../libs/settingsMail';
-import { ObtenerRutaPermisos, ObtenerRutaPermisosIdEmpleado } from '../../libs/accesoCarpetas';
+import { ObtenerRutaPermisos, ObtenerRutaPermisosGeneral, ObtenerRutaPermisosIdEmpleado } from '../../libs/accesoCarpetas';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
@@ -10,6 +10,7 @@ import fs from 'fs';
 import pool from '../../database';
 import path from 'path';
 import moment from 'moment';
+import { carpeta } from '../documentos/documentosControlador';
 moment.locale('es');
 
 class PermisosControlador {
@@ -164,7 +165,7 @@ class PermisosControlador {
         }
 
         return res.status(200).jsonp({ message, permiso });
-        
+
     }
 
     // METODO PARA EDITAR SOLICITUD DE PERMISOS
@@ -202,7 +203,7 @@ class PermisosControlador {
             const response: QueryResult = await pool.query(
                 `
                 UPDATE mp_solicitud_permiso SET descripcion = $1, fecha_inicio = $2, fecha_final = $3, dias_permiso = $4, 
-                    dia_libre = $5, id_tipo_permiso = $6, hora_numero = $7, numero_permiso = $8, hora_salida = $9, 
+                    dia_libre = $5, id_tipo_permiso = $6, horas_permiso = $7, numero_permiso = $8, hora_salida = $9, 
                     hora_ingreso = $10, id_periodo_vacacion = $11, fecha_edicion = $12
                 WHERE id = $13 RETURNING *
                 `
@@ -265,7 +266,7 @@ class PermisosControlador {
                     eu_configurar_alertas AS c, ed_departamentos AS cg 
                 WHERE n.id_departamento = $1
                     AND da.id_departamento = n.id_departamento_nivel
-                    AND dae.id_cargo = da.id_empl_cargo
+                    AND dae.id_cargo = da.id_empleado_cargo
                     AND dae.id = c.id_empleado
                     AND cg.id = n.id_departamento
                 ORDER BY nivel ASC
@@ -274,19 +275,19 @@ class PermisosControlador {
                 [depa_user_loggin]).then((result: any) => { return result.rows });
 
             if (JefesDepartamentos.length === 0) {
-                return res.status(400)
+                return res.status(200)
                     .jsonp({
-                        message: `Ups!!! algo salio mal. 
-                    Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`,
+                        message: `Revisar configuración de departamento y autorización de solicitudes.`,
                         permiso: permiso
                     });
             }
             else {
                 permiso.EmpleadosSendNotiEmail = JefesDepartamentos
-                return res.status(200).jsonp(permiso);
+                return res.status(200).jsonp({message: 'ok', permiso});
             }
         } catch (error) {
             // REVERTIR TRANSACCION
+            console.log('error ', error)
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error' });
         }
@@ -308,7 +309,7 @@ class PermisosControlador {
         }
 
         return res.status(200).jsonp({ message });
-       
+
     }
 
     // ELIMINAR DOCUMENTO DE RESPALDO DE PERMISO  
@@ -316,6 +317,7 @@ class PermisosControlador {
 
         try {
             const { id, archivo, codigo, user_name, ip } = req.body
+            console.log('ver data ', id, ' ', archivo, ' ', codigo, ' ', user_name, ' ', ip)
             let separador = path.sep;
 
             // INICIAR TRANSACCION
@@ -347,7 +349,7 @@ class PermisosControlador {
                 UPDATE mp_solicitud_permiso SET documento = null WHERE id = $1 RETURNING *
                 `
                 , [id]);
-            
+
             const [datosNuevos] = actualizacion.rows;
 
             // AUDITORIA
@@ -413,7 +415,7 @@ class PermisosControlador {
             const PERMISO = await pool.query(
                 `
                 SELECT p.id, p.fecha_creacion, p.descripcion, p.fecha_inicio, p.fecha_final, p.dias_permiso, 
-                    p.horas_permiso, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso, p.id_empleado_contrato, 
+                    p.horas_permiso, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso,  
                     p.id_periodo_vacacion, p.numero_permiso, p.documento, p.hora_salida, p.hora_ingreso, e.codigo, 
                     t.descripcion AS nom_permiso, t.tipo_descuento 
                 FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS t, eu_empleados AS e
@@ -437,8 +439,8 @@ class PermisosControlador {
             FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS tp, eu_empleado_contratos AS ec, 
                 ere_cat_regimenes AS cr, datos_actuales_empleado AS da, eu_empleado_cargos AS ce, e_sucursales AS s,
                 e_ciudades AS c, e_empresa AS e, e_cat_tipo_cargo AS tc
-            WHERE p.id_tipo_permiso = tp.id AND ec.id = p.id_empleado_contrato AND cr.id = ec.id_regimen
-                AND da.id = p.id_empleado AND ce.id_contrato = p.id_empleado_contrato
+            WHERE p.id_tipo_permiso = tp.id AND ec.id = ce.id_contrato AND cr.id = ec.id_regimen
+                AND da.id = p.id_empleado AND ce.id = p.id_empleado_cargo
                 AND s.id = ce.id_sucursal AND s.id_ciudad = c.id AND s.id_empresa = e.id AND tc.id = ce.id_tipo_cargo
                 AND p.id = $1
             `
@@ -455,8 +457,7 @@ class PermisosControlador {
     // METODO PARA ELIMINAR PERMISO
     public async EliminarPermiso(req: Request, res: Response): Promise<Response> {
         try {
-            const { user_name, ip } = req.body;
-            let { id_permiso, doc, codigo } = req.params;
+            const { user_name, ip, id_permiso, doc, codigo } = req.body;
             let separador = path.sep;
 
             // INICIAR TRANSACCION
@@ -474,30 +475,26 @@ class PermisosControlador {
                     datosOriginales: '',
                     datosNuevos: '',
                     ip,
-                    observacion: `Error al intentar eliminar permiso con id: ${id_permiso}`
+                    observacion: `Error al intentar eliminar notificación con id_permiso: ${id_permiso}`
                 });
-
-                // FINALIZAR TRANSACCION
-                await pool.query('COMMIT');
-                return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
+            } else {
+                await pool.query(
+                    `
+                    DELETE FROM ecm_realtime_notificacion where id_permiso = $1
+                    `
+                    , [id_permiso]);
+    
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'ecm_realtime_notificacion',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: JSON.stringify(datosOriginalesRealTime),
+                    datosNuevos: '',
+                    ip,
+                    observacion: null
+                });
             }
-
-            await pool.query(
-                `
-                DELETE FROM ecm_realtime_notificacion where id_permiso = $1
-                `
-                , [id_permiso]);
-
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'ecm_realtime_notificacion',
-                usuario: user_name,
-                accion: 'D',
-                datosOriginales: JSON.stringify(datosOriginalesRealTime),
-                datosNuevos: '',
-                ip,
-                observacion: null
-            });
 
             // CONSULTAR DATOSORIGINALESAUTORIZACIONES
             const consultaAutorizaciones = await pool.query(`SELECT * FROM ecm_autorizaciones WHERE id_permiso = $1`, [id_permiso]);
@@ -511,7 +508,7 @@ class PermisosControlador {
                     datosOriginales: '',
                     datosNuevos: '',
                     ip,
-                    observacion: `Error al intentar eliminar permiso con id: ${id_permiso}`
+                    observacion: `Error al intentar eliminar autorización con id_permiso: ${id_permiso}`
                 });
 
                 // FINALIZAR TRANSACCION
@@ -591,7 +588,6 @@ class PermisosControlador {
             await pool.query('COMMIT');
 
             if (doc != 'null' && doc != '' && doc != null) {
-                console.log(id_permiso, doc, ' entra ');
                 let ruta = await ObtenerRutaPermisos(codigo) + separador + doc;
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs.access(ruta, fs.constants.F_OK, (err) => {
@@ -613,6 +609,7 @@ class PermisosControlador {
             }
         } catch (error) {
             // REVERTIR TRANSACCION
+            console.log('error ', error)
             await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'error' });
         }
@@ -635,16 +632,93 @@ class PermisosControlador {
 
     // METODO PARA CREAR MULTIPLES PERMISOS
     public async CrearPermisosMultiples(req: Request, res: Response): Promise<any> {
-        try {
-           const { permisos, user_name, ip } = req.body;
-           let error: boolean = false;
+        const { permisos } = req.body;
 
-           for ( const permiso of permisos ) {
-            
-           }
+        // copnvertir permisos que esta en json a array
+        const permisosArray = JSON.parse(permisos);
+
+
+        const fecha = moment();
+        const anio = fecha.format('YYYY');
+        const mes = fecha.format('MM');
+        const dia = fecha.format('DD');
+
+        let errorPermisos: boolean = false;
+
+        const separador = path.sep;
+        const nombreArchivo = req.file?.originalname;
+        const carpetaPermisos = await ObtenerRutaPermisosGeneral();
+        const documentoTemporal = `${carpetaPermisos}${separador}${anio}_${mes}_${dia}_${nombreArchivo}`;
+        let permisosCorrectos: any = [];
+        let mensaje: string = '';
+
+        for ( const datos of permisosArray ) {
+            const { message, error, permiso } = await CrearPermiso(datos);
+            mensaje = message;
+
+            if (error) {
+                console.error('Error al crear permiso:', message);
+                errorPermisos = true;
+                continue;
+            }
+
+            if (datos.subir_documento) {
+                try {
+                    const carpetaEmpleado = await ObtenerRutaPermisos(permiso.codigo);
+    
+                    const consulta = await pool.query(`SELECT numero_permiso FROM mp_solicitud_permiso WHERE id = $1`, [permiso.id]);
+                    const numeroPermiso = consulta.rows[0].numero_permiso;
+        
+                    const documento = `${carpetaEmpleado}${separador}${numeroPermiso}_${permiso.codigo}_${anio}_${mes}_${dia}_${nombreArchivo}`;
+                    permiso.nombreArchivo = nombreArchivo;
+    
+                    fs.copyFileSync(documentoTemporal, documento);
+                    
+                    const { message: messageDoc, error: errorDoc, documento: nombreDocumento } = await RegistrarDocumentoPermiso(permiso);
+    
+                    if (errorDoc) {
+                        console.error('Error al registrar documento:', messageDoc);
+                        errorPermisos = true;
+                        continue;
+                    }
+
+                    permiso.documento = nombreDocumento;
+    
+                    
+                } catch (error) {
+                    console.error('Error al copiar el archivo:', error);
+                    errorPermisos = true;
+                    continue;
+                }
+            }
+
+            const permisoCreado = {datos, permiso};
+                
+            permisosCorrectos.push(permisoCreado);
+        }
+
+        try {
+            if (fs.existsSync(documentoTemporal)) {
+                fs.unlinkSync(documentoTemporal);
+            }
+        } catch (error) {
+            console.error('Error al eliminar el archivo temporal:', error);
+        }
+
+        if (errorPermisos) {
+            return res.status(500).jsonp({ message: 'Error al crear permisos.' });
+        }
+
+        return res.status(200).jsonp({ message: mensaje, permisos: permisosCorrectos });
+
+    }
+
+    // METODO PARA GUARDAR DOCUMENTOS DE PERMISOS MULTIPLES
+    public async GuardarDocumentosPermisosMultiples(req: Request, res: Response): Promise<any> {
+        try {
             
         } catch (error) {
-            
+
         }
     }
 
@@ -1076,9 +1150,10 @@ class PermisosControlador {
                 (e.nombre || \' \' || e.apellido) AS fullname, e.cedula, da.correo, cp.descripcion AS nom_permiso, 
                 ec.id AS id_contrato, da.id_departamento AS id_depa, da.codigo, depa.nombre AS depa_nombre 
             FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp, 
-                datos_actuales_empleado AS da, ed_departamentos AS depa
-            WHERE p.id_empleado_contrato = ec.id AND ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id 
-                AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 1 OR p.estado = 2)
+                datos_actuales_empleado AS da, ed_departamentos AS depa, eu_empleado_cargos AS ce
+            WHERE p.id_empleado_cargo = ce.id AND ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id 
+                AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 1 OR p.estado = 2) 
+                AND ce.id_contrato = ec.id
             ORDER BY estado DESC, fecha_creacion DESC
             `
         );
@@ -1100,9 +1175,10 @@ class PermisosControlador {
                 (e.nombre || \' \' || e.apellido) AS fullname, e.cedula, cp.descripcion AS nom_permiso, 
                 ec.id AS id_contrato, da.id_departamento AS id_depa, da.codigo, depa.nombre AS depa_nombre 
             FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp, 
-                datos_actuales_empleado AS da, ed_departamentos AS depa
-            WHERE p.id_empleado_contrato = ec.id AND ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id 
+                datos_actuales_empleado AS da, ed_departamentos AS depa, eu_empleado_cargos AS ce
+            WHERE p.id_empleado_cargo = ce.id AND ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id 
                 AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 3 OR p.estado = 4)
+                AND ce.id_contrato = ec.id
             ORDER BY estado ASC, fecha_creacion DESC
             `
         );
@@ -1121,7 +1197,7 @@ class PermisosControlador {
             const PERMISO = await pool.query(
                 `
                 SELECT p.id, p.fecha_creacion, p.descripcion, p.fecha_inicio, p.fecha_final, p.dias_permiso, 
-                    p.horas_permiso, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso, p.id_empleado_contrato, 
+                    p.horas_permiso, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso, p.id_empleado_cargo, 
                     p.id_periodo_vacacion, p.numero_permiso, p.documento, p.hora_salida, p.hora_ingreso, p.id_empleado, 
                     t.descripcion AS nom_permiso
                 FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS t
@@ -1228,7 +1304,7 @@ class PermisosControlador {
                 UPDATE mp_solicitud_permiso SET estado = $1 WHERE id = $2 RETURNING *
                 `
                 , [estado, id]);
-            
+
             const [datosNuevos] = actualizacion.rows;
 
             // AUDITORIA
@@ -1262,9 +1338,10 @@ class PermisosControlador {
                 p.horas_permiso, p.documento, p.fecha_final, p.estado, p.id_empleado_cargo, e.nombre, 
                 e.apellido, e.cedula, e.id AS id_empleado, e.codigo, cp.id AS id_tipo_permiso, 
                 cp.descripcion AS nom_permiso, ec.id AS id_contrato 
-            FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp 
-            WHERE p.id = $1 AND p.id_empleado_contrato = ec.id AND ec.id_empleado = e.id 
-                AND p.id_tipo_permiso = cp.id
+            FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp,
+                eu_empleado_cargos AS ce
+            WHERE p.id = $1 AND p.id_empleado_cargo = ce.id AND ec.id_empleado = e.id 
+                AND p.id_tipo_permiso = cp.id AND ce.id_contrato = ec.id
             `
             , [id]);
         if (PERMISOS.rowCount != 0) {
@@ -1623,17 +1700,17 @@ const generarTablaHTMLWeb = async function (datos: any[], tipo: any): Promise<st
 };
 
 async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
-    try { 
+    try {
         const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
-            id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
+            id_tipo_permiso, id_peri_vacacion, hora_numero, num_permiso,
             estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado,
-            depa_user_loggin, user_name, ip, subir_documento } = datos;
+            depa_user_loggin, user_name, ip, subir_documento, codigo } = datos;
 
-        let codigoEmpleado = '';
+        let codigoEmpleado = codigo || '';
 
         if (subir_documento) {
             try {
-                const {carpetaPermisos, codigo} = await ObtenerRutaPermisosIdEmpleado(id_empleado);
+                const { carpetaPermisos, codigo } = await ObtenerRutaPermisosIdEmpleado(id_empleado);
                 codigoEmpleado = codigo;
                 fs.access(carpetaPermisos, fs.constants.F_OK, (err) => {
                     if (err) {
@@ -1642,9 +1719,9 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
                             if (err2) {
                                 console.log('Error al intentar crear carpeta de permisos.', err2);
                                 throw new Error('Error al intentar crear carpeta de permisos.');
-                            } 
+                            }
                         });
-                    } 
+                    }
                 });
             } catch (error) {
                 throw new Error('Error al intentar acceder a la carpeta de permisos.');
@@ -1657,13 +1734,13 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
         const response: QueryResult = await pool.query(
             `
             INSERT INTO mp_solicitud_permiso (fecha_creacion, descripcion, fecha_inicio, fecha_final, dias_permiso, 
-                legalizado, dia_libre, id_tipo_permiso, id_empleado_contrato, id_periodo_vacacion, horas_permiso, 
+                legalizado, dia_libre, id_tipo_permiso, id_periodo_vacacion, horas_permiso, 
                 numero_permiso, estado, id_empleado_cargo, hora_salida, hora_ingreso, id_empleado) 
-            VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17 ) 
+            VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16 ) 
                 RETURNING * 
             `,
             [fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
-                id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
+                id_tipo_permiso, id_peri_vacacion, hora_numero, num_permiso,
                 estado, id_empl_cargo, hora_salida, hora_ingreso, id_empleado]);
 
         const [objetoPermiso] = response.rows;
@@ -1694,7 +1771,7 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
-        if (!objetoPermiso) return {message: 'Solicitud no registrada.', error: true};
+        if (!objetoPermiso) return { message: 'Solicitud no registrada.', error: true };
 
         const permiso = objetoPermiso;
         const JefesDepartamentos = await pool.query(
@@ -1715,23 +1792,24 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
             [depa_user_loggin]).then((result: any) => { return result.rows });
 
         if (JefesDepartamentos.length === 0) {
-            return {message: 'Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.', error: false, permiso};
+            return {message: 'Revisar configuración de departamento y autorización de solicitudes.', error: false, permiso};
         }
         else {
             permiso.EmpleadosSendNotiEmail = JefesDepartamentos
-            return {message: 'ok', error: false, permiso};
+            return { message: 'ok', error: false, permiso };
         }
     } catch (error) {
         // REVERTIR TRANSACCION
+        console.log('Error al crear permiso: ', error);
         await pool.query('ROLLBACK');
-        return {message: 'Error al crear permiso.', error: true};
+        return { message: 'Error al crear permiso.', error: true };
     }
 }
 
 async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> {
     try {
 
-        const {id_permiso, codigo, nombreArchivo, user_name, ip} = datos;
+        const {id, codigo, nombreArchivo, user_name, ip, eliminar} = datos;
 
         const fecha = moment();
         const anio = fecha.format('YYYY');
@@ -1742,7 +1820,7 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
         await pool.query('BEGIN');
 
         // CONSULTAR DATOSORIGINALES
-        const consulta = await pool.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id_permiso]);
+        const consulta = await pool.query(`SELECT * FROM mp_solicitud_permiso WHERE id = $1`, [id]);
         const [datosOriginales] = consulta.rows;
 
         if (!datosOriginales) {
@@ -1753,12 +1831,12 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
                 datosOriginales: '',
                 datosNuevos: '',
                 ip,
-                observacion: `Error al intentar actualizar permiso con id: ${id_permiso}`
+                observacion: `Error al intentar actualizar permiso con id: ${id}`
             });
 
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
-            return {message: 'Solicitud no registrada.', error: true};
+            return { message: 'Solicitud no registrada.', error: true };
         }
 
         const numeroPermiso = consulta.rows[0].numero_permiso;
@@ -1768,37 +1846,37 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
             `
             UPDATE mp_solicitud_permiso SET documento = $1 WHERE id = $2 RETURNING *
             `
-            , [documento, id_permiso]);
+            , [documento, id]);
 
         const [datosNuevos] = response.rows;
 
         const fechaCreacionN = await FormatearFecha2(datosOriginales.fecha_creacion, 'ddd');
-            const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
-            const fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
-            const fechaEdicionO = await FormatearFecha2(datosOriginales.fecha_edicion, 'ddd');
-            const horaSalidaO = await FormatearHora(datosOriginales.hora_salida);
-            const horaIngresoO = await FormatearHora(datosOriginales.hora_ingreso);
+        const fechaInicioO = await FormatearFecha2(datosOriginales.fecha_inicio, 'ddd');
+        const fechaFinalO = await FormatearFecha2(datosOriginales.fecha_final, 'ddd');
+        const fechaEdicionO = await FormatearFecha2(datosOriginales.fecha_edicion, 'ddd');
+        const horaSalidaO = await FormatearHora(datosOriginales.hora_salida);
+        const horaIngresoO = await FormatearHora(datosOriginales.hora_ingreso);
 
-            datosOriginales.fecha_creacion = fechaCreacionN;
-            datosOriginales.fecha_edicion = fechaEdicionO;
-            datosOriginales.fecha_inicio = fechaInicioO;
-            datosOriginales.fecha_final = fechaFinalO;
-            datosOriginales.hora_salida = horaSalidaO;
-            datosOriginales.hora_ingreso = horaIngresoO;
+        datosOriginales.fecha_creacion = fechaCreacionN;
+        datosOriginales.fecha_edicion = fechaEdicionO;
+        datosOriginales.fecha_inicio = fechaInicioO;
+        datosOriginales.fecha_final = fechaFinalO;
+        datosOriginales.hora_salida = horaSalidaO;
+        datosOriginales.hora_ingreso = horaIngresoO;
 
-            datosNuevos.fecha_creacion = fechaCreacionN;
-            datosNuevos.fecha_edicion = fechaEdicionO;
-            datosNuevos.fecha_inicio = fechaInicioO;
-            datosNuevos.fecha_final = fechaFinalO;
-            datosNuevos.hora_salida = horaSalidaO;
-            datosNuevos.hora_ingreso = horaIngresoO;
+        datosNuevos.fecha_creacion = fechaCreacionN;
+        datosNuevos.fecha_edicion = fechaEdicionO;
+        datosNuevos.fecha_inicio = fechaInicioO;
+        datosNuevos.fecha_final = fechaFinalO;
+        datosNuevos.hora_salida = horaSalidaO;
+        datosNuevos.hora_ingreso = horaIngresoO;
 
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
             tabla: 'mp_solicitud_permiso',
             usuario: user_name,
             accion: 'U',
-            datosOriginales: '',
+            datosOriginales: JSON.stringify(datosOriginales),
             datosNuevos: JSON.stringify(datosNuevos),
             ip, observacion: null
         });
@@ -1806,18 +1884,39 @@ async function RegistrarDocumentoPermiso(datos: any): Promise<RespuestaPermiso> 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
 
-        return {message: 'Documento actualizado.', error: false};
+        if (eliminar === 'true') {
+            await EliminarDocumentoServidor(codigo, datosOriginales.documento);
+        }
+
+        return {message: 'Documento actualizado.', error: false, documento};
     } catch (error) {
         // REVERTIR TRANSACCION
+        console.log('Error al registrar documento del permiso: ', error);
         await pool.query('ROLLBACK');
-        return {message: 'Error al registrar documento del permiso.', error: true};
+        return { message: 'Error al registrar documento del permiso.', error: true };
     }
+}
+
+async function EliminarDocumentoServidor(codigo: string, nombreDocumento: string){
+
+    const carpetaPermisos = await ObtenerRutaPermisos(codigo);
+    const separador = path.sep;
+
+    const ruta = `${carpetaPermisos}${separador}${nombreDocumento}`;
+
+    fs.access(ruta, fs.constants.F_OK, (err) => {
+        if (err) {
+        } else {
+            fs.unlinkSync(ruta);
+        }
+    });
 }
 
 interface RespuestaPermiso {
     message: string;
     error: boolean;
     permiso?: any;
+    documento?: any;
 }
 
 export const PERMISOS_CONTROLADOR = new PermisosControlador();

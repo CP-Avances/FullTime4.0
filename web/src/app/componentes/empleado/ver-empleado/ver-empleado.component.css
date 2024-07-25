@@ -414,3 +414,12 @@ td {
     left: 70px;
     background-color: #f0f0f0;
 }
+
+#refrescar {
+    font-size: 18px;
+    color: blue;
+    cursor: pointer;
+    text-align: center;
+    margin-left: 5px;
+    padding-top: 9px;
+}

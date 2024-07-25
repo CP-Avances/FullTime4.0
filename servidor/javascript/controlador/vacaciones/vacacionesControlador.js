@@ -42,12 +42,11 @@ class VacacionesControlador {
             const { estado } = req.body;
             const VACACIONES = yield database_1.default.query(`
       SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
-        v.id, v.id_periodo_vacacion, v.id_empleado_cargo, dc.contrato_id, e.id AS id_empl_solicita, da.id_departamento, 
+        v.id, v.id_periodo_vacacion, dc.contrato_id, e.id AS id_empl_solicita, da.id_departamento, 
 	      e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, da.codigo, depa.nombre AS depa_nombre
       FROM mv_solicitud_vacacion AS v, datos_empleado_cargo AS dc, eu_empleados AS e, datos_actuales_empleado AS da, 
         ed_departamentos AS depa   
-      WHERE dc.cargo_id = v.id_empleado_cargo 
-	      AND dc.empl_id = e.id  
+      WHERE dc.empl_id = e.id  
 	      AND da.id_contrato = dc.contrato_id
         AND depa.id = da.id_departamento
 	      AND (v.estado = 1 OR v.estado = 2) 
@@ -66,10 +65,10 @@ class VacacionesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const VACACIONES = yield database_1.default.query(`
       SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
-        v.id, v.id_periodo_vacacion, v.id_empleado_cargo, e.id AS id_empl_solicita, e.nombre, e.apellido, 
+        v.id, v.id_periodo_vacacion, e.id AS id_empl_solicita, e.nombre, e.apellido, 
         (e.nombre || \' \' || e.apellido) AS fullname, dc.codigo, depa.nombre AS depa_nombre 
 	    FROM mv_solicitud_vacacion AS v, datos_empleado_cargo AS dc, eu_empleados AS e, ed_departamentos AS depa   
-	    WHERE dc.cargo_id = v.id_empleado_cargo AND dc.empl_id = e.id  AND depa.id = dc.id_departamento
+	    WHERE dc.empl_id = e.id  AND depa.id = dc.id_departamento
 	      AND (v.estado = 3 OR v.estado = 4) 
       ORDER BY id DESC
       `);
@@ -133,15 +132,15 @@ class VacacionesControlador {
     CrearVacaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado, id_peri_vacacion, depa_user_loggin, id_empl_cargo, id_empleado, user_name, ip } = req.body;
+                const { fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado, id_peri_vacacion, id_empleado, user_name, ip } = req.body;
                 // INICIAR TRANSACCIÓN
                 yield database_1.default.query('BEGIN');
                 const response = yield database_1.default.query(`
         INSERT INTO mv_solicitud_vacacion (fecha_inicio, fecha_final, fecha_ingreso, estado, dia_libre, dia_laborable, 
-          legalizado, id_periodo_vacacion, id_empleado_cargo, id_empleado)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
+          legalizado, id_periodo_vacacion, id_empleado)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
         `, [fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado, id_peri_vacacion,
-                    id_empl_cargo, id_empleado]);
+                    id_empleado]);
                 const [objetoVacacion] = response.rows;
                 // AUDITORIA
                 yield auditoriaControlador_1.default.InsertarAuditoria({
@@ -411,7 +410,7 @@ class VacacionesControlador {
             const id = req.params.id;
             const VACACIONES = yield database_1.default.query(`
       SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, 
-        v.legalizado, v.id, v.id_periodo_vacacion, v.id_empleado_cargo, e.id AS id_empleado,
+        v.legalizado, v.id, v.id_periodo_vacacion, e.id AS id_empleado,
         (e.nombre || ' ' || e.apellido) AS fullname, e.cedula
       FROM mv_solicitud_vacacion AS v, eu_empleados AS e 
       WHERE v.id = $1 AND e.id = v.id_empleado

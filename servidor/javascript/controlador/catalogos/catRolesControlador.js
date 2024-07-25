@@ -184,6 +184,36 @@ class RolesControlador {
             }
         });
     }
+    //CONSULTA PARA OPTENER LOS USUARIOS CON NO SON JEFES Y ADMINISTRAR UN DEPARTAMENTO
+    ListarRolesUsuario(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log('entro en el controlador :)');
+            try {
+                const ROL = yield database_1.default.query(`
+        SELECT data_empl.codigo, data_empl.cedula, CONCAT(TRIM(data_empl.nombre), ' ',TRIM(data_empl.apellido)) AS nombre, 
+	            data_empl.id_rol, rol.nombre AS rol, empl_car.id_departamento, depa.nombre AS departamento,
+	            empl_car.id_sucursal, sucu.nombre AS sucursal, empl_car.id_tipo_cargo, cargo.cargo 
+        FROM eu_usuario_departamento AS usu_dep, eu_empleado_cargos AS empl_car, datos_actuales_empleado AS data_empl,
+	          ed_departamentos AS depa, e_sucursales AS sucu, e_cat_tipo_cargo AS cargo, ero_cat_roles AS rol
+        WHERE usu_dep.id_empleado = data_empl.id AND usu_dep.principal = true AND usu_dep.personal = true AND 
+	          usu_dep.administra = false AND empl_car.id = data_empl.id_cargo AND empl_car.jefe = false AND
+	          depa.id = empl_car.id_departamento AND sucu.id = empl_car.id_sucursal AND cargo.id = empl_car.id_tipo_cargo AND
+	          data_empl.id_rol != 1 AND rol.id = data_empl.id_rol order by nombre ASC
+        `);
+                if (ROL.rowCount != 0) {
+                    return res.jsonp({ message: 'Registros encontrados', lista: ROL.rows });
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'Registros no encontrados.' });
+                }
+            }
+            catch (error) {
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+            }
+        });
+    }
 }
 const ROLES_CONTROLADOR = new RolesControlador();
 exports.default = ROLES_CONTROLADOR;

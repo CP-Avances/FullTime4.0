@@ -22,13 +22,87 @@ const fs_1 = __importDefault(require("fs"));
 const settingsMail_1 = require("../../../libs/settingsMail");
 const xlsx_1 = __importDefault(require("xlsx"));
 class EmpleadoCargosControlador {
+    // METODO PARA BUSCAR ULTIMO CONTRATO
+    BuscarCargosActivos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.body;
+            const CARGO = yield database_1.default.query(`
+      SELECT e.id AS id_empleado,econ.id AS id_contrato, ecar.id AS id_cargo
+      FROM eu_empleado_cargos AS ecar, eu_empleado_contratos AS econ, eu_empleados AS e
+      WHERE e.id = econ.id_empleado AND econ.id = ecar.id_contrato AND ecar.estado = true AND e.id = $1;
+      `, [id_empleado]);
+            if (CARGO.rowCount != 0) {
+                return res.jsonp({ message: 'contrato_cargo', datos: CARGO.rows[0] });
+            }
+            else {
+                return res.status(404).jsonp({ message: 'No se han encontrado registro.' });
+            }
+        });
+    }
+    // METODO PARA ACTUALIZAR ESTADO DEL CARGO
+    EditarEstadoCargo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_cargo, estado, user_name, ip } = req.body;
+                // INICIAR TRANSACCION
+                yield database_1.default.query('BEGIN');
+                // CONSULTAR DATOSORIGINALES
+                const cargoConsulta = yield database_1.default.query(`
+        SELECT * FROM eu_empleado_cargos WHERE id = $1
+        `, [id_cargo]);
+                const [datosOriginales] = cargoConsulta.rows;
+                if (!datosOriginales) {
+                    // AUDITORIA
+                    yield auditoriaControlador_1.default.InsertarAuditoria({
+                        tabla: 'eu_empleado_cargos',
+                        usuario: user_name,
+                        accion: 'U',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al actualizar el cargo con id ${id_cargo}. Registro no encontrado.`
+                    });
+                    // FINALIZAR TRANSACCION
+                    yield database_1.default.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+                }
+                const datosNuevos = yield database_1.default.query(`
+        UPDATE eu_empleado_cargos SET estado = $2 
+        WHERE id = $1
+        `, [id_cargo, estado]);
+                const [empleadoCargo] = datosNuevos.rows;
+                const fechaIngresoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
+                const fechaSalidaO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_final, 'ddd');
+                datosOriginales.fecha_inicio = fechaIngresoO;
+                datosOriginales.fecha_final = fechaSalidaO;
+                // AUDITORIA
+                yield auditoriaControlador_1.default.InsertarAuditoria({
+                    tabla: 'eu_empleado_cargos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: JSON.stringify(datosOriginales),
+                    datosNuevos: JSON.stringify(empleadoCargo),
+                    ip,
+                    observacion: null
+                });
+                // FINALIZAR TRANSACCION
+                yield database_1.default.query('COMMIT');
+                return res.jsonp({ message: 'Registro actualizado exitosamente.' });
+            }
+            catch (error) {
+                // REVERTIR TRANSACCION
+                yield database_1.default.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+            }
+        });
+    }
     // METODO BUSQUEDA DATOS DEL CARGO DE UN USUARIO
     ObtenerCargoID(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const unEmplCargp = yield database_1.default.query(`
       SELECT ec.id, ec.id_contrato, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.sueldo, 
-        ec.hora_trabaja, ec.id_sucursal, s.nombre AS sucursal, ec.id_departamento, ec.jefe,
+        ec.hora_trabaja, ec.id_sucursal, s.nombre AS sucursal, ec.id_departamento, ec.jefe, ec.estado,
         d.nombre AS departamento, e.id AS id_empresa, e.nombre AS empresa, tc.cargo AS nombre_cargo 
       FROM eu_empleado_cargos AS ec, e_sucursales AS s, ed_departamentos AS d, e_empresa AS e, 
         e_cat_tipo_cargo AS tc 

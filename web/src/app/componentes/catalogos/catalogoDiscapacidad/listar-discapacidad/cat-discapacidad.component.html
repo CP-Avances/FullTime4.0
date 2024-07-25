@@ -6,7 +6,7 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button *ngIf="!Datos_discapacidad" id="btn-raised" class="btn btn-sm"
+                    <button *ngIf="!Datos_discapacidad && getCrearTipoDiscapacidad()" id="btn-raised" class="btn btn-sm"
                         (click)="AbrirVentanaRegistrarDiscapacidad()">
                         Crear Discapacidad
                     </button>
@@ -25,7 +25,7 @@
                 <span>REGISTRO MULTIPLE</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
-                <div class="row m-auto">
+                <div class="row m-auto" *ngIf="getCargarPlantillaTipoDiscapacidad()">
                     <div class="col-12 col-md-auto m-auto w-auto" style="padding-top: 5px; padding-bottom: 5px;">
                         <form method="post" class="btn-2" enctype="multipart/form-data">
                             <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
@@ -129,11 +129,11 @@
                         <td>{{discapacidad.nombre}}</td>
                         <td class="justify-content-center">
                             <i id="t-editar" (click)="AbrirEditar(discapacidad)" matSuffix matTooltipPosition="right"
-                                matTooltip="Modificar datos de este registro" class="fas fa-edit">
+                                matTooltip="Modificar datos de este registro" class="fas fa-edit" *ngIf="getEditarTipoDiscapacidad()">
                                 <p>Editar</p>
                             </i>
                             <i (click)="ConfirmarDelete(discapacidad)" class="far fa-trash-alt" id="t-eliminar"
-                                matSuffix matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                matSuffix matTooltipPosition="right" matTooltip="Eliminar este registro." *ngIf="getEliminarTipoDiscapacidad()">
                                 <p>Eliminar</p>
                             </i>
                         </td>
@@ -145,7 +145,7 @@
             [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
         <!--  ************************  DESCARGA DE REPORTES  ***********************  -->
-        <div>
+        <div *ngIf="getDescargarReportesTipoDiscapacidad()">
             <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
                 <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
                     matTooltipPosition="right" matTooltip="Descargar Lista de Discapacidades en formato PDF.">
@@ -211,8 +211,14 @@
                 </tbody>
             </table>
         </div>
-        <mat-paginator [length]="Datos_discapacidad.length" [pageSize]="tamanio_paginaMul"
-            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
-        </mat-paginator>
+        <div>
+            <div *ngIf="listaDiscapacidadCorrectas.length > 0" class="item" style="float: left; margin: 5px;" >
+                <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
+                <div class="text">items 'OK' - {{listaDiscapacidadCorrectas.length}}</div>
+            </div>
+            <mat-paginator [length]="Datos_discapacidad.length" [pageSize]="tamanio_paginaMul"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
+            </mat-paginator>
+        </div>
     </div>
 </div>

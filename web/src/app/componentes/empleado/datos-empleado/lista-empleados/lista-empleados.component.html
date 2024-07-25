@@ -405,8 +405,14 @@
                 </tbody>
             </table>
         </div>
-        <mat-paginator id="pagina" [length]="DataEmpleados.length" [pageSize]="tamanio_paginaMul"
-            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
-        </mat-paginator>
+        <div>
+            <div *ngIf="listUsuariosCorrectas.length > 0" class="item" style="float: left; margin: 5px;" >
+                <div class="icon" slot="start" id="t-editar" class="circulo" style="background-color: rgb(159, 221, 154);"></div>
+                <div class="text">items 'OK' - {{listUsuariosCorrectas.length}}</div>
+            </div>
+            <mat-paginator id="pagina" [length]="DataEmpleados.length" [pageSize]="tamanio_paginaMul"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
+            </mat-paginator>
+        </div>
     </div>
 </div>

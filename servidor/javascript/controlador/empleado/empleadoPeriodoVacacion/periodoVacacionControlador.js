@@ -21,7 +21,7 @@ class PeriodoVacacionControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             const VACACIONES = yield database_1.default.query(`
-        SELECT pv.id, pv.id_empleado_contrato
+        SELECT pv.id, pv.id_empleado_cargo
         FROM mv_periodo_vacacion AS pv
         WHERE pv.id = (SELECT MAX(pv.id) AS id 
                        FROM mv_periodo_vacacion AS pv 
@@ -36,14 +36,14 @@ class PeriodoVacacionControlador {
     CrearPerVacaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id_empleado, user_name, ip, } = req.body;
+                const { id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id_empleado, user_name, ip, } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 const datosNuevos = yield database_1.default.query(`
-          INSERT INTO mv_periodo_vacacion (id_empleado_contrato, descripcion, dia_vacacion,
+          INSERT INTO mv_periodo_vacacion (id_empleado_cargo., descripcion, dia_vacacion,
               dia_antiguedad, estado, fecha_inicio, fecha_final, dia_perdido, horas_vacaciones, minutos_vacaciones, id_empleado)
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *
-        `, [id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
+        `, [id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado,
                     fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones,
                     id_empleado,]);
                 const [periodo] = datosNuevos.rows;
@@ -87,7 +87,7 @@ class PeriodoVacacionControlador {
     ActualizarPeriodo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id, user_name, ip, } = req.body;
+                const { id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id, user_name, ip, } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query("BEGIN");
                 // CONSULTAR DATOSORIGINALES
@@ -108,11 +108,11 @@ class PeriodoVacacionControlador {
                     return res.status(404).jsonp({ message: "Error al actualizar período de vacaciones." });
                 }
                 const periodoNuevo = yield database_1.default.query(`
-        UPDATE mv_periodo_vacacion SET id_empleado_contrato = $1, descripcion = $2, dia_vacacion = $3 ,
+        UPDATE mv_periodo_vacacion SET id_empleado_cargo = $1, descripcion = $2, dia_vacacion = $3 ,
             dia_antiguedad = $4, estado = $5, fecha_inicio = $6, fecha_final = $7, dia_perdido = $8, 
             horas_vacaciones = $9, minutos_vacaciones = $10 
         WHERE id = $11 RETURNING *
-        `, [id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado,
+        `, [id_empl_cargo, descripcion, dia_vacacion, dia_antiguedad, estado,
                     fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones, id]);
                 const [datosNuevos] = periodoNuevo.rows;
                 const fechaInicioN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');

@@ -18,9 +18,6 @@ import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-ge
 
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
-import { environment } from 'src/environments/environment';
-
-
 @Component({
   selector: 'app-hora-extra-real',
   templateUrl: './hora-extra-real.component.html',

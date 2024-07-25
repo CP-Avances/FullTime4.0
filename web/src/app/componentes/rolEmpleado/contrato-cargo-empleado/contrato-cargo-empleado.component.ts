@@ -1,7 +1,6 @@
 import { FormControl, FormGroup } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { environment } from '../../../../environments/environment';
 
 import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';

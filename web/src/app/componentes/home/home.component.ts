@@ -3,7 +3,6 @@ import { PieChart, BarChart, LineChart } from 'echarts/charts';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { CanvasRenderer } from 'echarts/renderers';
-import { environment } from 'src/environments/environment';
 import * as echarts_asis from 'echarts/core';
 import * as echarts_inas from 'echarts/core';
 import * as echarts_retr from 'echarts/core';
