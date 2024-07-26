@@ -448,7 +448,7 @@ export class ListaSucursalesComponent implements OnInit {
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
+      if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
         this.Revisarplantilla();
       } else {
         this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {

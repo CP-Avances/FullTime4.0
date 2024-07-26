@@ -11,12 +11,12 @@ export class RolesService {
   constructor(private http: HttpClient) { }
 
 
-  // METODO PARA LISTAR ROLES DEL SISTEMA
+  // METODO PARA LISTAR ROLES DEL SISTEMA  **USADO
   BuscarRoles() {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/rol`);
   }
 
-  // ELIMINAR REGISTRO DE ROL
+  // ELIMINAR REGISTRO DE ROL  **USADO
   EliminarRoles(id: number, datos:any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/rol/eliminar/${id}`;
     const httpOtions = {
@@ -37,10 +37,12 @@ export class RolesService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/rol/${id}`);
   }
 
+  // METODO PARA LISTAR ROLES EXCEPTO EL QUE SE ACTUALIZA **USADO
   ListarRolesActualiza(id: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/rol/actualiza/${id}`);
   }
 
+  // METODO PARA ACTUALIZAR ROLES  **USADO
   ActualizarRol(data: any) {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/rol`, data);
   }

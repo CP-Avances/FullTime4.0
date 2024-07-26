@@ -42,9 +42,7 @@ export class ColoresEmpresaComponent implements OnInit {
 
   verFrase: boolean = false;
 
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
+  // VARIABLES PROGRESS SPINNER
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
@@ -72,7 +70,7 @@ export class ColoresEmpresaComponent implements OnInit {
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerLogo();
     this.VerFormularios();
-    this.obtenerColores();
+    this.ObtenerColores();
   }
 
   // METODO PARA MOSTRAR VENTANA DE COLORES O MARCA DE AGUA
@@ -99,7 +97,7 @@ export class ColoresEmpresaComponent implements OnInit {
 
   // METODO PARA OBTENER DATOS DE EMPRESA COLORES - MARCA DE AGUA
   empresas: any = [];
-  obtenerColores() {
+  ObtenerColores() {
     this.empresas = [];
     this.rest.ConsultarDatosEmpresa(this.data.datos.id).subscribe(res => {
       this.empresas = res;
@@ -167,7 +165,7 @@ export class ColoresEmpresaComponent implements OnInit {
       this.toastr.success('Frase registrada exitosamente.', '', {
         timeOut: 6000,
       });
-      this.obtenerColores();
+      this.ObtenerColores();
       this.ventana.close({ actualizar: true });
       this.habilitarprogress = false;
     })

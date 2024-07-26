@@ -16,28 +16,28 @@ export class ParametrosService {
     this.url = localStorage.getItem('empresaURL') ? localStorage.getItem('empresaURL') as string : environment.url as string;
   }
 
-  // BUSCAR LISTA DE PARAMETROS
+  // BUSCAR LISTA DE PARAMETROS  **USADO
   ListarParametros() {
     return this.http.get<any>(`${(this.url as string)}/parametrizacion`);
   }
 
 
-  // ACTUALIZAR REGISTRO PARAMETRO
+  // ACTUALIZAR REGISTRO PARAMETRO  **USADO
   ActualizarTipoParametro(datos: any) {
     return this.http.put(`${(this.url as string)}/parametrizacion/actual-tipo`, datos);
   }
 
-  // METODO PARA BUSCAR DATOS DE UN PARAMETRO
+  // METODO PARA BUSCAR DATOS DE UN PARAMETRO  **USADO
   ListarUnParametro(id: number) {
     return this.http.get<any>(`${(this.url as string)}/parametrizacion/ver-parametro/${id}`);
   }
 
-  // METODO PARA LISTAR DETALLES DE PARAMETRO
+  // METODO PARA LISTAR DETALLES DE PARAMETRO **USADO
   ListarDetalleParametros(id: number) {
     return this.http.get<any>(`${(this.url as string)}/parametrizacion/${id}`);
   }
 
-  // METODO PARA ELIMINAR DETALLE DE PARAMETRO
+  // METODO PARA ELIMINAR DETALLE DE PARAMETRO **USADO
   EliminarDetalleParametro(id: number, datos: any) {
     const url = `${(this.url as string)}/parametrizacion/eliminar-detalle/${id}`;
     const httpOptions = {
@@ -46,12 +46,12 @@ export class ParametrosService {
     return this.http.request('delete', url, httpOptions);
   }
 
-  // METODO PARA REGISTRAR DETALLE DE PARAMETRO
+  // METODO PARA REGISTRAR DETALLE DE PARAMETRO **USADO
   IngresarDetalleParametro(data: any) {
     return this.http.post(`${(this.url as string)}/parametrizacion/detalle`, data);
   }
 
-  // METODO PARA ACTUALIZAR DETALLE DE PARAMETRO
+  // METODO PARA ACTUALIZAR DETALLE DE PARAMETRO  **USADO
   ActualizarDetalleParametro(datos: any) {
     return this.http.put(`${(this.url as string)}/parametrizacion/actual-detalle`, datos);
   }

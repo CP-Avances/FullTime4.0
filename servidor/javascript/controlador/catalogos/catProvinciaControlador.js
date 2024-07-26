@@ -16,7 +16,7 @@ exports.PROVINCIA_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 class ProvinciaControlador {
-    // LISTA DE PAISES DE ACUERDO AL CONTINENTE
+    // LISTA DE PAISES DE ACUERDO AL CONTINENTE  **USADO
     ListarPaises(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { continente } = req.params;
@@ -31,7 +31,7 @@ class ProvinciaControlador {
             }
         });
     }
-    // METODO PARA BUSCAR LISTA DE CONTINENTES
+    // METODO PARA BUSCAR LISTA DE CONTINENTES  **USADO
     ListarContinentes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const CONTINENTE = yield database_1.default.query(`
@@ -45,7 +45,7 @@ class ProvinciaControlador {
             }
         });
     }
-    // METODO PARA BUSCAR PROVINCIAS POR PAIS
+    // METODO PARA BUSCAR PROVINCIAS POR PAIS  **USADO
     BuscarProvinciaPais(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_pais } = req.params;
@@ -60,7 +60,7 @@ class ProvinciaControlador {
             }
         });
     }
-    // METODO PARA BUSCAR PROVINCIAS
+    // METODO PARA BUSCAR PROVINCIAS  **USADO
     ListarProvincia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const PROVINCIA = yield database_1.default.query(`
@@ -76,7 +76,7 @@ class ProvinciaControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTROS
+    // METODO PARA ELIMINAR REGISTROS  **USADO
     EliminarProvincia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -85,7 +85,7 @@ class ProvinciaControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
-                const provincia = yield database_1.default.query('SELECT * FROM e_provincias WHERE id = $1', [id]);
+                const provincia = yield database_1.default.query(`SELECT * FROM e_provincias WHERE id = $1`, [id]);
                 const [datosOriginales] = provincia.rows;
                 if (!datosOriginales) {
                     // AUDITORIA
@@ -122,12 +122,11 @@ class ProvinciaControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                //return res.status(500).jsonp({ message: error });
                 return res.jsonp({ message: "error" });
             }
         });
     }
-    // METODO PARA REGISTRAR PROVINCIA
+    // METODO PARA REGISTRAR PROVINCIA   **USADO
     CrearProvincia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

@@ -6,11 +6,11 @@ import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
 import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
 
 import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.component';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-regimen',
@@ -167,7 +167,7 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   private _filter(value: string): any {
     if (value != null) {
       const filterValue = value.toLowerCase();
-      return this.paises.filter(pais => pais.nombre.toLowerCase().includes(filterValue));
+      return this.paises.filter((pais: any) => pais.nombre.toLowerCase().includes(filterValue));
     }
   }
 
@@ -243,7 +243,6 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   escritura_dias: boolean = false; // ------------------------------- Parametro readonly inhabilitado (false)
   // VALIDAR DIAS DE VACACIONES INGRESADAS
   ValidarVacaciones(form2: any) {
-    console.log('ingresa')
     this.LimpiarCalcular();
     // VERIFICAR QUE LOS DATOS NO SEAN VACIOS
     if (form2.diasCalendarioForm === '' && form2.diasLaborablesForm === '' && form2.diasLibresForm === '') {
@@ -567,11 +566,8 @@ export class RegimenComponent implements AfterViewInit, OnInit {
   mensaje1_: boolean = false; // ------------------------- Mensaje de errores inactivos (false)
   mensaje2_: boolean = false;
   mensaje3_: boolean = false;
-  //VerificarPeriodos(valor: string, opcion: number): void {
   VerificarPeriodos(event: Event, opcion: number): void {
     var valor = event.target as HTMLInputElement;
-
-    console.log(valor.value);
     if (parseFloat(valor.value) >= 5) {
       if (opcion === 1) {
         this.mensaje1_ = false;
@@ -1142,7 +1138,6 @@ export class RegimenComponent implements AfterViewInit, OnInit {
 
   // METODO PARA CALCULAR VACACIONES GANADAS AL MES
   CalcularDiasMeses(form1: any, form2: any, form3: any) {
-
     // EJEMPLO:
     // 12 --> 11
     //  1 --> x
@@ -1213,7 +1208,6 @@ export class RegimenComponent implements AfterViewInit, OnInit {
 
   // METODO PARA LEER DATOS DE REGIMEN LABORAL
   InsertarRegimen(form1: any, form2: any, form3: any) {
-
     // OBTENER ID DEL PAIS SELECCIONADO
     let pais: number = 0;
     this.paises.forEach((obj: any) => {

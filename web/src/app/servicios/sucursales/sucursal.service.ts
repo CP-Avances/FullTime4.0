@@ -31,12 +31,12 @@ export class SucursalService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/sucursales/empresa-sucursal/${id_empresa}`);
   }
 
-  // BUSCAR LISTA DE SUCURSALES
+  // BUSCAR LISTA DE SUCURSALES **USADO
   BuscarSucursal() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/sucursales`);
   }
 
-  // METODO PARA ELIMINAR REGISTRO
+  // METODO PARA ELIMINAR REGISTRO **USADO
   EliminarRegistro(id: any, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/sucursales/eliminar/${id}`;
     const httpOptions = {

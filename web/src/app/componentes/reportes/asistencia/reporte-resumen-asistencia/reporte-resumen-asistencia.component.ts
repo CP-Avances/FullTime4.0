@@ -2139,7 +2139,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy {
     this.paginatorDetalle.firstPage();
   }
 
-  //METDODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
+  // METDODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
   ObtenerClaseAlimentacion(asignado: any, tomado: any) {
     const tAsignado = Number(asignado);
     const tTomado = Number(tomado);

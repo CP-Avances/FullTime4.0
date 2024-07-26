@@ -1,4 +1,4 @@
-// SECCIÓN DE LIBRERIAS
+// SECCION DE LIBRERIAS
 import EMPLEADO_CONTROLADOR from '../../../controlador/empleado/empleadoRegistro/empleadoControlador';
 import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { TokenValidation } from '../../../libs/verificarToken';
@@ -56,7 +56,7 @@ class EmpleadoRutas {
          ** **                            MANEJO DE DATOS DE EMPLEADOS                            ** ** 
          ** **************************************************************************************** **/
 
-        // LISTAR DATOS DE UN USUARIO  --**VERIFICADO
+        // LISTAR DATOS DE UN USUARIO  **USANDO
         this.router.get('/:id', TokenValidation, EMPLEADO_CONTROLADOR.BuscarEmpleado);
         // LISTAR EMPLEADOS REGISTRADOS
         this.router.get('/buscador/empleado', TokenValidation, EMPLEADO_CONTROLADOR.ListarBusquedaEmpleados);
@@ -114,8 +114,8 @@ class EmpleadoRutas {
         // INFORMACIÓN DE LA IMAGEN
         this.router.get('/img/:id/:imagen', EMPLEADO_CONTROLADOR.BuscarImagen);
 
-        // INFORMACIÓN DE LA IMAGEN
-        this.router.get('/img/codificado/:id/:imagen', EMPLEADO_CONTROLADOR.getImagenBase64);
+        // INFORMACION DE LA IMAGEN FORMATO CODIFICADO **USADO
+        this.router.get('/img/codificado/:id/:imagen', EMPLEADO_CONTROLADOR.CodificarImagenBase64);
 
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMÁTICA 
         this.router.post('/verificar/automatico/plantillaExcel/', [TokenValidation, upload_plantilla.single('uploads')], EMPLEADO_CONTROLADOR.VerificarPlantilla_Automatica);

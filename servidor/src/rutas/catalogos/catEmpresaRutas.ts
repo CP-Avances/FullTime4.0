@@ -29,37 +29,40 @@ class DepartamentoRutas {
 
         // CADENA DE NAVEGACION
         this.router.get('/navegar', EMPRESA_CONTROLADOR.BuscarCadena);
-        // BUSQUEDA DE LOGO 
-        this.router.get('/logo/codificado/:id_empresa', TokenValidation, EMPRESA_CONTROLADOR.getImagenBase64);
-        // METODO PARA EDITAR LOGO DE EMPRESA
+        // BUSQUEDA DE LOGO **USADO
+        this.router.get('/logo/codificado/:id_empresa', TokenValidation, EMPRESA_CONTROLADOR.ConvertirImagenBase64);
+        // METODO PARA EDITAR LOGO DE EMPRESA **USADO
         this.router.put('/logo/:id_empresa/uploadImage', [TokenValidation, upload.single('image')], EMPRESA_CONTROLADOR.ActualizarLogoEmpresa);
-        // BUSCAR DATOS GENERALES DE EMPRESA
+        // BUSCAR DATOS GENERALES DE EMPRESA  **USADO
         this.router.get('/buscar/datos/:id', TokenValidation, EMPRESA_CONTROLADOR.ListarEmpresaId);
-        // ACTUALIZAR DATOS DE EMPRESA
+        // ACTUALIZAR DATOS DE EMPRESA **USADO
         this.router.put('/', TokenValidation, EMPRESA_CONTROLADOR.ActualizarEmpresa);
-        // ACTUALIZAR DATOS DE COLORES DE REPORTES
+        // ACTUALIZAR DATOS DE COLORES DE REPORTES **USADO
         this.router.put('/colores', [TokenValidation], EMPRESA_CONTROLADOR.ActualizarColores);
-        // ACTUALIZAR DATOS DE MARCA DE AGUA DE REPORTE
+        // ACTUALIZAR DATOS DE MARCA DE AGUA DE REPORTE **USADO
         this.router.put('/reporte/marca', TokenValidation, EMPRESA_CONTROLADOR.ActualizarMarcaAgua);
-        // METODO PARA ACTUALIZAR NIVEL DE SEGURIDAD DE EMPRESA
+        // METODO PARA ACTUALIZAR NIVEL DE SEGURIDAD DE EMPRESA **USADO
         this.router.put('/doble/seguridad', TokenValidation, EMPRESA_CONTROLADOR.ActualizarSeguridad);
-        // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO
+        // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO **USADO
         this.router.put('/cabecera/:id_empresa/uploadImage', [TokenValidation, upload.single('image')], EMPRESA_CONTROLADOR.ActualizarCabeceraCorreo);
-        // METODO PARA BUSCAR LOGO CABECERA DE CORREO
+        // METODO PARA BUSCAR LOGO CABECERA DE CORREO  **USADO
         this.router.get('/cabecera/codificado/:id_empresa', TokenValidation, EMPRESA_CONTROLADOR.VerCabeceraCorreo);
-        // METODO PARA ACTUALIZAR LOGO PIE DE FIRMA CORREO
+        // METODO PARA ACTUALIZAR LOGO PIE DE FIRMA CORREO  **USADO
         this.router.put('/pie-firma/:id_empresa/uploadImage', [TokenValidation, upload.single('image')], EMPRESA_CONTROLADOR.ActualizarPieCorreo);
-        // METODO PARA BUSCAR LOGO PIE DE FIRMA DE CORREO
+        // METODO PARA BUSCAR LOGO PIE DE FIRMA DE CORREO **USADO
         this.router.get('/pie-firma/codificado/:id_empresa', TokenValidation, EMPRESA_CONTROLADOR.VerPieCorreo);
-        // METODO PARA ACTUALIZAR DATOS DE CORREO
+        // METODO PARA ACTUALIZAR DATOS DE CORREO  **USADO
         this.router.put('/credenciales/:id_empresa', TokenValidation, EMPRESA_CONTROLADOR.EditarPassword);
         // METODO PARA ACTUALIZAR USO DE ACCIONES
         this.router.put('/acciones-timbre', TokenValidation, EMPRESA_CONTROLADOR.ActualizarAccionesTimbres);
         // METODO PARA BUSCAR DATOS DE EMPRESA
         this.router.get('/', TokenValidation, EMPRESA_CONTROLADOR.ListarEmpresa);
 
-        // CONSULTA USADA EN MODULO DE ALMUERZOS
-        this.router.get('/logo/codificados/:id_empresa', EMPRESA_CONTROLADOR.getImagenBase64);
+
+
+
+        // CONSULTA USADA EN MODULO DE ALMUERZOS 
+        this.router.get('/logo/codificados/:id_empresa', EMPRESA_CONTROLADOR.ConvertirImagenBase64);
 
     }
 }

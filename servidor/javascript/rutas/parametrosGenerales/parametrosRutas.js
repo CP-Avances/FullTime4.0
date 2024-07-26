@@ -12,19 +12,19 @@ class ParametrosRutas {
         this.configuracion();
     }
     configuracion() {
-        // BUSCAR LISTA DE PARAMETROS
+        // BUSCAR LISTA DE PARAMETROS  **USADO
         this.router.get('/', verificarToken_1.TokenValidation, parametrosControlador_1.default.ListarParametros);
-        // METODO PARA ACTUALIZAR PARAMETRO
+        // METODO PARA ACTUALIZAR PARAMETRO  **USADO
         this.router.put('/actual-tipo', verificarToken_1.TokenValidation, parametrosControlador_1.default.ActualizarTipoParametro);
-        // METODO PARA VER DATOS DE UN PARAMETRO
+        // METODO PARA VER DATOS DE UN PARAMETRO **USADO
         this.router.get('/ver-parametro/:id', verificarToken_1.TokenValidation, parametrosControlador_1.default.ListarUnParametro);
         // METODO PARA BUSCAR DETALLES DE PARAMETRO
         this.router.get('/:id', verificarToken_1.TokenValidation, parametrosControlador_1.default.VerDetalleParametro);
-        // METODO PARA ELIMINAR DETALLE DE PARAMETRO
+        // METODO PARA ELIMINAR DETALLE DE PARAMETRO  **USADO
         this.router.delete('/eliminar-detalle/:id', verificarToken_1.TokenValidation, parametrosControlador_1.default.EliminarDetalleParametro);
-        // METODO PARA REGISTRAR DETALLE DE PARAMETRO
+        // METODO PARA REGISTRAR DETALLE DE PARAMETRO  **USADO
         this.router.post('/detalle', verificarToken_1.TokenValidation, parametrosControlador_1.default.IngresarDetalleParametro);
-        // METODO PARA ACTUALIZAR DETALLE DE PARAMETRO
+        // METODO PARA ACTUALIZAR DETALLE DE PARAMETRO **USADO
         this.router.put('/actual-detalle', verificarToken_1.TokenValidation, parametrosControlador_1.default.ActualizarDetalleParametro);
         // METODO PARA COMPARAR COORDENADAS
         this.router.post('/coordenadas', verificarToken_1.TokenValidation, parametrosControlador_1.default.CompararCoordenadas);

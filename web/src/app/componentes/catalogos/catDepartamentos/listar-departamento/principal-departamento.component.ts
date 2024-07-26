@@ -259,7 +259,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
+      if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();

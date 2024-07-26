@@ -21,22 +21,22 @@ export class CiudadService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ciudades/listaCiudad`);
   }
 
-  // BUSCAR CIUDADES POR PROVINCIA
+  // BUSCAR CIUDADES POR PROVINCIA  **USADO
   BuscarCiudadProvincia(id_provincia: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ciudades/ciudad-provincia/${id_provincia}`);
   }
 
-  // REGISTRAR CIUDAD
+  // REGISTRAR CIUDAD  **USADO
   RegistrarCiudad(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/ciudades`, data);
   }
 
-  // BUSQUEDA DE NOMBRE CIUDADES - PROVINCIAS
+  // BUSQUEDA DE NOMBRE CIUDADES - PROVINCIAS  **USADO
   ListarNombreCiudadProvincia() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ciudades`);
   }
 
-  // METODO PARA ELIMINAR REGISTRO
+  // METODO PARA ELIMINAR REGISTRO  **USADO
   EliminarCiudad(id: any, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/ciudades/eliminar/${id}`;
     const httpOtions = {

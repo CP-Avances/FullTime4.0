@@ -4,7 +4,7 @@ import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 
 class ProvinciaControlador {
 
-  // LISTA DE PAISES DE ACUERDO AL CONTINENTE
+  // LISTA DE PAISES DE ACUERDO AL CONTINENTE  **USADO
   public async ListarPaises(req: Request, res: Response) {
     const { continente } = req.params;
     const CONTINENTE = await pool.query(
@@ -21,12 +21,13 @@ class ProvinciaControlador {
     }
   }
 
-  // METODO PARA BUSCAR LISTA DE CONTINENTES
+  // METODO PARA BUSCAR LISTA DE CONTINENTES  **USADO
   public async ListarContinentes(req: Request, res: Response) {
     const CONTINENTE = await pool.query(
       `
       SELECT continente FROM e_cat_paises GROUP BY continente ORDER BY continente ASC
-      `);
+      `
+    );
     if (CONTINENTE.rowCount != 0) {
       return res.jsonp(CONTINENTE.rows)
     }
@@ -35,7 +36,7 @@ class ProvinciaControlador {
     }
   }
 
-  // METODO PARA BUSCAR PROVINCIAS POR PAIS
+  // METODO PARA BUSCAR PROVINCIAS POR PAIS  **USADO
   public async BuscarProvinciaPais(req: Request, res: Response): Promise<any> {
     const { id_pais } = req.params;
     const UNA_PROVINCIA = await pool.query(
@@ -51,7 +52,7 @@ class ProvinciaControlador {
     }
   }
 
-  // METODO PARA BUSCAR PROVINCIAS
+  // METODO PARA BUSCAR PROVINCIAS  **USADO
   public async ListarProvincia(req: Request, res: Response) {
     const PROVINCIA = await pool.query(
       `
@@ -68,7 +69,7 @@ class ProvinciaControlador {
     }
   }
 
-  // METODO PARA ELIMINAR REGISTROS
+  // METODO PARA ELIMINAR REGISTROS  **USADO
   public async EliminarProvincia(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip } = req.body;
@@ -78,7 +79,7 @@ class ProvinciaControlador {
       await pool.query('BEGIN');
 
       // CONSULTAR DATOSORIGINALES
-      const provincia = await pool.query('SELECT * FROM e_provincias WHERE id = $1', [id]);
+      const provincia = await pool.query(`SELECT * FROM e_provincias WHERE id = $1`, [id]);
       const [datosOriginales] = provincia.rows;
 
       if (!datosOriginales) {
@@ -103,7 +104,7 @@ class ProvinciaControlador {
         DELETE FROM e_provincias WHERE id = $1
         `
         , [id]);
-      
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'e_provincias',
@@ -118,16 +119,16 @@ class ProvinciaControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro eliminado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      //return res.status(500).jsonp({ message: error });
       return res.jsonp({ message: "error" });
     }
   }
 
 
-  // METODO PARA REGISTRAR PROVINCIA
+  // METODO PARA REGISTRAR PROVINCIA   **USADO
   public async CrearProvincia(req: Request, res: Response): Promise<void> {
     try {
       const { nombre, id_pais, user_name, ip } = req.body;
@@ -140,7 +141,7 @@ class ProvinciaControlador {
         INSERT INTO e_provincias (nombre, id_pais) VALUES ($1, $2) RETURNING *
         `
         , [nombre, id_pais]);
-      
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'e_provincias',
@@ -155,6 +156,7 @@ class ProvinciaControlador {
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       res.jsonp({ message: 'Registro guardado.' });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');

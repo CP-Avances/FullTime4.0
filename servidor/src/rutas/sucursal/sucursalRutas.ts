@@ -38,9 +38,9 @@ class SucursalRutas {
         this.router.put('/', TokenValidation, SUCURSAL_CONTROLADOR.ActualizarSucursal);
         // LISTA DE SUCURSALES POR ID DE EMPRESA
         this.router.get('/empresa-sucursal/:id_empresa', TokenValidation, SUCURSAL_CONTROLADOR.ObtenerSucursalEmpresa);
-        // LISTAR SUCURSALES
+        // LISTAR SUCURSALES **USADO
         this.router.get('/', TokenValidation, SUCURSAL_CONTROLADOR.ListarSucursales);
-        // ELIMINAR REGISTRO
+        // ELIMINAR REGISTRO **USADO
         this.router.delete('/eliminar/:id', TokenValidation, SUCURSAL_CONTROLADOR.EliminarRegistros);
         // METODO PARA BUSCAR DATOS DE UNA SUCURSAL
         this.router.get('/unaSucursal/:id', TokenValidation, SUCURSAL_CONTROLADOR.ObtenerUnaSucursal);

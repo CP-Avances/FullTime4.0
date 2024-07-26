@@ -1,10 +1,10 @@
-// SECCIÓN DE LIBRERIAS
+// SECCION DE LIBRERIAS
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-// SECCIÓN SERVICIOS
+// SECCION SERVICIOS
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
 @Component({
@@ -36,8 +36,8 @@ export class CrearDetalleParametroComponent implements OnInit {
 
   nota: string = '';
   especificacion: string = '';
-  ngOnInit(): void {
 
+  ngOnInit(): void {
     this.user_name = localStorage.getItem('usuario');
     this.ip = localStorage.getItem('ip');
     // PARAMETRO TOLERANCIA UBICACION
@@ -47,7 +47,7 @@ export class CrearDetalleParametroComponent implements OnInit {
       this.especificacion = 'Rango de perímetro en metros.';
     }
     // PARAMETRO LIMITE CORREO
-    else if (this.data.parametros.id === 13) {
+    else if (this.data.parametros.id === 33) {
       this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
         'Guardar.'
       this.especificacion = 'Ingrese el número máximo de correos permitidos.';

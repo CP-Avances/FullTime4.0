@@ -5,7 +5,7 @@ import pool from '../../database';
 
 class RolesControlador {
 
-  // METODO PARA LISTAR ROLES DEL SISTEMA
+  // METODO PARA LISTAR ROLES DEL SISTEMA  **USADO
   public async ListarRoles(req: Request, res: Response) {
     const ROL = await pool.query(
       `
@@ -19,7 +19,7 @@ class RolesControlador {
     }
   }
 
-  // METODO PARA ELIMINAR REGISTRO
+  // METODO PARA ELIMINAR REGISTRO  **USADO
   public async EliminarRol(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip } = req.body;
@@ -113,6 +113,7 @@ class RolesControlador {
 
   }
 
+  // LISTAR ROLES A EXCEPCION EL QUE SE EDITA **USADO
   public async ListarRolesActualiza(req: Request, res: Response) {
     const id = req.params.id;
     const ROL = await pool.query(
@@ -142,7 +143,7 @@ class RolesControlador {
     }
   }
 
-
+// METODO PARA ACTUALIZAR ROLES  **USADO
   public async ActualizarRol(req: Request, res: Response): Promise<Response> {
     try {
       const { nombre, id, user_name, ip } = req.body;

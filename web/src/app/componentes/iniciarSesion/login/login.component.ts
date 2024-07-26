@@ -208,7 +208,6 @@ export class LoginComponent implements OnInit {
 
     // VALIDACION DEL LOGIN
     this.rest.ValidarCredenciales(dataUsuario).subscribe(datos => {
-      console.log('ver datos ', datos)
       if (datos.message === 'error') {
         var f = moment();
         var espera = '00:01:00';
@@ -261,7 +260,6 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('ip', datos.ip_adress);
         localStorage.setItem('usuario', datos.usuario);
         localStorage.setItem('empresa', datos.empresa);
-        localStorage.setItem('autoriza', datos.estado);
         localStorage.setItem('sucursal', datos.sucursal);
         localStorage.setItem('ultimoCargo', datos.cargo);
         localStorage.setItem('empleado', datos.empleado);
@@ -274,10 +272,10 @@ export class LoginComponent implements OnInit {
 
         this.toastr.success('Ingreso Existoso! ' + datos.usuario + ' ' + datos.ip_adress, 'Usuario y contraseña válidos', {
           timeOut: 6000,
-        });
-        console.log('datos.rol ', datos.rol);
+        })
+
         if (!!localStorage.getItem("redireccionar")) {
-          console.log('redireccionar ');
+          console.log('redireccionar')
           let redi = localStorage.getItem("redireccionar");
           this.router.navigate([redi], { relativeTo: this.route, skipLocationChange: false });
           localStorage.removeItem("redireccionar");

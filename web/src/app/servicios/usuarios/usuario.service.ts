@@ -28,7 +28,7 @@ export class UsuarioService {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios/dato/${id}`);
   }
 
-  // METODO PARA OBTENER IDS USUARIOS DEPARTAMENTO
+  // METODO PARA OBTENER IDS USUARIOS MEDIANTE DEPARTAMENTO VIGENTE **USADO
   ObtenerIdUsuariosDepartamento(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-ids-usuarios-departamento`, data);
   }
@@ -144,7 +144,7 @@ export class UsuarioService {
       );
   }
 
-  // METODO DE BUSQUEDA DE DATOS DE USUARIO - DEPARTAMENTOS
+  // METODO DE BUSQUEDA DE DATOS DE USUARIO - DEPARTAMENTOS - ASIGNACION DE INFORMACION **USADO
   BuscarUsuarioDepartamento(id_empleado: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/buscar-usuario-departamento`, id_empleado);
   }

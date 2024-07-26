@@ -67,7 +67,7 @@ export class RegistrarCiudadComponent implements OnInit {
   private _filter(value: string): any {
     if (value != null) {
       const filterValue = value.toLowerCase();
-      return this.paises.filter(pais => pais.nombre.toLowerCase().includes(filterValue));
+      return this.paises.filter((pais: any) => pais.nombre.toLowerCase().includes(filterValue));
     }
   }
 
@@ -75,7 +75,7 @@ export class RegistrarCiudadComponent implements OnInit {
   private _filterProvincia(value: string): any {
     if (value != null) {
       const filterValue = value.toLowerCase();
-      return this.provincias.filter(provincias => provincias.nombre.toLowerCase().includes(filterValue));
+      return this.provincias.filter((provincias: any) => provincias.nombre.toLowerCase().includes(filterValue));
     }
   }
 

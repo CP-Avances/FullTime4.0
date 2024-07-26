@@ -137,7 +137,7 @@ export class VistaRolesComponent implements OnInit {
     this.buscarDescripcion.reset();
   }
 
-  // ORDENAR LOS DATOS SEGÚN EL ID
+  // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
       if (a.id < b.id) {
@@ -155,7 +155,6 @@ export class VistaRolesComponent implements OnInit {
   rol_id: number = 0;
   VerFunciones(id_rol: number) {
     this.rol_id = id_rol;
-    //console.log('ver rol --- ', this.rol_id)
     this.ver_roles = false;
     this.ver_funciones = true;
   }
@@ -369,7 +368,7 @@ export class VistaRolesComponent implements OnInit {
       }
       return encontrado;
     } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+      if (parseInt(localStorage.getItem('rol') as string) != 1) {
         return false;
       } else {
         return true;
@@ -427,7 +426,7 @@ export class VistaRolesComponent implements OnInit {
       }
       return encontrado;
     } else {
-      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+      if (parseInt(localStorage.getItem('rol') as string) != 1) {
         return false;
       } else {
         return true;
@@ -471,8 +470,6 @@ export class VistaRolesComponent implements OnInit {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
     this.rolesEliminar = this.selectionRoles.selected;
-    //console.log('paginas para Eliminar',this.paginasEliminar);
-    //console.log(this.selectionPaginas.selected)
     return `${this.selectionRoles.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
   }
 
@@ -483,7 +480,6 @@ export class VistaRolesComponent implements OnInit {
       ip: this.ip
     };
     this.rest.EliminarRoles(rol.id, datos).subscribe((res: any) => {
-
       if (res.message === 'error') {
         this.toastr.error('No se puede eliminar.', '', {
           timeOut: 6000,

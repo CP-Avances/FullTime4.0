@@ -1,0 +1,6 @@
+id,codigo,nombre,minutos_comida,hora_trabajo,nocturno,documento,default_,default_tipo,detalles
+3,DEFAULT-ABIERTO,00:00 - 23:59,0,23:59:00,TRUE,,DHA,Abierto,
+2,DEFAULT-FERIADO,00:00 - 23:59,0,23:59:00,TRUE,,DFD,Feriado,
+1,DEFAULT-LIBRE,00:00 - 23:59,0,23:59:00,TRUE,,DL,Libre,
+4,OFICINA,08:00 - 17:00,30,08:00:00,FALSE,,N,Laborable,
+6,PPP,PPP,30,08:00,TRUE,6_PPP_2024_07_15_plantillaConfiguracionGeneral.xlsx,N,Laborable,

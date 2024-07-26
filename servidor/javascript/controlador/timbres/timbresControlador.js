@@ -179,7 +179,7 @@ class TimbresControlador {
             }
         });
     }
-    //METODO PARA BUSCAR EL TIMBRE DEL EMPLEADO POR FECHA // COLOCAR ESTADO
+    // METODO PARA BUSCAR EL TIMBRE DEL EMPLEADO POR FECHA // COLOCAR ESTADO
     ObtenertimbreFechaEmple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

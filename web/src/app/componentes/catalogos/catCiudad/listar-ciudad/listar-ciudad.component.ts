@@ -121,7 +121,6 @@ export class ListarCiudadComponent implements OnInit {
     this.numero_pagina = 1;
     this.rest.ListarNombreCiudadProvincia().subscribe(datos => {
       this.datosCiudades = datos;
-      //console.log('ciudades ', this.datosCiudades)
     })
   }
 
@@ -174,7 +173,6 @@ export class ListarCiudadComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    sessionStorage.setItem("Ciudades", this.datosCiudades);
     return {
       // ENCABEZADO DE LA PAGINA
       pageOrientation: "portrait",
@@ -259,9 +257,9 @@ export class ListarCiudadComponent implements OnInit {
               [
                 { text: "Provincia", style: "tableHeader" },
                 { text: "Ciudad", style: "tableHeader" },
-                
+
               ],
-              ...this.datosCiudades.map((obj) => {
+              ...this.datosCiudades.map((obj: any) => {
                 return [
                   { text: obj.provincia, style: "itemsTableC" },
                   { text: obj.nombre, style: "itemsTableC" },
@@ -316,7 +314,7 @@ export class ListarCiudadComponent implements OnInit {
   exportToXML() {
     var objeto: any;
     var arregloCiudades: any = [];
-    this.datosCiudades.forEach((obj) => {
+    this.datosCiudades.forEach((obj: any) => {
       objeto = {
         ciudad: {
           "$": { "id": obj.id },
@@ -413,6 +411,10 @@ export class ListarCiudadComponent implements OnInit {
     }
   }
 
+  /** ************************************************************************************************* **
+   ** **                               METODO DE SELECCION MULTIPLE DE DATOS                         ** **
+   ** ************************************************************************************************* **/
+
   // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
@@ -491,6 +493,7 @@ export class ListarCiudadComponent implements OnInit {
       });
   }
 
+  // METODO DE ELIMINACION MULTIPLE
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
@@ -524,6 +527,7 @@ export class ListarCiudadComponent implements OnInit {
     )
   }
 
+  // METODO DE CONFIRMACION DE ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {

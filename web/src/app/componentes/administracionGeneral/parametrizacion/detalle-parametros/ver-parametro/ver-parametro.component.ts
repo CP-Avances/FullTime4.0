@@ -200,7 +200,6 @@ export class VerParametroComponent implements OnInit {
     this.datosDetalle = [];
     this.parametro.ListarDetalleParametros(id).subscribe(datos => {
       this.datosDetalle = datos;
-      //console.log('ver detalles ', this.datosDetalle)
       // SELECCION DE OPCIONES
       if (this.ingreso === 0) {
         this.seleccion = this.datosDetalle[0].descripcion;
@@ -500,11 +499,9 @@ export class VerParametroComponent implements OnInit {
   // METODO PARA REGISTRAR DETALLE DE ATRASOS
   RegistrarAtraso() {
     if (this.tipoF.value) {
-      //console.log('ver registro ', this.tipoF.value)
       this.CrearDetalle(this.tipoF.value)
     }
     else {
-      //console.log('ver registro ', this.toleranciaF.value)
       this.CrearDetalle(this.toleranciaF.value)
     }
   }
@@ -512,18 +509,15 @@ export class VerParametroComponent implements OnInit {
   // METODO PARA REGISTRAR DETALLE DE ATRASOS
   ActualizarAtraso() {
     if (this.tipoF.value) {
-      //console.log('ver registro ', this.tipoF.value)
       this.ActualizarDetalle(this.datosDetalle[0].id_detalle, this.tipoF.value)
     }
     else {
-      //console.log('ver registro ', this.toleranciaF.value)
       this.ActualizarDetalle(this.datosDetalle[0].id_detalle, this.toleranciaF.value)
     }
   }
 
   // METODO PARA VER CONFIGURACION DE ATRASOS
   VerConfiguracionAtrasos() {
-    //console.log('ver detalles ', this.datosDetalle)
     if (this.datosDetalle[0].descripcion != '' && this.datosDetalle[0].descripcion != null) {
       this.ver_actualizar_atraso = true;
       this.ver_eliminar_atraso = true;

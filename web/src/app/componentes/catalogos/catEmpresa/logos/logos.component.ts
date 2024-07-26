@@ -1,9 +1,9 @@
-// SECCIÓN DE LIBRERIAS
+// SECCION DE LIBRERIAS
 import { FormControl } from '@angular/forms';
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
-// SECCIÓN DE SERVICIOS
+// SECCION DE SERVICIOS
 import { ToastrService } from 'ngx-toastr';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 

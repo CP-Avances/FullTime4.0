@@ -142,7 +142,7 @@ class SucursalControlador {
     }
   }
 
-  // METODO DE BUSQUEDA DE SUCURSALES
+  // METODO DE BUSQUEDA DE SUCURSALES **USADO
   public async ListarSucursales(req: Request, res: Response) {
     const SUCURSAL = await pool.query(
       `
@@ -160,7 +160,7 @@ class SucursalControlador {
     }
   }
 
-  // METODO PARA ELIMINAR REGISTRO
+  // METODO PARA ELIMINAR REGISTRO **USADO
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip } = req.body;
@@ -214,7 +214,6 @@ class SucursalControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      //return res.status(500).jsonp({ message: 'error' });
       return res.jsonp({ message: 'error' });
 
     }

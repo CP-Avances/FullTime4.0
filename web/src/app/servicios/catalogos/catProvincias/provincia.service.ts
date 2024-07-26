@@ -12,27 +12,27 @@ export class ProvinciaService {
   ) { }
 
 
-  // METODO PARA BUSCAR CONTINENTES
+  // METODO PARA BUSCAR CONTINENTES  **USADO
   BuscarContinente() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/continentes`);
   }
 
-  // METODO PARA BUSCAR LISTA DE PAISES
+  // METODO PARA BUSCAR LISTA DE PAISES  **USADO
   BuscarPais(continente: string) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/pais/${continente}`);
   }
 
-  // BUSCAR PROVINCIAS POR PAIS
+  // BUSCAR PROVINCIAS POR PAIS  **USADO
   BuscarProvinciaPais(id_pais: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/${id_pais}`);
   }
 
-  // METODO PARA BUSCAR PROVINCIAS
+  // METODO PARA BUSCAR PROVINCIAS  **USADO
   BuscarProvincias() {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia`);
   }
 
-  // METODO PARA ELIMINAR REGISTRO
+  // METODO PARA ELIMINAR REGISTRO  **USADO
   EliminarProvincia(id: any, datos: any) {
     const url = `${(localStorage.getItem('empresaURL') as string)}/provincia/eliminar/${id}`;
     const httpOtions = {
@@ -41,7 +41,7 @@ export class ProvinciaService {
     return this.http.request('delete', url, httpOtions).pipe(catchError(id));
   }
 
-  // METODO PARA REGISTRAR PROVINCIA
+  // METODO PARA REGISTRAR PROVINCIA  **USADO
   RegistrarProvincia(data: any) {
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/provincia`, data);
   }

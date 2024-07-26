@@ -1252,9 +1252,9 @@ class DatosGeneralesControlador {
         const { sucursal, estado } = req.body;
         const DATOS = await pool.query(
             `
-            SELECT  da.id, da.nombre, da.apellido, da.name_rol AS rol, da.name_dep AS departamento, da.id_departamento
+            SELECT  da.id, da.nombre, da.apellido, da.name_rol AS rol, da.name_dep AS departamento, da.id_depa
             FROM informacion_general AS da
-            WHERE da.id_sucursal = $1 AND da.estado = $2
+            WHERE da.id_suc = $1 AND da.estado = $2
             ORDER BY da.apellido ASC
             `,
             [sucursal, estado]);

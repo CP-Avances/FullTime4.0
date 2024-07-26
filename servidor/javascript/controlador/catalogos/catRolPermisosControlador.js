@@ -16,7 +16,7 @@ exports.rolPermisosControlador = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class RolPermisosControlador {
-    //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
+    // METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS  **USADO
     ListarMenuRoles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const Roles = yield database_1.default.query(`
@@ -30,7 +30,7 @@ class RolPermisosControlador {
             }
         });
     }
-    //METODO PARA ENLISTAR PAGINAS SEAN MODULOS
+    // METODO PARA ENLISTAR PAGINAS SEAN MODULOS  **USADO
     ListarMenuModulosRoles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const Roles = yield database_1.default.query(`
@@ -44,7 +44,7 @@ class RolPermisosControlador {
             }
         });
     }
-    //METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO
+    // METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO  **USADO
     ListarModuloPorNombre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre_modulo } = req.body;
@@ -59,12 +59,12 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION
+    // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION  **USADO
     ObtenerIdPaginas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { funcion, id_rol } = req.body;
             const PAGINA_ROL = yield database_1.default.query(`
-      SELECT * FROM ero_rol_permisos WHERE pagina = $1  AND id_rol = $2 
+      SELECT * FROM ero_rol_permisos WHERE pagina = $1 AND id_rol = $2 
       `, [funcion, id_rol]);
             if (PAGINA_ROL.rowCount != 0) {
                 return res.jsonp(PAGINA_ROL.rows);
@@ -74,7 +74,7 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA
+    // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA  **USADO
     ObtenerIdPaginasConAcciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { funcion, id_rol, id_accion } = req.body;
@@ -89,14 +89,14 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR LAS PAGINAS POR EL ID DEL ROL
+    // METODO PARA BUSCAR LAS PAGINAS POR EL ID DEL ROL  **USADO
     ObtenerPaginasRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_rol } = req.body;
                 const PAGINA_ROL = yield database_1.default.query(`
-      SELECT * FROM ero_rol_permisos WHERE id_rol = $1 order by 3,5
-      `, [id_rol]);
+        SELECT * FROM ero_rol_permisos WHERE id_rol = $1 ORDER BY 3,5
+        `, [id_rol]);
                 return res.jsonp(PAGINA_ROL.rows);
             }
             catch (error) {
@@ -160,7 +160,7 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTRO
+    // METODO PARA ELIMINAR REGISTRO  **USADO
     EliminarPaginaRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -206,7 +206,7 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR LAS ACCIONES POR CADA PAGINA
+    // METODO PARA BUSCAR LAS ACCIONES POR CADA PAGINA  **USADO
     ObtenerAccionesPaginas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_funcion } = req.body;
@@ -221,7 +221,7 @@ class RolPermisosControlador {
             }
         });
     }
-    // METODO PARA ENLISTAR ACCIONES SEGUN LA PAGINA 
+    // METODO PARA ENLISTAR ACCIONES SEGUN LA PAGINA  **USADO
     ObtenerAccionesPaginasExistentes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_funcion } = req.body;
@@ -236,7 +236,7 @@ class RolPermisosControlador {
             }
         });
     }
-    //METODO PARA ENLISTAR ACCIONES 
+    // METODO PARA ENLISTAR ACCIONES  **USADO
     ListarAcciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const Roles = yield database_1.default.query(`

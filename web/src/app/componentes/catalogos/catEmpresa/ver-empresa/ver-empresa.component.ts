@@ -16,11 +16,12 @@ import { TipoSeguridadComponent } from '../tipo-seguridad/tipo-seguridad.compone
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { LogosComponent } from 'src/app/componentes/catalogos/catEmpresa/logos/logos.component';
 
+import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { AsignacionesService } from 'src/app/servicios/asignaciones/asignaciones.service';
 import { SelectionModel } from '@angular/cdk/collections';
+
 import { ITableSucursales } from 'src/app/model/reportes.model';
 
 @Component({
@@ -117,7 +118,6 @@ export class VerEmpresaComponent implements OnInit {
       this.datosEmpresa = datos;
       this.p_color = this.datosEmpresa[0].color_principal;
       this.s_color = this.datosEmpresa[0].color_secundario;
-      //console.log('ver datos de colores ', this.p_color, ' - ', this.s_color)
       this.principal.patchValue(this.p_color);
       this.secundario.patchValue(this.s_color);
       if (this.datosEmpresa[0].establecimiento === null || this.datosEmpresa[0].establecimiento === '' || this.datosEmpresa[0].establecimiento === undefined) {
@@ -624,6 +624,7 @@ export class VerEmpresaComponent implements OnInit {
       });
   }
 
+  // METODO PARA ELIMINAR MULTIPLES REGISTROS
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
@@ -655,6 +656,7 @@ export class VerEmpresaComponent implements OnInit {
     )
   }
 
+  // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {

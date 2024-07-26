@@ -8,7 +8,7 @@ class RegimenControlador {
    ** **                                  CONSULTAS REGIMEN LABORAL                                    ** **
    ** ** ************************************************************************************************ **/
 
-  // REGISTRO DE REGIMEN LABORAL
+  // REGISTRO DE REGIMEN LABORAL  **USADO
   public async CrearRegimen(req: Request, res: Response): Promise<Response> {
     try {
       const {
@@ -107,7 +107,7 @@ class RegimenControlador {
     }
   }
 
-  // ACTUALIZAR REGISTRO DE REGIMEN LABORAL
+  // ACTUALIZAR REGISTRO DE REGIMEN LABORAL  **USADO
   public async ActualizarRegimen(req: Request, res: Response): Promise<Response> {
     try {
       const {
@@ -228,7 +228,7 @@ class RegimenControlador {
     }
   }
 
-  // METODO PARA BUSCAR DESCRIPCION DE REGIMEN LABORAL
+  // METODO PARA BUSCAR DESCRIPCION DE REGIMEN LABORAL  **USADO
   public async ListarNombresRegimen(req: Request, res: Response) {
     const REGIMEN = await pool.query(
       ` 
@@ -242,7 +242,7 @@ class RegimenControlador {
     }
   }
 
-  // METODO PARA BUSCAR LISTA DE REGIMEN
+  // METODO PARA BUSCAR LISTA DE REGIMEN  **USADO
   public async ListarRegimen(req: Request, res: Response) {
     const REGIMEN = await pool.query(
       `
@@ -259,7 +259,7 @@ class RegimenControlador {
     }
   }
 
-  // BUSCAR UN REGISTRO DE REGIMEN LABORAL
+  // BUSCAR UN REGISTRO DE REGIMEN LABORAL  **USADO
   public async ListarUnRegimen(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
     const REGIMEN = await pool.query(
@@ -292,7 +292,7 @@ class RegimenControlador {
     }
   }
 
-  // ELIMINAR REGISTRO DE REGIMEN LABORAL
+  // ELIMINAR REGISTRO DE REGIMEN LABORAL  **USADO
   public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip } = req.body;
@@ -351,17 +351,15 @@ class RegimenControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
-      //return res.status(500).jsonp({ message:'error'});
       return res.jsonp({ message: 'error' });
-
     }
   }
 
   /** ** ************************************************************************************************ **
    ** **                         CONSULTAS DE PERIODOS DE VACACIONES                                   ** **
    ** ** ************************************************************************************************ **/
-
-  // REGISTRAR PERIODO DE VACACIONES
+ 
+  // REGISTRAR PERIODO DE VACACIONES  **USADO
   public async CrearPeriodo(req: Request, res: Response): Promise<Response> {
     try {
       const { id_regimen, descripcion, dias_vacacion, user_name, ip } = req.body;
@@ -405,7 +403,7 @@ class RegimenControlador {
     }
   }
 
-  // ACTUALIZAR REGISTRO DE PERIODO DE VACACIONES
+  // ACTUALIZAR REGISTRO DE PERIODO DE VACACIONES  **USADO
   public async ActualizarPeriodo(req: Request, res: Response): Promise<Response> {
     try {
       const { descripcion, dias_vacacion, id, user_name, ip } = req.body;
@@ -459,8 +457,8 @@ class RegimenControlador {
 
       // FINALIZAR TRANSACCION
       await pool.query("COMMIT");
-  
       return res.jsonp({ message: "Periodo guardado" });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
@@ -469,7 +467,7 @@ class RegimenControlador {
     }
   }
 
-  // BUSCAR UN REGISTRO DE PERIODO DE VACACIONES POR REGIMEN LABORAL
+  // BUSCAR UN REGISTRO DE PERIODO DE VACACIONES POR REGIMEN LABORAL  **USADO
   public async ListarUnPeriodo(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
     const PERIODO = await pool.query(
@@ -486,7 +484,7 @@ class RegimenControlador {
     }
   }
 
-  // ELIMINAR REGISTRO DE PERIODO DE VACACIONES
+  // ELIMINAR REGISTRO DE PERIODO DE VACACIONES  **USADO
   public async EliminarPeriodo(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip } = req.body;
@@ -550,7 +548,7 @@ class RegimenControlador {
    ** ** **                     REGISTRAR ANTIGUEDAD DE VACACIONES                                   ** **
    ** ** ********************************************************************************************** **/
 
-  // REGISTRAR ANTIGUEDAD DE VACACIONES
+  // REGISTRAR ANTIGUEDAD DE VACACIONES  **USADO
   public async CrearAntiguedad(req: Request, res: Response): Promise<Response> {
     try {
       const { anio_desde, anio_hasta, dias_antiguedad, id_regimen, user_name, ip } = req.body;
@@ -594,7 +592,7 @@ class RegimenControlador {
     }
   }
 
-  // ACTUALIZAR ANTIGUEDAD DE VACACIONES
+  // ACTUALIZAR ANTIGUEDAD DE VACACIONES  **USADO
   public async ActualizarAntiguedad(
     req: Request,
     res: Response
@@ -650,8 +648,8 @@ class RegimenControlador {
   
       // FINALIZAR TRANSACCION
       await pool.query("COMMIT");
-  
       return res.jsonp({ message: "Antiguedad guardada" });
+
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
@@ -659,7 +657,7 @@ class RegimenControlador {
     }
   }
 
-  // BUSCAR UN REGISTRO DE ANTIGUEDAD
+  // BUSCAR UN REGISTRO DE ANTIGUEDAD  **USADO
   public async ListarAntiguedad(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
     const ANTIGUO = await pool.query(
@@ -675,7 +673,7 @@ class RegimenControlador {
     }
   }
 
-  // ELIMINAR REGISTRO DE ANTIGUEDAD DE VACACIONES
+  // ELIMINAR REGISTRO DE ANTIGUEDAD DE VACACIONES  **USADO
   public async EliminarAntiguedad(req: Request, res: Response): Promise<Response> {
     try {
       const { user_name, ip } = req.body;
@@ -731,6 +729,7 @@ class RegimenControlador {
       // FINALIZAR TRANSACCION
       await pool.query("COMMIT");
       return res.jsonp({ message: "Registro eliminado." });
+      
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");

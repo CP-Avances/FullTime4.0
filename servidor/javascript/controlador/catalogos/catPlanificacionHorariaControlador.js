@@ -21,7 +21,7 @@ const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
 const moment_1 = __importDefault(require("moment"));
 class PlanificacionHorariaControlador {
-    //METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA
+    // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA
     VerificarDatosPlanificacionHoraria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -120,7 +120,7 @@ class PlanificacionHorariaControlador {
             res.json({ planificacionHoraria: plantillaPlanificacionHorariaEstructurada, fechaInicioMes, fechaFinalMes });
         });
     }
-    //METODO PARA REGISTRAR LA PLANIFICACION HORARIA EN LA BASE DE DATOS
+    // METODO PARA REGISTRAR LA PLANIFICACION HORARIA EN LA BASE DE DATOS
     RegistrarPlanificacionHoraria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -595,7 +595,7 @@ function ConsultarFeriados(fecha_inicio, fecha_final, id_usuario) {
             FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s, 
                 informacion_general AS de
             WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
-                AND s.id_ciudad = cf.id_ciudad AND de.id_sucursal = s.id AND de.id = $3
+                AND s.id_ciudad = cf.id_ciudad AND de.id_suc = s.id AND de.id = $3
             `, [fecha_inicio, fecha_final, id_usuario]);
             if (FERIADO.rowCount != 0) {
                 return FERIADO.rows;

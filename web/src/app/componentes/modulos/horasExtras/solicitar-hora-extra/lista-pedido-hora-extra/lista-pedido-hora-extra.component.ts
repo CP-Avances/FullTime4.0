@@ -841,7 +841,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     };
   }
 
-  //Metodo seleccionar que lista de permisos mostrar (solicitados o autorizados)
+  // MEtodo seleccionar que lista de permisos mostrar (solicitados o autorizados)
   mostrarDatosSolicitudes(opcion: string) {
     return (opcion == "Solicitudes de horas extras con observaciones" ? this.lista_pedidosFiltradas : (
       opcion == "Solicitudes de horas extras con observaciones" ? this.listaHorasExtrasObservaFiltradas : this.listaHorasExtrasAutorizadasFiltradas

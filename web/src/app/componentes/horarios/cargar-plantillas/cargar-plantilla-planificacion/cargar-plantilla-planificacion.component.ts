@@ -151,7 +151,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
       let itemName = arrayItems[0];
 
       if (itemExtencion === 'xlsx' || itemExtencion === 'xls') {
-        if (itemName.toLowerCase() == 'plantillaplanificacionmultiple') {
+        if (itemName.toLowerCase().startsWith('plantillaplanificacionmultiple')) {
           this.VerificarPlantilla();
           this.deshabilitarRegistro = false;
         } else {
@@ -221,6 +221,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
       });
 
       this.planificacionesHorarias = data.planificacionHoraria;
+      console.log(this.planificacionesHorarias);
 
     }
   }

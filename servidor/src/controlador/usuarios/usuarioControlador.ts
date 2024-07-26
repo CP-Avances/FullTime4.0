@@ -89,6 +89,7 @@ class UsuarioControlador {
     }
   }
 
+  // METODO PARA OBTENER EL ID DEL USUARIO MEDIANTE DEPARTAMENTO VIGENTE DEL USUARIO **USADO
   public async ObtenerIdUsuariosDepartamento(req: Request, res: Response) {
     const { id_departamento } = req.body;
     const Ids = await pool.query(
@@ -172,11 +173,11 @@ class UsuarioControlador {
   
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
-  
+
       // CONSULTAR DATOSORIGINALES
       const consulta = await pool.query(`SELECT * FROM eu_usuarios WHERE id_empleado = $1`, [id_empleado]);
       const [datosOriginales] = consulta.rows;
-  
+
       if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
           tabla: 'eu_usuarios',
@@ -187,12 +188,12 @@ class UsuarioControlador {
           ip,
           observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
         });
-  
+
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
-  
+
       await pool.query(
         `
         UPDATE eu_usuarios SET contrasena = $1 WHERE id_empleado = $2
@@ -209,7 +210,7 @@ class UsuarioControlador {
         ip,
         observacion: null
       });
-  
+
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
       return res.jsonp({ message: 'Registro actualizado.' });
@@ -227,7 +228,7 @@ class UsuarioControlador {
       const { admin_comida, id_empleado, user_name, ip } = req.body;
 
       const adminComida = await admin_comida.toLowerCase() === 'si' ? true : false;
-      
+
 
       // INICIAR TRANSACCION
       await pool.query('BEGIN');
@@ -259,7 +260,7 @@ class UsuarioControlador {
         , [adminComida, id_empleado]);
 
       const [datosNuevos] = actualizacion.rows;
-      
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'eu_usuarios',
@@ -795,7 +796,7 @@ class UsuarioControlador {
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE WEB
   public async ActualizarEstadoTimbreWeb(req: Request, res: Response) {
     try {
-      const {array, user_name, ip} = req.body;
+      const { array, user_name, ip } = req.body;
 
       if (array.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registros.' })
 
@@ -1314,7 +1315,7 @@ class UsuarioControlador {
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
   public async ActualizarEstadoTimbreMovil(req: Request, res: Response) {
     try {
-      const {array, user_name, ip} = req.body;
+      const { array, user_name, ip } = req.body;
 
       if (array.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registros.' })
 
@@ -1583,7 +1584,7 @@ class UsuarioControlador {
   public async CambiarFrase(req: Request, res: Response): Promise<Response> {
     var token = req.body.token;
     var frase = req.body.frase;
-    const {user_name, ip} = req.body;
+    const { user_name, ip } = req.body;
     try {
       const payload = jwt.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail') as IPayload;
       const id_empleado = payload._id;
@@ -1638,7 +1639,7 @@ class UsuarioControlador {
     }
   }
 
-  
+
 
   /** ************************************************************************************************** **
    ** **                           METODOS TABLA USUARIO - DEPARTAMENTO                               ** **
@@ -1669,7 +1670,7 @@ class UsuarioControlador {
   public async CrearUsuarioDepartamento(req: Request, res: Response) {
     try {
       const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = req.body
-      
+
       // INICIA TRANSACCION
       await pool.query('BEGIN');
 
@@ -1700,9 +1701,9 @@ class UsuarioControlador {
       await pool.query('ROLLBACK');
       return res.jsonp({ message: 'error' });
     }
-  } 
+  }
 
-  //BUSCAR DATOS DE USUARIOS - DEPARTAMENTO
+  // BUSCAR DATOS DE USUARIOS - DEPARTAMENTO - ASIGNACION DE INFORMACION **USADO
   public async BuscarUsuarioDepartamento(req: Request, res: Response) {
     const { id_empleado } = req.body;
     const USUARIOS = await pool.query(
@@ -1710,12 +1711,13 @@ class UsuarioControlador {
       SELECT ud.id, e.nombre, e.apellido, d.nombre AS departamento, d.id AS id_departamento, 
       s.id AS id_sucursal, s.nombre AS sucursal, ud.principal, ud.personal, ud.administra
       FROM eu_usuario_departamento AS ud
-      INNER JOIN eu_empleados AS e ON ud.id_empleado=e.id
-      INNER JOIN ed_departamentos AS d ON ud.id_departamento=d.id
-      INNER JOIN e_sucursales AS s ON d.id_sucursal=s.id
+      INNER JOIN eu_empleados AS e ON ud.id_empleado = e.id
+      INNER JOIN ed_departamentos AS d ON ud.id_departamento = d.id
+      INNER JOIN e_sucursales AS s ON d.id_sucursal = s.id
       WHERE id_empleado = $1
       ORDER BY ud.id ASC
-      `,[id_empleado]
+      `
+      , [id_empleado]
     );
     if (USUARIOS.rowCount != 0) {
       return res.jsonp(USUARIOS.rows)
@@ -1914,8 +1916,8 @@ class UsuarioControlador {
 
     if (error) return res.status(500).jsonp({ message: 'error' });
 
-    return res.json({ message: 'Proceso completado'});
-    
+    return res.json({ message: 'Proceso completado' });
+
   }
 
 }
@@ -1925,23 +1927,23 @@ class UsuarioControlador {
     0: USUARIO NO EXISTE => NO SE EJECUTA NINGUNA ACCION
     1: NO EXISTE LA ASIGNACION => SE PUEDE ASIGNAR (INSERTAR)
     2: EXISTE LA ASIGNACION Y ES PRINCIPAL => SE ACTUALIZA LA ASIGNACION (PRINCIPAL) 
-    3: EXISTE LA ASIGNACION Y NO ES PRINCIPAL => NO SE EJECUTA NINGUNA ACCION  */  async function VerificarAsignaciones(datos: any, personal: boolean, isPersonal: boolean): Promise<number> {    const { id_empleado, id_departamento } = datos;      const consulta = await pool.query(      `      SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 AND id_departamento = $2      `      , [id_empleado, id_departamento]);           if (consulta.rowCount === 0) return 1;              const asignacion = consulta.rows[0];        if (asignacion.principal) {        datos.principal = true;        datos.id = asignacion.id;        datos.personal = asignacion.personal;            if (isPersonal) {          datos.personal = true;        }            if (personal) {          datos.administra = asignacion.administra;        }        return 2;      }    return 3;   }
-  
+    3: EXISTE LA ASIGNACION Y NO ES PRINCIPAL => NO SE EJECUTA NINGUNA ACCION  */  async function VerificarAsignaciones(datos: any, personal: boolean, isPersonal: boolean): Promise<number> { const { id_empleado, id_departamento } = datos; const consulta = await pool.query(`      SELECT * FROM eu_usuario_departamento WHERE id_empleado = $1 AND id_departamento = $2      `, [id_empleado, id_departamento]); if (consulta.rowCount === 0) return 1; const asignacion = consulta.rows[0]; if (asignacion.principal) { datos.principal = true; datos.id = asignacion.id; datos.personal = asignacion.personal; if (isPersonal) { datos.personal = true; } if (personal) { datos.administra = asignacion.administra; } return 2; } return 3; }
+
 async function RegistrarUsuarioDepartamento(datos: any): Promise<boolean> {
   try {
     const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = datos;
-  
+
     // INICIA TRANSACCION
     await pool.query('BEGIN');
-  
+
     const registro = await pool.query(
       `
       INSERT INTO eu_usuario_departamento (id_empleado, id_departamento, principal, personal, administra) 
       VALUES ($1, $2, $3, $4, $5) RETURNING *
       `
       , [id_empleado, id_departamento, principal, personal, administra]);
-        
-     const [datosNuevos] = registro.rows;
+
+    const [datosNuevos] = registro.rows;
 
     // AUDITORIA
     await AUDITORIA_CONTROLADOR.InsertarAuditoria({
@@ -1953,7 +1955,7 @@ async function RegistrarUsuarioDepartamento(datos: any): Promise<boolean> {
       ip,
       observacion: null
     });
-  
+
     // FINALIZAR TRANSACCION
     await pool.query('COMMIT');
     return false;
@@ -1961,7 +1963,7 @@ async function RegistrarUsuarioDepartamento(datos: any): Promise<boolean> {
     return true;
   }
 }
-  
+
 async function EditarUsuarioDepartamento(datos: any): Promise<boolean> {
   try {
     const { id_empleado, id_departamento, principal, personal, administra, user_name, ip } = datos;

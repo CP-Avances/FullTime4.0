@@ -9,7 +9,7 @@ import moment from "moment";
 
 class PlanificacionHorariaControlador {
 
-    //METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA
+    // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA
     public async VerificarDatosPlanificacionHoraria(req: Request, res: Response) {
         const documento = req.file?.originalname;
 
@@ -128,7 +128,7 @@ class PlanificacionHorariaControlador {
         res.json({ planificacionHoraria: plantillaPlanificacionHorariaEstructurada, fechaInicioMes, fechaFinalMes });
     }
 
-    //METODO PARA REGISTRAR LA PLANIFICACION HORARIA EN LA BASE DE DATOS
+    // METODO PARA REGISTRAR LA PLANIFICACION HORARIA EN LA BASE DE DATOS
     public async RegistrarPlanificacionHoraria(req: Request, res: Response): Promise<Response> {
 
         try {
@@ -678,7 +678,7 @@ async function ConsultarFeriados(fecha_inicio: string, fecha_final: string, id_u
             FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s, 
                 informacion_general AS de
             WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
-                AND s.id_ciudad = cf.id_ciudad AND de.id_sucursal = s.id AND de.id = $3
+                AND s.id_ciudad = cf.id_ciudad AND de.id_suc = s.id AND de.id = $3
             `
             , [fecha_inicio, fecha_final, id_usuario]);
 

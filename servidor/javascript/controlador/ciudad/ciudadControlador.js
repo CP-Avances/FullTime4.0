@@ -47,7 +47,7 @@ class CiudadControlador {
             }
         });
     }
-    // BUSCAR LISTA DE CIUDADES PROVINCIA
+    // BUSCAR LISTA DE CIUDADES PROVINCIA   **USADO
     ListarCiudadesProvincia(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_provincia } = req.params;
@@ -62,7 +62,7 @@ class CiudadControlador {
             }
         });
     }
-    // REGISTRAR CIUDAD
+    // REGISTRAR CIUDAD   **USADO
     CrearCiudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -93,7 +93,7 @@ class CiudadControlador {
             }
         });
     }
-    // METODO PARA LISTAR NOMBRE DE CIUDADES - PROVINCIAS
+    // METODO PARA LISTAR NOMBRE DE CIUDADES - PROVINCIAS   **USADO
     ListarNombreCiudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const CIUDAD = yield database_1.default.query(`
@@ -110,7 +110,7 @@ class CiudadControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTRO
+    // METODO PARA ELIMINAR REGISTRO  **USADO
     EliminarCiudad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -119,7 +119,7 @@ class CiudadControlador {
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOS ORIGINALES
-                const ciudad = yield database_1.default.query('SELECT * FROM e_ciudades WHERE id = $1', [id]);
+                const ciudad = yield database_1.default.query(`SELECT * FROM e_ciudades WHERE id = $1`, [id]);
                 const [datosOriginales] = ciudad.rows;
                 if (!datosOriginales) {
                     // AUDITORIA
@@ -156,7 +156,6 @@ class CiudadControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                //return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
                 return res.jsonp({ message: 'error' });
             }
         });

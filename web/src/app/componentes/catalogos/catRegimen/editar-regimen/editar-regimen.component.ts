@@ -1,16 +1,16 @@
-import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { AfterViewInit, Component, OnInit, ChangeDetectorRef, AfterContentChecked, Input } from '@angular/core';
+import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatRadioChange } from '@angular/material/radio';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 
-import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
-import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
-import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.component';
-import { use } from 'echarts';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
+import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
+
+import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.component';
 
 @Component({
   selector: 'app-editar-regimen',
@@ -174,7 +174,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
   private _filter(value: string): any {
     if (value != null) {
       const filterValue = value.toLowerCase();
-      return this.paises.filter(pais => pais.nombre.toLowerCase().includes(filterValue));
+      return this.paises.filter((pais: any) => pais.nombre.toLowerCase().includes(filterValue));
     }
   }
 
@@ -754,11 +754,8 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
   mensaje1_: boolean = false; // ------------------------- Mensaje de errores inactivos (false)
   mensaje2_: boolean = false;
   mensaje3_: boolean = false;
-  //   VerificarPeriodos(valor: string, opcion: number): void {
   VerificarPeriodos(event: Event, opcion: number): void {
-    var valor = event.target as HTMLInputElement;
-
-    console.log(valor.value);
+    var valor = event.target as HTMLInputElement;;
     if (parseFloat(valor.value) >= 5) {
       if (opcion === 1) {
         this.mensaje1_ = false;

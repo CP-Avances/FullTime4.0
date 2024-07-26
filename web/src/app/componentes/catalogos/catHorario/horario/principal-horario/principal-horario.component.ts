@@ -404,7 +404,7 @@ export class PrincipalHorarioComponent implements OnInit {
     });
   }
 
-  //METODO PARA ORDENAR DETALLES POR OBSERVACION
+  // METODO PARA ORDENAR DETALLES POR OBSERVACION
   OrdenarDetalles() {
     this.dataHorarios.plantillaDetalles.sort((a: any, b: any) => {
       if (a.OBSERVACION !== 'Ok' && b.OBSERVACION === 'Ok') {
@@ -558,32 +558,26 @@ export class PrincipalHorarioComponent implements OnInit {
       n.push({
         style: 'tableMarginCabeceraHorario',
         table: {
-          widths: ['*','*'],
-          headerRows: 2,
+          widths: ['*','*', '*'],
+          headerRows: 3,
           body: [
             [
               { text: `HORARIO: ${obj.nombre}`, style: 'itemsTableInfoHorario', border: [true, true, false, false] },
-              { text: `HORAS DE TRABAJO: ${obj.hora_trabajo}`, style: 'itemsTableInfoHorario', border: [false, true, true, false] }
+              { text: `HORAS DE TRABAJO: ${obj.hora_trabajo}`, style: 'itemsTableInfoHorario', border: [false, true, false, false] },
+              { text: `MINUTOS DE ALIMENTACIÓN: ${obj.minutos_comida}`, style: 'itemsTableInfoHorario', border: [false, true, true, false] },
             ],
             [
               { text: `CÓDIGO: ${obj.codigo}`, style: 'itemsTableInfoHorario', border: [true, false, false, false] },
-              { text: `HORARIO NOTURNO ${obj.noturno == true ? 'Sí' : 'No'}`, style: 'itemsTableInfoHorario', border: [false, false, true, false] }
+              { text: `HORARIO NOTURNO: ${obj.noturno == true ? 'Sí' : 'No'}`, style: 'itemsTableInfoHorario', border: [false, false, false, false] },
+              { text: ``, style: 'itemsTableInfoHorario', border: [false, false, true, false] },
             ],
-          ]
-        },
-      });
-
-      n.push({
-        style: 'tableMargin',
-        table: {
-          widths: ['*'],
-          headerRows: 1,
-          body: [
             [
-              { text: `DOCUMENTO: ${obj.documento ? obj.documento : ''}`, style: 'itemsTableInfoHorario', border: obj.detalles.length > 0 ? [true, false, true, false] : [true, false, true, true] },
+              { text: `DOCUMENTO: ${obj.documento ? obj.documento : ''}`, rowSpan: 1, colSpan: 3, style: 'itemsTableInfoHorario', border: obj.detalles.length > 0 ? [true, false, true, false] : [true, false, true, true] },
+              {},
+              {},
             ]
           ]
-        }
+        },
       });
 
       if (obj.detalles.length > 0) {
@@ -608,7 +602,7 @@ export class PrincipalHorarioComponent implements OnInit {
                 { text: 'HORA', style: 'tableHeader' },
                 { text: 'TOLERANCIA', style: 'tableHeader' },
                 { text: 'ACCIÓN', style: 'tableHeader' },
-                { text: 'OTRO DIA', style: 'tableHeader' },
+                { text: 'OTRO DÍA', style: 'tableHeader' },
                 { text: 'MINUTOS ANTES', style: 'tableHeader' },
                 { text: 'MINUTOS DESPUES', style: 'tableHeader' },
               ],
@@ -635,44 +629,6 @@ export class PrincipalHorarioComponent implements OnInit {
     });
 
     return n;
-    // return {
-    //   columns: [
-    //     { width: '*', text: '' },
-    //     {
-    //       width: 'auto',
-    //       table: {
-    //         widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
-    //         body: [
-    //           [
-    //             { text: 'Código', style: 'tableHeader' },
-    //             { text: 'Nombre', style: 'tableHeader' },
-    //             { text: 'Minutos de almuerzo', style: 'tableHeader' },
-    //             { text: 'Horas de trabajo', style: 'tableHeader' },
-    //             { text: 'Horario noturno', style: 'tableHeader' },
-    //             { text: 'Documento', style: 'tableHeader' },
-    //           ],
-    //           ...this.horarios.map((obj: any) => {
-    //             return [
-    //               { text: obj.codigo, style: 'itemsTableC' },
-    //               { text: obj.nombre, style: 'itemsTable' },
-    //               { text: obj.minutos_comida, style: 'itemsTableC' },
-    //               { text: obj.hora_trabajo, style: 'itemsTableC' },
-    //               { text: obj.noturno == true ? 'Sí' : 'No', style: 'itemsTableC' },
-    //               { text: obj.documento, style: 'itemsTableC' },
-    //             ];
-    //           })
-    //         ]
-    //       },
-    //       // ESTILO DE COLORES FORMATO ZEBRA
-    //       layout: {
-    //         fillColor: function (i: any) {
-    //           return (i % 2 === 0) ? '#CCD1D1' : null;
-    //         }
-    //       }
-    //     },
-    //     { width: '*', text: '' },
-    //   ]
-    // };
   }
 
 
@@ -681,10 +637,37 @@ export class PrincipalHorarioComponent implements OnInit {
    ** ************************************************************************************************* **/
 
   ExportToExcel() {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.horarios);
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel());
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'horarios');
     xlsx.writeFile(wb, "HorariosEXCEL" + '.xlsx');
+  }
+
+  EstructurarDatosExcel() {
+    let datos: any = [];
+    let n: number = 1;
+    this.horarios.forEach((obj: any) => {
+      obj.detalles.forEach((det: any) => {
+        datos.push({
+          'N°': n++,
+          'HORARIO': obj.nombre,
+          'CÓDIGO': obj.codigo,
+          'HORAS DE TRABAJO': obj.hora_trabajo,
+          'MINUTOS DE ALIMENTACIÓN': obj.minutos_comida,
+          'HORARIO NOTURNO': obj.noturno == true ? 'Sí' : 'No',
+          'DOCUMENTO': obj.documento ? obj.documento : '',
+          'ORDEN': det.orden,
+          'HORA': det.hora,
+          'TOLERANCIA': det.tolerancia != null ? det.tolerancia : '',
+          'ACCIÓN': det.tipo_accion_show,
+          'OTRO DÍA': det.segundo_dia == true ? 'Sí' : 'No',
+          'MINUTOS ANTES': det.minutos_antes,
+          'MINUTOS DESPUES': det.minutos_despues,
+        });
+      });
+    });
+
+    return datos;
   }
 
   /** ************************************************************************************************* **
@@ -692,10 +675,37 @@ export class PrincipalHorarioComponent implements OnInit {
    ** ************************************************************************************************* **/
 
   ExportToCVS() {
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.horarios);
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosCSV());
     const csvDataH = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "HorariosCSV" + '.csv');
+  }
+
+  EstructurarDatosCSV() {
+    let datos: any = [];
+    let n: number = 1;
+    this.horarios.forEach((obj: any) => {
+      obj.detalles.forEach((det: any) => {
+        datos.push({
+          'n': n++,
+          'horario': obj.nombre,
+          'codigo': obj.codigo,
+          'horas_trabajo': obj.hora_trabajo,
+          'minutos_alimentacion': obj.minutos_comida,
+          'horario_noturno': obj.noturno == true ? 'Sí' : 'No',
+          'documento': obj.documento ? obj.documento : '',
+          'orden': det.orden,
+          'hora': det.hora,
+          'tolerancia': det.tolerancia != null ? det.tolerancia : '',
+          'accion': det.tipo_accion,
+          'otro_dia': det.segundo_dia == true ? 'Sí' : 'No',
+          'minutos_antes': det.minutos_antes,
+          'minutos_despues': det.minutos_despues,
+        });
+      });
+    });
+
+    return datos;
   }
 
   /** ************************************************************************************************* **
@@ -708,14 +718,28 @@ export class PrincipalHorarioComponent implements OnInit {
     var objeto: any;
     var arregloHorarios: any = [];
     this.horarios.forEach((obj: any) => {
+      let detalles: any = [];
+      obj.detalles.forEach((det: any) => {
+        detalles.push({
+          "$": { "orden": det.orden },
+          "hora": det.hora,
+          "tolerancia": det.tolerancia != null ? det.tolerancia : '',
+          "accion": det.tipo_accion_show,
+          "otro_dia": det.segundo_dia == true ? 'Sí' : 'No',
+          "minutos_antes": det.minutos_antes,
+          "minutos_despues": det.minutos_despues,
+        });
+      });
+
       objeto = {
         "horario": {
-          "$": { "id": obj.id },
+          "$": { "codigo": obj.codigo },
           "nombre": obj.nombre,
-          "min_almuerzo": obj.minutos_comida,
-          "hora_trabajo": obj.hora_trabajo,
-          "noturno": obj.nocturno,
+          'horas_trabajo': obj.hora_trabajo,
+          'minutos_alimentación': obj.minutos_comida,
+          "horario_noturno": obj.nocturno,
           "documento": obj.documento,
+          "detalles": { "detalle": detalles }
         }
       }
       arregloHorarios.push(objeto)
@@ -749,7 +773,7 @@ export class PrincipalHorarioComponent implements OnInit {
   }
 
 
-  //METODO PARA DEFINIR EL COLOR DE LA OBSERVACION
+  // METODO PARA DEFINIR EL COLOR DE LA OBSERVACION
   ObtenerColorValidacion(observacion: string): string {
     if (observacion.startsWith('Datos no registrados:')) {
       return 'rgb(242, 21, 21)';

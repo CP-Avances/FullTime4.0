@@ -102,11 +102,11 @@ class EmpleadoCargosControlador {
             const { id } = req.params;
             const unEmplCargp = yield database_1.default.query(`
       SELECT ec.id, ec.id_contrato, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.sueldo, 
-        ec.hora_trabaja, ec.id_sucursal, s.nombre AS sucursal, ec.id_departamento, ec.jefe, ec.estado,
+        ec.hora_trabaja, d.id_sucursal, s.nombre AS sucursal, ec.id_departamento, ec.jefe, ec.estado,
         d.nombre AS departamento, e.id AS id_empresa, e.nombre AS empresa, tc.cargo AS nombre_cargo 
       FROM eu_empleado_cargos AS ec, e_sucursales AS s, ed_departamentos AS d, e_empresa AS e, 
         e_cat_tipo_cargo AS tc 
-      WHERE ec.id = $1 AND ec.id_sucursal = s.id AND ec.id_departamento = d.id AND 
+      WHERE ec.id = $1 AND d.id_sucursal = s.id AND ec.id_departamento = d.id AND 
         s.id_empresa = e.id AND ec.id_tipo_cargo = tc.id 
       ORDER BY ec.id
       `, [id]);
@@ -122,14 +122,14 @@ class EmpleadoCargosControlador {
     Crear(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, user_name, ip, jefe } = req.body;
+                const { id_empl_contrato, id_departamento, fec_inicio, fec_final, sueldo, hora_trabaja, cargo, user_name, ip, jefe } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 const datosNuevos = yield database_1.default.query(`
-        INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal,
+        INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final,
            sueldo, hora_trabaja, id_tipo_cargo, jefe) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
-        `, [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe]);
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *
+        `, [id_empl_contrato, id_departamento, fec_inicio, fec_final, sueldo, hora_trabaja, cargo, jefe]);
                 const [empleadoCargo] = datosNuevos.rows;
                 const fechaIngresoN = yield (0, settingsMail_1.FormatearFecha2)(fec_inicio, 'ddd');
                 const fechaSalidaN = yield (0, settingsMail_1.FormatearFecha2)(fec_final, 'ddd');
@@ -162,7 +162,7 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empl_contrato, id } = req.params;
-                const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, user_name, ip, jefe } = req.body;
+                const { id_departamento, fec_inicio, fec_final, sueldo, hora_trabaja, cargo, user_name, ip, jefe } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
                 // CONSULTAR DATOSORIGINALES
@@ -186,10 +186,10 @@ class EmpleadoCargosControlador {
                     return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
                 }
                 const datosNuevos = yield database_1.default.query(`
-        UPDATE eu_empleado_cargos SET id_departamento = $1, fecha_inicio = $2, fecha_final = $3, id_sucursal = $4, 
-          sueldo = $5, hora_trabaja = $6, id_tipo_cargo = $7, jefe = $10  
-        WHERE id_contrato = $8 AND id = $9 RETURNING *
-        `, [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo,
+        UPDATE eu_empleado_cargos SET id_departamento = $1, fecha_inicio = $2, fecha_final = $3, 
+          sueldo = $4, hora_trabaja = $5, id_tipo_cargo = $6, jefe = $9  
+        WHERE id_contrato = $7 AND id = $8 RETURNING *
+        `, [id_departamento, fec_inicio, fec_final, sueldo, hora_trabaja, cargo,
                     id_empl_contrato, id, jefe]);
                 const [empleadoCargo] = datosNuevos.rows;
                 const fechaIngresoO = yield (0, settingsMail_1.FormatearFecha2)(datosOriginales.fecha_inicio, 'ddd');
@@ -229,7 +229,7 @@ class EmpleadoCargosControlador {
       SELECT ec.id, ec.id_tipo_cargo, ec.fecha_inicio, ec.fecha_final, ec.sueldo, ec.hora_trabaja, 
         s.nombre AS sucursal, d.nombre AS departamento, ec.jefe 
       FROM eu_empleado_cargos AS ec, e_sucursales AS s, ed_departamentos AS d 
-      WHERE ec.id_contrato = $1 AND ec.id_sucursal = s.id AND ec.id_departamento = d.id
+      WHERE ec.id_contrato = $1 AND d.id_sucursal = s.id AND ec.id_departamento = d.id
       `, [id_empl_contrato]);
             if (unEmplCargp.rowCount != 0) {
                 return res.jsonp(unEmplCargp.rows);
@@ -325,6 +325,7 @@ class EmpleadoCargosControlador {
             }
         });
     }
+    //TODO REVISAR
     BuscarTipoSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
@@ -774,10 +775,10 @@ class EmpleadoCargosControlador {
                     console.log('id_empleado: ', id_empleado);
                     console.log('departamento: ', id_departamento);
                     const response = yield database_1.default.query(`
-          INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal, 
+          INSERT INTO eu_empleado_cargos (id_contrato, id_departamento, fecha_inicio, fecha_final, 
             sueldo, id_tipo_cargo, hora_trabaja, jefe) 
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
-          `, [id_contrato, id_departamento, fecha_desde, fecha_hasta, id_sucursal, sueldo, id_cargo,
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *
+          `, [id_contrato, id_departamento, fecha_desde, fecha_hasta, sueldo, id_cargo,
                         hora_trabaja, admin_dep]);
                     const [cargos] = response.rows;
                     const response2 = yield database_1.default.query(`

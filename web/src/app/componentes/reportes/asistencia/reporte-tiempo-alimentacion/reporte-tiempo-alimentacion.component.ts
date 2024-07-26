@@ -1498,7 +1498,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     this.paginatorDetalle.firstPage();
   }
 
-  //METDODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
+  // METDODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
   ObtenerClaseCeldas(valor: any) {
     if (valor > 0) {
       return 'verde';
