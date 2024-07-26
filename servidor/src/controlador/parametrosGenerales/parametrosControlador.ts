@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
+import { BuscarFecha , BuscarHora } from '../../libs/settingsMail';
 
 class ParametrosControlador {
 
@@ -288,6 +289,25 @@ class ParametrosControlador {
                 .jsonp({ message: 'error_500' });
         }
     }
+
+
+    //--------------------------------- METODO DE APP MOVIL ---------------------------------------------------------------------------------------- 
+
+    public async BuscarFechasHoras(req: Request, res: Response): Promise<Response> {
+        try {
+            let formato_fecha = await BuscarFecha();
+            let formato_hora = await BuscarHora();
+            let formatos = {
+                fecha: formato_fecha.fecha,
+                hora: formato_hora.hora
+            }
+            return res.jsonp(formatos);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+        }
+    };
+  
 
 }
 

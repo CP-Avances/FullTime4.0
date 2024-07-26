@@ -90,8 +90,8 @@ class LoginControlador {
                     caducidad_licencia = fec_desactivacion;
                     // BUSQUEDA DE INFORMACION
                     const INFORMACION = yield database_1.default.query(`
-           SELECT e.id as id_contrato, c.hora_trabaja, c.id_departamento, s.id_empresa, d.id_sucursal,
-            c.id AS id_cargo, cg_e.acciones_timbres, cg_e.public_key, 
+           SELECT empl.nombre, empl.apellido, empl.cedula, e.id as id_contrato, c.hora_trabaja, c.id_departamento, s.id_empresa, d.id_sucursal,
+            c.id AS id_cargo, cg_e.ruc ,cg_e.acciones_timbres, cg_e.public_key, 
             (SELECT id FROM mv_periodo_vacacion pv WHERE pv.id_empleado = empl.id 
             ORDER BY pv.fecha_inicio DESC LIMIT 1 ) as id_peri_vacacion, 
             (SELECT nombre FROM ed_departamentos cd WHERE cd.id = c.id_departamento ) AS ndepartamento 
@@ -107,7 +107,7 @@ class LoginControlador {
                     if (INFORMACION.rowCount != 0) {
                         console.log('ingresa a validacion de licencia');
                         try {
-                            const { id_contrato, id_cargo, id_departamento, acciones_timbres, id_sucursal, id_empresa, public_key: licencia } = INFORMACION.rows[0];
+                            const { nombre, apellido, cedula, id_contrato, id_cargo, id_departamento, acciones_timbres, id_sucursal, id_empresa, public_key: licencia, ruc } = INFORMACION.rows[0];
                             const AUTORIZA = yield database_1.default.query(`
               SELECT estado FROM ed_autoriza_departamento
               WHERE id_empleado_cargo = $1 AND id_departamento = $2
@@ -124,7 +124,7 @@ class LoginControlador {
                                     caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
                                     departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
                                     empresa: id_empresa, cargo: id_cargo, estado: autoriza_est, ip_adress: ip_cliente,
-                                    modulos: modulos, id_contrato: id_contrato
+                                    modulos: modulos, id_contrato: id_contrato, nombre: nombre, apellido: apellido, cedula: cedula, ruc: ruc, version: '4.0.0'
                                 });
                             }
                             else {
@@ -138,7 +138,7 @@ class LoginControlador {
                                     caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
                                     departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
                                     empresa: id_empresa, cargo: id_cargo, estado: false, ip_adress: ip_cliente, modulos: modulos,
-                                    id_contrato: id_contrato
+                                    id_contrato: id_contrato, nombre: nombre, apellido: apellido, cedula: cedula, ruc: ruc, version: '4.0.0'
                                 });
                             }
                         }

@@ -67,6 +67,7 @@ class UsuarioRutas {
         // METODOS PARA APP MOVIL
         this.router.get('/IDdispositivos/:id_empleado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getidDispositivo);
         this.router.post('/ingresarIDdispositivo', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ingresarIDdispositivo);
+        this.router.get('/usuarioEmpresa', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getEmpleadosActivos);
     }
 }
 const USUARIO_RUTA = new UsuarioRutas();

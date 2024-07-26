@@ -80,6 +80,7 @@ class UsuarioRutas {
 
         this.router.post('/ingresarIDdispositivo',TokenValidation, USUARIO_CONTROLADOR.ingresarIDdispositivo);
 
+        this.router.get('/usuarioEmpresa', TokenValidation, USUARIO_CONTROLADOR.getEmpleadosActivos);
 
     }
 }

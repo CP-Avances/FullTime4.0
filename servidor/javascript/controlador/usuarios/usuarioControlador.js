@@ -1689,6 +1689,27 @@ class UsuarioControlador {
         });
     }
     ;
+    getEmpleadosActivos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const response = yield database_1.default.query('SELECT e.cedula, e.codigo, ' +
+                    '( e.apellido || \' \' || e.nombre) as fullname, e.id, u.id_rol, u.usuario ' +
+                    'FROM eu_empleados AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND e.estado = 1 ORDER BY fullname');
+                const usuarios = response.rows;
+                console.log(usuarios);
+                return res.jsonp(usuarios);
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(500).
+                    jsonp({
+                    message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 ' +
+                        'o https://casapazmino.com.ec'
+                });
+            }
+        });
+    }
+    ;
 }
 /* @return
     CASOS DE RETORNO

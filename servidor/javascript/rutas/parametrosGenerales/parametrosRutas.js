@@ -28,6 +28,8 @@ class ParametrosRutas {
         this.router.put('/actual-detalle', verificarToken_1.TokenValidation, parametrosControlador_1.default.ActualizarDetalleParametro);
         // METODO PARA COMPARAR COORDENADAS
         this.router.post('/coordenadas', verificarToken_1.TokenValidation, parametrosControlador_1.default.CompararCoordenadas);
+        //-------------------------------- METODOS APP WEB ------------------------------------
+        this.router.get('/buscarformatos', verificarToken_1.TokenValidation, parametrosControlador_1.default.BuscarFechasHoras);
     }
 }
 const PARAMETROS_RUTAS = new ParametrosRutas();
