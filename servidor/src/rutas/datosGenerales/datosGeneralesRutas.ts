@@ -12,14 +12,12 @@ class CiudadRutas {
 
     configuracion(): void {
 
-        // METODO PARA CONSULTAR DATOS DE USUARIOS ACTIVOS E INACTIVOS CON PERFIL ADMINISTRADOR
-        this.router.get('/informacion-data-general-superior/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarDataGeneral_SUPERADMIN);
+        // METODO PARA CONSULTAR DATOS DE USUARIOS ACTIVOS E INACTIVOS 
+        this.router.get('/informacion-data-general/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarDataGeneral);
 
-        // METODO PARA CONSULTAR DATOS DE USUARIOS ACTIVOS E INACTIVOS CON PERFIL ADMINISTRADOR
-        this.router.post('/informacion-data-general/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarDataGeneral_ADMIN);
+        // METODO PARA CONSULTAR DATOS DE USUARIOS ACTIVOS E INACTIVOS 
+        this.router.get('/informacion-data-general-rol/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarDataGeneralRol);
 
-        // METODO PARA CONSULTAR DATOS DE USUARIOS ACTIVOS E INACTIVOS CON PERFIL ADMINISTRADOR-JEFE
-        this.router.post('/informacion-data-general-jefe/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarDataGeneral_JEFE);
 
         // METODO PARA BUSCAR INFORMACION DE UN USUARIO ADMNISTRADOR - JEFE
         this.router.post('/datos-actuales-usuario-rol', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarInformacionUserRol);
@@ -67,10 +65,6 @@ class CiudadRutas {
         this.router.post('/informacion-general-ubicacion/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesUbicacion);
         // METODO DE ACCESO A CONSULTA DE DATOS DE CRAGOS Y COLABORADORES ASIGNADOS A UBICACIONES
         this.router.post('/informacion-general-ubicacion-cargo/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesCargoUbicacion);
-
-
-        // METODO PARA BUSCAR ADMNISTRADORES Y JEFES
-        this.router.post('/datos-actuales-sucursales', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarAdminJefes);
 
         // METODO PARA BUSCAR USUARIOS DE UNA SUCURSAL
         this.router.post('/datos-actuales-sucursal', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarUsuariosSucursal);

@@ -158,10 +158,11 @@ export class LoginComponent implements OnInit {
 
     // VALIDACION DEL LOGIN
     this.rest.ValidarCredenciales(dataUsuario).subscribe(datos => {
+      console.log('ver datos ', datos)
       if (datos.message === 'error') {
         var f = moment();
         var espera = '00:01:00';
-        if (this.intentos === 3) {
+        if (this.intentos === 20) {
           var verificar = f.add(moment.duration(espera)).format('HH:mm:ss');
           localStorage.setItem('time_wait', verificar);
           this.toastr.error('Intentelo más tarde.', 'Ha exedido el número de intentos.', {

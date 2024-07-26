@@ -44,18 +44,6 @@ import { TimbreAbiertosComponent } from './componentes/reportes/timbres/timbre-a
 
 
 // Componentes Empleado
-import { ContratoCargoEmpleadoComponent } from './componentes/rolEmpleado/contrato-cargo-empleado/contrato-cargo-empleado.component';
-import { DatosEmpleadoComponent } from './componentes/rolEmpleado/datos-empleado/datos-empleado.component';
-import { HomeEmpleadoComponent } from './componentes/rolEmpleado/home-empleado/home-empleado.component';
-import { InformacionJefeComponent } from './componentes/rolEmpleado/informacion-jefe/informacion-jefe.component';
-import { HorariosEmpleadoComponent } from './componentes/rolEmpleado/horarios-empleado/horarios-empleado.component';
-import { VacacionesEmpleadoComponent } from './componentes/rolEmpleado/vacacion-empleado/vacaciones-empleado/vacaciones-empleado.component';
-import { SolicitarPermisosEmpleadoComponent } from './componentes/rolEmpleado/permisos-empleado/solicitar-permisos-empleado/solicitar-permisos-empleado.component';
-import { VerDocumentacionComponent } from './componentes/rolEmpleado/ver-documentacion/ver-documentacion.component';
-import { HoraExtraEmpleadoComponent } from './componentes/rolEmpleado/horasExtras-empleado/hora-extra-empleado/hora-extra-empleado.component';
-import { PlanificacionComidasEmpleadoComponent } from './componentes/rolEmpleado/comidas-empleado/planificacion-comidas-empleado/planificacion-comidas-empleado.component';
-import { ProcesosEmpleadoComponent } from './componentes/rolEmpleado/procesos-empleado/procesos-empleado.component';
-import { AutorizaEmpleadoComponent } from './componentes/rolEmpleado/autoriza-empleado/autoriza-empleado.component';
 import { ReporteKardexComponent } from './componentes/reportes/modulos/vacaciones/reporte-kardex/reporte-kardex.component';
 import { ReporteEmpleadosComponent } from './componentes/reportes/generales/reporte-empleados/reporte-empleados.component';
 import { ListaArchivosComponent } from './componentes/documentos/lista-archivos/lista-archivos.component';
@@ -73,10 +61,10 @@ import { ReporteTimbresMultiplesComponent } from './componentes/reportes/timbres
 import { TimbreMrlComponent } from './componentes/reportes/timbres/timbre-mrl/timbre-mrl.component';
 import { ReportePuntualidadComponent } from './componentes/reportes/asistencia/reporte-puntualidad/reporte-puntualidad.component';
 import { ReportePlanificacionHorariaComponent } from './componentes/reportes/asistencia/reporte-planificacion-horaria/reporte-planificacion-horaria.component';
-import { MetricaAtrasosComponent } from './componentes/rolEmpleado/grafica-empl-macro/metrica-atrasos/metrica-atrasos.component';
-import { MetricaHorasExtrasComponent } from './componentes/rolEmpleado/grafica-empl-macro/metrica-horas-extras/metrica-horas-extras.component';
-import { MetricaPermisosComponent } from './componentes/rolEmpleado/grafica-empl-macro/metrica-permisos/metrica-permisos.component';
-import { MetricaVacacionesComponent } from './componentes/rolEmpleado/grafica-empl-macro/metrica-vacaciones/metrica-vacaciones.component';
+import { MetricaAtrasosComponent } from './componentes/graficas/graficas-micro/metrica-atrasos/metrica-atrasos.component';
+import { MetricaHorasExtrasComponent } from './componentes/graficas/graficas-micro/metrica-horas-extras/metrica-horas-extras.component';
+import { MetricaPermisosComponent } from './componentes/graficas/graficas-micro/metrica-permisos/metrica-permisos.component';
+import { MetricaVacacionesComponent } from './componentes/graficas/graficas-micro/metrica-vacaciones/metrica-vacaciones.component';
 import { DetallePlanificadosComponent } from './componentes/reportes/modulos/alimentacion/detalle-planificados/detalle-planificados.component';
 import { HorarioMultipleEmpleadoComponent } from './componentes/horarios/rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 import { AdministradorTodasComponent } from './componentes/reportes/notificaciones/administrador-todas/administrador-todas.component';
@@ -129,8 +117,6 @@ import { ListarPedidoAccionComponent } from './componentes/modulos/accionesPerso
 import { PermisosMultiplesEmpleadosComponent } from './componentes/modulos/permisos/multiples/permisos-multiples-empleados/permisos-multiples-empleados.component';
 import { RealtimeNotificacionComponent } from './componentes/notificaciones/realtime-notificacion/realtime-notificacion.component';
 import { RealtimeAvisosComponent } from './componentes/notificaciones/realtime-avisos/realtime-avisos.component';
-import { HorasPlanificadasEmpleadoComponent } from './componentes/rolEmpleado/horasExtras-empleado/horas-planificadas-empleado/horas-planificadas-empleado.component';
-import { ComidasSolicitadasEmpleadoComponent } from './componentes/rolEmpleado/comidas-empleado/comidas-solicitadas-empleado/comidas-solicitadas-empleado.component';
 import { ListaWebComponent } from './componentes/modulos/timbreWeb/lista-web/lista-web.component';
 import { RegistroDispositivosComponent } from './componentes/modulos/appMovil/registro-dispositivos/registro-dispositivos.component';
 import { VistaElementosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/listarTipoPermisos/vista-elementos.component';
@@ -228,22 +214,6 @@ const routes: Routes = [
   { path: 'ver-permiso/:id', component: VerEmpleadoPermisoComponent, canActivate: [AuthGuard], data: { rolMix: 0 } },
   { path: 'ver-vacacion/:id', component: VerVacacionComponent, canActivate: [AuthGuard], data: { rolMix: 0 } },
   { path: 'ver-hora-extra/:id', component: VerPedidoHoraExtraComponent, canActivate: [AuthGuard], data: { rolMix: 0 } },
-
-  // PARA ROL EMPLEADO
-  { path: 'datosEmpleado', component: DatosEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'estadisticas', component: HomeEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'informacion', component: InformacionJefeComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'cargoEmpleado', component: ContratoCargoEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'horariosEmpleado', component: HorariosEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'vacacionesEmpleado', component: VacacionesEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'solicitarPermiso', component: SolicitarPermisosEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'verDocumentacion', component: VerDocumentacionComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'horaExtraEmpleado', component: HoraExtraEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'horasPlanEmpleado', component: HorasPlanificadasEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'comidasPlanEmpleado', component: PlanificacionComidasEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'comidasEmpleado', component: ComidasSolicitadasEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'procesosEmpleado', component: ProcesosEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
-  { path: 'autorizaEmpleado', component: AutorizaEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
 
   // PANTALLA INICIAL
   { path: 'recuperar-frase/:token', component: RecuperarFraseComponent, canActivate: [AuthGuard], data: { log: false } },

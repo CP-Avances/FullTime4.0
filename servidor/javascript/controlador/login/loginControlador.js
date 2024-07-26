@@ -33,13 +33,15 @@ class LoginControlador {
             }
             try {
                 const { nombre_usuario, pass } = req.body;
+                console.log('ingresa ', req.body);
                 // BUSQUEDA DE USUARIO
                 const USUARIO = yield database_1.default.query(`
         SELECT id, usuario, id_rol, id_empleado FROM accesoUsuarios($1, $2)
         `, [nombre_usuario, pass]);
+                console.log('verificar ', USUARIO.rows);
                 // SI EXISTE USUARIOS
                 if (USUARIO.rowCount != 0) {
-                    //console.log('usuario existe')
+                    console.log('usuario existe');
                     const { id, id_empleado, id_rol, usuario: user } = USUARIO.rows[0];
                     let ACTIVO = yield database_1.default.query(`
           SELECT e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access 
@@ -49,7 +51,7 @@ class LoginControlador {
                         return result.rows;
                     });
                     const { empleado, usuario, codigo, web_access } = ACTIVO[0];
-                    //console.log('estado del usuario ', empleado, ' ', usuario)
+                    console.log('estado del usuario ', empleado, ' ', usuario);
                     // SI EL USUARIO NO SE ENCUENTRA ACTIVO
                     if (empleado === 2 && usuario === false) {
                         return res.jsonp({ message: 'inactivo' });
@@ -88,17 +90,17 @@ class LoginControlador {
                     caducidad_licencia = fec_desactivacion;
                     // BUSQUEDA DE INFORMACION
                     const INFORMACION = yield database_1.default.query(`
-          SELECT e.id as id_contrato, c.hora_trabaja, c.id_departamento, c.id_sucursal, s.id_empresa, 
+           SELECT e.id as id_contrato, c.hora_trabaja, c.id_departamento, s.id_empresa, d.id_sucursal,
             c.id AS id_cargo, cg_e.acciones_timbres, cg_e.public_key, 
             (SELECT id FROM mv_periodo_vacacion pv WHERE pv.id_empleado = empl.id 
             ORDER BY pv.fecha_inicio DESC LIMIT 1 ) as id_peri_vacacion, 
             (SELECT nombre FROM ed_departamentos cd WHERE cd.id = c.id_departamento ) AS ndepartamento 
           FROM eu_empleado_contratos AS e, eu_empleado_cargos AS c, e_sucursales AS s, e_empresa AS cg_e, 
-            eu_empleados AS empl 
+            eu_empleados AS empl, ed_departamentos AS d 
           WHERE e.id_empleado = $1 AND e.id_empleado = empl.id AND 
-            (SELECT id_contrato FROM datos_actuales_empleado WHERE id = e.id_empleado) = e.id AND 
-            (SELECT id_cargo FROM datos_actuales_empleado WHERE id = e.id_empleado) = c.id AND 
-            c.id_sucursal = s.id AND s.id_empresa = cg_e.id 
+            (SELECT id_contrato FROM contrato_cargo_vigente WHERE id_empleado = e.id_empleado) = e.id AND 
+            (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = e.id_empleado) = c.id AND 
+            d.id_sucursal = s.id AND s.id_empresa = cg_e.id AND d.id = c.id_departamento
           ORDER BY c.fecha_inicio DESC LIMIT 1
           `, [USUARIO.rows[0].id_empleado]);
                     // VALIDACION DE ACCESO CON LICENCIA 

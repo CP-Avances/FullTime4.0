@@ -20,7 +20,6 @@ import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
-import { HorariosEmpleadoComponent } from 'src/app/componentes/rolEmpleado/horarios-empleado/horarios-empleado.component';
 import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
@@ -69,7 +68,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
     public componentev: VerEmpleadoComponent,
     public componentem: HorarioMultipleEmpleadoComponent,
     public componenteb: BuscarPlanificacionComponent,
-    public componentep: HorariosEmpleadoComponent,
     public parametro: ParametrosService,
     public feriado: FeriadosService,
     public validar: ValidacionesService,
@@ -1350,10 +1348,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
       this.componenteb.buscar_fechas = true;
       this.componenteb.auto_individual = true;
       this.componenteb.multiple = true;
-    }
-    else if (this.datoEmpleado.pagina === 'perfil-empleado') {
-      this.componentep.ver_tabla_horarios = true;
-      this.componentep.registrar_rotativo = false;
     }
   }
 

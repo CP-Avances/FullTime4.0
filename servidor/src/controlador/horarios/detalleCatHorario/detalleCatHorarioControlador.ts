@@ -231,12 +231,34 @@ class DetalleCatalogoHorarioControlador {
         const HORARIO = await pool.query(
             `
             SELECT * FROM eh_detalle_horarios
+            ORDER BY id_horario ASC, orden ASC
             `
         );
+    
         if (HORARIO.rowCount != 0) {
-            return res.jsonp(HORARIO.rows)
-        }
-        else {
+            const detallesHorarios = HORARIO.rows.map((detalle: any) => {
+                switch (detalle.tipo_accion) {
+                    case 'E':
+                        detalle.tipo_accion_show = 'Entrada';
+                        break;
+                    case 'I/A':
+                        detalle.tipo_accion_show = 'Inicio alimentación';
+                        break;
+                    case 'F/A':
+                        detalle.tipo_accion_show = 'Fin alimentación';
+                        break;
+                    case 'S':
+                        detalle.tipo_accion_show = 'Salida';
+                        break;
+                    default:
+                        detalle.tipo_accion_show = 'Desconocido';
+                        break;
+                }
+                return detalle;
+            });
+    
+            return res.jsonp(detallesHorarios);
+        } else {
             return res.status(404).jsonp({ text: 'No se encuentran registros.' });
         }
     }

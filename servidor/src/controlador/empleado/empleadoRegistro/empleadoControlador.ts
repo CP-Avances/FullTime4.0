@@ -1369,7 +1369,7 @@ class EmpleadoControlador {
           continue;
         }
 
-        const datosActuales = await pool.query('SELECT * FROM datos_actuales_empleado WHERE id = $1', [e.id]);
+        const datosActuales = await pool.query('SELECT * FROM informacion_general WHERE id = $1', [e.id]);
         const [datosActualesEmpleado] = datosActuales.rows;
 
         const contratos = await pool.query('SELECT * FROM eu_empleado_contratos WHERE id_empleado = $1', [e.id]);

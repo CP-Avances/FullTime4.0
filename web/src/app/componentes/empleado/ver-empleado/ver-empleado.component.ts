@@ -61,7 +61,6 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 // IMPORTAR COMPONENTES
 import { EditarVacacionesEmpleadoComponent } from 'src/app/componentes/modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
 import { RegistroAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/registro-autorizacion-depa/registro-autorizacion-depa.component';
-import { EditarPeriodoVacacionesComponent } from '../../modulos/vacaciones/periodoVacaciones/editar-periodo-vacaciones/editar-periodo-vacaciones.component';
 import { EditarAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/editar-autorizacion-depa/editar-autorizacion-depa.component';
 import { RegistrarEmpleProcesoComponent } from '../../modulos/accionesPersonal/procesos/registrar-emple-proceso/registrar-emple-proceso.component';
 import { EditarEmpleadoProcesoComponent } from '../../modulos/accionesPersonal/procesos/editar-empleado-proceso/editar-empleado-proceso.component';
@@ -69,14 +68,13 @@ import { EditarSolicitudComidaComponent } from '../../modulos/alimentacion/solic
 import { PlanificacionComidasComponent } from '../../modulos/alimentacion/planifica-comida/planificacion-comidas/planificacion-comidas.component';
 import { EditarPlanHoraExtraComponent } from '../../modulos/horasExtras/planificacionHoraExtra/editar-plan-hora-extra/editar-plan-hora-extra.component';
 import { RegistrarVacacionesComponent } from '../../modulos/vacaciones/registrar-vacaciones/registrar-vacaciones.component';
-import { CancelarVacacionesComponent } from 'src/app/componentes/rolEmpleado/vacacion-empleado/cancelar-vacaciones/cancelar-vacaciones.component';
-import { RegistrarPeriodoVComponent } from '../../modulos/vacaciones/periodoVacaciones/registrar-periodo-v/registrar-periodo-v.component';
+import { CancelarVacacionesComponent } from 'src/app/componentes/modulos/vacaciones/cancelar-vacaciones/cancelar-vacaciones.component';
 import { EditarPlanComidasComponent } from '../../modulos/alimentacion/planifica-comida/editar-plan-comidas/editar-plan-comidas.component';
-import { CancelarHoraExtraComponent } from 'src/app/componentes/rolEmpleado/horasExtras-empleado/cancelar-hora-extra/cancelar-hora-extra.component';
+import { CancelarHoraExtraComponent } from 'src/app/componentes/modulos/horasExtras/cancelar-hora-extra/cancelar-hora-extra.component';
 import { CambiarContrasenaComponent } from '../../iniciarSesion/contrasenia/cambiar-contrasena/cambiar-contrasena.component';
 import { AdministraComidaComponent } from '../../modulos/alimentacion/administra-comida/administra-comida.component';
 import { RegistroContratoComponent } from 'src/app/componentes/empleado/contrato/registro-contrato/registro-contrato.component';
-import { CancelarPermisoComponent } from '../../rolEmpleado/permisos-empleado/cancelar-permiso/cancelar-permiso.component';
+import { CancelarPermisoComponent } from '../../modulos/permisos/gestionar-permisos/cancelar-permiso/cancelar-permiso.component';
 import { EditarEmpleadoComponent } from '../datos-empleado/editar-empleado/editar-empleado.component';
 import { FraseSeguridadComponent } from '../../administracionGeneral/frase-seguridad/frase-seguridad/frase-seguridad.component';
 import { TituloEmpleadoComponent } from '../titulos/titulo-empleado/titulo-empleado.component';
@@ -964,7 +962,10 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
   AbrirVentanaCrearContrato(): void {
     this.ventana.open(RegistroContratoComponent, { width: '900px', data: this.idEmpleado }).
       afterClosed().subscribe(item => {
+        this.contratoEmpleado = [];
+        this.cargoEmpleado = [];
         this.VerDatosActuales(this.formato_fecha);
+        this.ObtenerContratosEmpleado(this.formato_fecha);
       });
     this.btnActualizarCargo = true;
   }
@@ -1078,17 +1079,13 @@ export class VerEmpleadoComponent implements OnInit, AfterViewInit {
       if (opcion === 2) {
         this.cargoSeleccionado = [];
         this.cargoEmpleado = [];
-        this.ObtenerCargoEmpleado(this.datoActual.id_cargo, this.formato_fecha);
+        this.VerDatosActuales(this.formato_fecha);
         this.ActualizarDatosCargoSeleccionado(this.fechaICargo.value)
-        //this.cargoSeleccionado = [];
-        //this.cargoForm.reset();
       }
       else {
         this.cargoEmpleado = [];
-        this.ObtenerCargoEmpleado(this.datoActual.id_cargo, this.formato_fecha);
+        this.VerDatosActuales(this.formato_fecha);
         if (this.fechaICargo.value) {
-          // this.cargoSeleccionado = [];
-          // this.cargoForm.reset();
           this.ActualizarDatosCargoSeleccionado(this.fechaICargo.value)
         }
       }

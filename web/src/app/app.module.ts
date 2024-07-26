@@ -105,20 +105,8 @@ import { VerEmpresaComponent } from './componentes/catalogos/catEmpresa/ver-empr
 import { LogosComponent } from './componentes/catalogos/catEmpresa/logos/logos.component';
 
 // COMPONENTES EMPLEADO
-import { DatosEmpleadoComponent } from './componentes/rolEmpleado/datos-empleado/datos-empleado.component';
 import { CambiarContrasenaComponent } from './componentes/iniciarSesion/contrasenia/cambiar-contrasena/cambiar-contrasena.component';
-import { ContratoCargoEmpleadoComponent } from './componentes/rolEmpleado/contrato-cargo-empleado/contrato-cargo-empleado.component';
-import { HorariosEmpleadoComponent } from './componentes/rolEmpleado/horarios-empleado/horarios-empleado.component';
-import { VacacionesEmpleadoComponent } from './componentes/rolEmpleado/vacacion-empleado/vacaciones-empleado/vacaciones-empleado.component';
-import { SolicitarPermisosEmpleadoComponent } from './componentes/rolEmpleado/permisos-empleado/solicitar-permisos-empleado/solicitar-permisos-empleado.component';
-import { VerDocumentacionComponent } from './componentes/rolEmpleado/ver-documentacion/ver-documentacion.component';
-import { InformacionJefeComponent } from './componentes/rolEmpleado/informacion-jefe/informacion-jefe.component';
-import { HomeEmpleadoComponent } from './componentes/rolEmpleado/home-empleado/home-empleado.component';
-import { HoraExtraEmpleadoComponent } from './componentes/rolEmpleado/horasExtras-empleado/hora-extra-empleado/hora-extra-empleado.component';
-import { PlanificacionComidasEmpleadoComponent } from './componentes/rolEmpleado/comidas-empleado/planificacion-comidas-empleado/planificacion-comidas-empleado.component';
-import { ProcesosEmpleadoComponent } from './componentes/rolEmpleado/procesos-empleado/procesos-empleado.component';
-import { AutorizaEmpleadoComponent } from './componentes/rolEmpleado/autoriza-empleado/autoriza-empleado.component';
-import { CancelarHoraExtraComponent } from './componentes/rolEmpleado/horasExtras-empleado/cancelar-hora-extra/cancelar-hora-extra.component';
+import { CancelarHoraExtraComponent } from './componentes/modulos/horasExtras/cancelar-hora-extra/cancelar-hora-extra.component';
 
 // CAMBIAR EL LOCAL DE LA APP
 import { registerLocaleData } from '@angular/common';
@@ -174,10 +162,10 @@ import { CrearTimbreComponent } from './componentes/timbres/acciones-timbres/cre
 import { SeguridadComponent } from './componentes/administracionGeneral/frase-seguridad/seguridad/seguridad.component';
 import { TipoSeguridadComponent } from './componentes/catalogos/catEmpresa/tipo-seguridad/tipo-seguridad.component';
 import { FraseSeguridadComponent } from './componentes/administracionGeneral/frase-seguridad/frase-seguridad/frase-seguridad.component';
-import { MetricaVacacionesComponent } from './componentes/rolEmpleado/grafica-empl-macro/metrica-vacaciones/metrica-vacaciones.component';
-import { MetricaHorasExtrasComponent } from './componentes/rolEmpleado/grafica-empl-macro/metrica-horas-extras/metrica-horas-extras.component';
-import { MetricaAtrasosComponent } from './componentes/rolEmpleado/grafica-empl-macro/metrica-atrasos/metrica-atrasos.component';
-import { MetricaPermisosComponent } from './componentes/rolEmpleado/grafica-empl-macro/metrica-permisos/metrica-permisos.component';
+import { MetricaVacacionesComponent } from './componentes/graficas/graficas-micro/metrica-vacaciones/metrica-vacaciones.component';
+import { MetricaHorasExtrasComponent } from './componentes/graficas/graficas-micro/metrica-horas-extras/metrica-horas-extras.component';
+import { MetricaAtrasosComponent } from './componentes/graficas/graficas-micro/metrica-atrasos/metrica-atrasos.component';
+import { MetricaPermisosComponent } from './componentes/graficas/graficas-micro/metrica-permisos/metrica-permisos.component';
 import { DetalleMenuComponent } from './componentes/modulos/alimentacion/catTipoComidas/detalles-comidas/detalle-menu/detalle-menu.component';
 import { VistaMenuComponent } from './componentes/modulos/alimentacion/catTipoComidas/detalles-comidas/vista-menu/vista-menu.component';
 import { EditarDetalleMenuComponent } from './componentes/modulos/alimentacion/catTipoComidas/detalles-comidas/editar-detalle-menu/editar-detalle-menu.component';
@@ -230,11 +218,11 @@ import { VerBirthdayComponent } from './componentes/administracionGeneral/birthd
 import { ConfiguracionComponent } from './componentes/administracionGeneral/correo/configuracion/configuracion.component';
 import { ListaNotificacionComponent } from './componentes/administracionGeneral/configuracion-notificaciones/multiple/lista-empleados/listaNotificacion.component';
 import { ConfiguracionNotificacionComponent } from './componentes/administracionGeneral/configuracion-notificaciones/multiple/configuracion/configuracionNotificacion.component';
-import { CancelarPermisoComponent } from './componentes/rolEmpleado/permisos-empleado/cancelar-permiso/cancelar-permiso.component';
-import { CancelarVacacionesComponent } from './componentes/rolEmpleado/vacacion-empleado/cancelar-vacaciones/cancelar-vacaciones.component';
+import { CancelarPermisoComponent } from './componentes/modulos/permisos/gestionar-permisos/cancelar-permiso/cancelar-permiso.component';
+import { CancelarVacacionesComponent } from './componentes/modulos/vacaciones/cancelar-vacaciones/cancelar-vacaciones.component';
 import { EditarVacacionesEmpleadoComponent } from './componentes/modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
-import { EditarHoraExtraEmpleadoComponent } from './componentes/rolEmpleado/horasExtras-empleado/editar-hora-extra-empleado/editar-hora-extra-empleado.component';
-import { CancelarComidaComponent } from './componentes/rolEmpleado/comidas-empleado/cancelar-comida/cancelar-comida.component';
+import { EditarHoraExtraEmpleadoComponent } from './componentes/modulos/horasExtras/editar-hora-extra-empleado/editar-hora-extra-empleado.component';
+import { CancelarComidaComponent } from './componentes/modulos/alimentacion/cancelar-comida/cancelar-comida.component';
 import { RegistrarNivelTitulosComponent } from './componentes/catalogos/catTitulos/nivelTitulos/registrar-nivel-titulos/registrar-nivel-titulos.component';
 import { ListarNivelTitulosComponent } from './componentes/catalogos/catTitulos/nivelTitulos/listar-nivel-titulos/listar-nivel-titulos.component';
 import { EditarNivelTituloComponent } from './componentes/catalogos/catTitulos/nivelTitulos/editar-nivel-titulo/editar-nivel-titulo.component';
@@ -303,8 +291,6 @@ import { ButtonNotificacionComponent } from './componentes/administracionGeneral
 import { ButtonAvisosComponent } from './componentes/administracionGeneral/main-nav/button-avisos/button-avisos.component';
 import { ButtonOpcionesComponent } from './componentes/administracionGeneral/main-nav/button-opciones/button-opciones.component';
 import { MainNavService } from './componentes/administracionGeneral/main-nav/main-nav.service';
-import { HorasPlanificadasEmpleadoComponent } from './componentes/rolEmpleado/horasExtras-empleado/horas-planificadas-empleado/horas-planificadas-empleado.component';
-import { ComidasSolicitadasEmpleadoComponent } from './componentes/rolEmpleado/comidas-empleado/comidas-solicitadas-empleado/comidas-solicitadas-empleado.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { BuscarTimbreComponent } from './componentes/timbres/acciones-timbres/buscar-timbre/buscar-timbre.component';
@@ -389,7 +375,6 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     EmplCargosComponent,
     ListarTitulosComponent,
     ListarCiudadFeriadosComponent,
-    PlanificacionComidasEmpleadoComponent,
     ListaSucursalesComponent,
     RegistrarSucursalesComponent,
     RegistrarNivelTitulosComponent,
@@ -417,7 +402,6 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     MetodosComponent,
     EditarContratoComponent,
     EditarCargoComponent,
-    DatosEmpleadoComponent,
     CambiarContrasenaComponent,
     EditarRelojComponent,
     EditarRolComponent,
@@ -430,33 +414,25 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     PlanificacionMultipleComponent,
     VerHorarioDetalleComponent,
     EditarHorarioComponent,
-    HomeEmpleadoComponent,
     ListarEmpleadoPermisoComponent,
     EditarPeriodoVacacionesComponent,
     RegistrarTimbreComponent,
     RegistrarAsistenciaComponent,
     PedidoHoraExtraComponent,
     CalculoHoraExtraComponent,
-    InformacionJefeComponent,
     VerEmpleadoPermisoComponent,
     EditarEstadoAutorizaccionComponent,
     ListarVacacionesComponent,
     EstadoVacacionesComponent,
     VerVacacionComponent,
     EditarEstadoVacacionAutoriacionComponent,
-    ContratoCargoEmpleadoComponent,
-    HorariosEmpleadoComponent,
-    VacacionesEmpleadoComponent,
-    SolicitarPermisosEmpleadoComponent,
     RealtimeNotificacionComponent,
     SubirDocumentoComponent,
     VerDocumentosComponent,
-    VerDocumentacionComponent,
     SettingsComponent,
     VacacionAutorizacionesComponent,
     ListaPedidoHoraExtraComponent,
     VerPedidoHoraExtraComponent,
-    HoraExtraEmpleadoComponent,
     HoraExtraAutorizacionesComponent,
     EditarEstadoHoraExtraAutorizacionComponent,
     EstadoHoraExtraComponent,
@@ -465,11 +441,8 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     EditarPlanificacionComponent,
     EditarPlanComidasComponent,
     EditarAutorizacionDepaComponent,
-    PlanificacionComidasEmpleadoComponent,
     EditarDetalleCatHorarioComponent,
     VerDipositivoComponent,
-    ProcesosEmpleadoComponent,
-    AutorizaEmpleadoComponent,
     ConfigurarCodigoComponent,
     EditarPermisoEmpleadoComponent,
     CancelarHoraExtraComponent,
@@ -582,8 +555,6 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     ListaNotificacionComponent,
     ConfiguracionNotificacionComponent,
     CancelarComidaComponent,
-    HorasPlanificadasEmpleadoComponent,
-    ComidasSolicitadasEmpleadoComponent,
     BuscarTimbreComponent,
     EditarTimbreComponent,
     VerTimbreComponent,
@@ -689,7 +660,6 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     VistaElementosComponent,
     ListaSucursalesComponent,
     VerEmpresaComponent,
-    HorariosEmpleadoComponent,
     ListarVacacionesComponent,
     ListaEmplePlanHoraEComponent,
     ListaPlanificacionesComponent,

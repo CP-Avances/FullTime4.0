@@ -87,7 +87,8 @@ class ReportesControlador {
             FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS cp, ecm_autorizaciones AS a, 
                 eu_empleado_cargos AS ec, eu_empleados AS e
             WHERE cp.id = p.id_tipo_permiso AND a.id_permiso = p.id 
-                AND ec.id = (SELECT MAX(cargo_id) FROM datos_empleado_cargo WHERE codigo = $1) 
+                AND ec.id = (SELECT MAX(cv.id_cargo) FROM contrato_cargo_vigente AS cv, eu_empleados AS e 
+                WHERE e.id = cv.id_empleado AND e.codigo = $1) 
                 AND p.id_empleado = e.id AND e.codigo = $1
             ORDER BY p.numero_permiso ASC
             `

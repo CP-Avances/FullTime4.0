@@ -27,42 +27,42 @@ export class ActualizacionInformacionComponent implements OnInit {
 
   listaUsuariosRol: any = []
 
-   // VARIABLES VISTA DE PANTALLAS ROLES
-   seleccionarRol: boolean = true;
-   asignarRol: boolean = false;
-   ventana_roles: boolean = false;
-   ventana_busquedaRol: boolean = false;
+  // VARIABLES VISTA DE PANTALLAS ROLES
+  seleccionarRol: boolean = true;
+  asignarRol: boolean = false;
+  ventana_roles: boolean = false;
+  ventana_busquedaRol: boolean = false;
 
   // VARIABLES VISTA DE PANTALLAS DEPA
-   seleccionarDepa: boolean = true;
-   asignarDepa: boolean = false;
-   ventana_Depa: boolean = false;
-   ventana_busquedaDepa: boolean = false;
- 
-   idEmpleadoLogueado: any;
-   rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
- 
-   idCargosAcceso: Set<any> = new Set();
-   idUsuariosAcceso: Set<any> = new Set();
-   idSucursalesAcceso: Set<any> = new Set();
-   idDepartamentosAcceso: Set<any> = new Set();
+  seleccionarDepa: boolean = true;
+  asignarDepa: boolean = false;
+  ventana_Depa: boolean = false;
+  ventana_busquedaDepa: boolean = false;
 
-    // CONTROL DE CRITERIOS DE BUSQUEDA ROL
-    codigoRol = new FormControl('');
-    cedulaRol = new FormControl('', [Validators.minLength(2)]);
-    nombre_empRol = new FormControl('', [Validators.minLength(2)]);
-    nombre_depRol = new FormControl('', [Validators.minLength(2)]);
-    nombre_sucRol = new FormControl('', [Validators.minLength(2)]);
-    nombre_regRol = new FormControl('', [Validators.minLength(2)]);
-    nombre_cargRol = new FormControl('', [Validators.minLength(2)]);
-    seleccionRol = new FormControl('');
+  idEmpleadoLogueado: any;
+  rolEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ROL DE EMPLEADO QUE INICIA SESION
+
+  idCargosAcceso: Set<any> = new Set();
+  idUsuariosAcceso: Set<any> = new Set();
+  idSucursalesAcceso: Set<any> = new Set();
+  idDepartamentosAcceso: Set<any> = new Set();
+
+  // CONTROL DE CRITERIOS DE BUSQUEDA ROL
+  codigoRol = new FormControl('');
+  cedulaRol = new FormControl('', [Validators.minLength(2)]);
+  nombre_empRol = new FormControl('', [Validators.minLength(2)]);
+  nombre_depRol = new FormControl('', [Validators.minLength(2)]);
+  nombre_sucRol = new FormControl('', [Validators.minLength(2)]);
+  nombre_regRol = new FormControl('', [Validators.minLength(2)]);
+  nombre_cargRol = new FormControl('', [Validators.minLength(2)]);
+  seleccionRol = new FormControl('');
 
   filtro_sucursal: any;
 
   // FILTROS SUCURSALES
- get filtroNombreSuc() { 
-  return this.restR.filtroNombreSuc 
-}
+  get filtroNombreSuc() {
+    return this.restR.filtroNombreSuc
+  }
 
   // FILTROS DEPARTAMENTOS
   get filtroNombreDep() { return this.restR.filtroNombreDep }
@@ -126,7 +126,7 @@ export class ActualizacionInformacionComponent implements OnInit {
   tamanio_pagina_rol: number = 5;
   numero_pagina_rol: number = 1;
 
-   public check: checkOptions[];
+  public check: checkOptions[];
 
   constructor(
     public informacion: DatosGeneralesService, // SERVICIO DE DATOS INFORMATIVOS DE USUARIOS
@@ -139,99 +139,33 @@ export class ActualizacionInformacionComponent implements OnInit {
     private asignaciones: AsignacionesService,
     private restRoles: RolesService,
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
-  ){
+  ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
-    this.check = this.restR.checkOptions([{ opcion: 'd' }, { opcion: 'c' }, { opcion: 'e' }]);
+    this.check = this.restR.checkOptions([{ opcion: 'r' }, { opcion: 'd' }, { opcion: 'c' }, { opcion: 'e' }]);
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
 
-    this.PresentarInformacion(); 
+    this.BuscarInformacionGeneral();
   }
 
-   // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
-   PresentarInformacion() {
-    let informacion = { id_empleado: this.idEmpleadoLogueado };
-    let respuesta: any = [];
-
-    this.restRoles.listaUsuariosRoles().subscribe((res: any) => {
-      this.listaUsuariosRol = res.lista
-    }, error => {
-      this.toastr.info('Tenemos problemas para listar los roles.', '', {
-        timeOut: 4000,
-      });
-    })
-
-    this.informacion.ObtenerInformacionUserRol(informacion).subscribe(res => {
-      respuesta = res[0];
-      this.AdministrarInformacion(respuesta, informacion);
-    }, vacio => {
-      this.toastr.info('No se han encontrado registros.', '', {
-        timeOut: 4000,
-      });
-    });
-  }
-
-  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
-  usua_sucursales: any = [];
-  AdministrarInformacion(usuario: any, empleado: any) {
+  // METODO DE BUSQUEDA DE DATOS GENERALES DEL EMPLEADO
+  BuscarInformacionGeneral() {
     // LIMPIAR DATOS DE ALMACENAMIENTO
     this.departamentos = [];
     this.sucursales = [];
     this.empleados = [];
     this.regimen = [];
     this.cargos = [];
-
-    this.usua_sucursales = [];
-    //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
-      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
-
-      // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
-      if (usuario.id_rol === 1 && usuario.jefe === false) {
-        this.usua_sucursales = { id_sucursal: codigos };
-        this.BuscarInformacionAdministrador(this.usua_sucursales);
-      }
-      else if (usuario.id_rol === 1 && usuario.jefe === true) {
-        this.usua_sucursales = { id_sucursal: codigos, id_departamento: usuario.id_departamento };
-        this.BuscarInformacionJefe(this.usua_sucursales);
-      }
-      else if (usuario.id_rol === 3) {
-        this.BuscarInformacionSuperAdministrador();
-      }
-    });
-  }
-
-   // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL SUPERADMINISTRADOR
-   BuscarInformacionSuperAdministrador() {
-    this.informacion.ObtenerInformacion_SUPERADMIN(1).subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacionGeneralRol(1).subscribe((res: any[]) => {
       this.ProcesarDatos(res);
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
-
-  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR
-  BuscarInformacionAdministrador(buscar: string) {
-    this.informacion.ObtenerInformacion_ADMIN(1, buscar).subscribe((res: any[]) => {
-      this.ProcesarDatos(res);
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR - JEFE
-  BuscarInformacionJefe(buscar: string) {
-    this.informacion.ObtenerInformacion_JEFE(1, buscar).subscribe((res: any[]) => {
-      this.ProcesarDatos(res);
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
 
   // METODO DE VALIDACION DE INGRESO DE LETRAS Y NUMEROS
   IngresarSoloLetras(e: any) {
@@ -245,82 +179,49 @@ export class ActualizacionInformacionComponent implements OnInit {
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
     //console.log('ver original ', this.origen)
-    console.log('informacion: ',informacion);
-
     informacion.forEach((obj: any) => {
       //console.log('ver obj ', obj)
       this.sucursales.push({
         id: obj.id_suc,
         sucursal: obj.name_suc
       })
-    })
 
-    console.log('lista regimines: ',informacion);
-
-    informacion.forEach((reg: any) => {
-      reg.regimenes.forEach((obj: any) => {
-        this.regimen.push({
-          id: obj.id_regimen,
-          nombre: obj.name_regimen,
-          sucursal: obj.name_suc,
-          id_suc: reg.id_suc
-        })
+      this.regimen.push({
+        id: obj.id_regimen,
+        nombre: obj.name_regimen,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc
       })
-    })
 
-    informacion.forEach((reg: any) => {
-      reg.regimenes.forEach((dep: any) => {
-        dep.departamentos.forEach((obj: any) => {
-          this.departamentos.push({
-            id: obj.id_depa,
-            departamento: obj.name_dep,
-            sucursal: obj.name_suc,
-            id_suc: reg.id_suc,
-            id_regimen: obj.id_regimen,
-          })
-        })
+      this.departamentos.push({
+        id: obj.id_depa,
+        departamento: obj.name_dep,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc,
+        id_regimen: obj.id_regimen,
       })
-    })
 
-    informacion.forEach((reg: any) => {
-      reg.regimenes.forEach((dep: any) => {
-        dep.departamentos.forEach((car: any) => {
-          car.cargos.forEach((obj: any) => {
-            this.cargos.push({
-              id: obj.id_cargo_,
-              nombre: obj.name_cargo,
-              sucursal: obj.name_suc,
-              id_suc: reg.id_suc
-            })
-          })
-        })
+      this.cargos.push({
+        id: obj.id_cargo_,
+        nombre: obj.name_cargo,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc
       })
-    })
 
-    informacion.forEach((reg: any) => {
-      reg.regimenes.forEach((dep: any) => {
-        dep.departamentos.forEach((car: any) => {
-          car.cargos.forEach((empl: any) => {
-            empl.empleado.forEach((obj: any) => {
-              let elemento = {
-                id: obj.id,
-                nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
-                codigo: obj.codigo,
-                cedula: obj.cedula,
-                correo: obj.correo,
-                id_cargo: obj.id_cargo,
-                id_contrato: obj.id_contrato,
-                sucursal: obj.name_suc,
-                id_suc: obj.id_suc,
-                id_regimen: obj.id_regimen,
-                id_depa: obj.id_depa,
-                id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-                hora_trabaja: obj.hora_trabaja,
-              }
-              this.empleados.push(elemento)
-            })
-          })
-        })
+      this.empleados.push({
+        id: obj.id,
+        nombre: (obj.nombre).toUpperCase() + ' ' + (obj.apellido).toUpperCase(),
+        codigo: obj.codigo,
+        cedula: obj.cedula,
+        correo: obj.correo,
+        id_cargo: obj.id_cargo,
+        id_contrato: obj.id_contrato,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc,
+        id_regimen: obj.id_regimen,
+        id_depa: obj.id_depa,
+        id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+        hora_trabaja: obj.hora_trabaja,
       })
     })
 
@@ -348,6 +249,30 @@ export class ActualizacionInformacionComponent implements OnInit {
 
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
   OmitirDuplicados() {
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
+    let verificados_suc = this.sucursales.filter((objeto: any, indice: any, valor: any) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    this.sucursales = verificados_suc;
+
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION REGIMEN
+    let verificados_reg = this.regimen.filter((objeto: any, indice: any, valor: any) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    this.regimen = verificados_reg;
+
     // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
     let verificados_dep = this.departamentos.filter((objeto: any, indice: any, valor: any) => {
       // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
@@ -427,7 +352,7 @@ export class ActualizacionInformacionComponent implements OnInit {
     }
   }
 
-  
+
 
   // METODO PARA MOSTRAR DATOS DE BUSQUEDA
   opcion: string;
@@ -523,16 +448,16 @@ export class ActualizacionInformacionComponent implements OnInit {
    ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
    ** ************************************************************************************** **/
 
-   isAllSelectedRol(){
+  isAllSelectedRol() {
     const numSelected = this.selectionRol.selected.length;
     return numSelected === this.listaUsuariosRol.length
-   }
-   masterToggleRol(){
+  }
+  masterToggleRol() {
     this.isAllSelectedRol() ?
       this.selectionRol.clear() :
       this.listaUsuariosRol.forEach((row: any) => this.selectionRol.select(row));
-   }
-   checkboxLabelRol(row?: ITableEmpleados): string {
+  }
+  checkboxLabelRol(row?: ITableEmpleados): string {
     if (!row) {
       return `${this.isAllSelectedRol() ? 'select' : 'deselect'} all`;
     }
@@ -643,7 +568,7 @@ export class ActualizacionInformacionComponent implements OnInit {
       this.tamanio_pagina_reg = e.pageSize;
       this.numero_pagina_reg = e.pageIndex + 1;
     }
-    else if(this._booleanOptions.bool_rol === true) {
+    else if (this._booleanOptions.bool_rol === true) {
       this.tamanio_pagina_rol = e.pageSize;
       this.numero_pagina_rol = e.pageIndex + 1;
     }
@@ -736,28 +661,132 @@ export class ActualizacionInformacionComponent implements OnInit {
   // METODO DE SELECCTION DE TIPO DE PROCESO
   SeleccionarProceso(tipo: string, datos: any) {
     if (tipo === 'p') {
-      
+      this.abriEditarRolUser(datos);
     }
     else if (tipo === 'b') {
-      
+      this.abriEditarRolUser(datos);
     }
     else if (tipo === 'e') {
-      
+      this.abriEditarRolUser(datos);
     }
     else if (tipo === 'm') {
-      
+      this.abriEditarRolUser(datos);
     }
     else if (tipo === 't') {
-      
+      this.abriEditarRolUser(datos);
     }
     else if (tipo === 'c') {
-      
+      this.abriEditarRolUser(datos);
     }
   }
 
-  abriEditarRolUser(){
-    if(this.selectionRol.selected.length > 0){
-      this.ventana.open(EditarRolUserComponent, { width: '600px' }).afterClosed()
+
+  /** ************************************************************************************** **
+  ** **                     METODOS DE PLANIFICACION DE HORARIOS                         ** **
+  ** ************************************************************************************** **/
+
+  // METODO PARA ABRI VENTANA DE ASIGNACION DE HORARIO
+  idCargo: any;
+  data_horario: any = [];
+  PlanificarIndividual(usuario: any, tipo: string): void {
+    if (tipo === 'p') {
+      this.seleccionarRol = false;
+      this.data_horario = {
+        pagina: 'rango_fecha',
+        codigo: usuario.codigo,
+        idCargo: usuario.id_cargo,
+        idEmpleado: usuario.id,
+        horas_trabaja: usuario.hora_trabaja,
+      }
+    }
+    else {
+      this.VerPlanificacion([usuario]);
+    }
+  }
+
+  // METODO DE VALIDACION DE SELECCION MULTIPLE
+  PlanificarMultiple(data: any) {
+    if (data.length > 0) {
+      this.Planificar(data);
+    }
+    else {
+      this.toastr.warning('No ha seleccionado usuarios.', '', {
+        timeOut: 6000,
+      });
+    }
+  }
+
+  // METODO PARA INGRESAR PLANIFICACION DE HORARIOS A VARIOS EMPLEADOS
+  seleccionados: any = [];
+  Planificar(seleccionados: any) {
+    if (seleccionados.length === 1) {
+      this.PlanificarIndividual(seleccionados[0], 'p');
+    } else {
+      this.seleccionados = seleccionados;
+      this.seleccionarRol = false;
+      this.asignarRol = true;
+    }
+  }
+
+  // METODO DE VALIDACION DE SELECCION MULTIPLE - ROTATIVOS
+  plan_rotativo: boolean = false;
+  data_rotativo: any = []
+  PlanificarRotativos(data: any) {
+    console.log('data rotativos ', data)
+    this.data_horario = [];
+    if (data.length > 0) {
+      this.data_horario = {
+        usuarios: data,
+        pagina: 'multiple-empleado',
+      }
+      this.seleccionarRol = false;
+      this.plan_rotativo = true;
+    }
+    else {
+      this.toastr.warning('No ha seleccionado usuarios.', '', {
+        timeOut: 6000,
+      });
+    }
+  }
+
+  // METODO PARA VER PLANIFICACION
+  resultados: any = [];
+  VerPlanificacion(data: any) {
+    console.log('VerPlanificacion', data);
+    if (data.length > 0) {
+      this.resultados = data;
+      this.seleccionarRol = false;
+      this.ventana_busquedaRol = true;
+    }
+    else {
+      this.toastr.warning('No ha seleccionado usuarios.', '', {
+        timeOut: 6000,
+      });
+    }
+  }
+
+    // METODO PARA TOMAR DATOS SELECCIONADOS
+    MetodosFiltro(valor: any, tipo: string) {
+      if (this.opcion === 'c') {
+        this.ModelarCargo(valor.id, tipo, valor.id_suc);
+      }
+      else if (this.opcion === 'd') {
+        this.ModelarDepartamentos(valor.id, tipo, valor.id_suc);
+      }
+      else if (this.opcion === 'r') {
+        this.ModelarRegimen(valor.id, tipo, valor.id_suc);
+      }
+      else {
+        this.ModelarEmpleados(tipo);
+      }
+      
+    }
+  
+
+  abriEditarRolUser(datos: any){
+    console.log('roles seleccionados: ',datos)
+    if(datos.length > 0){
+      this.ventana.open(EditarRolUserComponent, { width: '600px', data: datos }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           
@@ -768,14 +797,14 @@ export class ActualizacionInformacionComponent implements OnInit {
         timeOut: 4000,
       });
     }
-    
+
   }
 
-  abriEditarDepaUser(){
+  abriEditarDepaUser() {
     this.ventana.open(EditarDepaUserComponent, { width: '600px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          
+
         }
       });
   }

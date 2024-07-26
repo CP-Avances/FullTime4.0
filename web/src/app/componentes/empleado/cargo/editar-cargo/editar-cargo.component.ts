@@ -1,8 +1,8 @@
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-
-import { VerEmpleadoComponent } from '../../ver-empleado/ver-empleado.component';
+import moment from 'moment';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
@@ -11,7 +11,8 @@ import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { firstValueFrom } from 'rxjs';
+
+import { VerEmpleadoComponent } from '../../ver-empleado/ver-empleado.component';
 
 @Component({
   selector: 'app-editar-cargo',
@@ -98,6 +99,17 @@ export class EditarCargoComponent implements OnInit {
     this.BuscarTiposCargos();
     this.ObtenerCargoEmpleado();
     this.tipoCargo[this.tipoCargo.length] = { cargo: "OTRO" };
+  }
+
+  // BUSCAR DATOS DE CONTRATO
+  contrato_actual: any = [];
+  BuscarDatosContrato() {
+    let datosBusqueda = {
+      id_contrato: this.id_empl_contrato,
+    }
+    this.restEmpleado.BuscarFechaIdContrato(datosBusqueda).subscribe(response => {
+      this.contrato_actual = response[0];
+    });
   }
 
   // METODO PARA LISTAR SUCURSALES
@@ -202,6 +214,9 @@ export class EditarCargoComponent implements OnInit {
           personalForm: this.personal,
         })
       });
+
+      // BUSCAR DATOS DE CONTRATO
+      this.BuscarDatosContrato();
     })
   }
 
@@ -217,28 +232,38 @@ export class EditarCargoComponent implements OnInit {
 
   // METODO PARA VALIDAR INFORMACION
   ValidarDatosRegistro(form: any) {
-    let datosBusqueda = {
-      id_contrato: this.id_empl_contrato
-    }
-    this.restEmpleado.BuscarFechaIdContrato(datosBusqueda).subscribe(response => {
-      if (Date.parse(response[0].fecha_ingreso.split('T')[0]) < Date.parse(form.fecInicioForm)) {
-        if (Date.parse(form.fecInicioForm) < Date.parse(form.fecFinalForm)) {
-          this.ActualizarEmpleadoCargo(form);
-        }
-        else {
-          this.toastr.info(
-            'La fecha de finalización de actividades debe ser posterior a la fecha de inicio de actividades.', '', {
-            timeOut: 6000,
-          })
-        }
+    // FORMATEAR FECHAS AL FORMATO YYYY-MM-DD
+    let registro_inicio = moment(form.fecInicioForm).format('YYYY-MM-DD');
+    let registro_fin = moment(form.fecFinalForm).format('YYYY-MM-DD');
+    let contrato_inicio = moment(this.contrato_actual.fecha_ingreso).format('YYYY-MM-DD');
+    let contrato_fin = moment(this.contrato_actual.fecha_salida).format('YYYY-MM-DD');
+    console.log('inicio ', registro_inicio)
+    console.log('inicio format ', Date.parse(registro_inicio))
+    console.log('fin ', registro_fin)
+    console.log('fin format ', Date.parse(registro_fin))
+    console.log('inicio ', contrato_inicio)
+    console.log('inicio format ', Date.parse(contrato_inicio))
+    console.log('fin ', contrato_fin)
+    console.log('fin format ', Date.parse(contrato_fin))
+    // COMPARAR FECHAS INGRESADAS CON EL CONTRATO ACTUAL
+    if ((Date.parse(contrato_inicio) <= Date.parse(registro_inicio)) &&
+      (Date.parse(contrato_fin) >= Date.parse(registro_fin))) {
+      if (Date.parse(registro_inicio) < Date.parse(registro_fin)) {
+        this.ActualizarEmpleadoCargo(form);
       }
       else {
         this.toastr.info(
-          'La fecha de inicio de actividades no puede ser anterior a la fecha de ingreso de contrato.', '', {
+          'La fecha de finalización de actividades debe ser posterior a la fecha de inicio de actividades.', '', {
           timeOut: 6000,
-        });
+        })
       }
-    });
+    }
+    else {
+      this.toastr.info(
+        'Las fechas ingresadas no se encuentran dentro de las establecidas en el contrato laboral.', '', {
+        timeOut: 6000,
+      });
+    }
   }
 
   // METODO PARA ACTUALIZAR REGISTRO
@@ -284,7 +309,7 @@ export class EditarCargoComponent implements OnInit {
       fecha_verificar: datos.fec_inicio
     }
     this.restEmplCargos.BuscarCargoFechaEditar(verficar).subscribe(res => {
-      this.toastr.warning('Existe un cargo vigente en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Existe un cargo en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       });
     }, vacio => {

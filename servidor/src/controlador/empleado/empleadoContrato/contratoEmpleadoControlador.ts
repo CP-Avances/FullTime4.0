@@ -461,9 +461,9 @@ class ContratoEmpleadoControlador {
         const { id_empleado } = req.body;
         const FECHA = await pool.query(
             `
-            SELECT ca.id_contrato, ec.fecha_ingreso, ec.fecha_salida
-            FROM datos_contrato_actual AS ca, eu_empleado_contratos AS ec
-            WHERE ca.id = $1 AND ec.id = ca.id_contrato
+            SELECT cv.id_contrato, ec.fecha_ingreso, ec.fecha_salida
+            FROM contrato_cargo_vigente AS cv, eu_empleado_contratos AS ec
+            WHERE cv.id_empleado = $1 AND ec.id = cv.id_contrato
             `
             , [id_empleado]);
         if (FECHA.rowCount != 0) {
@@ -557,8 +557,8 @@ class ContratoEmpleadoControlador {
         const { id_contrato } = req.body;
         const FECHA = await pool.query(
             `
-            SELECT contrato.fecha_ingreso FROM eu_empleado_contratos AS contrato
-            WHERE contrato.id = $1
+            SELECT con.fecha_ingreso, con.fecha_salida FROM eu_empleado_contratos AS con
+            WHERE con.id = $1    
             `
             , [id_contrato]);
         if (FECHA.rowCount != 0) {

@@ -3,6 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import moment from 'moment';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
@@ -93,10 +94,24 @@ export class EmplCargosComponent implements OnInit {
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
 
+    this.BuscarDatosContrato()
     this.FiltrarSucursales();
     this.BuscarTiposCargos();
     this.BuscarDatosCargo();
     this.tipoCargo[this.tipoCargo.length] = { cargo: "OTRO" };
+  }
+
+  // BUSCAR DATOS DE CONTRATO
+  contrato_actual: any = [];
+  BuscarDatosContrato() {
+    let datosBusqueda = {
+      id_contrato: this.datoEmpleado.idContrato,
+    }
+    this.restEmpleado.BuscarFechaIdContrato(datosBusqueda).subscribe(response => {
+      this.contrato_actual = response[0];
+      this.fechaInicio.setValue(this.contrato_actual.fecha_ingreso);
+      this.fechaFinal.setValue(this.contrato_actual.fecha_salida);
+    });
   }
 
   // METODO DE BUSQUEDA DE TIPOS DE CARGOS
@@ -170,28 +185,38 @@ export class EmplCargosComponent implements OnInit {
 
   // METODO PARA VALIDAR INFORMACION
   ValidarDatosRegistro(form: any) {
-    let datosBusqueda = {
-      id_contrato: this.datoEmpleado.idContrato,
-    }
-    this.restEmpleado.BuscarFechaIdContrato(datosBusqueda).subscribe(response => {
-      if (Date.parse(response[0].fecha_ingreso.split('T')[0]) < Date.parse(form.fecInicioForm)) {
-        if (Date.parse(form.fecInicioForm) < Date.parse(form.fecFinalForm)) {
-          this.RegistrarCargo(form);
-        }
-        else {
-          this.toastr.info(
-            'La fecha de finalización de actividades debe ser posterior a la fecha de inicio de actividades.', '', {
-            timeOut: 6000,
-          })
-        }
+    // FORMATEAR FECHAS AL FORMATO YYYY-MM-DD
+    let registro_inicio = moment(form.fecInicioForm).format('YYYY-MM-DD');
+    let registro_fin = moment(form.fecFinalForm).format('YYYY-MM-DD');
+    let contrato_inicio = moment(this.contrato_actual.fecha_ingreso).format('YYYY-MM-DD');
+    let contrato_fin = moment(this.contrato_actual.fecha_salida).format('YYYY-MM-DD');
+    /*console.log('inicio ', registro_inicio)
+    console.log('inicio format ', Date.parse(registro_inicio))
+    console.log('fin ', registro_fin)
+    console.log('fin format ', Date.parse(registro_fin))
+    console.log('inicio ', contrato_inicio)
+    console.log('inicio format ', Date.parse(contrato_inicio))
+    console.log('fin ', contrato_fin)
+    console.log('fin format ', Date.parse(contrato_fin))*/
+    // COMPARAR FECHAS INGRESADAS CON EL CONTRATO ACTUAL
+    if ((Date.parse(contrato_inicio) <= Date.parse(registro_inicio)) &&
+      (Date.parse(contrato_fin) >= Date.parse(registro_fin))) {
+      if (Date.parse(registro_inicio) < Date.parse(registro_fin)) {
+        this.RegistrarCargo(form);
       }
       else {
         this.toastr.info(
-          'La fecha de inicio de actividades no puede ser anterior a la fecha de ingreso de contrato.', '', {
+          'La fecha de finalización de actividades debe ser posterior a la fecha de inicio de actividades.', '', {
           timeOut: 6000,
-        });
+        })
       }
-    });
+    }
+    else {
+      this.toastr.info(
+        'Las fechas ingresadas no se encuentran dentro de las establecidas en el contrato laboral.', '', {
+        timeOut: 6000,
+      });
+    }
   }
 
   // METODO PARA GUARDAR REGISTRO
@@ -236,7 +261,7 @@ export class EmplCargosComponent implements OnInit {
       fecha_verificar: datos.fec_inicio
     }
     this.cargos.BuscarCargoFecha(verficar).subscribe(res => {
-      this.toastr.warning('Existe un cargo vigente en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Existe un cargo en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       });
     }, vacio => {

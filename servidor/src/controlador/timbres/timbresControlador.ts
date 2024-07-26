@@ -158,8 +158,7 @@ class TimbresControlador {
                     `
                     SELECT ec.sueldo, tc.cargo, ec.hora_trabaja, cg.nombre AS departamento
                     FROM eu_empleado_cargos AS ec, e_cat_tipo_cargo AS tc, ed_departamentos AS cg
-                    WHERE ec.id = (SELECT MAX(cargo_id) AS cargo_id FROM datos_empleado_cargo
-                                    WHERE empl_id = $1)
+                    WHERE ec.id = (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = $1)
                         AND tc.id = ec.id_tipo_cargo AND cg.id = ec.id_departamento
                     `
                     , [id]).then((result: any) => {
@@ -179,7 +178,7 @@ class TimbresControlador {
             if (codigo === '') {
                 let usuario = await pool.query(
                     `
-                    SELECT * FROM datos_actuales_empleado    
+                    SELECT * FROM informacion_general    
                     WHERE cedula = $1
                     `
                     , [cedula]).then((result: any) => {
@@ -191,7 +190,7 @@ class TimbresControlador {
             } else if (cedula === '') {
                 let usuario = await pool.query(
                     `
-                    SELECT * FROM datos_actuales_empleado 
+                    SELECT * FROM informacion_general 
                     WHERE codigo = $1
                     `
                     , [codigo]).then((result: any) => {
@@ -209,7 +208,7 @@ class TimbresControlador {
                 SELECT (da.nombre || ' ' || da.apellido) AS empleado, da.id AS id_empleado, CAST(t.fecha_hora_timbre AS VARCHAR), t.accion, 
                     t.tecla_funcion, t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
                     CAST(fecha_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id 
-                FROM eu_timbres AS t, datos_actuales_empleado AS da
+                FROM eu_timbres AS t, informacion_general AS da
                 WHERE t.codigo = $1 
                     AND CAST(t.fecha_hora_timbre AS VARCHAR) LIKE $2
                     AND da.codigo = t.codigo 
