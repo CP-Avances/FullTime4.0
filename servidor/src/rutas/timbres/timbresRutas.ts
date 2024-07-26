@@ -13,15 +13,8 @@ class TimbresRutas {
 
         // METODO PARA ELIMINAR NOTIFICACIONES DE AVISOS  --**VERIFICADO
         this.router.put('/eliminar-multiples/avisos', TokenValidation, TIMBRES_CONTROLADOR.EliminarMultiplesAvisos);
-
-
         // METODO PARA BUSCAR TIMBRES (ASISTENCIA)
         this.router.post('/buscar/timbres-asistencia', TokenValidation, TIMBRES_CONTROLADOR.BuscarTimbresAsistencia);
-
-
-
-
-
         // METODO PARA BUSCAR MARCACIONES
         this.router.get('/', TokenValidation, TIMBRES_CONTROLADOR.ObtenerTimbres);
         // METODO PARA BUSCAR EL TIMBRE DE EMPLEADO POR FECHA
@@ -41,6 +34,12 @@ class TimbresRutas {
         this.router.get('/noti-timbres/avisos/:id_empleado', TokenValidation, TIMBRES_CONTROLADOR.ObtenerAvisosTimbresEmpleado);
         this.router.put('/noti-timbres/vista/:id_noti_timbre', TokenValidation, TIMBRES_CONTROLADOR.ActualizarVista);
         this.router.get('/ver/timbres/:id', TokenValidation, TIMBRES_CONTROLADOR.ObtenerTimbresEmpleado);
+        //------------------------ METODOS PARA APP MOVIL ---------------------------------------------------------------
+        this.router.post('/timbre', TokenValidation, TIMBRES_CONTROLADOR.crearTimbre);
+        this.router.post('/timbreSinConexion', TokenValidation, TIMBRES_CONTROLADOR.crearTimbreDesconectado);
+        this.router.post('/timbre/admin', TokenValidation, TIMBRES_CONTROLADOR.crearTimbreJustificadoAdmin);
+        this.router.post('/filtroTimbre', TokenValidation, TIMBRES_CONTROLADOR.FiltrarTimbre);
+        
     }
 }
 
