@@ -225,7 +225,7 @@ export class CargarPlantillaComponent implements OnInit {
     let itemName = arrayItems[0];
     console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
+      if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         console.log('niveles: ', tipo);
@@ -487,7 +487,7 @@ export class CargarPlantillaComponent implements OnInit {
     let itemName = arrayItems[0];
     console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
+      if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.RevisarplantillaCargo();

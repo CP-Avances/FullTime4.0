@@ -454,7 +454,7 @@ export class ListaEmpleadosComponent implements OnInit {
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
         //console.log('itemName: ', itemName)
-        if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
+        if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
           //console.log('entra_automatico');
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;
@@ -471,7 +471,7 @@ export class ListaEmpleadosComponent implements OnInit {
       }
       else {
         //console.log('itemName: ', itemName)
-        if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
+        if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
           //console.log('entra_manual');
           this.numero_paginaMul = 1;
           this.tamanio_paginaMul = 5;

@@ -148,7 +148,7 @@ export class EditarCargoComponent implements OnInit {
 
   // METODO PARA FILTRAR SUCURSALES ASIGNADAS
   FiltrarSucursalesAsignadas(data: any) {
-    return data.filter((sucursal: any) => this.idSucursalesAcceso.includes(sucursal.id));
+    return data.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
   }
 
   // METODO PARA LISTAR DEARTAMENTOS SEGUN SUCURSAL
@@ -166,7 +166,7 @@ export class EditarCargoComponent implements OnInit {
 
   // METODO PARA FILTRAR DEPARTAMENTOS ASIGNADOS
   FiltrarDepartamentosAsignados(data: any) {
-    return data.filter((departamento: any) => this.idDepartamentosAcceso.includes(departamento.id));
+    return data.filter((departamento: any) => this.idDepartamentosAcceso.has(departamento.id));
   }
 
   // METODO DE BUSQUEDA DE DEPARTAMENTOS

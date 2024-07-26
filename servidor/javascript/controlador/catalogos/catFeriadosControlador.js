@@ -267,7 +267,7 @@ class FeriadosControlador {
                 FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s, 
                     informacion_general AS de
                 WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
-                    AND s.id_ciudad = cf.id_ciudad AND de.id_sucursal = s.id AND de.id = $3
+                    AND s.id_ciudad = cf.id_ciudad AND de.id_suc = s.id AND de.id = $3
                 `, [fecha_inicio, fecha_final, id_empleado]);
                 if (FERIADO.rowCount != 0) {
                     return res.jsonp(FERIADO.rows);
@@ -291,7 +291,7 @@ class FeriadosControlador {
                 FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s, 
                     informacion_general AS de
                 WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
-                    AND s.id_ciudad = cf.id_ciudad AND de.id_sucursal = s.id AND de.id = $3
+                    AND s.id_ciudad = cf.id_ciudad AND de.id_suc = s.id AND de.id = $3
                     AND f.fecha_recuperacion IS NOT null
                 `, [fecha_inicio, fecha_final, id_empleado]);
                 if (FERIADO.rowCount != 0) {
