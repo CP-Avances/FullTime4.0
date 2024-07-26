@@ -121,16 +121,6 @@ export class AsignarUsuarioComponent implements OnInit {
     this.asignados = [];
     this.general.ObtenerUsuariosSucursal(data).subscribe(res => {
       this.usuarios = res;
-      // if (this.usuarios.length != 0) {
-      //   this.usuarios.forEach((elemento: any) => {
-      //     const data = {
-      //       id_empleado: elemento.id,
-      //     }
-      //     this.usuario.BuscarUsuarioDepartamento(data).subscribe(datos => {
-      //       elemento.asignaciones = datos;
-      //     });
-      //   });
-      // }
       this.ver_principal = true;
     });
   }
