@@ -15,7 +15,8 @@ class CiudadRutas {
         // METODO PARA CONSULTAR DATOS DE USUARIOS ACTIVOS E INACTIVOS 
         this.router.get('/informacion-data-general/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarDataGeneral);
 
-
+        // METODO PARA CONSULTAR DATOS DE USUARIOS ACTIVOS E INACTIVOS 
+        this.router.get('/informacion-data-general-rol/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarDataGeneralRol);
 
 
         // METODO PARA BUSCAR INFORMACION DE UN USUARIO ADMNISTRADOR - JEFE
@@ -64,10 +65,6 @@ class CiudadRutas {
         this.router.post('/informacion-general-ubicacion/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesUbicacion);
         // METODO DE ACCESO A CONSULTA DE DATOS DE CRAGOS Y COLABORADORES ASIGNADOS A UBICACIONES
         this.router.post('/informacion-general-ubicacion-cargo/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesCargoUbicacion);
-
-
-        // METODO PARA BUSCAR ADMNISTRADORES Y JEFES
-        this.router.post('/datos-actuales-sucursales', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarAdminJefes);
 
         // METODO PARA BUSCAR USUARIOS DE UNA SUCURSAL
         this.router.post('/datos-actuales-sucursal', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarUsuariosSucursal);

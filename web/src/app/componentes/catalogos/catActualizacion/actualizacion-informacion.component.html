@@ -173,12 +173,15 @@
                     </form>
 
                     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
-                        <button id="btn-raised" class="btn btn-sm" (click)="abriEditarRolUser()">
+                        <button id="btn-raised" class="btn btn-sm" (click)="MetodosFiltro(0, 'e')">
                             Actualizar Rol
                         </button>
                     </div>
-                    <hr *ngIf="listaUsuariosRol.length > 0">
+                    <hr *ngIf="mostrarTablas">
+
+
                     <!--  ****************************  TABLA USUARIOS ROLES ****************************  -->
+                    <!--
                     <div *ngIf="listaUsuariosRol.length > 0" class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="resultados">
                         <span class="w-100 bd-highlight">
@@ -237,11 +240,11 @@
                     </mat-paginator>
                     <br>
                     </div>
-
+                    -->
 
 
                     <!--  ****************************  TABLA PARA REGIMEN  ****************************  -->
-            <div *ngIf="_booleanOptions.bool_reg && mostrarTablas" class="mat-elevation-z8" style="background: white;">
+                    <div *ngIf="_booleanOptions.bool_reg && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
                         RESULTADO REGIMEN LABORAL
@@ -290,10 +293,10 @@
                     showFirstLastButtons>
                 </mat-paginator>
                 <br>
-            </div>
+                    </div>
 
-            <!--  ***************************  TABLA PARA CARGOS  ***************************  -->
-            <div *ngIf="_booleanOptions.bool_cargo && mostrarTablas" class="mat-elevation-z8"
+                    <!--  ***************************  TABLA PARA CARGOS  ***************************  -->
+                    <div *ngIf="_booleanOptions.bool_cargo && mostrarTablas" class="mat-elevation-z8"
                 style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
@@ -344,10 +347,10 @@
                     showFirstLastButtons>
                 </mat-paginator>
                 <br>
-            </div>
+                    </div>
 
-             <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
-            <div *ngIf="_booleanOptions.bool_dep && mostrarTablas" class="mat-elevation-z8" style="background: white;">
+                    <!--  **************************  TABLA PARA DEPARTAMENTOS  *****************************  -->
+                    <div *ngIf="_booleanOptions.bool_dep && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
                         RESULTADO DEPARTAMENTOS
@@ -397,10 +400,10 @@
                     showFirstLastButtons>
                 </mat-paginator>
                 <br>
-            </div>
+                    </div>
 
-            <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
-            <div *ngIf="_booleanOptions.bool_emp && mostrarTablas" class="mat-elevation-z8" style="background: white;">
+                    <!--  **************************  TABLA PARA EMPLEADOS  *****************************  -->
+                    <div *ngIf="_booleanOptions.bool_emp && mostrarTablas" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
                         RESULTADO USUARIOS
@@ -453,7 +456,7 @@
                     showFirstLastButtons>
                 </mat-paginator>
                 <br>
-            </div>
+                    </div>
 
                 </mat-card-content>
             </mat-card>

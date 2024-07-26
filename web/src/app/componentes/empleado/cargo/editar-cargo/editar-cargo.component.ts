@@ -309,7 +309,7 @@ export class EditarCargoComponent implements OnInit {
       fecha_verificar: datos.fec_inicio
     }
     this.restEmplCargos.BuscarCargoFechaEditar(verficar).subscribe(res => {
-      this.toastr.warning('Existe un cargo vigente en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('Existe un cargo en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       });
     }, vacio => {

@@ -16,6 +16,10 @@ export class DatosGeneralesService {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/informacion-data-general/${estado}`);
   }
 
+   // METODO PARA CONSULTAR DATOS DE LOS EMPLEADOS
+   ObtenerInformacionGeneralRol(estado: any) {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/informacion-data-general-rol/${estado}`);
+  }
 
   
 
@@ -91,12 +95,6 @@ export class DatosGeneralesService {
   // METODO DE ACCESO A INFORMACION DE CONFIGURACION DE NOTIFICACIONES
   ObtenerInfoConfiguracion(id_empleado: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/info-configuracion/${id_empleado}`);
-  }
-
-
-  // METODO PARA CONSULTAR DATOS DE ADMINISTRADORES Y JEFES
-  ObtenerAdminJefes(datos: any) {
-    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/generalidades/datos-actuales-sucursales`, datos);
   }
 
   // METODO PARA OBTENER USUARIOS DE UNA SUCURSAL

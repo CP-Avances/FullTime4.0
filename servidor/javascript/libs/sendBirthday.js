@@ -33,7 +33,7 @@ const cumpleanios = function () {
                 SELECT da.nombre, da.apellido, da.correo, da.fec_nacimiento, s.id_empresa, 
                     ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
                     ce.pie_firma, ce.cabecera_firma, m.asunto, m.mensaje, m.imagen, m.link  
-                FROM datos_actuales_empleado AS da, e_sucursales AS s, e_message_birthday AS m,
+                FROM informacion_general AS da, e_sucursales AS s, e_message_birthday AS m,
                     e_empresa AS ce 
                 WHERE CAST(da.fec_nacimiento AS VARCHAR) LIKE '%' || $1 AND da.id_sucursal = s.id
                     AND da.estado = 1

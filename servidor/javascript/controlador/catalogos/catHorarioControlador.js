@@ -567,17 +567,18 @@ class HorarioControlador {
                                     break;
                             }
                             // CAMBIAR SALIDA_SIGUIENTE_DIA
-                            switch (SALIDA_SIGUIENTE_DIA) {
-                                case 'Si':
+                            switch (SALIDA_SIGUIENTE_DIA.toLowerCase()) {
+                                case 'si':
                                     SALIDA_SIGUIENTE_DIA = true;
                                     break;
-                                case 'No':
+                                case 'no':
                                     SALIDA_SIGUIENTE_DIA = false;
                                     break;
                                 default:
                                     SALIDA_SIGUIENTE_DIA = false;
                                     break;
                             }
+                            //TODO NO SE ESTA USANDO ANALIZAR SI MANTENER O ELIMINAR
                             // CAMBIAR SALIDA_TERCER_DIA
                             switch (SALIDA_TERCER_DIA) {
                                 case 'Si':
@@ -818,14 +819,16 @@ function VerificarFormatoDatos(data) {
     let error = true;
     const { HORAS_TOTALES, MINUTOS_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = data;
     const horasTotalesFormatoCorrecto = /^(\d+)$|^(\d{1,2}:\d{2})$|^(\d{1,2}:\d{2}:\d{2})$/.test(HORAS_TOTALES);
+    const horasTotalesMayorCero = horasTotalesFormatoCorrecto ? parseInt(HORAS_TOTALES) > 0 : false;
     const minAlimentacionFormatoCorrecto = /^\d+$/.test(MINUTOS_ALIMENTACION);
     const tipoHorarioValido = ['Laborable', 'Libre', 'Feriado'].includes(TIPO_HORARIO);
     const tipoHorarioNocturnoValido = ['Si', 'No'].includes(HORARIO_NOCTURNO);
-    horasTotalesFormatoCorrecto ? null : observacion = 'Formato de horas totales incorrecto (HH:mm)';
+    horasTotalesFormatoCorrecto ? (horasTotalesMayorCero ? null : observacion = 'Horas totales debe ser mayor a 0')
+        : observacion = 'Formato de horas totales incorrecto (HH:mm)';
     minAlimentacionFormatoCorrecto ? null : observacion = 'Formato de minutos de alimentación incorrecto';
     tipoHorarioValido ? null : observacion = 'Tipo de horario incorrecto';
     tipoHorarioNocturnoValido ? null : observacion = 'Tipo de horario nocturno incorrecto';
-    error = horasTotalesFormatoCorrecto && minAlimentacionFormatoCorrecto && tipoHorarioValido && tipoHorarioNocturnoValido ? false : true;
+    error = horasTotalesFormatoCorrecto && horasTotalesMayorCero && minAlimentacionFormatoCorrecto && tipoHorarioValido && tipoHorarioNocturnoValido ? false : true;
     return [error, observacion];
 }
 // FUNCION PARA VERIFICAR SI EXISTEN DATOS DUPLICADOS EN LA BASE DE DATOS
@@ -846,19 +849,21 @@ function VerificarCodigoHorarioDetalleHorario(codigo, plantillaHorarios) {
 function VerificarFormatoDetalleHorario(data) {
     let observacion = '';
     let error = true;
-    const { TIPO_ACCION, HORA, TOLERANCIA, MINUTOS_ANTES, MINUTOS_DESPUES } = data;
-    const horaFormatoCorrecto = /^(\d{1,2}:\d{2})$|^(\d{1,2}:\d{2}:\d{2})$/.test(HORA);
+    const { TIPO_ACCION, HORA, TOLERANCIA, SALIDA_SIGUIENTE_DIA, MINUTOS_ANTES, MINUTOS_DESPUES } = data;
+    const horaFormatoCorrecto = /^(\d{1,2}:\d{2})$/.test(HORA);
+    const salidaSiguienteDiaFormatoCorrecto = ['si', 'no'].includes(SALIDA_SIGUIENTE_DIA.toLowerCase());
     const minAntesFormatoCorrecto = /^\d+$/.test(MINUTOS_ANTES);
     const minDespuesFormatoCorrecto = /^\d+$/.test(MINUTOS_DESPUES);
     let toleranciaFormatoCorrecto = true;
     if (TIPO_ACCION.toLowerCase() === 'entrada') {
         toleranciaFormatoCorrecto = /^\d+$/.test(TOLERANCIA);
     }
-    horaFormatoCorrecto ? null : observacion = observacion.concat('Formato de hora incorrecto (HH:mm)');
-    toleranciaFormatoCorrecto ? null : observacion = observacion.concat('Formato de tolerancia incorrecto');
-    minAntesFormatoCorrecto ? null : observacion = observacion.concat('Formato de minutos antes incorrecto');
-    minDespuesFormatoCorrecto ? null : observacion = observacion.concat('Formato de minutos después incorrecto');
-    error = horaFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto && toleranciaFormatoCorrecto ? false : true;
+    horaFormatoCorrecto ? null : observacion = 'Formato de hora incorrecto (HH:mm)';
+    toleranciaFormatoCorrecto ? null : 'Formato de tolerancia incorrecto';
+    salidaSiguienteDiaFormatoCorrecto ? null : observacion = 'Formato de salida siguiente día incorrecto';
+    minAntesFormatoCorrecto ? null : observacion = 'Formato de minutos antes incorrecto';
+    minDespuesFormatoCorrecto ? null : observacion = 'Formato de minutos después incorrecto';
+    error = horaFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto && toleranciaFormatoCorrecto && salidaSiguienteDiaFormatoCorrecto ? false : true;
     return [error, observacion];
 }
 // FUNCION PARA AGRUPAR LOS DETALLES QUE PERTENEZCAN A UN MISMO HORARIO

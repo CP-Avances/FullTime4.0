@@ -254,9 +254,15 @@
                 </tbody>
             </table>
         </div>
-        <mat-paginator id="paginaH" [length]="dataHorarios.plantillaHorarios.length" [pageSize]="tamanio_paginaH"
-            [pageSizeOptions]="pageSizeOptionsH" id="paginaH" (page)="ManejarPaginaH($event)" showFirstLastButtons>
-        </mat-paginator>
+        <div style="display: flex; align-items: center;">
+          <div class="contenedorTotal">
+            <div id="t-editar" class="circulo circuloTotal"></div>
+            <div>{{horariosCorrectos}}</div>
+          </div>
+          <mat-paginator id="paginaH" [length]="dataHorarios.plantillaHorarios.length" [pageSize]="tamanio_paginaH"
+                        [pageSizeOptions]="pageSizeOptionsH" (page)="ManejarPaginaH($event)" showFirstLastButtons>
+          </mat-paginator>
+        </div>
     </div>
 </div>
 
@@ -302,9 +308,15 @@
                 </tbody>
             </table>
         </div>
-        <mat-paginator id="paginaD" [length]="dataHorarios.plantillaDetalles.length" [pageSize]="tamanio_paginaD"
-            [pageSizeOptions]="pageSizeOptionsD" id="paginaD" (page)="ManejarPaginaD($event)" showFirstLastButtons>
-        </mat-paginator>
+        <div style="display: flex; align-items: center;">
+          <div class="contenedorTotal">
+            <div id="t-editar" class="circulo circuloTotal"></div>
+            <div>{{detallesCorrectos}}</div>
+          </div>
+          <mat-paginator id="paginaD" [length]="dataHorarios.plantillaDetalles.length" [pageSize]="tamanio_paginaD"
+              [pageSizeOptions]="pageSizeOptionsD" id="paginaD" (page)="ManejarPaginaD($event)" showFirstLastButtons>
+          </mat-paginator>
+        </div>
     </div>
 </div>
 

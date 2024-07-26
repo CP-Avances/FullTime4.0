@@ -35,7 +35,7 @@ class AutorizaDepartamentoControlador {
                 da.autorizar, da.preautorizar, da.id_empleado_cargo, e.id_contrato, e.id_departamento AS depa_pertenece, 
                 cd.nombre, ce.id AS id_empresa, ce.nombre AS nom_empresa, s.id AS id_sucursal, s.nombre AS nom_sucursal 
             FROM ed_autoriza_departamento AS da, ed_departamentos AS cd, e_empresa AS ce, 
-                e_sucursales AS s, datos_actuales_empleado AS e, ed_niveles_departamento AS n 
+                e_sucursales AS s, contrato_cargo_vigente AS e, ed_niveles_departamento AS n 
             WHERE da.id_departamento = cd.id 
                 AND cd.id_sucursal = s.id 
                 AND ce.id = s.id_empresa 
@@ -255,7 +255,7 @@ class AutorizaDepartamentoControlador {
                 (dae.nombre || ' ' || dae.apellido) as fullname, dae.cedula, dae.correo, c.permiso_mail, 
                 c.permiso_notificacion, c.vacacion_mail, c.vacacion_notificacion, c.hora_extra_mail, 
                 c.hora_extra_notificacion  
-            FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, datos_actuales_empleado AS dae, 
+            FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, informacion_general AS dae, 
                 eu_configurar_alertas AS c, ed_departamentos AS cg 
             WHERE n.id_departamento = $1
                 AND da.id_departamento = n.id_departamento_nivel 

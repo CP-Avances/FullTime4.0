@@ -144,7 +144,7 @@ export class ActualizacionInformacionComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.check = this.restR.checkOptions([{ opcion: 'd' }, { opcion: 'c' }, { opcion: 'e' }]);
+    this.check = this.restR.checkOptions([{ opcion: 'r' }, { opcion: 'd' }, { opcion: 'c' }, { opcion: 'e' }]);
     this.idUsuariosAcceso = this.asignaciones.idUsuariosAcceso;
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
@@ -160,7 +160,7 @@ export class ActualizacionInformacionComponent implements OnInit {
     this.empleados = [];
     this.regimen = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionGeneral(1).subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacionGeneralRol(1).subscribe((res: any[]) => {
       this.ProcesarDatos(res);
     }, err => {
       this.toastr.error(err.error.message)
@@ -179,8 +179,6 @@ export class ActualizacionInformacionComponent implements OnInit {
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
     //console.log('ver original ', this.origen)
-    console.log('informacion: ', informacion);
-
     informacion.forEach((obj: any) => {
       //console.log('ver obj ', obj)
       this.sucursales.push({
@@ -663,34 +661,138 @@ export class ActualizacionInformacionComponent implements OnInit {
   // METODO DE SELECCTION DE TIPO DE PROCESO
   SeleccionarProceso(tipo: string, datos: any) {
     if (tipo === 'p') {
-
+      this.abriEditarRolUser(datos);
     }
     else if (tipo === 'b') {
-
+      this.abriEditarRolUser(datos);
     }
     else if (tipo === 'e') {
-
+      this.abriEditarRolUser(datos);
     }
     else if (tipo === 'm') {
-
+      this.abriEditarRolUser(datos);
     }
     else if (tipo === 't') {
-
+      this.abriEditarRolUser(datos);
     }
     else if (tipo === 'c') {
-
+      this.abriEditarRolUser(datos);
     }
   }
 
-  abriEditarRolUser() {
-    if (this.selectionRol.selected.length > 0) {
-      this.ventana.open(EditarRolUserComponent, { width: '600px' }).afterClosed()
-        .subscribe((confirmado: Boolean) => {
-          if (confirmado) {
 
-          }
-        });
+  /** ************************************************************************************** **
+  ** **                     METODOS DE PLANIFICACION DE HORARIOS                         ** **
+  ** ************************************************************************************** **/
+
+  // METODO PARA ABRI VENTANA DE ASIGNACION DE HORARIO
+  idCargo: any;
+  data_horario: any = [];
+  PlanificarIndividual(usuario: any, tipo: string): void {
+    if (tipo === 'p') {
+      this.seleccionarRol = false;
+      this.data_horario = {
+        pagina: 'rango_fecha',
+        codigo: usuario.codigo,
+        idCargo: usuario.id_cargo,
+        idEmpleado: usuario.id,
+        horas_trabaja: usuario.hora_trabaja,
+      }
+    }
+    else {
+      this.VerPlanificacion([usuario]);
+    }
+  }
+
+  // METODO DE VALIDACION DE SELECCION MULTIPLE
+  PlanificarMultiple(data: any) {
+    if (data.length > 0) {
+      this.Planificar(data);
+    }
+    else {
+      this.toastr.warning('No ha seleccionado usuarios.', '', {
+        timeOut: 6000,
+      });
+    }
+  }
+
+  // METODO PARA INGRESAR PLANIFICACION DE HORARIOS A VARIOS EMPLEADOS
+  seleccionados: any = [];
+  Planificar(seleccionados: any) {
+    if (seleccionados.length === 1) {
+      this.PlanificarIndividual(seleccionados[0], 'p');
     } else {
+      this.seleccionados = seleccionados;
+      this.seleccionarRol = false;
+      this.asignarRol = true;
+    }
+  }
+
+  // METODO DE VALIDACION DE SELECCION MULTIPLE - ROTATIVOS
+  plan_rotativo: boolean = false;
+  data_rotativo: any = []
+  PlanificarRotativos(data: any) {
+    console.log('data rotativos ', data)
+    this.data_horario = [];
+    if (data.length > 0) {
+      this.data_horario = {
+        usuarios: data,
+        pagina: 'multiple-empleado',
+      }
+      this.seleccionarRol = false;
+      this.plan_rotativo = true;
+    }
+    else {
+      this.toastr.warning('No ha seleccionado usuarios.', '', {
+        timeOut: 6000,
+      });
+    }
+  }
+
+  // METODO PARA VER PLANIFICACION
+  resultados: any = [];
+  VerPlanificacion(data: any) {
+    console.log('VerPlanificacion', data);
+    if (data.length > 0) {
+      this.resultados = data;
+      this.seleccionarRol = false;
+      this.ventana_busquedaRol = true;
+    }
+    else {
+      this.toastr.warning('No ha seleccionado usuarios.', '', {
+        timeOut: 6000,
+      });
+    }
+  }
+
+    // METODO PARA TOMAR DATOS SELECCIONADOS
+    MetodosFiltro(valor: any, tipo: string) {
+      if (this.opcion === 'c') {
+        this.ModelarCargo(valor.id, tipo, valor.id_suc);
+      }
+      else if (this.opcion === 'd') {
+        this.ModelarDepartamentos(valor.id, tipo, valor.id_suc);
+      }
+      else if (this.opcion === 'r') {
+        this.ModelarRegimen(valor.id, tipo, valor.id_suc);
+      }
+      else {
+        this.ModelarEmpleados(tipo);
+      }
+      
+    }
+  
+
+  abriEditarRolUser(datos: any){
+    console.log('roles seleccionados: ',datos)
+    if(datos.length > 0){
+      this.ventana.open(EditarRolUserComponent, { width: '600px', data: datos }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          
+        }
+      });
+    }else{
       this.toastr.warning('Seleccione usuarios para actualizar.', '', {
         timeOut: 4000,
       });

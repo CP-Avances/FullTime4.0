@@ -262,7 +262,7 @@ class PermisosControlador {
                 SELECT n.id_departamento, cg.nombre, n.id_departamento_nivel, n.departamento_nombre_nivel, n.nivel,
                     da.estado, dae.id_contrato, da.id_empleado_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
                     dae.cedula, dae.correo, c.permiso_mail, c.permiso_notificacion 
-                FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, datos_actuales_empleado AS dae,
+                FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, informacion_general AS dae,
                     eu_configurar_alertas AS c, ed_departamentos AS cg 
                 WHERE n.id_departamento = $1
                     AND da.id_departamento = n.id_departamento_nivel
@@ -434,14 +434,13 @@ class PermisosControlador {
         const id = req.params.id_permiso
         const PERMISOS = await pool.query(
             `
-            SELECT p.*, tp.descripcion AS tipo_permiso, cr.descripcion AS regimen, da.nombre, da.apellido,
-                da.cedula, s.nombre AS sucursal, c.descripcion AS ciudad, e.nombre AS empresa, tc.cargo
-            FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS tp, eu_empleado_contratos AS ec, 
-                ere_cat_regimenes AS cr, datos_actuales_empleado AS da, eu_empleado_cargos AS ce, e_sucursales AS s,
-                e_ciudades AS c, e_empresa AS e, e_cat_tipo_cargo AS tc
-            WHERE p.id_tipo_permiso = tp.id AND ec.id = ce.id_contrato AND cr.id = ec.id_regimen
-                AND da.id = p.id_empleado AND ce.id = p.id_empleado_cargo
-                AND s.id = ce.id_sucursal AND s.id_ciudad = c.id AND s.id_empresa = e.id AND tc.id = ce.id_tipo_cargo
+            SELECT p.*, tp.descripcion AS tipo_permiso, da.name_regimen AS regimen, da.nombre, da.apellido,
+                da.cedula, da.name_suc AS sucursal, da.ciudad, e.nombre AS empresa, da.name_cargo AS cargo
+            FROM mp_solicitud_permiso AS p, mp_cat_tipo_permisos AS tp, informacion_general AS da, 
+                e_empresa AS e, e_sucursales AS s
+            WHERE p.id_tipo_permiso = tp.id 
+                AND da.id = p.id_empleado
+                AND s.id = da.id_sucursal AND s.id_empresa = e.id 
                 AND p.id = $1
             `
             , [id]);
@@ -751,7 +750,7 @@ class PermisosControlador {
                 FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
                     ed_departamentos AS d 
                 WHERE ecn.id = $1 AND ecn.id_empleado = e.id AND 
-                    (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id ) = ecr.id 
+                    (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = e.id) = ecr.id 
                     AND tc.id = ecr.id_tipo_cargo AND d.id = ecr.id_departamento 
                 ORDER BY cargo DESC
                 `
@@ -863,7 +862,7 @@ class PermisosControlador {
                 FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
                     ed_departamentos AS d 
                 WHERE ecn.id = $1 AND ecn.id_empleado = e.id AND 
-                    (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id ) = ecr.id 
+                    (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = e.id) = ecr.id 
                     AND tc.id = ecr.id_tipo_cargo AND d.id = ecr.id_departamento 
                 ORDER BY cargo DESC
                 `
@@ -1054,11 +1053,10 @@ class PermisosControlador {
 
             const solicita = await pool.query(
                 `
-                SELECT de.id, (de.nombre ||' '|| de.apellido) AS empleado, de.cedula, tc.cargo AS tipo_cargo, 
-                    d.nombre AS departamento     
-                FROM datos_actuales_empleado AS de, eu_empleado_cargos AS ec, e_cat_tipo_cargo AS tc, 
-                    ed_departamentos AS d 
-                WHERE de.id = $1 AND d.id = de.id_departamento AND ec.id = de.id_cargo AND ec.id_tipo_cargo = tc.id
+                SELECT de.id, (de.nombre ||' '|| de.apellido) AS empleado, de.cedula, de.name_cargo AS tipo_cargo, 
+                    de.name_dep AS departamento     
+                FROM informacion_general AS de
+                WHERE de.id = $1
                 `
                 , [usuario_solicita]);
 
@@ -1147,10 +1145,10 @@ class PermisosControlador {
             `
             SELECT p.id, p.fecha_creacion, p.descripcion, p.fecha_inicio, p.documento, p.fecha_final, p.estado, 
                 p.id_empleado_cargo, e.id AS id_emple_solicita, e.nombre, e.apellido, 
-                (e.nombre || \' \' || e.apellido) AS fullname, e.cedula, da.correo, cp.descripcion AS nom_permiso, 
-                ec.id AS id_contrato, da.id_departamento AS id_depa, da.codigo, depa.nombre AS depa_nombre 
+                (e.nombre || \' \' || e.apellido) AS fullname, e.cedula, e.correo, cp.descripcion AS nom_permiso, 
+                ec.id AS id_contrato, da.id_departamento AS id_depa, e.codigo, depa.nombre AS depa_nombre 
             FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp, 
-                datos_actuales_empleado AS da, ed_departamentos AS depa, eu_empleado_cargos AS ce
+                contrato_cargo_vigente AS da, ed_departamentos AS depa, eu_empleado_cargos AS ce
             WHERE p.id_empleado_cargo = ce.id AND ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id 
                 AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 1 OR p.estado = 2) 
                 AND ce.id_contrato = ec.id
@@ -1173,9 +1171,9 @@ class PermisosControlador {
             SELECT p.id, p.fecha_creacion, p.descripcion, p.fecha_inicio, p.documento,  p.fecha_final, p.estado, 
                 p.id_empleado_cargo, e.id AS id_emple_solicita, e.nombre, e.apellido, 
                 (e.nombre || \' \' || e.apellido) AS fullname, e.cedula, cp.descripcion AS nom_permiso, 
-                ec.id AS id_contrato, da.id_departamento AS id_depa, da.codigo, depa.nombre AS depa_nombre 
+                ec.id AS id_contrato, da.id_departamento AS id_depa, e.codigo, depa.nombre AS depa_nombre 
             FROM mp_solicitud_permiso AS p, eu_empleado_contratos AS ec, eu_empleados AS e, mp_cat_tipo_permisos AS cp, 
-                datos_actuales_empleado AS da, ed_departamentos AS depa, eu_empleado_cargos AS ce
+                contrato_cargo_vigente AS da, ed_departamentos AS depa, eu_empleado_cargos AS ce
             WHERE p.id_empleado_cargo = ce.id AND ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id 
                 AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 3 OR p.estado = 4)
                 AND ce.id_contrato = ec.id
@@ -1377,7 +1375,7 @@ class PermisosControlador {
                 FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
                     ed_departamentos AS d 
                 WHERE ecn.id = $1 AND ecn.id_empleado = e.id 
-                    AND (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
+                    AND (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = e.id) = ecr.id 
                     AND tc.id = ecr.id_tipo_cargo AND d.id = ecr.id_departamento 
                 ORDER BY cargo DESC
                 `
@@ -1488,7 +1486,7 @@ class PermisosControlador {
                 FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
                     ed_departamentos AS d 
                 WHERE ecn.id = $1 AND ecn.id_empleado = e.id 
-                    AND (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
+                    AND (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = e.id) = ecr.id 
                     AND tc.id = ecr.id_tipo_cargo AND d.id = ecr.id_departamento 
                 ORDER BY cargo DESC
                 `
@@ -1779,7 +1777,7 @@ async function CrearPermiso(datos: any): Promise<RespuestaPermiso> {
             SELECT n.id_departamento, cg.nombre, n.id_departamento_nivel, n.departamento_nombre_nivel, n.nivel,
                 da.estado, dae.id_contrato, da.id_empleado_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
                 dae.cedula, dae.correo, c.permiso_mail, c.permiso_notificacion, dae.id AS id_aprueba 
-            FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, datos_actuales_empleado AS dae,
+            FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, informacion_general AS dae,
                 eu_configurar_alertas AS c, ed_departamentos AS cg
             WHERE n.id_departamento = $1
                 AND da.id_departamento = n.id_departamento_nivel

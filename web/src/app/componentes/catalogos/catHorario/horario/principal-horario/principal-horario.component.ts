@@ -30,6 +30,8 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableHorarios } from 'src/app/model/reportes.model';
+import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-principal-horario',
@@ -41,6 +43,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // ALMACENAMIENTO DE DATOS Y BUSQUEDA
   horarios: any = [];
+  detallesHorarios: any = [];
   ver_horarios: boolean = true;
   horariosEliminar: any = [];
 
@@ -93,6 +96,8 @@ export class PrincipalHorarioComponent implements OnInit {
   mostrarbtnsubir: boolean = false;
   listaHorariosCorrectos: any = [];
   listaDetalleCorrectos: any = [];
+  horariosCorrectos: number = 0;
+  detallesCorrectos: number = 0;
 
   // VARIABLES PARA AUDITORIA
   user_name: string | null;
@@ -106,7 +111,9 @@ export class PrincipalHorarioComponent implements OnInit {
     public router: Router, // VARIABLE DE MANEJO DE RUTAS
     public restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     private rest: HorarioService, // SERVICIO DATOS DE HORARIO
+    private restD: DetalleCatHorariosService,
     private toastr: ToastrService, // VARIABLE DE MANEJO DE NOTIFICACIONES
+    public parametro: ParametrosService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -150,6 +157,15 @@ export class PrincipalHorarioComponent implements OnInit {
     });
   }
 
+  formato_hora: string = 'HH:mm:ss';
+  BuscarHora() {
+    // id_tipo_parametro Formato hora = 2
+    this.parametro.ListarDetalleParametros(2).subscribe(
+      res => {
+        this.formato_hora = res[0].descripcion;
+      });
+  }
+
   // METODO PARA MANEJAR PAGINAS DE TABLA
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
@@ -171,25 +187,43 @@ export class PrincipalHorarioComponent implements OnInit {
   // METODO PARA OBTENER HORARIOS
   ObtenerHorarios() {
     this.horarios = [];
-    this.rest.BuscarListaHorarios().subscribe(datos => {
-      this.horarios = datos;
-      this.horarios.forEach((obj: any) => {
-        if (obj.default_ === 'N') {
-          obj.default_tipo = 'Laborable';
+    this.rest.BuscarListaHorarios().subscribe((datos: any) => {
+      this.horarios = datos.map((obj: any) => {
+        switch (obj.default_) {
+          case 'N':
+            obj.default_tipo = 'Laborable';
+            break;
+          case 'L':
+          case 'DL':
+            obj.default_tipo = 'Libre';
+            break;
+          case 'FD':
+          case 'DFD':
+            obj.default_tipo = 'Feriado';
+            break;
+          case 'HA':
+          case 'DHA':
+            obj.default_tipo = 'Abierto';
+            break;
+          default:
+            obj.default_tipo = 'Desconocido'; // Manejo de caso por defecto
         }
-        else if (obj.default_ === 'L' || obj.default_ === 'DL') {
-          obj.default_tipo = 'Libre';
-        }
-        else if (obj.default_ === 'FD' || obj.default_ === 'DFD') {
-          obj.default_tipo = 'Feriado';
-        }
-        else if (obj.default_ === 'HA' || obj.default_ === 'DHA') {
-          obj.default_tipo = 'Abierto';
-        }
-      })
-    })
-  }
+        return obj;
+      });
 
+      this.restD.ConsultarDetalleHorarios({}).subscribe((data: any) => {
+        this.detallesHorarios = data.map((detalle: any) => {
+          // Formatear la hora del detalle
+          detalle.hora = this.validar.FormatearHora(detalle.hora, this.formato_hora);
+          return detalle;
+        });
+
+        this.horarios.forEach((horario: any) => {
+          horario.detalles = this.detallesHorarios.filter((detalle: any) => detalle.id_horario === horario.id);
+        });
+      });
+    });
+  }
   // METODO PARA ABRIR VENTANA REGISTRAR HORARIO
   AbrirVentanaRegistrarHorario(): void {
     this.ventana.open(RegistroHorarioComponent, { width: '1000px' })
@@ -299,7 +333,7 @@ export class PrincipalHorarioComponent implements OnInit {
       let itemName = arrayItems[0];
 
       if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-        if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
+        if (itemName.toLowerCase().startsWith('plantillaconfiguraciongeneral')) {
           this.VerificarPlantilla();
         } else {
           this.toastr.error('Solo se acepta plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
@@ -320,12 +354,15 @@ export class PrincipalHorarioComponent implements OnInit {
   }
 
   VerificarPlantilla() {
+    this.listaHorariosCorrectos = [];
+    this.listaDetalleCorrectos = [];
+
     let formData = new FormData();
-    for (var i = 0; i < this.archivoSubido.length; i++) {
+    for (let i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
 
     }
-    //--console.log("formdata", formData);
+
     this.rest.VerificarDatosHorario(formData).subscribe(res => {
       this.dataHorarios = res;
       this.dataHorarios.plantillaHorarios.forEach((obj: any) => {
@@ -338,6 +375,45 @@ export class PrincipalHorarioComponent implements OnInit {
           this.listaDetalleCorrectos.push(obj);
         }
       });
+      this.OrdenarHorarios();
+      this.OrdenarDetalles();
+
+      this.horariosCorrectos = this.listaHorariosCorrectos.length;
+      this.detallesCorrectos = this.listaDetalleCorrectos.length;
+    });
+  }
+
+  // METODO PARA ORDENAR HORARIOS POR OBSERVACION
+  OrdenarHorarios() {
+    this.dataHorarios.plantillaHorarios.sort((a: any, b: any) => {
+      if (a.OBSERVACION !== 'Ok' && b.OBSERVACION === 'Ok') {
+        return -1;
+      }
+      if (a.OBSERVACION === 'Ok' && b.OBSERVACION !== 'Ok') {
+        return 1;
+      }
+      if (a.OBSERVACION === 'Ok' && b.OBSERVACION === 'Ok') {
+        if (!a.DETALLE && b.DETALLE) {
+          return -1;
+        }
+        if (a.DETALLE && !b.DETALLE) {
+          return 1;
+        }
+      }
+      return 0;
+    });
+  }
+
+  //METODO PARA ORDENAR DETALLES POR OBSERVACION
+  OrdenarDetalles() {
+    this.dataHorarios.plantillaDetalles.sort((a: any, b: any) => {
+      if (a.OBSERVACION !== 'Ok' && b.OBSERVACION === 'Ok') {
+        return -1;
+      }
+      if (a.OBSERVACION === 'Ok' && b.OBSERVACION !== 'Ok') {
+        return 1;
+      }
+      return 0;
     });
   }
 
@@ -413,6 +489,7 @@ export class PrincipalHorarioComponent implements OnInit {
   // GENERAR ARCHIVO PDF
   GenerarPDF(action = 'open') {
     const documentDefinition = this.EstructurarPDF();
+    console.log('horarios', this.horarios);
 
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -428,7 +505,9 @@ export class PrincipalHorarioComponent implements OnInit {
     sessionStorage.setItem('Empleados', this.horarios);
     return {
       // ENCABEZADO DE PÁGINA
-      pageOrientation: 'landscape',
+      pageSize: 'A4',
+      pageOrientation: 'portrait',
+      pageMargins: [40, 50, 40, 50],
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       // PIE DE PAGINA
@@ -452,58 +531,148 @@ export class PrincipalHorarioComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: 'Lista de Horarios', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
-        this.PresentarDataPDFEmpleados(),
+        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'LISTA DE HORARIOS', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        ...this.PresentarDataPDFHorarios(),
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10 },
-        itemsTableC: { fontSize: 10, alignment: 'center' }
+        tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.s_color },
+        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.s_color, margin: [0, 7, 0, 0] },
+        itemsTable: { fontSize: 8 },
+        itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
+        itemsTableInfoHorario: { fontSize: 9, margin: [0, -1, 0, -1], fillColor: this.p_color },
+        itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+        tableMargin: { margin: [0, 0, 0, 0] },
+        tableMarginCabecera: { margin: [0, 15, 0, 0] },
+        tableMarginCabeceraHorario: { margin: [0, 10, 0, 0] },
       }
     };
   }
 
   // METODO PARA PRESENTAR DATOS DEL DOCUMENTO PDF
-  PresentarDataPDFEmpleados() {
-    return {
-      columns: [
-        { width: '*', text: '' },
-        {
-          width: 'auto',
+  PresentarDataPDFHorarios(): Array<any> {
+    let n: any = []
+
+    this.horarios.forEach((obj: any) => {
+      n.push({
+        style: 'tableMarginCabeceraHorario',
+        table: {
+          widths: ['*','*'],
+          headerRows: 2,
+          body: [
+            [
+              { text: `HORARIO: ${obj.nombre}`, style: 'itemsTableInfoHorario', border: [true, true, false, false] },
+              { text: `HORAS DE TRABAJO: ${obj.hora_trabajo}`, style: 'itemsTableInfoHorario', border: [false, true, true, false] }
+            ],
+            [
+              { text: `CÓDIGO: ${obj.codigo}`, style: 'itemsTableInfoHorario', border: [true, false, false, false] },
+              { text: `HORARIO NOTURNO ${obj.noturno == true ? 'Sí' : 'No'}`, style: 'itemsTableInfoHorario', border: [false, false, true, false] }
+            ],
+          ]
+        },
+      });
+
+      n.push({
+        style: 'tableMargin',
+        table: {
+          widths: ['*'],
+          headerRows: 1,
+          body: [
+            [
+              { text: `DOCUMENTO: ${obj.documento ? obj.documento : ''}`, style: 'itemsTableInfoHorario', border: obj.detalles.length > 0 ? [true, false, true, false] : [true, false, true, true] },
+            ]
+          ]
+        }
+      });
+
+      if (obj.detalles.length > 0) {
+        n.push({
+          style: 'tableMargin',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            widths: [ '*'],
+            headerRows: 1,
+            body: [
+              [{ rowSpan: 1, text: 'DETALLES', style: 'tableHeader', border: [true, true, true, false]  }],
+            ]
+          }
+        });
+        n.push({
+          style: 'tableMargin',
+          table: {
+            widths: ['auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto'],
+            headerRows: 1,
             body: [
               [
-                { text: 'Código', style: 'tableHeader' },
-                { text: 'Nombre', style: 'tableHeader' },
-                { text: 'Minutos de almuerzo', style: 'tableHeader' },
-                { text: 'Horas de trabajo', style: 'tableHeader' },
-                { text: 'Horario noturno', style: 'tableHeader' },
-                { text: 'Documento', style: 'tableHeader' },
+                { text: 'ORDEN', style: 'tableHeader' },
+                { text: 'HORA', style: 'tableHeader' },
+                { text: 'TOLERANCIA', style: 'tableHeader' },
+                { text: 'ACCIÓN', style: 'tableHeader' },
+                { text: 'OTRO DIA', style: 'tableHeader' },
+                { text: 'MINUTOS ANTES', style: 'tableHeader' },
+                { text: 'MINUTOS DESPUES', style: 'tableHeader' },
               ],
-              ...this.horarios.map((obj: any) => {
+              ...obj.detalles.map((detalle: any) => {
                 return [
-                  { text: obj.id, style: 'itemsTableC' },
-                  { text: obj.nombre, style: 'itemsTable' },
-                  { text: obj.minutos_comida, style: 'itemsTableC' },
-                  { text: obj.hora_trabajo, style: 'itemsTableC' },
-                  { text: obj.noturno == true ? 'Sí' : 'No', style: 'itemsTableC' },
-                  { text: obj.documento, style: 'itemsTableC' },
+                  { text: detalle.orden, style: 'itemsTableCentrado' },
+                  { text: detalle.hora, style: 'itemsTableCentrado' },
+                  { text: detalle.tolerancia !=null ? detalle.tolerancia : '', style: 'itemsTableCentrado' },
+                  { text: detalle.tipo_accion_show, style: 'itemsTableCentrado' },
+                  { text: detalle.segundo_dia == true ? 'Sí' : 'No', style: 'itemsTableCentrado' },
+                  { text: detalle.minutos_antes, style: 'itemsTableCentrado' },
+                  { text: detalle.minutos_despues, style: 'itemsTableCentrado' },
                 ];
               })
             ]
           },
-          // ESTILO DE COLORES FORMATO ZEBRA
           layout: {
-            fillColor: function (i: any) {
-              return (i % 2 === 0) ? '#CCD1D1' : null;
+            fillColor: function (rowIndex: any) {
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
             }
           }
-        },
-        { width: '*', text: '' },
-      ]
-    };
+        });
+      }
+    });
+
+    return n;
+    // return {
+    //   columns: [
+    //     { width: '*', text: '' },
+    //     {
+    //       width: 'auto',
+    //       table: {
+    //         widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+    //         body: [
+    //           [
+    //             { text: 'Código', style: 'tableHeader' },
+    //             { text: 'Nombre', style: 'tableHeader' },
+    //             { text: 'Minutos de almuerzo', style: 'tableHeader' },
+    //             { text: 'Horas de trabajo', style: 'tableHeader' },
+    //             { text: 'Horario noturno', style: 'tableHeader' },
+    //             { text: 'Documento', style: 'tableHeader' },
+    //           ],
+    //           ...this.horarios.map((obj: any) => {
+    //             return [
+    //               { text: obj.codigo, style: 'itemsTableC' },
+    //               { text: obj.nombre, style: 'itemsTable' },
+    //               { text: obj.minutos_comida, style: 'itemsTableC' },
+    //               { text: obj.hora_trabajo, style: 'itemsTableC' },
+    //               { text: obj.noturno == true ? 'Sí' : 'No', style: 'itemsTableC' },
+    //               { text: obj.documento, style: 'itemsTableC' },
+    //             ];
+    //           })
+    //         ]
+    //       },
+    //       // ESTILO DE COLORES FORMATO ZEBRA
+    //       layout: {
+    //         fillColor: function (i: any) {
+    //           return (i % 2 === 0) ? '#CCD1D1' : null;
+    //         }
+    //       }
+    //     },
+    //     { width: '*', text: '' },
+    //   ]
+    // };
   }
 
 
@@ -590,7 +759,8 @@ export class PrincipalHorarioComponent implements OnInit {
       return 'rgb(222, 162, 73)';
     }
 
-    if (observacion.startsWith('Requerido') || observacion.startsWith('No cumple') || observacion.startsWith('Minutos de alimentación no')) {
+    if (observacion.startsWith('Requerido') || observacion.startsWith('No cumple')
+        || (observacion.startsWith('Horas')) || observacion.startsWith('Minutos de alimentación no')) {
       return 'rgb(238, 34, 207)';
     }
 

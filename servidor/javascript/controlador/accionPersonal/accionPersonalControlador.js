@@ -573,9 +573,9 @@ class AccionPersonalControlador {
             const { id } = req.params;
             const EMPLEADO = yield database_1.default.query(`
             SELECT d.id, d.nombre, d.apellido, d.cedula, d.codigo, d.id_cargo, 
-                ec.sueldo, tc.cargo, cd.nombre AS departamento 
-            FROM datos_actuales_empleado AS d, eu_empleado_cargos AS ec, e_cat_tipo_cargo AS tc, ed_departamentos AS cd 
-            WHERE d.id_cargo = ec.id AND ec.id_tipo_cargo = tc.id AND ec.id_departamento = cd.id AND d.id = $1
+                ec.sueldo, d.name_cargo AS cargo, d.name_dep AS departamento 
+            FROM informacion_general AS d, eu_empleado_cargos AS ec
+            WHERE d.id_cargo = ec.id AND d.id = $1
             `, [id]);
             if (EMPLEADO.rowCount != 0) {
                 return res.jsonp(EMPLEADO.rows);

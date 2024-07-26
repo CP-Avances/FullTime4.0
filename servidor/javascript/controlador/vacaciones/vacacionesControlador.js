@@ -42,11 +42,11 @@ class VacacionesControlador {
             const { estado } = req.body;
             const VACACIONES = yield database_1.default.query(`
       SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
-        v.id, v.id_periodo_vacacion, dc.contrato_id, e.id AS id_empl_solicita, da.id_departamento, 
+        v.id, v.id_periodo_vacacion, dc.id_contrato AS contrato_id, e.id AS id_empl_solicita, da.id_departamento, 
 	      e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, da.codigo, depa.nombre AS depa_nombre
-      FROM mv_solicitud_vacacion AS v, datos_empleado_cargo AS dc, eu_empleados AS e, datos_actuales_empleado AS da, 
+      FROM mv_solicitud_vacacion AS v, cargos_empleado AS dc, eu_empleados AS e, informacion_general AS da, 
         ed_departamentos AS depa   
-      WHERE dc.empl_id = e.id  
+      WHERE dc.id_empleado = e.id  
 	      AND da.id_contrato = dc.contrato_id
         AND depa.id = da.id_departamento
 	      AND (v.estado = 1 OR v.estado = 2) 
@@ -67,8 +67,8 @@ class VacacionesControlador {
       SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
         v.id, v.id_periodo_vacacion, e.id AS id_empl_solicita, e.nombre, e.apellido, 
         (e.nombre || \' \' || e.apellido) AS fullname, dc.codigo, depa.nombre AS depa_nombre 
-	    FROM mv_solicitud_vacacion AS v, datos_empleado_cargo AS dc, eu_empleados AS e, ed_departamentos AS depa   
-	    WHERE dc.empl_id = e.id  AND depa.id = dc.id_departamento
+	    FROM mv_solicitud_vacacion AS v, cargos_empleado AS dc, eu_empleados AS e, ed_departamentos AS depa   
+	    WHERE dc.id_empleado = e.id  AND depa.id = dc.id_departamento
 	      AND (v.estado = 3 OR v.estado = 4) 
       ORDER BY id DESC
       `);
@@ -341,7 +341,7 @@ class VacacionesControlador {
             const VACACIONES = yield database_1.default.query(`
       SELECT v.id, v.fecha_inicio, v.fecha_final, fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, 
         v.legalizado, v.id, v.id_periodo_vacacion, e.id AS id_empleado, de.id_contrato
-      FROM mv_solicitud_vacacion AS v, eu_empleados AS e, datos_actuales_empleado AS de
+      FROM mv_solicitud_vacacion AS v, eu_empleados AS e, informacion_general AS de
 	    WHERE v.id = $1 AND e.id = v.id_empleado AND e.id = de.id AND de.estado = $2
       `, [id, estado]);
             if (VACACIONES.rowCount != 0) {
@@ -443,7 +443,7 @@ class VacacionesControlador {
         FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
           ed_departamentos AS d 
         WHERE ecn.id = $1 AND ecn.id_empleado = e.id AND 
-          (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
+          (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = e.id) = ecr.id 
           AND tc.id = ecr.id_tipo_cargo AND d.id = ecr.id_departamento 
         ORDER BY cargo DESC
         `, [idContrato]);
@@ -540,7 +540,7 @@ class VacacionesControlador {
         FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
           ed_departamentos AS d 
         WHERE ecn.id = $1 AND ecn.id_empleado = e.id AND 
-          (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
+          (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = e.id) = ecr.id 
           AND tc.id = ecr.id_tipo_cargo AND d.id = ecr.id_departamento 
         ORDER BY cargo DESC
         `, [idContrato]);

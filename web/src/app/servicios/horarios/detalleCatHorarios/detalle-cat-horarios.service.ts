@@ -34,4 +34,10 @@ export class DetalleCatHorariosService {
     return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/detalleHorario`, data);
   }
 
+  // METODO PARA BUSCAR DETALLES DE VARIOS HORARIOS
+  ConsultarDetalleHorarios(datos: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/detalleHorario/lista`, datos);
+  }
+
+
 }

@@ -35,9 +35,9 @@ class DatosGeneralesControlador {
             const { id_empleado } = req.body;
             const DATOS = yield database_1.default.query(`
             SELECT da.id, da.nombre, da.apellido, da.id_departamento, 
-                ce.jefe, r.nombre AS rol, r.id AS id_rol
-            FROM datos_actuales_empleado AS da, eu_empleado_cargos AS ce, ero_cat_roles AS r
-            WHERE da.id_cargo = ce.id AND da.id_rol = r.id 
+                da.jefe, da.name_rol AS rol, da.id_rol
+            FROM informacion_general AS da
+            WHERE NOT da.id_rol = 2 AND da.id = $1
             ORDER BY da.apellido ASC
             `);
             if (DATOS.rowCount != 0) {
@@ -428,6 +428,25 @@ class DatosGeneralesControlador {
             return res.status(200).jsonp(empleados);
         });
     }
+    // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR
+    BuscarDataGeneralRol(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let estado = req.params.estado;
+            // CONSULTA DE BUSQUEDA DE SUCURSALES
+            let informacion = yield database_1.default.query(`
+                SELECT * FROM informacion_general AS ig
+                WHERE ig.estado = 1 AND 
+	   		        ig.jefe = false AND
+			        ig.cedula = empl.cedula AND
+			        usd.id_empleado = empl.id AND
+	                usd.administra = false
+                ORDER BY ig.name_suc ASC
+                `, [estado]).then((result) => { return result.rows; });
+            if (informacion.length === 0)
+                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+            return res.status(200).jsonp(informacion);
+        });
+    }
     // METODO DE BUSQUEDA DE DATOS ACTUALES DEL USUARIO
     DatosActuales(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -490,13 +509,13 @@ class DatosGeneralesControlador {
                             s.nombre AS sucursal, c.descripcion AS ciudad, ca.hora_trabaja
                         FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e,
                             e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s, e_ciudades AS c
-                        WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
-                            da.id = e.id) 
+                        WHERE ca.id = (SELECT da.id_cargo FROM informacion_general AS da WHERE 
+                        da.id_empleado = e.id) 
                             AND tc.id = ca.id_tipo_cargo
                             AND ca.id_departamento = $1
                             AND ca.id_departamento = d.id
-                            AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
-                            da.id = e.id) 
+                            AND co.id = (SELECT da.id_contrato FROM informacion_general AS da WHERE 
+                            da.id_empleado = e.id) 
                             AND s.id = d.id_sucursal
                             AND s.id_ciudad = c.id
                             AND co.id_regimen = r.id AND e.estado = $2
@@ -513,13 +532,13 @@ class DatosGeneralesControlador {
                             s.nombre AS sucursal, c.descripcion AS ciudad, ca.fecha_final, ca.hora_trabaja
                         FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e,
                             e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s, e_ciudades AS c
-                        WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
-                            da.id = e.id) 
+                        WHERE ca.id = (SELECT da.id_cargo FROM informacion_general AS da WHERE 
+                            da.id_empleado = e.id) 
                             AND tc.id = ca.id_tipo_cargo
                             AND ca.id_departamento = $1
                             AND ca.id_departamento = d.id
-                            AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
-                            da.id = e.id) 
+                            AND co.id = (SELECT da.id_contrato FROM informacion_general AS da WHERE 
+                            da.id_empleado = e.id)  
                             AND s.id = d.id_sucursal
                             AND s.id_ciudad = c.id
                             AND co.id_regimen = r.id AND e.estado = $2
@@ -610,13 +629,13 @@ class DatosGeneralesControlador {
                         "s.nombre AS sucursal, c.descripcion AS ciudad, ca.hora_trabaja " +
                         "FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e, " +
                         "e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s, e_ciudades AS c " +
-                        "WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE " +
-                        "da.id = e.id) " +
+                        "WHERE ca.id = (SELECT da.id_cargo FROM informacion_general AS da WHERE " +
+                        "da.id_empleado = e.id) " +
                         "AND tc.id = ca.id_tipo_cargo " +
                         "AND ca.id_tipo_cargo = $1 " +
                         "AND ca.id_departamento = d.id " +
-                        "AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE " +
-                        "da.id = e.id) " +
+                        "AND co.id = (SELECT da.id_contrato FROM informacion_general AS da WHERE " +
+                        "da.id_empleado = e.id) " +
                         "AND s.id = d.id_sucursal " +
                         "AND s.id_ciudad = c.id " +
                         "AND co.id_regimen = r.id AND e.estado = $2 " +
@@ -631,13 +650,13 @@ class DatosGeneralesControlador {
                         "s.nombre AS sucursal, c.descripcion AS ciudad, ca.fecha_final, ca.hora_trabaja " +
                         "FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e, " +
                         "e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s, e_ciudades AS c " +
-                        "WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE " +
-                        "da.id = e.id) " +
+                        "WHERE ca.id = (SELECT da.id_cargo FROM informacion_general AS da WHERE " +
+                        "da.id_empleado = e.id) ) " +
                         "AND tc.id = ca.id_tipo_cargo " +
                         "AND ca.id_tipo_cargo = $1 " +
                         "AND ca.id_departamento = d.id " +
-                        "AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE " +
-                        "da.id = e.id) " +
+                        "AND co.id = (SELECT da.id_contrato FROM informacion_general AS da WHERE " +
+                        "da.id_empleado = e.id) " +
                         "AND s.id = d.id_sucursal " +
                         "AND s.id_ciudad = c.id " +
                         "AND co.id_regimen = r.id AND e.estado = $2 " +
@@ -703,13 +722,13 @@ class DatosGeneralesControlador {
                             s.nombre AS sucursal, ca.hora_trabaja
                         FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e,
                             e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s
-                        WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
-                            da.id = e.id) 
+                        WHERE ca.id = (SELECT da.id_cargo FROM informacion_general AS da WHERE 
+                        da.id_empleado = e.id)
                             AND tc.id = ca.id_tipo_cargo
                             AND ca.id_departamento = $1
                             AND ca.id_departamento = d.id
-                            AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
-                            da.id = e.id) 
+                            AND co.id = (SELECT da.id_contrato FROM informacion_general AS da WHERE 
+                            da.id_empleado = e.id)  
                             AND s.id = d.id_sucursal
                             AND co.id_regimen = r.id AND e.estado = $2
                             AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
@@ -727,13 +746,13 @@ class DatosGeneralesControlador {
                             s.nombre AS sucursal, ca.fecha_final, ca.hora_trabaja
                         FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e,
                             e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s
-                        WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
-                            da.id = e.id) 
+                        WHERE ca.id = (SELECT da.id_cargo FROM informacion_general AS da WHERE 
+                        da.id_empleado = e.id)
                             AND tc.id = ca.id_tipo_cargo
                             AND ca.id_departamento = $1
                             AND ca.id_departamento = d.id
-                            AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
-                            da.id = e.id) 
+                            AND co.id = (SELECT da.id_contrato FROM informacion_general AS da WHERE 
+                            da.id_empleado = e.id) 
                             AND s.id = d.id_sucursal
                             AND co.id_regimen = r.id AND e.estado = $2
                             AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
@@ -826,13 +845,13 @@ class DatosGeneralesControlador {
                         s.nombre AS sucursal, ca.hora_trabaja
                     FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e,
                         e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s
-                    WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
-                        da.id = e.id) 
+                    WHERE ca.id = (SELECT da.id_cargo FROM informacion_general AS da WHERE 
+                        da.id_empleado = e.id) 
                         AND tc.id = ca.id_tipo_cargo
                         AND ca.id_tipo_cargo = $1
                         AND ca.id_departamento = d.id
-                        AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
-                        da.id = e.id) 
+                        AND co.id = (SELECT da.id_contrato FROM informacion_general AS da WHERE 
+                            da.id_empleado = e.id)  
                         AND s.id = d.id_sucursal
                         AND co.id_regimen = r.id AND e.estado = $2
                         AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
@@ -849,13 +868,13 @@ class DatosGeneralesControlador {
                         s.nombre AS sucursal, ca.fecha_final, ca.hora_trabaja
                     FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, ere_cat_regimenes AS r, eu_empleados AS e,
                         e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s
-                    WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
-                        da.id = e.id) 
+                    WHERE ca.id = (SELECT da.id_cargo FROM informacion_general AS da WHERE 
+                        da.id_empleado = e.id) 
                         AND tc.id = ca.id_tipo_cargo
                         AND ca.id_tipo_cargo = $1
                         AND ca.id_departamento = d.id
-                        AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
-                        da.id = e.id) 
+                        AND co.id = (SELECT da.id_contrato FROM informacion_general AS da WHERE 
+                            da.id_empleado = e.id) 
                         AND s.id = d.id_sucursal
                         AND co.id_regimen = r.id AND e.estado = $2
                         AND NOT EXISTS (SELECT eu.id_empleado FROM mg_empleado_ubicacion AS eu 
@@ -878,19 +897,17 @@ class DatosGeneralesControlador {
     ListarDatosActualesEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const DATOS = yield database_1.default.query(`
-            SELECT e_datos.id, e_datos.cedula, e_datos.apellido, e_datos.nombre, e_datos.esta_civil, 
-                e_datos.genero, e_datos.correo, e_datos.fec_nacimiento, e_datos.estado, 
+            SELECT e_datos.id, e_datos.cedula, e_datos.apellido, e_datos.nombre, e_datos.estado_civil, 
+                e_datos.genero, e_datos.correo, e_datos.fecha_nacimiento, e_datos.estado, 
                 e_datos.domicilio, e_datos.telefono, e_datos.id_nacionalidad, e_datos.imagen, 
-                e_datos.codigo, e_datos.id_contrato, r.id AS id_regimen, r.descripcion AS regimen,
-                e_datos.id_cargo, tc.id AS id_tipo_cargo, tc.cargo, c.id_departamento, 
-                d.nombre AS departamento, c.id_sucursal, s.nombre AS sucursal, s.id_empresa, 
-                empre.nombre AS empresa, s.id_ciudad, e_ciudades.descripcion AS ciudad, c.hora_trabaja
-            FROM datos_actuales_empleado AS e_datos, eu_empleado_cargos AS c, ed_departamentos AS d, 
-                e_sucursales AS s, e_empresa AS empre, e_ciudades, ere_cat_regimenes AS r, e_cat_tipo_cargo AS tc, 
-                eu_empleado_contratos AS co 
-            WHERE c.id = e_datos.id_cargo AND d.id = c.id_departamento AND s.id = c.id_sucursal AND 
-                s.id_empresa = empre.id AND e_ciudades.id = s.id_ciudad AND c.id_tipo_cargo = tc.id AND 
-                e_datos.id_contrato = co.id AND co.id_regimen = r.id 
+                e_datos.codigo, e_datos.id_contrato, e_datos.id_regimen, e_datos.name_regimen AS regimen,
+                e_datos.id_cargo, e_datos.id_cargo_ AS id_tipo_cargo, e_datos.name_cargo AS cargo, e_datos.id_departamento, 
+                e_datos.name_dep AS departamento, e_datos.id_suc AS id_sucursal, e_datos.name_suc AS sucursal, s.id_empresa, 
+                empre.nombre AS empresa, e_datos.id_ciudad, e_datos.ciudad, e_datos.hora_trabaja
+            FROM informacion_general AS e_datos, 
+                e_sucursales AS s, e_empresa AS empre
+            WHERE s.id = e_datos.id_suc AND 
+                s.id_empresa = empre.id 
             ORDER BY e_datos.nombre ASC
             `);
             if (DATOS.rowCount != 0) {
@@ -905,9 +922,9 @@ class DatosGeneralesControlador {
     ListarIdDatosActualesEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const DATOS = yield database_1.default.query(`
-            SELECT dae.id
-            FROM datos_actuales_empleado AS dae
-            ORDER BY dae.id ASC
+            SELECT dae.id_empleado AS id
+            FROM contrato_cargo_vigente AS dae
+            ORDER BY dae.id_empleado ASC
             `);
             if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
@@ -921,12 +938,10 @@ class DatosGeneralesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { empleado_id } = req.params;
             const DATOS = yield database_1.default.query(`
-            SELECT (da.nombre ||' '|| da.apellido) AS fullname, da.cedula, tc.cargo, 
-                cd.nombre AS departamento
-            FROM datos_actuales_empleado AS da, eu_empleado_cargos AS ec, e_cat_tipo_cargo AS tc,
-                ed_departamentos AS cd
-            WHERE da.id_cargo = ec.id AND ec.id_tipo_cargo = tc.id AND cd.id = da.id_departamento AND 
-            da.id = $1
+            SELECT (da.nombre ||' '|| da.apellido) AS fullname, da.cedula, da.name_cargo AS cargo, 
+                da.name_dep AS departamento
+            FROM informacion_general AS da
+            WHERE da.id = $1
             `, [empleado_id]);
             if (DATOS.rowCount != 0) {
                 return res.jsonp(DATOS.rows);
@@ -948,7 +963,7 @@ class DatosGeneralesControlador {
                 dae.id_contrato as contrato, da.id_empleado AS empleado, (dae.nombre || ' ' || dae.apellido) as fullname,
                 dae.cedula, dae.correo, c.permiso_mail, c.permiso_notificacion, c.vacacion_mail, c.vacacion_notificacion, 
                 c.hora_extra_mail, c.hora_extra_notificacion, c.comida_mail, c.comida_notificacion 
-            FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, datos_actuales_empleado AS dae,
+            FROM ed_niveles_departamento AS n, ed_autoriza_departamento AS da, informacion_general AS dae,
                 eu_configurar_alertas AS c, ed_departamentos AS cg, e_sucursales AS s
             WHERE n.id_departamento = $1
                 AND da.id_departamento = n.id_departamento_nivel
@@ -1002,10 +1017,10 @@ class DatosGeneralesControlador {
                 const response = yield database_1.default.query(`
                 SELECT da.id_departamento,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, 
                     da.cedula, da.correo, da.codigo, da.estado, da.id_sucursal, 
-                    da.id_contrato,
-                    (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = da.id_departamento) AS ndepartamento,
-                    (SELECT s.nombre FROM e_sucursales AS s WHERE s.id = da.id_sucursal) AS nsucursal
-                FROM datos_actuales_empleado AS da, eu_configurar_alertas AS cn 
+                    da.id_contrato, 
+                    da.name_dep AS ndepartamento,
+                    da.name_suc AS nsucursal
+                FROM informacion_general AS da, eu_configurar_alertas AS cn 
                 WHERE da.id = $1 AND cn.id_empleado = da.id
                 `, [id_empleado]);
                 const [infoEmpleado] = response.rows;
@@ -1020,40 +1035,13 @@ class DatosGeneralesControlador {
         });
     }
     ;
-    // METODO PARA BUSCAR USUARIOS ADMINISTRADORES Y JEFES DE UNA SUCURSAL
-    // TODO: VER DONDE SE UTILIZA  MODIFICAR Y ELIMINAR METODO
-    BuscarAdminJefes(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { lista_sucursales, estado } = req.body;
-            const DATOS = yield database_1.default.query(`SELECT da.id, da.nombre, da.apellido, da.id_sucursal AS suc_pertenece, s.nombre AS sucursal,ce.jefe, r.nombre AS rol, 
-            us.id_sucursal, us.principal, us.id AS id_usucursal, d.nombre AS departamento, d.id AS id_departamento
-        FROM datos_actuales_empleado AS da
-        JOIN eu_empleado_cargos AS ce ON da.id_cargo = ce.id
-        JOIN ero_cat_roles AS r ON da.id_rol = r.id
-        JOIN eu_usuario_sucursal AS us ON us.id_empleado = da.id
-        JOIN e_sucursales AS s ON s.id = da.id_sucursal
-        JOIN ed_departamentos AS d ON d.id = da.id_departamento
-        WHERE NOT da.id_rol = 2 
-            AND da.estado = $1 AND us.id_sucursal IN (${lista_sucursales})
-        ORDER BY 
-            da.apellido ASC`, [estado]);
-            if (DATOS.rowCount != 0) {
-                return res.jsonp(DATOS.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'error' });
-            }
-        });
-    }
     // METODO PARA BUSCAR USUARIOS DE UNA SUCURSAL
     BuscarUsuariosSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { sucursal, estado } = req.body;
             const DATOS = yield database_1.default.query(`
-            SELECT  da.id, da.nombre, da.apellido, r.nombre AS rol, d.nombre AS departamento, d.id AS id_departamento
-            FROM datos_actuales_empleado AS da
-            JOIN ero_cat_roles AS r ON da.id_rol = r.id
-            JOIN ed_departamentos AS d ON da.id_departamento = d.id
+            SELECT  da.id, da.nombre, da.apellido, da.name_rol AS rol, da.name_dep AS departamento, da.id_departamento
+            FROM informacion_general AS da
             WHERE da.id_sucursal = $1 AND da.estado = $2
             ORDER BY da.apellido ASC
             `, [sucursal, estado]);

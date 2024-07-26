@@ -497,7 +497,7 @@ class PlanHoraExtraControlador {
 	      p.hora_fin, p.horas_totales, pe.observacion, pe.tiempo_autorizado, pe.estado,
         da.id AS id_empleado, (da.nombre || ' ' || da.apellido) AS nombre, da.correo, da.cedula,
         da.codigo, da.id_cargo, da.id_contrato
-      FROM mhe_empleado_plan_hora_extra AS pe, mhe_detalle_plan_hora_extra AS p, datos_actuales_empleado AS da
+      FROM mhe_empleado_plan_hora_extra AS pe, mhe_detalle_plan_hora_extra AS p, informacion_general AS da
       WHERE pe.id_empleado_realiza = $1 AND pe.id_detalle_plan = p.id AND da.id = pe.id_empleado_realiza
       `
       , [id]);
@@ -531,11 +531,10 @@ class PlanHoraExtraControlador {
 
       const Envia = await pool.query(
         `
-        SELECT da.nombre, da.apellido, da.cedula, da.correo, 
-          (SELECT tc.cargo FROM e_cat_tipo_cargo AS tc WHERE tc.id = ec.id_tipo_cargo) AS tipo_cargo,
-          (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = ec.id_departamento) AS departamento
-        FROM datos_actuales_empleado AS da, eu_empleado_cargos AS ec
-        WHERE da.id = $1 AND ec.id = da.id_cargo
+        SELECT da.nombre, da.apellido, da.cedula, da.correo, da.name_cargo AS tipo_cargo, 
+          da.name_dep AS departamento
+        FROM informacion_general AS da
+        WHERE da.id = $1
         `
         , [id_empl_envia]).then((resultado: any) => { return resultado.rows[0] });
 

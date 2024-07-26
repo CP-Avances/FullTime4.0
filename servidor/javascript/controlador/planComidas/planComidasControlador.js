@@ -873,7 +873,7 @@ class PlanComidasControlador {
         SELECT e.correo, e.nombre, e.apellido, e.cedula, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, 
           tc.cargo AS tipo_cargo, d.nombre AS departamento 
         FROM eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, ed_departamentos AS d 
-        WHERE (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
+        WHERE (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = e.id) = ecr.id 
           AND tc.id = ecr.id_tipo_cargo AND d.id = ecr.id_departamento AND e.id = $1 
         ORDER BY cargo DESC
         `, [id_usua_solicita]);
@@ -981,7 +981,7 @@ class PlanComidasControlador {
           SELECT e.correo, e.nombre, e.apellido, e.cedula, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, 
             tc.cargo AS tipo_cargo, d.nombre AS departamento 
           FROM eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, ed_departamentos AS d
-          WHERE (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
+          WHERE (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = e.id) = ecr.id 
             AND tc.id = ecr.id_tipo_cargo AND d.id = ecr.id_departamento AND e.id = $1 
           ORDER BY cargo DESC
         `, [id_usua_solicita]);
@@ -1088,11 +1088,10 @@ class PlanComidasControlador {
                     tipo_servicio = 'Normal';
                 }
                 const Envia = yield database_1.default.query(`
-        SELECT da.nombre, da.apellido, da.cedula, da.correo, 
-          (SELECT tc.cargo FROM e_cat_tipo_cargo AS tc WHERE tc.id = ec.id_tipo_cargo) AS tipo_cargo,
-          (SELECT cd.nombre FROM ed_departamentos AS cd WHERE cd.id = ec.id_departamento) AS departamento
-        FROM datos_actuales_empleado AS da, eu_empleado_cargos AS ec
-        WHERE da.id = $1 AND ec.id = da.id_cargo
+        SELECT da.nombre, da.apellido, da.cedula, da.correo, da.name_cargo AS tipo_cargo, 
+          da.name_dep AS departamento
+        FROM informacion_general AS da
+        WHERE da.id = $1
         `, [id_envia]).then((resultado) => { return resultado.rows[0]; });
                 console.log('envia...', Envia);
                 const SERVICIO_SOLICITADO = yield database_1.default.query(`

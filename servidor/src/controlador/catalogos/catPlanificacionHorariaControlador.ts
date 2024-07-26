@@ -386,10 +386,9 @@ async function VerificarEmpleado(cedula: string): Promise<[boolean, any, string]
         let empleadoValido = false;
 
         const empleado = await pool.query(`
-            SELECT e.*, dae.id_cargo, ec.hora_trabaja 
+            SELECT e.*, dae.id_cargo, dae.hora_trabaja 
             FROM eu_empleados e 
-            LEFT JOIN datos_actuales_empleado dae ON e.cedula = dae.cedula 
-            LEFT JOIN eu_empleado_cargos ec ON dae.id_cargo = ec.id 
+            LEFT JOIN informacion_general dae ON e.cedula = dae.cedula 
             WHERE LOWER(e.cedula) = $1
         `, [cedula.toLowerCase()]);
 
@@ -677,7 +676,7 @@ async function ConsultarFeriados(fecha_inicio: string, fecha_final: string, id_u
             `
             SELECT TO_CHAR(f.fecha, 'YYYY-MM-DD') AS fecha, cf.id_ciudad, c.descripcion, s.nombre
             FROM ef_cat_feriados AS f, ef_ciudad_feriado AS cf, e_ciudades AS c, e_sucursales AS s, 
-                datos_actuales_empleado AS de
+                informacion_general AS de
             WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
                 AND s.id_ciudad = cf.id_ciudad AND de.id_sucursal = s.id AND de.id = $3
             `
