@@ -3,9 +3,9 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
+import { ThemePalette } from '@angular/material/core';
 
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { ThemePalette } from '@angular/material/core';
 
 @Component({
   selector: 'app-tipo-seguridad',
@@ -23,9 +23,7 @@ export class TipoSeguridadComponent implements OnInit {
     tipoForm: this.tipoF
   });
 
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
+  // VARIABLES PROGRESS SPINNER
   habilitarprogress: boolean = false;
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';

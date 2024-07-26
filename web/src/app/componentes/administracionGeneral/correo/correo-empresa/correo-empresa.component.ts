@@ -1,4 +1,4 @@
-// SECCIÓN DE LIBRERIAS
+// SECCION DE LIBRERIAS
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, Inject, OnInit } from '@angular/core';
@@ -6,8 +6,9 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 
-// SECCIÓN DE SERVICIOS
+// SECCION DE SERVICIOS
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-correo-empresa',
@@ -55,6 +56,7 @@ export class CorreoEmpresaComponent implements OnInit {
     private restE: EmpresaService,
     private toastr: ToastrService,
     public ventana: MatDialogRef<CorreoEmpresaComponent>,
+    public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
@@ -156,11 +158,11 @@ export class CorreoEmpresaComponent implements OnInit {
   CompararContrasenia() {
     if (this.contrasenia === this.confirmar_contrasenia
       && this.contrasenia != '' && this.confirmar_contrasenia != '') {
-      this.toastr.success('Contraseñas iguales')
+      this.toastr.success('Contraseñas iguales');
       this.btnDisableGuardar = false;
     } else {
       this.btnDisableGuardar = true;
-      this.password_confirmF.setValidators(Validators.requiredTrue)
+      this.password_confirmF.setValidators(Validators.requiredTrue);
     }
   }
 
@@ -173,24 +175,9 @@ export class CorreoEmpresaComponent implements OnInit {
     return '';
   }
 
-  // METODO PARA VALIDAR INGRESO DE NÚMEROS
+  // METODO PARA VALIDAR INGRESO DE NUMEROS
   IngresarSoloNumeros(evt: any) {
-    if (window.event) {
-      var keynum = evt.keyCode;
-    }
-    else {
-      keynum = evt.which;
-    }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
-    if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
-      return true;
-    }
-    else {
-      this.toastr.info('No se admite el ingreso de letras', 'Usar solo números', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
 }

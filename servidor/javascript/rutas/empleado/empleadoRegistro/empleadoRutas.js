@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// SECCIÓN DE LIBRERIAS
+// SECCION DE LIBRERIAS
 const empleadoControlador_1 = __importDefault(require("../../../controlador/empleado/empleadoRegistro/empleadoControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const verificarToken_1 = require("../../../libs/verificarToken");
@@ -46,7 +46,7 @@ class EmpleadoRutas {
         /** **************************************************************************************** **
          ** **                            MANEJO DE DATOS DE EMPLEADOS                            ** **
          ** **************************************************************************************** **/
-        // LISTAR DATOS DE UN USUARIO  --**VERIFICADO
+        // LISTAR DATOS DE UN USUARIO  **USANDO
         this.router.get('/:id', verificarToken_1.TokenValidation, empleadoControlador_1.default.BuscarEmpleado);
         // LISTAR EMPLEADOS REGISTRADOS
         this.router.get('/buscador/empleado', verificarToken_1.TokenValidation, empleadoControlador_1.default.ListarBusquedaEmpleados);
@@ -93,8 +93,8 @@ class EmpleadoRutas {
         this.router.post('/buscarDepartamento', verificarToken_1.TokenValidation, empleadoControlador_1.default.ObtenerDepartamentoEmpleado);
         // INFORMACIÓN DE LA IMAGEN
         this.router.get('/img/:id/:imagen', empleadoControlador_1.default.BuscarImagen);
-        // INFORMACIÓN DE LA IMAGEN
-        this.router.get('/img/codificado/:id/:imagen', empleadoControlador_1.default.getImagenBase64);
+        // INFORMACION DE LA IMAGEN FORMATO CODIFICADO **USADO
+        this.router.get('/img/codificado/:id/:imagen', empleadoControlador_1.default.CodificarImagenBase64);
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMÁTICA 
         this.router.post('/verificar/automatico/plantillaExcel/', [verificarToken_1.TokenValidation, upload_plantilla.single('uploads')], empleadoControlador_1.default.VerificarPlantilla_Automatica);
         //this.router.post('/verificar/datos/automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosAutomatico);

@@ -38,11 +38,9 @@ class CiudadControlador {
         }
     }
 
-    // BUSCAR LISTA DE CIUDADES PROVINCIA
+    // BUSCAR LISTA DE CIUDADES PROVINCIA   **USADO
     public async ListarCiudadesProvincia(req: Request, res: Response) {
-
         const { id_provincia } = req.params;
-
         const CIUDAD = await pool.query(
             `
             SELECT * FROM e_ciudades WHERE id_provincia = $1
@@ -57,7 +55,7 @@ class CiudadControlador {
         }
     }
 
-    // REGISTRAR CIUDAD
+    // REGISTRAR CIUDAD   **USADO
     public async CrearCiudad(req: Request, res: Response): Promise<void> {
         try {
             const { id_provincia, descripcion, user_name, ip } = req.body;
@@ -70,7 +68,7 @@ class CiudadControlador {
                 INSERT INTO e_ciudades (id_provincia, descripcion) VALUES ($1, $2) RETURNING *
                 `
                 , [id_provincia, descripcion]);
-            
+
             // AUDITORIA
             await AUDITORIA_CONTROLADOR.InsertarAuditoria({
                 tabla: 'e_ciudades',
@@ -85,6 +83,7 @@ class CiudadControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             res.jsonp({ message: 'Registro guardado.' });
+            
         } catch (error) {
             // FINALIZAR TRANSACCION
             await pool.query('ROLLBACK');
@@ -92,7 +91,7 @@ class CiudadControlador {
         }
     }
 
-    // METODO PARA LISTAR NOMBRE DE CIUDADES - PROVINCIAS
+    // METODO PARA LISTAR NOMBRE DE CIUDADES - PROVINCIAS   **USADO
     public async ListarNombreCiudad(req: Request, res: Response) {
         const CIUDAD = await pool.query(
             `
@@ -110,7 +109,7 @@ class CiudadControlador {
         }
     }
 
-    // METODO PARA ELIMINAR REGISTRO
+    // METODO PARA ELIMINAR REGISTRO  **USADO
     public async EliminarCiudad(req: Request, res: Response): Promise<Response> {
         try {
             const { user_name, ip } = req.body;
@@ -120,7 +119,7 @@ class CiudadControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOS ORIGINALES
-            const ciudad = await pool.query('SELECT * FROM e_ciudades WHERE id = $1', [id]);
+            const ciudad = await pool.query(`SELECT * FROM e_ciudades WHERE id = $1`, [id]);
             const [datosOriginales] = ciudad.rows;
 
             if (!datosOriginales) {
@@ -160,10 +159,10 @@ class CiudadControlador {
             // FINALIZAR TRANSACCION
             await pool.query('COMMIT');
             return res.jsonp({ message: 'Registro eliminado.' });
+
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            //return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
             return res.jsonp({ message: 'error' });
 
         }

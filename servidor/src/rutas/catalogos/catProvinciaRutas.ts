@@ -11,17 +11,17 @@ class ProvinciaRutas {
 
     configuracion(): void {
 
-        // LISTAR PAISES DE ACUERDO AL CONTINENTE
+        // LISTAR PAISES DE ACUERDO AL CONTINENTE  **USADO
         this.router.get('/pais/:continente', TokenValidation, PROVINCIA_CONTROLADOR.ListarPaises);
-        // LISTAR CONTINENTES
+        // LISTAR CONTINENTES   **USADO
         this.router.get('/continentes', TokenValidation, PROVINCIA_CONTROLADOR.ListarContinentes);
-        // BUSCAR PROVINCIAS POR PAIS
+        // BUSCAR PROVINCIAS POR PAIS  **USADO
         this.router.get('/:id_pais', TokenValidation, PROVINCIA_CONTROLADOR.BuscarProvinciaPais);
-        // METODO PARA BUSCAR PROVINCIAS
+        // METODO PARA BUSCAR PROVINCIAS  **USADO
         this.router.get('/', TokenValidation, PROVINCIA_CONTROLADOR.ListarProvincia);
-        // METODO PARA ELIMINAR REGISTROS
+        // METODO PARA ELIMINAR REGISTROS  **USADO
         this.router.delete('/eliminar/:id', TokenValidation, PROVINCIA_CONTROLADOR.EliminarProvincia);
-        // METODO PARA REGISTRAR PROVINCIA
+        // METODO PARA REGISTRAR PROVINCIA  **USADO
         this.router.post('/', TokenValidation, PROVINCIA_CONTROLADOR.CrearProvincia);
         // METODO PARA BUSCAR DATOS DE UNA PROVINCIA
         this.router.get('/buscar/:id', TokenValidation, PROVINCIA_CONTROLADOR.ObtenerProvincia);

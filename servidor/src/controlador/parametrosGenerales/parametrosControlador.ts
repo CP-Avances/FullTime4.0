@@ -5,7 +5,7 @@ import pool from '../../database';
 
 class ParametrosControlador {
 
-    // METODO PARA LISTAR PARAMETROS GENERALES
+    // METODO PARA LISTAR PARAMETROS GENERALES  **USADO
     public async ListarParametros(req: Request, res: Response) {
         const PARAMETRO = await pool.query(
             `
@@ -21,7 +21,7 @@ class ParametrosControlador {
         }
     }
 
-    // METODO PARA ACTUALIZAR TIPO PARAMETRO GENERAL
+    // METODO PARA ACTUALIZAR TIPO PARAMETRO GENERAL  **USADO
     public async ActualizarTipoParametro(req: Request, res: Response): Promise<Response> {
         try {
             const { descripcion, id, user_name, ip } = req.body;
@@ -76,7 +76,7 @@ class ParametrosControlador {
         }
     }
 
-    // METODO PARA LISTAR UN PARAMETRO GENERALES
+    // METODO PARA LISTAR UN PARAMETRO GENERALES **USADO
     public async ListarUnParametro(req: Request, res: Response) {
         const { id } = req.params;
         const PARAMETRO = await pool.query(
@@ -110,7 +110,7 @@ class ParametrosControlador {
         }
     }
 
-    // METODO PARA ELIMINAR DETALLE TIPO PARAMETRO GENERAL
+    // METODO PARA ELIMINAR DETALLE TIPO PARAMETRO GENERAL  **USADO
     public async EliminarDetalleParametro(req: Request, res: Response): Promise<Response> {
         try {
             const { user_name, ip } = req.body;
@@ -167,7 +167,7 @@ class ParametrosControlador {
         }
     }
 
-    // METODO PARA INGRESAR DETALLE TIPO PARAMETRO GENERAL
+    // METODO PARA INGRESAR DETALLE TIPO PARAMETRO GENERAL  **USADO
     public async IngresarDetalleParametro(req: Request, res: Response): Promise<any> {
         try {
             const { id_tipo, descripcion, user_name, ip } = req.body;
@@ -198,15 +198,13 @@ class ParametrosControlador {
             res.jsonp({ message: 'Registro exitoso.' });
 
         } catch (error) {
-
-            console.log('ver error ', error)
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
             res.status(500).jsonp({ message: 'error' });
         }
     }
 
-    // METODO PARA ACTUALIZAR DETALLE TIPO PARAMETRO GENERAL
+    // METODO PARA ACTUALIZAR DETALLE TIPO PARAMETRO GENERAL  **USADO
     public async ActualizarDetalleParametro(req: Request, res: Response): Promise<Response> {
         try {
             const { id, descripcion, user_name, ip } = req.body;

@@ -309,7 +309,7 @@ class DepartamentoControlador {
     }
   }
 
-  //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
+  // METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
   public async CrearNivelDepa(req: Request, res: Response): Promise<any> {
     try {
       const { id_departamento, departamento, nivel, dep_nivel, dep_nivel_nombre, id_establecimiento,
@@ -351,7 +351,7 @@ class DepartamentoControlador {
   }
 
 
-  //METODO PARA BUSCAR NIVELES JERARQUICOS POR DEPARTAMENTO   --**VERIFICADO
+  // METODO PARA BUSCAR NIVELES JERARQUICOS POR DEPARTAMENTO   --**VERIFICADO
   public async ObtenerNivelesDepa(req: Request, res: Response): Promise<any> {
     const { id_departamento, id_establecimiento } = req.params;
     const NIVELESDEP = await pool.query(
@@ -485,7 +485,7 @@ class DepartamentoControlador {
     }
   }
 
-  //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
+  // METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
   public async ActualizarNombreNivel(req: Request, res: Response): Promise<any> {
     try {
       const { id_departamento, departamento, user_name, ip } = req.body;

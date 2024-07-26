@@ -266,7 +266,7 @@ class DepartamentoControlador {
             }
         });
     }
-    //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
+    // METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
     CrearNivelDepa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -299,7 +299,7 @@ class DepartamentoControlador {
             }
         });
     }
-    //METODO PARA BUSCAR NIVELES JERARQUICOS POR DEPARTAMENTO   --**VERIFICADO
+    // METODO PARA BUSCAR NIVELES JERARQUICOS POR DEPARTAMENTO   --**VERIFICADO
     ObtenerNivelesDepa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_departamento, id_establecimiento } = req.params;
@@ -416,7 +416,7 @@ class DepartamentoControlador {
             }
         });
     }
-    //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
+    // METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
     ActualizarNombreNivel(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

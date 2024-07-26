@@ -17,27 +17,27 @@ export class EmpresaService {
     return this.http.get(`${environment.url}/empresas/navegar`);
   }
 
-  // CONSULTAR DATOS DE EMPRESA
+  // CONSULTAR DATOS DE EMPRESA **USADO
   ConsultarDatosEmpresa(id: number) {
     return this.http.get(`${environment.url}/empresas/buscar/datos/${id}`);
   }
 
-  // METODO PARA ACTUALIZAR DATOS EMPRESA
+  // METODO PARA ACTUALIZAR DATOS EMPRESA **USADO
   ActualizarEmpresa(datos: any) {
     return this.http.put(`${environment.url}/empresas`, datos);
   }
 
-  // METODO PARA ACTUALIZAR COLORES DE REPORTES
+  // METODO PARA ACTUALIZAR COLORES DE REPORTES **USADO
   ActualizarColores(formData: any) {
     return this.http.put<any>(`${environment.url}/empresas/colores`, formData);
   }
 
-  // METODO PARA ACTUALIZAR MARCA DE AGUA
+  // METODO PARA ACTUALIZAR MARCA DE AGUA **USADO
   ActualizarMarcaAgua(formData: any) {
     return this.http.put<any>(`${environment.url}/empresas/reporte/marca`, formData);
   }
 
-  // METODO PARA ACTUALIZAR NIVEL DE SEGURIDAD
+  // METODO PARA ACTUALIZAR NIVEL DE SEGURIDAD **USADO
   ActualizarSeguridad(formData: any) {
     return this.http.put<any>(`${environment.url}/empresas/doble/seguridad`, formData);
   }
@@ -48,37 +48,37 @@ export class EmpresaService {
    * @param id_empresa ID DE LA EMPRESA
    */
 
-  // METODO PARA OBTENER LOGO DE EMPRESA
+  // METODO PARA OBTENER LOGO DE EMPRESA **USADO
   LogoEmpresaImagenBase64(id_empresa: string) {
     return this.http.get<any>(`${environment.url}/empresas/logo/codificado/${parseInt(id_empresa)}`)
   }
 
-  // METODO PARA EDITAR LOGO DE EMPRESA
+  // METODO PARA EDITAR LOGO DE EMPRESA **USADO
   EditarLogoEmpresa(id_empresa: number, formData: any) {
     return this.http.put<any>(`${environment.url}/empresas/logo/${id_empresa}/uploadImage`, formData);
   }
 
-  // METODO PARA BUSCAR IMAGEN DE CABECERA DE CORREO
+  // METODO PARA BUSCAR IMAGEN DE CABECERA DE CORREO **USADO
   EditarCabeceraCorreo(id_empresa: number, formData: any) {
     return this.http.put<any>(`${environment.url}/empresas/cabecera/${id_empresa}/uploadImage`, formData);
   }
 
-  // METODO PARA BUSCAR LOGO CABECERA DE CORREO
+  // METODO PARA BUSCAR LOGO CABECERA DE CORREO  **USADO
   ObtenerCabeceraCorreo(id_empresa: string) {
     return this.http.get<any>(`${environment.url}/empresas/cabecera/codificado/${parseInt(id_empresa)}`)
   }
 
-  // ACTUALIZAR LOGO DE PIE DE FIRMA DE CORREO
+  // ACTUALIZAR LOGO DE PIE DE FIRMA DE CORREO  **USADO
   EditarPieCorreo(id_empresa: number, formData: any) {
     return this.http.put<any>(`${environment.url}/empresas/pie-firma/${id_empresa}/uploadImage`, formData);
   }
 
-  // METODO PARA BUSCAR LOGO PIE DE FIRMA DE CORREO
+  // METODO PARA BUSCAR LOGO PIE DE FIRMA DE CORREO  **USADO
   ObtenerPieCorreo(id_empresa: string) {
     return this.http.get<any>(`${environment.url}/empresas/pie-firma/codificado/${parseInt(id_empresa)}`)
   }
 
-  // METODO PARA EDITAR DATOS DE CORREO
+  // METODO PARA EDITAR DATOS DE CORREO  **USADO
   EditarCredenciales(id_empresa: number, data: any) {
     return this.http.put<any>(`${environment.url}/empresas/credenciales/${id_empresa}`, data);
   }

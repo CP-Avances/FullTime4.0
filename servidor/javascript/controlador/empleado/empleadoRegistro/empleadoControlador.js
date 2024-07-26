@@ -406,7 +406,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // BUSQUEDA DE UN SOLO EMPLEADO  --**VERIFICADO
+    // BUSQUEDA DE UN SOLO EMPLEADO  **USADO
     BuscarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -1102,15 +1102,14 @@ class EmpleadoControlador {
             });
         });
     }
-    // METODO PARA CONVERTIR IMAGEN EN BASE64
-    getImagenBase64(req, res) {
+    // METODO PARA CONVERTIR IMAGEN EN BASE64 **USADO
+    CodificarImagenBase64(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const imagen = req.params.imagen;
             const id = req.params.id;
             let separador = path_1.default.sep;
             let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id)) + separador + imagen;
             let verificador = 0;
-            //console.log('imagen ------ ', ruta)
             fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                 if (err) {
                     verificador = 1;
@@ -1121,7 +1120,6 @@ class EmpleadoControlador {
             });
             if (verificador === 0) {
                 const codificado = (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
-                //console.log('codificado ', codificado)
                 if (codificado === 0) {
                     res.status(200).jsonp({ imagen: 0 });
                 }

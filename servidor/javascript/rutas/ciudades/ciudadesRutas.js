@@ -16,13 +16,13 @@ class CiudadRutas {
         this.router.get('/informacion-ciudad/:id_ciudad', verificarToken_1.TokenValidation, ciudadControlador_1.default.ListarInformacionCiudad);
         // BUSQUEDA DE LISTA DE CIUDADES
         this.router.get('/listaCiudad', verificarToken_1.TokenValidation, ciudadControlador_1.default.ListarCiudades);
-        // LISTAR CIUDADES POR PROVINCIA
+        // LISTAR CIUDADES POR PROVINCIA  ** USADO
         this.router.get('/ciudad-provincia/:id_provincia', verificarToken_1.TokenValidation, ciudadControlador_1.default.ListarCiudadesProvincia);
-        // REGISTRAR CIUDAD
+        // REGISTRAR CIUDAD  **USADO
         this.router.post('/', verificarToken_1.TokenValidation, ciudadControlador_1.default.CrearCiudad);
-        // LISTAR NOMBRE DE CIUDADES-PROVINCIA
+        // LISTAR NOMBRE DE CIUDADES-PROVINCIA  **USADO
         this.router.get('/', verificarToken_1.TokenValidation, ciudadControlador_1.default.ListarNombreCiudad);
-        // METODO PARA ELIMINAR REGISTRO
+        // METODO PARA ELIMINAR REGISTRO  **USADO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, ciudadControlador_1.default.EliminarCiudad);
         // METODO PARA BUSCAR DATOS DE UNA CIUDAD
         this.router.get('/:id', verificarToken_1.TokenValidation, ciudadControlador_1.default.ConsultarUnaCiudad);

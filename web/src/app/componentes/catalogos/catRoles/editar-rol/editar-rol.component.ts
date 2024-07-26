@@ -31,11 +31,11 @@ export class EditarRolComponent implements OnInit {
   });
 
   constructor(
-    public ventana: MatDialogRef<EditarRolComponent>, // VARIABLE USADA PARA MANEJO DE VENTANAS
-    @Inject(MAT_DIALOG_DATA) public data: any, // VARIABLE USADA PARA PASAR DATOS ENTRE VENTANAS
     public validar: ValidacionesService, // VARIABLE USADA PARA VALIDAR SERVICIOS
     private toastr: ToastrService, // VARAIBLE USADA PARA MANEJO DE NOTIFICACIONES
     public rest: RolesService, // SERVICIO DATOS CATÁLOGO ROLES
+    public ventana: MatDialogRef<EditarRolComponent>, // VARIABLE USADA PARA MANEJO DE VENTANAS
+    @Inject(MAT_DIALOG_DATA) public data: any, // VARIABLE USADA PARA PASAR DATOS ENTRE VENTANAS
   ) { }
 
   ngOnInit(): void {
@@ -47,6 +47,7 @@ export class EditarRolComponent implements OnInit {
     });
   }
 
+  // METODO PARA INGRESAR UN ROL
   contador: number = 0;
   roles: any = [];
   data_nueva: any = [];
@@ -86,21 +87,25 @@ export class EditarRolComponent implements OnInit {
     })
   }
 
-  IngresarSoloLetras(e) {
-    this.validar.IngresarSoloLetras(e);
+  // METODO PARA REGISTRAR SOLO LETRAS
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
   }
 
+  // METODO PARA CERRAR VENTA DE REGISTRO
   CerrarVentanaRegistroRol() {
     this.LimpiarCampos();
     this.ventana.close(this.salir);
   }
 
+  // METODO PARA VALIDAR INFORMACION
   ObtenerMensajeErrorDescripcion() {
     if (this.descripcion.hasError('required')) {
       return 'Debe ingresar alguna Descripción.';
     }
   }
 
+  // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
     this.nuevoRolForm.reset();
   }

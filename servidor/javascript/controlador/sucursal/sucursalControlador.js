@@ -135,7 +135,7 @@ class SucursalControlador {
             }
         });
     }
-    // METODO DE BUSQUEDA DE SUCURSALES
+    // METODO DE BUSQUEDA DE SUCURSALES **USADO
     ListarSucursales(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const SUCURSAL = yield database_1.default.query(`
@@ -152,7 +152,7 @@ class SucursalControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTRO
+    // METODO PARA ELIMINAR REGISTRO **USADO
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -197,7 +197,6 @@ class SucursalControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
-                //return res.status(500).jsonp({ message: 'error' });
                 return res.jsonp({ message: 'error' });
             }
         });

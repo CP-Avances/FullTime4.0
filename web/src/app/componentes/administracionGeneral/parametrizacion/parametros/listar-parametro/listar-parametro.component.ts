@@ -1,4 +1,4 @@
-// SECCIÓN DE LIBRERIAS
+// SECCION DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
@@ -30,7 +30,7 @@ export class ListarParametroComponent implements OnInit {
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
-  
+
   empleado: any = [];
   idEmpleado: number;
   tipoPermiso: any = [];
@@ -107,7 +107,7 @@ export class ListarParametroComponent implements OnInit {
     this.parametros = [];
     this.numero_pagina = 1;
     this.restP.ListarParametros().subscribe(datos => {
-      datos.sort((a, b) => a.id - b.id);
+      datos.sort((a: any, b: any) => a.id - b.id);
       this.parametros = datos;
     });
   }
@@ -142,8 +142,6 @@ export class ListarParametroComponent implements OnInit {
     this.parametro_id = String(id);
   }
 
-
-  // revisar
   /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************** **/

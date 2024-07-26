@@ -83,6 +83,7 @@ class UsuarioControlador {
             }
         });
     }
+    // METODO PARA OBTENER EL ID DEL USUARIO MEDIANTE DEPARTAMENTO VIGENTE DEL USUARIO **USADO
     ObtenerIdUsuariosDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_departamento } = req.body;
@@ -1454,7 +1455,7 @@ class UsuarioControlador {
             }
         });
     }
-    //BUSCAR DATOS DE USUARIOS - DEPARTAMENTO
+    // BUSCAR DATOS DE USUARIOS - DEPARTAMENTO - ASIGNACION DE INFORMACION **USADO
     BuscarUsuarioDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
@@ -1462,9 +1463,9 @@ class UsuarioControlador {
       SELECT ud.id, e.nombre, e.apellido, d.nombre AS departamento, d.id AS id_departamento, 
       s.id AS id_sucursal, s.nombre AS sucursal, ud.principal, ud.personal, ud.administra
       FROM eu_usuario_departamento AS ud
-      INNER JOIN eu_empleados AS e ON ud.id_empleado=e.id
-      INNER JOIN ed_departamentos AS d ON ud.id_departamento=d.id
-      INNER JOIN e_sucursales AS s ON d.id_sucursal=s.id
+      INNER JOIN eu_empleados AS e ON ud.id_empleado = e.id
+      INNER JOIN ed_departamentos AS d ON ud.id_departamento = d.id
+      INNER JOIN e_sucursales AS s ON d.id_sucursal = s.id
       WHERE id_empleado = $1
       ORDER BY ud.id ASC
       `, [id_empleado]);

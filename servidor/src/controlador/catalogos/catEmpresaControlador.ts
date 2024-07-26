@@ -25,9 +25,8 @@ class EmpresaControlador {
         }
     }
 
-    // METODO DE BUSQUEDA DE IMAGEN
-    public async getImagenBase64(req: Request, res: Response): Promise<any> {
-
+    // METODO DE BUSQUEDA DE IMAGEN DE EMPRESA EN BASE64 **USADO
+    public async ConvertirImagenBase64(req: Request, res: Response): Promise<any> {
         const file_name = await pool.query(
             `
             SELECT nombre, logo FROM e_empresa WHERE id = $1
@@ -36,17 +35,12 @@ class EmpresaControlador {
             .then((result: any) => {
                 return result.rows[0];
             });
-
         if (file_name.logo === null) {
             file_name.logo = 'logo_reportes.png';
         }
-
         let separador = path.sep;
         let ruta = ObtenerRutaLogos() + separador + file_name.logo;
-        //console.log( 'solo ruta ', ruta)
         const codificado = await ConvertirImagenBase64(ruta);
-
-        //console.log('empresa ', codificado)
         if (codificado === 0) {
             res.status(200).jsonp({ imagen: 0, nom_empresa: file_name.nombre })
         } else {
@@ -54,7 +48,7 @@ class EmpresaControlador {
         }
     }
 
-    // METODO PARA EDITAR LOGO DE EMPRESA
+    // METODO PARA EDITAR LOGO DE EMPRESA **USADO
     public async ActualizarLogoEmpresa(req: Request, res: Response): Promise<any> {
         sharp.cache(false);
 
@@ -73,8 +67,6 @@ class EmpresaControlador {
         let id = req.params.id_empresa;
 
         let ruta_guardar = ObtenerRutaLogos() + separador + logo;
-        //console.log('ruta 1 ', ruta_temporal)
-
         let comprimir = await ComprimirImagen(ruta_temporal, ruta_guardar);
 
         if (comprimir != false) {
@@ -146,7 +138,6 @@ class EmpresaControlador {
 
             // LEER DATOS DE IMAGEN
             let ruta_almacenamiento = ObtenerRutaLogos() + separador + logo;
-            //console.log('ruta alma ', ruta_almacenamiento)
             const codificado = await ConvertirImagenBase64(ruta_almacenamiento);
             res.send({ imagen: codificado, nom_empresa: logo_name.rows[0].nombre, message: 'Logo actualizado.' })
         }
@@ -155,7 +146,7 @@ class EmpresaControlador {
         }
     }
 
-    // METODO PARA BUSCAR DATOS GENERALES DE EMPRESA
+    // METODO PARA BUSCAR DATOS GENERALES DE EMPRESA **USADO
     public async ListarEmpresaId(req: Request, res: Response) {
         const { id } = req.params;
         const EMPRESA = await pool.query(
@@ -171,7 +162,7 @@ class EmpresaControlador {
         }
     }
 
-    // ACTUALIZAR DATOS DE EMPRESA
+    // ACTUALIZAR DATOS DE EMPRESA **USADO
     public async ActualizarEmpresa(req: Request, res: Response): Promise<Response> {
         try {
             const { nombre, ruc, direccion, telefono, correo_empresa, tipo_empresa, representante,
@@ -232,7 +223,7 @@ class EmpresaControlador {
         }
     }
 
-    // METODO PARA ACTUALIZAR DATOS DE COLORES DE EMPRESA
+    // METODO PARA ACTUALIZAR DATOS DE COLORES DE EMPRESA **USADO
     public async ActualizarColores(req: Request, res: Response): Promise<Response> {
         try {
             const { color_p, color_s, id, user_name, ip } = req.body;
@@ -289,7 +280,7 @@ class EmpresaControlador {
         }
     }
 
-    // METODO PARA ACTUALIZAR DATOS DE MARCA DE AGUA DE REPORTES
+    // METODO PARA ACTUALIZAR DATOS DE MARCA DE AGUA DE REPORTES **USADO
     public async ActualizarMarcaAgua(req: Request, res: Response): Promise<Response> {
         try {
             const { marca_agua, id, user_name, ip } = req.body;
@@ -298,7 +289,6 @@ class EmpresaControlador {
             await pool.query('BEGIN');
 
             // CONSULTAR DATOS ORIGINALES
-
             const datosOriginales = await pool.query(
                 `
                 SELECT marca_agua FROM e_empresa WHERE id = $1
@@ -347,7 +337,7 @@ class EmpresaControlador {
         }
     }
 
-    // METODO PARA ACTUALIZAR NIVELES DE SEGURIDAD
+    // METODO PARA ACTUALIZAR NIVELES DE SEGURIDAD  **USADO
     public async ActualizarSeguridad(req: Request, res: Response): Promise<Response> {
         try {
             const { seg_contrasena, seg_frase, seg_ninguna, id, user_name, ip } = req.body;
@@ -405,7 +395,7 @@ class EmpresaControlador {
         }
     }
 
-    // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO
+    // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO **USADO
     public async ActualizarCabeceraCorreo(req: Request, res: Response): Promise<any> {
         sharp.cache(false);
 
@@ -502,7 +492,7 @@ class EmpresaControlador {
         }
     }
 
-    // METODO PARA CONSULTAR IMAGEN DE CABECERA DE CORREO
+    // METODO PARA CONSULTAR IMAGEN DE CABECERA DE CORREO  **USADO
     public async VerCabeceraCorreo(req: Request, res: Response): Promise<any> {
         const file_name =
             await pool.query(
@@ -523,7 +513,7 @@ class EmpresaControlador {
         }
     }
 
-    // METODO PARA ACTUALIZAR PIE DE FIRMA DE CORREO
+    // METODO PARA ACTUALIZAR PIE DE FIRMA DE CORREO **USADO
     public async ActualizarPieCorreo(req: Request, res: Response): Promise<any> {
         sharp.cache(false);
 
@@ -542,8 +532,6 @@ class EmpresaControlador {
         let id = req.params.id_empresa;
 
         let ruta_guardar = ObtenerRutaLogos() + separador + logo;
-        //console.log('ruta 1 ', ruta_temporal)
-
         let comprimir = await ComprimirImagen(ruta_temporal, ruta_guardar);
 
         if (comprimir != false) {
@@ -622,7 +610,7 @@ class EmpresaControlador {
         }
     }
 
-    // METODO PARA CONSULTAR IMAGEN DE PIE DE FIRMA DE CORREO
+    // METODO PARA CONSULTAR IMAGEN DE PIE DE FIRMA DE CORREO **USADO
     public async VerPieCorreo(req: Request, res: Response): Promise<any> {
         const file_name =
             await pool.query(
@@ -643,7 +631,7 @@ class EmpresaControlador {
         }
     }
 
-    // METODO PARA ACTUALIZAR DATOS DE CORREO
+    // METODO PARA ACTUALIZAR DATOS DE CORREO  **USADO
     public async EditarPassword(req: Request, res: Response): Promise<Response> {
         try {
             const id = req.params.id_empresa

@@ -18,7 +18,7 @@ class RegimenControlador {
     /** ** ************************************************************************************************ **
      ** **                                  CONSULTAS REGIMEN LABORAL                                    ** **
      ** ** ************************************************************************************************ **/
-    // REGISTRO DE REGIMEN LABORAL
+    // REGISTRO DE REGIMEN LABORAL  **USADO
     CrearRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -85,7 +85,7 @@ class RegimenControlador {
             }
         });
     }
-    // ACTUALIZAR REGISTRO DE REGIMEN LABORAL
+    // ACTUALIZAR REGISTRO DE REGIMEN LABORAL  **USADO
     ActualizarRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -167,7 +167,7 @@ class RegimenControlador {
             }
         });
     }
-    // METODO PARA BUSCAR DESCRIPCION DE REGIMEN LABORAL
+    // METODO PARA BUSCAR DESCRIPCION DE REGIMEN LABORAL  **USADO
     ListarNombresRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const REGIMEN = yield database_1.default.query(` 
@@ -181,7 +181,7 @@ class RegimenControlador {
             }
         });
     }
-    // METODO PARA BUSCAR LISTA DE REGIMEN
+    // METODO PARA BUSCAR LISTA DE REGIMEN  **USADO
     ListarRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const REGIMEN = yield database_1.default.query(`
@@ -198,7 +198,7 @@ class RegimenControlador {
             }
         });
     }
-    // BUSCAR UN REGISTRO DE REGIMEN LABORAL
+    // BUSCAR UN REGISTRO DE REGIMEN LABORAL  **USADO
     ListarUnRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -229,7 +229,7 @@ class RegimenControlador {
             }
         });
     }
-    // ELIMINAR REGISTRO DE REGIMEN LABORAL
+    // ELIMINAR REGISTRO DE REGIMEN LABORAL  **USADO
     EliminarRegistros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -277,7 +277,6 @@ class RegimenControlador {
             catch (error) {
                 // REVERTIR TRANSACCION
                 yield database_1.default.query("ROLLBACK");
-                //return res.status(500).jsonp({ message:'error'});
                 return res.jsonp({ message: 'error' });
             }
         });
@@ -285,7 +284,7 @@ class RegimenControlador {
     /** ** ************************************************************************************************ **
      ** **                         CONSULTAS DE PERIODOS DE VACACIONES                                   ** **
      ** ** ************************************************************************************************ **/
-    // REGISTRAR PERIODO DE VACACIONES
+    // REGISTRAR PERIODO DE VACACIONES  **USADO
     CrearPeriodo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -323,7 +322,7 @@ class RegimenControlador {
             }
         });
     }
-    // ACTUALIZAR REGISTRO DE PERIODO DE VACACIONES
+    // ACTUALIZAR REGISTRO DE PERIODO DE VACACIONES  **USADO
     ActualizarPeriodo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -374,7 +373,7 @@ class RegimenControlador {
             }
         });
     }
-    // BUSCAR UN REGISTRO DE PERIODO DE VACACIONES POR REGIMEN LABORAL
+    // BUSCAR UN REGISTRO DE PERIODO DE VACACIONES POR REGIMEN LABORAL  **USADO
     ListarUnPeriodo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -390,7 +389,7 @@ class RegimenControlador {
             }
         });
     }
-    // ELIMINAR REGISTRO DE PERIODO DE VACACIONES
+    // ELIMINAR REGISTRO DE PERIODO DE VACACIONES  **USADO
     EliminarPeriodo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -443,7 +442,7 @@ class RegimenControlador {
     /** ** ********************************************************************************************** **
      ** ** **                     REGISTRAR ANTIGUEDAD DE VACACIONES                                   ** **
      ** ** ********************************************************************************************** **/
-    // REGISTRAR ANTIGUEDAD DE VACACIONES
+    // REGISTRAR ANTIGUEDAD DE VACACIONES  **USADO
     CrearAntiguedad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -481,7 +480,7 @@ class RegimenControlador {
             }
         });
     }
-    // ACTUALIZAR ANTIGUEDAD DE VACACIONES
+    // ACTUALIZAR ANTIGUEDAD DE VACACIONES  **USADO
     ActualizarAntiguedad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -532,7 +531,7 @@ class RegimenControlador {
             }
         });
     }
-    // BUSCAR UN REGISTRO DE ANTIGUEDAD
+    // BUSCAR UN REGISTRO DE ANTIGUEDAD  **USADO
     ListarAntiguedad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -547,7 +546,7 @@ class RegimenControlador {
             }
         });
     }
-    // ELIMINAR REGISTRO DE ANTIGUEDAD DE VACACIONES
+    // ELIMINAR REGISTRO DE ANTIGUEDAD DE VACACIONES  **USADO
     EliminarAntiguedad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

@@ -53,7 +53,7 @@ export class EmpleadoService {
    ** **                     METODO PARA MANEJAR DATOS DE EMPLEADO                                ** **
    ** ********************************************************************************************** **/
 
-  // BUSCAR UN REGISTRO DE USUARIO  --**VERIFICADO
+  // BUSCAR UN REGISTRO DE USUARIO  **USADO
   BuscarUnEmpleado(id: number) {
     return this.http.get<any>(`${environment.url}/empleado/${id}`);
   }
@@ -118,7 +118,8 @@ export class EmpleadoService {
     return this.http.put(`${environment.url}/empleado/${idEmpleado}/uploadImage`, formData)
   }
 
-  obtenerImagen(id: any, imagen: any) {
+  // METODO PARA MOSTRAR IMAGEN DEL EMPLEADO **USADO
+  ObtenerImagen(id: any, imagen: any) {
     return this.http.get<any>(`${environment.url}/empleado/img/codificado/${id}/${imagen}`)
   }
 

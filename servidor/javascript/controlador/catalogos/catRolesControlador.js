@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class RolesControlador {
-    // METODO PARA LISTAR ROLES DEL SISTEMA
+    // METODO PARA LISTAR ROLES DEL SISTEMA  **USADO
     ListarRoles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const ROL = yield database_1.default.query(`
@@ -29,7 +29,7 @@ class RolesControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR REGISTRO
+    // METODO PARA ELIMINAR REGISTRO  **USADO
     EliminarRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -110,6 +110,7 @@ class RolesControlador {
             }
         });
     }
+    // LISTAR ROLES A EXCEPCION EL QUE SE EDITA **USADO
     ListarRolesActualiza(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
@@ -138,6 +139,7 @@ class RolesControlador {
             }
         });
     }
+    // METODO PARA ACTUALIZAR ROLES  **USADO
     ActualizarRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

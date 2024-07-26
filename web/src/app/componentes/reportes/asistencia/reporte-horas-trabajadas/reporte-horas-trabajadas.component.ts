@@ -1984,7 +1984,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     this.paginatorDetalle.firstPage();
   }
 
-  //METODODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
+  // METODODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
   obtenerClaseTiempo(planificado: any, laborado: any) {
     const tPlanificado = Number(planificado);
     const tLaborado = Number(laborado);

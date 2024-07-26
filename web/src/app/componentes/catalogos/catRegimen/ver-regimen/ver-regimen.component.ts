@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
 import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service'
+
 import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.component';
 
 @Component({
@@ -84,7 +85,6 @@ export class VerRegimenComponent implements OnInit {
   ver_antiguedad_variable: boolean = false;
   ver_antiguedad_fija: boolean = false;
   ObtenerAntiguedad() {
-
     if (this.regimen.antiguedad_fija === true) {
       this.ver_antiguedad_fija = true;
     }

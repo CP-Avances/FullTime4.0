@@ -265,7 +265,7 @@ export class PrincipalProvinciaComponent implements OnInit {
                 { text: "País", style: "tableHeader" },
                 { text: "Provincias", style: "tableHeader" },
               ],
-              ...this.provincias.map((obj) => {
+              ...this.provincias.map((obj: any) => {
                 return [
                   { text: obj.pais, style: "itemsTableC" },
                   { text: obj.nombre, style: "itemsTable" },
@@ -318,9 +318,9 @@ export class PrincipalProvinciaComponent implements OnInit {
   urlxml: string;
   data: any = [];
   exportToXML() {
-    var objeto;
+    var objeto: any;
     var arregloProvincias: any = [];
-    this.provincias.forEach((obj) => {
+    this.provincias.forEach((obj: any) => {
       objeto = {
         provincia: {
           "$": { "id": obj.id },
@@ -335,7 +335,6 @@ export class PrincipalProvinciaComponent implements OnInit {
     const xml = xmlBuilder.buildObject(arregloProvincias);
 
     if (xml === undefined) {
-      console.error('Error al construir el objeto XML.');
       return;
     }
 
@@ -356,10 +355,7 @@ export class PrincipalProvinciaComponent implements OnInit {
     a.download = 'Provincias.xml';
     // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
-
   }
-
-
 
   // METODOS PARA LA SELECCION MULTIPLE
   plan_multiple: boolean = false;
@@ -437,7 +433,7 @@ export class PrincipalProvinciaComponent implements OnInit {
       });
   }
 
-
+// METODO PARA ELIMINAR DE MANERA MULTIPLE
   contador: number = 0;
   ingresar: boolean = false;
   EliminarMultiple() {
@@ -449,7 +445,7 @@ export class PrincipalProvinciaComponent implements OnInit {
     this.contador = 0;
     this.provinciasEliminar = this.selectionProvincias.selected;
     this.provinciasEliminar.forEach((datos: any) => {
-      this.provincias = this.provincias.filter(item => item.id !== datos.id);
+      this.provincias = this.provincias.filter((item: any) => item.id !== datos.id);
       this.contador = this.contador + 1;
       this.rest.EliminarProvincia(datos.id, data).subscribe((res: any) => {
         if (res.message === 'error') {
@@ -471,6 +467,7 @@ export class PrincipalProvinciaComponent implements OnInit {
     );
   }
 
+  // METODO PARA CONFIRMAR ELIMINAR MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {

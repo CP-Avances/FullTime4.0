@@ -5,8 +5,7 @@
     </div>
   </div>
   <br>
-
-  <!--Modulos-->
+  <!--  ***************************  MODULOS  ********************************  -->
   <div class="row">
     <div class="d-flex justify-content-center flex-wrap">
       <div class="col-md-4" (click)="MenuRapido(0)">
@@ -30,7 +29,6 @@
                     </div>
                   </ng-template>
                 </div>
-  
                 <br>
                 <label>
                   <mat-icon class="icon-menu">assignment_ind</mat-icon>
@@ -57,10 +55,10 @@
           </mat-card-content>
         </mat-card>
       </div>
-  
       <div class="col-md-8">
         <div class="row" style="text-align:justify;">
-          <div class="col-md-6" (click)="MenuRapido(4)"><!--Permiso-->
+          <!--  *****************  PERMISO  **********************  -->
+          <div class="col-md-6" (click)="MenuRapido(4)">
             <mat-card [ngClass]="!permisos ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-permi'"
               style="color: antiquewhite;">
               <mat-card-title style="text-align: center; padding: 3px;">
@@ -77,7 +75,8 @@
               </mat-card-content>
             </mat-card>
           </div>
-          <div class="col-md-6" (click)="MenuRapido(3)"><!--Vacaciones-->
+          <!--  *****************  VACACIONES  **********************  -->
+          <div class="col-md-6" (click)="MenuRapido(3)">
             <mat-card [ngClass]="!vacaciones ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-vaca'"
               style="color: antiquewhite;">
               <mat-card-title style="text-align: center; padding: 3px;">
@@ -96,10 +95,11 @@
           </div>
         </div>
         <br>
+        <!--  *****************  HORAS EXTRAS  **********************  -->
         <div class="row" style="text-align:justify;">
-          <div class="col-md-6" (click)="MenuRapido(2)"> <!--Horas Extras-->
+          <div class="col-md-6" (click)="MenuRapido(2)">
             <mat-card [ngClass]="!horasExtras ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-horasExtras'"
-              style="color: antiquewhite;"><!--boton-inactivo-->
+              style="color: antiquewhite;"> <!--BOTON-INACTIVO-->
               <mat-card-title style="text-align: center; padding: 3px;">
                 <mat-label class="titulo-card">Horas Extras</mat-label>
               </mat-card-title>
@@ -114,8 +114,10 @@
               </mat-card-content>
             </mat-card>
           </div>
-          <div class="col-md-6" (click)="MenuRapido(7)"><!--Alimentacion-->
-            <mat-card [ngClass]="!alimentacion ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-alimentacion'"
+          <!--  *****************  ALIMENTACION  **********************  -->
+          <div class="col-md-6" (click)="MenuRapido(7)">
+            <mat-card
+              [ngClass]="!alimentacion ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-alimentacion'"
               style="color: antiquewhite;">
               <mat-card-title style="text-align: center; padding: 3px;">
                 <mat-label class="titulo-card">Alimentación</mat-label>
@@ -135,13 +137,13 @@
       </div>
     </div>
   </div>
-
   <br><br>
   <div class="col-md">
     <div class="d-flex justify-content-center flex-wrap">
+      <!--  *****************  ACCIONES DE PERSONAL  **********************  -->
       <mat-card (click)="MenuRapido(5)" class="Cardfila1"
         [ngClass]="!accion ? 'mat-elevation-z8 card-inactivo_' : 'mat-elevation-z8 card-accionPerso'"
-        style="color: antiquewhite;"><!--boton-inactivo-->
+        style="color: antiquewhite;"> <!--BOTON-INACTIVO-->
         <mat-card-title style="text-align: center; padding: 3px;">
           <mat-label class="titulo-card">Acciones Personal</mat-label>
         </mat-card-title>
@@ -155,10 +157,10 @@
           </div>
         </mat-card-content>
       </mat-card>
-
+      <!--  *****************  GEOLOCALIZACION  **********************  -->
       <mat-card (click)="MenuRapido(8)" class="Cardfila1"
         [ngClass]="!geolocalizacion ? 'mat-elevation-z8 card-inactivo_' : 'mat-elevation-z8 card-geolocali'"
-        style="color: antiquewhite;"><!--boton-inactivo-->
+        style="color: antiquewhite;"> <!--BOTON-INACTIVO-->
         <mat-card-title style="text-align: center; padding: 3px;">
           <mat-label class="titulo-card">Geolocalización</mat-label>
         </mat-card-title>
@@ -172,10 +174,10 @@
           </div>
         </mat-card-content>
       </mat-card>
-
+      <!--  *****************  APLICACION MOVIL  **********************  -->
       <mat-card (click)="MenuRapido(6)" class="Cardfila2"
         [ngClass]="!movil ? 'mat-elevation-z8 card-inactivo_' : 'mat-elevation-z8 card-aplicacionMovil'"
-        style="color: antiquewhite;"><!--boton-inactivo-->
+        style="color: antiquewhite;"> <!--BOTON-INACTIVO-->
         <mat-card-title style="text-align: center; padding: 3px;">
           <mat-label class="titulo-card">Aplicación Móvil</mat-label>
         </mat-card-title>
@@ -189,12 +191,12 @@
           </div>
         </mat-card-content>
       </mat-card>
-      
+      <!--  *****************  TIMBRE VIRTUAL  **********************  -->
       <mat-card (click)="MenuRapido(1)" class="Cardfila2"
         [ngClass]="!teletrabajo ? 'mat-elevation-z8 card-inactivo_' : 'mat-elevation-z8 card-timbreTele'"
-        style="color: antiquewhite;"><!--boton-inactivo-->
+        style="color: antiquewhite;"> <!--BOTON-INACTIVO-->
         <mat-card-title style="text-align: center; padding: 3px;">
-          <mat-label class="titulo-card">Timbre Teletrabajo</mat-label>
+          <mat-label class="titulo-card">Timbre Virtual</mat-label>
         </mat-card-title>
         <mat-card-content>
           <div class="row">
@@ -208,5 +210,4 @@
       </mat-card>
     </div>
   </div>
-
 </div>

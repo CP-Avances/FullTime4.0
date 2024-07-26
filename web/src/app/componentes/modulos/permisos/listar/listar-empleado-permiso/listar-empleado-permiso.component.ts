@@ -653,7 +653,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     };
   }
 
-  //Metodo seleccionar que lista de permisos mostrar (solicitados o autorizados)
+  // MEtodo seleccionar que lista de permisos mostrar (solicitados o autorizados)
   mostrarDatosPermisos(opcion: string) {
     return (opcion == "Permisos solicitados" ? this.listaPermisosDeparta : this.listaPermisosAutorizadosFiltrados).map((obj) => {
       return [

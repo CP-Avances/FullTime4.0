@@ -125,8 +125,7 @@
                                         <label id="datosF">Color principal:</label>
                                     </div>
                                     <div class="caja2 d-flex justify-content-center">
-                                        <input type="color" value="{{p_color}}"
-                                            [formControl]="principal" matSuffix
+                                        <input type="color" value="{{p_color}}" [formControl]="principal" matSuffix
                                             matTooltip="Seleccionar color principal.">
                                     </div>
                                 </div>
@@ -170,30 +169,28 @@
                 <div class="container" style="padding-bottom: 50px; text-align: center; padding: 0%;">
                     <div class="mat-elevation-z8" style="background: white;">
                         <div class="d-flex bd-highlight" id="titulo">
-
                             <div class="flex-shrink-1 bd-highlight" style="margin-left: 10px;">
-
                                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="AbrirVentanaRegistrarSucursal()">Crear {{e.establecimiento}}</button>
+                                    (click)="AbrirVentanaRegistrarSucursal()">
+                                    Crear {{e.establecimiento}}
+                                </button>
                             </div>
                             <div class="w-100 bd-highlight">
                                 <h5>
                                     LISTA DE {{nombre_establecimiento.toUpperCase()}}
                                 </h5>
                             </div>
-
-
                             <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-
                                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="ConfirmarDeleteMultiple()">Eliminar {{e.establecimiento}}</button>
+                                    (click)="ConfirmarDeleteMultiple()">
+                                    Eliminar {{e.establecimiento}}
+                                </button>
                             </div>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-hover table-sm">
                                 <thead class="thead-light">
                                     <tr style="text-align: center;">
-
                                         <th>
                                             <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight"
                                                 matSuffix matTooltipPosition="right"
@@ -207,24 +204,13 @@
                                                 [indeterminate]="selectionSucursales.hasValue() && !isAllSelectedPag()"
                                                 [aria-label]="checkboxLabelPag()">
                                             </mat-checkbox>
-
-
-
                                         </th>
-
-
-
-
-
                                         <th scope="col">{{nombre_establecimiento | titlecase}}</th>
                                         <th scope="col">Ciudad</th>
                                         <th scope="col">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-
-
-
                                     <tr *ngFor="let ds of datosSucursales | paginate:tamanio_pagina:numero_pagina">
                                         <td>
                                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
@@ -233,7 +219,6 @@
                                                 [aria-label]="checkboxLabelPag(ds)">
                                             </mat-checkbox>
                                         </td>
-
                                         <td>{{ds.nombre}}</td>
                                         <td>{{ds.descripcion}}</td>
                                         <td>
@@ -271,4 +256,5 @@
 <app-editar-empresa *ngIf="ver_editar" [idEmpresa]="idEmpresa"></app-editar-empresa>
 
 <!--  ********************  VER DEPARTAMETOS DE SUCURSALES  ************************  -->
-<app-ver-sucursal *ngIf="ver_departamentos" [idSucursal]="sucursal_id" [idDepartamentosAcceso]="idDepartamentosAcceso" [pagina_]="pagina"></app-ver-sucursal>
+<app-ver-sucursal *ngIf="ver_departamentos" [idSucursal]="sucursal_id" [idDepartamentosAcceso]="idDepartamentosAcceso"
+    [pagina_]="pagina"></app-ver-sucursal>

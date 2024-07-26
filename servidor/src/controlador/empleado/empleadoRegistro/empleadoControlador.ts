@@ -456,7 +456,7 @@ class EmpleadoControlador {
     }
   }
 
-  // BUSQUEDA DE UN SOLO EMPLEADO  --**VERIFICADO
+  // BUSQUEDA DE UN SOLO EMPLEADO  **USADO
   public async BuscarEmpleado(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
     const EMPLEADO = await pool.query(
@@ -1278,14 +1278,13 @@ class EmpleadoControlador {
     });
   }
 
-  // METODO PARA CONVERTIR IMAGEN EN BASE64
-  public async getImagenBase64(req: Request, res: Response): Promise<any> {
+  // METODO PARA CONVERTIR IMAGEN EN BASE64 **USADO
+  public async CodificarImagenBase64(req: Request, res: Response): Promise<any> {
     const imagen = req.params.imagen;
     const id = req.params.id;
     let separador = path.sep;
     let ruta = await ObtenerRutaUsuario(id) + separador + imagen;
     let verificador = 0;
-    //console.log('imagen ------ ', ruta)
     fs.access(ruta, fs.constants.F_OK, (err) => {
       if (err) {
         verificador = 1;
@@ -1295,7 +1294,6 @@ class EmpleadoControlador {
     });
     if (verificador === 0) {
       const codificado = ConvertirImagenBase64(ruta);
-      //console.log('codificado ', codificado)
       if (codificado === 0) {
         res.status(200).jsonp({ imagen: 0 })
       } else {

@@ -12,12 +12,12 @@ export class RolesService {
   constructor(private http: HttpClient) { }
 
 
-  // METODO PARA LISTAR ROLES DEL SISTEMA
+  // METODO PARA LISTAR ROLES DEL SISTEMA  **USADO
   BuscarRoles() {
     return this.http.get<any>(`${environment.url}/rol`);
   }
 
-  // ELIMINAR REGISTRO DE ROL
+  // ELIMINAR REGISTRO DE ROL  **USADO
   EliminarRoles(id: number, datos:any) {
     const url = `${environment.url}/rol/eliminar/${id}`;
     const httpOtions = {
@@ -38,10 +38,12 @@ export class RolesService {
     return this.http.get<any>(`${environment.url}/rol/${id}`);
   }
 
+  // METODO PARA LISTAR ROLES EXCEPTO EL QUE SE ACTUALIZA **USADO
   ListarRolesActualiza(id: number) {
     return this.http.get<any>(`${environment.url}/rol/actualiza/${id}`);
   }
 
+  // METODO PARA ACTUALIZAR ROLES  **USADO
   ActualizarRol(data: any) {
     return this.http.put(`${environment.url}/rol`, data);
   }

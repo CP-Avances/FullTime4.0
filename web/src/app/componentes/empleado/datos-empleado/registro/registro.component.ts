@@ -1,4 +1,4 @@
-// SECCIÓN DE LIBRERIAS
+// SECCION DE LIBRERIAS
 import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';

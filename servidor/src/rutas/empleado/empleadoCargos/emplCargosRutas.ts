@@ -29,9 +29,9 @@ class EmpleadosCargpsRutas {
 
     configuracion(): void {
 
-        //METODO PARA EDITAR ESTADO DEL CARGO
+        // METODO PARA EDITAR ESTADO DEL CARGO
         this.router.post('/estado-cargo', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.EditarEstadoCargo);
-        //METODO PARA BUSCAR CARGOS ACTIVOS
+        // METODO PARA BUSCAR CARGOS ACTIVOS
         this.router.post('/cargo-activo', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.BuscarCargosActivos);
 
 

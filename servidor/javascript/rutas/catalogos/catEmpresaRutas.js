@@ -26,36 +26,36 @@ class DepartamentoRutas {
     configuracion() {
         // CADENA DE NAVEGACION
         this.router.get('/navegar', catEmpresaControlador_1.default.BuscarCadena);
-        // BUSQUEDA DE LOGO 
-        this.router.get('/logo/codificado/:id_empresa', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.getImagenBase64);
-        // METODO PARA EDITAR LOGO DE EMPRESA
+        // BUSQUEDA DE LOGO **USADO
+        this.router.get('/logo/codificado/:id_empresa', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ConvertirImagenBase64);
+        // METODO PARA EDITAR LOGO DE EMPRESA **USADO
         this.router.put('/logo/:id_empresa/uploadImage', [verificarToken_1.TokenValidation, upload.single('image')], catEmpresaControlador_1.default.ActualizarLogoEmpresa);
-        // BUSCAR DATOS GENERALES DE EMPRESA
+        // BUSCAR DATOS GENERALES DE EMPRESA  **USADO
         this.router.get('/buscar/datos/:id', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ListarEmpresaId);
-        // ACTUALIZAR DATOS DE EMPRESA
+        // ACTUALIZAR DATOS DE EMPRESA **USADO
         this.router.put('/', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ActualizarEmpresa);
-        // ACTUALIZAR DATOS DE COLORES DE REPORTES
+        // ACTUALIZAR DATOS DE COLORES DE REPORTES **USADO
         this.router.put('/colores', [verificarToken_1.TokenValidation], catEmpresaControlador_1.default.ActualizarColores);
-        // ACTUALIZAR DATOS DE MARCA DE AGUA DE REPORTE
+        // ACTUALIZAR DATOS DE MARCA DE AGUA DE REPORTE **USADO
         this.router.put('/reporte/marca', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ActualizarMarcaAgua);
-        // METODO PARA ACTUALIZAR NIVEL DE SEGURIDAD DE EMPRESA
+        // METODO PARA ACTUALIZAR NIVEL DE SEGURIDAD DE EMPRESA **USADO
         this.router.put('/doble/seguridad', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ActualizarSeguridad);
-        // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO
+        // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO **USADO
         this.router.put('/cabecera/:id_empresa/uploadImage', [verificarToken_1.TokenValidation, upload.single('image')], catEmpresaControlador_1.default.ActualizarCabeceraCorreo);
-        // METODO PARA BUSCAR LOGO CABECERA DE CORREO
+        // METODO PARA BUSCAR LOGO CABECERA DE CORREO  **USADO
         this.router.get('/cabecera/codificado/:id_empresa', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.VerCabeceraCorreo);
-        // METODO PARA ACTUALIZAR LOGO PIE DE FIRMA CORREO
+        // METODO PARA ACTUALIZAR LOGO PIE DE FIRMA CORREO  **USADO
         this.router.put('/pie-firma/:id_empresa/uploadImage', [verificarToken_1.TokenValidation, upload.single('image')], catEmpresaControlador_1.default.ActualizarPieCorreo);
-        // METODO PARA BUSCAR LOGO PIE DE FIRMA DE CORREO
+        // METODO PARA BUSCAR LOGO PIE DE FIRMA DE CORREO **USADO
         this.router.get('/pie-firma/codificado/:id_empresa', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.VerPieCorreo);
-        // METODO PARA ACTUALIZAR DATOS DE CORREO
+        // METODO PARA ACTUALIZAR DATOS DE CORREO  **USADO
         this.router.put('/credenciales/:id_empresa', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.EditarPassword);
         // METODO PARA ACTUALIZAR USO DE ACCIONES
         this.router.put('/acciones-timbre', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ActualizarAccionesTimbres);
         // METODO PARA BUSCAR DATOS DE EMPRESA
         this.router.get('/', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ListarEmpresa);
-        // CONSULTA USADA EN MODULO DE ALMUERZOS
-        this.router.get('/logo/codificados/:id_empresa', catEmpresaControlador_1.default.getImagenBase64);
+        // CONSULTA USADA EN MODULO DE ALMUERZOS 
+        this.router.get('/logo/codificados/:id_empresa', catEmpresaControlador_1.default.ConvertirImagenBase64);
     }
 }
 const EMPRESA_RUTAS = new DepartamentoRutas();

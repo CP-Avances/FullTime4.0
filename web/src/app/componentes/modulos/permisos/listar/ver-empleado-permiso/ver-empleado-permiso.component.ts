@@ -373,7 +373,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
       });
   }
 
-  //METODO PARA CERRAR VENTANA
+  // METODO PARA CERRAR VENTANA
   cerrarVentana(){
     this.router.navigate(['/permisos-solicitados']);
   }

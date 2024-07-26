@@ -9,7 +9,7 @@ import moment from "moment";
 
 class PlanificacionHorariaControlador {
 
-    //METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA
+    // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA
     public async VerificarDatosPlanificacionHoraria(req: Request, res: Response) {
         const documento = req.file?.originalname;
 
@@ -128,7 +128,7 @@ class PlanificacionHorariaControlador {
         res.json({ planificacionHoraria: plantillaPlanificacionHorariaEstructurada, fechaInicioMes, fechaFinalMes });
     }
 
-    //METODO PARA REGISTRAR LA PLANIFICACION HORARIA EN LA BASE DE DATOS
+    // METODO PARA REGISTRAR LA PLANIFICACION HORARIA EN LA BASE DE DATOS
     public async RegistrarPlanificacionHoraria(req: Request, res: Response): Promise<Response> {
 
         try {

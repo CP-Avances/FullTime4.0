@@ -25,7 +25,6 @@ import { RegimenService } from "src/app/servicios/catalogos/catRegimen/regimen.s
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableRegimen } from 'src/app/model/reportes.model';
 
-
 @Component({
   selector: "app-listar-regimen",
   templateUrl: "./listar-regimen.component.html",
@@ -305,7 +304,7 @@ export class ListarRegimenComponent implements OnInit {
                 { text: "Años para antiguedad", style: "tableHeader" },
                 { text: "Días de incremento", style: "tableHeader" },
               ],
-              ...this.regimen.map((obj) => {
+              ...this.regimen.map((obj: any) => {
                 return [
                   { text: obj.id, style: "itemsTable" },
                   { text: obj.descripcion, style: "itemsTable" },
@@ -387,7 +386,7 @@ export class ListarRegimenComponent implements OnInit {
     this.OrdenarDatos(this.regimen);
     var objeto: any;
     var arregloRegimen: any = [];
-    this.regimen.forEach((obj) => {
+    this.regimen.forEach((obj: any) => {
       objeto = {
         regimen_laboral: {
           "$": { "id": obj.id },
@@ -415,7 +414,6 @@ export class ListarRegimenComponent implements OnInit {
     const xml = xmlBuilder.buildObject(arregloRegimen);
 
     if (xml === undefined) {
-      console.error('Error al construir el objeto XML.');
       return;
     }
 
@@ -430,7 +428,6 @@ export class ListarRegimenComponent implements OnInit {
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
-
 
     const a = document.createElement('a');
     a.href = xmlUrl;
@@ -455,8 +452,12 @@ export class ListarRegimenComponent implements OnInit {
     this.ObtenerRegimen();
   }
 
-  //HABILITAR LOS CHECKS
 
+  /** ************************************************************************************************** **
+   ** **                       METODO DE SELECCION MULTIPLE DE USUARIOS                               ** **
+   ** ************************************************************************************************** **/
+
+  //HABILITAR LOS CHECKS
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
 
@@ -474,14 +475,11 @@ export class ListarRegimenComponent implements OnInit {
 
   selectionRegimen = new SelectionModel<ITableRegimen>(true, []);
 
-
-
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
     const numSelected = this.selectionRegimen.selected.length;
     return numSelected === this.regimen.length
   }
-
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
@@ -490,7 +488,6 @@ export class ListarRegimenComponent implements OnInit {
       this.regimen.forEach((row: any) => this.selectionRegimen.select(row));
   }
 
-
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelPag(row?: ITableRegimen): string {
     if (!row) {
@@ -498,12 +495,11 @@ export class ListarRegimenComponent implements OnInit {
     }
     this.regimenesEliminar = this.selectionRegimen.selected;
     return `${this.selectionRegimen.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
-
   }
+
+  // METODO DE ELIMINACION DE REGISTROS
   contador: number = 0;
   ingresar: boolean = false;
-
-
   EliminarMultiple() {
     const data = {
       user_name: this.user_name,
@@ -536,6 +532,7 @@ export class ListarRegimenComponent implements OnInit {
     )
   }
 
+  // METODO PARA CONFIRMAR ELIMINACION MULTIPLE
   ConfirmarDeleteMultiple() {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -558,7 +555,6 @@ export class ListarRegimenComponent implements OnInit {
         }
       });
   }
-
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_regimen: number) {

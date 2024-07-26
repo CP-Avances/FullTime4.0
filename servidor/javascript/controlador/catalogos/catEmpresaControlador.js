@@ -36,8 +36,8 @@ class EmpresaControlador {
             }
         });
     }
-    // METODO DE BUSQUEDA DE IMAGEN
-    getImagenBase64(req, res) {
+    // METODO DE BUSQUEDA DE IMAGEN DE EMPRESA EN BASE64 **USADO
+    ConvertirImagenBase64(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const file_name = yield database_1.default.query(`
             SELECT nombre, logo FROM e_empresa WHERE id = $1
@@ -50,9 +50,7 @@ class EmpresaControlador {
             }
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + file_name.logo;
-            //console.log( 'solo ruta ', ruta)
             const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta);
-            //console.log('empresa ', codificado)
             if (codificado === 0) {
                 res.status(200).jsonp({ imagen: 0, nom_empresa: file_name.nombre });
             }
@@ -61,7 +59,7 @@ class EmpresaControlador {
             }
         });
     }
-    // METODO PARA EDITAR LOGO DE EMPRESA
+    // METODO PARA EDITAR LOGO DE EMPRESA **USADO
     ActualizarLogoEmpresa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
@@ -78,7 +76,6 @@ class EmpresaControlador {
             let logo = anio + '_' + mes + '_' + dia + '_' + ((_b = req.file) === null || _b === void 0 ? void 0 : _b.originalname);
             let id = req.params.id_empresa;
             let ruta_guardar = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + logo;
-            //console.log('ruta 1 ', ruta_temporal)
             let comprimir = yield (0, ImagenCodificacion_1.ComprimirImagen)(ruta_temporal, ruta_guardar);
             if (comprimir != false) {
                 const { user_name, ip } = req.body;
@@ -136,7 +133,6 @@ class EmpresaControlador {
                 }));
                 // LEER DATOS DE IMAGEN
                 let ruta_almacenamiento = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + logo;
-                //console.log('ruta alma ', ruta_almacenamiento)
                 const codificado = yield (0, ImagenCodificacion_1.ConvertirImagenBase64)(ruta_almacenamiento);
                 res.send({ imagen: codificado, nom_empresa: logo_name.rows[0].nombre, message: 'Logo actualizado.' });
             }
@@ -145,7 +141,7 @@ class EmpresaControlador {
             }
         });
     }
-    // METODO PARA BUSCAR DATOS GENERALES DE EMPRESA
+    // METODO PARA BUSCAR DATOS GENERALES DE EMPRESA **USADO
     ListarEmpresaId(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -160,7 +156,7 @@ class EmpresaControlador {
             }
         });
     }
-    // ACTUALIZAR DATOS DE EMPRESA
+    // ACTUALIZAR DATOS DE EMPRESA **USADO
     ActualizarEmpresa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -211,7 +207,7 @@ class EmpresaControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR DATOS DE COLORES DE EMPRESA
+    // METODO PARA ACTUALIZAR DATOS DE COLORES DE EMPRESA **USADO
     ActualizarColores(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -259,7 +255,7 @@ class EmpresaControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR DATOS DE MARCA DE AGUA DE REPORTES
+    // METODO PARA ACTUALIZAR DATOS DE MARCA DE AGUA DE REPORTES **USADO
     ActualizarMarcaAgua(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -307,7 +303,7 @@ class EmpresaControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR NIVELES DE SEGURIDAD
+    // METODO PARA ACTUALIZAR NIVELES DE SEGURIDAD  **USADO
     ActualizarSeguridad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -356,7 +352,7 @@ class EmpresaControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO
+    // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO **USADO
     ActualizarCabeceraCorreo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
@@ -437,7 +433,7 @@ class EmpresaControlador {
             }
         });
     }
-    // METODO PARA CONSULTAR IMAGEN DE CABECERA DE CORREO
+    // METODO PARA CONSULTAR IMAGEN DE CABECERA DE CORREO  **USADO
     VerCabeceraCorreo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const file_name = yield database_1.default.query(`
@@ -457,7 +453,7 @@ class EmpresaControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR PIE DE FIRMA DE CORREO
+    // METODO PARA ACTUALIZAR PIE DE FIRMA DE CORREO **USADO
     ActualizarPieCorreo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
@@ -474,7 +470,6 @@ class EmpresaControlador {
             let logo = anio + '_' + mes + '_' + dia + '_' + ((_b = req.file) === null || _b === void 0 ? void 0 : _b.originalname);
             let id = req.params.id_empresa;
             let ruta_guardar = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + logo;
-            //console.log('ruta 1 ', ruta_temporal)
             let comprimir = yield (0, ImagenCodificacion_1.ComprimirImagen)(ruta_temporal, ruta_guardar);
             if (comprimir != false) {
                 const { user_name, ip } = req.body;
@@ -539,7 +534,7 @@ class EmpresaControlador {
             }
         });
     }
-    // METODO PARA CONSULTAR IMAGEN DE PIE DE FIRMA DE CORREO
+    // METODO PARA CONSULTAR IMAGEN DE PIE DE FIRMA DE CORREO **USADO
     VerPieCorreo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const file_name = yield database_1.default.query(`
@@ -559,7 +554,7 @@ class EmpresaControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR DATOS DE CORREO
+    // METODO PARA ACTUALIZAR DATOS DE CORREO  **USADO
     EditarPassword(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

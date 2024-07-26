@@ -5,7 +5,6 @@ import { ToastrService } from "ngx-toastr";
 import { MatDialogRef } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 
-
 import { ProvinciaService } from "src/app/servicios/catalogos/catProvincias/provincia.service";
 import { ValidacionesService } from "src/app/servicios/validaciones/validaciones.service";
 
@@ -62,7 +61,7 @@ export class RegistroProvinciaComponent implements OnInit {
   private _filter(value: string): any {
     if (value != null) {
       const filterValue = value.toLowerCase();
-      return this.paises.filter((pais) =>
+      return this.paises.filter((pais: any) =>
         pais.nombre.toLowerCase().includes(filterValue)
       );
     }
@@ -108,7 +107,7 @@ export class RegistroProvinciaComponent implements OnInit {
   InsertarProvincia(form: any) {
     let idPais = 0;
     // VALIDACION PAIS
-    this.paises.forEach((obj) => {
+    this.paises.forEach((obj: any) => {
       if (obj.nombre.toUpperCase() === form.nombrePaisForm.toUpperCase()) {
         idPais = obj.id;
       }
@@ -131,7 +130,7 @@ export class RegistroProvinciaComponent implements OnInit {
       // VALIDAR SI EXISTE REGISTRO DE PROVINCIA
       if (this.provincias.length != 0) {
         this.contador = 0;
-        this.provincias.forEach((obj) => {
+        this.provincias.forEach((obj: any) => {
           if (
             obj.nombre.toUpperCase() === form.nombreProvinciaForm.toUpperCase()
           ) {

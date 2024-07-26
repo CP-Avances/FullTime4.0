@@ -16,7 +16,7 @@ exports.PARAMETROS_CONTROLADOR = void 0;
 const auditoriaControlador_1 = __importDefault(require("../auditoria/auditoriaControlador"));
 const database_1 = __importDefault(require("../../database"));
 class ParametrosControlador {
-    // METODO PARA LISTAR PARAMETROS GENERALES
+    // METODO PARA LISTAR PARAMETROS GENERALES  **USADO
     ListarParametros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const PARAMETRO = yield database_1.default.query(`
@@ -31,7 +31,7 @@ class ParametrosControlador {
             }
         });
     }
-    // METODO PARA ACTUALIZAR TIPO PARAMETRO GENERAL
+    // METODO PARA ACTUALIZAR TIPO PARAMETRO GENERAL  **USADO
     ActualizarTipoParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -79,7 +79,7 @@ class ParametrosControlador {
             }
         });
     }
-    // METODO PARA LISTAR UN PARAMETRO GENERALES
+    // METODO PARA LISTAR UN PARAMETRO GENERALES **USADO
     ListarUnParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -111,7 +111,7 @@ class ParametrosControlador {
             }
         });
     }
-    // METODO PARA ELIMINAR DETALLE TIPO PARAMETRO GENERAL
+    // METODO PARA ELIMINAR DETALLE TIPO PARAMETRO GENERAL  **USADO
     EliminarDetalleParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -160,7 +160,7 @@ class ParametrosControlador {
             }
         });
     }
-    // METODO PARA INGRESAR DETALLE TIPO PARAMETRO GENERAL
+    // METODO PARA INGRESAR DETALLE TIPO PARAMETRO GENERAL  **USADO
     IngresarDetalleParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -186,14 +186,13 @@ class ParametrosControlador {
                 res.jsonp({ message: 'Registro exitoso.' });
             }
             catch (error) {
-                console.log('ver error ', error);
                 // REVERTIR TRANSACCION
                 yield database_1.default.query('ROLLBACK');
                 res.status(500).jsonp({ message: 'error' });
             }
         });
     }
-    // METODO PARA ACTUALIZAR DETALLE TIPO PARAMETRO GENERAL
+    // METODO PARA ACTUALIZAR DETALLE TIPO PARAMETRO GENERAL  **USADO
     ActualizarDetalleParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

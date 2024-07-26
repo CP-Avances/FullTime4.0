@@ -1,11 +1,11 @@
-// SECCIÓN DE LIBRERIAS
+// SECCION DE LIBRERIAS
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 
-// SECCIÓN SERVICIOS
+// SECCION SERVICIOS
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
 @Component({
@@ -43,7 +43,7 @@ export class EditarParametroComponent implements OnInit {
     this.MostrarInformacion();
   }
 
-  // METODO PARA MOSTRAR INFORMACIÓN
+  // METODO PARA MOSTRAR INFORMACION
   MostrarInformacion() {
     this.formulario.patchValue({
       descripcionForm: this.data.parametros.descripcion

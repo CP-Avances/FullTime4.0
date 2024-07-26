@@ -63,10 +63,8 @@ export class AsignacionesService {
       if (noPersonal) {
         this.idUsuariosAcceso.delete(idEmpleado);
       }
-
       this.GuardarEstado();
     }
-
   }
 
   GuardarEstado() {

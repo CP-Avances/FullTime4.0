@@ -405,7 +405,7 @@ export class PrincipalHorarioComponent implements OnInit {
     });
   }
 
-  //METODO PARA ORDENAR DETALLES POR OBSERVACION
+  // METODO PARA ORDENAR DETALLES POR OBSERVACION
   OrdenarDetalles() {
     this.dataHorarios.plantillaDetalles.sort((a: any, b: any) => {
       if (a.OBSERVACION !== 'Ok' && b.OBSERVACION === 'Ok') {
@@ -750,7 +750,7 @@ export class PrincipalHorarioComponent implements OnInit {
   }
 
 
-  //METODO PARA DEFINIR EL COLOR DE LA OBSERVACION
+  // METODO PARA DEFINIR EL COLOR DE LA OBSERVACION
   ObtenerColorValidacion(observacion: string): string {
     if (observacion.startsWith('Datos no registrados:')) {
       return 'rgb(242, 21, 21)';

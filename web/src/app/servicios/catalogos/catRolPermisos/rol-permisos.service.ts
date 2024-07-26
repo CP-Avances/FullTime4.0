@@ -12,58 +12,58 @@ export class RolPermisosService {
     private http: HttpClient
   ) { }
 
-  //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
-  getMenu() {
+  // METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS  ** USADO
+  ObtenerMenu() {
     return this.http.get(`${environment.url}/rolPermisos/menu/paginas`);
   }
 
-  //METODO PARA ENLISTAR PAGINAS SEAN MODULOS
-  getModulos() {
+  // METODO PARA ENLISTAR PAGINAS SEAN MODULOS  **USADO
+  ObtenerModulos() {
     return this.http.get(`${environment.url}/rolPermisos/menu/modulos`);
   }
 
-  //METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO
-  getMenuModulos(datos) {
+  // METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO  **USADO
+  ObtenerMenuModulos(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginasmodulos`, datos);
   }
   
-  // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION
+  // METODO PARA BUSCAR SI EXISTEN PAGINAS CON EL ID DEL ROL REGISTRADA CUANDO NO TIENE ACCION  ** USADO
   BuscarIdPaginas(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/ide`, datos);
   }
 
-  // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL Y POR SU ACCION
+  // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL Y POR SU ACCION  **USADO
   BuscarIdPaginasConAcciones(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/ideaccion`, datos);
   }
 
-  // METODO PARA ASIGNAR PERMISOS AL ROL
-  crearPaginaRol(data: any) {
+  // METODO PARA ASIGNAR PERMISOS AL ROL   **USADO
+  CrearPaginaRol(data: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/insertar`, data).pipe(
       catchError(data));;
   }
 
-  //METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL
+  // METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL  **USADO
   BuscarPaginasRol(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/todaspaginasrol`, datos);
   }
 
-  // ELIMINAR PAGINAS ROL
+  // ELIMINAR PAGINAS ROL  **USADO
   EliminarPaginasRol(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/eliminar`, datos).pipe(catchError(datos));
   }
 
-  // METODO PARA BUSCAR LAS ACCIONES POR CADA PAGINA
+  // METODO PARA BUSCAR LAS ACCIONES POR CADA PAGINA  **USADO
   BuscarAccionesPaginas(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/acciones`, datos);
   }
 
-  // METODO PARA ENLISTAR ACCIONES SEGUN LA PAGINA 
+  // METODO PARA ENLISTAR ACCIONES SEGUN LA PAGINA  **USADO
   BuscarAccionesExistentesPaginas(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/accionesexistentes`, datos);
   }
 
-  // ENLISTAR ACCIONES
+  // ENLISTAR ACCIONES  **USADO
   ObtenerAcciones() {
     return this.http.get(`${environment.url}/rolPermisos/menu/paginas/acciones/todas`);
   }

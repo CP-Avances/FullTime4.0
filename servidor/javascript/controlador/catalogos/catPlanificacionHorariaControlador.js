@@ -21,7 +21,7 @@ const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
 const moment_1 = __importDefault(require("moment"));
 class PlanificacionHorariaControlador {
-    //METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA
+    // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA
     VerificarDatosPlanificacionHoraria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -120,7 +120,7 @@ class PlanificacionHorariaControlador {
             res.json({ planificacionHoraria: plantillaPlanificacionHorariaEstructurada, fechaInicioMes, fechaFinalMes });
         });
     }
-    //METODO PARA REGISTRAR LA PLANIFICACION HORARIA EN LA BASE DE DATOS
+    // METODO PARA REGISTRAR LA PLANIFICACION HORARIA EN LA BASE DE DATOS
     RegistrarPlanificacionHoraria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

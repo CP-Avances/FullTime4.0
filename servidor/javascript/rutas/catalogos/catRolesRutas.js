@@ -12,16 +12,18 @@ class PruebasRutas {
         this.configuracion();
     }
     configuracion() {
-        // METODO PARA LISTAR ROLES DEL SISTEMA
+        // METODO PARA LISTAR ROLES DEL SISTEMA **USADO
         this.router.get('/', verificarToken_1.TokenValidation, catRolesControlador_1.default.ListarRoles);
-        // METODO PARA ELIMINAR REGISTRO
+        // METODO PARA ELIMINAR REGISTRO  **USADO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catRolesControlador_1.default.EliminarRol);
         // METODO PARA REGISTRAR ROL
         this.router.post('/', verificarToken_1.TokenValidation, catRolesControlador_1.default.CrearRol);
         this.router.post('/updateUsers', verificarToken_1.TokenValidation, catRolesControlador_1.default.UpdateRoles);
         this.router.get('/listausuariosroles', verificarToken_1.TokenValidation, catRolesControlador_1.default.ListarRolesUsuario);
         this.router.get('/:id', verificarToken_1.TokenValidation, catRolesControlador_1.default.ObtnenerUnRol);
+        // METODO PARA LISTAR ROLES EXCEPTO EL QUE SE EDITA  **USADO
         this.router.get('/actualiza/:id', verificarToken_1.TokenValidation, catRolesControlador_1.default.ListarRolesActualiza);
+        // METODO PARA ACTUALIZAR ROLES **USADO
         this.router.put('/', verificarToken_1.TokenValidation, catRolesControlador_1.default.ActualizarRol);
     }
 }

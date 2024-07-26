@@ -5,14 +5,11 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
-import { Router } from '@angular/router';
-
 
 // IMPORTAR SERVICIOS
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { VerEmpresaComponent } from '../ver-empresa/ver-empresa.component';
-
 
 @Component({
   selector: 'app-editar-empresa',
@@ -60,7 +57,6 @@ export class EditarEmpresaComponent implements OnInit {
   constructor(
     private formulario: FormBuilder,
     private toastr: ToastrService,
-    private router: Router,
     private rest: EmpresaService,
     public validar: ValidacionesService,
     public componentei: VerEmpresaComponent,
@@ -107,7 +103,6 @@ export class EditarEmpresaComponent implements OnInit {
     this.data = [];
     this.rest.ConsultarDatosEmpresa(this.idEmpresa).subscribe(datos => {
       this.data = datos[0];
-      console.log('datos ', this.data)
       this.ImprimirDatos();
     });
   }

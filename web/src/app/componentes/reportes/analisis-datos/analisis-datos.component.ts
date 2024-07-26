@@ -21,7 +21,7 @@ export class AnalisisDatosComponent implements OnInit{
     this.BuscarURL();
   }
 
-  //METODO PARA BUSCAR PARAMETRO DE URL DE LA HERRAMIENTA DE ANALISIS
+  // METODO PARA BUSCAR PARAMETRO DE URL DE LA HERRAMIENTA DE ANALISIS
   BuscarURL(){
     this.parametro.ListarDetalleParametros(3).subscribe(
       res => {

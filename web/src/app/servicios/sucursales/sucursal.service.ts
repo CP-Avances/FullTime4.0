@@ -32,12 +32,12 @@ export class SucursalService {
     return this.http.get(`${environment.url}/sucursales/empresa-sucursal/${id_empresa}`);
   }
 
-  // BUSCAR LISTA DE SUCURSALES
+  // BUSCAR LISTA DE SUCURSALES **USADO
   BuscarSucursal() {
     return this.http.get(`${environment.url}/sucursales`);
   }
 
-  // METODO PARA ELIMINAR REGISTRO
+  // METODO PARA ELIMINAR REGISTRO **USADO
   EliminarRegistro(id: any, datos: any) {
     const url = `${environment.url}/sucursales/eliminar/${id}`;
     const httpOptions = {
