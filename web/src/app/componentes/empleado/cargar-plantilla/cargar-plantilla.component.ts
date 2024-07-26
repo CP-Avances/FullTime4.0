@@ -181,7 +181,8 @@ export class CargarPlantillaComponent implements OnInit {
           this.toastr.success('Plantilla de Nivel departamentos importada.', 'Operación exitosa.', {
             timeOut: 3000,
           });
-          window.location.reload();
+          this.LimpiarCampos();
+          this.ngOnInit();
           this.archivoForm.reset();
           this.nameFile = '';
         },
@@ -342,7 +343,8 @@ export class CargarPlantillaComponent implements OnInit {
           this.toastr.success('Plantilla de Contratos importada.', 'Operación exitosa.', {
             timeOut: 3000,
           });
-          window.location.reload();
+          this.LimpiarCampos();
+          this.ngOnInit();
           this.archivoForm.reset();
           this.nameFile = '';
         },
@@ -428,7 +430,7 @@ export class CargarPlantillaComponent implements OnInit {
       observacion == 'Modalidad Laboral no existe en el sistema') {
       return 'rgb(255, 192, 203)';
     }
-    else if (observacion == 'Existe un cargo vigente en esas fechas' ||
+    else if (observacion == 'Existe un cargo en esas fechas' ||
       observacion == 'Existe un contrato vigente en esas fechas') {
       return 'rgb(239, 203, 106)';
     }
@@ -592,7 +594,8 @@ export class CargarPlantillaComponent implements OnInit {
           this.toastr.success('Plantilla de Cargos importada.', 'Operación exitosa.', {
             timeOut: 3000,
           });
-          window.location.reload();
+          this.LimpiarCampos();
+          this.ngOnInit();
           this.archivoForm.reset();
           this.nameFile = '';
         },

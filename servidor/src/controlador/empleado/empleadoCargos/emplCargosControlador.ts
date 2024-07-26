@@ -747,7 +747,7 @@ class EmpleadoCargosControlador {
                           , [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta])
 
                         if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
-                          valor.observacion = 'Existe un cargo vigente en esas fechas'
+                          valor.observacion = 'Existe un cargo en esas fechas'
                         } else {
 
                           // Discriminación de elementos iguales
@@ -872,16 +872,16 @@ class EmpleadoCargosControlador {
           WHERE e.id = uc.id_empleado AND e.cedula = $1
           `
           , [cedula]);
+        const ID_SUCURSAL: any = await pool.query(
+            `
+            SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+            `
+            , [sucursal.toUpperCase()]);
         const ID_DEPARTAMENTO: any = await pool.query(
           `
-          SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
+          SELECT id FROM ed_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2
           `
-          , [departamento.toUpperCase()]);
-        const ID_SUCURSAL: any = await pool.query(
-          `
-          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
-          `
-          , [sucursal.toUpperCase()]);
+          , [ID_SUCURSAL.rows[0].id, departamento.toUpperCase()]);
         const ID_TIPO_CARGO: any = await pool.query(
           `
           SELECT id FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
@@ -891,8 +891,8 @@ class EmpleadoCargosControlador {
 
         let id_empleado = ID_EMPLEADO.rows[0].id;
         let id_contrato = ID_CONTRATO.rows[0].id_contrato;
-        let id_departamento = ID_DEPARTAMENTO.rows[0].id;
         let id_sucursal = ID_SUCURSAL.rows[0].id;
+        let id_departamento = ID_DEPARTAMENTO.rows[0].id;
         let id_cargo = ID_TIPO_CARGO.rows[0].id;
         let admin_dep = false;
 
@@ -922,6 +922,22 @@ class EmpleadoCargosControlador {
           , [id_empleado, id_departamento, true, true, admin_dep]);
 
         const [usuarioDep] = response2.rows;
+
+
+        const id_last_cargo = await pool.query(
+          `
+           SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1
+          `
+          , [id_contrato]);
+
+        const response3 = await pool.query(
+          `
+          UPDATE eu_empleado_cargos set estado = $2 
+          WHERE id = $1 AND estado = 'true' RETURNING *
+          `
+          , [id_last_cargo.rows[0].id, false]);
+
+        const [usuarioCargo] = response3.rows;
 
         // AUDITORIA
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({

@@ -17,6 +17,10 @@ export class DatosGeneralesService {
     return this.http.get<any>(`${environment.url}/generalidades/informacion-data-general/${estado}`);
   }
 
+   // METODO PARA CONSULTAR DATOS DE LOS EMPLEADOS
+   ObtenerInformacionGeneralRol(estado: any) {
+    return this.http.get<any>(`${environment.url}/generalidades/informacion-data-general-rol/${estado}`);
+  }
 
   
 

@@ -489,6 +489,28 @@ class DatosGeneralesControlador {
         return res.status(200).jsonp(empleados);
     }
 
+        // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR
+     public async BuscarDataGeneralRol(req: Request, res: Response) {
+            let estado = req.params.estado;
+            // CONSULTA DE BUSQUEDA DE SUCURSALES
+            let informacion = await pool.query(
+                `
+                SELECT * FROM informacion_general AS ig
+                WHERE ig.estado = 1 AND 
+	   		        ig.jefe = false AND
+			        ig.cedula = empl.cedula AND
+			        usd.id_empleado = empl.id AND
+	                usd.administra = false
+                ORDER BY ig.name_suc ASC
+                `
+                , [estado]
+            ).then((result: any) => { return result.rows });
+    
+            if (informacion.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
+    
+            return res.status(200).jsonp(informacion);
+        }
+
 
 
 

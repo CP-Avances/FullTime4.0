@@ -227,6 +227,28 @@ class RolesControlador {
     }
   }
 
+  //CONSULTA PARA actualizar roles a varios usuarios
+  public async UpdateRoles(req: Request, res: Response){
+    try{
+
+      const { rol, listUsuarios} = req.body;
+
+      for (const user of listUsuarios) {
+        await pool.query(`
+          UPDATE eu_usuarios
+          SET id_rol = $1, 
+          WHERE id = $2
+        `, [rol, user.id]);
+      }
+
+    } catch (error) {
+      // FINALIZAR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
+    }
+  }
+
+
 }
 
 const ROLES_CONTROLADOR = new RolesControlador();

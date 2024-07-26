@@ -15,6 +15,8 @@ class CiudadRutas {
     configuracion() {
         // METODO PARA CONSULTAR DATOS DE USUARIOS ACTIVOS E INACTIVOS 
         this.router.get('/informacion-data-general/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.BuscarDataGeneral);
+        // METODO PARA CONSULTAR DATOS DE USUARIOS ACTIVOS E INACTIVOS 
+        this.router.get('/informacion-data-general-rol/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.BuscarDataGeneralRol);
         // METODO PARA BUSCAR INFORMACION DE UN USUARIO ADMNISTRADOR - JEFE
         this.router.post('/datos-actuales-usuario-rol', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.BuscarInformacionUserRol);
         // LISTA DE DATOS ACTIVOS O INACTIVOS QUE TIENEN CONFIGURADO COMUNICADOS SUPERADMIN

@@ -650,7 +650,7 @@ class EmpleadoCargosControlador {
                                     fecha_inicio BETWEEN $2 AND $3)
                                     `, [ID_CONTRATO.rows[0].id_contrato, valor.fecha_desde, valor.fecha_hasta]);
                                                     if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
-                                                        valor.observacion = 'Existe un cargo vigente en esas fechas';
+                                                        valor.observacion = 'Existe un cargo en esas fechas';
                                                     }
                                                     else {
                                                         // Discriminación de elementos iguales
@@ -753,19 +753,19 @@ class EmpleadoCargosControlador {
           SELECT uc.id_contrato FROM ultimo_contrato AS uc, eu_empleados AS e 
           WHERE e.id = uc.id_empleado AND e.cedula = $1
           `, [cedula]);
-                    const ID_DEPARTAMENTO = yield database_1.default.query(`
-          SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1
-          `, [departamento.toUpperCase()]);
                     const ID_SUCURSAL = yield database_1.default.query(`
-          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
-          `, [sucursal.toUpperCase()]);
+            SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+            `, [sucursal.toUpperCase()]);
+                    const ID_DEPARTAMENTO = yield database_1.default.query(`
+          SELECT id FROM ed_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2
+          `, [ID_SUCURSAL.rows[0].id, departamento.toUpperCase()]);
                     const ID_TIPO_CARGO = yield database_1.default.query(`
           SELECT id FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
           `, [cargo.toUpperCase()]);
                     let id_empleado = ID_EMPLEADO.rows[0].id;
                     let id_contrato = ID_CONTRATO.rows[0].id_contrato;
-                    let id_departamento = ID_DEPARTAMENTO.rows[0].id;
                     let id_sucursal = ID_SUCURSAL.rows[0].id;
+                    let id_departamento = ID_DEPARTAMENTO.rows[0].id;
                     let id_cargo = ID_TIPO_CARGO.rows[0].id;
                     let admin_dep = false;
                     if (admini_depa.toLowerCase() == 'si') {
@@ -785,6 +785,14 @@ class EmpleadoCargosControlador {
           VALUES ($1, $2, $3, $4, $5) RETURNING *
           `, [id_empleado, id_departamento, true, true, admin_dep]);
                     const [usuarioDep] = response2.rows;
+                    const id_last_cargo = yield database_1.default.query(`
+           SELECT id FROM eu_empleado_cargos WHERE id_contrato = $1
+          `, [id_contrato]);
+                    const response3 = yield database_1.default.query(`
+          UPDATE eu_empleado_cargos set estado = $2 
+          WHERE id = $1 AND estado = 'true' RETURNING *
+          `, [id_last_cargo.rows[0].id, false]);
+                    const [usuarioCargo] = response3.rows;
                     // AUDITORIA
                     yield auditoriaControlador_1.default.InsertarAuditoria({
                         tabla: 'eu_empleado_cargos',
