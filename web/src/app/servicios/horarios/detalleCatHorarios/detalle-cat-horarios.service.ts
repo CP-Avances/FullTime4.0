@@ -35,5 +35,10 @@ export class DetalleCatHorariosService {
     return this.http.put(`${environment.url}/detalleHorario`, data);
   }
 
+  // METODO PARA BUSCAR DETALLES DE VARIOS HORARIOS
+  ConsultarDetalleHorarios(datos: any) {
+    return this.http.post(`${environment.url}/detalleHorario/lista`, datos);
+  }
+
 
 }
