@@ -450,9 +450,9 @@ class NotificacionTiempoRealControlador {
       const USUARIO_ENVIA = await pool.query(
         `
         SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
-          tc.cargo, d.nombre AS departamento
-        FROM datos_actuales_empleado AS e, eu_empleado_cargos AS ec, e_cat_tipo_cargo AS tc, ed_departamentos AS d
-        WHERE e.id = $1 AND ec.id = e.id_cargo AND tc.id = ec.id_tipo_cargo AND d.id = ec.id_departamento
+          e.name_cargo AS cargo, e.name_dep AS departamento
+        FROM informacion_general AS e
+        WHERE e.id = $1
         `
         ,
         [id_envia]);
@@ -544,9 +544,9 @@ class NotificacionTiempoRealControlador {
       const USUARIO_ENVIA = await pool.query(
         `
         SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
-          tc.cargo, d.nombre AS departamento 
-        FROM datos_actuales_empleado AS e, eu_empleado_cargos AS ec, e_cat_tipo_cargo AS tc, ed_departamentos AS d 
-        WHERE e.id = $1 AND ec.id = e.id_cargo AND tc.id = ec.id_tipo_cargo AND d.id = ec.id_departamento
+          e.name_cargo AS cargo, e.name_dep AS departamento 
+        FROM informacion_general AS e
+        WHERE e.id = $1
         `
         , [id_envia]);
 
@@ -709,9 +709,9 @@ class NotificacionTiempoRealControlador {
       const USUARIO_ENVIA = await pool.query(
         `
         SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
-          tc.cargo, d.nombre AS departamento 
-        FROM datos_actuales_empleado AS e, eu_empleado_cargos AS ec, e_cat_tipo_cargo AS tc, ed_departamentos AS d 
-        WHERE e.id = $1 AND ec.id = e.id_cargo AND tc.id = ec.id_tipo_cargo AND d.id = ec.id_departamento
+          e.name_cargo AS cargo, e.name_dep AS departamento 
+        FROM informacion_general AS e
+        WHERE e.id = $1 
         `
         , [id_envia]);
 

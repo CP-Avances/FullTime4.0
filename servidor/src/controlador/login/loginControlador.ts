@@ -121,8 +121,8 @@ class LoginControlador {
           FROM eu_empleado_contratos AS e, eu_empleado_cargos AS c, e_sucursales AS s, e_empresa AS cg_e, 
             eu_empleados AS empl 
           WHERE e.id_empleado = $1 AND e.id_empleado = empl.id AND 
-            (SELECT id_contrato FROM datos_actuales_empleado WHERE id = e.id_empleado) = e.id AND 
-            (SELECT id_cargo FROM datos_actuales_empleado WHERE id = e.id_empleado) = c.id AND 
+            (SELECT id_contrato FROM contrato_cargo_vigente WHERE id_empleado = e.id_empleado) = e.id AND 
+            (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = e.id_empleado) = c.id AND 
             c.id_sucursal = s.id AND s.id_empresa = cg_e.id 
           ORDER BY c.fecha_inicio DESC LIMIT 1
           `

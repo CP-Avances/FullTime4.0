@@ -94,12 +94,6 @@ export class DatosGeneralesService {
     return this.http.get<any>(`${environment.url}/generalidades/info-configuracion/${id_empleado}`);
   }
 
-
-  // METODO PARA CONSULTAR DATOS DE ADMINISTRADORES Y JEFES
-  ObtenerAdminJefes(datos: any) {
-    return this.http.post(`${environment.url}/generalidades/datos-actuales-sucursales`, datos);
-  }
-
   // METODO PARA OBTENER USUARIOS DE UNA SUCURSAL
   ObtenerUsuariosSucursal(datos: any) {
     return this.http.post(`${environment.url}/generalidades/datos-actuales-sucursal`, datos);

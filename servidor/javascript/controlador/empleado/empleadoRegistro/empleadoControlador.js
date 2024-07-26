@@ -1188,7 +1188,7 @@ class EmpleadoControlador {
                         yield database_1.default.query('COMMIT');
                         continue;
                     }
-                    const datosActuales = yield database_1.default.query('SELECT * FROM datos_actuales_empleado WHERE id = $1', [e.id]);
+                    const datosActuales = yield database_1.default.query('SELECT * FROM informacion_general WHERE id = $1', [e.id]);
                     const [datosActualesEmpleado] = datosActuales.rows;
                     const contratos = yield database_1.default.query('SELECT * FROM eu_empleado_contratos WHERE id_empleado = $1', [e.id]);
                     const [datosContratos] = contratos.rows;

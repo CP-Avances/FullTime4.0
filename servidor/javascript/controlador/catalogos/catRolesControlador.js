@@ -193,7 +193,7 @@ class RolesControlador {
         SELECT data_empl.codigo, data_empl.cedula, CONCAT(TRIM(data_empl.nombre), ' ',TRIM(data_empl.apellido)) AS nombre, 
 	            data_empl.id_rol, rol.nombre AS rol, empl_car.id_departamento, depa.nombre AS departamento,
 	            empl_car.id_sucursal, sucu.nombre AS sucursal, empl_car.id_tipo_cargo, cargo.cargo 
-        FROM eu_usuario_departamento AS usu_dep, eu_empleado_cargos AS empl_car, datos_actuales_empleado AS data_empl,
+        FROM eu_usuario_departamento AS usu_dep, eu_empleado_cargos AS empl_car, informacion_general AS data_empl,
 	          ed_departamentos AS depa, e_sucursales AS sucu, e_cat_tipo_cargo AS cargo, ero_cat_roles AS rol
         WHERE usu_dep.id_empleado = data_empl.id AND usu_dep.principal = true AND usu_dep.personal = true AND 
 	          usu_dep.administra = false AND empl_car.id = data_empl.id_cargo AND empl_car.jefe = false AND

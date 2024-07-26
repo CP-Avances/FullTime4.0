@@ -25,10 +25,10 @@ class HorasExtrasPedidasControlador {
             const HORAS_EXTRAS_PEDIDAS = yield database_1.default.query(`
       SELECT h.id, h.fecha_inicio, h.fecha_final, h.estado, h.fecha_solicita, h.descripcion, h.horas_solicitud, 
         h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empleado_cargo, e.nombre, e.apellido, 
-        (e.nombre || \' \' || e.apellido) AS fullname, contrato.id AS id_contrato, da.id_departamento, da.codigo, 
+        (e.nombre || \' \' || e.apellido) AS fullname, contrato.id AS id_contrato, da.id_departamento, e.codigo, 
         depa.nombre AS depa_nombre 
       FROM mhe_solicitud_hora_extra AS h, eu_empleados AS e, eu_empleado_contratos As contrato, eu_empleado_cargos AS cargo,
-        datos_actuales_empleado AS da, ed_departamentos AS depa 
+        contrato_cargo_vigente AS da, ed_departamentos AS depa 
       WHERE h.id_empleado_solicita = e.id AND 
         da.id_contrato = contrato.id AND depa.id = da.id_departamento AND (h.estado = 1 OR h.estado = 2) AND 
         contrato.id = cargo.id_contrato AND cargo.id = h.id_empleado_cargo AND h.observacion = false 
@@ -48,10 +48,10 @@ class HorasExtrasPedidasControlador {
             const HORAS_EXTRAS_PEDIDAS = yield database_1.default.query(`
       SELECT h.id, h.fecha_inicio, h.fecha_final, h.estado, h.fecha_solicita, h.descripcion, h.horas_solicitud, 
         h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empleado_cargo, e.nombre, e.apellido,
-        (e.nombre || \' \' || e.apellido) AS fullname, contrato.id AS id_contrato, da.id_departamento, da.codigo, 
+        (e.nombre || \' \' || e.apellido) AS fullname, contrato.id AS id_contrato, da.id_departamento, e.codigo, 
         depa.nombre AS depa_nombre 
       FROM mhe_solicitud_hora_extra AS h, eu_empleados AS e, eu_empleado_contratos As contrato, eu_empleado_cargos AS cargo, 
-        datos_actuales_empleado AS da, ed_departamentos AS depa 
+        contrato_cargo_vigente AS da, ed_departamentos AS depa 
       WHERE h.id_empleado_solicita = e.id AND (h.estado = 1 OR h.estado = 2) AND contrato.id = cargo.id_contrato 
         AND cargo.id = h.id_empleado_cargo AND h.observacion = true AND da.id_contrato = e.id AND depa.id = da.id_departamento
       ORDER BY id DESC
@@ -70,9 +70,9 @@ class HorasExtrasPedidasControlador {
             const HORAS_EXTRAS_PEDIDAS = yield database_1.default.query(`
       SELECT h.id, h.fecha_inicio, h.fecha_final, h.estado, h.fecha_solicita, h.descripcion, h.horas_solicitud, 
         h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empleado_cargo, e.nombre, e.apellido, 
-        (e.nombre || \' \' || e.apellido) AS fullname, contrato.id AS id_contrato, da.codigo, depa.nombre AS depa_nombre 
+        (e.nombre || \' \' || e.apellido) AS fullname, contrato.id AS id_contrato, e.codigo, depa.nombre AS depa_nombre 
       FROM mhe_solicitud_hora_extra AS h, eu_empleados AS e, eu_empleado_contratos As contrato, eu_empleado_cargos AS cargo, 
-        datos_actuales_empleado AS da, ed_departamentos AS depa 
+        contrato_cargo_vigente AS da, ed_departamentos AS depa 
       WHERE h.id_empleado_solicita = e.id AND (h.estado = 3 OR h.estado = 4) AND contrato.id = cargo.id_contrato 
         AND cargo.id = h.id_empleado_cargo AND da.id_contrato = e.id AND depa.id = da.id_departamento 
       ORDER BY id DESC
@@ -815,7 +815,7 @@ class HorasExtrasPedidasControlador {
         FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
           ed_departamentos AS d 
         WHERE ecn.id = $1 AND ecn.id_empleado = e.id AND 
-          (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
+          (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = e.id) = ecr.id 
           AND tc.id = ecr.id_tipo_cargo AND d.id = ecr.id_departamento 
         ORDER BY cargo DESC
         `, [id_empl_contrato]);
@@ -915,7 +915,7 @@ class HorasExtrasPedidasControlador {
         FROM eu_empleado_contratos AS ecn, eu_empleados AS e, eu_empleado_cargos AS ecr, e_cat_tipo_cargo AS tc, 
           ed_departamentos AS d 
         WHERE ecn.id = $1 AND ecn.id_empleado = e.id AND 
-          (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id) = ecr.id 
+          (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = e.id) = ecr.id 
           AND tc.id = ecr.id_tipo_cargo AND d.id = ecr.id_departamento 
         ORDER BY cargo DESC
         `, [id_empl_contrato]);

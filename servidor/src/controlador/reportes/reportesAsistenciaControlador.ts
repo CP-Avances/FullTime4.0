@@ -66,12 +66,12 @@ class ReportesAsistenciaControlador {
                         FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, eu_empleados AS e, 
                             e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s, ere_cat_regimenes AS r, 
                             e_ciudades AS c
-                        WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
-                            da.id = e.id) 
+                        WHERE ca.id = (SELECT da.id_cargo FROM contrato_cargo_vigente AS da WHERE 
+                            da.id_empleado = e.id) 
                             AND tc.id = ca.id_tipo_cargo
                             AND ca.id_departamento = $1
                             AND ca.id_departamento = d.id
-                            AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.id = e.id)
+                            AND co.id = (SELECT da.id_contrato FROM contrato_cargo_vigente AS da WHERE da.id_empleado = e.id)
                             AND co.id_regimen = r.id 
                             AND s.id = d.id_sucursal
                             AND s.id_ciudad = c.id
@@ -96,12 +96,13 @@ class ReportesAsistenciaControlador {
                         FROM eu_empleado_cargos AS ca, eu_empleado_contratos AS co, eu_empleados AS e,
                             e_cat_tipo_cargo AS tc, ed_departamentos AS d, e_sucursales AS s, ere_cat_regimenes AS r, 
                             e_ciudades AS c
-                        WHERE ca.id = (SELECT de.cargo_id FROM datos_empleado_cargo AS de WHERE 
-                            de.empl_id = e.id) 
+                        WHERE ca.id = (SELECT id_cargo FROM cargos_empleado WHERE 
+                            id_empleado = e.id) 
                             AND tc.id = ca.id_tipo_cargo
                             AND ca.id_departamento = $1
                             AND ca.id_departamento = d.id
-                            AND co.id = (SELECT de.contrato_id FROM datos_empleado_cargo AS de WHERE de.empl_id = e.id) 
+                            AND co.id = (SELECT id_contrato FROM cargos_empleado WHERE 
+                            id_empleado = e.id) 
 							AND co.id_regimen = r.id
                             AND s.id = d.id_sucursal
                             AND s.id_ciudad = c.id
@@ -132,7 +133,7 @@ class ReportesAsistenciaControlador {
 
         return res.status(200).jsonp(respuesta)
     }
-    
+
     public async ReporteTimbresMultiple(req: Request, res: Response) {
 
         let { desde, hasta } = req.params;

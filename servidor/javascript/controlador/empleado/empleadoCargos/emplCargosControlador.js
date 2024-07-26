@@ -244,9 +244,10 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, fecha_verificar } = req.body;
             const CARGOS = yield database_1.default.query(`
-      SELECT dc.empl_id, ec.id AS id_cargo, ec.fecha_inicio, ec.fecha_final
-      FROM eu_empleado_cargos AS ec, datos_empleado_cargo AS dc
-      WHERE ec.id = dc.cargo_id AND dc.empl_id = $1 AND $2 < ec.fecha_final
+      SELECT e.id AS id_empleado, car.id AS id_cargo, car.fecha_inicio, car.fecha_final, car.estado
+      FROM eu_empleados e, eu_empleado_contratos con, eu_empleado_cargos car
+      WHERE con.id_empleado = e.id AND con.id = car.id_contrato AND e.id = $1 AND $2 < car.fecha_final
+      ORDER BY e.id ASC
       `, [id_empleado, fecha_verificar]);
             if (CARGOS.rowCount != 0) {
                 return res.jsonp(CARGOS.rows);
@@ -261,9 +262,11 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado, fecha_verificar, id_cargo } = req.body;
             const CARGOS = yield database_1.default.query(`
-        SELECT dc.empl_id, ec.id AS id_cargo, ec.fecha_inicio, ec.fecha_final
-        FROM eu_empleado_cargos AS ec, datos_empleado_cargo AS dc
-        WHERE ec.id = dc.cargo_id AND dc.empl_id = $1 AND $2 < ec.fecha_final AND NOT ec.id = $3
+        SELECT e.id AS id_empleado, car.id AS id_cargo, car.fecha_inicio, car.fecha_final, car.estado
+        FROM eu_empleados e, eu_empleado_contratos con, eu_empleado_cargos car
+        WHERE con.id_empleado = e.id AND con.id = car.id_contrato AND e.id = $1 AND $2 < car.fecha_final
+          AND NOT car.id = $3
+        ORDER BY e.id ASC
         `, [id_empleado, fecha_verificar, id_cargo]);
             if (CARGOS.rowCount != 0) {
                 return res.jsonp(CARGOS.rows);
@@ -294,8 +297,8 @@ class EmpleadoCargosControlador {
             const { id_empleado } = req.params;
             const CARGO = yield database_1.default.query(`
       SELECT ec.id AS max, ec.hora_trabaja 
-      FROM datos_actuales_empleado AS da, eu_empleado_cargos AS ec
-      WHERE ec.id = da.id_cargo AND da.id = $1
+      FROM contrato_cargo_vigente AS da, eu_empleado_cargos AS ec
+      WHERE ec.id = da.id_cargo AND da.id_empleado = $1
       `, [id_empleado]);
             if (CARGO.rowCount != 0 && CARGO.rows[0]['max'] != null) {
                 return res.jsonp(CARGO.rows);
@@ -622,7 +625,10 @@ class EmpleadoCargosControlador {
               SELECT * FROM eu_empleados WHERE cedula = $1
               `, [valor.cedula]);
                         if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                            const ID_CONTRATO = yield database_1.default.query(`SELECT id_contrato FROM datos_contrato_actual WHERE cedula = $1`, [valor.cedula]);
+                            const ID_CONTRATO = yield database_1.default.query(`
+              SELECT uc.id_contrato FROM ultimo_contrato AS uc, eu_empleados AS e 
+              WHERE e.id = uc.id_empleado AND e.cedula = $1
+              `, [valor.cedula]);
                             if (ID_CONTRATO.rows[0] != undefined && ID_CONTRATO.rows[0].id_contrato != null &&
                                 ID_CONTRATO.rows[0].id_contrato != 0 && ID_CONTRATO.rows[0].id_contrato != '') {
                                 var VERIFICAR_SUCURSALES = yield database_1.default.query(`SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1`, [valor.sucursal.toUpperCase()]);
@@ -744,7 +750,8 @@ class EmpleadoCargosControlador {
           SELECT id FROM eu_empleados WHERE cedula = $1
           `, [cedula]);
                     const ID_CONTRATO = yield database_1.default.query(`
-          SELECT id_contrato FROM datos_contrato_actual WHERE cedula = $1
+          SELECT uc.id_contrato FROM ultimo_contrato AS uc, eu_empleados AS e 
+          WHERE e.id = uc.id_empleado AND e.cedula = $1
           `, [cedula]);
                     const ID_DEPARTAMENTO = yield database_1.default.query(`
           SELECT id FROM ed_departamentos WHERE UPPER(nombre) = $1

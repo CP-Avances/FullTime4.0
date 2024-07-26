@@ -65,10 +65,6 @@ class CiudadRutas {
         // METODO DE ACCESO A CONSULTA DE DATOS DE CRAGOS Y COLABORADORES ASIGNADOS A UBICACIONES
         this.router.post('/informacion-general-ubicacion-cargo/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosGeneralesCargoUbicacion);
 
-
-        // METODO PARA BUSCAR ADMNISTRADORES Y JEFES
-        this.router.post('/datos-actuales-sucursales', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarAdminJefes);
-
         // METODO PARA BUSCAR USUARIOS DE UNA SUCURSAL
         this.router.post('/datos-actuales-sucursal', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarUsuariosSucursal);
 
