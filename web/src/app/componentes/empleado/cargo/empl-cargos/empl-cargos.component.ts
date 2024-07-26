@@ -94,8 +94,6 @@ export class EmplCargosComponent implements OnInit {
     this.idDepartamentosAcceso = this.asignaciones.idDepartamentosAcceso;
     this.idSucursalesAcceso = this.asignaciones.idSucursalesAcceso;
 
-    console.log('asignaciones', this.asignaciones);
-
     this.BuscarDatosContrato()
     this.FiltrarSucursales();
     this.BuscarTiposCargos();
@@ -131,7 +129,6 @@ export class EmplCargosComponent implements OnInit {
     this.sucursales = [];
     this.restSucursales.BuscarSucursalEmpresa(idEmpre).subscribe(datos => {
       this.sucursales = this.rolEmpleado === 1 ? datos : this.FiltrarSucursalesAsignadas(datos);
-      console.log('sucursales', this.sucursales);
     }, error => {
       this.toastr.info('No se han encontrado registros de Sucursales.', '', {
         timeOut: 6000,
@@ -141,8 +138,6 @@ export class EmplCargosComponent implements OnInit {
 
   // METODO PARA FILTRAR SUCURSALES ASIGNADAS
   FiltrarSucursalesAsignadas(data: any) {
-    console.log('sucursales', data);
-    console.log('idSucursalesAcceso', this.idSucursalesAcceso);
     return data.filter((sucursal: any) => this.idSucursalesAcceso.has(sucursal.id));
   }
 
