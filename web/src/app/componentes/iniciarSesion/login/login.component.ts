@@ -158,7 +158,6 @@ export class LoginComponent implements OnInit {
 
     // VALIDACION DEL LOGIN
     this.rest.ValidarCredenciales(dataUsuario).subscribe(datos => {
-      console.log('ver datos ', datos)
       if (datos.message === 'error') {
         var f = moment();
         var espera = '00:01:00';
@@ -212,7 +211,6 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('ip', datos.ip_adress);
         localStorage.setItem('usuario', datos.usuario);
         localStorage.setItem('empresa', datos.empresa);
-        localStorage.setItem('autoriza', datos.estado);
         localStorage.setItem('sucursal', datos.sucursal);
         localStorage.setItem('ultimoCargo', datos.cargo);
         localStorage.setItem('empleado', datos.empleado);
@@ -227,19 +225,14 @@ export class LoginComponent implements OnInit {
           timeOut: 6000,
         })
 
-        if (datos.rol === 1 || datos.rol === 3) { // ADMIN
-          //console.log('ver redireccionar ', localStorage.getItem("redireccionar"))
-          if (!!localStorage.getItem("redireccionar")) {
-            let redi = localStorage.getItem("redireccionar");
-            this.router.navigate([redi], { relativeTo: this.route, skipLocationChange: false });
-            localStorage.removeItem("redireccionar");
-          } else {
-            this.router.navigate(['/home'])
-          };
-        }
-        if (datos.rol === 2) { // EMPLEADO
-          this.router.navigate(['/estadisticas']);
-        }
+        if (!!localStorage.getItem("redireccionar")) {
+          console.log('redireccionar')
+          let redi = localStorage.getItem("redireccionar");
+          this.router.navigate([redi], { relativeTo: this.route, skipLocationChange: false });
+          localStorage.removeItem("redireccionar");
+        } else {
+          this.router.navigate(['/home'])
+        };
 
       }
     }, err => {

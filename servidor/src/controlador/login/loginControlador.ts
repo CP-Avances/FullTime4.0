@@ -35,23 +35,17 @@ class LoginControlador {
     }
 
     try {
-
       const { nombre_usuario, pass } = req.body;
-      console.log('ingresa ', req.body)
       // BUSQUEDA DE USUARIO
       const USUARIO = await pool.query(
         `
         SELECT id, usuario, id_rol, id_empleado FROM accesoUsuarios($1, $2)
         `
         , [nombre_usuario, pass]);
-      console.log('verificar ', USUARIO.rows)
-      // SI EXISTE USUARIOS
+      
+        // SI EXISTE USUARIOS
       if (USUARIO.rowCount != 0) {
-
-        console.log('usuario existe')
-
         const { id, id_empleado, id_rol, usuario: user } = USUARIO.rows[0];
-
         let ACTIVO = await pool.query(
           `
           SELECT e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access 
@@ -63,8 +57,6 @@ class LoginControlador {
           });
 
         const { empleado, usuario, codigo, web_access } = ACTIVO[0];
-
-        console.log('estado del usuario ', empleado, ' ', usuario)
         // SI EL USUARIO NO SE ENCUENTRA ACTIVO
         if (empleado === 2 && usuario === false) {
           return res.jsonp({ message: 'inactivo' });
@@ -88,7 +80,6 @@ class LoginControlador {
         );
 
         const { public_key, id_empresa } = EMPRESA.rows[0];
-
         // BUSQUEDA DE LICENCIA DE USO DE APLICACION
         const data = fs.readFileSync('licencia.conf.json', 'utf8')
         const FileLicencias = JSON.parse(data);
@@ -113,76 +104,36 @@ class LoginControlador {
         // BUSQUEDA DE INFORMACION
         const INFORMACION = await pool.query(
           `
-           SELECT e.id as id_contrato, c.hora_trabaja, c.id_departamento, s.id_empresa, d.id_sucursal,
-            c.id AS id_cargo, cg_e.acciones_timbres, cg_e.public_key, 
-            (SELECT id FROM mv_periodo_vacacion pv WHERE pv.id_empleado = empl.id 
-            ORDER BY pv.fecha_inicio DESC LIMIT 1 ) as id_peri_vacacion, 
-            (SELECT nombre FROM ed_departamentos cd WHERE cd.id = c.id_departamento ) AS ndepartamento 
-          FROM eu_empleado_contratos AS e, eu_empleado_cargos AS c, e_sucursales AS s, e_empresa AS cg_e, 
-            eu_empleados AS empl, ed_departamentos AS d 
-          WHERE e.id_empleado = $1 AND e.id_empleado = empl.id AND 
-            (SELECT id_contrato FROM contrato_cargo_vigente WHERE id_empleado = e.id_empleado) = e.id AND 
-            (SELECT id_cargo FROM contrato_cargo_vigente WHERE id_empleado = e.id_empleado) = c.id AND 
-            d.id_sucursal = s.id AND s.id_empresa = cg_e.id AND d.id = c.id_departamento
-          ORDER BY c.fecha_inicio DESC LIMIT 1
+          SELECT cv.id_contrato, cv.id_cargo, cv.id_departamento, d.nombre AS ndepartamento, ec.hora_trabaja,
+            d.id_sucursal, s.id_empresa, e.acciones_timbres, e.public_key
+          FROM contrato_cargo_vigente AS cv, ed_departamentos AS d, e_sucursales AS s, e_empresa AS e,
+            eu_empleado_cargos AS ec
+          WHERE cv.id_empleado = $1 AND d.id = cv.id_departamento AND s.id = d.id_sucursal AND ec.id = cv.id_cargo
           `
           , [USUARIO.rows[0].id_empleado]);
 
         // VALIDACION DE ACCESO CON LICENCIA 
         if (INFORMACION.rowCount != 0) {
-          console.log('ingresa a validacion de licencia')
+          const { id_contrato, id_cargo, id_departamento, acciones_timbres, id_sucursal, id_empresa,
+            public_key: licencia } = INFORMACION.rows[0];
 
-          try {
-            const { id_contrato, id_cargo, id_departamento, acciones_timbres, id_sucursal, id_empresa,
-              public_key: licencia } = INFORMACION.rows[0];
-
-            const AUTORIZA = await pool.query(
-              `
-              SELECT estado FROM ed_autoriza_departamento
-              WHERE id_empleado_cargo = $1 AND id_departamento = $2
-              `
-              , [id_cargo, id_departamento])
-
-            if (AUTORIZA.rowCount != 0) {
-
-              const { estado: autoriza_est } = AUTORIZA.rows[0]
-              const token = jwt.sign({
-                _licencia: licencia, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
-                _dep: id_departamento, _web_access: web_access, _acc_tim: acciones_timbres, _suc: id_sucursal,
-                _empresa: id_empresa, estado: autoriza_est, cargo: id_cargo, ip_adress: ip_cliente,
-                modulos: modulos, id_contrato: id_contrato
-              },
-                process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
-              return res.status(200).jsonp({
-                caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
-                departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
-                empresa: id_empresa, cargo: id_cargo, estado: autoriza_est, ip_adress: ip_cliente,
-                modulos: modulos, id_contrato: id_contrato
-              });
-
-            } else {
-              const token = jwt.sign({
-                _licencia: licencia, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
-                _dep: id_departamento, _web_access: web_access, _acc_tim: acciones_timbres, _suc: id_sucursal,
-                _empresa: id_empresa, estado: false, cargo: id_cargo, ip_adress: ip_cliente, modulos: modulos,
-                id_contrato: id_contrato
-              },
-                process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
-              return res.status(200).jsonp({
-                caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
-                departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
-                empresa: id_empresa, cargo: id_cargo, estado: false, ip_adress: ip_cliente, modulos: modulos,
-                id_contrato: id_contrato
-              });
-            }
-
-          } catch (error) {
-            return res.status(404).jsonp({ message: 'licencia_no_existe' });
-          }
+          const token = jwt.sign({
+            _licencia: licencia, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
+            _dep: id_departamento, _web_access: web_access, _acc_tim: acciones_timbres, _suc: id_sucursal,
+            _empresa: id_empresa, cargo: id_cargo, ip_adress: ip_cliente, modulos: modulos,
+            id_contrato: id_contrato
+          },
+            process.env.TOKEN_SECRET || 'llaveSecreta', { expiresIn: 60 * 60 * 23, algorithm: 'HS512' });
+          return res.status(200).jsonp({
+            caducidad_licencia, token, usuario: user, rol: id_rol, empleado: id_empleado,
+            departamento: id_departamento, acciones_timbres: acciones_timbres, sucursal: id_sucursal,
+            empresa: id_empresa, cargo: id_cargo, ip_adress: ip_cliente, modulos: modulos,
+            id_contrato: id_contrato
+          });
         }
         else {
           // VALIDAR SI EL USUARIO QUE ACCEDE ES ADMINISTRADOR
-          if (id_rol === 1 || id_rol == 3) {
+          if (id_rol === 1) {
             const token = jwt.sign({
               _licencia: public_key, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
               _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente, modulos: modulos
