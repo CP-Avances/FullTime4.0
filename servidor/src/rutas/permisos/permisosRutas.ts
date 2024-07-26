@@ -1,7 +1,7 @@
 import PERMISOS_CONTROLADOR from '../../controlador/permisos/permisosControlador';
 import { ModuloPermisosValidation } from '../../libs/Modulos/verificarPermisos'
 import { TokenValidation } from '../../libs/verificarToken'
-import { ObtenerRutaPermisos } from '../../libs/accesoCarpetas';
+import { ObtenerRutaPermisos, ObtenerRutaPermisosGeneral } from '../../libs/accesoCarpetas';
 import { Router } from 'express';
 import multer from 'multer';
 import pool from '../../database';
@@ -36,9 +36,31 @@ const storage = multer.diskStorage({
 
         cb(null, documento)
     }
-})
+});
+
+const storage2 = multer.diskStorage({
+    
+        destination: async function (req, file, cb) {
+            const ruta = await ObtenerRutaPermisosGeneral();
+            cb(null, ruta)
+        },
+        filename: async function (req, file, cb) {
+    
+            // FECHA DEL SISTEMA
+            const fecha = moment();
+            const anio = fecha.format('YYYY');
+            const mes = fecha.format('MM');
+            const dia = fecha.format('DD');
+
+            const documento = `${anio}_${mes}_${dia}_${file.originalname}`;
+            console.log('documento', documento);
+    
+            cb(null, documento)
+        }
+    });
 
 const upload = multer({ storage: storage });
+const upload2 = multer({ storage: storage2 });
 
 class PermisosRutas {
     public router: Router = Router();
@@ -74,10 +96,8 @@ class PermisosRutas {
         // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO APLICACION MOVIL
         this.router.put('/:id/archivo/:archivo/validar/:codigo', upload.single('uploads'), PERMISOS_CONTROLADOR.GuardarDocumentoPermiso);
 
-
-
-
-
+        // METODO PARA CREAR PERMISOS MULTIPLES
+        this.router.put('/permisos-multiples', [TokenValidation, ModuloPermisosValidation, upload2.single('uploads')], PERMISOS_CONTROLADOR.CrearPermisosMultiples);
 
         // ELIMINAR DOCUMENTO
         this.router.put('/eliminar-documento', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EliminarDocumentoPermiso);
@@ -89,7 +109,7 @@ class PermisosRutas {
         this.router.get('/informe-un-permiso/:id_permiso', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.InformarUnPermiso);
 
         // ELIMINAR PERMISO
-        this.router.delete('/eliminar/:id_permiso/:doc/verificar/:codigo', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EliminarPermiso);
+        this.router.delete('/eliminar/', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EliminarPermiso);
 
         // BUSQUEDA DE RESPALDOS DE PERMISOS
         this.router.get('/documentos/:docs/visualizar/:codigo', PERMISOS_CONTROLADOR.ObtenerDocumentoPermiso);

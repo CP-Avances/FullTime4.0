@@ -42,8 +42,8 @@ async function AniosEmpleado(idEmpleado: number): Promise<number> {
     let anioInicio: string = await pool.query(
         `
         SELECT pv.fecha_inicio 
-        FROM eu_empleado_contratos co, mv_periodo_vacacion pv 
-        WHERE co.id_empleado = $1 AND pv.id_empleado_contrato = co.id 
+        FROM eu_empleado_contratos co, mv_periodo_vacacion pv, eu_empleado_cargos AS ca 
+        WHERE co.id_empleado = $1 AND pv.id_empleado_cargo = ca.id AND ca.id_contrato = co.id
         ORDER BY pv.fecha_inicio ASC limit 1
         `
         , [idEmpleado]).then((result: any) => {
@@ -52,8 +52,8 @@ async function AniosEmpleado(idEmpleado: number): Promise<number> {
     let anioPresente: string = await pool.query(
         `
         SELECT pv.fecha_final 
-        FROM eu_empleado_contratos co, mv_periodo_vacacion pv
-        WHERE co.id_empleado = $1 AND pv.id_empleado_contrato = co.id 
+        FROM eu_empleado_contratos co, mv_periodo_vacacion pv, eu_empleado_cargos AS ca
+        WHERE co.id_empleado = $1 AND pv.id_empleado_cargo = ca.id AND ca.id_contrato = co.id
             AND CAST(pv.fecha_final AS VARCHAR) like $2 || \'%\'
         `
         , [idEmpleado, anioHoy]).then((result: any) => {
@@ -99,7 +99,7 @@ async function CrearNuevoPeriodo(Obj: any, descripcion: string, dia: Date, anio:
     // console.log(nuevo);
     await pool.query(
         `
-        INSERT INTO mv_periodo_vacacion (id_empleado_contrato, descripcion, dia_vacacion, dia_antiguedad, estado, 
+        INSERT INTO mv_periodo_vacacion (id_empleado_cargo, descripcion, dia_vacacion, dia_antiguedad, estado, 
             fecha_inicio, fecha_final, dia_perdido, horas_vacaciones, minutos_vacaciones) 
         VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 )
         `
@@ -118,11 +118,11 @@ async function PeriVacacionHoy(fechaHoy: string) {
     // let expira_peri_hoy = await pool.query('select pv.id, pv.id_empl_contrato, pv.dia_vacacion, pv.dia_antiguedad, pv.fec_inicio, pv.fec_final, pv.dia_perdido, pv.horas_vacaciones, pv.min_vacaciones, co.id_regimen from mv_periodo_vacacion pv, eu_empleado_contratos co, eu_empleados e where CAST(pv.fec_final AS VARCHAR) like $1 || \'%\' AND pv.estado = 1 AND co.id = pv.id_empl_contrato AND co.id_empleado = e.id AND e.estado = 1', [fechaHoy]);    
     let expira_peri_hoy = await pool.query(
         `
-        SELECT pv.id, pv.id_empleado_contrato, pv.dia_vacacion, pv.dia_antiguedad, pv.fecha_final, pv.dia_perdido, 
+        SELECT pv.id, pv.id_empleado_cargo, pv.dia_vacacion, pv.dia_antiguedad, pv.fecha_final, pv.dia_perdido, 
         pv.horas_vacaciones, pv.minutos_vacaciones, co.id_regimen 
-        FROM mv_periodo_vacacion pv, eu_empleado_contratos co, eu_empleados e 
-        WHERE CAST(pv.fecha_final AS VARCHAR) like $1 || \'%\' AND co.id = pv.id_empleado_contrato 
-            AND co.id_empleado = e.id AND e.estado = 1
+        FROM mv_periodo_vacacion pv, eu_empleado_contratos co, eu_empleados e, eu_empleado_cargos AS ca 
+        WHERE CAST(pv.fecha_final AS VARCHAR) like $1 || \'%\' AND ca.id = pv.id_empleado_cargo
+            AND co.id_empleado = e.id AND e.estado = 1 AND ca.id_contrato = co.id
         `
         , [fechaHoy]);
     return expira_peri_hoy.rows;
@@ -177,8 +177,8 @@ export const beforeFiveDays = function () {
             const avisoVacacion = await pool.query(
                 `
                 SELECT pv.fecha_inicio, pv.fecha_final, e.nombre, e.apellido, e.correo 
-                FROM mv_periodo_vacacion AS pv, eu_empleado_contratos AS ec, eu_empleados AS e 
-                WHERE pv.id_empleado_contrato = ec.id AND ec.id_empleado = e.id 
+                FROM mv_periodo_vacacion AS pv, eu_empleado_contratos AS ec, eu_empleados AS e, eu_empleado_cargos AS ca 
+                WHERE pv.id_empleado_cargo = ca.id AND ec.id_empleado = e.id AND ca.id_contrato = ec.id 
                     AND pv.fecha_inicio = $1
                 `
                 , [diaIncrementado]);
@@ -229,8 +229,8 @@ export const beforeTwoDays = function () {
             const avisoVacacion = await pool.query(
                 `
                 SELECT pv.fecha_inicio, pv.fecha_final, e.nombre, e.apellido, e.correo 
-                FROM mv_periodo_vacacion AS pv, eu_empleado_contratos AS ec, eu_empleados AS e 
-                WHERE pv.id_empleado_contrato = ec.id AND ec.id_empleado = e.id 
+                FROM mv_periodo_vacacion AS pv, eu_empleado_contratos AS ec, eu_empleados AS e, eu_empleado_cargos AS ca 
+                WHERE pv.id_empleado_cargo = ca.id AND ec.id_empleado = e.id AND ca.id_contrato = ec.id
                     AND pv.fecha_inicio = $1
                 `
                 , [diaIncrementado]);

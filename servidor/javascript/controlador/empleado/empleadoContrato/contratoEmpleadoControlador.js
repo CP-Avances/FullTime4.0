@@ -12,15 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
-const auditoriaControlador_1 = __importDefault(require("../../auditoria/auditoriaControlador"));
+const settingsMail_1 = require("../../../libs/settingsMail");
 const moment_1 = __importDefault(require("moment"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const settingsMail_1 = require("../../../libs/settingsMail");
 class ContratoEmpleadoControlador {
     // REGISTRAR CONTRATOS
     CrearContrato(req, res) {
@@ -407,7 +407,7 @@ class ContratoEmpleadoControlador {
             const { id } = req.params;
             const CONTRATO = yield database_1.default.query(`
             SELECT ec.id, ec.id_empleado, ec.id_regimen, ec.fecha_ingreso, ec.fecha_salida, ec.controlar_vacacion,
-                ec.controlar_asistencia, ec.documento, ec.id_modalidad_laboral, cr.descripcion, 
+                ec.controlar_asistencia, ec.documento, ec.id_modalidad_laboral, cr.descripcion,
                 cr.mes_periodo, mt.descripcion AS nombre_contrato 
             FROM eu_empleado_contratos AS ec, ere_cat_regimenes AS cr, e_cat_modalidad_trabajo AS mt 
             WHERE ec.id = $1 AND ec.id_regimen = cr.id AND mt.id = ec.id_modalidad_laboral
@@ -425,9 +425,9 @@ class ContratoEmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
             const FECHA = yield database_1.default.query(`
-            SELECT ca.id_contrato, ec.fecha_ingreso, ec.fecha_salida
-            FROM datos_contrato_actual AS ca, eu_empleado_contratos AS ec
-            WHERE ca.id = $1 AND ec.id = ca.id_contrato
+            SELECT cv.id_contrato, ec.fecha_ingreso, ec.fecha_salida
+            FROM contrato_cargo_vigente AS cv, eu_empleado_contratos AS ec
+            WHERE cv.id_empleado = $1 AND ec.id = cv.id_contrato
             `, [id_empleado]);
             if (FECHA.rowCount != 0) {
                 return res.jsonp(FECHA.rows);
@@ -508,8 +508,8 @@ class ContratoEmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_contrato } = req.body;
             const FECHA = yield database_1.default.query(`
-            SELECT contrato.fecha_ingreso FROM eu_empleado_contratos AS contrato
-            WHERE contrato.id = $1
+            SELECT con.fecha_ingreso, con.fecha_salida FROM eu_empleado_contratos AS con
+            WHERE con.id = $1    
             `, [id_contrato]);
             if (FECHA.rowCount != 0) {
                 return res.jsonp(FECHA.rows);

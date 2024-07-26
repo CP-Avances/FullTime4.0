@@ -15,395 +15,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../../database"));
 class DatosGeneralesControlador {
     // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR
-    BuscarDataGeneral_SUPERADMIN(req, res) {
+    BuscarDataGeneral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let estado = req.params.estado;
             // CONSULTA DE BUSQUEDA DE SUCURSALES
-            let sucursal_ = yield database_1.default.query(`
-            SELECT ig.id_suc, ig.name_suc, ig.ciudad FROM informacion_general AS ig
-            GROUP BY ig.id_suc, ig.name_suc, ig.ciudad
+            let informacion = yield database_1.default.query(`
+            SELECT * FROM informacion_general AS ig
+            WHERE ig.estado = $1
             ORDER BY ig.name_suc ASC
-            `).then((result) => { return result.rows; });
-            if (sucursal_.length === 0)
+            `, [estado]).then((result) => { return result.rows; });
+            if (informacion.length === 0)
                 return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            // CONSULTA DE BUSQUEDA DE REGIMEN
-            let regimen_ = yield Promise.all(sucursal_.map((reg) => __awaiter(this, void 0, void 0, function* () {
-                reg.regimenes = yield database_1.default.query(`
-                SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-                FROM informacion_general AS ig
-                WHERE ig.id_suc = $1
-                GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-                ORDER BY ig.name_suc ASC
-                `, [reg.id_suc]).then((result) => { return result.rows; });
-                return reg;
-            })));
-            let lista_regimen = regimen_.filter((obj) => {
-                return obj.regimenes.length > 0;
-            });
-            if (lista_regimen.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            // CONSULTA DE BUSQUEDA DE DEPARTAMENTOS
-            let departamentos_ = yield Promise.all(lista_regimen.map((reg) => __awaiter(this, void 0, void 0, function* () {
-                reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
-                    dep.departamentos = yield database_1.default.query(`
-                    SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-                    FROM informacion_general AS ig
-                    WHERE ig.id_regimen = $1 AND ig.id_suc = $2
-                    GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-                    ORDER BY ig.name_suc ASC
-                    `, [dep.id_regimen, dep.id_suc]).then((result) => { return result.rows; });
-                    return dep;
-                })));
-                return reg;
-            })));
-            let lista_departamentos = departamentos_.map((reg) => {
-                reg.regimenes = reg.regimenes.filter((dep) => {
-                    return dep.departamentos.length > 0;
-                });
-                return reg;
-            });
-            if (lista_departamentos.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            // CONSULTA DE BUSQUEDA DE CARGOS
-            let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
-                reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
-                    dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
-                        car.cargos = yield database_1.default.query(`
-                        SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
-                            ig.name_regimen
-                        FROM informacion_general AS ig
-                        WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
-                        GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
-                            ig.name_regimen
-                        ORDER BY ig.name_suc ASC
-                        `, [car.id_depa, car.id_suc, car.id_regimen]).then((result) => { return result.rows; });
-                        return car;
-                    })));
-                    return dep;
-                })));
-                return reg;
-            })));
-            let lista_cargos = cargos_.map((reg) => {
-                reg.regimenes = reg.regimenes.filter((dep) => {
-                    dep.departamentos = dep.departamentos.filter((car) => {
-                        return car.cargos.length > 0;
-                    });
-                    return dep;
-                });
-                return reg;
-            });
-            if (lista_cargos.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            // CONSULTA DE BUSQUEDA DE COLABORADORES POR CARGO
-            let lista = yield Promise.all(lista_cargos.map((reg) => __awaiter(this, void 0, void 0, function* () {
-                reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
-                    dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        car.cargos = yield Promise.all(car.cargos.map((empl) => __awaiter(this, void 0, void 0, function* () {
-                            empl.empleado = yield database_1.default.query(`
-                            SELECT info_g.* 
-                            FROM informacion_general as info_g, 
-                                eu_usuario_departamento as usua_dep, 
-                                eu_empleado_cargos as empl_car
-                            WHERE id_cargo_= $1 AND id_suc = $2 AND estado = $3
-                                AND id_depa = $4 AND id_regimen = $5 AND 
-                                info_g.id = usua_dep.id_empleado AND
-	                            usua_dep.administra = false AND 
-	                            empl_car.id = info_g.id_cargo AND 
-	                            empl_car.jefe = false
-                            `, [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen])
-                                .then((result) => { return result.rows; });
-                            return empl;
-                        })));
-                        return car;
-                    })));
-                    return dep;
-                })));
-                return reg;
-            })));
-            let empleados = lista.map((reg) => {
-                reg.regimenes = reg.regimenes.filter((dep) => {
-                    dep.departamentos = dep.departamentos.filter((car) => {
-                        car.cargos = car.cargos.filter((empl) => {
-                            return empl.empleado.length > 0;
-                        });
-                        return car;
-                    }).filter((car) => {
-                        return car.cargos.length > 0;
-                    });
-                    return dep;
-                }).filter((dep) => {
-                    return dep.departamentos.length > 0;
-                });
-                return reg;
-            }).filter((reg) => {
-                return reg.regimenes.length > 0;
-            });
-            if (empleados.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            return res.status(200).jsonp(empleados);
-        });
-    }
-    // METODO PARA LEER DATOS PERFIL ADMINISTRADOR
-    BuscarDataGeneral_ADMIN(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let estado = req.params.estado;
-            let { id_sucursal } = req.body;
-            //console.log('ver id_sucursal ', id_sucursal)
-            // CONSULTA DE BUSQUEDA DE SUCURSALES
-            let sucursal_ = yield database_1.default.query("SELECT ig.id_suc, ig.name_suc, ig.ciudad " +
-                "FROM informacion_general AS ig " +
-                "WHERE ig.id_suc IN (" + id_sucursal + ")" +
-                "GROUP BY ig.id_suc, ig.name_suc, ig.ciudad " +
-                "ORDER BY ig.name_suc ASC").then((result) => { return result.rows; });
-            if (sucursal_.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            // CONSULTA DE BUSQUEDA DE REGIMEN
-            let regimen_ = yield Promise.all(sucursal_.map((reg) => __awaiter(this, void 0, void 0, function* () {
-                reg.regimenes = yield database_1.default.query(`
-                SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-                FROM informacion_general AS ig
-                WHERE ig.id_suc = $1
-                GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-                ORDER BY ig.name_suc ASC
-                `, [reg.id_suc]).then((result) => { return result.rows; });
-                return reg;
-            })));
-            let lista_regimen = regimen_.filter((obj) => {
-                return obj.regimenes.length > 0;
-            });
-            if (lista_regimen.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            // CONSULTA DE BUSQUEDA DE DEPARTAMENTOS
-            let departamentos_ = yield Promise.all(lista_regimen.map((reg) => __awaiter(this, void 0, void 0, function* () {
-                reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
-                    dep.departamentos = yield database_1.default.query(`
-                    SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-                    FROM informacion_general AS ig
-                    WHERE ig.id_regimen = $1 AND ig.id_suc = $2
-                    GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen
-                    ORDER BY ig.name_suc ASC
-                    `, [dep.id_regimen, dep.id_suc]).then((result) => { return result.rows; });
-                    return dep;
-                })));
-                return reg;
-            })));
-            let lista_departamentos = departamentos_.map((reg) => {
-                reg.regimenes = reg.regimenes.filter((dep) => {
-                    return dep.departamentos.length > 0;
-                });
-                return reg;
-            });
-            if (lista_departamentos.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            // CONSULTA DE BUSQUEDA DE CARGOS
-            let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
-                reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
-                    dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
-                        car.cargos = yield database_1.default.query(`
-                        SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
-                            ig.name_regimen
-                        FROM informacion_general AS ig
-                        WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
-                        GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
-                            ig.name_regimen
-                        ORDER BY ig.name_suc ASC
-                        `, [car.id_depa, car.id_suc, car.id_regimen]).then((result) => { return result.rows; });
-                        return car;
-                    })));
-                    return dep;
-                })));
-                return reg;
-            })));
-            let lista_cargos = cargos_.map((reg) => {
-                reg.regimenes = reg.regimenes.filter((dep) => {
-                    dep.departamentos = dep.departamentos.filter((car) => {
-                        return car.cargos.length > 0;
-                    });
-                    return dep;
-                });
-                return reg;
-            });
-            if (lista_cargos.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            // CONSULTA DE BUSQUEDA DE COLABORADORES POR CARGO
-            let lista = yield Promise.all(lista_cargos.map((reg) => __awaiter(this, void 0, void 0, function* () {
-                reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
-                    dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        car.cargos = yield Promise.all(car.cargos.map((empl) => __awaiter(this, void 0, void 0, function* () {
-                            empl.empleado = yield database_1.default.query(`
-                            SELECT info_g.* 
-                            FROM informacion_general as info_g, 
-                                eu_usuario_departamento as usua_dep, 
-                                eu_empleado_cargos as empl_car
-                            WHERE id_cargo_= $1 AND id_suc = $2 AND estado = $3
-                                AND id_depa = $4 AND id_regimen = $5 AND 
-                                info_g.id = usua_dep.id_empleado AND
-	                            usua_dep.administra = false AND 
-	                            empl_car.id = info_g.id_cargo AND 
-	                            empl_car.jefe = false
-                            `, [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen])
-                                .then((result) => { return result.rows; });
-                            return empl;
-                        })));
-                        return car;
-                    })));
-                    return dep;
-                })));
-                return reg;
-            })));
-            let empleados = lista.map((reg) => {
-                reg.regimenes = reg.regimenes.filter((dep) => {
-                    dep.departamentos = dep.departamentos.filter((car) => {
-                        car.cargos = car.cargos.filter((empl) => {
-                            return empl.empleado.length > 0;
-                        });
-                        return car;
-                    }).filter((car) => {
-                        return car.cargos.length > 0;
-                    });
-                    return dep;
-                }).filter((dep) => {
-                    return dep.departamentos.length > 0;
-                });
-                return reg;
-            }).filter((reg) => {
-                return reg.regimenes.length > 0;
-            });
-            if (empleados.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            return res.status(200).jsonp(empleados);
-        });
-    }
-    // METODO PARA LEER DATOS PERFIL ADMINISTRADOR JEFE
-    BuscarDataGeneral_JEFE(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let estado = req.params.estado;
-            let { id_sucursal, id_departamento } = req.body;
-            //console.log('ver id_sucursal ', id_sucursal)
-            // CONSULTA DE BUSQUEDA DE SUCURSALES
-            let sucursal_ = yield database_1.default.query("SELECT ig.id_suc, ig.name_suc, ciudad " +
-                "FROM informacion_general AS ig " +
-                "WHERE ig.id_suc IN (" + id_sucursal + ")" +
-                "GROUP BY ig.id_suc, ig.name_suc, ig.ciudad " +
-                "ORDER BY ig.name_suc ASC").then((result) => { return result.rows; });
-            if (sucursal_.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            // CONSULTA DE BUSQUEDA DE REGIMEN
-            let regimen_ = yield Promise.all(sucursal_.map((reg) => __awaiter(this, void 0, void 0, function* () {
-                reg.regimenes = yield database_1.default.query(`
-                SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-                FROM informacion_general AS ig
-                WHERE ig.id_suc = $1
-                GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
-                ORDER BY ig.name_suc ASC
-                `, [reg.id_suc]).then((result) => { return result.rows; });
-                return reg;
-            })));
-            let lista_regimen = regimen_.filter((obj) => {
-                return obj.regimenes.length > 0;
-            });
-            if (lista_regimen.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            // CONSULTA DE BUSQUEDA DE DEPARTAMENTOS
-            let departamentos_ = yield Promise.all(lista_regimen.map((reg) => __awaiter(this, void 0, void 0, function* () {
-                reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
-                    dep.departamentos = yield database_1.default.query("SELECT DISTINCT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen " +
-                        "FROM informacion_general AS ig " +
-                        "WHERE ig.id_regimen = $1 AND ig.id_suc = $2 AND ig.id_depa IN (" + id_departamento + ")" +
-                        "GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep, ig.id_regimen, ig.name_regimen " +
-                        "ORDER BY ig.name_suc ASC ", [dep.id_regimen, dep.id_suc]).then((result) => { return result.rows; });
-                    return dep;
-                })));
-                return reg;
-            })));
-            let lista_departamentos = departamentos_.map((reg) => {
-                reg.regimenes = reg.regimenes.filter((dep) => {
-                    return dep.departamentos.length > 0;
-                });
-                return reg;
-            });
-            if (lista_departamentos.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            // CONSULTA DE BUSQUEDA DE CARGOS
-            let cargos_ = yield Promise.all(lista_departamentos.map((reg) => __awaiter(this, void 0, void 0, function* () {
-                reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
-                    dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        //console.log('ver car ', car)
-                        car.cargos = yield database_1.default.query(`
-                        SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen,
-                            ig.name_regimen
-                        FROM informacion_general AS ig
-                        WHERE ig.id_depa = $1 AND ig.id_suc = $2 AND ig.id_regimen = $3
-                        GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo, ig.id_depa, ig.name_dep, ig.id_regimen, 
-                            ig.name_regimen
-                        ORDER BY ig.name_suc ASC
-                        `, [car.id_depa, car.id_suc, car.id_regimen]).then((result) => { return result.rows; });
-                        return car;
-                    })));
-                    return dep;
-                })));
-                return reg;
-            })));
-            let lista_cargos = cargos_.map((reg) => {
-                reg.regimenes = reg.regimenes.filter((dep) => {
-                    dep.departamentos = dep.departamentos.filter((car) => {
-                        return car.cargos.length > 0;
-                    });
-                    return dep;
-                });
-                return reg;
-            });
-            if (lista_cargos.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            // CONSULTA DE BUSQUEDA DE COLABORADORES POR CARGO
-            let lista = yield Promise.all(lista_cargos.map((reg) => __awaiter(this, void 0, void 0, function* () {
-                reg.regimenes = yield Promise.all(reg.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
-                    dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
-                        car.cargos = yield Promise.all(car.cargos.map((empl) => __awaiter(this, void 0, void 0, function* () {
-                            empl.empleado = yield database_1.default.query(`
-                            SELECT info_g.* 
-                            FROM informacion_general as info_g, 
-                                eu_usuario_departamento as usua_dep, 
-                                eu_empleado_cargos as empl_car
-                            WHERE id_cargo_= $1 AND id_suc = $2 AND estado = $3
-                                AND id_depa = $4 AND id_regimen = $5 AND 
-                                info_g.id = usua_dep.id_empleado AND
-	                            usua_dep.administra = false AND 
-	                            empl_car.id = info_g.id_cargo AND 
-	                            empl_car.jefe = false
-                            `, [empl.id_cargo_, empl.id_suc, estado, empl.id_depa, empl.id_regimen])
-                                .then((result) => { return result.rows; });
-                            return empl;
-                        })));
-                        return car;
-                    })));
-                    return dep;
-                })));
-                return reg;
-            })));
-            let empleados = lista.map((reg) => {
-                reg.regimenes = reg.regimenes.filter((dep) => {
-                    dep.departamentos = dep.departamentos.filter((car) => {
-                        car.cargos = car.cargos.filter((empl) => {
-                            return empl.empleado.length > 0;
-                        });
-                        return car;
-                    }).filter((car) => {
-                        return car.cargos.length > 0;
-                    });
-                    return dep;
-                }).filter((dep) => {
-                    return dep.departamentos.length > 0;
-                });
-                return reg;
-            }).filter((reg) => {
-                return reg.regimenes.length > 0;
-            });
-            if (empleados.length === 0)
-                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-            return res.status(200).jsonp(empleados);
+            return res.status(200).jsonp(informacion);
         });
     }
     // METODO PARA BUSCAR USUARIOS ADMINISTRADORES Y JEFES DE UNA SUCURSAL
@@ -803,6 +426,25 @@ class DatosGeneralesControlador {
             if (empleados.length === 0)
                 return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
             return res.status(200).jsonp(empleados);
+        });
+    }
+    // METODO PARA LEER DATOS PERFIL SUPER-ADMINISTRADOR
+    BuscarDataGeneralRol(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let estado = req.params.estado;
+            // CONSULTA DE BUSQUEDA DE SUCURSALES
+            let informacion = yield database_1.default.query(`
+                SELECT * FROM informacion_general AS ig
+                WHERE ig.estado = 1 AND 
+	   		        ig.jefe = false AND
+			        ig.cedula = empl.cedula AND
+			        usd.id_empleado = empl.id AND
+	                usd.administra = false
+                ORDER BY ig.name_suc ASC
+                `, [estado]).then((result) => { return result.rows; });
+            if (informacion.length === 0)
+                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+            return res.status(200).jsonp(informacion);
         });
     }
     // METODO DE BUSQUEDA DE DATOS ACTUALES DEL USUARIO
@@ -1338,8 +980,7 @@ class DatosGeneralesControlador {
             if (JefesDepartamentos.length === 0)
                 return res.status(400)
                     .jsonp({
-                    message: `Ups!!! algo salio mal. 
-            Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`
+                    message: `Revisar configuración de departamento y autorización de solicitudes.`
                 });
             const obj = JefesDepartamentos[JefesDepartamentos.length - 1];
             let depa_padre = obj.id_departamento_nivel;

@@ -150,7 +150,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
-    this.PresentarInformacion(this.opcionBusqueda);
+    this.BuscarInformacionGeneral(this.opcionBusqueda);
   }
 
   ngOnDestroy() {
@@ -167,74 +167,15 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
    ** ****************************************************************************************** **/
 
-  // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
-  PresentarInformacion(opcion: any) {
-    let informacion = { id_empleado: this.idEmpleadoLogueado };
-    let respuesta: any = [];
-    this.informacion.ObtenerInformacionUserRol(informacion).subscribe(res => {
-      respuesta = res[0];
-      this.AdministrarInformacion(opcion, respuesta, informacion);
-    }, vacio => {
-      this.toastr.info('No se han encontrado registros.', '', {
-        timeOut: 4000,
-      });
-    });
-  }
-
-  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
-  usua_sucursales: any = [];
-  AdministrarInformacion(opcion: any, usuario: any, empleado: any) {
+// METODO DE BUSQUEDA DE DATOS GENERALES DEL EMPLEADO
+  BuscarInformacionGeneral(opcion: any) {
     // LIMPIAR DATOS DE ALMACENAMIENTO
     this.departamentos = [];
     this.sucursales = [];
     this.empleados = [];
     this.regimen = [];
     this.cargos = [];
-    this.origen = [];
-
-    this.usua_sucursales = [];
-
-    //console.log('empleado ', empleado)
-    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe((data: any) => {
-      const codigos = data.map((obj: any) => `'${obj.id_sucursal}'`).join(', ');
-      //console.log('ver sucursales ', codigos);
-
-      // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
-      if (usuario.id_rol === 1 && usuario.jefe === false) {
-        this.usua_sucursales = { id_sucursal: codigos };
-        this.BuscarInformacionAdministrador(opcion, this.usua_sucursales);
-      }
-      else if (usuario.id_rol === 1 && usuario.jefe === true) {
-        this.usua_sucursales = { id_sucursal: codigos, id_departamento: usuario.id_departamento };
-        this.BuscarInformacionJefe(opcion, this.usua_sucursales);
-      }
-      else if (usuario.id_rol === 3) {
-        this.BuscarInformacionSuperAdministrador(opcion);
-      }
-    });
-  }
-
-  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL SUPERADMINISTRADOR
-  BuscarInformacionSuperAdministrador(opcion: any) {
-    this.informacion.ObtenerInformacion_SUPERADMIN(opcion).subscribe((res: any[]) => {
-      this.ProcesarDatos(res);
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR
-  BuscarInformacionAdministrador(opcion: any, buscar: string) {
-    this.informacion.ObtenerInformacion_ADMIN(opcion, buscar).subscribe((res: any[]) => {
-      this.ProcesarDatos(res);
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR - JEFE
-  BuscarInformacionJefe(opcion: any, buscar: string) {
-    this.informacion.ObtenerInformacion_JEFE(opcion, buscar).subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacionGeneral(opcion).subscribe((res: any[]) => {
       this.ProcesarDatos(res);
     }, err => {
       this.toastr.error(err.error.message)
@@ -244,83 +185,55 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
     this.origen = JSON.stringify(informacion);
+
     informacion.forEach((obj: any) => {
+      //console.log('ver obj ', obj)
       this.sucursales.push({
         id: obj.id_suc,
+        sucursal: obj.name_suc
+      })
+
+      this.regimen.push({
+        id: obj.id_regimen,
+        nombre: obj.name_regimen,
         sucursal: obj.name_suc,
-        ciudad: obj.ciudad
+        id_suc: obj.id_suc
       })
-    })
 
-    informacion.forEach((reg: any) => {
-      reg.regimenes.forEach((obj: any) => {
-        this.regimen.push({
-          id: obj.id_regimen,
-          nombre: obj.name_regimen,
-          sucursal: obj.name_suc,
-          id_suc: reg.id_suc
-        })
+      this.departamentos.push({
+        id: obj.id_depa,
+        departamento: obj.name_dep,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc,
+        id_regimen: obj.id_regimen,
       })
-    })
 
-    informacion.forEach((reg: any) => {
-      reg.regimenes.forEach((dep: any) => {
-        dep.departamentos.forEach((obj: any) => {
-          this.departamentos.push({
-            id: obj.id_depa,
-            departamento: obj.name_dep,
-            sucursal: obj.name_suc,
-            id_suc: reg.id_suc,
-            id_regimen: obj.id_regimen,
-          })
-        })
+      this.cargos.push({
+        id: obj.id_cargo_,
+        nombre: obj.name_cargo,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc
       })
-    })
 
-    informacion.forEach((reg: any) => {
-      reg.regimenes.forEach((dep: any) => {
-        dep.departamentos.forEach((car: any) => {
-          car.cargos.forEach((obj: any) => {
-            this.cargos.push({
-              id: obj.id_cargo_,
-              nombre: obj.name_cargo,
-              sucursal: obj.name_suc,
-              id_suc: reg.id_suc
-            })
-          })
-        })
-      })
-    })
-
-    informacion.forEach((reg: any) => {
-      reg.regimenes.forEach((dep: any) => {
-        dep.departamentos.forEach((car: any) => {
-          car.cargos.forEach((empl: any) => {
-            empl.empleado.forEach((obj: any) => {
-              let elemento = {
-                id: obj.id,
-                nombre: obj.nombre,
-                apellido: obj.apellido,
-                codigo: obj.codigo,
-                cedula: obj.cedula,
-                correo: obj.correo,
-                id_cargo: obj.id_cargo,
-                id_contrato: obj.id_contrato,
-                sucursal: obj.name_suc,
-                id_suc: obj.id_suc,
-                id_regimen: obj.id_regimen,
-                id_depa: obj.id_depa,
-                id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-                ciudad: obj.ciudad,
-                regimen: obj.name_regimen,
-                departamento: obj.name_dep,
-                cargo: obj.name_cargo,
-                hora_trabaja: obj.hora_trabaja
-              }
-              this.empleados.push(elemento)
-            })
-          })
-        })
+      this.empleados.push({
+        id: obj.id,
+        nombre: obj.nombre,
+        apellido: obj.apellido,
+        codigo: obj.codigo,
+        cedula: obj.cedula,
+        correo: obj.correo,
+        id_cargo: obj.id_cargo,
+        id_contrato: obj.id_contrato,
+        sucursal: obj.name_suc,
+        id_suc: obj.id_suc,
+        id_regimen: obj.id_regimen,
+        id_depa: obj.id_depa,
+        id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+        ciudad: obj.ciudad,
+        regimen: obj.name_regimen,
+        departamento: obj.name_dep,
+        cargo: obj.name_cargo,
+        hora_trabaja: obj.hora_trabaja
       })
     })
 
@@ -335,8 +248,32 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
   // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
   OmitirDuplicados() {
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION SUCURSALES
+    let verificados_suc = this.sucursales.filter((objeto: any, indice: any, valor: any) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    this.sucursales = verificados_suc;
+
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION REGIMEN
+    let verificados_reg = this.regimen.filter((objeto: any, indice: any, valor: any) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    this.regimen = verificados_reg;
+
     // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
-    let verificados_dep = this.departamentos.filter((objeto, indice, valor) => {
+    let verificados_dep = this.departamentos.filter((objeto: any, indice: any, valor: any) => {
       // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
       for (let i = 0; i < indice; i++) {
         if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
@@ -348,7 +285,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     this.departamentos = verificados_dep;
 
     // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
-    let verificados_car = this.cargos.filter((objeto, indice, valor) => {
+    let verificados_car = this.cargos.filter((objeto: any, indice: any, valor: any) => {
       // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
       for (let i = 0; i < indice; i++) {
         if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
@@ -369,7 +306,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     this.selectionCar.clear();
     this.selectionReg.clear();
     this.selectionEmp.clear();
-    this.PresentarInformacion(this.opcionBusqueda);
+    this.BuscarInformacionGeneral(this.opcionBusqueda);
   }
 
   // VALIDACIONES DE SELECCION DE BUSQUEDA

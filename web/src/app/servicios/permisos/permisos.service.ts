@@ -73,8 +73,15 @@ export class PermisosService {
     return this.http.put(`${environment.url}/empleadoPermiso/${id}/archivo/${archivo}/validar/${codigo}`, formData)
   }
 
+  // METODO PARA CREAR PERMISOS MULTIPLES
+  CrearPermisosMultiples(datos: any) {
+    return this.http.put<any>(`${environment.url}/empleadoPermiso/permisos-multiples`, datos);
+  }
 
-
+  // METODO PARA GUARDAR DOCUMENTOS MULTIPLES
+  GuardarDocumentosPermisosMultiples(datos: any) {
+    return this.http.put<any>(`${environment.url}/empleadoPermiso/documentos-multiples/`, datos);
+  }
 
   // METODO DE BUSQUEDA DE PERMISOS POR ID DE EMPLEADO
   BuscarPermisoEmpleado(id_empleado: any) {
@@ -88,11 +95,9 @@ export class PermisosService {
 
   // METODO PARA ELIMINAR PERMISOS
   EliminarPermiso(datos: any) {
-    const { id_permiso, doc, codigo, user_name, ip } = datos;
-    const data = { user_name, ip };
-    const url = `${environment.url}/empleadoPermiso/eliminar/${id_permiso}/${doc}/verificar/${codigo}`;
+    const url = `${environment.url}/empleadoPermiso/eliminar`;
     const httpOtions = {
-      body: data
+      body: datos
     };
     return this.http.request('delete', url, httpOtions);
   }

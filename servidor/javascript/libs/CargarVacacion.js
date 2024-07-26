@@ -108,7 +108,7 @@ function HorasTrabaja(id_periodo) {
         return yield database_1.default.query(`
         SELECT ca.hora_trabaja 
         FROM mv_periodo_vacacion AS pv, eu_empleado_contratos AS co, eu_empleado_cargos AS ca 
-        WHERE pv.id = $1 AND pv.id_empleado_contrato = co.id AND co.id = ca.id_contrato
+        WHERE pv.id = $1 AND pv.id_empleado_cargo = ca.id AND co.id = ca.id_contrato
         `, [id_periodo]).then(result => {
             return result.rows[0].hora_trabaja;
         });

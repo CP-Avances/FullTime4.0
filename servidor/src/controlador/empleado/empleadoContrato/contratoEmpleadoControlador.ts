@@ -1,14 +1,14 @@
+import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import { ObtenerIndicePlantilla, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { ObtenerRutaContrato } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
+import { FormatearFecha2 } from '../../../libs/settingsMail';
 import { QueryResult } from 'pg';
-import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import moment from 'moment';
 import excel from 'xlsx';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
-import { FormatearFecha2 } from '../../../libs/settingsMail';
 
 class ContratoEmpleadoControlador {
 
@@ -442,7 +442,7 @@ class ContratoEmpleadoControlador {
         const CONTRATO = await pool.query(
             `
             SELECT ec.id, ec.id_empleado, ec.id_regimen, ec.fecha_ingreso, ec.fecha_salida, ec.controlar_vacacion,
-                ec.controlar_asistencia, ec.documento, ec.id_modalidad_laboral, cr.descripcion, 
+                ec.controlar_asistencia, ec.documento, ec.id_modalidad_laboral, cr.descripcion,
                 cr.mes_periodo, mt.descripcion AS nombre_contrato 
             FROM eu_empleado_contratos AS ec, ere_cat_regimenes AS cr, e_cat_modalidad_trabajo AS mt 
             WHERE ec.id = $1 AND ec.id_regimen = cr.id AND mt.id = ec.id_modalidad_laboral
@@ -461,9 +461,9 @@ class ContratoEmpleadoControlador {
         const { id_empleado } = req.body;
         const FECHA = await pool.query(
             `
-            SELECT ca.id_contrato, ec.fecha_ingreso, ec.fecha_salida
-            FROM datos_contrato_actual AS ca, eu_empleado_contratos AS ec
-            WHERE ca.id = $1 AND ec.id = ca.id_contrato
+            SELECT cv.id_contrato, ec.fecha_ingreso, ec.fecha_salida
+            FROM contrato_cargo_vigente AS cv, eu_empleado_contratos AS ec
+            WHERE cv.id_empleado = $1 AND ec.id = cv.id_contrato
             `
             , [id_empleado]);
         if (FECHA.rowCount != 0) {
@@ -557,8 +557,8 @@ class ContratoEmpleadoControlador {
         const { id_contrato } = req.body;
         const FECHA = await pool.query(
             `
-            SELECT contrato.fecha_ingreso FROM eu_empleado_contratos AS contrato
-            WHERE contrato.id = $1
+            SELECT con.fecha_ingreso, con.fecha_salida FROM eu_empleado_contratos AS con
+            WHERE con.id = $1    
             `
             , [id_contrato]);
         if (FECHA.rowCount != 0) {
@@ -885,77 +885,77 @@ class ContratoEmpleadoControlador {
     }
 
     public async CargarPlantilla_contrato(req: Request, res: Response): Promise<any> {
-        const {plantilla, user_name, ip} = req.body;
+        const { plantilla, user_name, ip } = req.body;
         let error: boolean = false;
 
         for (const data of plantilla) {
             try {
 
-            const { item, cedula, pais, regimen_la, modalida_la, fecha_desde, fecha_hasta,
-                control_asis, control_vaca } = data;
+                const { item, cedula, pais, regimen_la, modalida_la, fecha_desde, fecha_hasta,
+                    control_asis, control_vaca } = data;
 
-            // INICIAR TRANSACCION
-            await pool.query('BEGIN');
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
 
-            const ID_EMPLEADO: any = await pool.query(
-                `
+                const ID_EMPLEADO: any = await pool.query(
+                    `
                 SELECT id FROM eu_empleados WHERE UPPER(cedula) = $1
                 `
-                , [cedula]);
-            const ID_REGIMEN: any = await pool.query(
-                `
+                    , [cedula]);
+                const ID_REGIMEN: any = await pool.query(
+                    `
                 SELECT id FROM ere_cat_regimenes WHERE UPPER(descripcion) = $1
                 `
-                , [regimen_la.toUpperCase()]);
-            const ID_TIPO_CONTRATO: any = await pool.query(
-                `
+                    , [regimen_la.toUpperCase()]);
+                const ID_TIPO_CONTRATO: any = await pool.query(
+                    `
                 SELECT id FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
                 `
-                , [modalida_la.toUpperCase()]);
+                    , [modalida_la.toUpperCase()]);
 
-            //Transformar el string en booleano
-            let vaca_controla: any;
-            if (control_vaca.toUpperCase() === 'SI') {
-                vaca_controla = true;
-            } else {
-                vaca_controla = false;
-            }
+                //Transformar el string en booleano
+                let vaca_controla: any;
+                if (control_vaca.toUpperCase() === 'SI') {
+                    vaca_controla = true;
+                } else {
+                    vaca_controla = false;
+                }
 
-            let asis_controla: any;
-            if (control_asis.toUpperCase() === 'SI') {
-                asis_controla = true;
-            } else {
-                asis_controla = false;
-            }
+                let asis_controla: any;
+                if (control_asis.toUpperCase() === 'SI') {
+                    asis_controla = true;
+                } else {
+                    asis_controla = false;
+                }
 
-            const id_empleado = ID_EMPLEADO.rows[0].id;
-            const id_regimen = ID_REGIMEN.rows[0].id;
-            const id_tipo_contrato = ID_TIPO_CONTRATO.rows[0].id;
+                const id_empleado = ID_EMPLEADO.rows[0].id;
+                const id_regimen = ID_REGIMEN.rows[0].id;
+                const id_tipo_contrato = ID_TIPO_CONTRATO.rows[0].id;
 
-            const response: QueryResult = await pool.query(
-                `
+                const response: QueryResult = await pool.query(
+                    `
                 INSERT INTO eu_empleado_contratos (id_empleado, fecha_ingreso, fecha_salida, controlar_vacacion, 
                     controlar_asistencia, id_regimen, id_modalidad_laboral) 
                 VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
                 `
-                , [id_empleado, fecha_desde, fecha_hasta, vaca_controla, asis_controla, id_regimen,
-                    id_tipo_contrato]);
+                    , [id_empleado, fecha_desde, fecha_hasta, vaca_controla, asis_controla, id_regimen,
+                        id_tipo_contrato]);
 
-            const [contrato] = response.rows;
+                const [contrato] = response.rows;
 
-            // AUDITORIA
-            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-                tabla: 'eu_empleado_contratos',
-                usuario: user_name,
-                accion: 'I',
-                datosOriginales: '',
-                datosNuevos: JSON.stringify(contrato),
-                ip,
-                observacion: null
-            });
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'eu_empleado_contratos',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(contrato),
+                    ip,
+                    observacion: null
+                });
 
-            // FINALIZAR TRANSACCION
-            await pool.query('COMMIT');
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
             } catch (error) {
                 // REVERTIR TRANSACCION
                 await pool.query('ROLLBACK');
@@ -965,9 +965,9 @@ class ContratoEmpleadoControlador {
 
         if (error) {
             return res.status(500).jsonp({ message: 'error' });
-          }
-    
-          return res.status(200).jsonp({ message: 'ok' });
+        }
+
+        return res.status(200).jsonp({ message: 'ok' });
 
     }
 

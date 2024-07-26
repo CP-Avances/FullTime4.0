@@ -36,12 +36,11 @@ class VacacionesControlador {
     const VACACIONES = await pool.query(
       `
       SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
-        v.id, v.id_periodo_vacacion, v.id_empleado_cargo, dc.contrato_id, e.id AS id_empl_solicita, da.id_departamento, 
+        v.id, v.id_periodo_vacacion, dc.contrato_id, e.id AS id_empl_solicita, da.id_departamento, 
 	      e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, da.codigo, depa.nombre AS depa_nombre
       FROM mv_solicitud_vacacion AS v, datos_empleado_cargo AS dc, eu_empleados AS e, datos_actuales_empleado AS da, 
         ed_departamentos AS depa   
-      WHERE dc.cargo_id = v.id_empleado_cargo 
-	      AND dc.empl_id = e.id  
+      WHERE dc.empl_id = e.id  
 	      AND da.id_contrato = dc.contrato_id
         AND depa.id = da.id_departamento
 	      AND (v.estado = 1 OR v.estado = 2) 
@@ -63,10 +62,10 @@ class VacacionesControlador {
     const VACACIONES = await pool.query(
       `
       SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
-        v.id, v.id_periodo_vacacion, v.id_empleado_cargo, e.id AS id_empl_solicita, e.nombre, e.apellido, 
+        v.id, v.id_periodo_vacacion, e.id AS id_empl_solicita, e.nombre, e.apellido, 
         (e.nombre || \' \' || e.apellido) AS fullname, dc.codigo, depa.nombre AS depa_nombre 
 	    FROM mv_solicitud_vacacion AS v, datos_empleado_cargo AS dc, eu_empleados AS e, ed_departamentos AS depa   
-	    WHERE dc.cargo_id = v.id_empleado_cargo AND dc.empl_id = e.id  AND depa.id = dc.id_departamento
+	    WHERE dc.empl_id = e.id  AND depa.id = dc.id_departamento
 	      AND (v.estado = 3 OR v.estado = 4) 
       ORDER BY id DESC
       `
@@ -136,7 +135,7 @@ class VacacionesControlador {
   public async CrearVacaciones(req: Request, res: Response): Promise<Response> {
     try {
       const { fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado,
-        id_peri_vacacion, depa_user_loggin, id_empl_cargo, id_empleado, user_name, ip } = req.body;
+        id_peri_vacacion, id_empleado, user_name, ip } = req.body;
 
       // INICIAR TRANSACCIÓN
       await pool.query('BEGIN');
@@ -144,11 +143,11 @@ class VacacionesControlador {
       const response: QueryResult = await pool.query(
         `
         INSERT INTO mv_solicitud_vacacion (fecha_inicio, fecha_final, fecha_ingreso, estado, dia_libre, dia_laborable, 
-          legalizado, id_periodo_vacacion, id_empleado_cargo, id_empleado)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
+          legalizado, id_periodo_vacacion, id_empleado)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
         `
         , [fec_inicio, fec_final, fec_ingreso, estado, dia_libre, dia_laborable, legalizado, id_peri_vacacion,
-          id_empl_cargo, id_empleado]);
+          id_empleado]);
 
       const [objetoVacacion] = response.rows;
 
@@ -194,9 +193,9 @@ class VacacionesControlador {
 
       // CONSULTAR DATOSORIGINALES
       const consulta = await pool.query(`SELECT * FROM mv_solicitud_vacacion WHERE id = $1`, [id]);
-      const [datosOriginales] = consulta.rows; 
+      const [datosOriginales] = consulta.rows;
 
-      if (!datosOriginales){
+      if (!datosOriginales) {
         await AUDITORIA_CONTROLADOR.InsertarAuditoria({
           tabla: 'mv_solicitud_vacacion',
           usuario: user_name,
@@ -280,13 +279,13 @@ class VacacionesControlador {
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
-  
+
       await pool.query(
         `
         DELETE FROM ecm_realtime_notificacion WHERE id_vacaciones = $1
         `
         , [id_vacacion]);
-      
+
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'ecm_realtime_notificacion',
@@ -313,7 +312,7 @@ class VacacionesControlador {
           observacion: `Error al intentar eliminar registro con id_vacacion ${id_vacacion}. Registro no encontrado.`
         });
       }
-  
+
       await pool.query(
         `
         DELETE FROM ecm_autorizaciones WHERE id_vacacion = $1
@@ -346,13 +345,13 @@ class VacacionesControlador {
           observacion: `Error al intentar eliminar registro con id ${id_vacacion}. Registro no encontrado.`
         });
       }
-  
+
       const response: QueryResult = await pool.query(
         `
         DELETE FROM mv_solicitud_vacacion WHERE id = $1 RETURNING *
         `
         , [id_vacacion]);
-  
+
       const [objetoVacacion] = response.rows;
 
       // AUDITORIA
@@ -368,7 +367,7 @@ class VacacionesControlador {
 
       // FINALIZAR TRANSACCIÓN
       await pool.query('COMMIT');
-  
+
       if (objetoVacacion) {
         return res.status(200).jsonp(objetoVacacion)
       }
@@ -379,7 +378,7 @@ class VacacionesControlador {
       // REVERTIR TRANSACCIÓN
       await pool.query('ROLLBACK');
       return res.status(500).jsonp({ message: 'error' });
-      
+
     }
   }
 
@@ -408,7 +407,7 @@ class VacacionesControlador {
 
     try {
       const id = req.params.id;
-      const { estado, user_name, ip} = req.body;
+      const { estado, user_name, ip } = req.body;
       console.log('estado', id);
 
       // INICIAR TRANSACCIÓN
@@ -433,7 +432,7 @@ class VacacionesControlador {
         await pool.query('COMMIT');
         return res.status(404).jsonp({ message: 'Registro no encontrado.' });
       }
-  
+
       await pool.query(
         `
         UPDATE mv_solicitud_vacacion SET estado = $1 WHERE id = $2
@@ -452,7 +451,7 @@ class VacacionesControlador {
 
       // FINALIZAR TRANSACCIÓN
       await pool.query('COMMIT');
-  
+
       if (3 === estado) {
         RestarPeriodoVacacionAutorizada(parseInt(id), user_name, ip);
       }
@@ -470,7 +469,7 @@ class VacacionesControlador {
     const VACACIONES = await pool.query(
       `
       SELECT v.fecha_inicio, v.fecha_final, v.fecha_ingreso, v.estado, v.dia_libre, v.dia_laborable, 
-        v.legalizado, v.id, v.id_periodo_vacacion, v.id_empleado_cargo, e.id AS id_empleado,
+        v.legalizado, v.id, v.id_periodo_vacacion, e.id AS id_empleado,
         (e.nombre || ' ' || e.apellido) AS fullname, e.cedula
       FROM mv_solicitud_vacacion AS v, eu_empleados AS e 
       WHERE v.id = $1 AND e.id = v.id_empleado

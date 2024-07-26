@@ -63,6 +63,14 @@ export const ObtenerRutaPermisosIdEmpleado = async function (id_empleado: any) {
     return { carpetaPermisos, codigo };
 }
 
+// METODO PARA OBTENER RUTA CARPETA DE PERMISOS GENERAL
+export const ObtenerRutaPermisosGeneral = async function () {
+    let ruta = '';
+    let separador = path.sep;
+    ruta = path.join(__dirname, `..${separador}..`);
+    return ruta + separador + 'permisos';
+}
+
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE CONTRATOS DEL USUARIO
 export const ObtenerRutaContrato = async function (id: any) {
     let ruta = '';

@@ -287,7 +287,7 @@ class PlanHoraExtraControlador {
 
     try {
 
-      const { id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, id_empl_contrato, estado,
+      const { id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, estado,
         user_name, ip } = req.body;
 
       // INICIAR TRANSACCION
@@ -296,10 +296,10 @@ class PlanHoraExtraControlador {
       const response: QueryResult = await pool.query(
         `
         INSERT INTO mhe_empleado_plan_hora_extra (id_detalle_plan, id_empleado_realiza, observacion, 
-          id_empleado_cargo, id_empleado_contrato, estado)
-        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
+          id_empleado_cargo, estado)
+        VALUES ($1, $2, $3, $4, $5) RETURNING *
         `
-        , [id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, id_empl_contrato, estado]);
+        , [id_plan_hora, id_empl_realiza, observacion, id_empl_cargo, estado]);
 
       const [planEmpleado] = response.rows;
 
@@ -354,7 +354,7 @@ class PlanHoraExtraControlador {
       `
       SELECT p.id AS id_plan, pe.id, p.descripcion, p.fecha_desde, p.fecha_hasta, p.hora_inicio, p.hora_fin,
         p.horas_totales, e.id AS id_empleado, (e.nombre || ' ' || e.apellido) AS nombre,
-        e.codigo, e.cedula, e.correo, pe.id_empleado_cargo AS id_cargo, pe.id_empleado_contrato AS id_contrato
+        e.codigo, e.cedula, e.correo, pe.id_empleado_cargo AS id_cargo
       FROM mhe_empleado_plan_hora_extra AS pe, mhe_detalle_plan_hora_extra AS p, eu_empleados AS e
       WHERE pe.id_detalle_plan = $1 AND pe.id_detalle_plan = p.id AND e.id = pe.id_empleado_realiza
       `

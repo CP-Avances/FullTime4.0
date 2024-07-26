@@ -97,8 +97,8 @@ function ObtenerPeriodosEmpleado(id_empl, diasObliga, fec_final_Rango, hora_trab
     return __awaiter(this, void 0, void 0, function* () {
         let primerPeriodoInicio = yield database_1.default.query(`
         SELECT pv.fecha_inicio 
-        FROM eu_empleado_contratos e, mv_periodo_vacacion pv 
-        WHERE e.id_empleado = $1 AND e.id = pv.id_empleado_contrato 
+        FROM eu_empleado_contratos e, mv_periodo_vacacion pv, eu_empleado_cargos AS ca 
+        WHERE e.id_empleado = $1 AND ca.id = pv.id_empleado_cargo AND ca.id_contrato = e.id
         ORDER BY e.fecha_ingreso DESC, pv.fecha_inicio LIMIT 1
         `, [id_empl])
             .then((result) => {
@@ -107,8 +107,8 @@ function ObtenerPeriodosEmpleado(id_empl, diasObliga, fec_final_Rango, hora_trab
         let arrayPeriodos = yield database_1.default.query(`
         SELECT pv.id as id_peri_vac, pv.fecha_inicio, pv.fecha_final, pv.dia_vacacion, pv.horas_vacaciones, 
             pv.minutos_vacaciones, pv.dia_antiguedad 
-            FROM eu_empleado_contratos e, mv_periodo_vacacion pv 
-        WHERE e.id_empleado = $1 AND e.id = pv.id_empleado_contrato 
+            FROM eu_empleado_contratos e, mv_periodo_vacacion pv, eu_empleado_cargos AS ca 
+        WHERE e.id_empleado = $1 AND ca.id = pv.id_empleado_cargo AND ca.id_contrato = e.id
             AND CAST(pv.fecha_final as VARCHAR) BETWEEN $2 || \'%\' AND $3 || \'%\' 
         ORDER BY e.fec_ingreso DESC, pv.fecha_inicio
         `, [id_empl, primerPeriodoInicio, fec_final_Rango])
@@ -191,8 +191,8 @@ function PeriodoVacacionContrato(id_empl, ant, pre) {
         SELECT e.id as id_contrato, pv.id as id_peri_vac, e.id_regimen, 
             pv.fecha_inicio, pv.fecha_final, pv.dia_vacacion, pv.horas_vacaciones, pv.minutos_vacaciones, 
             pv.dia_antiguedad 
-        FROM eu_empleado_contratos e, mv_periodo_vacacion pv 
-        WHERE e.id_empleado = $1 AND e.id = pv.id_empleado_contrato 
+        FROM eu_empleado_contratos e, mv_periodo_vacacion pv, eu_empleado_cargos AS ca 
+        WHERE e.id_empleado = $1 AND ca.id = pv.id_empleado_cargo AND ca.id_contrato = e.id
             AND CAST(pv.fecha_inicio as VARCHAR) like $2 || \'%\' 
             AND CAST(pv.fecha_final as VARCHAR) LIKE $3 || \'%\' 
         ORDER BY e.fec_ingreso DESC
@@ -560,8 +560,8 @@ function PeriodosVacacionesEmpleado(id_empleado) {
         return yield database_1.default.query(`
         SELECT pv.descripcion, pv.dia_vacacion, pv.dia_antiguedad, pv.estado, pv.fecha_inicio, pv.fecha_final, 
             pv.dia_perdido, pv.horas_vacaciones, pv.minutos_vacaciones 
-        FROM eu_empleado_contratos AS co, mv_periodo_vacacion AS pv 
-        WHERE co.id_empleado = $1 AND co.id = pv.id_empleado_contrato 
+        FROM eu_empleado_contratos AS co, mv_periodo_vacacion AS pv, eu_empleado_cargos AS ca 
+        WHERE co.id_empleado = $1 AND ca.id = pv.id_empleado_cargo AND ca.id_contrato = co.id
         ORDER BY pv.fecha_inicio ASC
         `, [id_empleado])
             .then((result) => {

@@ -46,7 +46,28 @@ const storage = multer_1.default.diskStorage({
         });
     }
 });
+const storage2 = multer_1.default.diskStorage({
+    destination: function (req, file, cb) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const ruta = yield (0, accesoCarpetas_1.ObtenerRutaPermisosGeneral)();
+            cb(null, ruta);
+        });
+    },
+    filename: function (req, file, cb) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // FECHA DEL SISTEMA
+            const fecha = (0, moment_1.default)();
+            const anio = fecha.format('YYYY');
+            const mes = fecha.format('MM');
+            const dia = fecha.format('DD');
+            const documento = `${anio}_${mes}_${dia}_${file.originalname}`;
+            console.log('documento', documento);
+            cb(null, documento);
+        });
+    }
+});
 const upload = (0, multer_1.default)({ storage: storage });
+const upload2 = (0, multer_1.default)({ storage: storage2 });
 class PermisosRutas {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -75,6 +96,8 @@ class PermisosRutas {
         this.router.put('/:id/archivo/:archivo/validar/:codigo', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation, upload.single('uploads')], permisosControlador_1.default.GuardarDocumentoPermiso);
         // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO APLICACION MOVIL
         this.router.put('/:id/archivo/:archivo/validar/:codigo', upload.single('uploads'), permisosControlador_1.default.GuardarDocumentoPermiso);
+        // METODO PARA CREAR PERMISOS MULTIPLES
+        this.router.put('/permisos-multiples', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation, upload2.single('uploads')], permisosControlador_1.default.CrearPermisosMultiples);
         // ELIMINAR DOCUMENTO
         this.router.put('/eliminar-documento', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EliminarDocumentoPermiso);
         // BUSQUEDA DE PERMISOS POR ID DE EMPLEADO
@@ -82,7 +105,7 @@ class PermisosRutas {
         // BUSCAR INFORMACION DE UN PERMISO
         this.router.get('/informe-un-permiso/:id_permiso', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.InformarUnPermiso);
         // ELIMINAR PERMISO
-        this.router.delete('/eliminar/:id_permiso/:doc/verificar/:codigo', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EliminarPermiso);
+        this.router.delete('/eliminar/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EliminarPermiso);
         // BUSQUEDA DE RESPALDOS DE PERMISOS
         this.router.get('/documentos/:docs/visualizar/:codigo', permisosControlador_1.default.ObtenerDocumentoPermiso);
         // ENVIAR CORREO MEDIANTE APLICACION WEB
