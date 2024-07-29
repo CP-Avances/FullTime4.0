@@ -33,7 +33,7 @@ class PlanificacionHorariaControlador {
             const plantillaPlanificacionHoraria = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             const plantillaPlanificacionHorariaHeaders = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]], { header: 1 });
             // OBTENER FECHA DE LA PLANTILLA
-            const segundaColumna = plantillaPlanificacionHorariaHeaders[0][1];
+            const segundaColumna = plantillaPlanificacionHorariaHeaders[0][2];
             let [diaSemana, fecha] = segundaColumna.split(', ');
             let [dia, mes, ano] = fecha.split('/');
             let fechaFormateada = `${dia}/${mes}/${ano}`;
@@ -56,10 +56,10 @@ class PlanificacionHorariaControlador {
             });
             // ESTRUCTURAR PLANTILLA PLANIFICACION HORARIA
             let plantillaPlanificacionHorariaEstructurada = plantillaPlanificacionHorariaFiltrada.map((data) => {
-                let nuevoObjeto = { empleado: data.EMPLEADO, dias: {} };
+                let nuevoObjeto = { cedula: data.CEDULA, dias: {} };
                 // AGREGAR COLUMNAS DE LA PLANTILLA COMO DIAS AL HORARIO
                 for (let propiedad in data) {
-                    if (propiedad !== 'EMPLEADO') {
+                    if (propiedad !== 'EMPLEADO' && propiedad !== 'CEDULA') {
                         let [diaSemana, fecha] = propiedad.split(', ');
                         let [dia, mes, ano] = fecha.split('/');
                         let fechaFormateada = `${ano}-${mes}-${dia}`;
@@ -70,20 +70,20 @@ class PlanificacionHorariaControlador {
             });
             // VERIFICAR EMPLEADO, HORARIOS Y SOBREPOSICION DE HORARIOS
             for (const [index, data] of plantillaPlanificacionHorariaEstructurada.entries()) {
-                let { empleado: empleado } = data;
-                empleado = empleado.toString();
+                let { cedula: cedula } = data;
+                cedula = cedula.toString();
                 // VERIFICAR DATO REQUERIDO EMPLEADO
-                if (!empleado) {
+                if (!cedula) {
                     data.observacion = 'Datos no registrados: EMPLEADO';
                     continue;
                 }
                 // VERIFICAR EMPLEADO DUPLICADO
-                if (plantillaPlanificacionHorariaEstructurada.filter((d) => d.usuario === empleado).length > 1) {
+                if (plantillaPlanificacionHorariaEstructurada.filter((d) => d.usuario === cedula).length > 1) {
                     data.observacion = 'Empleado duplicado';
                     continue;
                 }
                 // VERIFICAR EXISTENCIA DE EMPLEADO
-                const empleadoVerificado = yield VerificarEmpleado(empleado);
+                const empleadoVerificado = yield VerificarEmpleado(cedula);
                 if (!empleadoVerificado[0]) {
                     data.observacion = empleadoVerificado[2];
                     data.dias = {};
@@ -346,7 +346,7 @@ function VerificarEmpleado(cedula) {
             WHERE LOWER(e.cedula) = $1
         `, [cedula.toLowerCase()]);
             if (empleado.rowCount === 0) {
-                observacion = 'Usuario no valido';
+                observacion = 'Empleado no válido';
             }
             else if (empleado.rows[0].id_cargo === null) {
                 observacion = 'No tiene un cargo asignado';

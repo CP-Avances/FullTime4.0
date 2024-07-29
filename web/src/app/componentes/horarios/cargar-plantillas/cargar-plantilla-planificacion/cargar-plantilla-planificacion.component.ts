@@ -305,7 +305,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     const filas: any[] = [];
 
     // CREAR LA FILA DE ENCABEZADOS
-    const encabezados = ['EMPLEADO'];
+    const encabezados = ['CEDULA','EMPLEADO'];
     for (let fecha = new Date(fechaInicio); fecha <= fechaFin; fecha.setDate(fecha.getDate() + 1)) {
       // CONVERTIR FECHA A ESTE FORMATO VIERNES 26/01/2024
       const opciones: Intl.DateTimeFormatOptions = {
@@ -322,7 +322,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
     // CREAR LAS FILAS DE DATOS
     for (const usuario of usuarios) {
-      const fila = [usuario.cedula];
+      const fila = [usuario.cedula, usuario.nombre];
       filas.push(fila);
     }
 
@@ -332,7 +332,10 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
 
     // ESTABLECER EL ANCHO DE LAS COLUMNAS
-    ws['!cols'] = Array(encabezados.length).fill({ wpx: 125 });
+    const columnWidths = Array(encabezados.length).fill({ wpx: 125 });
+    columnWidths[1] = { wpx: 300 }; // ESTABLECER EL ANCHO DE LA SEGUNDA COLUMNA
+
+    ws['!cols'] = columnWidths;
 
     // AGREGAR LA HOJA DE CÁLCULO AL LIBRO DE TRABAJO
     XLSX.utils.book_append_sheet(wb, ws, 'Planificacion');
@@ -375,13 +378,14 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
   }
 
   // METODO PARA OBTENER EL COLOR DEL USUARIO
-  ObtenerColorUsuario(observacion: string) {
-    if(observacion === 'Usuario no válido' || observacion === 'No tiene un cargo asignado') return 'rgb(242, 21, 21)';
+  ObtenerColorEmpleado(observacion: string) {
+    console.log('observacion', observacion);
+    if(observacion === 'Empleado no válido' || observacion === 'No tiene un cargo asignado') return 'rgb(242, 21, 21)';
   }
 
   // OBTENER NOMBRE DE USUARIO
   ObtenerNombreUsuario(nombre: any, usuario: any) {
-    return nombre ? nombre : usuario + '\nUsuario no válido';
+    return nombre ? nombre : 'Empleado no válido';
   }
 
   ManejarPaginaResultados(e: PageEvent) {

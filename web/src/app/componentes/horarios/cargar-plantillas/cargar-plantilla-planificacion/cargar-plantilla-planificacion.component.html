@@ -104,8 +104,9 @@
 
               <tbody>
                   <tr *ngFor="let empleado of planificacionesHorarias | paginate:tamanio_pagina_planificacion:numero_pagina_planificacion">
-                      <td class="sticky colum_1 td_horarios">{{empleado.cedula_empleado}}</td>
-                      <td class="sticky-2 colum_1 td_horarios" [style.color]="ObtenerColorUsuario(empleado.observacion)">{{ObtenerNombreUsuario(empleado.nombre_usuario, empleado.usuario)}}</td>
+                      <td class="sticky colum_1 td_horarios" *ngIf="empleado.cedula_empleado">{{empleado.cedula_empleado}}</td>
+                      <td class="sticky colum_1 td_horarios" *ngIf="!empleado.cedula_empleado" [style.color]="ObtenerColorEmpleado('Empleado no válido')">{{empleado.cedula}}</td>
+                      <td class="sticky-2 colum_1 td_horarios" [style.color]="ObtenerColorEmpleado(empleado.observacion)">{{ObtenerNombreUsuario(empleado.nombre_usuario, empleado.usuario)}}</td>
                       <td *ngFor="let dia of empleado.dias" class="td_observaciones">
                         <div *ngFor="let horario of dia.horarios">
                             {{horario.codigo}}
